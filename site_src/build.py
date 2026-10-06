@@ -33,7 +33,7 @@ CH_ORDER = ["text", "video", "github"]
 SOURCE_TYPE_LABELS = {"rss": "RSS", "arxiv": "arXiv", "youtube": "유튜브", "oss_insight": "OSS Insight", "github_repos": "레포 추적"}
 RUN_KIND_LABELS = {"weekly": "주간 발행", "nightly": "매일 수집"}
 RUN_STATUS_LABELS = {"ok": "정상", "partial": "일부 실패"}
-DISABLED_NOTE = "예시 사이트라 동작하지 않아요"
+DISABLED_NOTE = "예시 사이트라 동작 안 함"
 
 
 # ---------------------------------------------------------------- 공통 도우미
@@ -467,7 +467,7 @@ def video_diagram(g, src):
         f'<div class="vhead"><span class="vtitle">{esc(src["title"])}</span>{SEP}'
         f'<span class="vmeta">{esc(src.get("duration", ""))}{" / " if ex else ""}{ex}</span></div>'
     )
-    cap = f'출처: {src["title"]}' + (" (가상)" if src.get("example") else "") + ". 진한 점은 슬라이드에서 읽은 장면이에요."
+    cap = f'출처: {src["title"]}' + (" (가상)" if src.get("example") else "") + " / 진한 점: 슬라이드에서 읽은 장면"
     return f'{head}<ol class="timeline">{"".join(marks)}</ol><p class="cap">{esc(cap)}</p>'
 
 
@@ -491,7 +491,7 @@ def events_diagram(g, topics, src_num):
     if cited:
         cap.append("이 토픽의 출처 " + " ".join(f"[{n}]" for n in sorted(cited)))
     if past:
-        cap.append("링크가 걸린 사건은 지난 토픽 " + ", ".join(f"'{plain(topics[p]['title'])}'" for p in past))
+        cap.append("링크된 사건: 지난 토픽 " + ", ".join(f"'{plain(topics[p]['title'])}'" for p in past))
     return f'<ol class="events">{"".join(rows)}</ol><p class="cap">출처: {esc(" / ".join(cap))}</p>'
 
 
@@ -522,7 +522,7 @@ def render_topic(d, t, topics, weeks_by_id):
         f'<div class="graph"><div class="g-m">{source_graph(t, topics, weeks_by_id, src_num, 350, 210)}</div>'
         f'<div class="g-p">{source_graph(t, topics, weeks_by_id, src_num, 680, 240)}</div></div>'
     )
-    gcap = "굵은 선은 수치를 직접 제공한 소스" + (", 점선은 이어지는 지난 토픽이에요." if t["relation"]["type"] == "follow_up" else "예요.")
+    gcap = "굵은 선: 수치를 직접 준 소스" + (" / 점선: 이어지는 지난 토픽" if t["relation"]["type"] == "follow_up" else "")
     secs.append(f'<section class="sec"><h2 class="h">소스 연결</h2>{graph}<p class="cap">{gcap}</p></section>')
 
     pts = []
@@ -599,28 +599,9 @@ def md_wd_hm(ts):
     return f"{md_wd(ts)} {ts[11:16]}"
 
 
-def josa(word, pair):
-    """받침 여부로 조사 고르기. pair는 ('이', '가') 또는 ('은', '는')."""
-    ch = word.rstrip()[-1]
-    o = ord(ch)
-    if 0xAC00 <= o <= 0xD7A3:
-        has = (o - 0xAC00) % 28 != 0
-    elif ch.isalpha():
-        has = ch.upper() in "LMNR"
-    elif ch.isdigit():
-        has = ch in "013678"
-    else:
-        has = False
-    return word + (pair[0] if has else pair[1])
-
-
 def short_name(name):
     """'예시 블로그 A (로컬 LLM 실험기)' → '예시 블로그 A'"""
     return re.sub(r"\s*\([^)]*\)$", "", name)
-
-
-def times_word(n):
-    return {1: "한 번", 2: "두 번", 3: "세 번"}.get(n, f"{n}번")
 
 
 def btn(label, primary=False):
@@ -663,7 +644,7 @@ def render_sources(d):
     used = sum(s["weeks"][wid]["used_in_topics"] for s in srcs)
     head = (
         f'<h1 class="ptitle">소스 {len(srcs)}개</h1>'
-        f'<p class="psub">켜짐 {len(on)} / 꺼짐 {len(srcs) - len(on)}. {esc(w["label"])}에 {total}건 모아 토픽에 {used}건 썼어요.</p>'
+        f'<p class="psub">켜짐 {len(on)} / 꺼짐 {len(srcs) - len(on)}. {esc(w["label"])} 수집 {total}건, 토픽에 쓰인 것 {used}건</p>'
     )
 
     # 확인할 것: 이번 주 실패 / 2주 연속 토픽에 안 쓰인 켜진 소스
@@ -676,13 +657,19 @@ def render_sources(d):
             idx = [i for i, v in enumerate(day) if v is None]
             when = ", ".join(md((start + datetime.timedelta(days=i)).isoformat()) for i in idx)
             recovered = idx and idx[-1] + 1 < len(day) and day[idx[-1] + 1] is not None
-            tail = "했고 다음 날 정상이에요." if recovered else "했어요."
-            checks.append(f'{esc(josa(short_name(s["name"]), ("이", "가")))} <mark class="hl">{when}에 {times_word(fd)} 실패</mark>{tail}')
+            times = f" {fd}회" if fd > 1 else ""
+            tail = ", 다음 날 정상" if recovered else ""
+            checks.append(f'{esc(short_name(s["name"]))}: <mark class="hl">{when} 수집 실패{times}</mark>{tail}')
     recent = [x["id"] for x in d["weeks"][:2]]
     idle = [s for s in on if len(recent) == 2 and all(s["weeks"][k]["used_in_topics"] == 0 for k in recent)]
     if idle:
-        names = ", ".join(short_name(s["name"]) for s in idle)
-        checks.append(f'{esc(josa(names, ("은", "는")))} 2주째 토픽에 쓰이지 않았어요. <mark class="hl">끄거나 키워드 필터를 붙일지</mark> 정해 주세요.')
+        kinds = {}  # 이름에 든 종류 낱말로 센다(없으면 소스 유형 라벨), 처음 나온 순서
+        for x in idle:
+            k = next((w_ for w_ in ("블로그", "뉴스레터", "채널") if w_ in x["name"]), SOURCE_TYPE_LABELS.get(x["type"], x["type"]))
+            kinds[k] = kinds.get(k, 0) + 1
+        breakdown = ", ".join(f"{k} {n}" for k, n in kinds.items())
+        title_attr = esc(", ".join(short_name(x["name"]) for x in idle))
+        checks.append(f'<span title="{title_attr}">2주째 토픽에 쓰이지 않은 소스 {len(idle)}곳 ({breakdown})</span>: <mark class="hl">끄거나 키워드 필터 추가 검토</mark>')
     alert = ""
     if checks:
         alert = (
@@ -754,7 +741,7 @@ def render_keywords(d, runs_by_id):
     rejected = [c for c in kw["candidates"] if c["status"] == "rejected"]
     head = (
         f'<h1 class="ptitle">키워드 {len(items)}개</h1>'
-        '<p class="psub">여러 표기를 한 키워드로 묶어요. 다른 대상을 잘못 묶지 않는 게 더 중요해요.</p>'
+        '<p class="psub">여러 표기를 한 키워드로 묶음. 다른 대상을 잘못 묶지 않는 것이 우선</p>'
     )
     cand_html = ""
     if pending:
@@ -771,7 +758,7 @@ def render_keywords(d, runs_by_id):
             rows.append(
                 '<li class="cand">'
                 f'<div class="cand-a"><mark class="hl">{esc(c["alias"])}</mark></div>'
-                f'<div class="cand-q">{esc(names[c["keyword_id"]])}의 별칭으로 묶을까요?</div>'
+                f'<div class="cand-q">묶을 키워드: {esc(names[c["keyword_id"]])}</div>'
                 f'<div class="cand-r">{esc(c["reason"])} / 제안: {esc(c["by"])}</div>'
                 f"{ev}"
                 f'<div class="dis">{btn("승인", True)}{SEP}{btn("거절")}{SEP}{dis_note()}</div>'
@@ -898,7 +885,7 @@ def render_runs_week(d, rw, rws, week_runs, weeks_by_id, path):
     inner = (
         head + att_html + rail
         + f'<h2 class="sub-h ruled">이 주의 실행 {len(week_runs)}번</h2><ul class="runs">{"".join(runs_rows)}</ul>'
-        + '<p class="foot-note">실행을 누르면 단계별 판단 기록(하위)으로 가요.</p>'
+        + '<p class="foot-note">실행을 누르면 단계별 판단 기록</p>'
     )
     return mgmt_page(f'{rw["label"]} 실행 기록 | TrendsIT', "runs", inner, path)
 
@@ -906,11 +893,11 @@ def render_runs_week(d, rw, rws, week_runs, weeks_by_id, path):
 def render_runs_weeks(d, rws):
     old_first = list(reversed(rws))
     total = sum(w["published"] for w in rws)
-    rej = ", ".join(f'{w["rejected"]}회' for w in old_first)
+    rej = " / ".join(f'{w["rejected"]}회' for w in old_first)
     head = (
         f'<div class="bc"><span>{crumbs([("실행 기록", "/runs/"), ("주차별", None)])}</span></div>'
         '<h1 class="ptitle bc-title">주차별 실행 기록</h1>'
-        f'<p class="psub">{len(rws)}주 동안 발행 {total}개. 검수 반려는 {rej}였어요.</p>'
+        f'<p class="psub">{len(rws)}주 발행 {total}개, 검수 반려 {rej}</p>'
     )
     mx = max(max(w["published"], w["rejected"]) for w in rws) or 1
     unit = min(8, 56 / mx)
@@ -946,15 +933,15 @@ def render_runs_weeks(d, rws):
         if w["detail"]:
             rows.append(f'<li><a class="wk" href="/runs/{esc(w["week"])}/">{body}</a></li>')
         else:
-            rows.append(f'<li><div class="wk">{body}<div class="wk-out">단계별 기록은 예시 데이터 범위 밖</div></div></li>')
+            rows.append(f'<li><div class="wk">{body}<div class="wk-out">단계별 기록 없음 (예시 데이터 범위 밖)</div></div></li>')
     inner = (
         head + chart + f'<ul class="wks">{"".join(rows)}</ul>'
-        + '<p class="foot-note">주차를 누르면 그 주 실행 기록(메인)으로 가요. 이번 주는 메뉴에서 바로 열려요.</p>'
+        + '<p class="foot-note">주차를 누르면 그 주 실행 기록</p>'
     )
     return mgmt_page("주차별 실행 기록 | TrendsIT", "runs", inner, "/runs/weeks/")
 
 
-def render_run_detail(d, r, rw, week_runs, topics, enabled_count):
+def render_run_detail(d, r, rw, week_runs, topics, enabled_count, latest):
     title = f'{md_wd(r["at"])} {RUN_KIND_LABELS[r["kind"]]}'
     week_href = "/runs/" + rw["week"] + "/"
     head = (
@@ -963,7 +950,7 @@ def render_run_detail(d, r, rw, week_runs, topics, enabled_count):
     )
     if r["kind"] == "weekly":
         c = r["counts"]
-        inp = f'이번 주 수집 {rw["collected"]}건, 후보 토픽 {c["candidates"]}개'
+        inp = f'{"이번 주" if latest else "이 주"} 수집 {rw["collected"]}건, 후보 토픽 {c["candidates"]}개'
         out = f'토픽 {c["published"]}개 발행, 근거 id {c["evidence_ids"]}개'
     else:
         inp = f"켜진 소스 {enabled_count}개"
@@ -981,14 +968,12 @@ def render_run_detail(d, r, rw, week_runs, topics, enabled_count):
     tabs_html = f'<div class="rtabs">{SEP.join(tabs)}</div>'
 
     has_t = r["kind"] == "weekly"
-    empty_t = '<span class="lg-t"></span>' if has_t else ""
+    # 수집 실패(errors)는 판단 로그가 아니라 맨 위 한 줄로만 (2차 리뷰)
+    errs = "".join(
+        f'<p class="errline"><mark class="hl">{esc(short_name(e["source"]))} 수집 실패</mark>: {esc(e["text"])}</p>'
+        for e in r.get("errors", [])
+    )
     log = []
-    for e in r.get("errors", []):
-        log.append(
-            f'<li class="lg-row err">{empty_t}<span class="lg-b">'
-            f'<span class="lg-role">수집기</span>{SEP}'
-            f'<span class="lg-text"><mark class="hl">{esc(short_name(e["source"]))} 수집 실패</mark>: {esc(e["text"])}</span></span></li>'
-        )
     for si, s in enumerate(r["steps"]):
         text = attention_hl(s["text"]) if s.get("attention") else esc(s["text"])
         role = esc(s["role"]) + (" / 자동" if s.get("auto") else "")
@@ -1019,7 +1004,7 @@ def render_run_detail(d, r, rw, week_runs, topics, enabled_count):
     if i + 1 < len(seq):
         links.append(f'<a class="u" href="{run_path(seq[i + 1])}">다음 실행: {md(seq[i + 1]["at"])} {seq[i + 1]["at"][11:16]} {RUN_KIND_LABELS[seq[i + 1]["kind"]]}</a>')
     inner = (
-        head + info_html + tabs_html
+        head + info_html + errs + tabs_html
         + f'<ol class="log">{"".join(log)}</ol>'
         + f'<nav class="dlinks">{SEP.join(links)}</nav>'
     )
@@ -1057,7 +1042,7 @@ def build():
         if wi == 0:
             write("runs/index.html", render_runs_week(d, rw, rws, week_runs, weeks_by_id, "/runs/"))
         for r in week_runs:
-            write(f'runs/{rw["week"]}/{r["id"]}/index.html', render_run_detail(d, r, rw, week_runs, topics, enabled_count))
+            write(f'runs/{rw["week"]}/{r["id"]}/index.html', render_run_detail(d, r, rw, week_runs, topics, enabled_count, wi == 0))
     n = sum(1 for _ in OUT.rglob("*.html"))
     print(f"built {n} html files into {OUT}")
 

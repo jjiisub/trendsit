@@ -380,6 +380,7 @@ a.wk:hover h2 { text-decoration: underline; text-decoration-color: var(--seed-co
 .info div { display: flex; gap: 12px; padding: 5px 0; font-size: 13px; }
 .info dt { flex: none; width: 64px; color: var(--seed-color-palette-gray-700); }
 .info dd { margin: 0; color: var(--seed-color-palette-gray-900); }
+.errline { margin-top: 14px; font-size: 14px; line-height: 21px; color: var(--seed-color-palette-gray-900); }
 .rtabs { display: flex; flex-wrap: wrap; gap: 0 16px; padding-top: 20px; font-size: 13px; color: var(--seed-color-palette-gray-700); }
 .rtabs span { padding: 6px 0; border-bottom: 2px solid transparent; }
 .rtabs span.on { color: var(--seed-color-palette-gray-1000); font-weight: 700; border-bottom-color: var(--seed-color-palette-gray-1000); }

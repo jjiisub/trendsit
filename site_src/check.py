@@ -171,10 +171,10 @@ try:
     s = page_of("/sources/")
     groups = re.findall(r'<h2 class="sgroup-h"><span>([^<]+)</span>(?:' + re.escape(SEP) + r')?<span class="sgroup-n">(\d+)개 / (\d+)건</span>', s)
     check("소스: 채널 묶음 합계 글 41 / 영상 3 / GitHub 11", [(g[0], g[2]) for g in groups] == [("글", "41"), ("영상", "3"), ("GitHub", "11")], f"{groups}")
-    check("소스: \"토픽에 29건\"", "토픽에 29건 썼어요" in s)
+    check("소스: \"토픽에 29건\"", "수집 55건, 토픽에 쓰인 것 29건" in s)
     check("소스: 확인할 것 2개 (블로그 A 실패, 2주째 안 쓰인 소스 4개)",
-          "확인할 것 2개" in s and "예시 블로그 A가" in s and "실패</mark>" in s
-          and all(n in s.split("2주째")[0].split("확인할 것")[1] for n in ["예시 블로그 A", "예시 AI 뉴스레터", "예시 블로그 B", "예시 모델 회사 블로그"]))
+          "확인할 것 2개" in s and '예시 블로그 A: <mark class="hl">10.2 수집 실패</mark>, 다음 날 정상' in s
+          and "2주째 토픽에 쓰이지 않은 소스 4곳 (블로그 3, 뉴스레터 1)</span>: <mark class=\"hl\">끄거나 키워드 필터 추가 검토</mark>" in s)
     check("소스: 7일 막대 9줄 + 꺼짐 1줄", s.count('<li class="srow">') == 9 and s.count('<li class="srow off">') == 1
           and s.count('class="days"') == 9 and len(re.findall(r'<i class="d', s.split('class="slegend"')[0])) == 63)
 
@@ -224,6 +224,28 @@ try:
     notice = DATA["meta"]["notice"]
     with_notice = [url_of(p) for p in html_files() if notice[:20] in read(p)]
     check("맨 아래 예시 데이터 안내 문구 없음 (사용자 결정)", not with_notice, ", ".join(with_notice[:5]))
+
+    # ------------------------------------------------------------ 05_TASK: 문체, 2차 리뷰
+    haeyo = {}
+    for p in sorted(SITE.rglob("*")):
+        if p.is_file() and p.suffix in (".html", ".css", ".svg"):
+            for m in re.findall(r"[가-힣]+(?:어요|에요|해요|예요|까요|세요|돼요|줘요)", p.read_text(encoding="utf-8")):
+                haeyo[m] = haeyo.get(m, 0) + 1
+    check("문체: 해요체 0건 (05 2-3 grep)", not haeyo, f"{haeyo}")
+    fixed = {"/sources/": "예시 사이트라 동작 안 함", "/keywords/": "묶을 키워드: 판단 모델",
+             "/topic/w40-jev-race/": "굵은 선: 수치를 직접 준 소스 / 점선: 이어지는 지난 토픽",
+             "/runs/weeks/": "3주 발행 15개, 검수 반려 3회 / 0회 / 1회"}
+    miss = [u for u, t in fixed.items() if t not in page_of(u)]
+    check("문체: 화면 고정 문구 (02_DESIGN 10장 표)", not miss and "단계별 기록 없음 (예시 데이터 범위 밖)" in page_of("/runs/weeks/")
+          and "여러 표기를 한 키워드로 묶음. 다른 대상을 잘못 묶지 않는 것이 우선" in page_of("/keywords/"), ", ".join(miss))
+    n3 = page_of("/runs/2026-w40/nightly-2026-10-03/")
+    tabs = re.search(r'<div class="rtabs">(.*?)</div>', n3).group(1)
+    tab_txt = re.sub(r"<[^>]+>", "", tabs)
+    check("2차 리뷰: 매일 수집 실패는 맨 위 한 줄만, 로그에 수집기 줄 없음, 탭은 steps만",
+          n3.count('<p class="errline">') == 1 and "수집기" not in n3 and tab_txt == "전체 2 / 편집장 1 / 레포 분석가 1", tab_txt)
+    w39w = page_of("/runs/2026-w39/weekly-2026-09-28/")
+    check("2차 리뷰: 지난 주차 실행 상세는 \"이 주 수집\"", "<dd>이 주 수집 45건" in w39w and "이번 주" not in w39w.split("<body>")[1]
+          and "<dd>이번 주 수집 55건" in page_of("/runs/2026-w40/weekly-2026-10-05/") and "이번 주" not in page_of("/runs/2026-w39/").split("<body>")[1])
 
     # ------------------------------------------------------------ 04_TASK: 파비콘, 공유 미리보기, 1차 리뷰
     HEAD_TAGS = ['<link rel="icon" href="/favicon.ico" sizes="any">', '<link rel="icon" href="/favicon.svg" type="image/svg+xml">',
