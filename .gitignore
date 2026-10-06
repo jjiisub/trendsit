@@ -2,3 +2,5 @@ site/
 .DS_Store
 *.log
 .env
+site_src/shots/
+__pycache__/
