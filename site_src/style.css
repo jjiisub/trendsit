@@ -23,9 +23,15 @@ body {
   font-family: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
   font-size: 15px;
   line-height: 1.6;
-  word-break: keep-all;
+  word-break: normal;
+  line-break: strict;
   overflow-wrap: anywhere;
 }
+/* 줄바꿈: 본문은 글자 단위, 제목류는 단어 단위 + 줄 길이 균형 */
+.wtitle, .ttitle, .lead-t, .item-t, .h, .ptitle, .side-h, .tabs, .badge, button { word-break: keep-all; text-wrap: balance; }
+.body, .lead-s, .item-s, .points li, .r2 { text-wrap: pretty; }
+/* 간격으로만 떨어진 항목 사이의 글자 구분: 화면에는 숨기고 텍스트에는 남김 */
+.sr-sep { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
 ul, ol { list-style: none; }
 a { color: var(--seed-color-palette-gray-1000); text-decoration: none; }
@@ -103,6 +109,7 @@ mark.hl {
 .whead { padding: 24px 0 4px; }
 .wtitle { font-size: 26px; font-weight: 700; letter-spacing: -0.4px; line-height: 1.35; }
 .wsub { font-size: 13px; color: var(--seed-color-palette-gray-800); margin-top: 2px; }
+a.wprev { display: inline-block; margin-top: 4px; font-size: 13px; color: var(--seed-color-palette-gray-800); }
 .collect.m-only { margin-top: 14px; }
 .wbar { display: flex; height: 8px; border-radius: 4px; overflow: hidden; }
 .legend { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 8px; font-size: 12px; color: var(--seed-color-palette-gray-800); }
@@ -427,11 +434,12 @@ a.wk:hover h2 { text-decoration: underline; text-decoration-color: var(--seed-co
   .wrap.two { display: flex; gap: 64px; align-items: flex-start; }
   .wrap.two .col-main { width: 680px; flex: none; }
   .wrap.two .col-side { width: 336px; flex: none; position: sticky; top: 24px; padding-top: 36px; }
-  .wrap.one { max-width: 680px; }
+  .wrap.one .col-main { max-width: 680px; }
 
   .whead { padding: 36px 0 0; display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; }
   .wtitle { font-size: 32px; letter-spacing: -0.5px; }
   .wsub { font-size: 14px; margin-top: 0; }
+  a.wprev { margin: 0 0 0 auto; }
 
   .lead { margin-top: 24px; padding: 24px 26px 22px; }
   .lead-t { font-size: 23px; line-height: 32px; margin-top: 8px; }

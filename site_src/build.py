@@ -15,6 +15,11 @@ OUT = ROOT / "site"
 CSS_SRC = pathlib.Path(__file__).resolve().parent / "style.css"
 # CSS 주소에 내용 해시를 붙여 Cloudflare 캐시(4시간)가 옛 CSS를 주지 않게 한다
 CSS_VER = hashlib.sha256(CSS_SRC.read_bytes()).hexdigest()[:10]
+STATIC = pathlib.Path(__file__).resolve().parent / "static"  # 파비콘, 공유 미리보기 이미지 → site/ 루트로 복사
+SITE_URL = "https://trendsit.jiseop.com"
+DEFAULT_DESC = "로컬 AI가 매주 정리하는 개인 기술 브리핑 (예시 데이터)"
+# 간격으로만 떨어진 항목 사이의 글자 구분. 화면에는 숨기고 텍스트에는 남긴다
+SEP = '<span class="sr-sep"> / </span>'
 
 FONT_LINKS = (
     '<link rel="preconnect" href="https://fonts.googleapis.com">\n'
@@ -104,7 +109,7 @@ def tabs_html(active):
     for key, href, label in TABS:
         cur = ' class="on" aria-current="page"' if key == active else ""
         out.append(f'<a href="{href}"{cur}>{label}</a>')
-    return "".join(out)
+    return SEP.join(out)
 
 
 def site_header(active):
@@ -112,19 +117,33 @@ def site_header(active):
         '<header class="top">\n'
         '  <div class="top-in">\n'
         '    <a class="wordmark" href="/">TrendsIT</a>\n'
-        f'    <nav class="tabs">{tabs_html(active)}</nav>\n'
-        '    <span class="ex">예시 데이터</span>\n'
+        f'    {SEP}<nav class="tabs">{tabs_html(active)}</nav>\n'
+        f'    {SEP}<span class="ex">예시 데이터</span>\n'
         "  </div>\n"
         "</header>"
     )
 
 
-def page(title, body, header):
+def page(title, body, header, path, desc=DEFAULT_DESC):
+    head_meta = (
+        '<link rel="icon" href="/favicon.ico" sizes="any">\n'
+        '<link rel="icon" href="/favicon.svg" type="image/svg+xml">\n'
+        '<link rel="apple-touch-icon" href="/apple-touch-icon.png">\n'
+        '<meta name="theme-color" content="#ffffff">\n'
+        f'<meta name="description" content="{esc(desc)}">\n'
+        '<meta property="og:type" content="website">\n'
+        '<meta property="og:site_name" content="TrendsIT">\n'
+        f'<meta property="og:title" content="{esc(title)}">\n'
+        f'<meta property="og:description" content="{esc(desc)}">\n'
+        f'<meta property="og:url" content="{SITE_URL}{esc(path)}">\n'
+        f'<meta property="og:image" content="{SITE_URL}/og-image.png">\n'
+        '<meta name="twitter:card" content="summary_large_image">\n'
+    )
     return (
         "<!doctype html>\n"
         '<html lang="ko">\n<head>\n<meta charset="utf-8">\n'
         '<meta name="viewport" content="width=device-width, initial-scale=1">\n'
-        f"<title>{esc(title)}</title>\n{FONT_LINKS}\n"
+        f"<title>{esc(title)}</title>\n{head_meta}{FONT_LINKS}\n"
         f'<link rel="stylesheet" href="/assets/style.css?v={CSS_VER}">\n'
         "</head>\n<body>\n"
         f"{header}\n{body}\n"
@@ -140,12 +159,12 @@ def topic_meta(t, meta, ctx):
     checks = sum(1 for p in t["points"] if p.get("check"))
     if t.get("has_check") and checks:
         bits.append(badge(f"확인 필요 {checks}"))
-    return f'<div class="meta">{"".join(bits)}</div>'
+    return f'<div class="meta">{bits[0]}{SEP.join(bits[1:])}</div>'
 
 
 def collect_block(w, meta, cls):
     c = w["collected"]
-    legend = "".join(
+    legend = SEP.join(
         f'<span class="lg"><span class="sq c-{ch}"></span>{esc(meta["channel_labels"][ch])} {c[ch]}</span>'
         for ch in CH_ORDER
     )
@@ -174,7 +193,7 @@ def repo_item(r, meta, topics):
         third.append(f'<a class="lk" href="/topic/{esc(r["topic_id"])}/">\'{esc(tt)}\' 토픽과 관련</a>')
     return (
         '<li class="repo">'
-        f'<div class="r1">{name}<span class="{stars_cls}">{esc(r["stars_7d"])}</span></div>'
+        f'<div class="r1">{name}{SEP}<span class="{stars_cls}">{esc(r["stars_7d"])}</span></div>'
         f'<div class="r2">{esc(r["what"])}</div>'
         f'<div class="r3">{" / ".join(third)}</div>'
         "</li>"
@@ -185,7 +204,7 @@ def week_path(w, latest_id):
     return "/" if w["id"] == latest_id else f'/week/{w["id"]}/'
 
 
-def render_week(d, wi, topics):
+def render_week(d, wi, topics, path):
     meta = d["meta"]
     weeks = d["weeks"]
     w = weeks[wi]
@@ -193,11 +212,17 @@ def render_week(d, wi, topics):
     ts.sort(key=lambda t: t["rank"])
     lead = [t for t in ts if t.get("lead")]
     rest = [t for t in ts if not t.get("lead")]
+    this = "이번 주" if wi == 0 else "이 주"  # 지난 주차 페이지는 "이 주"
+    prev_link = ""
+    if wi + 1 < len(weeks):
+        pw = weeks[wi + 1]
+        prev_link = f'{SEP}<a class="wprev u" href="/week/{esc(pw["id"])}/">지난 주차: {esc(pw["label"])}</a>'
 
     head = (
         '<div class="whead">'
         f'<h1 class="wtitle">{esc(w["label"])}</h1>'
-        f'<div class="wsub">{esc(w["range"])} / 소스 {w["source_count"]}건에서 토픽 {w["topic_count"]}개</div>'
+        f'{SEP}<div class="wsub">{esc(w["range"])} / 소스 {w["source_count"]}건에서 토픽 {w["topic_count"]}개</div>'
+        f"{prev_link}"
         f'{collect_block(w, meta, "m-only")}'
         "</div>"
     )
@@ -205,7 +230,7 @@ def render_week(d, wi, topics):
     for t in lead:
         lead_html += (
             f'<a class="lead row" href="/topic/{esc(t["id"])}/">'
-            '<div class="lead-k">이번 주 핵심 토픽</div>'
+            f'<div class="lead-k">{"이번 주" if wi == 0 else "이 주의"} 핵심 토픽</div>'
             f'<h2 class="t lead-t">{esc(t["title"])}</h2>'
             f'<p class="lead-s">{hl(t["summary"])}</p>'
             f"{topic_meta(t, meta, 'lead')}"
@@ -234,17 +259,18 @@ def render_week(d, wi, topics):
         '<div class="wrap two">\n'
         f'<main class="col-main">{head}{lead_html}<ul class="items">{items}</ul></main>\n'
         '<aside class="col-side">'
-        '<section class="side-collect p-only"><h2 class="side-h">이번 주 수집</h2>'
+        f'<section class="side-collect p-only"><h2 class="side-h">{this} 수집</h2>'
         f'{collect_block(w, meta, "")}</section>'
-        '<section class="repos"><h2 class="side-h"><span class="m-only">이번 주 </span>관심 분야 레포</h2>'
+        f'<section class="repos"><h2 class="side-h"><span class="m-only">{this} </span>관심 분야 레포</h2>'
         f'<ul class="repo-list">{repo_html}</ul></section>'
-        f'<nav class="weeknav">{"".join(nav)}</nav>'
+        f'<nav class="weeknav">{SEP.join(nav)}</nav>'
         f'<div class="runat">발행 {mdhm(w["published_at"])}<span class="sep"> / </span><br class="p-br">다음 발행 {mdhm(w["next_run"])}</div>'
         "</aside>\n"
         "</div>"
     )
-    title = "TrendsIT" if wi == 0 else f'{w["label"]} | TrendsIT'
-    return page(title, body, site_header("briefing"))
+    title = "TrendsIT" if wi == 0 else f'{w["label"]} 브리핑 | TrendsIT'
+    desc = f'{w["label"]} 기술 동향 브리핑. 토픽 {w["topic_count"]}개, 소스 {w["source_count"]}건'
+    return page(title, body, site_header("briefing"), path, desc)
 
 
 # ---------------------------------------------------------------- 도식 A: 소스 연결도
@@ -414,7 +440,7 @@ def bars_diagram(g):
             f'<div class="brow">'
             f'<span class="blab" style="width: {lab_w}px">{esc(i["label"])}</span>'
             f'<span class="btrack"><span class="bfill {fill}" style="width: {num(pct)}%"></span></span>'
-            f'<span class="bval" style="width: {val_w}px">{esc(v)}</span>'
+            f'{SEP}<span class="bval" style="width: {val_w}px">{esc(v)}</span>'
             "</div>"
         )
     cap = g.get("caption", "")
@@ -435,10 +461,10 @@ def video_diagram(g, src):
         else:
             tm = f'<span class="tm">{esc(m["t"])}</span>'
         slide = '<span class="vh">슬라이드</span>' if m.get("slide") else ""
-        marks.append(f'<li class="{cls}"><i></i>{tm}<span class="tx">{esc(m["text"])}{slide}</span></li>')
+        marks.append(f'<li class="{cls}"><i></i>{tm}{SEP}<span class="tx">{esc(m["text"])}{slide}</span></li>')
     ex = "<span>예시 영상</span>" if src.get("example") else ""
     head = (
-        f'<div class="vhead"><span class="vtitle">{esc(src["title"])}</span>'
+        f'<div class="vhead"><span class="vtitle">{esc(src["title"])}</span>{SEP}'
         f'<span class="vmeta">{esc(src.get("duration", ""))}{" / " if ex else ""}{ex}</span></div>'
     )
     cap = f'출처: {src["title"]}' + (" (가상)" if src.get("example") else "") + ". 진한 점은 슬라이드에서 읽은 장면이에요."
@@ -460,7 +486,7 @@ def events_diagram(g, topics, src_num):
                 text += f' <a class="ref" href="#src-{n}">[{n}]</a>'
                 if n not in cited:
                     cited.append(n)
-        rows.append(f'<li class="ev"><span class="ed">{md(e["date"])}</span><span class="et">{text}</span></li>')
+        rows.append(f'<li class="ev"><span class="ed">{md(e["date"])}</span>{SEP}<span class="et">{text}</span></li>')
     cap = []
     if cited:
         cap.append("이 토픽의 출처 " + " ".join(f"[{n}]" for n in sorted(cited)))
@@ -487,7 +513,7 @@ def render_topic(d, t, topics, weeks_by_id):
         f'<h1 class="ttitle">{esc(t["title"])}</h1>'
         '<div class="meta tmeta">'
         f'{channel_bar(t["channels"])}<span>{esc(channel_text(t["channels"], meta["channel_labels_topic"]))}</span>'
-        f'<span>{t["cross_checked"]}개 채널에서 확인</span></div>'
+        f'{SEP}<span>{t["cross_checked"]}개 채널에서 확인</span></div>'
         f"{rel}</div>"
     )
     secs = [header]
@@ -522,7 +548,7 @@ def render_topic(d, t, topics, weeks_by_id):
         secs.append(f'<section class="sec"><h2 class="h">핵심 개념</h2>{cs}</section>')
     if t.get("contributions"):
         cs = "".join(
-            f'<li><span class="cl">{esc(meta["channel_labels_topic"][c["channel"]])}</span><span>{esc(c["text"])}</span></li>'
+            f'<li><span class="cl">{esc(meta["channel_labels_topic"][c["channel"]])}</span>{SEP}<span>{esc(c["text"])}</span></li>'
             for c in t["contributions"]
         )
         secs.append(f'<section class="sec"><h2 class="h">소스별로 더한 것</h2><ul class="contrib">{cs}</ul></section>')
@@ -536,12 +562,12 @@ def render_topic(d, t, topics, weeks_by_id):
         else:
             title = f'<a class="lk stitle" href="{esc(s["url"])}" target="_blank" rel="noopener">{esc(s["title"])}</a>'
             sub = f'{esc(s["site"])} / {md(s["date"])}'
-        srcs.append(f'<li id="src-{n}" class="src"><span class="sn">[{n}]</span><span><span class="sl">{title}</span><span class="ss">{sub}</span></span></li>')
+        srcs.append(f'<li id="src-{n}" class="src"><span class="sn">[{n}]</span>{SEP}<span><span class="sl">{title}</span>{SEP}<span class="ss">{sub}</span></span></li>')
     sources = f'<section class="sec srcs"><h2 class="h">출처</h2><ol class="src-list">{"".join(srcs)}</ol></section>'
 
     topbar = (
         '<header class="tbar m-flex">'
-        f"{back}"
+        f"{back}{SEP}"
         '<a class="wordmark small" href="/">TrendsIT</a>'
         "</header>"
     )
@@ -552,7 +578,7 @@ def render_topic(d, t, topics, weeks_by_id):
         f'<aside class="col-side side-src">{sources}</aside>\n'
         "</div>"
     )
-    return page(f'{plain(t["title"])} | TrendsIT', body, header_all)
+    return page(f'{plain(t["title"])} | TrendsIT', body, header_all, f'/topic/{t["id"]}/', plain(t["summary"]))
 
 
 # ---------------------------------------------------------------- 관리 화면 공통
@@ -621,9 +647,9 @@ def crumbs(parts):
     return " / ".join(out)
 
 
-def mgmt_page(title, active, inner):
+def mgmt_page(title, active, inner, path):
     body = f'<div class="wrap one"><main class="col-main mgmt">{inner}</main></div>'
-    return page(title, body, site_header(active))
+    return page(title, body, site_header(active), path)
 
 
 # ---------------------------------------------------------------- 소스 (6.3)
@@ -678,8 +704,8 @@ def render_sources(d):
             kind = SOURCE_TYPE_LABELS.get(s["type"], s["type"])
             if not s["enabled"]:
                 items.append(
-                    f'<li class="srow off"><span class="sinfo"><span class="sname">{esc(s["name"])}</span>'
-                    f'<span class="smeta">{esc(s.get("note") or "")}</span></span><span class="soff">꺼짐</span></li>'
+                    f'<li class="srow off"><span class="sinfo"><span class="sname">{esc(s["name"])}</span>{SEP}'
+                    f'<span class="smeta">{esc(s.get("note") or "")}</span></span>{SEP}<span class="soff">꺼짐</span></li>'
                 )
                 continue
             m = f'{kind} / {wk["collected"]}건, 토픽에 {wk["used_in_topics"]}건'
@@ -695,18 +721,18 @@ def render_sources(d):
                     h = max(4, min(22, v * 3))
                     bars.append(f'<i class="d" style="height: {h}px" title="{v}건"></i>')
             items.append(
-                f'<li class="srow"><span class="sinfo"><span class="sname">{esc(s["name"])}</span>'
+                f'<li class="srow"><span class="sinfo"><span class="sname">{esc(s["name"])}</span>{SEP}'
                 f'<span class="smeta">{esc(m)}</span></span>'
                 f'<span class="days" aria-label="최근 7일 수집">{"".join(bars)}</span></li>'
             )
         groups.append(
-            f'<section class="sgroup"><h2 class="sgroup-h"><span>{esc(meta["channel_labels"][ch])}</span>'
+            f'<section class="sgroup"><h2 class="sgroup-h"><span>{esc(meta["channel_labels"][ch])}</span>{SEP}'
             f'<span class="sgroup-n">{len(rows)}개 / {n}건</span></h2><ul>{"".join(items)}</ul></section>'
         )
     legend = (
         '<div class="slegend">'
-        '<span><i class="d" style="height: 12px"></i>그날 수집</span>'
-        '<span><i class="d zero"></i>새 글 없음</span>'
+        f'<span><i class="d" style="height: 12px"></i>그날 수집</span>{SEP}'
+        f'<span><i class="d zero"></i>새 글 없음</span>{SEP}'
         '<span><i class="d fail small"></i>실패</span>'
         "</div>"
     )
@@ -714,9 +740,9 @@ def render_sources(d):
         head + alert
         + f'<div class="dayhead" aria-hidden="true">{days}</div>'
         + "".join(groups) + legend
-        + f'<div class="dis">{btn("소스 추가")}{dis_note()}</div>'
+        + f'<div class="dis">{btn("소스 추가")}{SEP}{dis_note()}</div>'
     )
-    return mgmt_page("소스 | TrendsIT", "sources", inner)
+    return mgmt_page("소스 | TrendsIT", "sources", inner, "/sources/")
 
 
 # ---------------------------------------------------------------- 키워드 (6.4)
@@ -748,11 +774,11 @@ def render_keywords(d, runs_by_id):
                 f'<div class="cand-q">{esc(names[c["keyword_id"]])}의 별칭으로 묶을까요?</div>'
                 f'<div class="cand-r">{esc(c["reason"])} / 제안: {esc(c["by"])}</div>'
                 f"{ev}"
-                f'<div class="dis">{btn("승인", True)}{btn("거절")}{dis_note()}</div>'
+                f'<div class="dis">{btn("승인", True)}{SEP}{btn("거절")}{SEP}{dis_note()}</div>'
                 "</li>"
             )
         cand_html = (
-            f'<div class="sec-h"><h2>확인할 별칭 후보 {len(pending)}개</h2><span class="sec-r">{src}</span></div>'
+            f'<div class="sec-h"><h2>확인할 별칭 후보 {len(pending)}개</h2>{SEP}<span class="sec-r">{src}</span></div>'
             f'<ul class="cands">{"".join(rows)}</ul>'
         )
     rej_html = ""
@@ -762,8 +788,8 @@ def render_keywords(d, runs_by_id):
 
     legend = (
         '<div class="klegend">'
-        '<span><i class="br solid"></i>확정</span>'
-        '<span><i class="br dashed"></i>후보</span>'
+        f'<span><i class="br solid"></i>확정</span>{SEP}'
+        f'<span><i class="br dashed"></i>후보</span>{SEP}'
         '<span><i class="br dotted"></i>거절</span>'
         "</div>"
     )
@@ -779,12 +805,12 @@ def render_keywords(d, runs_by_id):
             if c["keyword_id"] != k["id"]:
                 continue
             if c["status"] == "pending":
-                leaves.append(f'<li class="pend"><i class="br dashed"></i><span class="lv">{esc(c["alias"])}</span><span class="lt">후보</span></li>')
+                leaves.append(f'<li class="pend"><i class="br dashed"></i><span class="lv">{esc(c["alias"])}</span>{SEP}<span class="lt">후보</span></li>')
             elif c["status"] == "rejected":
-                leaves.append(f'<li class="rejd"><i class="br dotted"></i><s class="lv">{esc(c["alias"])}</s><span class="lt">거절, 다른 대상</span></li>')
+                leaves.append(f'<li class="rejd"><i class="br dotted"></i><s class="lv">{esc(c["alias"])}</s>{SEP}<span class="lt">거절, 다른 대상</span></li>')
         trees.append(
             '<li class="kw">'
-            f'<div class="kw-h"><h3>{esc(k["name"])}</h3><span>이번 주 {now}회 / 지난주 {dtext}</span></div>'
+            f'<div class="kw-h"><h3>{esc(k["name"])}</h3>{SEP}<span>이번 주 {now}회 / 지난주 {dtext}</span></div>'
             f'<ul class="tree">{"".join(leaves)}</ul>'
             "</li>"
         )
@@ -792,9 +818,9 @@ def render_keywords(d, runs_by_id):
         head + cand_html + rej_html
         + '<h2 class="sub-h">키워드와 별칭</h2>' + legend
         + f'<ul class="kws">{"".join(trees)}</ul>'
-        + f'<div class="dis">{btn("키워드 추가")}{dis_note()}</div>'
+        + f'<div class="dis">{btn("키워드 추가")}{SEP}{dis_note()}</div>'
     )
-    return mgmt_page("키워드 | TrendsIT", "keywords", inner)
+    return mgmt_page("키워드 | TrendsIT", "keywords", inner, "/keywords/")
 
 
 # ---------------------------------------------------------------- 실행 기록 3단 (6.5)
@@ -811,7 +837,7 @@ def run_step_time(r, s):
     return f'{md(r["at"])} {s.get("t") or r["at"][11:16]}'
 
 
-def render_runs_week(d, rw, rws, week_runs, weeks_by_id):
+def render_runs_week(d, rw, rws, week_runs, weeks_by_id, path):
     wi = rws.index(rw)
     prev = rws[wi + 1] if wi + 1 < len(rws) else None
     if prev and prev["detail"]:
@@ -821,7 +847,7 @@ def render_runs_week(d, rw, rws, week_runs, weeks_by_id):
     weekly = next((r for r in week_runs if r["kind"] == "weekly"), None)
     model = weekly["model"] if weekly else week_runs[0]["model"]
     head = (
-        f'<div class="bc"><span>{crumbs([("주차별", "/runs/weeks/"), (rw["label"], None)])}</span><span>{right}</span></div>'
+        f'<div class="bc"><span>{crumbs([("주차별", "/runs/weeks/"), (rw["label"], None)])}</span>{SEP}<span>{right}</span></div>'
         f'<h1 class="ptitle bc-title">{esc(rw["label"])} 실행 기록</h1>'
         f'<p class="psub">{esc(rw["range"])} / 모델 {esc(model)} / 실행 {len(week_runs)}번</p>'
     )
@@ -831,7 +857,7 @@ def render_runs_week(d, rw, rws, week_runs, weeks_by_id):
             if s.get("attention"):
                 att.append(
                     f'<li><a class="att" href="{run_path(r)}#step-{si + 1}">'
-                    f'<span class="att-t">{attention_hl(s["text"])}</span>'
+                    f'<span class="att-t">{attention_hl(s["text"])}</span>{SEP}'
                     f'<span class="att-m">{run_step_time(r, s)} {esc(s["role"])} / 판단 기록 보기</span></a></li>'
                 )
     att_html = f'<h2 class="sub-h">봐야 할 판단 {len(att)}개</h2><ul class="atts">{"".join(att)}</ul>' if att else ""
@@ -852,7 +878,7 @@ def render_runs_week(d, rw, rws, week_runs, weeks_by_id):
             ("발행", f'{c["published"]}개', md_wd_hm(weekly["at"])),
         ]
         rows = "".join(
-            f'<li><div class="rl-h"><span>{name}</span><b>{esc(n)}</b></div><div class="rl-s">{esc(sub)}</div></li>'
+            f'<li><div class="rl-h"><span>{name}</span>{SEP}<b>{esc(n)}</b></div><div class="rl-s">{esc(sub)}</div></li>'
             for name, n, sub in steps
         )
         rail = f'<h2 class="sub-h ruled">브리핑이 나오기까지</h2><ol class="rail">{rows}</ol>'
@@ -864,9 +890,9 @@ def render_runs_week(d, rw, rws, week_runs, weeks_by_id):
         t_cls = "rt weekly" if r["kind"] == "weekly" else "rt"
         runs_rows.append(
             f'<li><a class="runrow" href="{run_path(r)}">'
-            f'<span><span class="{t_cls}">{md_wd_hm(r["at"])} {RUN_KIND_LABELS[r["kind"]]}</span>'
-            f'<span class="rsum">{esc(r["summary"])}</span></span>'
-            f'<span class="rright"><span class="{st_cls}">{st}</span><span class="rdec">판단 {r["decisions"]}개</span></span>'
+            f'<span><span class="{t_cls}">{md_wd_hm(r["at"])} {RUN_KIND_LABELS[r["kind"]]}</span>{SEP}'
+            f'<span class="rsum">{esc(r["summary"])}</span></span>{SEP}'
+            f'<span class="rright"><span class="{st_cls}">{st}</span>{SEP}<span class="rdec">판단 {r["decisions"]}개</span></span>'
             "</a></li>"
         )
     inner = (
@@ -874,7 +900,7 @@ def render_runs_week(d, rw, rws, week_runs, weeks_by_id):
         + f'<h2 class="sub-h ruled">이 주의 실행 {len(week_runs)}번</h2><ul class="runs">{"".join(runs_rows)}</ul>'
         + '<p class="foot-note">실행을 누르면 단계별 판단 기록(하위)으로 가요.</p>'
     )
-    return mgmt_page(f'{rw["label"]} 실행 기록 | TrendsIT', "runs", inner)
+    return mgmt_page(f'{rw["label"]} 실행 기록 | TrendsIT', "runs", inner, path)
 
 
 def render_runs_weeks(d, rws):
@@ -896,13 +922,13 @@ def render_runs_weeks(d, rws):
         f'<div class="wcol"><div class="wbars">'
         f'<span class="wb pub" style="height: {h(w["published"])}px" title="발행 {w["published"]}"></span>'
         f'<span class="wb rej" style="height: {h(w["rejected"])}px" title="반려 {w["rejected"]}"></span>'
-        f'</div><span class="wl">{esc(w["label"].removesuffix("차"))}</span></div>'
+        f'</div><span class="wl">{esc(w["label"].removesuffix("차"))}</span></div>{SEP}'
         for w in old_first
     )
     chart = (
         '<div class="wchart"><div class="wchart-k">주별 발행 토픽과 검수 반려</div>'
         f'<div class="wchart-in">{cols}'
-        '<div class="wlegend"><span><span class="sq pub"></span>발행 토픽</span><span><span class="sq rej"></span>검수 반려</span></div>'
+        f'<div class="wlegend"><span><span class="sq pub"></span>발행 토픽</span>{SEP}<span><span class="sq rej"></span>검수 반려</span></div>'
         "</div></div>"
     )
     rows = []
@@ -911,7 +937,7 @@ def render_runs_weeks(d, rws):
         when = esc(w["range"]) + (" / 이번 주" if i == 0 else "")
         fail = f' (실패 {w["nightly_failed"]})' if w["nightly_failed"] else ""
         body = (
-            f'<div class="wk-h"><h2>{esc(w["label"])}{badge_html}</h2><span>{when}</span></div>'
+            f'<div class="wk-h"><h2>{esc(w["label"])}{badge_html}</h2>{SEP}<span>{when}</span></div>'
             f'<div class="wk-n"><span>수집 {w["collected"]}건</span><span class="slash">/</span><span>후보 {w["candidates"]}</span>'
             f'<span class="slash">/</span><b>발행 {w["published"]}</b></div>'
             f'<div class="wk-m">매일 수집 {w["nightly"]}회{fail} / 검수 반려 {w["rejected"]}회 / 확인 필요 {w["needs_check"]}문장</div>'
@@ -925,7 +951,7 @@ def render_runs_weeks(d, rws):
         head + chart + f'<ul class="wks">{"".join(rows)}</ul>'
         + '<p class="foot-note">주차를 누르면 그 주 실행 기록(메인)으로 가요. 이번 주는 메뉴에서 바로 열려요.</p>'
     )
-    return mgmt_page("주차별 실행 기록 | TrendsIT", "runs", inner)
+    return mgmt_page("주차별 실행 기록 | TrendsIT", "runs", inner, "/runs/weeks/")
 
 
 def render_run_detail(d, r, rw, week_runs, topics, enabled_count):
@@ -952,7 +978,7 @@ def render_run_detail(d, r, rw, week_runs, topics, enabled_count):
     tabs = [f'<span class="on">전체 {len(r["steps"])}</span>'] + [
         f'<span>{esc(ro)} {sum(1 for s in r["steps"] if s["role"] == ro)}</span>' for ro in roles
     ]
-    tabs_html = f'<div class="rtabs">{"".join(tabs)}</div>'
+    tabs_html = f'<div class="rtabs">{SEP.join(tabs)}</div>'
 
     has_t = r["kind"] == "weekly"
     empty_t = '<span class="lg-t"></span>' if has_t else ""
@@ -960,7 +986,7 @@ def render_run_detail(d, r, rw, week_runs, topics, enabled_count):
     for e in r.get("errors", []):
         log.append(
             f'<li class="lg-row err">{empty_t}<span class="lg-b">'
-            f'<span class="lg-role">수집기</span>'
+            f'<span class="lg-role">수집기</span>{SEP}'
             f'<span class="lg-text"><mark class="hl">{esc(short_name(e["source"]))} 수집 실패</mark>: {esc(e["text"])}</span></span></li>'
         )
     for si, s in enumerate(r["steps"]):
@@ -973,14 +999,14 @@ def render_run_detail(d, r, rw, week_runs, topics, enabled_count):
             where = f' <span class="dim">({esc(src["site"])}, {md(src["date"])})</span>' if src else ""
             box = (
                 '<div class="reject">'
-                f'<div><span class="rk">초안</span><span>{esc(det["draft"])}</span></div>'
-                f'<div><span class="rk">근거</span><span>"{esc(det["evidence"])}"{where}</span></div>'
-                f'<div class="fixed"><span class="rk">수정</span><span>{esc(det["fixed"])}</span></div>'
+                f'<div><span class="rk">초안</span>{SEP}<span>{esc(det["draft"])}</span></div>'
+                f'<div><span class="rk">근거</span>{SEP}<span>"{esc(det["evidence"])}"{where}</span></div>'
+                f'<div class="fixed"><span class="rk">수정</span>{SEP}<span>{esc(det["fixed"])}</span></div>'
                 "</div>"
             )
-        t = f'<span class="lg-t">{esc(s.get("t", ""))}</span>' if has_t else ""
+        t = f'<span class="lg-t">{esc(s.get("t", ""))}</span>{SEP}' if has_t else ""
         log.append(
-            f'<li class="lg-row" id="step-{si + 1}">{t}<span class="lg-b"><span class="lg-role">{role}</span>'
+            f'<li class="lg-row" id="step-{si + 1}">{t}<span class="lg-b"><span class="lg-role">{role}</span>{SEP}'
             f'<span class="lg-text">{text}</span>{box}</span></li>'
         )
     links = []
@@ -995,9 +1021,9 @@ def render_run_detail(d, r, rw, week_runs, topics, enabled_count):
     inner = (
         head + info_html + tabs_html
         + f'<ol class="log">{"".join(log)}</ol>'
-        + f'<nav class="dlinks">{"".join(links)}</nav>'
+        + f'<nav class="dlinks">{SEP.join(links)}</nav>'
     )
-    return mgmt_page(f"{title} | TrendsIT", "runs", inner)
+    return mgmt_page(f"{title} | TrendsIT", "runs", inner, run_path(r))
 
 
 # ---------------------------------------------------------------- 실행
@@ -1008,11 +1034,13 @@ def build():
     OUT.mkdir(exist_ok=True)
     (OUT / "assets").mkdir(exist_ok=True)
     shutil.copyfile(CSS_SRC, OUT / "assets" / "style.css")
+    for f in sorted(STATIC.iterdir()):
+        if f.is_file():
+            shutil.copyfile(f, OUT / f.name)
     for wi, w in enumerate(d["weeks"]):
-        html_ = render_week(d, wi, topics)
-        write(f'week/{w["id"]}/index.html', html_)
+        write(f'week/{w["id"]}/index.html', render_week(d, wi, topics, f'/week/{w["id"]}/'))
         if wi == 0:
-            write("index.html", html_)
+            write("index.html", render_week(d, wi, topics, "/"))
     for t in d["topics"]:
         write(f'topic/{t["id"]}/index.html', render_topic(d, t, topics, weeks_by_id))
     write("sources/index.html", render_sources(d))
@@ -1025,10 +1053,9 @@ def build():
         if not rw["detail"]:
             continue
         week_runs = [r for r in d["runs"] if r["week"] == rw["week"]]
-        html_ = render_runs_week(d, rw, rws, week_runs, weeks_by_id)
-        write(f'runs/{rw["week"]}/index.html', html_)
+        write(f'runs/{rw["week"]}/index.html', render_runs_week(d, rw, rws, week_runs, weeks_by_id, f'/runs/{rw["week"]}/'))
         if wi == 0:
-            write("runs/index.html", html_)
+            write("runs/index.html", render_runs_week(d, rw, rws, week_runs, weeks_by_id, "/runs/"))
         for r in week_runs:
             write(f'runs/{rw["week"]}/{r["id"]}/index.html', render_run_detail(d, r, rw, week_runs, topics, enabled_count))
     n = sum(1 for _ in OUT.rglob("*.html"))

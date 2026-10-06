@@ -71,7 +71,10 @@ check("빌드 두 번 결과 동일", a == b, f"{len(a)}개 파일")
 
 RUN_DETAILS = [f'/runs/{r["week"]}/{r["id"]}/' for r in DATA["runs"]]
 PAGES = (["/", "/week/2026-w39/", "/week/2026-w40/"] + [f'/topic/{t["id"]}/' for t in DATA["topics"]]
-         + ["/sources/", "/keywords/", "/runs/", "/runs/weeks/", "/runs/2026-w40/", "/runs/2026-w39/"] + RUN_DETAILS + ["/assets/style.css"])
+         + ["/sources/", "/keywords/", "/runs/", "/runs/weeks/", "/runs/2026-w40/", "/runs/2026-w39/"] + RUN_DETAILS + ["/assets/style.css"]
+         + ["/favicon.ico", "/favicon.svg", "/favicon-16.png", "/favicon-32.png", "/favicon-48.png", "/apple-touch-icon.png", "/icon-512.png", "/og-image.png"])
+SITE_URL = "https://trendsit.jiseop.com"
+SEP = '<span class="sr-sep"> / </span>'
 
 # ---------------------------------------------------------------- 2. 로컬 서버 200
 server = subprocess.Popen(
@@ -140,7 +143,7 @@ try:
         u = url_of(p)
         n_hl = s.count('<mark class="hl">')
         check(f"{u} 형광 밑줄 4개 이하", n_hl <= 4, f"{n_hl}개")
-        check(f"{u} 요약 재수록 없음", t["summary"].replace("==", "")[:30] not in s.replace('<mark class="hl">', "").replace("</mark>", ""))
+        check(f"{u} 요약 재수록 없음", t["summary"].replace("==", "")[:30] not in s.split("<body>", 1)[1].replace('<mark class="hl">', "").replace("</mark>", ""))
         check(f"{u} 소스 연결도 있음", s.count('<div class="graph">') == 1 and s.count("<svg") == 2)
         want = {k: sum(1 for g in t.get("diagrams", []) if g["type"] == k) for k in ("bars", "video", "events")}
         got = {k: s.count(f'class="sec diag-{k}"') for k in want}
@@ -166,7 +169,7 @@ try:
         return read(SITE / u.lstrip("/") / "index.html")
 
     s = page_of("/sources/")
-    groups = re.findall(r'<h2 class="sgroup-h"><span>([^<]+)</span><span class="sgroup-n">(\d+)개 / (\d+)건</span>', s)
+    groups = re.findall(r'<h2 class="sgroup-h"><span>([^<]+)</span>(?:' + re.escape(SEP) + r')?<span class="sgroup-n">(\d+)개 / (\d+)건</span>', s)
     check("소스: 채널 묶음 합계 글 41 / 영상 3 / GitHub 11", [(g[0], g[2]) for g in groups] == [("글", "41"), ("영상", "3"), ("GitHub", "11")], f"{groups}")
     check("소스: \"토픽에 29건\"", "토픽에 29건 썼어요" in s)
     check("소스: 확인할 것 2개 (블로그 A 실패, 2주째 안 쓰인 소스 4개)",
@@ -186,9 +189,10 @@ try:
     check("키워드: 가지에 후보 3개 점선, Luna 취소선", k.count('<li class="pend"><i class="br dashed">') == 3 and '<s class="lv">Luna</s>' in k)
 
     r = page_of("/runs/")
-    check("실행 기록: 메뉴 링크가 /runs/, 10월 1주차 메인", 'href="/runs/" class="on"' in r and "10월 1주차 실행 기록</h1>" in r and r == page_of("/runs/2026-w40/"))
+    no_url = lambda h: re.sub(r'<meta property="og:url"[^>]*>', "", h)
+    check("실행 기록: 메뉴 링크가 /runs/, 10월 1주차 메인", 'href="/runs/" class="on"' in r and "10월 1주차 실행 기록</h1>" in r and no_url(r) == no_url(page_of("/runs/2026-w40/")))
     check("실행 기록: 봐야 할 판단 3개", "봐야 할 판단 3개" in r and r.count('class="att"') == 3)
-    rail = re.findall(r'<div class="rl-h"><span>[^<]+</span><b>([^<]+)</b></div><div class="rl-s">([^<]*)</div>', r)
+    rail = re.findall(r'<div class="rl-h"><span>[^<]+</span>(?:' + re.escape(SEP) + r')?<b>([^<]+)</b></div><div class="rl-s">([^<]*)</div>', r)
     nums = [re.search(r"\d+", b).group() for b, _ in rail]
     check("실행 기록: 단계 레일 55, 9, 6, 6, 5(반려 1), 6", nums == ["55", "9", "6", "6", "5", "6"] and "반려 1회" in rail[4][1], f"{rail}")
     check("실행 기록: 실행 8개 목록", r.count('class="runrow"') == 8 and "이 주의 실행 8번" in r)
@@ -220,6 +224,63 @@ try:
     notice = DATA["meta"]["notice"]
     with_notice = [url_of(p) for p in html_files() if notice[:20] in read(p)]
     check("맨 아래 예시 데이터 안내 문구 없음 (사용자 결정)", not with_notice, ", ".join(with_notice[:5]))
+
+    # ------------------------------------------------------------ 04_TASK: 파비콘, 공유 미리보기, 1차 리뷰
+    HEAD_TAGS = ['<link rel="icon" href="/favicon.ico" sizes="any">', '<link rel="icon" href="/favicon.svg" type="image/svg+xml">',
+                 '<link rel="apple-touch-icon" href="/apple-touch-icon.png">', '<meta name="theme-color" content="#ffffff">',
+                 '<meta name="description" content="', '<meta property="og:type" content="website">',
+                 '<meta property="og:site_name" content="TrendsIT">', '<meta property="og:title" content="',
+                 '<meta property="og:description" content="', '<meta property="og:url" content="',
+                 f'<meta property="og:image" content="{SITE_URL}/og-image.png">', '<meta name="twitter:card" content="summary_large_image">']
+    bad_head = []
+    for p in html_files():
+        h = read(p)
+        u = url_of(p)
+        miss = [t for t in HEAD_TAGS if h.count(t) != 1]
+        title = re.search(r"<title>([^<]*)</title>", h).group(1)
+        ogt = re.search(r'<meta property="og:title" content="([^"]*)">', h)
+        ogu = re.search(r'<meta property="og:url" content="([^"]*)">', h)
+        desc = re.search(r'<meta name="description" content="([^"]*)">', h)
+        ogd = re.search(r'<meta property="og:description" content="([^"]*)">', h)
+        if miss or not ogt or ogt.group(1) != title or not ogu or ogu.group(1) != SITE_URL + u or not desc or not desc.group(1) or not ogd or ogd.group(1) != desc.group(1):
+            bad_head.append(f"{u} {miss[:2]}")
+    check(f"head 태그가 모든 페이지에 한 번씩, og:url이 그 페이지 주소 ({len(html_files())}개)", not bad_head, "; ".join(bad_head[:5]))
+    import html as _html
+    descs = {
+        "/": f'{DATA["weeks"][0]["label"]} 기술 동향 브리핑. 토픽 {DATA["weeks"][0]["topic_count"]}개, 소스 {DATA["weeks"][0]["source_count"]}건',
+        "/week/2026-w39/": f'{DATA["weeks"][1]["label"]} 기술 동향 브리핑. 토픽 {DATA["weeks"][1]["topic_count"]}개, 소스 {DATA["weeks"][1]["source_count"]}건',
+        "/topic/w40-jev-race/": next(t for t in DATA["topics"] if t["id"] == "w40-jev-race")["summary"].replace("==", ""),
+        "/sources/": "로컬 AI가 매주 정리하는 개인 기술 브리핑 (예시 데이터)",
+    }
+    got = {u: _html.unescape(re.search(r'<meta name="description" content="([^"]*)">', page_of(u)).group(1)) for u in descs}
+    check("설명 문구 규칙 (홈/주차, 토픽 summary, 나머지 기본)", got == descs, f"{got}")
+
+    leftover = [url_of(p) for p in html_files() if "==" in read(p)]
+    check('형광: HTML에 "==" 남지 않음', not leftover, ", ".join(leftover[:5]))
+
+    GLUE = [r"\d(?:지난|영상|레포|GitHub|확인|판단|정상|일부|편집장|작성자|검수자|수집기|이번|다음|예시)", r"(?:정상|일부 실패)판단",
+            r"브리핑소스", r"키워드실행", r"TrendsIT브리핑", r"데이터TrendsIT", r"(?:확정|후보)(?:후보|거절)", r"\d{1,2}:\d{2}[가-힣]",
+            r"(?:초안|근거|수정)(?:Pi|\")", r"\][A-Za-z가-힣]", r"[가-힣]\d+(?:\.\d+)?%"]
+    glued = []
+    for p in html_files():
+        body = read(p).split("<body>", 1)[1]
+        # 블록 경계는 텍스트 도구가 줄을 바꾸므로 줄바꿈으로, 나머지 태그는 지운다(인라인 항목 붙음만 잡는다)
+        body = re.sub(r"</?(?:div|p|li|ul|ol|dl|dt|dd|h[1-6]|section|nav|header|main|aside|br)\b[^>]*>", "\n", body)
+        text = _html.unescape(re.sub(r"<[^>]+>", "", body))
+        for g in GLUE:
+            for m in re.finditer(g, text):
+                glued.append(f"{url_of(p)}: …{text[max(0, m.start() - 8):m.end() + 6]}…")
+    check("붙어 읽히는 항목 없음 (태그를 지운 텍스트 기준)", not glued, " | ".join(glued[:8]))
+
+    w39 = page_of("/week/2026-w39/")
+    w40 = page_of("/")
+    check("지난 주차 문구: 이 주의 핵심 토픽 / 이 주 관심 분야 레포 / 이 주 수집",
+          all(x in w39 for x in ["이 주의 핵심 토픽", "이 주 수집", '<span class="m-only">이 주 </span>관심 분야 레포']) and "이번 주" not in w39.split("<body>")[1]
+          and all(x in w40 for x in ["이번 주 핵심 토픽", "이번 주 수집"]))
+    check('title: 지난 주차 "9월 4주차 브리핑 | TrendsIT", 최신 홈 "TrendsIT"',
+          "<title>9월 4주차 브리핑 | TrendsIT</title>" in w39 and "<title>TrendsIT</title>" in w40 and "<title>TrendsIT</title>" in page_of("/week/2026-w40/"))
+    check("헤더에 지난 주차 링크 (있을 때만)",
+          all('class="wprev u" href="/week/2026-w39/"' in page_of(u) for u in ["/", "/week/2026-w40/"]) and 'class="wprev' not in w39)
 
     # ------------------------------------------------------------ 7. 색
     css = (SITE / "assets" / "style.css").read_text(encoding="utf-8")
