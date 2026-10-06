@@ -29,7 +29,7 @@ body {
 }
 /* 줄바꿈: 본문은 글자 단위, 제목류는 단어 단위 + 줄 길이 균형 */
 .wtitle, .ttitle, .lead-t, .item-t, .h, .ptitle, .side-h, .tabs, .badge, button { word-break: keep-all; text-wrap: balance; }
-.body, .lead-s, .item-s, .points li, .r2 { text-wrap: pretty; }
+/* 본문에는 text-wrap: pretty를 쓰지 않는다: Safari(WebKit)가 문단 전체를 다시 배치해 줄마다 오른쪽을 비움(평균 59px → 11px, 2026-10-06 실측) */
 /* 간격으로만 떨어진 항목 사이의 글자 구분: 화면에는 숨기고 텍스트에는 남김 */
 .sr-sep { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 h1, h2, h3, p, ul, ol { margin: 0; padding: 0; }
@@ -75,15 +75,14 @@ mark.hl {
 .top { border-bottom: 1px solid var(--seed-color-palette-gray-300); }
 .top-in {
   display: grid;
-  grid-template-columns: 1fr auto;
-  grid-template-areas: "wm ex" "tabs tabs";
+  grid-template-columns: 1fr;
+  grid-template-areas: "wm" "tabs";
   align-items: center;
   padding: 0 20px;
   max-width: 720px;
   margin: 0 auto;
 }
-.wordmark { grid-area: wm; font-size: 18px; font-weight: 700; letter-spacing: -0.2px; padding: 16px 0 8px; }
-.ex { grid-area: ex; font-size: 12px; color: var(--seed-color-palette-gray-700); }
+.wordmark { grid-area: wm; justify-self: start; font-size: 18px; font-weight: 700; letter-spacing: -0.2px; padding: 16px 0 8px; }
 .tabs { grid-area: tabs; display: flex; gap: 20px; font-size: 14px; }
 .tabs a { display: flex; align-items: center; min-height: 44px; padding: 0; color: var(--seed-color-palette-gray-700); border-bottom: 2px solid transparent; }
 .tabs a.on { color: var(--seed-color-palette-gray-1000); font-weight: 700; border-bottom-color: var(--seed-color-palette-gray-1000); }
@@ -429,7 +428,6 @@ a.wk:hover h2 { text-decoration: underline; text-decoration-color: var(--seed-co
   .wordmark { font-size: 19px; padding: 18px 0; }
   .tabs { gap: 26px; }
   .tabs a { min-height: 62px; padding-top: 2px; }
-  .ex { margin-left: auto; }
 
   .wrap { max-width: 1080px; padding: 0 0 56px; }
   .wrap.two { display: flex; gap: 64px; align-items: flex-start; }

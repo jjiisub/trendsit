@@ -118,7 +118,6 @@ def site_header(active):
         '  <div class="top-in">\n'
         '    <a class="wordmark" href="/">TrendsIT</a>\n'
         f'    {SEP}<nav class="tabs">{tabs_html(active)}</nav>\n'
-        f'    {SEP}<span class="ex">예시 데이터</span>\n'
         "  </div>\n"
         "</header>"
     )
