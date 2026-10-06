@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>최종 토픽 모바일 (디자인 목업)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#1a1c20;text-decoration:none}
+a.lk{text-decoration:underline;text-decoration-color:#d1d3d8;text-underline-offset:4px}a.lk:hover{text-decoration-color:#1a1c20}
+.hl{background:linear-gradient(transparent 56%, #ffd5c0 56%);padding:0 2px;color:#1a1c20;font-weight:500}
+.h{font-size:17px;font-weight:700;margin:0 0 10px}
+.sec{padding:26px 20px 0}
+.li{display:flex;gap:10px;font-size:15px;line-height:24px;color:#2a3038;margin-top:8px}
+.dot{flex:none;width:5px;height:5px;border-radius:50%;background:#868b94;margin-top:10px}
+.c1{background:#2a3038}.c2{background:#868b94}.c3{background:#d1d3d8}
+.tl{display:flex;gap:12px;padding:6px 0;position:relative}
+.tl i{position:absolute;left:-18px;top:12px;width:10px;height:10px;border-radius:50%;background:#d1d3d8}
+.tl b{width:44px;font-size:13px;font-weight:500;color:#555d6d;text-decoration:underline;text-decoration-color:#d1d3d8;text-underline-offset:3px}
+.tl span{font-size:14px;color:#2a3038}
+</style>
+<style>body{background:#f3f4f5} body>div{margin:24px auto;box-shadow:0 0 0 1px #dcdee3}</style>
+</head>
+<body>
+<div style="width: 390px; height: 1900px; box-sizing: border-box; overflow: hidden; background: #ffffff; color: #1a1c20; font-family: 'IBM Plex Sans KR', sans-serif; display: flex; flex-direction: column">
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid #eeeff1">
+    <a href="#" style="font-size: 14px; color: #555d6d">10월 3주차 브리핑으로</a>
+    <div style="font-size: 15px; font-weight: 700">TrendsIT</div>
+  </div>
+
+  <div style="padding: 22px 20px 0">
+    <div style="font-size: 23px; font-weight: 700; line-height: 32px; letter-spacing: -0.3px">로컬 LLM의 도구 호출, 4비트 양자화에서도 쓸 만할까</div>
+    <div style="display: flex; align-items: center; gap: 10px; margin-top: 12px; font-size: 12px; color: #868b94">
+      <span style="display: flex; height: 6px; width: 96px; border-radius: 3px; overflow: hidden"><span class="c1" style="flex: 2"></span><span class="c2" style="flex: 1"></span><span class="c3" style="flex: 1"></span></span>
+      <span>글 2 / 영상 1 / 레포 1</span><span>3개 채널에서 확인</span>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="h">개요</div>
+    <div style="font-size: 15px; line-height: 26px; color: #2a3038">로컬에서 돌리는 작은 모델이 4비트로 양자화한 뒤에도 도구 호출을 제대로 하는지가 이번 주 쟁점이었어요. 발표 슬라이드 기준 성공률은 8비트 91%, 4비트 87%로 <span class="hl">하락 폭이 작아 실사용에 충분한 수준</span>이었고, 글 두 편과 레포 벤치마크도 같은 방향이에요.</div>
+  </div>
+
+  <div class="sec">
+    <div class="h">소스 연결</div>
+    <div style="background: #f7f8f9; border-radius: 12px; padding: 8px 0">
+      <svg width="350" height="210" viewBox="0 0 350 210">
+        <line x1="175" y1="105" x2="70" y2="40" stroke="#d1d3d8" stroke-width="1.5"/>
+        <line x1="175" y1="105" x2="70" y2="165" stroke="#d1d3d8" stroke-width="1.5"/>
+        <line x1="175" y1="105" x2="285" y2="45" stroke="#2a3038" stroke-width="2.5"/>
+        <line x1="175" y1="105" x2="285" y2="165" stroke="#d1d3d8" stroke-width="1.5"/>
+        <line x1="175" y1="105" x2="175" y2="192" stroke="#b0b3ba" stroke-width="1.5" stroke-dasharray="4 4"/>
+        <rect x="128" y="88" width="94" height="34" rx="8" fill="#1a1c20"/>
+        <text x="175" y="110" font-size="12" fill="#ffffff" text-anchor="middle" font-weight="700">이번 토픽</text>
+        <circle cx="70" cy="40" r="6" fill="#2a3038"/><text x="70" y="22" font-size="11" fill="#2a3038" text-anchor="middle">글 / 양자화 실험</text>
+        <circle cx="70" cy="165" r="6" fill="#2a3038"/><text x="70" y="186" font-size="11" fill="#2a3038" text-anchor="middle">글 / 주간 뉴스레터</text>
+        <circle cx="285" cy="45" r="7" fill="#868b94"/><text x="285" y="24" font-size="11" fill="#2a3038" text-anchor="middle">영상 / 발표 14:05</text>
+        <circle cx="285" cy="165" r="6" fill="#d1d3d8" stroke="#868b94"/><text x="285" y="188" font-size="11" fill="#2a3038" text-anchor="middle">레포 / 서빙 도구</text>
+        <circle cx="175" cy="192" r="5" fill="#ffffff" stroke="#868b94" stroke-width="1.5"/><text x="186" y="196" font-size="11" fill="#868b94">10월 2주차 로컬 LLM 서빙</text>
+      </svg>
+    </div>
+    <div style="font-size: 12px; color: #868b94; margin-top: 8px">굵은 선은 수치를 직접 제공한 소스, 점선은 이어지는 지난 토픽이에요.</div>
+  </div>
+
+  <div class="sec">
+    <div class="h">핵심 포인트</div>
+    <div class="li"><span class="dot"></span><span>4비트에서 성공률이 4%p 떨어졌지만 <span class="hl">메모리는 절반 수준</span>이에요.</span></div>
+    <div class="li"><span class="dot"></span><span>실패는 주로 <span class="hl">인자가 많은 도구</span>에서 나왔어요. 인자 3개 이하에서는 차이가 거의 없었어요.</span></div>
+    <div class="li"><span class="dot"></span><span>서빙 도구 레포가 같은 주에 별 1.2k 늘었고, 4비트 기본 설정을 추가했어요.</span></div>
+    <div class="li"><span class="dot"></span><span>글 두 편은 실험 규모가 작아 수치는 영상 슬라이드를 기준으로 삼았어요.</span></div>
+  </div>
+
+  <div class="sec">
+    <div class="h">양자화별 도구 호출 성공률</div>
+    <div style="display: flex; flex-direction: column; gap: 10px">
+      <div style="display: flex; align-items: center; gap: 10px; font-size: 13px"><span style="width: 42px; color: #555d6d">8비트</span><span style="flex: 1; height: 14px; background: #f3f4f5; border-radius: 4px; overflow: hidden"><span style="display: block; width: 91%; height: 100%; background: #b0b3ba"></span></span><span style="width: 34px; text-align: right; font-weight: 500">91%</span></div>
+      <div style="display: flex; align-items: center; gap: 10px; font-size: 13px"><span style="width: 42px; color: #555d6d">4비트</span><span style="flex: 1; height: 14px; background: #f3f4f5; border-radius: 4px; overflow: hidden"><span style="display: block; width: 87%; height: 100%; background: #2a3038"></span></span><span style="width: 34px; text-align: right; font-weight: 500">87%</span></div>
+    </div>
+    <div style="font-size: 12px; color: #868b94; margin-top: 8px">출처: 발표 영상 14:05 슬라이드</div>
+  </div>
+
+  <div class="sec">
+    <div class="h">발표 영상 타임라인</div>
+    <div style="position: relative; padding-left: 18px">
+      <div style="position: absolute; left: 4px; top: 6px; bottom: 6px; width: 2px; background: #eeeff1"></div>
+      <a class="tl" href="#"><i></i><b>03:10</b><span>문제 제기, 로컬 모델의 도구 호출</span></a>
+      <a class="tl" href="#"><i></i><b>08:40</b><span>서빙 구조 설명</span></a>
+      <a class="tl" href="#"><i style="background: #2a3038"></i><b>14:05</b><span style="font-weight: 500">양자화별 성공률 슬라이드</span></a>
+      <a class="tl" href="#"><i></i><b>22:30</b><span>질의응답, 인자 많은 도구의 실패 사례</span></a>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="h">핵심 개념</div>
+    <div style="font-size: 14px; line-height: 23px; color: #2a3038"><b style="font-weight: 700">도구 호출</b><br>모델이 정해진 형식으로 함수 이름과 인자를 만들어 외부 도구를 실행하게 하는 방식이에요.</div>
+    <div style="font-size: 14px; line-height: 23px; color: #2a3038; margin-top: 12px"><b style="font-weight: 700">4비트 양자화</b><br>가중치를 4비트로 줄여 메모리를 아끼는 방법이에요. 정확도가 얼마나 남는지가 관건이에요.</div>
+  </div>
+
+  <div class="sec">
+    <div class="h">소스별로 더한 것</div>
+    <div style="display: flex; flex-direction: column; font-size: 14px; line-height: 22px">
+      <div style="display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px solid #eeeff1"><span style="flex: none; width: 34px; color: #868b94; font-weight: 500">글</span><span style="color: #2a3038">작은 규모 재현 실험과 설정 팁</span></div>
+      <div style="display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px solid #eeeff1"><span style="flex: none; width: 34px; color: #868b94; font-weight: 500">영상</span><span style="color: #2a3038">양자화별 성공률 수치, 실패 사례</span></div>
+      <div style="display: flex; gap: 10px; padding: 10px 0"><span style="flex: none; width: 34px; color: #868b94; font-weight: 500">레포</span><span style="color: #2a3038">4비트 기본 설정 추가, 별 1.2k 증가</span></div>
+    </div>
+  </div>
+
+  <div class="sec" style="padding-bottom: 28px">
+    <div class="h">출처</div>
+    <div style="display: flex; flex-direction: column; gap: 10px; font-size: 14px">
+      <a class="lk" href="#">양자화한 모델로 도구 호출 실험하기 (블로그)</a>
+      <a class="lk" href="#">로컬 LLM 주간 뉴스레터 10월 3주</a>
+      <a class="lk" href="#">로컬 모델 서빙 발표 영상 (14:05부터)</a>
+      <a class="lk" href="#">example/llm-serve 릴리스 노트</a>
+    </div>
+  </div>
+</div>
+</body>
+</html>
