@@ -469,64 +469,235 @@ for w in weeks:
     w["topic_count"] = len(w["topic_ids"])
     w["source_count"] = sum(w["collected"].values())
 
+# ---------------- 관리 화면 데이터 (소스, 키워드, 실행 기록) ----------------
+# 일별 배열은 그 주 월~일 7칸. 값은 그날 수집한 건수, None은 수집 실패.
+DAYS = {
+    "2026-w39": ["2026-09-21", "2026-09-22", "2026-09-23", "2026-09-24", "2026-09-25", "2026-09-26", "2026-09-27"],
+    "2026-w40": ["2026-09-28", "2026-09-29", "2026-09-30", "2026-10-01", "2026-10-02", "2026-10-03", "2026-10-04"],
+}
+
 sources_cfg = [
-    {"name": "GeekNews", "type": "rss", "channel": "text", "url": "https://news.hada.io/rss/news", "enabled": True,
-     "last": {"at": "2026-10-05T02:00:00+09:00", "count": 9, "error": None}},
-    {"name": "예시 블로그 A (로컬 LLM)", "type": "rss", "channel": "text", "url": None, "enabled": True,
-     "last": {"at": "2026-10-05T02:00:00+09:00", "count": 0, "error": "응답 시간 초과 (10초)"}},
-    {"name": "예시 기술 뉴스레터", "type": "rss", "channel": "text", "url": None, "enabled": True,
-     "last": {"at": "2026-10-05T02:00:00+09:00", "count": 3, "error": None}},
-    {"name": "arXiv cs.CL 신규", "type": "arxiv", "channel": "text", "url": "https://arxiv.org/list/cs.CL/new", "enabled": False,
-     "last": None},
-    {"name": "예시 유튜브 채널 (개발 컨퍼런스)", "type": "youtube", "channel": "video", "url": None, "enabled": True,
-     "last": {"at": "2026-10-04T02:00:00+09:00", "count": 1, "error": None}},
-    {"name": "OSS Insight 주간 트렌딩", "type": "oss_insight", "channel": "github", "url": "https://ossinsight.io/", "enabled": True,
-     "last": {"at": "2026-10-05T02:00:00+09:00", "count": 11, "error": None}},
+    {"id": "src-geeknews", "name": "GeekNews", "type": "rss", "channel": "text",
+     "url": "https://news.hada.io/rss/news", "enabled": True, "added_at": "2026-09-14",
+     "daily": {"2026-w39": [3, 4, 3, 4, 4, 2, 2], "2026-w40": [4, 3, 5, 5, 4, 3, 2]},
+     "note": "개발, AI 소식 큐레이션. 이번 학기 주력 소스"},
+    {"id": "src-blog-a", "name": "예시 블로그 A (로컬 LLM 실험기)", "type": "rss", "channel": "text",
+     "url": None, "enabled": True, "added_at": "2026-09-14",
+     "daily": {"2026-w39": [0, 1, 0, 1, 0, 0, 0], "2026-w40": [1, 0, 0, 0, None, 1, 0]},
+     "error": {"at": "2026-10-03T02:00:00+09:00", "text": "응답 시간 초과 (10초). 다음 실행에서 재시도해 정상"}},
+    {"id": "src-newsletter", "name": "예시 AI 뉴스레터 (주간)", "type": "rss", "channel": "text",
+     "url": None, "enabled": True, "added_at": "2026-09-14",
+     "daily": {"2026-w39": [0, 0, 0, 4, 0, 0, 0], "2026-w40": [0, 0, 0, 5, 0, 0, 0]},
+     "note": "매주 목요일 발행"},
+    {"id": "src-blog-b", "name": "예시 블로그 B (에이전트 엔지니어링)", "type": "rss", "channel": "text",
+     "url": None, "enabled": True, "added_at": "2026-09-21",
+     "daily": {"2026-w39": [1, 0, 1, 0, 1, 0, 0], "2026-w40": [1, 0, 1, 0, 1, 0, 1]}},
+    {"id": "src-lab-blog", "name": "예시 모델 회사 블로그", "type": "rss", "channel": "text",
+     "url": None, "enabled": True, "added_at": "2026-09-21",
+     "daily": {"2026-w39": [0, 1, 0, 1, 0, 1, 0], "2026-w40": [0, 1, 1, 0, 1, 1, 0]}},
+    {"id": "src-arxiv", "name": "arXiv cs.CL 신규 논문", "type": "arxiv", "channel": "text",
+     "url": "https://arxiv.org/list/cs.CL/new", "enabled": False, "added_at": "2026-09-14",
+     "daily": {"2026-w39": [0] * 7, "2026-w40": [0] * 7},
+     "note": "하루 100건이 넘어 9월 3주차에 껐어요. 키워드 필터를 붙인 뒤 다시 켤 예정"},
+    {"id": "src-yt-conf", "name": "예시 유튜브 채널 A (개발 컨퍼런스)", "type": "youtube", "channel": "video",
+     "url": None, "enabled": True, "added_at": "2026-09-14",
+     "daily": {"2026-w39": [0] * 7, "2026-w40": [0, 0, 0, 2, 0, 0, 0]}},
+    {"id": "src-yt-meetup", "name": "예시 유튜브 채널 B (로컬 AI 밋업)", "type": "youtube", "channel": "video",
+     "url": None, "enabled": True, "added_at": "2026-09-14",
+     "daily": {"2026-w39": [0, 0, 0, 0, 1, 0, 1], "2026-w40": [0, 0, 0, 0, 0, 1, 0]}},
+    {"id": "src-ossinsight", "name": "OSS Insight 주간 트렌딩", "type": "oss_insight", "channel": "github",
+     "url": "https://ossinsight.io/", "enabled": True, "added_at": "2026-09-14",
+     "daily": {"2026-w39": [0, 0, 0, 0, 0, 0, 7], "2026-w40": [0, 0, 0, 0, 0, 0, 8]},
+     "note": "일요일에 주간 목록을 한 번 가져와요"},
+    {"id": "src-tracked", "name": "추적 레포 3개", "type": "github_repos", "channel": "github",
+     "url": None, "enabled": True, "added_at": "2026-09-14",
+     "repos": ["earendil-works/pi", "Tencent/AI-Infra-Guard", "ollaya-dev/ollaya"],
+     "daily": {"2026-w39": [0, 0, 1, 0, 1, 0, 0], "2026-w40": [0, 0, 1, 0, 2, 0, 0]},
+     "note": "릴리스와 별 증가만 확인"},
 ]
 
+# 토픽에 실제로 쓰인 항목 수(기여)를 소스별로 계산
+_tracked = set(sources_cfg[-1]["repos"])
+_video_src = {"w39-llama-measure": "src-yt-meetup", "w40-jev-race": "src-yt-conf", "w40-video-local": "src-yt-conf"}
+for s in sources_cfg:
+    s["weeks"] = {}
+for w in DAYS:
+    used = {s["id"]: 0 for s in sources_cfg}
+    for t in topics:
+        if t["week"] != w:
+            continue
+        for src in t["sources"]:
+            if src["site"] == "GeekNews":
+                used["src-geeknews"] += 1
+            elif src["channel"] == "video":
+                used[_video_src[t["id"]]] += 1
+            elif src["channel"] == "github":
+                used["src-tracked" if src["title"] in _tracked else "src-ossinsight"] += 1
+    for s in sources_cfg:
+        d = s["daily"][w]
+        s["weeks"][w] = {"collected": sum(x for x in d if x), "failed_days": sum(1 for x in d if x is None), "used_in_topics": used[s["id"]]}
+
+for w in DAYS:  # 주간 수집 합계가 weeks[].collected와 맞는지 확인
+    tot = {"text": 0, "video": 0, "github": 0}
+    for s in sources_cfg:
+        tot[s["channel"]] += s["weeks"][w]["collected"]
+    wk = next(x for x in weeks if x["id"] == w)
+    assert tot == wk["collected"], (w, tot, wk["collected"])
+
+for s in sources_cfg:
+    w = "2026-w40"
+    last_i = 6
+    s["last"] = None if not s["enabled"] else {
+        "at": "2026-10-05T02:00:00+09:00", "count": s["daily"][w][last_i] or 0,
+        "status": "ok"}
+    if s.get("error"):
+        s["last_error"] = s.pop("error")
+
 keywords = {
+    "weeks": ["2026-w37", "2026-w38", "2026-w39", "2026-w40"],
     "items": [
-        {"name": "판단 모델", "aliases": ["Jev", "Jev 방식", "의사결정 모델", "decision model"]},
-        {"name": "로컬 LLM", "aliases": ["llama.cpp", "Ollama", "양자화", "온디바이스"]},
-        {"name": "코딩 에이전트", "aliases": ["하네스", "Claude Code", "Codex", "Pi"]},
-        {"name": "MCP", "aliases": ["Model Context Protocol", "MCP 서버"]},
-        {"name": "RAG", "aliases": ["벡터 검색", "전문 검색", "하이브리드 검색"]},
-        {"name": "에이전트 보안", "aliases": ["SSRF", "탈옥", "프롬프트 인젝션"]},
-        {"name": "홈서버", "aliases": ["Cloudflare Tunnel", "Tailscale"]},
+        {"id": "kw-judge", "name": "판단 모델", "aliases": ["Jev", "Jev 방식", "의사결정 모델", "decision model"],
+         "added_at": "2026-09-14", "mentions": [0, 2, 9, 11], "topics": ["w39-jev-local", "w40-jev-race"]},
+        {"id": "kw-local-llm", "name": "로컬 LLM", "aliases": ["llama.cpp", "Ollama", "양자화", "온디바이스"],
+         "added_at": "2026-09-14", "mentions": [6, 5, 7, 4], "topics": ["w39-llama-measure"]},
+        {"id": "kw-coding-agent", "name": "코딩 에이전트", "aliases": ["하네스", "Claude Code", "Codex", "Pi"],
+         "added_at": "2026-09-14", "mentions": [8, 9, 10, 14], "topics": ["w39-plan-mode", "w40-harness", "w40-measure"]},
+        {"id": "kw-mcp", "name": "MCP", "aliases": ["Model Context Protocol", "MCP 서버"],
+         "added_at": "2026-09-14", "mentions": [5, 4, 3, 6], "topics": ["w40-harness", "w40-video-local"]},
+        {"id": "kw-rag", "name": "RAG", "aliases": ["벡터 검색", "전문 검색", "하이브리드 검색"],
+         "added_at": "2026-09-14", "mentions": [3, 2, 1, 5], "topics": ["w40-search-store"]},
+        {"id": "kw-agent-sec", "name": "에이전트 보안", "aliases": ["SSRF", "탈옥", "프롬프트 인젝션", "레드팀"],
+         "added_at": "2026-09-21", "mentions": [0, 0, 4, 5], "topics": ["w39-hf-attack", "w40-browser-security"]},
+        {"id": "kw-video", "name": "영상 이해", "aliases": ["전사", "STT", "OCR", "슬라이드 판독"],
+         "added_at": "2026-09-14", "mentions": [2, 1, 2, 6], "topics": ["w40-video-local"]},
+        {"id": "kw-homeserver", "name": "홈서버", "aliases": ["Cloudflare Tunnel", "Tailscale", "사설망"],
+         "added_at": "2026-09-28", "mentions": [0, 0, 2, 1], "topics": []},
     ],
     "candidates": [
-        {"alias": "Decision API", "keyword": "판단 모델", "seen": 2},
-        {"alias": "Codemode", "keyword": "코딩 에이전트", "seen": 1},
+        {"id": "cand-1", "alias": "Decision API", "keyword_id": "kw-judge", "status": "pending", "run_id": "weekly-2026-10-05",
+         "by": "편집장", "reason": "판단 모델 토픽의 글 2건에서 같은 대상을 가리켜요",
+         "evidence": [{"title": "OpenAI, Jev와 경쟁할 Luna 기반 Decision API 공개", "date": "2026-09-30", "url": GN + "34528"}],
+         "seen": 2},
+        {"id": "cand-2", "alias": "Codemode", "keyword_id": "kw-coding-agent", "status": "pending", "run_id": "weekly-2026-10-05",
+         "by": "정규화 v0", "reason": "Pi 관련 글에서 도구 조합 방식 이름으로 나와요. 별칭보다 하위 개념일 수 있어요",
+         "evidence": [{"title": "Pi: MCP는 지원하지 않는다더니!", "date": "2026-09-30", "url": GN + "34545"}],
+         "seen": 1},
+        {"id": "cand-3", "alias": "하네스 엔지니어링", "keyword_id": "kw-coding-agent", "status": "pending", "run_id": "weekly-2026-10-05",
+         "by": "정규화 v0", "reason": "'하네스'와 표기 유사도 0.91",
+         "evidence": [{"title": "하네스가 곧 회사다", "date": "2026-10-04", "url": GN + "34718"}],
+         "seen": 3},
+        {"id": "cand-4", "alias": "Luna", "keyword_id": "kw-judge", "status": "rejected", "run_id": "weekly-2026-10-05",
+         "by": "정규화 v0", "reason": "Luna는 OpenAI의 소형 모델 이름이라 판단 모델과 다른 대상이에요(오병합 방지)",
+         "decided_at": "2026-10-05", "evidence": [], "seen": 2},
     ],
 }
 
-runs = [
-    {"kind": "weekly", "at": "2026-10-05T07:00:00+09:00", "duration": "18분", "status": "ok",
-     "summary": "토픽 6개 발행, 검수 반려 1회, 확인 필요 1문장",
-     "steps": [
-         {"role": "편집장", "text": "후보 토픽 9개 중 6개 선정. 판단 모델은 지난주 토픽과 겹쳐 후속으로 연결"},
-         {"role": "작성자", "text": "토픽 6개 초안, 근거 id 41개"},
-         {"role": "검수자", "text": "1차 반려: 하네스 토픽의 '15,000줄'이 근거와 단위가 달라 수정 요청. 2차 통과"},
-         {"role": "검수자", "text": "브라우저 보안 토픽의 의견 글 문장은 근거 대조 불가로 '확인 필요' 표시"},
-     ]},
-    {"kind": "nightly", "at": "2026-10-04T02:00:00+09:00", "duration": "11분", "status": "ok",
-     "summary": "글 7, 영상 1, 레포 2 수집",
-     "steps": [
-         {"role": "편집장", "text": "영상 1편 처리 깊이: 슬라이드까지. 근거: 제목에 '비교', 길이 22분, 수동 자막 있음"},
-         {"role": "영상 분석가", "text": "장면 전환 프레임 64장 중 수치가 많은 9장 판독, 슬라이드 전용 수치 3개"},
-     ]},
-    {"kind": "nightly", "at": "2026-10-03T02:00:00+09:00", "duration": "6분", "status": "partial",
-     "summary": "글 5 수집, 소스 1개 실패",
-     "steps": [
-         {"role": "수집기", "text": "예시 블로그 A 응답 시간 초과 (10초), 다음 실행에서 재시도"},
-     ]},
-    {"kind": "nightly", "at": "2026-10-02T02:00:00+09:00", "duration": "9분", "status": "ok",
-     "summary": "글 12, 레포 4 수집",
-     "steps": [
-         {"role": "편집장", "text": "새 영상 없음, 영상 단계 건너뜀"},
-         {"role": "레포 분석가", "text": "example/mega-agent-hub: 7일 별 +5.6k, 커밋 0건, 기여자 1명으로 '확인 필요'"},
-     ]},
+def _run(kind, at, dur_min, status, summary, counts, steps, errors=None, week=None):
+    d = {"id": f"{kind}-{at[:10]}", "kind": kind, "at": at, "duration_min": dur_min, "status": status,
+         "summary": summary, "counts": counts, "steps": steps, "model": "qwen3.5:9b (예시)"}
+    if errors:
+        d["errors"] = errors
+    if week:
+        d["week"] = week
+    return d
+
+def _nightly(week):
+    out = []
+    for i, day in enumerate(DAYS[week]):
+        c = {"text": 0, "video": 0, "github": 0}
+        errs = []
+        for s in sources_cfg:
+            v = s["daily"][week][i]
+            if v is None:
+                errs.append({"source": s["name"], "text": "응답 시간 초과 (10초)"})
+            elif v:
+                c[s["channel"]] += v
+        y, m, dd = map(int, day.split("-"))
+        import datetime as _dt
+        run_day = (_dt.date(y, m, dd) + _dt.timedelta(days=1)).isoformat()
+        steps = [{"role": "편집장", "text": f"수집 계획: 켜진 소스 9개 확인, 새 항목 {sum(c.values())}건", "auto": True}]
+        out.append(_run("nightly", run_day + "T02:00:00+09:00", 0, "partial" if errs else "ok",
+                        f"글 {c['text']}, 영상 {c['video']}, 레포 {c['github']} 수집" + (f", 소스 {len(errs)}개 실패" if errs else ""),
+                        c, steps, errs or None, week))
+    return out
+
+runs = _nightly("2026-w39") + _nightly("2026-w40")
+
+# 날짜별로 사람이 읽을 판단 기록을 덧붙임
+_extra = {
+    "2026-09-26": [{"role": "편집장", "text": "영상 1편 '맥에서 로컬 LLM 굴리기' 처리 깊이: 슬라이드까지. 근거: 제목에 '실측', 길이 31분, 자동 자막만 있음"},
+                   {"role": "영상 분석가", "text": "장면 전환 프레임 58장 중 수치가 많은 7장 판독, 슬라이드 전용 수치 2개"}],
+    "2026-09-28": [{"role": "편집장", "text": "영상 1편 처리 깊이: 자막만. 근거: 인터뷰 형식, 슬라이드 없음"},
+                   {"role": "레포 분석가", "text": "example/agent-swarm-x: 7일 별 +4.8k, 커밋 0건, 기여자 1명으로 '확인 필요'"}],
+    "2026-10-02": [{"role": "편집장", "text": "영상 2편 처리 깊이: 둘 다 슬라이드까지. 근거: 제목에 '비교', '수치', 수동 자막 있음"},
+                   {"role": "영상 분석가", "text": "2편에서 프레임 121장 중 16장 판독, 슬라이드 전용 수치 5개"}],
+    "2026-10-03": [{"role": "레포 분석가", "text": "earendil-works/pi 1.0, Tencent/AI-Infra-Guard v4.6.0 릴리스 감지"}],
+    "2026-10-04": [{"role": "편집장", "text": "영상 1편 처리 깊이: 자막만. 근거: 길이 9분, 데모 위주"}],
+    "2026-10-05": [{"role": "레포 분석가", "text": "example/mega-agent-hub: 7일 별 +5.6k, 커밋 0건, 기여자 1명으로 '확인 필요'"}],
+}
+_dur = [7, 9, 8, 14, 9, 6, 11, 8, 7, 10, 19, 6, 8, 12]
+for r, dmin in zip(runs, _dur):
+    r["duration_min"] = dmin
+    r["steps"] += _extra.get(r["at"][:10], [])
+    vids = r["counts"]["video"]
+    r["counts"]["video_depth"] = {"captions": 0, "transcript": 0, "slides": 0}
+    for st in _extra.get(r["at"][:10], []):
+        if "처리 깊이" in st["text"] and "슬라이드까지" in st["text"]:
+            r["counts"]["video_depth"]["slides"] = vids
+        elif "처리 깊이" in st["text"] and "자막만" in st["text"]:
+            r["counts"]["video_depth"]["captions"] = vids
+
+runs.append(_run("weekly", "2026-09-28T07:00:00+09:00", 16, "ok", "토픽 5개 발행, 검수 반려 0회",
+                 {"candidates": 8, "related": {"follow_up": 0, "new": 8, "duplicate": 0}, "selected": 5, "evidence_ids": 31, "review": {"passed_first": 5, "rejected": 0, "needs_check": 0}, "published": 5},
+                 [{"role": "편집장", "text": "후보 토픽 8개 중 5개 선정. 판단 모델이 4개 소스에 걸쳐 가장 많이 겹쳐 1순위"},
+                  {"role": "편집장", "text": "과거 대조: 후보 8개 모두 신규(누적 리포트가 아직 적음)"},
+                  {"role": "작성자", "text": "토픽 5개 초안, 근거 id 31개"},
+                  {"role": "검수자", "text": "5개 모두 1차 통과"}], week="2026-w39"))
+runs.append(_run("weekly", "2026-10-05T07:00:00+09:00", 18, "ok", "토픽 6개 발행, 검수 반려 1회, 확인 필요 1문장",
+                 {"candidates": 9, "related": {"follow_up": 3, "new": 6, "duplicate": 0}, "selected": 6, "evidence_ids": 41, "review": {"passed_first": 5, "rejected": 1, "needs_check": 1}, "published": 6},
+                 [{"role": "편집장", "text": "후보 토픽 9개 중 6개 선정"},
+                  {"role": "편집장", "text": "과거 대조: 후보 9개 중 후속 3개(판단 모델, 하네스, 브라우저 보안), 신규 6개, 중복 0개"},
+                  {"role": "작성자", "text": "토픽 6개 초안, 근거 id 41개"},
+                  {"role": "검수자", "text": "1차 반려: 하네스 토픽의 수치가 근거와 단위가 달라 수정 요청. 2차 통과",
+                   "detail": {"topic_id": "w40-harness", "draft": "Pi Durable은 약 15,000토큰 분량의 TypeScript예요.", "evidence": "테스트 제외 약 15,000줄의 TypeScript, GPT 기준 약 150,000토큰", "evidence_ref": "s3", "fixed": "Pi Durable은 테스트를 빼고 약 15,000줄의 TypeScript예요."}},
+                  {"role": "검수자", "text": "브라우저 보안 토픽의 의견 글 문장은 근거 대조 불가로 '확인 필요' 표시"}], week="2026-w40"))
+for r in runs:  # 사람이 봐야 할 판단 표시
+    for st in r["steps"]:
+        if "반려:" in st["text"] or "'확인 필요'" in st["text"]:
+            st["attention"] = True
+runs.sort(key=lambda r: r["at"], reverse=True)
+# 주간 발행 단계에 시각(분 단위) 붙이기
+for r in runs:
+    if r["kind"] == "weekly":
+        r["steps"].append({"role": "편집장", "text": f"토픽 {r['counts']['published']}개 발행, 지식 누적 저장"})
+        offs = [0, 2, 5, 11, 14, 18] if len(r["steps"]) == 6 else [0, 2, 5, 11, 16]
+        for st, o in zip(r["steps"], offs):
+            st["t"] = f"07:{o:02d}"
+
+# 실행 기록 상위(주차 목록)용 요약. 9월 3주차는 첫 운영 주라 승인 모드를 켜 둔 기간
+run_weeks = [
+    {"week": "2026-w40", "label": "10월 1주차", "range": "9.28 ~ 10.4", "nightly": 7, "nightly_failed": 1,
+     "collected": 55, "candidates": 9, "published": 6, "rejected": 1, "needs_check": 1, "approval_mode": False,
+     "note": "후속 토픽 3개"},
+    {"week": "2026-w39", "label": "9월 4주차", "range": "9.21 ~ 9.27", "nightly": 7, "nightly_failed": 0,
+     "collected": 45, "candidates": 8, "published": 5, "rejected": 0, "needs_check": 0, "approval_mode": False,
+     "note": "승인 모드 끄고 자동 발행 시작"},
+    {"week": "2026-w38", "label": "9월 3주차", "range": "9.14 ~ 9.20", "nightly": 7, "nightly_failed": 2,
+     "collected": 38, "candidates": 6, "published": 4, "rejected": 3, "needs_check": 2, "approval_mode": True,
+     "note": "첫 운영 주. 승인 모드로 사람이 발행 전 확인, 토픽 1개 직접 뺌", "detail": False},
 ]
+for w in run_weeks:
+    w.setdefault("detail", True)
+for r in runs:
+    r.setdefault("errors", [])
+    for st in r["steps"]:
+        st.setdefault("auto", False)
+        st.setdefault("attention", False)
+    r["decisions"] = sum(1 for st in r["steps"] if not st["auto"])
+for s_ in sources_cfg:
+    s_.setdefault("note", None)
+    s_.setdefault("last_error", None)
+
 
 data = {
     "meta": {
@@ -543,6 +714,7 @@ data = {
     "sources": sources_cfg,
     "keywords": keywords,
     "runs": runs,
+    "run_weeks": run_weeks,
 }
 
 out = pathlib.Path(__file__).parent / "trendsit-example.json"

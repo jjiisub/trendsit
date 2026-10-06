@@ -69,7 +69,9 @@ build()
 b = snapshot()
 check("빌드 두 번 결과 동일", a == b, f"{len(a)}개 파일")
 
-PAGES = ["/", "/week/2026-w39/", "/week/2026-w40/"] + [f'/topic/{t["id"]}/' for t in DATA["topics"]] + ["/sources/", "/keywords/", "/runs/", "/assets/style.css"]
+RUN_DETAILS = [f'/runs/{r["week"]}/{r["id"]}/' for r in DATA["runs"]]
+PAGES = (["/", "/week/2026-w39/", "/week/2026-w40/"] + [f'/topic/{t["id"]}/' for t in DATA["topics"]]
+         + ["/sources/", "/keywords/", "/runs/", "/runs/weeks/", "/runs/2026-w40/", "/runs/2026-w39/"] + RUN_DETAILS + ["/assets/style.css"])
 
 # ---------------------------------------------------------------- 2. 로컬 서버 200
 server = subprocess.Popen(
@@ -104,6 +106,7 @@ try:
                     broken.append(f"{url_of(p)} {href}")
                 continue
             path, _, frag = href.partition("#")
+            path = path.split("?", 1)[0]
             target = SITE / path.lstrip("/")
             if path.endswith("/"):
                 target = target / "index.html"
@@ -157,6 +160,66 @@ try:
             ok, detail = False, f"출처 목록 {src_ids}"
         check(f"{u} 출처 번호와 확인 필요 표시", ok, detail)
         check(f"{u} title", f"<title>{t['title'].replace('==', '')} | TrendsIT</title>" in s)
+
+    # ------------------------------------------------------------ 관리 화면 (5.4 추가 항목)
+    def page_of(u):
+        return read(SITE / u.lstrip("/") / "index.html")
+
+    s = page_of("/sources/")
+    groups = re.findall(r'<h2 class="sgroup-h"><span>([^<]+)</span><span class="sgroup-n">(\d+)개 / (\d+)건</span>', s)
+    check("소스: 채널 묶음 합계 글 41 / 영상 3 / GitHub 11", [(g[0], g[2]) for g in groups] == [("글", "41"), ("영상", "3"), ("GitHub", "11")], f"{groups}")
+    check("소스: \"토픽에 29건\"", "토픽에 29건 썼어요" in s)
+    check("소스: 확인할 것 2개 (블로그 A 실패, 2주째 안 쓰인 소스 4개)",
+          "확인할 것 2개" in s and "예시 블로그 A가" in s and "실패</mark>" in s
+          and all(n in s.split("2주째")[0].split("확인할 것")[1] for n in ["예시 블로그 A", "예시 AI 뉴스레터", "예시 블로그 B", "예시 모델 회사 블로그"]))
+    check("소스: 7일 막대 9줄 + 꺼짐 1줄", s.count('<li class="srow">') == 9 and s.count('<li class="srow off">') == 1
+          and s.count('class="days"') == 9 and len(re.findall(r'<i class="d', s.split('class="slegend"')[0])) == 63)
+
+    k = page_of("/keywords/")
+    cands = re.findall(r'<li class="cand">(.*?)</li>', k)
+    check("키워드: 후보 3개, 승인/거절 버튼 비활성", len(cands) == 3 and all(c.count("disabled") == 2 and "승인" in c and "거절" in c for c in cands))
+    check("키워드: 최근 거절 1줄", k.count('<p class="rejline">최근 거절: Luna') == 1)
+    order = re.findall(r'<div class="kw-h"><h3>([^<]+)</h3>', k)
+    items = DATA["keywords"]["items"]
+    want = [items[i]["name"] for i in sorted(range(len(items)), key=lambda i: (-items[i]["mentions"][-1], i))]
+    check("키워드: 8개가 이번 주 언급 많은 순", order == want and len(order) == 8, f"{order}")
+    check("키워드: 가지에 후보 3개 점선, Luna 취소선", k.count('<li class="pend"><i class="br dashed">') == 3 and '<s class="lv">Luna</s>' in k)
+
+    r = page_of("/runs/")
+    check("실행 기록: 메뉴 링크가 /runs/, 10월 1주차 메인", 'href="/runs/" class="on"' in r and "10월 1주차 실행 기록</h1>" in r and r == page_of("/runs/2026-w40/"))
+    check("실행 기록: 봐야 할 판단 3개", "봐야 할 판단 3개" in r and r.count('class="att"') == 3)
+    rail = re.findall(r'<div class="rl-h"><span>[^<]+</span><b>([^<]+)</b></div><div class="rl-s">([^<]*)</div>', r)
+    nums = [re.search(r"\d+", b).group() for b, _ in rail]
+    check("실행 기록: 단계 레일 55, 9, 6, 6, 5(반려 1), 6", nums == ["55", "9", "6", "6", "5", "6"] and "반려 1회" in rail[4][1], f"{rail}")
+    check("실행 기록: 실행 8개 목록", r.count('class="runrow"') == 8 and "이 주의 실행 8번" in r)
+    w = page_of("/runs/weeks/")
+    wk = re.findall(r'<li>(<a class="wk"|<div class="wk")', w)
+    w38 = w.split("9월 3주차")[1] if "9월 3주차" in w else ""
+    check("실행 기록: 상위에 3주, 9월 3주차는 승인 모드 + 링크 없음",
+          len(wk) == 3 and wk[2] == '<div class="wk"' and '<span class="badge">승인 모드</span>' in w38 and "/runs/2026-w38/" not in w)
+    bad = []
+    for u in RUN_DETAILS:
+        h = page_of(u)
+        wid = u.split("/")[2]
+        if not ('href="/runs/weeks/"' in h and f'href="/runs/{wid}/"' in h and h.count('<div class="bc">') == 1):
+            bad.append(u)
+    check(f"실행 기록: 상세 {len(RUN_DETAILS)}개 모두 경로 줄로 위로 이동", len(RUN_DETAILS) == 16 and not bad, ", ".join(bad))
+    dd = page_of("/runs/2026-w40/weekly-2026-10-05/")
+    box = re.search(r'<div class="reject">(.*?)</div></span>', dd)
+    check("실행 기록: 10.5 주간 발행 상세에 반려 상자(초안, 근거, 수정)",
+          bool(box) and all(x in box.group(1) for x in ['class="rk">초안', 'class="rk">근거', 'class="rk">수정', "(GeekNews, 10.2)"]))
+    att_links = re.findall(r'class="att" href="([^"]+)"', r)
+    check("실행 기록: 봐야 할 판단 링크가 판단 줄로 이동", all("#step-" in a for a in att_links))
+
+    hl_over = []
+    for u in ["/sources/", "/keywords/", "/runs/", "/runs/2026-w39/", "/runs/weeks/"] + RUN_DETAILS:
+        n = page_of(u).count('<mark class="hl">')
+        if n > 4:
+            hl_over.append(f"{u}={n}")
+    check("관리 화면 형광 밑줄 화면당 4개 이하", not hl_over, ", ".join(hl_over))
+    notice = DATA["meta"]["notice"]
+    with_notice = [url_of(p) for p in html_files() if notice[:20] in read(p)]
+    check("맨 아래 예시 데이터 안내 문구 없음 (사용자 결정)", not with_notice, ", ".join(with_notice[:5]))
 
     # ------------------------------------------------------------ 7. 색
     css = (SITE / "assets" / "style.css").read_text(encoding="utf-8")
@@ -252,7 +315,9 @@ try:
         SHOTS.mkdir(exist_ok=True)
         shot_pages = {"/": "home", "/week/2026-w39/": "week-w39", "/topic/w40-jev-race/": "topic-w40-jev-race",
                       "/topic/w40-measure/": "topic-w40-measure", "/topic/w40-browser-security/": "topic-w40-browser-security",
-                      "/sources/": "sources", "/keywords/": "keywords", "/runs/": "runs"}
+                      "/sources/": "sources", "/keywords/": "keywords", "/runs/": "runs",
+                      "/runs/weeks/": "runs-weeks", "/runs/2026-w40/weekly-2026-10-05/": "run-weekly-2026-10-05",
+                      "/runs/2026-w40/nightly-2026-10-03/": "run-nightly-2026-10-03"}
         js = """
 const { chromium } = require(process.env.PW);
 (async () => {

@@ -16,7 +16,7 @@
 | `docs/03_TASK.md` | 이 문서 |
 | `data/trendsit-example.json` | 2주치 예시 데이터 (토픽 11, 레포 10, 소스, 키워드, 실행 기록) |
 | `data/make_data.py` | 위 JSON을 만든 스크립트 (참고용, 고칠 필요 없음) |
-| `mockups/home-mobile.html`, `topic-mobile.html`, `home-pc.html` | 디자인 시각 기준. 브라우저로 열어 본다 |
+| `mockups/` 8개 | 디자인 시각 기준. 브라우저로 열어 본다. 홈 모바일, 토픽 모바일, 홈 PC, 소스, 키워드, 실행 기록 3단(주차별, 이번 주차, 실행 상세) |
 
 ## 2. 결과물
 - `~/Claude/projects/trendsit/` 프로젝트 폴더 (CLAUDE.md, docs, data, mockups, site_src, site)
@@ -80,7 +80,12 @@ git init -q && printf "site/\n.DS_Store\n*.log\n.env\n" > .gitignore && git add 
 | `/` | `site/index.html` | 최신 주차(`weeks[0]`, 10월 1주차) 브리핑 홈 |
 | `/week/2026-w39/` | `site/week/2026-w39/index.html` | 지난 주차 브리핑 홈 (주차마다 하나. 최신 주차도 `/week/2026-w40/`로 하나 더 만든다) |
 | `/topic/<id>/` | `site/topic/<id>/index.html` | 토픽 페이지 11개 |
-| `/sources/` `/keywords/` `/runs/` | 각 `index.html` | 읽기 전용 목록 |
+| `/sources/` | `site/sources/index.html` | 소스 (02_DESIGN 6.3) |
+| `/keywords/` | `site/keywords/index.html` | 키워드 (6.4) |
+| `/runs/` | `site/runs/index.html` | 실행 기록 메인 = 최신 주차 (6.5). `/runs/2026-w40/`도 같은 내용으로 하나 더 |
+| `/runs/<주차id>/` | `site/runs/2026-w39/index.html` 등 | 주차별 메인 (`runs[].week`가 있는 주차: w40, w39) |
+| `/runs/weeks/` | `site/runs/weeks/index.html` | 실행 기록 상위: 주차별 목록 |
+| `/runs/<주차id>/<실행id>/` | 실행마다 1개 (16개) | 실행 기록 하위: 실행 1건 상세 |
 | `/assets/style.css` | | 공통 CSS |
 
 ### 5.3 데이터 → 화면 매핑 (`data/trendsit-example.json`)
@@ -91,18 +96,28 @@ git init -q && printf "site/\n.DS_Store\n*.log\n.env\n" > .gitignore && git add 
   - 토픽 페이지: `overview`, `points[]`(`refs`는 그 토픽 `sources[].id`, 화면에는 출처 목록 순번 [1][2]로), `diagrams[]`, `concepts[]`, `contributions[]`, `sources[]`, `relation`(후속이면 헤더와 소스 연결도에 지난 토픽 링크)
   - 문자열의 `==텍스트==` → `<mark class="hl">텍스트</mark>` (HTML 이스케이프 먼저, 그다음 변환)
 - `diagrams[].type`: `bars` → B 수치 막대, `events` → D 사건 흐름, `video` → C 영상 타임라인. 소스 연결도(A)는 데이터와 상관없이 항상 `sources[]`로 그린다
-- `sources[]`: `example: true`(예시 영상)는 링크 없이 "예시 영상" 표시. 나머지는 `url`로 새 탭(`rel="noopener"`)
+- `topics[].sources[]`(토픽의 출처): `example: true`(예시 영상)는 링크 없이 "예시 영상" 표시. 나머지는 `url`로 새 탭(`rel="noopener"`)
 - `repos[]` (주차별 `week`): 이름, `stars_7d`(문자열 그대로, 예 "+1.9k"), `what`(하는 일 한 문장), 셋째 줄은 `signal` 라벨(`meta.signal_labels`) / `note`(있을 때만) / `topic_id`가 있으면 "'토픽 제목' 토픽과 관련" 링크(없으면 생략). `url`이 없으면(가상 레포) 링크 없음
 - 채널 라벨: 주간 수집 범례는 `meta.channel_labels`(글, 영상, GitHub), 토픽 메타와 소스별로 더한 것은 `meta.channel_labels_topic`(글, 영상, 레포)
 - 영상 타임라인 시각: 화면에는 `t`(MM:SS), 원본 링크에는 `sec`(초)를 `?t=` 값으로. 이번 데이터의 영상은 모두 예시라 링크 없음
-- `sources`(소스 설정), `keywords`, `runs`: 각 목록 페이지
+- 최상위 `sources[]`(소스 설정, 토픽 안의 `topics[].sources[]`와 다름): `id`, `name`, `type`, `channel`, `url`, `enabled`, `added_at`, `note`(없으면 null), `daily[주차id]`(월~일 7칸, `null`은 그날 실패), `weeks[주차id]`(`collected`, `failed_days`, `used_in_topics`), `last`, `last_error`(없으면 null), `repos`(추적 레포 소스만). 소스 페이지는 최신 주차 기준
+- `keywords.items[]`: `id`, `name`, `aliases`, `added_at`, `mentions`(`keywords.weeks` 4주 순서, 마지막이 이번 주), `topics`. `keywords.candidates[]`: `id`, `status`(pending/rejected), `alias`, `keyword_id`, `reason`, `by`, `evidence[]`(title, date, url), `seen`, `run_id`(후보를 낸 실행), `decided_at`(거절만)
+- `runs[]`: `id`, `week`, `kind`(nightly/weekly), `at`, `duration_min`, `status`(ok/partial), `summary`, `model`, `counts`, `errors[]`(빈 배열 가능), `decisions`(판단 수 = `auto`가 아닌 단계 수), `steps[]`(`role`, `text`, `auto`, `attention`, weekly만 `t`, 반려만 `detail`{topic_id, draft, evidence, evidence_ref, fixed})
+  - **매일 수집(nightly)은 실행일 02:00에 전날 것을 모은다.** 그래서 `nightly-2026-09-28`은 9월 4주차(w39) 소속이고, 소스의 실패 칸(`daily`의 null)은 수집 대상 날짜(10.2), `last_error.at`은 실행 시각(10.3 02:00)이다. 주차 페이지에 넣을 실행은 날짜가 아니라 `runs[].week`로 고른다
+  - `steps[].detail.evidence_ref`는 `topics[]`에서 `detail.topic_id` 토픽의 `sources[].id`. 반려 상자 근거 줄 끝의 "(GeekNews, 10.2)"는 그 출처의 `site`, `date`
+- `run_weeks[]`: 주차별 요약(상위 화면). `detail`이 false인 주(w38)는 페이지와 링크가 없다
+- 날짜 표시: 제목, 목록 줄은 "10.5 (월) 07:00"(요일 포함), 경로 줄과 짧은 링크는 "10.5 주간 발행"처럼 요일 생략. 요일은 고정 표 `"월화수목금토일"[date.weekday()]`로 붙인다(`strftime('%a')`는 영어라 쓰지 않음)
+- 라벨 표: 소스 유형 rss→RSS, arxiv→arXiv, youtube→유튜브, oss_insight→OSS Insight, github_repos→레포 추적 / 실행 종류 weekly→주간 발행, nightly→매일 수집 / 상태 ok→정상, partial→일부 실패
 
 ### 5.4 검증 (모두 통과해야 완료)
 `site_src/check.py`를 만들어 자동으로 확인할 수 있는 것은 자동으로 확인한다.
 - [ ] `python3 site_src/build.py`를 두 번 실행해도 결과 파일이 같다
-- [ ] 로컬 서버에서 모든 페이지 200: `/`, `/week/2026-w39/`, `/week/2026-w40/`, 토픽 11개, `/sources/`, `/keywords/`, `/runs/`, `/assets/style.css`
+- [ ] 로컬 서버에서 모든 페이지 200: `/`, `/week/2026-w39/`, `/week/2026-w40/`, 토픽 11개, `/sources/`, `/keywords/`, `/runs/`, `/runs/weeks/`, `/runs/2026-w40/`, `/runs/2026-w39/`, 실행 상세 16개, `/assets/style.css`
 - [ ] 내부 링크(`href="/..."`) 깨짐 0건
 - [ ] 홈: 리드 카드 정확히 1개, 목록이 rank 순, 레포가 그 주차 것만(10월 1주차 5개)
+- [ ] 소스: 채널 묶음 합계가 글 41 / 영상 3 / GitHub 11, "토픽에 29건", 확인할 것 2개(블로그 A 실패, 2주째 안 쓰인 소스 4개), 7일 막대 9줄 + 꺼짐 1줄
+- [ ] 키워드: 후보 3개(승인/거절 버튼 비활성), 최근 거절 1줄, 키워드 8개가 이번 주 언급 많은 순, 가지에 후보 3개는 점선, Luna는 취소선
+- [ ] 실행 기록: 메뉴 링크가 `/runs/`로 열리고 10월 1주차 메인이 보인다 / 봐야 할 판단 3개 / 단계 레일 숫자 55, 9, 6, 6, 5(반려 1), 6 / 실행 8개 목록 / 상위에 3주, 9월 3주차는 "승인 모드"와 링크 없음 / 상세 16개 모두 경로 줄로 위로 이동 가능 / 10.5 주간 발행 상세에 반려 상자(초안, 근거, 수정)
 - [ ] 형광 밑줄 개수(`<mark class="hl">` 개수): 홈 토픽 요약마다 1개 이하 / 토픽 페이지는 개요 + 핵심 포인트 합계 4개 이하 (토픽 페이지에는 요약을 다시 싣지 않는다)
 - [ ] 토픽 페이지: 소스 연결도가 항상 있음 / `diagrams`에 없는 도식은 그리지 않음 / 출처 번호가 출처 목록과 맞음 / `check: true` 문장에 "확인 필요"
 - [ ] 색: CSS와 HTML(인라인 style, SVG `fill`/`stroke` 포함)의 색 값이 `02_DESIGN.md` 3장 표의 값, `#fff`, `transparent`, `none`뿐. 유채색은 #ffd5c0 하나
@@ -162,7 +177,7 @@ cloudflared tunnel info home | head -20
 
 ## 8. 외부 확인
 ```bash
-for u in / /week/2026-w39/ /topic/w40-jev-race/ /sources/; do curl -s -o /dev/null -w "%{http_code} $u\n" https://trendsit.jiseop.com$u; done
+for u in / /week/2026-w39/ /topic/w40-jev-race/ /sources/ /keywords/ /runs/ /runs/weeks/ /runs/2026-w40/weekly-2026-10-05/; do curl -s -o /dev/null -w "%{http_code} $u\n" https://trendsit.jiseop.com$u; done
 curl -s https://trendsit.jiseop.com/ | grep -o "<title>[^<]*</title>"
 curl -s -o /dev/null -w "%{http_code} pt\n" https://pt.jiseop.com/
 ```
