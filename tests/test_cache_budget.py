@@ -9,7 +9,8 @@ from trendsit.core.cache import cache_key
 from trendsit.core.role import load_role, run_role
 
 INPUT = RepoOnelinerInput(full_name="a/b", readme_head="# B")
-GOOD = json.dumps({"oneliner": "테스트용 도구", "log": "README 근거", "attention": False}, ensure_ascii=False)
+GOOD = json.dumps({"basis": "# B", "oneliner": "테스트용 도구", "log": "README 근거", "attention": False},
+                  ensure_ascii=False)
 MSG = [{"role": "user", "content": "hi"}]
 
 
@@ -163,3 +164,15 @@ def test_unknown_spec_is_refused(tmp_path):
     for spec in ("S1", "s0"):
         with pytest.raises(ConfigError, match="상한이 없음"):
             Budget(cfg, spec, DB(tmp_path / "t.db"), tmp_path / "b.json", None, PriceBook(tmp_path / "p.json"))
+
+
+def test_reasoning_tokens_are_inside_max_tokens(tmp_path, models):
+    """추론 토큰은 max_tokens 안에서 센다(OpenRouter). 예상 출력 = max(max_tokens, reasoning.max_tokens)."""
+    ctx = make_ctx(tmp_path, FakeTransport())
+    spec = models.models["judge"]
+    body = ctx.llm.build_body("judge", MSG, max_tokens=1600)
+    assert body["reasoning"]["max_tokens"] == 800
+    pin, pout = ctx.budget.prices.price(spec, models.base_url("judge"))
+    est = ctx.budget.estimate(spec, models.base_url("judge"), body)
+    tokens_in = est - 1600 * pout
+    assert tokens_in == pytest.approx((len(json.dumps(MSG)) // 2 + 1 + 1 + 1) * pin, rel=0.05)

@@ -1,0 +1,16 @@
+{
+ "since": "2026-09-30",
+ "until": "2026-10-01",
+ "max_items": 2,
+ "source": "techbridge",
+ "today": "2026-10-07",
+ "recorded_at": "2026-10-07T13:02:05+00:00",
+ "result": {
+  "techbridge": {
+   "status": "ok",
+   "n_new": 1,
+   "n_backfilled": 1,
+   "backfill_pages": 1
+  }
+ }
+}

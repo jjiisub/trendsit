@@ -78,14 +78,53 @@ class BudgetConfig(Strict):
 
 
 # ---------- sources.yaml ----------
+class Backfill(Strict):
+    method: Literal["rss_only", "list_pages", "day_archive"]
+    url_template: str | None = Field(default=None, pattern=r"^https?://")
+    page_template: str | None = Field(default=None, pattern=r"^https?://")  # list_pages의 2페이지부터
+    max_pages: int = Field(default=50, ge=1, le=200)
+    archive_tz: Literal["kst", "utc"] = "kst"  # day_archive의 날짜 기준. utc면 한국 시간 시작일의 전날부터 읽는다
+    pages_per_day: int | None = Field(default=None, ge=1, le=50)  # day_archive에서 날짜당 읽을 페이지 수. 없으면 끝까지(max_pages)
+    note: str | None = None
+
+    @model_validator(mode="after")
+    def _template(self) -> Backfill:
+        if self.method == "rss_only":
+            return self
+        if not self.url_template:
+            raise ValueError(f"{self.method}에는 url_template이 필요함")
+        if self.method == "day_archive" and not any(k in self.url_template for k in ("{date}", "{d}")):
+            raise ValueError("day_archive의 url_template에는 날짜 자리({date} 또는 {yyyy}/{Mon}/{d})가 필요함")
+        return self
+
+
 class TextSource(Strict):
     id: str
     name: str
     kind: Literal["primary", "curation", "news"]
     lang: str
-    feed: str = Field(pattern=r"^https?://")
-    fallback_list: str | None = Field(default=None, pattern=r"^https?://")
-    fetch: Literal["feed_full", "feed_summary", "feed_title"]
+    feed: str | None = Field(default=None, pattern=r"^https?://")
+    # list_origin: RSS를 쓰지 않고 날짜별 목록(backfill.day_archive)에서 제목, 원문 링크를 모은 뒤 본문은 원문 링크에서(GeekNews)
+    fetch: Literal["feed_full", "feed_summary", "feed_title", "list_origin"]
+    backfill: Backfill = Backfill(method="rss_only")
+    request_interval_s: float | None = Field(default=None, ge=1, le=60)  # 이 소스 도메인의 요청 간격(기본 1초)
+    note: str | None = None
+
+    @model_validator(mode="after")
+    def _mode(self) -> TextSource:
+        if self.fetch == "list_origin":
+            if self.feed is not None:
+                raise ValueError("list_origin은 RSS(feed)를 쓰지 않음")
+            if self.backfill.method != "day_archive":
+                raise ValueError("list_origin은 날짜별 목록(day_archive)으로 받음(매일 수집과 백필 모두)")
+        elif self.feed is None:
+            raise ValueError(f"{self.fetch}에는 feed가 필요함")
+        return self
+
+
+class VideoBackfill(Strict):
+    method: Literal["rss_only", "channel_listing"]
+    max_videos: int = Field(default=60, ge=1, le=500)
     note: str | None = None
 
 
@@ -96,14 +135,13 @@ class VideoSource(Strict):
     channel_handle: str
     channel_id: str = Field(pattern=r"^UC[\w-]{22}$")
     feed: str = Field(pattern=r"^https?://")
+    backfill: VideoBackfill = VideoBackfill(method="rss_only")
     note: str | None = None
 
 
 class Trending(Strict):
-    source: Literal["ossinsight"]
-    period: str
-    language: str | None = None
-    top_n: int = Field(gt=0)
+    source: Literal["github_trending_page"]
+    url: str = Field(pattern=r"^https://github\.com/trending")
 
 
 class TrackedRepo(Strict):
@@ -127,6 +165,24 @@ class SourcesConfig(Strict):
         dup = {i for i in ids if ids.count(i) > 1}
         if dup:
             raise ValueError(f"소스 id 중복: {', '.join(sorted(dup))}")
+        return self
+
+
+# ---------- link_kinds.yaml ----------
+class KindRule(Strict):
+    domains: list[str] = []
+    paths: list[str] = []  # 참고용(예: arxiv /abs/). 판별은 도메인으로
+    path_contains: list[str] = []  # 도메인이 달라도 경로에 이 문자열이 있으면 이 종류
+
+
+class LinkKindsConfig(Strict):
+    kinds: dict[str, KindRule]
+    default: str
+
+    @model_validator(mode="after")
+    def _kinds(self) -> LinkKindsConfig:
+        if not self.kinds:
+            raise ValueError("kinds가 비어 있음")
         return self
 
 
@@ -163,6 +219,7 @@ FILES: dict[str, type[BaseModel]] = {
     "budget.yaml": BudgetConfig,
     "sources.yaml": SourcesConfig,
     "keywords.yaml": KeywordsConfig,
+    "link_kinds.yaml": LinkKindsConfig,
 }
 
 

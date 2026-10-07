@@ -1,0 +1,320 @@
+{
+ "https://openai.com/news/rss.xml": {
+  "file": "bea4293d5eddcb343872.gz",
+  "status": 200,
+  "content_type": "text/xml; charset=utf-8",
+  "location": null
+ },
+ "https://openai.com/robots.txt": {
+  "file": "b0b9086e8ce048f58f6c.gz",
+  "status": 200,
+  "content_type": "text/plain; charset=utf-8",
+  "location": null
+ },
+ "https://openai.com/index/jump-trading": {
+  "file": "ebb413cc5359756bf923.gz",
+  "status": 308,
+  "content_type": "text/plain",
+  "location": "/index/jump-trading/"
+ },
+ "https://openai.com/index/jump-trading/": {
+  "file": "552c4a7fdaaa2aad95fa.gz",
+  "status": 200,
+  "content_type": "text/html; charset=utf-8",
+  "location": null
+ },
+ "https://openai.com/index/sharing-ai-progress-in-mathematics": {
+  "file": "00427e47df5ef3064509.gz",
+  "status": 308,
+  "content_type": "text/plain",
+  "location": "/index/sharing-ai-progress-in-mathematics/"
+ },
+ "https://openai.com/index/sharing-ai-progress-in-mathematics/": {
+  "file": "270d2009beef3a33ff16.gz",
+  "status": 200,
+  "content_type": "text/html; charset=utf-8",
+  "location": null
+ },
+ "https://openai.com/index/advancing-computer-use-with-ironclad": {
+  "file": "f57eff9c23a4454b476b.gz",
+  "status": 308,
+  "content_type": "text/plain",
+  "location": "/index/advancing-computer-use-with-ironclad/"
+ },
+ "https://openai.com/index/advancing-computer-use-with-ironclad/": {
+  "file": "826bb176747af3b1372d.gz",
+  "status": 200,
+  "content_type": "text/html; charset=utf-8",
+  "location": null
+ },
+ "https://raw.githubusercontent.com/Olshansk/rss-feeds/main/feeds/feed_anthropic_news.xml": {
+  "file": "e5d6a6a2919c5bbb40b7.gz",
+  "status": 200,
+  "content_type": "text/plain; charset=utf-8",
+  "location": null
+ },
+ "https://www.anthropic.com/robots.txt": {
+  "file": "8e1efc487fda32deafee.gz",
+  "status": 200,
+  "content_type": "text/plain",
+  "location": null
+ },
+ "https://www.anthropic.com/news/cyber-verification-program": {
+  "file": "2bd8707fdab8226a9f67.gz",
+  "status": 200,
+  "content_type": "text/html; charset=utf-8",
+  "location": null
+ },
+ "https://deepmind.google/blog/rss.xml": {
+  "file": "9c92f29eb29326b99ea4.gz",
+  "status": 200,
+  "content_type": "text/xml",
+  "location": null
+ },
+ "https://news.hada.io/robots.txt": {
+  "file": "dee8e9efbc57787178ae.gz",
+  "status": 200,
+  "content_type": "text/plain; charset=utf-8",
+  "location": null
+ },
+ "https://news.hada.io/past?day=2026-10-06&page=1": {
+  "file": "61c5abd35135dd39c637.gz",
+  "status": 200,
+  "content_type": "text/html; charset=UTF-8",
+  "location": null
+ },
+ "https://github.com/robots.txt": {
+  "file": "6f12b3a8ea73b7281526.gz",
+  "status": 200,
+  "content_type": "text/plain",
+  "location": null
+ },
+ "https://github.com/mvschwarz/openrig": {
+  "file": "a5babe6eb0c3a37fb08e.gz",
+  "status": 200,
+  "content_type": "text/html; charset=utf-8",
+  "location": null
+ },
+ "https://danbom425.tistory.com/robots.txt": {
+  "file": "c0befffb2b4409ededf5.gz",
+  "status": 200,
+  "content_type": "text/plain;charset=UTF-8",
+  "location": null
+ },
+ "https://danbom425.tistory.com/113": {
+  "file": "376fe96b84a392094899.gz",
+  "status": 200,
+  "content_type": "text/html;charset=UTF-8",
+  "location": null
+ },
+ "https://simonwillison.net/atom/everything/": {
+  "file": "052434531db837d632eb.gz",
+  "status": 200,
+  "content_type": "application/xml; charset=utf-8",
+  "location": null
+ },
+ "https://simonwillison.net/robots.txt": {
+  "file": "cbcac9ae97216ec3d245.gz",
+  "status": 200,
+  "content_type": "text/plain",
+  "location": null
+ },
+ "https://simonwillison.net/2026/Oct/5/felix-rieseberg/": {
+  "file": "d43019accfd19e1ed1c4.gz",
+  "status": 200,
+  "content_type": "text/html; charset=utf-8",
+  "location": null
+ },
+ "https://www.aitimes.com/rss/allArticle.xml": {
+  "file": "315b4e52b4ddf0528fc3.gz",
+  "status": 200,
+  "content_type": "application/xml",
+  "location": null
+ },
+ "https://www.aitimes.com/robots.txt": {
+  "file": "dda2488fe73e642a7eb6.gz",
+  "status": 200,
+  "content_type": "text/plain; charset=utf-8",
+  "location": null
+ },
+ "https://www.aitimes.com/news/articleList.html?sc_sdate=2026-10-06&sc_edate=2026-10-06&view_type=sm": {
+  "file": "39fa4567265680f9f4dc.gz",
+  "status": 200,
+  "content_type": "text/html; charset=utf-8",
+  "location": null
+ },
+ "https://www.aitimes.com/news/ajaxArticlePaging.php?page=2&list_per_page=20&page_per_page=10&sc_sdate=2026-10-06&sc_edate=2026-10-06&sc_order_by=E&view_type=sm": {
+  "file": "4c2aaabaefb725296619.gz",
+  "status": 200,
+  "content_type": "text/javascript; charset=utf-8",
+  "location": null
+ },
+ "https://www.aitimes.com/news/ajaxArticlePaging.php?page=3&list_per_page=20&page_per_page=10&sc_sdate=2026-10-06&sc_edate=2026-10-06&sc_order_by=E&view_type=sm": {
+  "file": "a54cc02e61b9c71eb1c1.gz",
+  "status": 200,
+  "content_type": "text/javascript; charset=utf-8",
+  "location": null
+ },
+ "https://www.aitimes.com/news/articleView.html?idxno=216001": {
+  "file": "5a15e5e21f429ff849ef.gz",
+  "status": 200,
+  "content_type": "text/html; charset=utf-8",
+  "location": null
+ },
+ "https://www.aitimes.com/news/articleView.html?idxno=215986": {
+  "file": "8d1208cbd371c740e937.gz",
+  "status": 200,
+  "content_type": "text/html; charset=utf-8",
+  "location": null
+ },
+ "https://www.aitimes.com/news/articleView.html?idxno=215996": {
+  "file": "7ba0107570d5b3d3ef16.gz",
+  "status": 200,
+  "content_type": "text/html; charset=utf-8",
+  "location": null
+ },
+ "https://www.youtube.com/feeds/videos.xml?channel_id=UC895rbZX2iXLTDfji7W4PfA": {
+  "file": "b0b492b2590f0ff2c1ed.gz",
+  "status": 200,
+  "content_type": "text/xml; charset=UTF-8",
+  "location": null
+ },
+ "https://github.com/trending?since=weekly": {
+  "file": "39098fdc8eb15acd0f90.gz",
+  "status": 200,
+  "content_type": "text/html; charset=utf-8",
+  "location": null
+ },
+ "https://api.github.com/repos/mvschwarz/openrig": {
+  "file": "4f71afc14d2e4759529f.gz",
+  "status": 200,
+  "content_type": "application/json; charset=utf-8",
+  "location": null
+ },
+ "https://api.github.com/repos/mvschwarz/openrig/readme": {
+  "file": "bb8d5dc4b4b66f8870c2.gz",
+  "status": 200,
+  "content_type": "application/vnd.github.raw; charset=utf-8",
+  "location": null
+ },
+ "https://api.github.com/repos/heygen-com/hyperframes": {
+  "file": "8ac0e84b5df2874e67ba.gz",
+  "status": 200,
+  "content_type": "application/json; charset=utf-8",
+  "location": null
+ },
+ "https://api.github.com/repos/heygen-com/hyperframes/readme": {
+  "file": "d630df5e74ee58cf43db.gz",
+  "status": 200,
+  "content_type": "application/vnd.github.raw; charset=utf-8",
+  "location": null
+ },
+ "https://api.github.com/repos/NVIDIA/OpenShell": {
+  "file": "eb847cc602bf8ade0009.gz",
+  "status": 200,
+  "content_type": "application/json; charset=utf-8",
+  "location": null
+ },
+ "https://api.github.com/repos/NVIDIA/OpenShell/readme": {
+  "file": "def6532cee63ebcba6cc.gz",
+  "status": 200,
+  "content_type": "application/vnd.github.raw; charset=utf-8",
+  "location": null
+ },
+ "https://api.github.com/repos/Panniantong/Agent-Reach": {
+  "file": "3b5dd13e6fe21cea140f.gz",
+  "status": 200,
+  "content_type": "application/json; charset=utf-8",
+  "location": null
+ },
+ "https://api.github.com/repos/Panniantong/Agent-Reach/readme": {
+  "file": "be7539ee4487fc5ebb32.gz",
+  "status": 200,
+  "content_type": "application/vnd.github.raw; charset=utf-8",
+  "location": null
+ },
+ "https://api.github.com/repos/thedotmack/claude-mem": {
+  "file": "9e109b34bfa2727d8253.gz",
+  "status": 200,
+  "content_type": "application/json; charset=utf-8",
+  "location": null
+ },
+ "https://api.github.com/repos/thedotmack/claude-mem/readme": {
+  "file": "3900820b68d093fc5569.gz",
+  "status": 200,
+  "content_type": "application/vnd.github.raw; charset=utf-8",
+  "location": null
+ },
+ "https://api.github.com/repos/ollama/ollama": {
+  "file": "bd5130a562c79573b548.gz",
+  "status": 200,
+  "content_type": "application/json; charset=utf-8",
+  "location": null
+ },
+ "https://api.github.com/repos/ollama/ollama/readme": {
+  "file": "5035df2c02fc289cd485.gz",
+  "status": 200,
+  "content_type": "application/vnd.github.raw; charset=utf-8",
+  "location": null
+ },
+ "https://github.com/ollama/ollama/releases.atom": {
+  "file": "b7aae8f6c0115e4c50b3.gz",
+  "status": 200,
+  "content_type": "application/atom+xml; charset=utf-8",
+  "location": null
+ },
+ "https://api.github.com/repos/NousResearch/hermes-agent": {
+  "file": "152946c7f8b3042e8091.gz",
+  "status": 200,
+  "content_type": "application/json; charset=utf-8",
+  "location": null
+ },
+ "https://api.github.com/repos/NousResearch/hermes-agent/readme": {
+  "file": "804ca344f860756cedc9.gz",
+  "status": 200,
+  "content_type": "application/vnd.github.raw; charset=utf-8",
+  "location": null
+ },
+ "https://github.com/NousResearch/hermes-agent/releases.atom": {
+  "file": "5b2974619ccf2ffb1093.gz",
+  "status": 200,
+  "content_type": "application/atom+xml; charset=utf-8",
+  "location": null
+ },
+ "https://api.github.com/repos/openai/codex": {
+  "file": "855df53e751c30fc458e.gz",
+  "status": 200,
+  "content_type": "application/json; charset=utf-8",
+  "location": null
+ },
+ "https://api.github.com/repos/openai/codex/readme": {
+  "file": "e54a821d507771cfc23e.gz",
+  "status": 200,
+  "content_type": "application/vnd.github.raw; charset=utf-8",
+  "location": null
+ },
+ "https://github.com/openai/codex/releases.atom": {
+  "file": "6b522d124dcf6560f845.gz",
+  "status": 200,
+  "content_type": "application/atom+xml; charset=utf-8",
+  "location": null
+ },
+ "https://api.github.com/repos/anthropics/claude-code": {
+  "file": "1067c67d1a157efc429c.gz",
+  "status": 200,
+  "content_type": "application/json; charset=utf-8",
+  "location": null
+ },
+ "https://api.github.com/repos/anthropics/claude-code/readme": {
+  "file": "7b6735cd9d122b2b9dc5.gz",
+  "status": 200,
+  "content_type": "application/vnd.github.raw; charset=utf-8",
+  "location": null
+ },
+ "https://github.com/anthropics/claude-code/releases.atom": {
+  "file": "705d18fb3c9f3a743e7a.gz",
+  "status": 200,
+  "content_type": "application/atom+xml; charset=utf-8",
+  "location": null
+ }
+}

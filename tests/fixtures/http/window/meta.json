@@ -1,0 +1,62 @@
+{
+ "since": "2026-10-06",
+ "until": "2026-10-06",
+ "max_items": 3,
+ "source": null,
+ "today": "2026-10-07",
+ "recorded_at": "2026-10-07T22:10:10+00:00",
+ "result": {
+  "openai": {
+   "status": "ok",
+   "n_new": 3,
+   "n_backfilled": 0,
+   "backfill_pages": 0
+  },
+  "anthropic": {
+   "status": "ok",
+   "n_new": 1,
+   "n_backfilled": 0,
+   "backfill_pages": 0
+  },
+  "deepmind": {
+   "status": "ok",
+   "n_new": 0,
+   "n_backfilled": 0,
+   "backfill_pages": 0
+  },
+  "geeknews": {
+   "status": "ok",
+   "n_new": 3,
+   "n_backfilled": 3,
+   "backfill_pages": 1
+  },
+  "simonw": {
+   "status": "ok",
+   "n_new": 1,
+   "n_backfilled": 0,
+   "backfill_pages": 0
+  },
+  "aitimes": {
+   "status": "ok",
+   "n_new": 3,
+   "n_backfilled": 0,
+   "backfill_pages": 3
+  },
+  "techbridge": {
+   "status": "ok",
+   "n_new": 3,
+   "n_backfilled": 0,
+   "backfill_pages": 0
+  },
+  "github_trending": {
+   "status": "ok",
+   "trending": 11,
+   "releases": 0
+  },
+  "github_releases": {
+   "status": "ok",
+   "trending": 0,
+   "releases": 8
+  }
+ }
+}

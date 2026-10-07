@@ -53,6 +53,63 @@ CREATE TABLE IF NOT EXISTS llm_calls (
 );
 """
 
+# 칠판(S1~). 마이그레이션은 PRAGMA user_version으로 순서대로 한 번씩
+MIGRATIONS = [
+    """
+    CREATE TABLE IF NOT EXISTS sources (
+        id TEXT PRIMARY KEY, channel TEXT NOT NULL, kind TEXT, name TEXT, feed TEXT,
+        enabled INTEGER NOT NULL DEFAULT 1, config_json TEXT
+    );
+    CREATE TABLE IF NOT EXISTS fetch_log (
+        id INTEGER PRIMARY KEY, run_id TEXT, source_id TEXT, day TEXT,
+        status TEXT NOT NULL CHECK(status IN ('ok','failed','partial')),
+        n_new INTEGER NOT NULL DEFAULT 0, n_backfilled INTEGER NOT NULL DEFAULT 0, error TEXT,
+        n_seen INTEGER NOT NULL DEFAULT 0, detail TEXT, t TEXT
+    );
+    CREATE TABLE IF NOT EXISTS items (
+        id INTEGER PRIMARY KEY, source_id TEXT NOT NULL,
+        channel TEXT NOT NULL CHECK(channel IN ('text','video','github')), kind TEXT,
+        external_id TEXT NOT NULL, url TEXT, title TEXT, published_at TEXT,
+        published_estimated INTEGER NOT NULL DEFAULT 0, day TEXT, week TEXT, summary_feed TEXT,
+        body_status TEXT, filter_status TEXT CHECK(filter_status IN ('pass','filtered')),
+        filter_reason TEXT, score INTEGER, run_id TEXT, created_at TEXT,
+        via TEXT,
+        UNIQUE(source_id, external_id)
+    );
+    CREATE INDEX IF NOT EXISTS items_day ON items(day);
+    CREATE INDEX IF NOT EXISTS items_week ON items(week);
+    CREATE TABLE IF NOT EXISTS item_texts (
+        item_id INTEGER PRIMARY KEY REFERENCES items(id), text TEXT, origin_summary TEXT, expires_at TEXT
+    );
+    CREATE TABLE IF NOT EXISTS item_keywords (
+        item_id INTEGER NOT NULL, keyword_id TEXT NOT NULL, where_matched TEXT,
+        PRIMARY KEY(item_id, keyword_id)
+    );
+    CREATE TABLE IF NOT EXISTS links (
+        id INTEGER PRIMARY KEY, item_id INTEGER NOT NULL, url TEXT NOT NULL, anchor TEXT, kind TEXT,
+        role TEXT NOT NULL CHECK(role IN ('body','origin_candidate')), UNIQUE(item_id, url)
+    );
+    CREATE TABLE IF NOT EXISTS videos (
+        item_id INTEGER PRIMARY KEY, video_id TEXT, duration_sec INTEGER, manual_sub_langs TEXT,
+        has_auto_sub INTEGER, chapters_json TEXT, meta_status TEXT
+    );
+    CREATE TABLE IF NOT EXISTS repos (
+        full_name TEXT PRIMARY KEY, description TEXT, language TEXT, topics_json TEXT, readme_head TEXT,
+        first_seen TEXT
+    );
+    CREATE TABLE IF NOT EXISTS repo_trending (
+        week TEXT NOT NULL, full_name TEXT NOT NULL, rank INTEGER, stars_total INTEGER,
+        stars_this_week INTEGER, forks INTEGER, run_id TEXT,
+        score INTEGER, filter_status TEXT, filter_reason TEXT, keywords TEXT,
+        PRIMARY KEY(week, full_name)
+    );
+    """,
+    # 2: 소스별 부가 정보(GeekNews 점수, 댓글 수, topic id 등). 받은 시점의 값
+    """
+    ALTER TABLE items ADD COLUMN meta_json TEXT;
+    """,
+]
+
 STEP_COLUMNS = (
     "run_id", "seq", "t", "role", "kind", "text", "attention", "detail", "prompt_hash", "model",
     "provider", "tokens_in", "tokens_out", "cost_usd", "cost_estimated", "latency_ms", "cache_hit",
@@ -85,6 +142,15 @@ class DB:
         for name, kind in ADDED_STEP_COLUMNS:
             if name not in have:
                 self.conn.execute(f"ALTER TABLE steps ADD COLUMN {name} {kind}")
+        self.migrate()
+
+    def migrate(self) -> int:
+        version = self.conn.execute("PRAGMA user_version").fetchone()[0]
+        for i, script in enumerate(MIGRATIONS[version:], start=version + 1):
+            with self.conn:
+                self.conn.executescript(script)
+                self.conn.execute(f"PRAGMA user_version = {i}")
+        return self.conn.execute("PRAGMA user_version").fetchone()[0]
 
     def close(self) -> None:
         self.conn.close()
@@ -168,3 +234,99 @@ class DB:
             args = (spec,)
         sql += " GROUP BY r.spec, s.model ORDER BY r.spec, cost DESC"
         return self.conn.execute(sql, args).fetchall()
+
+    # ---------- 칠판: 수집 (S1) ----------
+    def upsert_source(self, sid: str, channel: str, kind: str | None, name: str, feed: str | None,
+                      config_json: Any) -> None:
+        with self.conn:
+            self.conn.execute(
+                "INSERT INTO sources(id, channel, kind, name, feed, config_json) VALUES (?,?,?,?,?,?) "
+                "ON CONFLICT(id) DO UPDATE SET channel=excluded.channel, kind=excluded.kind, name=excluded.name, "
+                "feed=excluded.feed, config_json=excluded.config_json",
+                (sid, channel, kind, name, feed, _json(config_json)))
+
+    def item_by_external(self, source_id: str, external_id: str) -> sqlite3.Row | None:
+        return self.conn.execute(
+            "SELECT i.*, t.text AS body FROM items i LEFT JOIN item_texts t ON t.item_id=i.id "
+            "WHERE i.source_id=? AND i.external_id=?", (source_id, external_id)).fetchone()
+
+    def save_item(self, item: dict[str, Any], *, text: str | None, origin_summary: str | None,
+                  expires_at: str | None, links: list[dict[str, Any]], keywords: dict[str, str],
+                  video: dict[str, Any] | None = None, replace_id: int | None = None) -> int:
+        """항목 하나와 딸린 행을 한 트랜잭션으로. replace_id가 있으면(본문이 비었던 항목 재시도) 그 행을 갱신."""
+        cols = ("source_id", "channel", "kind", "external_id", "url", "title", "published_at",
+                "published_estimated", "day", "week", "summary_feed", "body_status", "filter_status",
+                "filter_reason", "score", "run_id", "via", "meta_json")
+        item = {**item, "meta_json": _json(item.get("meta_json"))}
+        with self.conn:
+            if replace_id is None:
+                cur = self.conn.execute(
+                    f"INSERT INTO items({','.join(cols)}, created_at) VALUES ({','.join('?' * len(cols))}, ?)",
+                    (*(item.get(c) for c in cols), now_kst()))
+                item_id = int(cur.lastrowid)
+            else:
+                item_id = replace_id
+                self.conn.execute(
+                    f"UPDATE items SET {', '.join(f'{c}=?' for c in cols)} WHERE id=?",
+                    (*(item.get(c) for c in cols), item_id))
+                for t in ("item_texts", "item_keywords", "links", "videos"):
+                    self.conn.execute(f"DELETE FROM {t} WHERE item_id=?", (item_id,))
+            self.conn.execute("INSERT INTO item_texts(item_id, text, origin_summary, expires_at) VALUES (?,?,?,?)",
+                              (item_id, text, origin_summary, expires_at))
+            self.conn.executemany(
+                "INSERT OR IGNORE INTO item_keywords(item_id, keyword_id, where_matched) VALUES (?,?,?)",
+                [(item_id, k, w) for k, w in keywords.items()])
+            self.conn.executemany(
+                "INSERT OR IGNORE INTO links(item_id, url, anchor, kind, role) VALUES (?,?,?,?,?)",
+                [(item_id, x["url"], x.get("anchor"), x.get("kind"), x.get("role", "body")) for x in links])
+            if video is not None:
+                self.conn.execute(
+                    "INSERT INTO videos(item_id, video_id, duration_sec, manual_sub_langs, has_auto_sub, "
+                    "chapters_json, meta_status) VALUES (?,?,?,?,?,?,?)",
+                    (item_id, video.get("video_id"), video.get("duration_sec"),
+                     _json(video.get("manual_sub_langs")), video.get("has_auto_sub"),
+                     _json(video.get("chapters")), video.get("meta_status")))
+        return item_id
+
+    def video_meta_status(self, item_id: int) -> str | None:
+        row = self.conn.execute("SELECT meta_status FROM videos WHERE item_id=?", (item_id,)).fetchone()
+        return row["meta_status"] if row else None
+
+    def log_fetch(self, run_id: str, source_id: str, day: str, status: str, *, n_new: int = 0,
+                  n_backfilled: int = 0, n_seen: int = 0, error: str | None = None, detail: Any = None) -> None:
+        with self.conn:
+            self.conn.execute(
+                "INSERT INTO fetch_log(run_id, source_id, day, status, n_new, n_backfilled, n_seen, error, detail, t) "
+                "VALUES (?,?,?,?,?,?,?,?,?,?)",
+                (run_id, source_id, day, status, n_new, n_backfilled, n_seen, error, _json(detail), now_kst()))
+
+    def upsert_repo(self, full_name: str, *, description: str | None = None, language: str | None = None,
+                    topics: list[str] | None = None, readme_head: str | None = None) -> None:
+        with self.conn:
+            self.conn.execute(
+                "INSERT INTO repos(full_name, description, language, topics_json, readme_head, first_seen) "
+                "VALUES (?,?,?,?,?,?) ON CONFLICT(full_name) DO UPDATE SET "
+                "description=COALESCE(excluded.description, description), language=COALESCE(excluded.language, language), "
+                "topics_json=COALESCE(excluded.topics_json, topics_json), readme_head=COALESCE(excluded.readme_head, readme_head)",
+                (full_name, description, language, _json(topics) if topics is not None else None, readme_head,
+                 now_kst()))
+
+    def clear_trending(self, week: str) -> None:
+        with self.conn:
+            self.conn.execute("DELETE FROM repo_trending WHERE week=?", (week,))
+
+    def save_trending(self, week: str, row: dict[str, Any], run_id: str) -> bool:
+        """주차별 트렌딩 1행. 같은 주에 이미 있으면 수치만 갱신하고 False."""
+        with self.conn:
+            exists = self.conn.execute("SELECT 1 FROM repo_trending WHERE week=? AND full_name=?",
+                                       (week, row["full_name"])).fetchone()
+            self.conn.execute(
+                "INSERT INTO repo_trending(week, full_name, rank, stars_total, stars_this_week, forks, run_id, "
+                "score, filter_status, filter_reason, keywords) VALUES (?,?,?,?,?,?,?,?,?,?,?) "
+                "ON CONFLICT(week, full_name) DO UPDATE SET rank=excluded.rank, stars_total=excluded.stars_total, "
+                "stars_this_week=excluded.stars_this_week, forks=excluded.forks, score=excluded.score, "
+                "filter_status=excluded.filter_status, filter_reason=excluded.filter_reason, keywords=excluded.keywords",
+                (week, row["full_name"], row["rank"], row.get("stars_total"), row.get("stars_this_week"),
+                 row.get("forks"), run_id, row.get("score"), row.get("filter_status"), row.get("filter_reason"),
+                 _json(row.get("keywords"))))
+        return exists is None

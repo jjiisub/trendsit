@@ -1,6 +1,7 @@
 # 26. 에이전트별 명세 v1
 
 작성: 2026-10-07 (같은 날 v1.1: 02:00 순서를 얕게 훑기 → 계획 → 깊게로 변경, 깊이 규칙 추가). 09번 역할 설계(5주차)를 대화에서 정한 것으로 갱신한다. 코드 구조는 뒤로 미루고, **에이전트 단위로 역할, 입력, 출력, 제약, 필요한 기능**을 정한다.
+v1.2(같은 날): 프롬프트 작성 가이드(문서 35) 반영. 역할 md 형식(0.5), 역할별 프롬프트 권고(0.7), 출력 칸 순서(인용·이유 먼저), 작성자 수정 모드를 별도 md로.
 바뀐 것: 글 분석가 추가(원본 추적), 역할 5개 제한은 엄격하게 보지 않음, 묶기는 에이전트 없이 3단(코드 → 애매한 쌍 판단 → 편집장 확정), 에이전트 정의는 md 하나(역할 카드 5요소 + 실행 설정) 방향.
 
 ## 0. 공통
@@ -52,7 +53,9 @@
 - 처음 1~2주는 기본 2, 최대 3. 원본을 찾은 깊이 분포를 보고 4를 열지 결정
 
 ### 0.5 에이전트 정의 방식
-- 에이전트 하나 = md 하나: 앞부분 실행 설정(모델, 출력 스키마 이름, 허용 도구, max_depth, max_steps), 본문 역할 카드 5요소 + 판단 기준 + 출력 예시
+- 에이전트 하나 = md 하나: 앞부분 실행 설정(모델, 출력 스키마 이름, 허용 도구, max_depth, max_steps, task, core_rules), 본문은 **문서 35의 공통 템플릿**: 목표(+왜) / 입력 / 판단 기준 / 출력 / 막혔을 때 / 예시 3개(보통 / 빈칸이 맞는 경우 / 함정)
+- 메시지 조립(코드): system = 역할 md 본문 + includes(정적, 캐시). user = `<data>`(문서는 `<document id="it:123" source="...">`) → 이번 과제(task) → 핵심 규칙 3줄(core_rules) 다시
+- 출력 스키마 칸 순서: **인용·이유 칸 먼저, 결론 칸(enum, status, 요약) 나중**, log와 attention은 맨 뒤. generate 모델은 추론을 끄고 쓰기 때문(문서 35). 아래 각 역할의 출력 표는 이 순서로 적는다
 - 여러 역할이 같이 쓰는 절차는 지침 md(원본 추적, 문체)
 - 도구, 출력 스키마, 입력 조립, 상한, 보안은 파이썬 코드. 모델이 알아야 하는 것은 md, 반드시 지켜져야 하는 것은 코드
 
@@ -64,13 +67,33 @@
 | 1 | 편집장 · 계획 | 판단 + 분기 | 02:00 ② | 세 채널의 깊이 1 결과, 예산 → CollectionPlan | 없음 |
 | 3 | 글 분석가 | 에이전트 | 02:00 ③ | 원본 확인이 필요한 글 → ItemCard v2 | fetch_page, read_more, arxiv, github_repo, render_page |
 | 4 | 영상 분석가 | 판단 + 분기 | 02:00 ③ | 영상 + 처리 깊이 → VideoDigest | 파이프라인 함수 + VLM |
-| 5 | 레포 분석가 | 에이전트 | 02:00 ③ | 레포 후보 → RepoCard | github_repo, commits, contributors, releases, star_history, search_items |
+| 5 | 레포 분석가 | 에이전트 | 02:00 ③ | 레포 후보 → RepoCard | github_repo, commits, contributors, releases, search_items |
 | - | 묶기 | 도구 + 판단 함수 | 02:00 ④ | ItemCard 전체 → TopicCluster 후보 | decide() |
 | 6 | 편집장 · 선별 | LLM 1회 | 07:00 | TopicCluster 후보 → BriefingPlan | 없음 |
 | 7 | 작성자 | LLM 1회 | 07:00 | 토픽 + 근거 묶음 → TopicPage | 없음 |
 | - | 코드 검사 | 도구 | 07:00 | TopicPage → 통과/반려 | - |
 | 8 | 검수자 | LLM 1회 | 07:00 | TopicPage + 근거 원문 → ReviewVerdict | 없음 |
 | 9 | 설정 도우미 | 에이전트(대화형) | 10주차 | 관심사 문장, URL → 소스, 키워드 후보 | detect_source, normalize |
+
+### 0.7 역할별 프롬프트 권고 (문서 35)
+역할 md를 쓸 때 꼭 넣을 지시와, 가장 흔할 실패와 대응. 형태별 뼈대와 이유는 35.
+
+| 역할 (md) | 형태 | 꼭 넣을 지시 | 예상 실패 → 대응 |
+|---|---|---|---|
+| 글 1차 요약 (`item_card`) | 추출 | quotes를 먼저 뽑고 claims·numbers는 quote 번호로만. needs_original은 수치·주장의 출처가 본문 밖 링크에 있을 때 참 | 큐레이션 글을 원본처럼 요약 → is_curation 참 예시(GeekNews) 1개, 거짓 예시(공식 블로그) 1개 |
+| 레포 한 줄 (`repo_oneliner`) | 추출 | 대상 + 동작을 담은 명사형 60자, README 내용만. 근거 구절을 먼저 뽑음 | 마케팅 문구를 옮김 → "자기 홍보는 빼고 기능만" + 나쁜 예 |
+| 편집장 계획 (`editor_plan`) | 판단 | 예산을 숫자로(남은 영상 분, fetch 수). 항목별 reason → max_depth. **예산의 80%까지만 계획**(나머지는 재시도 몫). 영상 mode 열거형을 md에 그대로 | 모두 깊게 고름 → 80% 규칙 + 코드가 자름 |
+| 글 분석가 (`text_analyst`) | 도구 에이전트 | 추측 대신 도구로 확인. 원본 우선순위. 멈추는 조건 3개(확인할 수치를 찾음 / 두 단계 더 가도 새 정보 없음 / 남은 걸음 1). **못 찾음은 정상 결과**. "끝까지 계속"은 넣지 않음 | 못 찾았는데 confirmed → verified는 quote가 있을 때만 confirmed (코드도 검사) |
+| 레포 분석가 (`repo_analyst`) | 도구 에이전트 | 별 수만으로 중요도 단정 금지, 과열 신호 목록, 언제 커밋까지 볼지. **README로 관련성이 낮으면 바로 finish** | 매번 모든 도구 호출 → 도구 설명에 "언제 쓰나" 한 줄 |
+| 슬라이드 판독 (`video_slide`) | 추출(이미지) | 화면 텍스트·수치·표를 그대로. 불확실하면 값 대신 check. 하드 자막 줄은 무시 | 흐린 숫자 추측 → confidence 칸을 값 앞에, 예시에 "흐린 숫자 → check" |
+| 영상 요약 (`video_summary`) | 추출 | 전사 품질 규칙(V5): suspect면 프레임만, 없으면 "내용 없음". 전사와 화면이 다르면 각각 기술 | 스쳐 간 화면을 주제로 부풀림 → "비중은 발화 시간으로" |
+| 묶기 판단 (`decide`) | 판단 | "같은 대상" 정의(같은 제품·발표·릴리스). 스키마 reason 한 줄 → answer → confidence | 같은 회사 다른 제품을 묶음 → 비슷하지만 다른 쌍 예시 2개 |
+| 편집장 선별 (`editor_select`) | 판단 | 토픽 수 상한, 리드 1개, 빼는 이유 필수, 기존 항목 밖 추가 금지 | 목록 앞쪽 선호(위치 편향) → 코드가 후보를 점수순이 아닌 고정 순서(cluster_id순)로 넣음 |
+| 작성자 (`writer`, `writer_revise`) | 생성 | 문서 29·32 그대로. 수정은 별도 md `writer_revise`, 맨 위에 "지적된 칸만 고친다" | 수정 때 다른 문장까지 다시 씀 → 코드가 지적 안 된 칸의 변경을 감지해 되돌림 |
+| 검수자 (`critic`) | 판정 | 근거 밖 지식으로 판정 금지, 이슈 유형 정의와 예시, 반려에는 근거 id와 hint. 문장 하나씩 근거와 대조하는 절차 | 길고 자신 있는 초안에 관대(길이 편향) → 절차 명시 + 경고 한 줄. 사소한 문체는 코드 몫이라 반려 사유 아님 |
+
+- 도구 설명(docstring)도 프롬프트로 관리한다: 언제 쓰나 / 언제 쓰지 않나 / 인자 예 한 줄씩
+- 판정 역할과 judge의 통과 기준은 예/아니오 질문 + 한 줄 비평. 1~5점은 보고용. 사람 라벨로 일치율을 먼저 잰다(30 2장)
 
 ---
 
@@ -83,7 +106,7 @@
 | 필드 | 내용 | 만드는 곳 |
 |---|---|---|
 | new_videos[] | video_id, 제목, 채널, 길이, 수동 자막 유무와 언어, 설명 앞 300자, 게시일 | 수집기(채널 RSS + 메타데이터) |
-| repo_candidates[] | full_name, 7일 별 증가, 언어, 설명 한 줄, README 앞부분, 추적 레포 여부, 코드 과열 규칙 결과 | 수집기(OSS Insight, releases.atom, GitHub API) |
+| repo_candidates[] | full_name, 이번 주 별(트렌딩 페이지), 언어, 설명 한 줄, README 앞부분, 추적 레포 여부, 코드 과열 규칙 결과 | 수집기(GitHub Trending 주간 페이지, releases.atom, GitHub API) |
 | text_candidates[] | 원본 확인 필요로 표시된 글: 제목, 소스, relevance, needs_original 이유, 원본 후보 링크 종류 | 글 1차 요약 |
 | keywords[] | 정본 키워드 | 칠판 |
 | budget | 영상 분 수, VLM 프레임 수, 글 분석가 fetch 수, 레포 분석 수 | 설정 |
@@ -109,7 +132,7 @@
 - `validate_plan()`: 예산 합계 검사, 넘으면 reason 우선순위대로 잘라냄
 
 **제약**
-- 지침: 본문, 요약, 사실 주장을 쓰지 않음. 모든 결정에 이유 한 줄
+- 지침: 본문, 요약, 사실 주장을 쓰지 않음. 모든 결정에 이유 한 줄(이유 칸이 결정 칸 앞). 예산의 80%까지만 계획
 - 강제: 예산 초과 불가(코드가 자름), 도구 없음
 - 강제: 항목별 max_depth는 전체 상한 4 이하(코드)
 - 실패 시 대체: 규칙 기반 기본 계획(수동 자막 있으면 captions, 없으면 whisper, slides 0편, 레포는 별 증가 상위 N, 글은 relevance high인 것만 깊이 2)
@@ -129,15 +152,16 @@
 **출력: ItemCard v1**
 | 필드 | 내용 |
 |---|---|
-| summary | 2~3문장 |
-| claims[] | 핵심 주장, 각자 근거 quote 번호 |
+| quotes[] | n, 원문 문장 그대로 (근거 id `it:{id}#q{n}`). **가장 먼저 채움** |
 | numbers[] | value, unit, 무엇의 수치인지, quote 번호 |
-| quotes[] | n, 원문 문장 그대로 (근거 id `it:{id}#q{n}`) |
+| claims[] | 핵심 주장, 각자 근거 quote 번호 |
+| summary | 2~3문장 |
 | entities[], keywords[] | 제품, 회사, 모델 이름 / 매칭된 키워드 |
-| relevance | high / mid / low + 이유 |
 | is_curation | 큐레이션, 요약 글 여부 (GeekNews, 뉴스레터) |
 | origin_candidates[] | 본문 링크 중 원본 후보 번호 |
-| needs_original | true면 글 분석가로. reason 예: "수치 출처가 원문 블로그" |
+| relevance | 이유 한 줄 → high / mid / low |
+| needs_original | 이유 한 줄 → true면 글 분석가로. 예: "수치 출처가 원문 블로그" |
+| log, attention | |
 
 **제약:** 본문에 없는 내용 금지, 수치는 quote에 있는 문자열만. 실패 시 대체: summary 없이 제목만 남기고 관련성 low
 
@@ -169,9 +193,10 @@
 |---|---|
 | origin | url, kind(논문 / 공식 블로그 / 보도자료 / 레포 / 언론), 제목, 날짜 |
 | trail[] | 거쳐 간 URL과 이유 ("GeekNews → OpenAI 블로그: 수치 출처") |
-| summary, claims[], numbers[], quotes[] | 원본 기준으로 다시. quotes는 원본 문장 |
-| verified[] | v1의 수치, 주장마다 confirmed / differs / not_found |
+| quotes[] | 원본 문장 그대로 (먼저 채움) |
+| verified[] | v1의 수치, 주장마다 confirmed / differs / not_found. confirmed는 원본 quote가 있을 때만 |
 | differences[] | 요약 글과 원본이 다른 점 (예: 요약은 "10배", 원본은 "최대 10배") |
+| numbers[], claims[], summary | 원본 기준으로 다시 |
 | log, attention | differs가 있으면 attention true |
 
 **판단하는 것**
@@ -215,7 +240,7 @@
 | transcript_quality | ok / suspect_hallucination / empty (스킬 판정) |
 | name_pairs[] | 전사 표기 ↔ 화면 표기 (예: "라마 쓰리 포인트 원" ↔ Llama 3.1) |
 | segments[] | sec, text |
-| slides[] | sec, ocr_text, numbers[], table, confidence |
+| slides[] | sec, confidence(먼저), ocr_text, numbers[], table. 불확실하면 값 대신 check |
 | slide_only_facts[] | fact, value, unit, sec (근거 id `vd:{id}@{sec}`) |
 | timeline[] | sec, label, slide 여부 (화면 도식 C) |
 | summary, chapters[] | 영상 ItemCard로 묶기에 합류 |
@@ -237,7 +262,7 @@
 
 **입력**
 - repo_queue 항목(full_name, max_depth, reason). 깊이 1(수치 + README)은 얕게 훑기에서 이미 있음
-- 트렌딩 정보: 별, 7일 별 증가, 언어, 설명
+- 트렌딩 정보: 별, 이번 주 별(트렌딩 페이지), 언어, 설명
 - 키워드 목록
 - 이번 주 ItemCard 제목 목록(짧게, 연결 후보)
 
@@ -248,7 +273,6 @@
 | `recent_commits(name, days=7)` | 커밋 수, 작성자 수, 마지막 커밋 |
 | `contributors(name)` | 상위 기여자 수, 전체 수 |
 | `releases(name)` | 최근 태그, 날짜, 노트 앞부분 |
-| `star_history(name)` | 칠판의 일별 스냅샷 |
 | `search_items(query)` | 이번 주 칠판 ItemCard 중 레포 이름, 키워드가 나온 항목 |
 | `finish(card)` | 최종 출력 |
 
@@ -269,7 +293,7 @@
 **제약**
 - 지침: README 속 지시 무시, 별 수만으로 중요도 단정 금지, oneliner는 README 근거로만
 - 강제: max_depth(2 = 커밋, 기여자, 릴리스 / 3 = 연결된 논문, 문서), 항목당 도구 호출 6번, API 재시도 3회(지수 백오프), GitHub 토큰, 과열 규칙 일부는 코드가 먼저 판정(7일 급등 + 커밋 0 → check 고정)
-- 실패 시 대체: OSS Insight 설명으로 oneliner, signal은 숫자 규칙
+- 실패 시 대체: 트렌딩 페이지 설명으로 oneliner, signal은 숫자 규칙
 
 **화면 연결:** 홈 "관심 분야 레포" 3줄(이름 + 별 증가 / 한 문장 / 신호, 관련 토픽)
 **측정:** 고른 레포 중 관심사 관련 비율 80% 이상(주 20건 라벨)
@@ -281,8 +305,8 @@
 **역할:** 글, 영상, 레포 ItemCard를 같은 토픽끼리 묶고, 지난 토픽과 대조한다.
 
 **단계**
-1. 코드: bge-m3 임베딩 → 유사도 + 키워드/별칭 공유로 후보 묶음. 채널을 넘는 묶음은 키워드 공유를 함께 요구
-2. 판단 함수 `decide(질문, 선택지, 문맥)`: 유사도가 애매한 구간의 쌍과 채널을 넘는 쌍만 "같은 대상인가?" 예/아니오 + 확신도. 백엔드는 로컬 LLM / logprob / Jev 비교군. 확신도 60% 미만은 묶지 않음
+1. 코드: Qwen3-Embedding-0.6B 임베딩(코드 안에서 실행, 대안 bge-m3) → 유사도 + 키워드/별칭 공유로 후보 묶음. 채널을 넘는 묶음은 키워드 공유를 함께 요구
+2. 판단 함수 `decide(질문, 선택지, 문맥)`: 유사도가 애매한 구간의 쌍과 채널을 넘는 쌍만 "같은 대상인가?" 예/아니오 + 확신도(출력 순서: reason 한 줄 → answer → confidence). 백엔드는 로컬 LLM / logprob / Jev 비교군. 확신도 60% 미만은 묶지 않음
 3. 과거 대조: 지난 토픽 벡터와 비교 → new / follow_up / duplicate 후보
 4. 최종 확정은 편집장 선별(합치기, 나누기, 버리기)
 
@@ -316,14 +340,14 @@
 
 **제약**
 - 지침: 사실 주장 금지(angle은 방향만), 빼는 데는 이유 필수
-- 강제: 토픽 수 상한, 리드 정확히 1개, 합치기와 나누기는 기존 항목 범위 안에서만(새 항목 추가 불가) → 코드가 검증 후 적용하고 토픽 slug 생성
+- 강제: 후보는 코드가 고정 순서(cluster_id순)로 넣음(위치 편향 방지), 토픽 수 상한, 리드 정확히 1개, 합치기와 나누기는 기존 항목 범위 안에서만(새 항목 추가 불가) → 코드가 검증 후 적용하고 토픽 slug 생성
 - 실패 시 대체: 점수 순 상위 N, 점수 1위가 리드
 
 **화면 연결:** 홈 순서와 리드 카드, "지난 흐름의 후속", 실행 기록 단계 레일(후보 → 선별)
 
 ---
 
-## 7. 작성자 (07:00, LLM 1회, 수정 모드 포함)
+## 7. 작성자 (07:00, LLM 1회, 수정은 별도 md `writer_revise`)
 
 **역할:** 토픽 하나를 근거 id가 달린 토픽 페이지로 쓴다. 반려되면 지적된 부분만 고친다.
 
@@ -334,9 +358,9 @@
 | evidence | 토픽의 ItemCard(v2가 있으면 v2): summary, claims, numbers, quotes + 근거 id / VideoDigest: slide_only_facts, timeline / RepoCard |
 | previous | 후속 토픽이면 지난 토픽의 요약과 포인트 |
 | style | 문체 규칙(02_DESIGN 10장), 형광 규칙 |
-| (수정 모드) | 이전 TopicPage + 검수 이슈 목록 |
+| (수정, `writer_revise`) | 이전 TopicPage + 검수 이슈 목록. md 맨 위에 "지적된 칸만 고친다" |
 
-**출력: TopicPage**
+**출력: TopicPage** (스키마 순서: 근거 id가 붙은 칸 points, numbers, events, contributions → concepts → overview → summary → title. 아래 표는 화면 순서)
 | 필드 | 내용 | 화면 |
 |---|---|---|
 | title | 토픽 제목 | 목록, 페이지 헤더 |
@@ -352,7 +376,7 @@
 
 **제약**
 - 지침: 근거 id 없는 문장 금지, 근거에 없는 수치 금지, 슬라이드 수치는 "발표 슬라이드 기준"으로 씀, 원문 길게 옮기지 않음, 요약과 개요는 "~다", 포인트는 명사형, 해요체와 평가형 마무리 금지
-- 강제: 도구 없음(웹 접근 불가), 입력은 그 토픽 근거만, 분량 상한
+- 강제: 도구 없음(웹 접근 불가), 입력은 그 토픽 근거만, 분량 상한, 수정 라운드에서 지적 안 된 칸이 바뀌면 코드가 되돌림
 - 실패 시 대체: 토픽 제외 + attention "작성 실패"
 
 ---
@@ -381,14 +405,14 @@
 **출력: ReviewVerdict**
 | 필드 | 내용 |
 |---|---|
-| status | pass / reject |
-| issues[] | 위치(point 번호 또는 필드), type(`unsupported` / `number_mismatch` / `overclaim` / `missing_key` / `wrong_ref` / `overuse` / `missing_diagram`), evidence_id, hint |
-| fact_support | 원자 사실 수, 지지된 사실 수(FActScore 방식) |
+| fact_support | 원자 사실 수, 지지된 사실 수(FActScore 방식). 먼저 채움 |
+| issues[] | 위치(point 번호 또는 필드), evidence_id, 비평 한 줄, type(`unsupported` / `number_mismatch` / `overclaim` / `missing_key` / `wrong_ref` / `overuse` / `missing_diagram`), hint |
+| status | pass / reject (issues 다음) |
 | round | 1~3 |
 | log, attention | 반려면 attention. 예: "단위 불일치: 근거는 초, 초안은 분" |
 
 **제약**
-- 지침: 근거 밖 지식으로 판정 금지(근거에 없으면 unsupported), 직접 고쳐 쓰기 금지(hint만), 형광과 문체는 코드 몫이므로 의미만 봄
+- 지침: 근거 밖 지식으로 판정 금지(근거에 없으면 unsupported), 직접 고쳐 쓰기 금지(hint만), 형광과 문체는 코드 몫이므로 의미만 봄. 길고 자신 있는 초안에 관대해지기 쉬움(길이 편향)을 md에 적고 문장 하나씩 대조
 - 판정 방식(문서 29 v2): 문장을 원자 사실로 쪼개 하나씩 근거와 대조. 도식마다 "빼면 잃는 것이 있나?"(없으면 overuse), 코드의 누락 의심 경고가 있으면 "문장이 그림보다 느린가?"(그렇다면 missing_diagram)
 - 강제: 작성자와 다른 새 메시지 목록, 반려 최대 2회(코드), 2회 후 남은 이슈의 포인트는 `check = true`로 발행
 - 실패 시 대체: 코드 검사만 통과한 상태로 발행하고, 토픽에 attention "검수 실패" 표시
@@ -419,6 +443,6 @@
 | 전체 실행 시간 | nightly 3시간, weekly 1시간 30분 |
 
 ## 11. 다음
-- 이 명세를 역할별 md(역할 카드 5요소 + 실행 설정)로 옮기기
+- 이 명세를 역할별 md(문서 35 공통 템플릿 + 실행 설정)로 옮기기. 0.7 권고를 각 md에
 - 6주차 모델 비교에 도구 호출 정확도(글 분석가, 레포 분석가) 추가
 - 09번 문서에 "26번이 갱신본" 표시

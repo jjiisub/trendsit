@@ -176,9 +176,10 @@ class Budget:
         pin, pout = self.prices.price(spec, base_url)
         tokens_in = estimate_tokens(body.get("messages")) + estimate_tokens(body.get("tools") or "")
         tokens_in += estimate_tokens(body.get("response_format") or "")
-        tokens_out = int(body.get("max_tokens") or 0)
+        # OpenRouter: 추론 토큰은 max_tokens 안에서 센다(추론과 보이는 출력이 같은 예산).
+        # https://openrouter.ai/docs/use-cases/reasoning-tokens — 그래서 더하지 않고 큰 쪽을 쓴다
         reasoning = body.get("reasoning") or {}
-        tokens_out += int(reasoning.get("max_tokens") or 0)
+        tokens_out = max(int(body.get("max_tokens") or 0), int(reasoning.get("max_tokens") or 0))
         return tokens_in * pin + tokens_out * pout
 
     def check(self, estimate: float, attempted: str) -> None:

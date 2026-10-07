@@ -1,0 +1,32 @@
+{
+ "https://simonwillison.net/atom/everything/": {
+  "file": "052434531db837d632eb.gz",
+  "status": 200,
+  "content_type": "application/xml; charset=utf-8",
+  "location": null
+ },
+ "https://simonwillison.net/robots.txt": {
+  "file": "cbcac9ae97216ec3d245.gz",
+  "status": 200,
+  "content_type": "text/plain",
+  "location": null
+ },
+ "https://simonwillison.net/2026/Sep/25/": {
+  "file": "1e75748f904d415c9ed8.gz",
+  "status": 200,
+  "content_type": "text/html; charset=utf-8",
+  "location": null
+ },
+ "https://simonwillison.net/2026/Sep/26/": {
+  "file": "575e4342d011f4bf948b.gz",
+  "status": 200,
+  "content_type": "text/html; charset=utf-8",
+  "location": null
+ },
+ "https://simonwillison.net/2026/Sep/27/": {
+  "file": "d7e2e10172733f3ae5f8.gz",
+  "status": 200,
+  "content_type": "text/html; charset=utf-8",
+  "location": null
+ }
+}
