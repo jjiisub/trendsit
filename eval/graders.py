@@ -13,6 +13,7 @@ from trendsit.core.artifacts import Document, JudgeInput, JudgeResult, RoleInput
 from trendsit.core.config import ROOT
 from trendsit.core.context import Ctx
 from trendsit.core.role import load_role, run_role
+from trendsit.core.textclean import clean_markdown
 
 RUBRICS = ROOT / "eval" / "rubrics"
 JUDGE_ROLE = "eval/judge.md"
@@ -71,14 +72,16 @@ def code_repo_oneliner(inp: dict[str, Any], out: dict[str, Any], expect: dict[st
     line = out["oneliner"].strip()
     basis = out.get("basis", "").strip()
     readme = inp.get("readme_head") or ""
-    readme = readme.get("text", "") if isinstance(readme, dict) else readme
+    readme = readme.get("text", "") if isinstance(readme, dict) else clean_markdown(readme)
+    # basis 검사 기준(설계 결정 S1 Q3): 기호를 걷어 낸 README 본문 + description
+    source_text = f"{readme}\n{inp.get('description') or ''}"
     checks = [
         check("길이 상한", len(line) <= expect.get("max_len", 60), f"{len(line)}자"),
         check("명사형 끝", not SENTENCE_END.search(line), line[-8:]),
         check("평가어 없음", not [w for w in EVAL_WORDS if w in line],
               ", ".join(w for w in EVAL_WORDS if w in line)),
         # basis는 README에 있는 구절 그대로여야 한다(공백 정규화 후 부분 문자열)
-        check("basis가 README 안에 있음", _norm(basis) in _norm(readme), basis[:60]),
+        check("basis가 README 본문이나 description 안에 있음", _norm(basis) in _norm(source_text), basis[:60]),
         check("문장이 있으면 basis도 있음", not line or bool(basis), "basis 비어 있음"),
         check("빈 문장이면 attention", bool(line) or out["attention"] is True, "oneliner 비었는데 attention=false"),
     ]

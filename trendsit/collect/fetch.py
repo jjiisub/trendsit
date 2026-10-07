@@ -94,6 +94,7 @@ class Fetcher:
         self.client = httpx.Client(transport=transport, timeout=TIMEOUT, follow_redirects=False,
                                    headers={"User-Agent": USER_AGENT})
         self.last_hit: dict[str, float] = {}
+        self.intervals: dict[str, float] = {}  # 도메인별 요청 간격(기본 DOMAIN_INTERVAL_S)
         self.robots: dict[str, RobotFileParser | str | None] = {}  # None=제한 없음, str=확인 불가(이유)
         self.blocked_by_robots: list[str] = []
         self.robots_unavailable: dict[str, str] = {}
@@ -167,13 +168,18 @@ class Fetcher:
         for a in addrs:
             check_address(a)
 
+    def set_interval(self, host: str, seconds: float) -> None:
+        """이 도메인은 seconds초에 1번(설정의 request_interval_s)."""
+        self.intervals[host.removeprefix("www.")] = max(seconds, DOMAIN_INTERVAL_S)
+
     def _wait_turn(self, host: str) -> None:
-        host = host.removeprefix("www.")  # 같은 도메인(www 유무 무관)은 1초에 1번
+        host = host.removeprefix("www.")  # 같은 도메인(www 유무 무관)은 정한 간격에 1번(기본 1초)
+        interval = self.intervals.get(host, DOMAIN_INTERVAL_S)
         last = self.last_hit.get(host)
         if last is not None:
             gap = self.clock() - last
-            if gap < DOMAIN_INTERVAL_S:
-                self.sleep(DOMAIN_INTERVAL_S - gap)
+            if gap < interval:
+                self.sleep(interval - gap)
         self.last_hit[host] = self.clock()
 
     def _cache_path(self, url: str) -> Path | None:

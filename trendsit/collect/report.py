@@ -16,19 +16,20 @@ HANDOFF_CANDIDATES = {
     "openai": "rss_only",
     "anthropic": "list_pages https://www.anthropic.com/news",
     "deepmind": "rss_only",
-    "geeknews": "list_pages https://news.hada.io/?page={page}",
+    "geeknews": "RSS + list_pages https://news.hada.io/?page={page}",
     "simonw": "day_archive https://simonwillison.net/{yyyy}/{Mon}/{d}/",
     "aitimes": "list_pages https://www.aitimes.com/news/articleList.html?page={page}&view_type=sm",
     "techbridge": "channel_listing (yt-dlp)",
 }
 CHECK_NOTES = {
-    "geeknews": "?page=는 추천순이라 날짜로 멈출 수 없음 → 날짜별 아카이브 past?day=(하루치를 20건씩 페이지로)",
+    "geeknews": "설계 결정(Q1): RSS·상세 페이지를 쓰지 않음. 평소는 메인(점수순) 1~2페이지, 지난 기간은 날짜별 목록 past?day=(20건씩 페이지). 본문은 원문 링크에서",
     "aitimes": "목록의 page 값이 무시됨(더보기는 JS) → 1페이지는 sc_sdate/sc_edate로 거른 HTML, 2페이지부터 ajaxArticlePaging.php(JSON)",
     "anthropic": "목록은 최신 10건 안팎, 페이지 넘김 없음. 커뮤니티 피드가 2021년부터 담고 있어 대체 수단으로만",
     "simonw": "후보 그대로 동작(조각마다 고유 주소, 시각)",
     "techbridge": "yt-dlp 채널 목록(flat, approximate_date) 동작. 정확한 시각은 영상별 메타데이터",
 }
-THRESHOLDS = {"body_rate": 0.9, "origin_rate": 0.95, "trending_min": 20}
+THRESHOLDS = {"body_rate": 0.9, "origin_rate": 0.95}
+SKIP = {"skip_robots": "robots 차단", "skip_type": "허용 밖 형식(PDF 등)", "skip_video": "영상"}
 
 
 def _pct(a: int, b: int) -> str:
@@ -59,8 +60,11 @@ def build(since: date, until: date, *, data_dir: Path | None = None, out: Path |
          "GitHub 트렌딩은 과거 기록이 없어 실행 시점의 주간 목록이다(기간과 다름).", ""]
 
     # 1. 소스별 표
-    L += ["## 1. 소스별", "", "| 소스 | 받는 방식 | RSS 가장 오래된 날 | 기간 덮음 | 백필(방법, 페이지) | 기간 안 항목 | 백필로 얻음 | "
-          "본문 추출 성공 | 키워드 통과 | 실패, 메모 |", "|" + "---|" * 10]
+    L += ["## 1. 소스별", "",
+          "본문 추출 성공률의 분모는 원문 링크가 있는 글에서 의도적으로 건너뛴 것(robots 차단, PDF 등 허용 밖 형식, 영상)을 뺀 수. "
+          "403 같은 실패는 실패로 센다(설계 결정 Q1).", "",
+          "| 소스 | 받는 방식 | RSS 가장 오래된 날 | 기간 덮음 | 백필(방법, 페이지) | 기간 안 항목 | 백필로 얻음 | "
+          "본문 추출 성공 | 의도적 건너뜀 | 키워드 통과 | 실패, 메모 |", "|" + "---|" * 11]
     body_fail = []
     for s in [*sources.text, *sources.video]:
         lg = logs.get(s.id, {})
@@ -70,6 +74,9 @@ def build(since: date, until: date, *, data_dir: Path | None = None, out: Path |
                (s.id, *rng)).fetchone()[0]
         ok = q("SELECT COUNT(*) FROM items WHERE source_id=? AND body_status='ok' AND day BETWEEN ? AND ?",
                (s.id, *rng)).fetchone()[0]
+        skips = {k: q("SELECT COUNT(*) FROM items WHERE source_id=? AND body_status=? AND day BETWEEN ? AND ?",
+                      (s.id, k, *rng)).fetchone()[0] for k in SKIP}
+        n_skip = sum(skips.values())
         npass = q("SELECT COUNT(*) FROM items WHERE source_id=? AND filter_status='pass' AND day BETWEEN ? AND ?",
                   (s.id, *rng)).fetchone()[0]
         fetch_mode = getattr(s, "fetch", "rss + yt-dlp")
@@ -80,12 +87,29 @@ def build(since: date, until: date, *, data_dir: Path | None = None, out: Path |
         memo = "; ".join([*(d.get("notes") or []), *(d.get("errors") or [])[:3],
                           *(f"{k} {v}건" for k, v in sorted(reasons.items(), key=lambda kv: -kv[1])[:5])])
         memo = memo or (lg.get("error") or "")
-        rate = ok / n if n else 0
-        if fetch_mode in ("feed_summary", "feed_title") and n and rate < THRESHOLDS["body_rate"]:
+        denom = n - n_skip
+        rate = ok / denom if denom else 0
+        if fetch_mode in ("feed_summary", "feed_title", "list_origin") and denom and rate < THRESHOLDS["body_rate"]:
             body_fail.append(f"{s.id} {rate:.0%}")
+        skip_txt = ", ".join(f"{SKIP[k]} {v}" for k, v in skips.items() if v) or "-"
+        if d.get("n_self_excluded"):
+            memo = f"자기 글(Show GN 등) {d['n_self_excluded']}건 제외; " + memo
+        pages_txt = f"{method}, {pages}" + (f" + 평소 목록 {d['list_pages']}" if d.get("list_pages") else "")
         L.append(f"| {s.id} | {fetch_mode} | {d.get('rss_oldest') or '-'} | {'예' if covered else '아니오'} | "
-                 f"{method}, {pages} | {n} | {nb} | {_pct(ok, n)} | {_pct(npass, n)} | {memo[:200] or '-'} |")
+                 f"{pages_txt} | {n} | {nb} | {_pct(ok, denom)} | {skip_txt} | {_pct(npass, n)} | {memo[:220] or '-'} |")
         verdict.setdefault("covered", {})[s.id] = bool(covered) and lg.get("status") != "failed"
+    L.append("")
+
+    # 1-1. 하루 신규 건수(게시일 기준). 페이지 수나 방식을 조정할 근거
+    days = [r["day"] for r in q("SELECT DISTINCT day FROM items WHERE day BETWEEN ? AND ? ORDER BY day", rng)]
+    L += ["### 하루 신규 건수(게시일, 한국 시간)", "",
+          "| 소스 | " + " | ".join(d[5:] for d in days) + " | 하루 평균 |", "|---|" + "---|" * (len(days) + 1)]
+    for s in [*sources.text, *sources.video]:
+        cnt = {r["day"]: r["n"] for r in q("SELECT day, COUNT(*) n FROM items WHERE source_id=? AND day BETWEEN ? AND ? "
+                                            "GROUP BY day", (s.id, *rng))}
+        span = (until - since).days + 1
+        L.append(f"| {s.id} | " + " | ".join(str(cnt.get(d, 0)) for d in days)
+                 + f" | {sum(cnt.values()) / span:.1f} |")
     L.append("")
 
     # 2. 백필 확인
@@ -104,10 +128,12 @@ def build(since: date, until: date, *, data_dir: Path | None = None, out: Path |
     week = q("SELECT MAX(week) FROM repo_trending").fetchone()[0]
     tr = q("SELECT * FROM repo_trending WHERE week=? ORDER BY rank", (week,)).fetchall() if week else []
     missing = sum(1 for r in tr if r["stars_this_week"] is None)
+    page_rows = logs.get("github_trending", {}).get("detail", {}).get("page_rows")
     rel = q("SELECT title, day FROM items WHERE source_id='github_releases' AND day BETWEEN ? AND ? ORDER BY day",
             rng).fetchall()
     L += ["## 3. GitHub", "",
-          f"- 트렌딩(주간 페이지, 실행 주차 {week or '-'}): 레포 {len(tr)}개, 키워드 통과 "
+          f"- 트렌딩(주간 페이지, 실행 주차 {week or '-'}): 페이지에 보인 {page_rows if page_rows is not None else '-'}개 중 "
+          f"{len(tr)}개 저장, 키워드 통과 "
           f"{sum(1 for r in tr if r['filter_status'] == 'pass')}개, 이번 주 별 누락 {missing}개",
           f"- 추적 레포 릴리스(기간 안): {len(rel)}건" + (" — " + ", ".join(f"{r['title']}({r['day']})" for r in rel[:12])
                                                      if rel else ""), ""]
@@ -120,6 +146,7 @@ def build(since: date, until: date, *, data_dir: Path | None = None, out: Path |
         L.append("")
     verdict["trending"] = len(tr)
     verdict["trending_missing"] = missing
+    verdict["trending_page_rows"] = page_rows
 
     # 4. 유튜브
     for v in sources.video:
@@ -156,12 +183,11 @@ def build(since: date, until: date, *, data_dir: Path | None = None, out: Path |
              "GROUP BY l.kind ORDER BY n DESC", rng).fetchall()
     gn = q("SELECT i.id, i.title, (SELECT COUNT(*) FROM links l WHERE l.item_id=i.id AND l.role='origin_candidate') o "
            "FROM items i WHERE i.source_id='geeknews' AND i.day BETWEEN ? AND ?", rng).fetchall()
-    self_posts = [r for r in gn if (r["title"] or "").startswith(("Ask GN", "Show GN")) and not r["o"]]
-    denom = len(gn) - len(self_posts)
+    n_self = logs.get("geeknews", {}).get("detail", {}).get("n_self_excluded", 0)  # 수집에서 뺀 자기 글
+    denom = len(gn)
     got = sum(1 for r in gn if r["o"])
     L += ["## 6. 링크", "", "| 종류 | 링크 수 |", "|---|---|", *[f"| {r['kind']} | {r['n']} |" for r in dist], "",
-          f"- GeekNews 원문 링크 확보율: {_pct(got, denom)} (제목 링크가 GeekNews 자신인 Ask/Show GN 글 "
-          f"{len(self_posts)}건은 제외)",
+          f"- GeekNews 원문 링크 확보율: {_pct(got, denom)} (원문 링크가 GeekNews 자신인 글 {n_self}건은 수집에서 뺌)",
           "- 원문이 Hacker News 토론 페이지인 GeekNews 글은 토론 속 링크가 많이 잡힘(curation 링크 대부분). "
           "S3 원본 추적에서 거를 대상", ""]
     verdict["origin_rate"] = got / denom if denom else None
@@ -183,8 +209,9 @@ def build(since: date, until: date, *, data_dir: Path | None = None, out: Path |
           f"{'통과' if not body_fail else '미달'} |",
           f"| GeekNews 원문 링크 확보율 | 95% 이상 | {_pct(got, denom)} | "
           f"{'통과' if denom and got / denom >= THRESHOLDS['origin_rate'] else '미달'} |",
-          f"| 트렌딩 | 20개 이상, stars_this_week 누락 0 | {len(tr)}개, 누락 {missing} | "
-          f"{'통과' if len(tr) >= THRESHOLDS['trending_min'] and missing == 0 else '미달'} |",
+          f"| 트렌딩 | 주간 페이지에 보이는 전부, stars_this_week 누락 0, 0개면 실패(설계 결정 Q2) | "
+          f"페이지 {page_rows if page_rows is not None else '-'}개 중 {len(tr)}개, 누락 {missing} | "
+          f"{'통과' if tr and page_rows == len(tr) and missing == 0 else '미달'} |",
           f"| 중복 | 0 | {dup} | {'통과' if dup == 0 else '미달'} |", ""]
     out = out or config.ROOT / "reports" / "S1_collection.md"
     out.parent.mkdir(parents=True, exist_ok=True)

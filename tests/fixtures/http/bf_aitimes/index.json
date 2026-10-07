@@ -23,6 +23,12 @@
   "content_type": "text/javascript; charset=utf-8",
   "location": null
  },
+ "https://www.aitimes.com/news/ajaxArticlePaging.php?page=3&list_per_page=20&page_per_page=10&sc_sdate=2026-10-03&sc_edate=2026-10-04&sc_order_by=E&view_type=sm": {
+  "file": "1cffe07c529c8ddbb116.gz",
+  "status": 200,
+  "content_type": "text/javascript; charset=utf-8",
+  "location": null
+ },
  "https://www.aitimes.com/news/articleView.html?idxno=215688": {
   "file": "482e28affd2cfd7fe3ff.gz",
   "status": 200,

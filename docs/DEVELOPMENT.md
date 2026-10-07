@@ -28,8 +28,8 @@ GITHUB_TOKEN=...             # 선택. 픽스처 README 수집에만
 | `uv run python -m trendsit trace <run_id>` | 실행 1건의 걸음(시각, 역할, kind, text, 비용) |
 | `uv run python -m trendsit collect [--source ID] [--since DATE] [--until DATE] [--no-body] [--no-http-cache] [--max-items N]` | 기간 수집(글 6곳, 유튜브, GitHub 트렌딩, 추적 레포 릴리스). 기본 기간은 최근 1일. RSS가 기간을 못 덮으면 백필 |
 | `uv run python -m trendsit items [--week 2026-W40] [--source ID] [--status pass\|filtered] [--limit N]` | 수집 항목 목록(날짜, 소스, 필터 상태, 본문 상태, 키워드, 제목) |
-| `uv run python -m trendsit report collection [--since DATE] [--until DATE]` | `reports/S1_collection.md`: 소스별 표, 백필 확인, GitHub, 유튜브, 사람 확인용 샘플, 링크 분포, 문턱값 |
-| `uv run python scripts/record_http_fixtures.py <이름> --since D --until D [--source ID] [--max-items N]` | 수집 테스트용 응답 녹화(`tests/fixtures/http/<이름>/`, 피드와 HTML은 줄여서 gzip) |
+| `uv run python -m trendsit report collection [--since DATE] [--until DATE]` | `reports/S1_collection.md`: 소스별 표, 하루 신규 건수, 백필 확인, GitHub, 유튜브, 사람 확인용 샘플, 링크 분포, 문턱값 |
+| `uv run python scripts/record_http_fixtures.py <이름> --since D --until D [--source ID] [--max-items N] [--today D] [--extend]` | 수집 테스트용 응답 녹화(`tests/fixtures/http/<이름>/`, 피드와 HTML은 줄여서 gzip). `--extend`는 이전 녹화를 쓰고 새 URL만 받음 |
 
 - `--input`은 JSON 파일 경로나 JSON 문자열. 픽스처 파일(`{"input", "expect"}`)이면 `input` 칸을 쓴다
 - `--no-cache`는 캐시 읽기만 끈다. 새 응답은 캐시에 저장된다
@@ -53,14 +53,15 @@ GITHUB_TOKEN=...             # 선택. 픽스처 README 수집에만
 - HTTP 캐시 `data/http_cache/`(ETag, Last-Modified 조건부 요청). `--no-http-cache`로 끔
 - 글: RSS → 요청 시작일이 RSS의 가장 오래된 항목보다 앞서면 `sources.yaml`의 `backfill`로 거슬러 읽음 → 기간 필터 → 본문(`feed_full`은 피드 본문, 나머지는 원글을 trafilatura로, GeekNews는 토픽 페이지의 한국어 요약 + 원문 링크) → 링크 종류(`link_kinds.yaml`) → 키워드(`keywords.yaml`) → 칠판
   - 백필 조건: 시작일이 RSS의 가장 오래된 날과 같거나 앞서면(그날을 일부만 담을 수 있어서)
-  - `day_archive`: 시작일 하루 전부터(UTC 날짜 아카이브 대응) 날짜마다 아카이브(`{date}` 또는 `{yyyy}/{Mon}/{d}`, `{page}`가 있으면 20건 미만 페이지까지)
+  - `day_archive`: `archive_tz: utc`면 시작일 하루 전부터(Simon Willison), 아니면 시작일부터 날짜마다 아카이브(`{date}` 또는 `{yyyy}/{Mon}/{d}`, `{page}`가 있으면 20건 미만 페이지까지)
   - `list_pages`: 1페이지는 `url_template`, 2페이지부터 `page_template`(Referer로 1페이지를 보냄). 날짜가 `--since`보다 앞선 항목이 나오면 멈춤. 목록 해석 실패는 3초 뒤 한 번 더
   - 300자 미만이면 `body_status=short`, 추출 실패면 `failed`. 이미 있는 항목은 건너뛰고 본문이 비었던 항목만 다시 시도
   - 목록에 날짜가 없던 후보는 글 페이지에서 얻은 날짜로 기간을 다시 보고, 기간 밖이면 저장하지 않음
   - "기간 덮음"은 백필이 시작일보다 앞선 항목이나 목록 끝까지 닿았을 때만. 백필 오류나 페이지 상한이면 아님
-  - GeekNews가 브라우저 확인(Turnstile)을 요구하면 우회하지 않고 그 실행에서 토픽 페이지 요청을 멈춘다. 남은 글은 날짜별 아카이브의 원문 링크로 원문 글을 본문으로
+- GeekNews(`fetch: list_origin`, 설계 결정 S1 Q1): RSS와 상세 페이지(`topic?id=`)를 쓰지 않는다. 기간에 어제 이후가 들어 있으면 평소 목록(메인, 점수순 `daily.max_pages` 페이지), 그 앞의 날짜는 날짜별 목록(`past?day=`). 목록에서 제목, 원문 링크, 요약 앞부분, 받을 때의 점수와 댓글 수(`items.meta_json`)를 저장하고 본문은 원문 링크에서. 같은 글은 topic id로 한 번(`external_id=topic:<id>`). 원문 링크가 GeekNews 자신인 글(Show GN 등)은 수집에서 빼고 건수만(`n_self_excluded`). 목록 요청은 `request_interval_s`(5초) 간격
+  - 본문 상태: `ok`, `short`, `failed`(403, 타임아웃 등) 외에 의도적으로 건너뛴 것은 `skip_robots`, `skip_type`(PDF 등 허용 밖 형식), `skip_video`(원문이 영상). 본문 성공률은 원문 링크가 있는 글에서 skip_*를 뺀 수가 분모
 - 유튜브: 채널 RSS(최근 15편) → 부족하면 `yt-dlp --flat-playlist`(다운로드 없음, 날짜는 대략값이라 앞뒤 3일까지 후보) → 영상마다 yt-dlp 메타데이터(길이, 수동 자막 언어, 자동 자막 유무, 챕터, 정확한 시각으로 기간 재확인). yt-dlp가 없으면 null + 경고. 메타데이터를 못 받은 영상은 다음 실행에서 다시 시도
-- GitHub: 트렌딩 주간 페이지(실행 시점 목록, 실행 주차로 저장, 0건이면 실패), 추적 레포 `releases.atom`(기간 안), README 앞 3,000자는 추적 레포 + 키워드에 걸린 트렌딩 레포만(GitHub API, `GITHUB_TOKEN` 있으면 사용)
+- GitHub: 트렌딩 주간 페이지에 보이는 전부(실행 시점 목록, 실행 주차로 저장, 0건이면 실패, 설계 결정 Q2), 추적 레포 `releases.atom`(기간 안), README 앞 3,000자는 추적 레포 + 키워드에 걸린 트렌딩 레포만(GitHub API, `GITHUB_TOKEN` 있으면 사용)
 - 레포 키워드: 설명(제목 자리), 토픽, README(이름은 넣지 않음). 같은 주에 다시 돌리면 그 주 트렌딩 목록을 바꾼다
 - 키워드: 제목, 요약, 본문 앞 2,000자. 영어 별칭은 단어 경계, 한국어는 부분 문자열. 점수 = 제목 키워드 × 3 + 본문 키워드 × 1. 제외어가 있고 제목에 포함 키워드가 없으면 filtered. 걸러진 항목도 이유와 함께 저장
 - 실행 기록: `runs`(kind='collect') 1행, 소스마다 `steps`(kind='code', 실패면 attention)와 `fetch_log`

@@ -83,3 +83,23 @@ def test_missing_question_fails():
     rows = [_res()] * 9 + [_res(missing=("Q1",))]
     s = graders.summarize("repo_oneliner", rows)
     assert not s["passed"] and any("누락" in r for r in s["fail_reasons"])
+
+
+def test_basis_checked_against_cleaned_readme_and_description():
+    """설계 결정 S1 Q3: basis는 기호를 걷어 낸 README 본문 + description 기준."""
+    raw = "**The self-improving AI agent built by [Nous Research](https://nousresearch.com).** It learns."
+    out = {"basis": "The self-improving AI agent built by Nous Research", "oneliner": "스스로 학습하는 AI 에이전트",
+           "log": "README 근거", "attention": False}
+    assert graders.code_grade("repo_oneliner", {"readme_head": raw}, out, None, {})["passed"]
+    out2 = out | {"basis": "Full-stack web application template"}
+    inp = {"readme_head": "# Full Stack FastAPI Template", "description": "Full-stack web application template with X"}
+    assert graders.code_grade("repo_oneliner", inp, out2, None, {})["passed"]
+    assert not graders.code_grade("repo_oneliner", {"readme_head": raw}, out2, None, {})["passed"]
+
+
+def test_clean_markdown():
+    from trendsit.core.textclean import clean_markdown
+
+    t = ('<p align="center"><img src="x.png"></p>\n# Title\n[![badge](b.svg)](ci)\n'
+         '**Bold [link](http://a)** and [WSGI] and `code`.<br/>Next\n[WSGI]: https://wsgi.org')
+    assert clean_markdown(t) == "Title\n\nBold link and WSGI and code.\nNext"

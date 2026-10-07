@@ -6,6 +6,8 @@ from typing import Any, Literal, Self
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+from .textclean import clean_markdown
+
 
 class RoleInput(BaseModel):
     model_config = ConfigDict(extra="forbid")
@@ -40,19 +42,20 @@ class RepoOnelinerInput(RoleInput):
     full_name: str
     description: str | None = None
     topics: list[str] = []
-    readme_head: Document  # 픽스처와 CLI 입력은 README 문자열. 아래에서 rp:{full_name} 문서로 감싼다
+    readme_head: Document  # 픽스처와 CLI 입력은 README 원문 문자열. 아래에서 기호를 걷어 내고 rp:{full_name} 문서로
 
     @model_validator(mode="before")
     @classmethod
     def _readme_as_document(cls, data: Any) -> Any:
+        """README 원문의 마크다운·HTML 기호를 걷어 낸 본문을 모델에 준다(설계 결정 S1 Q3)."""
         if isinstance(data, dict) and not isinstance(data.get("readme_head"), dict | Document):
             data = {**data, "readme_head": Document(id=f"rp:{data.get('full_name', '')}", source="GitHub README",
-                                                    text=data.get("readme_head") or "")}
+                                                    text=clean_markdown(data.get("readme_head") or ""))}
         return data
 
 
 class RepoOneliner(RoleOutput):
-    basis: str = Field(max_length=120, description="README에서 근거가 된 구절을 그대로 옮김. 근거가 없으면 빈 문자열")
+    basis: str = Field(max_length=120, description="README 본문이나 description에서 근거가 된 구절을 그대로 옮김. 근거가 없으면 빈 문자열")
     oneliner: str = Field(max_length=60, description="무엇을 하는 레포인지 한 문장. 명사형 60자 이내. 근거가 없으면 빈 문자열")
 
     @classmethod

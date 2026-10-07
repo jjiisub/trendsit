@@ -41,7 +41,7 @@ def sync_sources(db: DB, src: config.SourcesConfig) -> None:
 def collect(since: date, until: date, *, only: str | None = None, no_body: bool = False,
             data_dir: Path | None = None, config_dir: Path | None = None, use_http_cache: bool = True,
             fetcher: Fetcher | None = None, ytdlp: YtDlp = run_ytdlp, max_items: int | None = None,
-            spec: str | None = None) -> CollectResult:
+            spec: str | None = None, today: date | None = None) -> CollectResult:
     data_dir = data_dir or config.ROOT / "data"
     sources = config.load("sources.yaml", config_dir)
     keywords = config.load("keywords.yaml", config_dir)
@@ -88,7 +88,8 @@ def collect(since: date, until: date, *, only: str | None = None, no_body: bool 
         tracer.step(kind="code", role="collect", text=text, attention=partial, detail=detail,
                     error="; ".join(detail.get("errors") or [])[:500] or None)
 
-    text_c = TextCollector(db, fetcher, keywords, kinds, run_id=tracer.run_id, no_body=no_body, max_items=max_items)
+    text_c = TextCollector(db, fetcher, keywords, kinds, run_id=tracer.run_id, no_body=no_body, max_items=max_items,
+                           today=today)
     for s in sources.text:
         run_one(s.id, lambda s=s: text_c.collect(s, since, until))
     yt = YoutubeCollector(db, fetcher, keywords, kinds, run_id=tracer.run_id, ytdlp=ytdlp, max_items=max_items)
@@ -123,5 +124,6 @@ def collect(since: date, until: date, *, only: str | None = None, no_body: bool 
 
 def _github_text(sid: str, st: GithubStats) -> str:
     if sid == "github_trending":
-        return f"github_trending: 레포 {st.trending}개, 키워드 통과 {st.trending_pass}개, README {st.readmes}건"
+        return (f"github_trending: 페이지 {st.page_rows}개 중 {st.trending}개 저장, 키워드 통과 {st.trending_pass}개, "
+                f"README {st.readmes}건")
     return f"github_releases: 기간 안 릴리스 {st.releases}건(신규 {st.releases_new}), README {st.readmes}건"

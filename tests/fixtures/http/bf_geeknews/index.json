@@ -1,10 +1,4 @@
 {
- "https://news.hada.io/rss/news": {
-  "file": "c04fef880853c73e7038.gz",
-  "status": 200,
-  "content_type": "application/atom+xml; charset=UTF-8",
-  "location": null
- },
  "https://news.hada.io/robots.txt": {
   "file": "dee8e9efbc57787178ae.gz",
   "status": 200,
@@ -29,32 +23,26 @@
   "content_type": "text/html; charset=UTF-8",
   "location": null
  },
- "https://news.hada.io/topic?id=34739": {
-  "file": "9ff68e8f51738806ac5c.gz",
+ "https://github.com/robots.txt": {
+  "file": "6f12b3a8ea73b7281526.gz",
   "status": 200,
-  "content_type": "text/html; charset=UTF-8",
+  "content_type": "text/plain",
   "location": null
  },
- "https://news.hada.io/topic?id=34752": {
-  "file": "a0c5ff7f246b14f80c4d.gz",
+ "https://github.com/deepakness/cogsend": {
+  "file": "bdf196187582f224f979.gz",
   "status": 200,
-  "content_type": "text/html; charset=UTF-8",
+  "content_type": "text/html; charset=utf-8",
   "location": null
  },
- "https://news.hada.io/past?day=2026-10-03&page=1": {
-  "file": "6d41aeabd6b9864f7c46.gz",
+ "https://stock-engineer.com/robots.txt": {
+  "file": "b45a8f3c09cd7b6dbf4e.gz",
   "status": 200,
-  "content_type": "text/html; charset=UTF-8",
+  "content_type": "text/plain; charset=utf-8",
   "location": null
  },
- "https://news.hada.io/past?day=2026-10-03&page=2": {
-  "file": "a63e14f7cf655b3ecf68.gz",
-  "status": 200,
-  "content_type": "text/html; charset=UTF-8",
-  "location": null
- },
- "https://news.hada.io/past?day=2026-10-03&page=3": {
-  "file": "43149b44a668de1f50dd.gz",
+ "https://stock-engineer.com/claude-code-skill-pattern-reusable-agent-design/": {
+  "file": "a63f1b1593b41a82a5bb.gz",
   "status": 200,
   "content_type": "text/html; charset=UTF-8",
   "location": null

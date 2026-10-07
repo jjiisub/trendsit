@@ -41,7 +41,9 @@ class Recorder(httpx.BaseTransport):
 
     def handle_request(self, request: httpx.Request) -> httpx.Response:
         old = self.existing.get(str(request.url))
-        if old is not None:
+        if old is not None:  # 이전 녹화를 그대로 쓰고, 이번에 쓴 응답으로 다시 기록(안 쓰는 응답은 정리됨)
+            self.records.append({"url": str(request.url), "status": old["status"], "content_type": old["content_type"],
+                                 "location": old["location"], "body": old["body"], "reused": True})
             headers = {"content-type": old["content_type"]} | ({"location": old["location"]} if old["location"] else {})
             return httpx.Response(old["status"], headers=headers, content=old["body"], request=request)
         resp = self.inner.handle_request(request)
@@ -92,6 +94,7 @@ def main() -> None:
     ap.add_argument("--until", required=True)
     ap.add_argument("--max-items", type=int, default=3)
     ap.add_argument("--source")
+    ap.add_argument("--today", help="평소 목록과 날짜별 목록을 가르는 기준 날짜(기본 오늘). 테스트 재현용으로 meta에 남긴다")
     ap.add_argument("--extend", action="store_true",
                     help="이미 녹화한 응답은 그대로 쓰고, 코드가 새로 요청하는 URL만 실제로 받아 보탠다")
     args = ap.parse_args()
@@ -130,23 +133,19 @@ def main() -> None:
 
     tmp = Path(tempfile.mkdtemp())
     fetcher = Fetcher(None, use_cache=False, transport=rec)
+    today = date.fromisoformat(args.today) if args.today else datetime.now(timezone(timedelta(hours=9))).date()
     res = collect(since, until, only=args.source, data_dir=tmp, fetcher=fetcher, ytdlp=ytdlp,
-                  max_items=args.max_items)
-    keep_files = {}
-    if args.extend:
-        for meta in old_index.values():
-            keep_files[meta["file"]] = (out / meta["file"]).read_bytes()
+                  max_items=args.max_items, today=today)
     if out.exists():
         shutil.rmtree(out)
     out.mkdir(parents=True)
     index = {}
-    for url, meta in old_index.items():  # --extend: 이전 녹화 유지
-        (out / meta["file"]).write_bytes(keep_files[meta["file"]])
-        index[url] = meta
     for r in rec.records:
         ctype = r["content_type"].split(";")[0].strip().lower()
         body = r["body"].decode("utf-8", errors="replace")
-        if any(x in ctype for x in ("xml", "rss", "atom")) or r["url"].endswith((".atom", ".xml")):
+        if r.get("reused"):
+            pass  # 이미 줄인 응답
+        elif any(x in ctype for x in ("xml", "rss", "atom")) or r["url"].endswith((".atom", ".xml")):
             body = trim_feed(body, since, until)
         elif "html" in ctype:
             body = trim_html(body)
@@ -155,6 +154,7 @@ def main() -> None:
         index[r["url"]] = {"file": fname, "status": r["status"], "content_type": r["content_type"],
                            "location": r["location"]}
     meta = {"since": args.since, "until": args.until, "max_items": args.max_items, "source": args.source,
+            "today": today.isoformat(),
             "recorded_at": datetime.now(UTC).isoformat(timespec="seconds"),
             "result": {k: {x: v.get(x) for x in ("status", "n_new", "n_backfilled", "backfill_pages", "trending",
                                                    "releases") if x in v} for k, v in res.sources.items()}}

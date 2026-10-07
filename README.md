@@ -77,8 +77,8 @@ uv run python -m trendsit cost --spec S0       # 사용액과 남은 예산
 |---|---|---|---|
 | S0 | `repo_oneliner` 픽스처 10개(generate) | 코드 채점 10/10, 정확성 평균 4.8 / 5(1점 0개), 구체성 4.9, 표현 5.0 | S0 전체 $0.052 (상한 $0.15) |
 | S0 | `lookup_agent` 도구 루프 5건(smoke) | 5/5. 깊이 상한 밖 문서는 코드가 거부 | $0 |
-| S1 | 수집 9/28~10/4(한 주) | 글 492건(GeekNews 376, AI타임스 79, OpenAI 15, Simon Willison 18, Anthropic 2, DeepMind 2), 영상 17편, 릴리스 18건, 트렌딩 11개. 6곳 모두 기간을 덮음(백필 GeekNews·AI타임스·유튜브), 중복 0. 본문 추출 성공 GeekNews 77%(사이트의 브라우저 확인으로 토픽 페이지가 막혀 원문 글로 대체), 나머지 글 소스 93~100%. 키워드 통과 207건 | LLM 없음 $0 |
-| S1 | `repo_oneliner` 새 프롬프트 형식 + 예/아니오 채점(generate) | 코드 채점 8/10(근거 구절 검사에서 2건 실패), judge 판정 Q1·Q2·Q3 8/8(잠정, 사람 라벨 전) | S1 $0.035 (상한 $0.05) |
+| S1 | 수집 9/28~10/4(한 주) | 글 544건(GeekNews 319, AI타임스 188, Simon Willison 18, OpenAI 15, Anthropic 2, DeepMind 2), 영상 17편, 릴리스 18건, 트렌딩 11개(페이지 전부). 6곳 모두 기간을 덮음, 중복 0. 본문 추출 성공 GeekNews 93%(원문 기준, 의도적 건너뜀 25건 제외), 나머지 93~100%. 하루 신규 GeekNews 45.6건, AI타임스 26.9건. 키워드 통과 249건 | LLM 없음 $0 |
+| S1 | `repo_oneliner` 새 프롬프트 형식 + 예/아니오 채점(generate) | 3회 개선 후 코드 채점 8/10. README 기호 정리(설계 결정) 뒤 재측정은 예산 상한으로 7개에서 멈춤: 코드 6/7, judge Q1·Q2·Q3 5/5(잠정) | S1 $0.044 (상한 $0.05) |
 
 - 같은 입력 재실행은 캐시로 0원. 채점 기준은 S1부터 예/아니오 질문 + 사람 라벨 일치율로 바뀐다
 - 상세: [reports/S0_quality.md](reports/S0_quality.md), [reports/S0_report.md](reports/S0_report.md), [reports/S1_collection.md](reports/S1_collection.md), [reports/S1_report.md](reports/S1_report.md)

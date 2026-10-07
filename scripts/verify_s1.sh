@@ -43,8 +43,8 @@ pt A6 "같은 collect 두 번: 항목 수 그대로, 중복 0" tests/test_s1b.py
 pt A7 "백필: list_pages(AI타임스)와 day_archive(GeekNews, Simon Willison), 유튜브 채널 목록, --since 앞에서 멈춤" \
   tests/test_s1b.py -k "backfill_from_saved or day_archive_pages or stops_before_since"
 pt A8 "실패 격리: 한 소스 500이어도 나머지 수집, fetch_log failed + 실행 기록 attention" tests/test_s1b.py -k "one_source_failing"
-pt A9 "트렌딩 파서: 저장한 주간 페이지 11개(스펙 25개 내외, 지금 GitHub가 11~13개만 보임)와 월간 페이지 25개 전부, stars_this_week 모두 숫자, 빈 페이지는 실패로 기록" \
-  tests/test_s1b.py -k "trending_parser or empty_trending"
+pt A9 "트렌딩(설계 결정 Q2): 주간 페이지에 보이는 전부 저장(페이지 수 = 저장 수), stars_this_week 모두 숫자, 0개면 실패로 기록. 파서는 월간 페이지 25개로도 확인" \
+  tests/test_s1b.py -k "trending_parser or empty_trending or trending_verdict"
 pt A10 "키워드: 제목 매칭 3점, 단어 경계(eval ≠ evaluate), 제외어 규칙" tests/test_s1b.py -k "keyword_rules"
 pt A11 "robots: 막힌 경로는 가져오지 않고 기록" tests/test_s1b.py -k "robots"
 A12_MISS=""

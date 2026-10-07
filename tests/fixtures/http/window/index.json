@@ -71,32 +71,56 @@
   "content_type": "text/xml",
   "location": null
  },
- "https://news.hada.io/rss/news": {
-  "file": "c04fef880853c73e7038.gz",
-  "status": 200,
-  "content_type": "application/atom+xml; charset=UTF-8",
-  "location": null
- },
  "https://news.hada.io/robots.txt": {
   "file": "dee8e9efbc57787178ae.gz",
   "status": 200,
   "content_type": "text/plain; charset=utf-8",
   "location": null
  },
- "https://news.hada.io/topic?id=34895": {
-  "file": "572d93f93ca855e0f235.gz",
+ "https://news.hada.io/?page=1": {
+  "file": "7771cf89c5835989270c.gz",
   "status": 200,
   "content_type": "text/html; charset=UTF-8",
   "location": null
  },
- "https://news.hada.io/topic?id=34894": {
-  "file": "91e85c63c67d5d954213.gz",
+ "https://news.hada.io/?page=2": {
+  "file": "b1fc52a4dbe17b4c5368.gz",
   "status": 200,
   "content_type": "text/html; charset=UTF-8",
   "location": null
  },
- "https://news.hada.io/topic?id=34893": {
-  "file": "7f830fc35318a462d24b.gz",
+ "https://qlabs.sh/robots.txt": {
+  "file": "8ee3cdbff6b9ed991d3b.gz",
+  "status": 200,
+  "content_type": "text/plain; charset=utf-8",
+  "location": null
+ },
+ "https://qlabs.sh/research/dust": {
+  "file": "4b350aa2264060c3cebc.gz",
+  "status": 200,
+  "content_type": "text/html; charset=utf-8",
+  "location": null
+ },
+ "https://www.vivienhenz.com/robots.txt": {
+  "file": "94ea4c878c2cf89e303a.gz",
+  "status": 404,
+  "content_type": "text/html; charset=utf-8",
+  "location": null
+ },
+ "https://www.vivienhenz.com/common-lisp": {
+  "file": "6f6d21ae5ee6fba679d6.gz",
+  "status": 200,
+  "content_type": "text/html; charset=utf-8",
+  "location": null
+ },
+ "https://terrytao.wordpress.com/robots.txt": {
+  "file": "8aea203920c1fdf216ff.gz",
+  "status": 200,
+  "content_type": "text/plain; charset=utf-8",
+  "location": null
+ },
+ "https://terrytao.wordpress.com/2026/10/05/the-future-of-mathematics/": {
+  "file": "ed5197d10f48dfb1b2f2.gz",
   "status": 200,
   "content_type": "text/html; charset=UTF-8",
   "location": null
@@ -129,6 +153,24 @@
   "file": "dda2488fe73e642a7eb6.gz",
   "status": 200,
   "content_type": "text/plain; charset=utf-8",
+  "location": null
+ },
+ "https://www.aitimes.com/news/articleList.html?sc_sdate=2026-10-06&sc_edate=2026-10-06&view_type=sm": {
+  "file": "39fa4567265680f9f4dc.gz",
+  "status": 200,
+  "content_type": "text/html; charset=utf-8",
+  "location": null
+ },
+ "https://www.aitimes.com/news/ajaxArticlePaging.php?page=2&list_per_page=20&page_per_page=10&sc_sdate=2026-10-06&sc_edate=2026-10-06&sc_order_by=E&view_type=sm": {
+  "file": "4c2aaabaefb725296619.gz",
+  "status": 200,
+  "content_type": "text/javascript; charset=utf-8",
+  "location": null
+ },
+ "https://www.aitimes.com/news/ajaxArticlePaging.php?page=3&list_per_page=20&page_per_page=10&sc_sdate=2026-10-06&sc_edate=2026-10-06&sc_order_by=E&view_type=sm": {
+  "file": "a54cc02e61b9c71eb1c1.gz",
+  "status": 200,
+  "content_type": "text/javascript; charset=utf-8",
   "location": null
  },
  "https://www.aitimes.com/news/articleView.html?idxno=216001": {
@@ -297,66 +339,6 @@
   "file": "705d18fb3c9f3a743e7a.gz",
   "status": 200,
   "content_type": "application/atom+xml; charset=utf-8",
-  "location": null
- },
- "https://news.hada.io/past?day=2026-10-05&page=1": {
-  "file": "58c938cc55ec9528d079.gz",
-  "status": 200,
-  "content_type": "text/html; charset=UTF-8",
-  "location": null
- },
- "https://news.hada.io/past?day=2026-10-05&page=2": {
-  "file": "640ec4812ff3aa133ca9.gz",
-  "status": 200,
-  "content_type": "text/html; charset=UTF-8",
-  "location": null
- },
- "https://news.hada.io/past?day=2026-10-05&page=3": {
-  "file": "338e0dd1e7c6677f33b8.gz",
-  "status": 200,
-  "content_type": "text/html; charset=UTF-8",
-  "location": null
- },
- "https://news.hada.io/past?day=2026-10-05&page=4": {
-  "file": "af05ba3bc5d879aa1839.gz",
-  "status": 200,
-  "content_type": "text/html; charset=UTF-8",
-  "location": null
- },
- "https://news.hada.io/past?day=2026-10-06&page=1": {
-  "file": "61c5abd35135dd39c637.gz",
-  "status": 200,
-  "content_type": "text/html; charset=UTF-8",
-  "location": null
- },
- "https://news.hada.io/past?day=2026-10-06&page=2": {
-  "file": "5dea760a9b9a82dd8bfe.gz",
-  "status": 200,
-  "content_type": "text/html; charset=UTF-8",
-  "location": null
- },
- "https://news.hada.io/past?day=2026-10-06&page=3": {
-  "file": "0ce6f413fa7d78c71ab5.gz",
-  "status": 200,
-  "content_type": "text/html; charset=UTF-8",
-  "location": null
- },
- "https://news.hada.io/past?day=2026-10-06&page=4": {
-  "file": "57e66d1c54f21e1d2be5.gz",
-  "status": 200,
-  "content_type": "text/html; charset=UTF-8",
-  "location": null
- },
- "https://www.aitimes.com/news/articleList.html?sc_sdate=2026-10-06&sc_edate=2026-10-06&view_type=sm": {
-  "file": "39fa4567265680f9f4dc.gz",
-  "status": 200,
-  "content_type": "text/html; charset=utf-8",
-  "location": null
- },
- "https://www.aitimes.com/news/ajaxArticlePaging.php?page=2&list_per_page=20&page_per_page=10&sc_sdate=2026-10-06&sc_edate=2026-10-06&sc_order_by=E&view_type=sm": {
-  "file": "4c2aaabaefb725296619.gz",
-  "status": 200,
-  "content_type": "text/javascript; charset=utf-8",
   "location": null
  }
 }

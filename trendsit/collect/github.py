@@ -50,6 +50,7 @@ def parse_trending(html: str) -> list[dict[str, Any]]:
 @dataclass
 class GithubStats:
     trending: int = 0
+    page_rows: int = 0  # 페이지에 보인 레포 수(전부 저장했는지 리포트가 확인)
     trending_pass: int = 0
     trending_missing_week_stars: int = 0
     releases: int = 0
@@ -75,7 +76,8 @@ class GithubCollector:
         res = self.fetcher.fetch(self.cfg.trending.url, kind="page")
         if not res.ok:
             raise SourceFailed(f"트렌딩 페이지 실패: {res.error}")
-        rows = parse_trending(res.text or "")[: self.cfg.trending.top_n]
+        rows = parse_trending(res.text or "")  # 주간 페이지에 보이는 전부(S1 Q2)
+        st.page_rows = len(rows)
         if not rows:
             raise SourceFailed("트렌딩 0건: 페이지 구조가 바뀌었을 수 있음")
         week = iso_week(datetime.now(KST).date())

@@ -77,7 +77,8 @@ def run_window(tmp_path, transport=None, data_dir=None):
     meta = json.loads((FIX / "window" / "meta.json").read_text())
     transport = transport or FixtureTransport("window")
     res = collect(date.fromisoformat(meta["since"]), date.fromisoformat(meta["until"]), data_dir=data_dir or tmp_path,
-                  fetcher=fetcher_for(transport), ytdlp=fake_ytdlp("window"), max_items=meta["max_items"])
+                  fetcher=fetcher_for(transport), ytdlp=fake_ytdlp("window"), max_items=meta["max_items"],
+                  today=date.fromisoformat(meta["today"]))
     return res, meta, transport
 
 
@@ -90,6 +91,8 @@ def independent_in_range(transport: "FixtureTransport", day: str) -> dict[str, i
     kst = timezone(timedelta(hours=9))
     out = {}
     for src in config.load("sources.yaml").text:
+        if src.feed is None:  # 목록으로 받는 소스(GeekNews)
+            continue
         path, _ = transport.index[src.feed]
         feed = feedparser.parse(gzip.decompress(path.read_bytes()))
         n = 0
@@ -277,7 +280,8 @@ def test_collect_twice_is_idempotent(tmp_path):
 def test_backfill_from_saved_pages(tmp_path, name, sid):
     meta = json.loads((FIX / name / "meta.json").read_text())
     res = collect(date.fromisoformat(meta["since"]), date.fromisoformat(meta["until"]), only=sid, data_dir=tmp_path,
-                  fetcher=fetcher_for(FixtureTransport(name)), ytdlp=fake_ytdlp(name), max_items=meta["max_items"])
+                  fetcher=fetcher_for(FixtureTransport(name)), ytdlp=fake_ytdlp(name), max_items=meta["max_items"],
+                  today=date.fromisoformat(meta["today"]))
     d = res.sources[sid]
     exp = meta["result"][sid]
     assert d["status"] in ("ok", "partial") and not d.get("errors")
@@ -293,37 +297,62 @@ def test_day_archive_pages_until_short_page(tmp_path):
     meta = json.loads((FIX / "bf_geeknews" / "meta.json").read_text())
     t = FixtureTransport("bf_geeknews")
     collect(date.fromisoformat(meta["since"]), date.fromisoformat(meta["until"]), only="geeknews", data_dir=tmp_path,
-            fetcher=fetcher_for(t), max_items=meta["max_items"])
+            fetcher=fetcher_for(t), max_items=meta["max_items"], today=date.fromisoformat(meta["today"]))
     pages = [u for u in t.requested if "past?day=" in u]
-    # 아카이브는 시작일 하루 전부터(UTC 날짜 아카이브 대응), 날마다 1페이지부터 20건 미만 페이지까지
-    start = date.fromisoformat(meta["since"])
+    # GeekNews 날짜별 목록은 한국 시간 날짜라 요청 기간의 날짜만, 날마다 1페이지부터 20건 미만 페이지까지
     days = sorted({u.split("day=")[1].split("&")[0] for u in pages})
-    assert days[0] == (start - timedelta(days=1)).isoformat() and days[-1] == meta["since"]
+    assert days == [meta["since"]]
+    assert not any("topic?id=" in u for u in t.requested)  # 상세 페이지는 요청하지 않음(설계 결정 Q1)
     for d in days:
         nums = [int(u.rsplit("=", 1)[1]) for u in pages if f"day={d}&" in u]
         assert nums == list(range(1, len(nums) + 1))
 
 
 def test_list_pages_stops_before_since(tmp_path):
-    """목록 페이지에 --since보다 앞선 항목이 나오면 다음 페이지를 읽지 않는다."""
-    src = next(s for s in config.load("sources.yaml").text if s.id == "aitimes")
-    since, until = date(2026, 10, 3), date(2026, 10, 4)
-    p1 = src.backfill.url_template.format(since=since, until=until)
-    p2 = src.backfill.page_template.format(page=2, since=since, until=until)
-    p3 = src.backfill.page_template.format(page=3, since=since, until=until)
+    """날짜순 목록: --since보다 앞선 항목이 나오면 다음 페이지를 읽지 않는다."""
+    from trendsit.collect.text import SourceStats
+    from trendsit.core.config import TextSource
+
+    src = TextSource(id="aitimes", name="t", kind="news", lang="ko", feed="https://www.aitimes.com/rss.xml",
+                     fetch="feed_summary", backfill={"method": "list_pages",
+                                                     "url_template": "https://www.aitimes.com/list?p=1",
+                                                     "page_template": "https://www.aitimes.com/ajax?page={page}"})
     html = ('<section id="section-list"><ul><li><h2 class="altlist-subject"><a href="https://www.aitimes.com/news/'
             'articleView.html?idxno=1">A</a></h2><div class="altlist-info-item">10-04 10:00</div></li></ul></section>')
     ajax = json.dumps({"result": "success", "data": [{"idxno": "2", "title": "B", "pub_date": "2026-10-02"}]})
+    p1, p2, p3 = "https://www.aitimes.com/list?p=1", "https://www.aitimes.com/ajax?page=2", "https://www.aitimes.com/ajax?page=3"
     t = FixtureTransport(extra={p1: (200, "text/html", html), p2: (200, "text/javascript", ajax),
                                 p3: (200, "text/javascript", ajax),
                                 "https://www.aitimes.com/robots.txt": (200, "text/plain", "User-agent: *\nAllow: /")})
-    db = DB(tmp_path / "t.db")
-    c = TextCollector(db, fetcher_for(t), config.load("keywords.yaml"), config.load("link_kinds.yaml"), run_id="r")
-    from trendsit.collect.text import SourceStats
+    c = TextCollector(DB(tmp_path / "t.db"), fetcher_for(t), config.load("keywords.yaml"),
+                      config.load("link_kinds.yaml"), run_id="r")
     st = SourceStats("aitimes")
-    rows = c._list_pages(src, since, until, st)
+    rows = c._list_pages(src, date(2026, 10, 3), date(2026, 10, 4), st)
     assert [r.url.rsplit("=", 1)[1] for r in rows] == ["1", "2"]
-    assert p3 not in t.requested and st.backfill_pages == 2
+    assert p3 not in t.requested and st.backfill_pages == 2 and st.covered
+
+
+def test_date_filtered_list_reads_until_empty_page(tmp_path):
+    """기간으로 거른 목록({since})은 기간 안에 수정된 예전 글이 섞여도 빈 페이지까지 읽는다(AI타임스 실측)."""
+    from trendsit.collect.text import SourceStats
+
+    src = next(s for s in config.load("sources.yaml").text if s.id == "aitimes")
+    since, until = date(2026, 10, 3), date(2026, 10, 4)
+    p1 = src.backfill.url_template.format(since=since, until=until)
+    pages = {i: src.backfill.page_template.format(page=i, since=since, until=until) for i in (2, 3, 4)}
+    html = ('<section id="section-list"><ul><li><h2 class="altlist-subject"><a href="https://www.aitimes.com/news/'
+            'articleView.html?idxno=1">A</a></h2><div class="altlist-info-item">10-04 10:00</div></li></ul></section>')
+    old = json.dumps({"result": "success", "data": [{"idxno": "2", "title": "B", "pub_date": "2026-09-23"},
+                                                    {"idxno": "3", "title": "C", "pub_date": "2026-10-03"}]})
+    empty = json.dumps({"result": "success", "data": []})
+    t = FixtureTransport(extra={p1: (200, "text/html", html), pages[2]: (200, "text/javascript", old),
+                                pages[3]: (200, "text/javascript", old), pages[4]: (200, "text/javascript", empty),
+                                "https://www.aitimes.com/robots.txt": (200, "text/plain", "User-agent: *\nAllow: /")})
+    c = TextCollector(DB(tmp_path / "t.db"), fetcher_for(t), config.load("keywords.yaml"),
+                      config.load("link_kinds.yaml"), run_id="r")
+    st = SourceStats("aitimes")
+    c._list_pages(src, since, until, st)
+    assert pages[4] in t.requested and st.backfill_pages == 4 and st.covered
 
 
 # ---------- A8 실패 격리 ----------
@@ -409,40 +438,8 @@ def test_collection_report(tmp_path):
         assert h in text
     assert "- [ ] 놓침" in text and "- [ ] 잘못 통과" in text
     assert verdict["trending"] == meta["result"]["github_trending"]["trending"] and verdict["duplicates"] == 0
-    assert verdict["origin_rate"] == 1.0
-
-
-# ---------- GeekNews 브라우저 확인 ----------
-def test_geeknews_browser_check_stops_and_uses_origin(tmp_path):
-    """토픽 페이지가 브라우저 확인으로 넘어가면 더 요청하지 않고(우회 안 함) 목록의 원문 링크 글을 본문으로."""
-    from trendsit.collect.text import Candidate, SourceStats
-
-    article = "<html><body><article><h1>T</h1>" + "<p>원문 본문 문장입니다. " * 40 + "</p></article></body></html>"
-    calls = []
-
-    def handler(r):
-        calls.append(str(r.url))
-        if r.url.path == "/robots.txt":
-            return httpx.Response(404)
-        if r.url.path == "/topic":
-            return httpx.Response(302, headers={"location": "/topic_browser_check?return=%2Ftopic"})
-        if r.url.path == "/topic_browser_check":
-            return httpx.Response(200, headers={"content-type": "text/html"},
-                                  text='<form id="browser-check"></form>')
-        return httpx.Response(200, headers={"content-type": "text/html"}, text=article)
-    f = Fetcher(None, use_cache=False, transport=httpx.MockTransport(handler), resolver=lambda h: [PUBLIC_IP],
-                sleep=lambda s: None)
-    src = next(s for s in config.load("sources.yaml").text if s.id == "geeknews")
-    c = TextCollector(DB(tmp_path / "t.db"), f, config.load("keywords.yaml"), config.load("link_kinds.yaml"), run_id="r")
-    st = SourceStats("geeknews")
-    for i in (1, 2):
-        cand = Candidate(url=f"https://news.hada.io/topic?id={i}", title=f"글 {i}", published=None,
-                         extra={"origin_url": f"https://blog.example.com/post{i}"})
-        c._save(src, cand, st)
-    assert c.gn_blocked and st.body == {"ok": 2}
-    assert sum("/topic?id=" in u for u in calls) == 1  # 확인 페이지를 본 뒤로는 토픽 페이지를 다시 요청하지 않음
-    db = c.db
-    assert count(db, "SELECT COUNT(*) FROM links WHERE role='origin_candidate'") == 2
+    assert verdict["origin_rate"] == 1.0 and verdict["trending_page_rows"] == verdict["trending"]
+    assert "### 하루 신규 건수" in text
 
 
 # ---------- 리뷰 반영 회귀 테스트 ----------
@@ -453,35 +450,6 @@ def _collector(tmp_path, handler):
 
 
 ARTICLE = "<html><body><article><h1>T</h1>" + "<p>원문 본문 문장입니다. " * 40 + "</p></article></body></html>"
-
-
-def test_rss_only_geeknews_finds_origin_from_archive_when_blocked(tmp_path):
-    """RSS로만 얻은 GeekNews 글도 브라우저 확인이 나오면 그날 목록에서 원문 링크를 찾아 원문을 받는다."""
-    from trendsit.collect.text import Candidate, SourceStats
-
-    lst = ("<div class='topic_row' data-topic-state-id='7'><div class='topictitle'><a href='https://blog.example.com/a' "
-           "class='topic-title-link'><h2>글</h2></a></div><div class='topicdesc'><a href='topic?id=7'>요약 앞부분</a></div>"
-           "<div class='topicinfo'><time datetime='2026-10-06T10:00:00+09:00'>x</time></div></div>")
-
-    def handler(r):
-        if r.url.path == "/robots.txt":
-            return httpx.Response(404)
-        if r.url.path == "/topic":
-            return httpx.Response(302, headers={"location": "/topic_browser_check?return=x"})
-        if r.url.path == "/topic_browser_check":
-            return httpx.Response(200, headers={"content-type": "text/html"}, text='<form id="browser-check"></form>')
-        if r.url.path == "/past":
-            return httpx.Response(200, headers={"content-type": "text/html"}, text=lst)
-        return httpx.Response(200, headers={"content-type": "text/html"}, text=ARTICLE)
-    c = _collector(tmp_path, handler)
-    src = next(s for s in config.load("sources.yaml").text if s.id == "geeknews")
-    c._range, c._src = (date(2026, 10, 6), date(2026, 10, 6)), src
-    st = SourceStats("geeknews")
-    cand = Candidate(url="https://news.hada.io/topic?id=7", title="글",
-                     published=datetime.fromisoformat("2026-10-06T10:00:00+09:00"))  # RSS 항목: 원문 링크 없음
-    c._save(src, cand, st)
-    assert st.body == {"ok": 1}
-    assert count(c.db, "SELECT COUNT(*) FROM links WHERE role='origin_candidate' AND url='https://blog.example.com/a'") == 1
 
 
 def test_out_of_range_date_from_page_is_not_saved(tmp_path):
@@ -547,3 +515,96 @@ def test_retry_after_http_date():
     assert _retry_after("7") == 7.0
     assert _retry_after("Wed, 21 Oct 2015 07:28:00 GMT") == 0.0  # 지난 시각이면 바로
     assert _retry_after("garbage") is None
+
+
+# ---------- 설계 결정 반영(S1 Q1, Q2) ----------
+def test_geeknews_list_parser_points_comments_self_posts():
+    from trendsit.collect.sites import geeknews
+
+    html = gzip.decompress(next(p for u, (p, _) in FixtureTransport("bf_geeknews").index.items()
+                                if "past?day=" in u).read_bytes()).decode()
+    rows = geeknews.parse_list(html)
+    assert rows and all(r["topic_id"].isdigit() and isinstance(r["points"], int) and isinstance(r["comments"], int)
+                        for r in rows)
+    assert all(r["origin_url"] is None or "news.hada.io" not in r["origin_url"] for r in rows)
+    own = ("<div class='topic_row' data-topic-state-id='9'><div class='topictitle'><a href='topic?id=9' "
+           "class='topic-title-link'><h2>Show GN: 내 앱</h2></a></div><div class='topicinfo'><span id='tp9'>3</span>"
+           "<a data-topic-comment-count='2'>x</a></div></div>")
+    r = geeknews.parse_list(own)[0]
+    assert r["origin_url"] is None and r["points"] == 3 and r["comments"] == 2
+
+
+def test_geeknews_collects_from_lists_only(tmp_path):
+    """RSS와 상세 페이지를 요청하지 않고, topic id로 중복 제거, 자기 글은 빼고 세고, 점수·댓글 수를 저장."""
+    meta = json.loads((FIX / "bf_geeknews" / "meta.json").read_text())
+    t = FixtureTransport("bf_geeknews")
+    res = collect(date.fromisoformat(meta["since"]), date.fromisoformat(meta["until"]), only="geeknews",
+                  data_dir=tmp_path, fetcher=fetcher_for(t), today=date.fromisoformat(meta["today"]), no_body=True)
+    assert not any("topic?id=" in u or "/rss/" in u for u in t.requested)
+    d = res.sources["geeknews"]
+    db = DB(tmp_path / "trendsit.db")
+    n = count(db, "SELECT COUNT(*) FROM items WHERE source_id='geeknews'")
+    assert n == d["n_in_range"] and n + d["n_self_excluded"] >= n
+    assert count(db, "SELECT COUNT(*) FROM items WHERE source_id='geeknews' AND external_id LIKE 'topic:%'") == n
+    row = db.conn.execute("SELECT meta_json FROM items WHERE source_id='geeknews' LIMIT 1").fetchone()
+    m = json.loads(row["meta_json"])
+    assert m["topic_id"].isdigit() and isinstance(m["points"], int) and isinstance(m["comments"], int)
+    assert count(db, "SELECT COUNT(*) FROM links WHERE role='origin_candidate'") == n
+
+
+def test_geeknews_self_posts_excluded_and_counted(tmp_path):
+
+    page = ("<div class='topic_row' data-topic-state-id='{i}'><div class='topictitle'><a href='{href}' "
+            "class='topic-title-link'><h2>{title}</h2></a></div><div class='topicdesc'><a>요약</a></div>"
+            "<div class='topicinfo'><span id='tp{i}'>1</span><time datetime='2026-10-03T10:00:00+09:00'>x</time>"
+            "<a data-topic-comment-count='0'>c</a></div></div>")
+    html = (page.format(i=1, href="https://blog.example.com/a", title="글 A")
+            + page.format(i=1, href="https://blog.example.com/a", title="글 A")  # 같은 topic id 두 번
+            + page.format(i=2, href="topic?id=2", title="Show GN: 내 앱"))
+
+    def handler(r):
+        if r.url.path == "/robots.txt":
+            return httpx.Response(404)
+        if r.url.path == "/past":
+            return httpx.Response(200, headers={"content-type": "text/html"},
+                                  text=html if "page=1" in str(r.url) else "")
+        return httpx.Response(200, headers={"content-type": "text/html"}, text=ARTICLE)
+    c = _collector(tmp_path, handler)
+    c.today = date(2026, 10, 7)
+    src = next(s for s in config.load("sources.yaml").text if s.id == "geeknews")
+    st = c.collect(src, date(2026, 10, 3), date(2026, 10, 3))
+    assert st.n_self_excluded == 1 and st.n_new == 1 and st.body == {"ok": 1}
+
+
+def test_intentional_skips_are_separate_from_failures(tmp_path):
+    from trendsit.collect.text import Candidate, SourceStats
+
+    def handler(r):
+        if r.url.path == "/robots.txt":
+            return httpx.Response(200, headers={"content-type": "text/plain"}, text="User-agent: *\nDisallow: /private")
+        if r.url.path.endswith(".pdf"):
+            return httpx.Response(200, headers={"content-type": "application/pdf"}, content=b"%PDF")
+        if r.url.path == "/forbidden":
+            return httpx.Response(403)
+        return httpx.Response(200, headers={"content-type": "text/html"}, text=ARTICLE)
+    c = _collector(tmp_path, handler)
+    src = next(s for s in config.load("sources.yaml").text if s.id == "geeknews")
+    c._range = (date(2026, 10, 3), date(2026, 10, 3))
+    st = SourceStats("geeknews")
+    when = datetime.fromisoformat("2026-10-03T10:00:00+09:00")
+    for i, origin in enumerate(["https://a.example/private/x", "https://a.example/r.pdf", "https://youtu.be/abc",
+                                "https://a.example/forbidden", "https://a.example/ok"]):
+        c._save(src, Candidate(url=f"https://news.hada.io/topic?id={i}", title=f"t{i}", published=when,
+                               extra={"origin_url": origin, "external_id": f"topic:{i}"}), st)
+    assert st.body == {"skip_robots": 1, "skip_type": 1, "skip_video": 1, "failed": 1, "ok": 1}
+
+
+def test_trending_verdict_requires_all_page_rows(tmp_path):
+    """트렌딩 기준(Q2): 페이지에 보인 수와 저장한 수가 같고 누락 0이면 통과(개수 하한 없음)."""
+    from trendsit.collect.report import build
+
+    _, meta, _ = run_window(tmp_path)
+    day = date.fromisoformat(meta["since"])
+    path, verdict = build(day, day, data_dir=tmp_path, out=tmp_path / "r.md")
+    assert verdict["trending"] == verdict["trending_page_rows"] > 0
+    assert "| 트렌딩 |" in path.read_text() and "| 통과 |" in path.read_text().split("| 트렌딩 |")[1].split("\n")[0]

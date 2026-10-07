@@ -104,6 +104,10 @@ MIGRATIONS = [
         PRIMARY KEY(week, full_name)
     );
     """,
+    # 2: 소스별 부가 정보(GeekNews 점수, 댓글 수, topic id 등). 받은 시점의 값
+    """
+    ALTER TABLE items ADD COLUMN meta_json TEXT;
+    """,
 ]
 
 STEP_COLUMNS = (
@@ -252,7 +256,8 @@ class DB:
         """항목 하나와 딸린 행을 한 트랜잭션으로. replace_id가 있으면(본문이 비었던 항목 재시도) 그 행을 갱신."""
         cols = ("source_id", "channel", "kind", "external_id", "url", "title", "published_at",
                 "published_estimated", "day", "week", "summary_feed", "body_status", "filter_status",
-                "filter_reason", "score", "run_id", "via")
+                "filter_reason", "score", "run_id", "via", "meta_json")
+        item = {**item, "meta_json": _json(item.get("meta_json"))}
         with self.conn:
             if replace_id is None:
                 cur = self.conn.execute(

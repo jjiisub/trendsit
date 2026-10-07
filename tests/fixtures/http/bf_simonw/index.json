@@ -11,6 +11,12 @@
   "content_type": "text/plain",
   "location": null
  },
+ "https://simonwillison.net/2026/Sep/25/": {
+  "file": "1e75748f904d415c9ed8.gz",
+  "status": 200,
+  "content_type": "text/html; charset=utf-8",
+  "location": null
+ },
  "https://simonwillison.net/2026/Sep/26/": {
   "file": "575e4342d011f4bf948b.gz",
   "status": 200,
@@ -19,12 +25,6 @@
  },
  "https://simonwillison.net/2026/Sep/27/": {
   "file": "d7e2e10172733f3ae5f8.gz",
-  "status": 200,
-  "content_type": "text/html; charset=utf-8",
-  "location": null
- },
- "https://simonwillison.net/2026/Sep/25/": {
-  "file": "1e75748f904d415c9ed8.gz",
   "status": 200,
   "content_type": "text/html; charset=utf-8",
   "location": null
