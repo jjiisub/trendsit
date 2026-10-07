@@ -1,0 +1,148 @@
+{
+ "role": "repo_oneliner",
+ "model_alias": "generate",
+ "model_id": "qwen/qwen3.8-27b",
+ "prompt_hash": "c03ec9c6dcee",
+ "spec": "S0",
+ "run_id": "20261007-154038-eval-b2e7",
+ "at": "2026-10-07T15:40:45+09:00",
+ "note": "배관 확인(1건), judge 추론 설정 수정 후",
+ "stopped": null,
+ "cost_usd": 0.000993,
+ "summary": {
+  "n": 1,
+  "code_pass": 1,
+  "criteria": {
+   "정확성": {
+    "avg": 5.0,
+    "ones": 0,
+    "n": 1
+   },
+   "구체성": {
+    "avg": 5.0,
+    "ones": 0,
+    "n": 1
+   },
+   "표현": {
+    "avg": 5.0,
+    "ones": 0,
+    "n": 1
+   }
+  },
+  "below3": 0,
+  "passed": true,
+  "fail_reasons": []
+ },
+ "results": [
+  {
+   "id": "NousResearch__hermes-agent",
+   "input": {
+    "full_name": "NousResearch/hermes-agent",
+    "description": "The agent that grows with you",
+    "topics": [
+     "ai",
+     "ai-agent",
+     "ai-agents",
+     "anthropic",
+     "chatgpt",
+     "claude",
+     "claude-code",
+     "codex",
+     "hermes",
+     "hermes-agent",
+     "llm",
+     "nous-research",
+     "openai"
+    ],
+    "readme_head": "<p align=\"center\">\n  <img src=\"assets/banner.png\" alt=\"Hermes Agent\" width=\"100%\">\n</p>\n\n# Hermes Agent ☤\n<p align=\"center\">\n  <a href=\"https://hermes-agent.nousresearch.com/\">Hermes Agent</a> | <a href=\"https://hermes-agent.nousresearch.com/\">Hermes Desktop</a>\n</p>\n<p align=\"center\">\n  <a href=\"https://hermes-agent.nousresearch.com/docs/\"><img src=\"https://img.shields.io/badge/Docs-hermes--agent.nousresearch.com-FFD700?style=for-the-badge\" alt=\"Documentation\"></a>\n  <a href=\"https://discord.gg/NousResearch\"><img src=\"https://img.shields.io/badge/Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white\" alt=\"Discord\"></a>\n  <a href=\"https://github.com/NousResearch/hermes-agent/blob/main/LICENSE\"><img src=\"https://img.shields.io/badge/License-MIT-green?style=for-the-badge\" alt=\"License: MIT\"></a>\n  <a href=\"https://nousresearch.com\"><img src=\"https://img.shields.io/badge/Built%20by-Nous%20Research-blueviolet?style=for-the-badge\" alt=\"Built by Nous Research\"></a>\n  <a href=\"README.zh-CN.md\"><img src=\"https://img.shields.io/badge/Lang-中文-red?style=for-the-badge\" alt=\"中文\"></a>\n  <a href=\"README.ur-pk.md\"><img src=\"https://img.shields.io/badge/Lang-اردو-green?style=for-the-badge\" alt=\"اردو\"></a>\n  <a href=\"README.es.md\"><img src=\"https://img.shields.io/badge/Lang-Español-orange?style=for-the-badge\" alt=\"Español\"></a>\n</p>\n\n**The self-improving AI agent built by [Nous Research](https://nousresearch.com).** It's the only agent with a built-in learning loop — it creates skills from experience, improves them during use, nudges itself to persist knowledge, searches its own past conversations, and builds a deepening model of who you are across sessions. Run it on a $5 VPS, a GPU cluster, or serverless infrastructure that costs nearly nothing when idle. It's not tied to your laptop — talk to it from Telegram while it works on a cloud VM.\n\nUse any model you want — [Nous Portal](https://portal.nousresearch.com), OpenRouter, OpenAI, your own endpoint, and [many others](https://hermes-agent.nousresearch.com/docs/integrations/providers). Switch with `hermes model` — no code changes, no lock-in.\n\n<table>\n<tr><td><b>A real terminal interface</b></td><td>Full TUI with multiline editing, slash-command autocomplete, conversation history, interrupt-and-redirect, and streaming tool output.</td></tr>\n<tr><td><b>Lives where you do</b></td><td>Telegram, Discord, Slack, WhatsApp, Signal, and CLI — all from a single gateway process. Voice memo transcription, cross-platform conversation continuity.</td></tr>\n<tr><td><b>A closed learning loop</b></td><td>Agent-curated memory with periodic nudges. Autonomous skill creation after complex tasks. Skills self-improve during use. FTS5 session search with LLM summarization for cross-session recall. <a href=\"https://github.com/plastic-labs/honcho\">Honcho</a> dialectic user modeling. Compatible with the <a href=\"https://agentskills.io\">agentskills.io</a> open standard.</td></tr>\n<tr><td><b>Scheduled automations</b></td><td>Buil"
+   },
+   "expect": {
+    "max_len": 60,
+    "must_include_any": [
+     "에이전트",
+     "agent",
+     "Agent"
+    ]
+   },
+   "note": "추적 레포: 에이전트. README 16818자 중 앞 3000자. 수집 2026-10-07 기준",
+   "step_id": 52,
+   "output": {
+    "log": "README 첫 문단과 학습 루프 설명 근거",
+    "attention": false,
+    "oneliner": "경험 기반 학습 루프를 갖춘 AI 에이전트"
+   },
+   "error": null,
+   "code": {
+    "passed": true,
+    "checks": [
+     {
+      "name": "스키마",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "길이 상한",
+      "passed": true,
+      "detail": "23자"
+     },
+     {
+      "name": "명사형 끝",
+      "passed": true,
+      "detail": " AI 에이전트"
+     },
+     {
+      "name": "평가어 없음",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "핵심어 포함",
+      "passed": true,
+      "detail": "후보 ['에이전트', 'agent', 'Agent']"
+     },
+     {
+      "name": "해요체 없음(log)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(log)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "해요체 없음(oneliner)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(oneliner)",
+      "passed": true,
+      "detail": ""
+     }
+    ],
+    "failed": []
+   },
+   "llm": {
+    "scores": {
+     "정확성": {
+      "score": 5,
+      "reason": "README 서두의 'self-improving AI agent' 및 'built-in learning loop — it creates skills from experience'라는 설명과 완벽히 부합함"
+     },
+     "구체성": {
+      "score": 5,
+      "reason": "단순한 AI 도구가 아니라 '경험 기반 학습 루프를 갖춘 AI 에이전트'로 동작 방식과 대상이 명확하게 드러남"
+     },
+     "표현": {
+      "score": 5,
+      "reason": "명사형 종결로 끝나며 불필요한 평가어나 군더더기가 전혀 없음"
+     }
+    },
+    "missing": [],
+    "judge_prompt_hash": "7668352b80ae",
+    "judge_step_id": 53
+   },
+   "cost_usd": 0.000993
+  }
+ ]
+}

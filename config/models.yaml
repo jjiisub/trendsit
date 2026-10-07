@@ -7,11 +7,11 @@ models:
     reasoning: off
   judge:
     id: google/gemini-3.8-flash
-    provider: {allow_fallbacks: false, require_parameters: true}   # 더 싼 요금 등급(flex)을 OpenRouter에서 고를 수 있으면 사용, 방법은 확인 후 리포트
-    reasoning: {effort: low, max_tokens: 800}
+    provider: {order: [google-ai-studio/flex], allow_fallbacks: false, require_parameters: true}   # flex 등급은 제공사 태그로 고정(standard의 절반 단가, 2026-10-07 확인)
+    reasoning: {max_tokens: 800}   # OpenRouter는 effort와 max_tokens 중 하나만 받음(원안 effort: low 제거)
   compare:
     id: mistralai/mistral-large-4-0
     reasoning: off
   smoke:
-    id: google/gemma-4-26b-a4b-it:free   # 열리지 않으면 구조화 출력이 되는 다른 :free 모델로 바꾸고 리포트
+    id: nvidia/nemotron-3-super-120b-a12b:free   # 원안 gemma-4-26b-a4b-it:free는 구조화 출력 미지원 + 업스트림 429(2026-10-07). S0 리포트 참고
     reasoning: off

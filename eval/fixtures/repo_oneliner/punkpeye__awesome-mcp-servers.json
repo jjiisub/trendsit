@@ -1,0 +1,18 @@
+{
+ "input": {
+  "full_name": "punkpeye/awesome-mcp-servers",
+  "description": "A collection of MCP servers.",
+  "topics": [
+   "ai",
+   "mcp"
+  ],
+  "readme_head": "[![ไทย](https://img.shields.io/badge/Thai-Click-blue)](README-th.md)\n[![English](https://img.shields.io/badge/English-Click-yellow)](README.md)\n[![繁體中文](https://img.shields.io/badge/繁體中文-點擊查看-orange)](README-zh_TW.md)\n[![简体中文](https://img.shields.io/badge/简体中文-点击查看-orange)](README-zh.md)\n[![日本語](https://img.shields.io/badge/日本語-クリック-青)](README-ja.md)\n[![한국어](https://img.shields.io/badge/한국어-클릭-yellow)](README-ko.md)\n[![Português Brasileiro](https://img.shields.io/badge/Português_Brasileiro-Clique-green)](README-pt_BR.md)\n[![Discord](https://img.shields.io/discord/1312302100125843476?logo=discord&label=discord)](https://glama.ai/mcp/discord)\n[![Subreddit subscribers](https://img.shields.io/reddit/subreddit-subscribers/mcp?style=flat&logo=reddit&label=subreddit)](https://www.reddit.com/r/mcp/)\n\n> [!IMPORTANT]\n> [ray.run](https://ray.run/) – from idea to a production-grade MCP server in under a minute! 🦜\n\n<sup><a href=\"https://glama.ai/advertise\">Ad</a></sup>\n\nA curated list of awesome Model Context Protocol (MCP) servers.\n\n* [What is MCP?](#what-is-mcp)\n* [Clients](#clients)\n* [Remote Servers](#remote-servers)\n* [Tutorials](#tutorials)\n* [Community](#community)\n* [Legend](#legend)\n* [Server Implementations](#server-implementations) \n* [Frameworks](#frameworks)\n* [Tips & Tricks](#tips-and-tricks)\n\n## What is MCP?\n\n[MCP](https://modelcontextprotocol.io/) is an open protocol that enables AI models to securely interact with local and remote resources through standardized server implementations. This list focuses on production-ready and experimental MCP servers that extend AI capabilities through file access, database connections, API integrations, and other contextual services.\n\n## Clients\n\nCheckout [awesome-mcp-clients](https://github.com/punkpeye/awesome-mcp-clients/) and [glama.ai/mcp/clients](https://glama.ai/mcp/clients).\n\n## Remote Servers\n\nThis list is for servers with a GitHub repo you install and run yourself. Looking for a hosted server you just connect to over a URL? See [awesome-remote-mcp-servers](https://github.com/punkpeye/awesome-remote-mcp-servers).\n\n## Tutorials\n\n* [Tool Definition Quality Score (TDQS)](https://github.com/glama-ai/tool-definition-quality-score)\n* [Model Context Protocol (MCP) Quickstart](https://glama.ai/blog/2024-11-25-model-context-protocol-quickstart)\n* [Setup Claude Desktop App to Use a SQLite Database](https://youtu.be/wxCCzo9dGj0)\n\n## Community\n\n* [r/mcp Reddit](https://www.reddit.com/r/mcp)\n* [Discord Server](https://glama.ai/mcp/discord)\n\n## Legend\n\n* 🎖️ – official implementation\n* programming language\n  * 🐍 – Python codebase\n  * 📇 – TypeScript (or JavaScript) codebase\n  * 🏎️ – Go codebase\n  * 🦀 – Rust codebase\n  * #️⃣ - C# Codebase\n  * ☕ - Java codebase\n  * 🌊 – C/C++ codebase\n  * 💎 - Ruby codebase\n\n* scope\n  * ☁️ - Cloud Service\n  * 🏠 - Local Service\n  * 📟 - Embedded Systems\n* operating system\n  * 🍎 – For macOS\n  * 🪟 – For Windows\n  * 🐧 - For Linux\n\n> [!NOTE]\n> Confused about Local 🏠 vs Cloud ☁️?\n> * Use loca"
+ },
+ "expect": {
+  "max_len": 60,
+  "must_include_any": [
+   "MCP"
+  ]
+ },
+ "note": "목록류 awesome-*. README 494387자 중 앞 3000자. 수집 2026-10-07, 레포 최근 push 2026-09-27"
+}
