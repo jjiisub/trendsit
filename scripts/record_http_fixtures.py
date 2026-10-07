@@ -32,11 +32,18 @@ OUT = ROOT / "tests" / "fixtures" / "http"
 
 
 class Recorder(httpx.BaseTransport):
-    def __init__(self) -> None:
+    """실제로 보내고 응답을 기록한다. existing(--extend)이 있으면 이미 녹화한 URL은 네트워크 없이 그 응답을 쓴다."""
+
+    def __init__(self, existing: dict[str, dict[str, Any]] | None = None) -> None:
         self.inner = httpx.HTTPTransport()
         self.records: list[dict[str, Any]] = []
+        self.existing = existing or {}
 
     def handle_request(self, request: httpx.Request) -> httpx.Response:
+        old = self.existing.get(str(request.url))
+        if old is not None:
+            headers = {"content-type": old["content_type"]} | ({"location": old["location"]} if old["location"] else {})
+            return httpx.Response(old["status"], headers=headers, content=old["body"], request=request)
         resp = self.inner.handle_request(request)
         body = resp.read()
         self.records.append({"url": str(request.url), "status": resp.status_code,
@@ -85,13 +92,29 @@ def main() -> None:
     ap.add_argument("--until", required=True)
     ap.add_argument("--max-items", type=int, default=3)
     ap.add_argument("--source")
+    ap.add_argument("--extend", action="store_true",
+                    help="이미 녹화한 응답은 그대로 쓰고, 코드가 새로 요청하는 URL만 실제로 받아 보탠다")
     args = ap.parse_args()
     since, until = date.fromisoformat(args.since), date.fromisoformat(args.until)
 
-    rec = Recorder()
+    out = OUT / args.name
+    existing: dict[str, dict[str, Any]] = {}
+    old_index: dict[str, Any] = {}
+    old_yt: dict[str, Any] = {}
+    if args.extend and (out / "index.json").exists():
+        old_index = json.loads((out / "index.json").read_text(encoding="utf-8"))
+        for url, meta in old_index.items():
+            existing[url] = meta | {"body": gzip.decompress((out / meta["file"]).read_bytes())}
+        if (out / "ytdlp.json").exists():
+            old_yt = json.loads((out / "ytdlp.json").read_text(encoding="utf-8"))
+    rec = Recorder(existing)
     yt_calls: dict[str, Any] = {}
 
     def ytdlp(cli_args: list[str]) -> dict[str, Any] | None:
+        key = " ".join(cli_args)
+        if key in old_yt:
+            yt_calls[key] = old_yt[key]
+            return old_yt[key]
         out = youtube.run_ytdlp(cli_args)
         if out is not None:  # 필요한 칸만(원본은 수 MB)
             keep = ("id", "title", "description", "duration", "timestamp", "upload_date", "chapters")
@@ -109,11 +132,17 @@ def main() -> None:
     fetcher = Fetcher(None, use_cache=False, transport=rec)
     res = collect(since, until, only=args.source, data_dir=tmp, fetcher=fetcher, ytdlp=ytdlp,
                   max_items=args.max_items)
-    out = OUT / args.name
+    keep_files = {}
+    if args.extend:
+        for meta in old_index.values():
+            keep_files[meta["file"]] = (out / meta["file"]).read_bytes()
     if out.exists():
         shutil.rmtree(out)
     out.mkdir(parents=True)
     index = {}
+    for url, meta in old_index.items():  # --extend: 이전 녹화 유지
+        (out / meta["file"]).write_bytes(keep_files[meta["file"]])
+        index[url] = meta
     for r in rec.records:
         ctype = r["content_type"].split(";")[0].strip().lower()
         body = r["body"].decode("utf-8", errors="replace")

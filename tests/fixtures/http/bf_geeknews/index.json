@@ -40,5 +40,23 @@
   "status": 200,
   "content_type": "text/html; charset=UTF-8",
   "location": null
+ },
+ "https://news.hada.io/past?day=2026-10-03&page=1": {
+  "file": "6d41aeabd6b9864f7c46.gz",
+  "status": 200,
+  "content_type": "text/html; charset=UTF-8",
+  "location": null
+ },
+ "https://news.hada.io/past?day=2026-10-03&page=2": {
+  "file": "a63e14f7cf655b3ecf68.gz",
+  "status": 200,
+  "content_type": "text/html; charset=UTF-8",
+  "location": null
+ },
+ "https://news.hada.io/past?day=2026-10-03&page=3": {
+  "file": "43149b44a668de1f50dd.gz",
+  "status": 200,
+  "content_type": "text/html; charset=UTF-8",
+  "location": null
  }
 }

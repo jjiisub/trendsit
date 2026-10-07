@@ -9,10 +9,10 @@
 | openai | feed_summary | 2015-12-11 | 예 | rss_only, 0 | 15 | 0 | 93% (14/15) | 73% (11/15) | - |
 | anthropic | feed_summary | 2021-05-28 | 예 | list_pages, 0 | 2 | 0 | 100% (2/2) | 100% (2/2) | - |
 | deepmind | feed_summary | 2025-11-11 | 예 | rss_only, 0 | 2 | 0 | 100% (2/2) | 50% (1/2) | - |
-| geeknews | feed_summary | 2026-10-06 | 예 | day_archive, 23 | 376 | 376 | 77% (288/376) | 37% (138/376) | GeekNews가 브라우저 확인을 요구해 토픽 페이지 요청을 멈춤(우회 안 함). 원문 글을 본문으로 252건; GeekNews 브라우저 확인 요구 + 원문 링크 없음 46건; 원문 robots.txt가 막음 15건; 원문 HTTP 403 12건; 원문 허용 밖 형식: application/pdf 3건; 원문 ReadTimeout: The read oper |
-| simonw | feed_full | 2026-09-28 | 예 | day_archive, 0 | 17 | 0 | 100% (17/17) | 71% (12/17) | - |
+| geeknews | feed_summary | 2026-10-06 | 예 | day_archive, 26 | 376 | 376 | 77% (288/376) | 37% (138/376) | GeekNews가 브라우저 확인을 요구해 토픽 페이지 요청을 멈춤(우회 안 함). 원문 글을 본문으로 2건; GeekNews 브라우저 확인 요구 + 원문 링크 없음 46건; 원문 robots.txt가 막음 15건; 원문 HTTP 403 12건; 원문 허용 밖 형식: application/pdf 4건; 원문 robots.txt 확인 불가로 건너뜀(ReadTi |
+| simonw | feed_full | 2026-09-28 | 예 | day_archive, 2 | 18 | 1 | 94% (17/18) | 67% (12/18) | - |
 | aitimes | feed_summary | 2026-10-06 | 예 | list_pages, 4 | 79 | 79 | 100% (79/79) | 54% (43/79) | - |
-| techbridge | rss + yt-dlp | 2026-10-02 | 예 | channel_listing, 1 | 17 | 10 | 94% (16/17) | 82% (14/17) | 메타데이터 실패: 5tdMgKkX5dU |
+| techbridge | rss + yt-dlp | 2026-10-02 | 예 | channel_listing, 1 | 17 | 10 | 94% (16/17) | 82% (14/17) | - |
 
 ## 2. 백필 URL 확인 (2026-10-07 실제로 열어 봄)
 
@@ -33,17 +33,17 @@
 
 | 순위 | 레포 | 이번 주 별 | 전체 별 | 키워드 | 상태 |
 |---|---|---|---|---|---|
-| 1 | mvschwarz/openrig | 3327 | 5628 | agent, coding-agent, frontier-release | pass |
-| 2 | boykopovar/AnyPS5 | 3073 | 8246 | - | filtered |
-| 3 | heygen-com/hyperframes | 3614 | 58238 | agent, mcp-tools | pass |
-| 4 | cursor/plugins | 1106 | 10180 | - | filtered |
-| 5 | NVIDIA/OpenShell | 5228 | 15208 | agent | pass |
-| 6 | Panniantong/Agent-Reach | 6454 | 92943 | agent, mcp-tools, frontier-release | pass |
-| 7 | thedotmack/claude-mem | 2104 | 97416 | agent, coding-agent, rag-search, frontier-release | pass |
-| 8 | pablostanley/yoinks | 2947 | 4982 | - | filtered |
-| 9 | DuarteSantos8/openGym | 3318 | 6359 | - | filtered |
-| 10 | tile-ai/tilelang | 675 | 8456 | - | filtered |
-| 11 | HunxByts/GhostTrack | 2017 | 17300 | - | filtered |
+| 1 | mvschwarz/openrig | 3327 | 5634 | agent, coding-agent, frontier-release | pass |
+| 2 | boykopovar/AnyPS5 | 3073 | 8437 | - | filtered |
+| 3 | heygen-com/hyperframes | 3614 | 58253 | agent, mcp-tools | pass |
+| 4 | cursor/plugins | 1106 | 10185 | - | filtered |
+| 5 | NVIDIA/OpenShell | 5228 | 15212 | agent | pass |
+| 6 | Panniantong/Agent-Reach | 6454 | 92960 | agent, mcp-tools, frontier-release | pass |
+| 7 | thedotmack/claude-mem | 2104 | 97435 | agent, coding-agent, rag-search, frontier-release | pass |
+| 8 | pablostanley/yoinks | 2947 | 4991 | - | filtered |
+| 9 | DuarteSantos8/openGym | 3318 | 6405 | - | filtered |
+| 10 | tile-ai/tilelang | 675 | 8460 | - | filtered |
+| 11 | HunxByts/GhostTrack | 2017 | 17304 | - | filtered |
 
 ## 4. 유튜브 (Tech Bridge)
 
@@ -75,15 +75,15 @@
 
 ### openai
 - 걸러진 글
-  - [ ] 놓침 · The Den frees up 10-15 hours a week to grow with ChatGPT Work (no_keyword)
-  - [ ] 놓침 · How Albertsons Companies is reimagining retail from the inside out (no_keyword)
   - [ ] 놓침 · The Lenfest Institute grows landmark program with expanded OpenAI support (no_keyword)
   - [ ] 놓침 · Helping small businesses put AI to work (no_keyword)
+  - [ ] 놓침 · The Den frees up 10-15 hours a week to grow with ChatGPT Work (no_keyword)
+  - [ ] 놓침 · How Albertsons Companies is reimagining retail from the inside out (no_keyword)
 - 통과한 글
+  - [ ] 잘못 통과 · A model guide for the GPT-6 family (점수 4)
   - [ ] 잘못 통과 · Introducing dots (점수 2)
-  - [ ] 잘못 통과 · How we will do better for Australia (점수 2)
   - [ ] 잘못 통과 · Introducing GPT-6.1 Sol (점수 5)
-  - [ ] 잘못 통과 · Are you a Codex Original? (점수 3)
+  - [ ] 잘못 통과 · How we will do better for Australia (점수 2)
   - [ ] 잘못 통과 · Chatham scales its capital markets expertise with OpenAI (점수 2)
 
 ### anthropic
@@ -101,45 +101,45 @@
 
 ### geeknews
 - 걸러진 글
-  - [ ] 놓침 · Show GN: cuesheet - 링크 하나로 MSW 응답을 바꿔, AI도 QA도 상황별 화면을 확인하는 도구 (no_keyword)
-  - [ ] 놓침 · PostgreSQL JSONB: JSON 데이터 조회, 수정 및 인덱싱 (no_keyword)
-  - [ ] 놓침 · F/OSS Comics #11: BSD 유닉스 1화 – UC 버클리로 간 유닉스 코드 (no_keyword)
-  - [ ] 놓침 · example.com이 바뀐 이유를 설명한 IANA의 이메일 (no_keyword)
-  - [ ] 놓침 · Chess.com을 8,400만원에 인수해 연 매출 3,000억원으로 키우기 (excluded:인수)
+  - [ ] 놓침 · Show GN: Brief - AI Slop이 만든 기——인 글을 GeekNews 요약처럼 만들어 주는 Mac 앱 (no_keyword)
+  - [ ] 놓침 · F/OSS Comics #10: C언어의 아버지, 데니스 리치의 일생 (no_keyword)
+  - [ ] 놓침 · Bob Cringely 별세 (no_keyword)
+  - [ ] 놓침 · Show GN: AutoPixel Studio - 이미지 기반 매크로 프로그램 (no_keyword)
+  - [ ] 놓침 · Show GN: SSGOI – 모바일 웹을 네이티브 앱처럼 만드는 페이지 전환 라이브러리 (no_keyword)
 - 통과한 글
-  - [ ] 잘못 통과 · Google은 언제부터 이렇게 이상해졌을까? (점수 1)
-  - [ ] 잘못 통과 · 얀 르쿤, AI의 인류 멸종 위험에 “전혀 우려 없다” (점수 2)
-  - [ ] 잘못 통과 · Muse Gadgets - Meta의 AI 에이전트를 직접 만든 기기에 연결하기 (점수 3)
-  - [ ] 잘못 통과 · 모두가 짐을 싸고 있다 (점수 1)
-  - [ ] 잘못 통과 · ChatGPT Sites - 대화로 웹사이트와 앱을 만들고 게시하기 (점수 1)
+  - [ ] 잘못 통과 · Sam Altman은 왜 자유의 몸인가? (점수 1)
+  - [ ] 잘못 통과 · 개발 못 하는 영업 직장인이 옵시디언에 클로드 코드를 붙여 일한 기록 (점수 1)
+  - [ ] 잘못 통과 · Show GN: Blyck Video Understanding - Claude·Codex가 영상을 시각 근거와 함께 분석·검색하게 해주는 MCP (점수 9)
+  - [ ] 잘못 통과 · 페이페이 리의 World Labs, AMD에 합류 (점수 1)
+  - [ ] 잘못 통과 · 거의 모든 서비스에 예산을 넘으면 멈추는 기능이 필요해질 것 (점수 1)
 
 ### simonw
 - 걸러진 글
+  - [ ] 놓침 · sighting 404239413 (no_keyword)
   - [ ] 놓침 · S3 Is the Future, S3 Is the Past (no_keyword)
-  - [ ] 놓침 · Bluesky reply bot checker (no_keyword)
+  - [ ] 놓침 · Rex's Dino Store (no_keyword)
   - [ ] 놓침 · He Built This City (no_keyword)
   - [ ] 놓침 · September sponsors-only newsletter (no_keyword)
-  - [ ] 놓침 · Rex's Dino Store (no_keyword)
 - 통과한 글
-  - [ ] 잘못 통과 · OpenAI DevDay 2026 live blog (점수 3)
-  - [ ] 잘못 통과 · pwasm 0.2a0 (점수 1)
   - [ ] 잘못 통과 · We're going to need default hard budget caps on pretty much everything (점수 1)
+  - [ ] 잘못 통과 · 2026 in LLMs (so far) (점수 6)
+  - [ ] 잘못 통과 · Quoting Muse AI Agent (점수 3)
   - [ ] 잘못 통과 · Quoting @joedaroo (점수 1)
   - [ ] 잘못 통과 · Photo Scrubber — local face blur & metadata removal (점수 2)
 
 ### aitimes
 - 걸러진 글
-  - [ ] 놓침 · 아일랜드, 주택용 태양광·배터리 지원 확대…국내는 마을 단위 실증 (no_keyword)
+  - [ ] 놓침 · 오스트리아 영농형 태양광서 겨울밀 수확량 14% 높아…가뭄 속 현장실증 (no_keyword)
+  - [ ] 놓침 · 기상청, 태양광·풍력 발전량 예측 돕는다…1km 단위 기상자료 제공 (no_keyword)
   - [ ] 놓침 · 태양광 발전량·전력가격 예측하는 AI…일본 ESS 충·방전 자동화 (no_keyword)
-  - [ ] 놓침 · "다섯 손가락 필요 없다"...보스턴 다이내믹스, 네 손가락 로봇 손 공개 (no_keyword)
-  - [ ] 놓침 · 구글 "우주 데이터센터 실현 위해 스타십 최소 1800회 발사 필요" (no_keyword)
-  - [ ] 놓침 · 엔비디아·소프트뱅크, 오픈AI 투자 잔여분 27조 최종 집행 (no_keyword)
+  - [ ] 놓침 · [AI 이슈트렌드] 계속된 DMZ 논란 속 트럼프 LNG 협박·청주 흉기 성폭행 화제 (no_keyword)
+  - [ ] 놓침 · 메타, AI 데이터센터 '실험 시설' 지정...수십억달러 세액공제 논란 (no_keyword)
 - 통과한 글
-  - [ ] 잘못 통과 · 앤트로픽, 중국 'GLM-5.3' 해킹 위험성 경고..."클로드 미소스와 맞먹는 능력" (점수 3)
-  - [ ] 잘못 통과 · 네이버, 웨일 브라우저 내 'AI 챗' 탑재..."타 서비스 도입도 검토" (점수 3)
-  - [ ] 잘못 통과 · 원프레딕트 “버려지던 제조 데이터, AI 자산으로 바꾸겠다” (점수 2)
-  - [ ] 잘못 통과 · 애플, AI 에이전트 공격 대비해 맥OS '전체 디스크 접근' 제어 강화 (점수 4)
-  - [ ] 잘못 통과 · 오픈AI, 내부 기밀 유출 혐의로 정렬·안전팀 연구원 3명 해고 (점수 3)
+  - [ ] 잘못 통과 · [10월2일] "뜻밖의 주인공은 로그인과 플러그인"…알트먼이 보여준 챗GPT의 다음 무대 (점수 4)
+  - [ ] 잘못 통과 · 오픈AI 안전 총괄, 조직 문화 비판하며 사직..."시행착오 시대 끝났다" (점수 3)
+  - [ ] 잘못 통과 · 애플, 13일 스마트홈 허브 공개…'AI 시리' 앞세워 아마존·구글에 도전장 (점수 1)
+  - [ ] 잘못 통과 · 오퍼스 5.5 ‘이것은 중요합니다’ 남발…습관 못 버린 AI 글쓰기 (점수 1)
+  - [ ] 잘못 통과 · 딥시크, 데스크톱 앱 '딥시크 하네스' 출시..."챗·코딩·문서 통합" (점수 4)
 
 ### techbridge
 - 걸러진 글
@@ -147,17 +147,17 @@
   - [ ] 놓침 · AI로 무엇이든 효과적으로 학습하는 방법 (no_keyword)
   - [ ] 놓침 · [한영자막] 400개 기업 데이터로 본 소프트웨어 개발 AI의 현주소입니다 (excluded:채용)
 - 통과한 글
-  - [ ] 잘못 통과 · [한영자막] 코드 리뷰의 종말: 데이터가 보여주는 진짜 현실입니다 (점수 3)
-  - [ ] 잘못 통과 · [한영자막] 진짜 '소프트웨어 팩토리'를 만들려면 무엇이 필요할까요? — Factory Tereza (점수 4)
   - [ ] 잘못 통과 · [한영자막] 자는 동안 스스로 학습하는 AI: 단순 기억을 넘어 꿈으로 진화하는 에이전트의 비밀 (점수 5)
-  - [ ] 잘못 통과 · [한영자막] 루프 자체가 제품입니다 — xAI 출신 창업자가 밝히는 차세대 AI 에이전트의 핵심 (점수 4)
-  - [ ] 잘못 통과 · [한영자막] 소프트웨어 엔지니어링은 이제 소프트웨어 공장을 짓는 일이 될 것입니다 — Zach Lloyd (Warp) (점수 2)
+  - [ ] 잘못 통과 · [한영자막] 스스로 개선되는 AI 에이전트는 어떻게 만들었을까요? | Weights & Biases (점수 6)
+  - [ ] 잘못 통과 · [한영자막] AI 시대, 스펙 기반 개발(SDD)을 실무에 적용하며 배운 교훈들 (점수 2)
+  - [ ] 잘못 통과 · [한영자막] AI가 여러분의 데이터를 노출하고 있습니다: 눈에 보이지 않는 AI 보안의 숨은 위험 (점수 2)
+  - [ ] 잘못 통과 · [한영자막] Claude Code와 Codex를 인간 연구자들과 경쟁시켰습니다 — Elie Bakouch, Prime Intellect (점수 8)
 
 ## 6. 링크
 
 | 종류 | 링크 수 |
 |---|---|
-| other | 1807 |
+| other | 1809 |
 | curation | 839 |
 | repo | 231 |
 | social | 143 |

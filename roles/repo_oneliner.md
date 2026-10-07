@@ -48,9 +48,9 @@ README에 기능을 말하는 구절이 하나도 없으면(제목, 배지, 링�
 <examples>
 <example>
 보통: 첫 문단에 기능이 있는 README
-입력: `<document id="rp:ggml-org/llama.cpp" source="GitHub README"># llama.cpp ... The main goal of llama.cpp is to enable LLM inference with minimal setup and state-of-the-art performance on a wide range of hardware - locally and in the cloud.</document>`
-출력: `{"basis": "enable LLM inference with minimal setup", "oneliner": "다양한 하드웨어에서 LLM 추론을 실행하는 C/C++ 라이브러리", "log": "README 첫 문단 근거", "attention": false}`
-"state-of-the-art performance"는 홍보 문구라서 옮기지 않았다. "on a wide range of hardware"는 문장의 다른 부분이지만 대상 범위라서 oneliner에 반영했다.
+입력: `<document id="rp:ggml-org/llama.cpp" source="GitHub README"># llama.cpp LLM inference in C/C++ ... The main goal of llama.cpp is to enable LLM inference with minimal setup and state-of-the-art performance on a wide range of hardware - locally and in the cloud.</document>`
+출력: `{"basis": "enable LLM inference with minimal setup", "oneliner": "다양한 하드웨어에서 LLM 추론을 실행하는 C/C++ 구현", "log": "README 첫 줄과 첫 문단 근거", "attention": false}`
+"C/C++"는 README 첫 줄에 있다. "state-of-the-art performance"는 홍보 문구라서 옮기지 않았다.
 </example>
 <example>
 빈칸이 맞는 경우: README에 기능 설명이 없음
@@ -60,8 +60,8 @@ description의 "cool project"는 기능이 아니므로 문장을 만들지 않�
 </example>
 <example>
 함정: 핵심 구절 사이에 링크 기호가 있고, description은 README와 다른 문구
-입력: `<document id="rp:pallets/flask" source="GitHub README"># Flask Flask is a lightweight [WSGI] web application framework. It is designed to make getting started quick and easy, with the ability to scale up to complex applications.</document>`, description: "The Python micro framework for building web applications."
-출력: `{"basis": "web application framework. It is designed to make getting started quick and easy", "oneliner": "Python 웹 애플리케이션을 만드는 WSGI 프레임워크", "log": "README 첫 문단 근거", "attention": false}`
-"lightweight [WSGI] web application framework"는 기호 `[ ]`를 빼고 옮기면 README 원문과 글자가 달라지므로, 기호가 끼지 않은 뒤쪽 구간을 골랐다. description의 문구는 basis로 쓰지 않는다. "lightweight", "quick and easy"는 평가어라서 oneliner에 넣지 않았다.
+입력: `<document id="rp:pallets/flask" source="GitHub README"># Flask Flask is a lightweight [WSGI] web application framework. It is designed to make getting started quick and easy, with the ability to scale up to complex applications. ... has become one of the most popular Python web application frameworks.</document>`, description: "The Python micro framework for building web applications."
+출력: `{"basis": "Python web application frameworks", "oneliner": "Python 웹 애플리케이션을 만드는 WSGI 프레임워크", "log": "README 첫 문단 근거", "attention": false}`
+"lightweight [WSGI] web application framework"는 기호 `[ ]`를 빼고 옮기면 README 원문과 글자가 달라지므로, 기호가 끼지 않은 구간을 골랐다. description의 문구는 basis로 쓰지 않는다. "lightweight", "quick and easy"는 평가어라서 넣지 않았다.
 </example>
 </examples>

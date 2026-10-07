@@ -10,7 +10,7 @@ import re
 import shutil
 import subprocess
 from collections.abc import Callable
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, timedelta
 from typing import Any
 
 import feedparser
@@ -74,9 +74,11 @@ class YoutubeCollector:
         self.ytdlp = ytdlp
         self.with_meta = with_meta
         self.max_items = max_items
+        self._range: tuple[date, date] = (date.min, date.max)
 
     def collect(self, src: VideoSource, since: date, until: date) -> SourceStats:
         st = SourceStats(src.id)
+        self._range = (since, until)
         res = self.fetcher.fetch(src.feed, kind="feed")
         if not res.ok:
             raise SourceFailed(f"채널 RSS 실패: {res.error}")
@@ -84,7 +86,7 @@ class YoutubeCollector:
         dated = [to_kst(v["published"]).date() for v in videos.values() if v["published"]]
         oldest = min(dated) if dated else None
         st.rss_oldest = oldest.isoformat() if oldest else None
-        if oldest is None or since < oldest:
+        if oldest is None or since <= oldest:  # RSS의 가장 오래된 날은 일부만 담을 수 있다
             if src.backfill.method == "channel_listing":
                 listing = self.ytdlp(["--flat-playlist", "--playlist-end", str(src.backfill.max_videos),
                                       "--extractor-args", "youtubetab:approximate_date",
@@ -104,8 +106,17 @@ class YoutubeCollector:
                 st.covered = False
                 st.notes.append(f"RSS 가장 오래된 영상 {oldest}, 요청 시작 {since}: 백필 없음")
 
-        in_range = [v for v in videos.values()
-                    if v["published"] and since <= to_kst(v["published"]).date() <= until]
+        # 채널 목록의 시각은 대략값이라 기간 앞뒤 3일까지 후보로 받고, 정확한 시각을 얻은 뒤 기간을 다시 본다
+        margin = timedelta(days=3)
+
+        def near(v: dict[str, Any]) -> bool:
+            if not v["published"]:
+                return False
+            d = to_kst(v["published"]).date()
+            return (since - margin <= d <= until + margin) if v.get("approximate") else (since <= d <= until)
+
+        in_range = [v for v in videos.values() if near(v)]
+        st.n_in_range = len(in_range)
         if self.max_items:
             in_range = in_range[: self.max_items]
         for v in in_range:
@@ -115,13 +126,21 @@ class YoutubeCollector:
         return st
 
     def _save(self, src: VideoSource, v: dict[str, Any], st: SourceStats) -> None:
-        if self.db.item_by_external(src.id, v["video_id"]) is not None:
+        existing = self.db.item_by_external(src.id, v["video_id"])
+        # 이미 있으면 건너뛴다. 메타데이터를 못 받았던 영상만 다시 시도
+        if existing is not None and self.db.video_meta_status(existing["id"]) != "failed":
             st.n_skipped += 1
             return
         st.n_seen += 1
         meta = video_meta(self.ytdlp([WATCH.format(id=v["video_id"])])) if self.with_meta else {"meta_status": "skipped"}
         if meta.get("timestamp"):  # 채널 목록의 대략 시각보다 정확
             v["published"] = datetime.fromtimestamp(meta["timestamp"], UTC)
+            v["approximate"] = False
+        since, until = self._range
+        d = to_kst(v["published"]).date()
+        if not since <= d <= until:  # 정확한 시각으로 다시 보니 기간 밖
+            st.n_out_of_range += 1
+            return
         if meta.get("meta_status") == "failed":
             st.errors.append(f"메타데이터 실패: {v['video_id']}")
         description = meta.get("description") or v.get("description") or ""
@@ -142,9 +161,11 @@ class YoutubeCollector:
                                                 "meta_status")}
         self.db.save_item(item, text=description or None, origin_summary=None,
                           expires_at=(datetime.now(KST) + TEXT_TTL).isoformat(timespec="seconds"),
-                          links=links, keywords=m.keywords, video=video)
-        st.n_new += 1
-        st.n_backfilled += int(v["via"] == "backfill")
+                          links=links, keywords=m.keywords, video=video,
+                          replace_id=existing["id"] if existing is not None else None)
+        if existing is None:
+            st.n_new += 1
+            st.n_backfilled += int(v["via"] == "backfill")
         status = item["body_status"]
         st.body[status] = st.body.get(status, 0) + 1
 

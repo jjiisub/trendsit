@@ -3,7 +3,7 @@
  "until": "2026-10-06",
  "max_items": 3,
  "source": null,
- "recorded_at": "2026-10-07T11:36:51+00:00",
+ "recorded_at": "2026-10-07T12:39:33+00:00",
  "result": {
   "openai": {
    "status": "ok",
@@ -27,7 +27,7 @@
    "status": "ok",
    "n_new": 3,
    "n_backfilled": 0,
-   "backfill_pages": 0
+   "backfill_pages": 8
   },
   "simonw": {
    "status": "ok",
@@ -39,7 +39,7 @@
    "status": "ok",
    "n_new": 3,
    "n_backfilled": 0,
-   "backfill_pages": 0
+   "backfill_pages": 2
   },
   "techbridge": {
    "status": "ok",

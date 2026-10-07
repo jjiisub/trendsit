@@ -43,12 +43,12 @@ pt A6 "같은 collect 두 번: 항목 수 그대로, 중복 0" tests/test_s1b.py
 pt A7 "백필: list_pages(AI타임스)와 day_archive(GeekNews, Simon Willison), 유튜브 채널 목록, --since 앞에서 멈춤" \
   tests/test_s1b.py -k "backfill_from_saved or day_archive_pages or stops_before_since"
 pt A8 "실패 격리: 한 소스 500이어도 나머지 수집, fetch_log failed + 실행 기록 attention" tests/test_s1b.py -k "one_source_failing"
-pt A9 "트렌딩 파서: 저장한 페이지의 레포 전부, stars_this_week 모두 숫자, 빈 페이지는 실패로 기록" \
+pt A9 "트렌딩 파서: 저장한 주간 페이지 11개(스펙 25개 내외, 지금 GitHub가 11~13개만 보임)와 월간 페이지 25개 전부, stars_this_week 모두 숫자, 빈 페이지는 실패로 기록" \
   tests/test_s1b.py -k "trending_parser or empty_trending"
 pt A10 "키워드: 제목 매칭 3점, 단어 경계(eval ≠ evaluate), 제외어 규칙" tests/test_s1b.py -k "keyword_rules"
 pt A11 "robots: 막힌 경로는 가져오지 않고 기록" tests/test_s1b.py -k "robots"
 A12_MISS=""
-grep -q "collect" README.md || A12_MISS+=" README:collect"
+grep -q "trendsit collect --since" README.md || A12_MISS+=" README:collect"
 grep -q "trendsit collect" docs/DEVELOPMENT.md || A12_MISS+=" DEVELOPMENT:collect"
 grep -q "## 1b 수집" reports/S1_report.md 2>/dev/null || A12_MISS+=" reports/S1_report.md(1b)"
 [ -z "$A12_MISS" ] && pass A12 "README와 DEVELOPMENT.md에 수집 명령, reports/S1_report.md" || fail A12 "없음:$A12_MISS"

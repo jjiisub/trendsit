@@ -283,6 +283,10 @@ class DB:
                      _json(video.get("chapters")), video.get("meta_status")))
         return item_id
 
+    def video_meta_status(self, item_id: int) -> str | None:
+        row = self.conn.execute("SELECT meta_status FROM videos WHERE item_id=?", (item_id,)).fetchone()
+        return row["meta_status"] if row else None
+
     def log_fetch(self, run_id: str, source_id: str, day: str, status: str, *, n_new: int = 0,
                   n_backfilled: int = 0, n_seen: int = 0, error: str | None = None, detail: Any = None) -> None:
         with self.conn:
@@ -301,6 +305,10 @@ class DB:
                 "topics_json=COALESCE(excluded.topics_json, topics_json), readme_head=COALESCE(excluded.readme_head, readme_head)",
                 (full_name, description, language, _json(topics) if topics is not None else None, readme_head,
                  now_kst()))
+
+    def clear_trending(self, week: str) -> None:
+        with self.conn:
+            self.conn.execute("DELETE FROM repo_trending WHERE week=?", (week,))
 
     def save_trending(self, week: str, row: dict[str, Any], run_id: str) -> bool:
         """주차별 트렌딩 1행. 같은 주에 이미 있으면 수치만 갱신하고 False."""

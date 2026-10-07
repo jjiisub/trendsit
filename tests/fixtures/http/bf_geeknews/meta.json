@@ -3,13 +3,13 @@
  "until": "2026-10-04",
  "max_items": 2,
  "source": "geeknews",
- "recorded_at": "2026-10-07T11:37:28+00:00",
+ "recorded_at": "2026-10-07T12:39:45+00:00",
  "result": {
   "geeknews": {
    "status": "ok",
    "n_new": 2,
    "n_backfilled": 2,
-   "backfill_pages": 3
+   "backfill_pages": 6
   }
  }
 }

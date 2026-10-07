@@ -9,6 +9,7 @@ from typing import Any
 
 from ..core import config
 from ..core.db import DB
+from .links import normalize_url
 
 # handoff(S1) 묶음의 백필 후보. 실제로 열어 확인한 결과와 나란히 보여 준다
 HANDOFF_CANDIDATES = {
@@ -34,11 +35,14 @@ def _pct(a: int, b: int) -> str:
     return f"{a / b:.0%} ({a}/{b})" if b else "-"
 
 
-def _latest_logs(db: DB) -> dict[str, dict[str, Any]]:
+def _latest_logs(db: DB, since: date, until: date) -> dict[str, dict[str, Any]]:
+    """소스마다 같은 기간(--since, --until)을 수집한 가장 최근 기록. 다른 기간의 기록은 섞지 않는다."""
     rows = db.conn.execute("SELECT * FROM fetch_log ORDER BY id").fetchall()
     out: dict[str, dict[str, Any]] = {}
     for r in rows:
-        out[r["source_id"]] = dict(r) | {"detail": json.loads(r["detail"]) if r["detail"] else {}}
+        detail = json.loads(r["detail"]) if r["detail"] else {}
+        if detail.get("since") == since.isoformat() and detail.get("until") == until.isoformat():
+            out[r["source_id"]] = dict(r) | {"detail": detail}
     return out
 
 
@@ -46,7 +50,7 @@ def build(since: date, until: date, *, data_dir: Path | None = None, out: Path |
     data_dir = data_dir or config.ROOT / "data"
     sources = config.load("sources.yaml")
     db = DB(data_dir / "trendsit.db")
-    logs = _latest_logs(db)
+    logs = _latest_logs(db, since, until)
     rng = (since.isoformat(), until.isoformat())
     q = db.conn.execute
     verdict: dict[str, Any] = {}
@@ -71,7 +75,7 @@ def build(since: date, until: date, *, data_dir: Path | None = None, out: Path |
         fetch_mode = getattr(s, "fetch", "rss + yt-dlp")
         method = s.backfill.method
         pages = d.get("backfill_pages", 0)
-        covered = d.get("covered", lg.get("status") not in (None, "failed"))
+        covered = bool(lg) and lg.get("status") != "failed" and d.get("covered", False)  # 이 기간 기록이 없으면 아니오
         reasons = d.get("fetch_errors") or {}
         memo = "; ".join([*(d.get("notes") or []), *(d.get("errors") or [])[:3],
                           *(f"{k} {v}건" for k, v in sorted(reasons.items(), key=lambda kv: -kv[1])[:5])])
@@ -162,8 +166,12 @@ def build(since: date, until: date, *, data_dir: Path | None = None, out: Path |
           "S3 원본 추적에서 거를 대상", ""]
     verdict["origin_rate"] = got / denom if denom else None
 
-    # 중복
-    dup = q("SELECT COUNT(*) FROM (SELECT source_id, url FROM items GROUP BY source_id, url HAVING COUNT(*) > 1)").fetchone()[0]
+    # 중복: 정규화한 URL(추적 파라미터, 끝 슬래시, 대소문자) 기준. UNIQUE(source_id, external_id)와 별개로 확인
+    seen: dict[tuple[str, str], int] = {}
+    for r in q("SELECT source_id, url FROM items WHERE day BETWEEN ? AND ?", rng):
+        k = (r["source_id"], normalize_url(r["url"] or ""))
+        seen[k] = seen.get(k, 0) + 1
+    dup = sum(1 for v in seen.values() if v > 1)
     verdict["duplicates"] = dup
     verdict["body_fail"] = body_fail
 

@@ -3,12 +3,12 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
 from typing import Any
 
 from ..core import config
-from ..core.db import DB
+from ..core.db import DB, KST
 from ..core.trace import Tracer
 from .fetch import Fetcher
 from .github import GithubCollector, GithubStats
@@ -46,15 +46,17 @@ def collect(since: date, until: date, *, only: str | None = None, no_body: bool 
     sources = config.load("sources.yaml", config_dir)
     keywords = config.load("keywords.yaml", config_dir)
     kinds = config.load("link_kinds.yaml", config_dir)
+    ids = [s.id for s in sources.text] + [s.id for s in sources.video] + ["github_trending", "github_releases"]
+    if only and only not in ids:  # 실행 기록을 만들기 전에 거른다
+        raise config.ConfigError("sources.yaml", "", f"없는 소스 '{only}' (있는 소스: {', '.join(ids)})")
     db = DB(data_dir / "trendsit.db")
     sync_sources(db, sources)
+    own_fetcher = fetcher is None
     fetcher = fetcher or Fetcher(data_dir / "http_cache", use_cache=use_http_cache)
     tracer = Tracer(db, "collect", config.current_spec(spec), note=f"collect {since}~{until}" + (f" {only}" if only else ""))
     result = CollectResult(tracer.run_id, since.isoformat(), until.isoformat())
-    day = date.today().isoformat()
-    ids = [s.id for s in sources.text] + [s.id for s in sources.video] + ["github_trending", "github_releases"]
-    if only and only not in ids:
-        raise config.ConfigError("sources.yaml", "", f"없는 소스 '{only}' (있는 소스: {', '.join(ids)})")
+    day = datetime.now(KST).date().isoformat()
+    period = {"since": since.isoformat(), "until": until.isoformat()}
 
     def run_one(sid: str, fn: Any) -> None:
         if only and sid != only:
@@ -68,10 +70,10 @@ def collect(since: date, until: date, *, only: str | None = None, no_body: bool 
         if st is None:
             result.failed.append(sid)
             result.sources[sid] = {"status": "failed", "error": err}
-            db.log_fetch(tracer.run_id, sid, day, "failed", error=err)
+            db.log_fetch(tracer.run_id, sid, day, "failed", error=err, detail=period)
             tracer.step(kind="code", role="collect", text=f"{sid}: 수집 실패", attention=True, error=err)
             return
-        detail = asdict(st)
+        detail = asdict(st) | period
         partial = bool(getattr(st, "errors", None)) or not getattr(st, "covered", True)
         status = "partial" if partial else "ok"
         result.sources[sid] = {"status": status} | detail
@@ -110,8 +112,11 @@ def collect(since: date, until: date, *, only: str | None = None, no_body: bool 
     result.requests = fetcher.requests
     if result.robots_blocked:
         tracer.step(kind="code", role="collect", text=f"robots.txt로 건너뜀 {len(result.robots_blocked)}건",
-                    attention=True, detail={"urls": result.robots_blocked[:50]})
+                    attention=True, detail={"urls": result.robots_blocked[:50],
+                                            "robots_unavailable": fetcher.robots_unavailable})
     tracer.finish("partial" if result.failed else "ok")
+    if own_fetcher:
+        fetcher.close()
     db.close()
     return result
 

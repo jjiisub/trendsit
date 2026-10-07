@@ -16,6 +16,8 @@ import socket
 import time
 from collections.abc import Callable
 from dataclasses import asdict, dataclass
+from datetime import UTC, datetime
+from email.utils import parsedate_to_datetime
 from pathlib import Path
 from typing import Literal
 from urllib.parse import urljoin, urlsplit
@@ -65,12 +67,16 @@ def _resolve(host: str) -> list[str]:
     return sorted({info[4][0] for info in socket.getaddrinfo(host, None)})
 
 
+SITE_LOCAL_V6 = ipaddress.ip_network("fec0::/10")  # 폐지된 site-local. is_global이 참으로 나와 따로 막는다
+
+
 def check_address(ip_text: str) -> None:
     ip = ipaddress.ip_address(ip_text.split("%")[0])
     if isinstance(ip, ipaddress.IPv6Address) and ip.ipv4_mapped:
         ip = ip.ipv4_mapped
     bad = (ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_multicast or ip.is_reserved
-           or ip.is_unspecified or not ip.is_global)
+           or ip.is_unspecified or not ip.is_global
+           or (isinstance(ip, ipaddress.IPv6Address) and ip in SITE_LOCAL_V6))
     if bad:
         raise FetchBlocked(f"공인 주소가 아님: {ip}")
 
@@ -88,8 +94,9 @@ class Fetcher:
         self.client = httpx.Client(transport=transport, timeout=TIMEOUT, follow_redirects=False,
                                    headers={"User-Agent": USER_AGENT})
         self.last_hit: dict[str, float] = {}
-        self.robots: dict[str, RobotFileParser | None] = {}
+        self.robots: dict[str, RobotFileParser | str | None] = {}  # None=제한 없음, str=확인 불가(이유)
         self.blocked_by_robots: list[str] = []
+        self.robots_unavailable: dict[str, str] = {}
         self.requests = 0
 
     # ---------- 공개 함수 ----------
@@ -99,28 +106,45 @@ class Fetcher:
             self._check_url(url)
             if kind == "page" and not self.allowed_by_robots(url):
                 self.blocked_by_robots.append(url)
-                return FetchResult(url, url, None, None, None, now_kst(), error="robots.txt가 막음")
+                origin = self._origin(url)
+                why = self.robots_unavailable.get(origin)
+                return FetchResult(url, url, None, None, None, now_kst(),
+                                   error=f"robots.txt 확인 불가로 건너뜀({why})" if why else "robots.txt가 막음")
             return self._fetch(url, headers or {})
         except FetchBlocked as e:
             return FetchResult(url, url, None, None, None, now_kst(), error=f"차단: {e}")
         except httpx.HTTPError as e:
             return FetchResult(url, url, None, None, None, now_kst(), error=f"{type(e).__name__}: {e}")
 
-    def allowed_by_robots(self, url: str) -> bool:
+    @staticmethod
+    def _origin(url: str) -> str:
         parts = urlsplit(url)
-        origin = f"{parts.scheme}://{parts.netloc}"
+        return f"{parts.scheme}://{parts.netloc}"
+
+    def allowed_by_robots(self, url: str) -> bool:
+        """RFC 9309: 4xx는 제한 없음, 5xx나 연결 실패는 전부 막힌 것으로 본다(출처마다 한 번 확인하고 기억)."""
+        origin = self._origin(url)
         if origin not in self.robots:
-            parser: RobotFileParser | None = RobotFileParser()
-            res = self._fetch(f"{origin}/robots.txt", {}, allow_types=None)
+            entry: RobotFileParser | str | None
+            try:
+                res = self._fetch(f"{origin}/robots.txt", {}, allow_types=None)
+            except (httpx.HTTPError, FetchBlocked) as e:
+                res = FetchResult(origin, origin, None, None, None, now_kst(), error=f"{type(e).__name__}: {e}")
             if res.ok and res.text is not None:
-                parser.parse(res.text.splitlines())
+                entry = RobotFileParser()
+                entry.parse(res.text.splitlines())
             elif res.status is not None and 400 <= res.status < 500:
-                parser = None  # robots.txt 없음 = 제한 없음
+                entry = None  # robots.txt 없음 = 제한 없음
             else:
-                parser = None  # 가져오지 못함. 막지는 않고 리포트에서 확인
-            self.robots[origin] = parser
-        parser = self.robots[origin]
-        return True if parser is None else parser.can_fetch(ROBOTS_AGENT, url)
+                entry = res.error or f"HTTP {res.status}"
+                self.robots_unavailable[origin] = entry
+            self.robots[origin] = entry
+        entry = self.robots[origin]
+        if entry is None:
+            return True
+        if isinstance(entry, str):
+            return False
+        return entry.can_fetch(ROBOTS_AGENT, url)
 
     # ---------- 내부 ----------
     def _check_url(self, url: str) -> None:
@@ -144,6 +168,7 @@ class Fetcher:
             check_address(a)
 
     def _wait_turn(self, host: str) -> None:
+        host = host.removeprefix("www.")  # 같은 도메인(www 유무 무관)은 1초에 1번
         last = self.last_hit.get(host)
         if last is not None:
             gap = self.clock() - last
@@ -185,7 +210,9 @@ class Fetcher:
         ctype = (resp.headers.get("content-type") or "").split(";")[0].strip().lower()
         if resp.status_code >= 400:
             return FetchResult(url, current, resp.status_code, ctype, None, now_kst(), error=f"HTTP {resp.status_code}")
-        if allow_types is not None and ctype and not ctype.startswith(allow_types):
+        if allow_types is not None and not ctype:
+            return FetchResult(url, current, resp.status_code, None, None, now_kst(), error="형식 헤더 없음")
+        if allow_types is not None and not ctype.startswith(allow_types):
             return FetchResult(url, current, resp.status_code, ctype, None, now_kst(),
                                error=f"허용 밖 형식: {ctype}")
         text = body.decode(resp.encoding or "utf-8", errors="replace")
@@ -216,8 +243,7 @@ class Fetcher:
             if resp.status_code == 429 or resp.status_code >= 500:
                 if attempt == RETRIES:
                     return resp, body
-                retry_after = resp.headers.get("retry-after")
-                wait = min(float(retry_after), 30.0) if retry_after and retry_after.isdigit() else 2.0 ** attempt
+                wait = min(_retry_after(resp.headers.get("retry-after")) or 2.0 ** attempt, 30.0)
                 self.sleep(wait)
                 continue
             return resp, body
@@ -225,3 +251,16 @@ class Fetcher:
 
     def close(self) -> None:
         self.client.close()
+
+
+def _retry_after(value: str | None) -> float | None:
+    """Retry-After: 초 또는 HTTP 날짜."""
+    if not value:
+        return None
+    if value.strip().isdigit():
+        return float(value)
+    try:
+        when = parsedate_to_datetime(value)
+    except (TypeError, ValueError):
+        return None
+    return max((when - datetime.now(when.tzinfo or UTC)).total_seconds(), 0.0)

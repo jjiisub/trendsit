@@ -79,14 +79,15 @@ class GithubCollector:
         if not rows:
             raise SourceFailed("트렌딩 0건: 페이지 구조가 바뀌었을 수 있음")
         week = iso_week(datetime.now(KST).date())
+        self.db.clear_trending(week)  # 같은 주에 다시 돌리면 이번 목록으로 바꾼다(빠진 레포 행이 남지 않게)
         for row in rows:
-            m = self.matcher.match(row["full_name"], row["description"])
+            # 스펙 5.5: 설명, 토픽, README로 판정(이름은 넣지 않음). 설명을 제목 자리에(트렌딩 페이지에는 토픽이 없음)
+            m = self.matcher.match(row["description"], None)
             readme = None
-            if m.filter_status == "pass":  # 키워드에 걸린 레포만 README로 다시 판정
+            if m.filter_status == "pass":  # 키워드에 걸린 레포만 README를 받아 토픽, README까지 넣어 다시 판정
                 meta = self.readme(row["full_name"], st)
                 readme = meta.get("readme_head")
-                m = self.matcher.match(row["full_name"], " ".join([row["description"] or "", *meta.get("topics", [])]),
-                                       readme)
+                m = self.matcher.match(row["description"], " ".join(meta.get("topics", [])), readme)
             self.db.upsert_repo(row["full_name"], description=row["description"], language=row["language"],
                                 readme_head=readme)
             row |= {"score": m.score, "filter_status": m.filter_status, "filter_reason": m.filter_reason,

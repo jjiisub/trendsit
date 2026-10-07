@@ -42,10 +42,12 @@ class Candidate:
 @dataclass
 class SourceStats:
     source_id: str
-    n_seen: int = 0  # 기간 안 후보
+    n_in_range: int = 0  # 기간 안 후보(개발용 상한 적용 전)
+    n_seen: int = 0  # 이번에 처리한 후보
     n_new: int = 0
     n_backfilled: int = 0  # 새 항목 중 백필로 얻은 것
     n_skipped: int = 0  # 이미 있음
+    n_out_of_range: int = 0  # 글 페이지에서 얻은 게시 시각이 기간 밖이라 저장하지 않음
     backfill_pages: int = 0
     rss_oldest: str | None = None
     covered: bool = True
@@ -66,6 +68,8 @@ class SourceStats:
             parts.append("실패 이유 " + ", ".join(f"{k} {v}건" for k, v in top))
         if self.n_skipped:
             parts.append(f"기존 {self.n_skipped}건 건너뜀")
+        if self.n_out_of_range:
+            parts.append(f"기간 밖 {self.n_out_of_range}건 제외")
         if not self.covered:
             parts.append("기간 부족")
         if self.errors:
@@ -135,12 +139,16 @@ class TextCollector:
         self.no_body = no_body
         self.max_items = max_items  # 개발용 작은 샘플
         self._last_error: str | None = None
-        self.gn_blocked = False
-        self.origin_bodies = 0  # GeekNews가 브라우저 확인을 요구하면 이 실행에서는 토픽 페이지를 더 요청하지 않음
+        self.gn_blocked = False  # GeekNews가 브라우저 확인을 요구하면 이 실행에서는 토픽 페이지를 더 요청하지 않음
+        self.origin_bodies = 0
+        self._gn_days: dict[date, dict[str, Candidate]] = {}  # 막혔을 때 원문 링크를 찾는 날짜별 목록
+        self._range: tuple[date, date] = (date.min, date.max)
+        self._src: TextSource | None = None
 
     # ---------- 소스 하나 ----------
     def collect(self, src: TextSource, since: date, until: date) -> SourceStats:
         st = SourceStats(src.id)
+        self._range, self._src = (since, until), src
         res = self.fetcher.fetch(src.feed, kind="feed")
         if not res.ok:
             raise SourceFailed(f"피드 실패: {res.error}")
@@ -150,7 +158,8 @@ class TextCollector:
         st.rss_oldest = oldest.isoformat() if oldest else None
 
         backfilled: list[Candidate] = []
-        if oldest is None or since < oldest:
+        # RSS의 가장 오래된 날은 그날을 일부만 담을 수 있으므로, 시작일이 그날과 같아도 백필한다
+        if oldest is None or since <= oldest:
             if src.backfill.method == "rss_only":
                 st.covered = False
                 st.notes.append(f"RSS 가장 오래된 항목 {oldest}, 요청 시작 {since}: 백필 방법 없음(rss_only)")
@@ -158,9 +167,14 @@ class TextCollector:
                 backfilled = self._backfill(src, since, until, oldest, st)
 
         merged: dict[str, Candidate] = {}
-        for c in [*entries, *backfilled]:  # RSS 항목이 먼저(피드 요약, 본문 보존)
-            merged.setdefault(url_id(c.url), c)
+        for c in [*entries, *backfilled]:  # RSS 항목이 먼저(피드 요약, 본문 보존). 백필에만 있는 정보는 합친다
+            kept = merged.setdefault(url_id(c.url), c)
+            if kept is not c:
+                kept.extra = c.extra | kept.extra
+                kept.published = kept.published or c.published
+                kept.summary = kept.summary or c.summary
         in_range = [c for c in merged.values() if c.published is None or since <= to_kst(c.published).date() <= until]
+        st.n_in_range = len(in_range)
         if self.max_items:
             in_range = in_range[: self.max_items]
         before = self.origin_bodies
@@ -178,7 +192,7 @@ class TextCollector:
         out: list[Candidate] = []
         if bf.method == "day_archive":
             last = min(until, oldest) if oldest else until  # RSS가 덮는 날은 건너뛰되, 가장 오래된 날은 다시 본다
-            day = since
+            day = since - timedelta(days=1)  # 아카이브가 UTC 날짜면 한국 시간 시작일 0~9시 글이 전날 아카이브에 있다
             while day <= last:
                 out += self._archive_day(src, day, st)
                 day += timedelta(days=1)
@@ -197,9 +211,13 @@ class TextCollector:
             res = self.fetcher.fetch(url, kind="page")
             st.backfill_pages += 1
             if not res.ok:
-                if res.status == 404:
+                if res.status == 404 and page in (None, 1):  # 그날 글이 없는 아카이브
+                    st.notes.append(f"아카이브 없음(404): {day}")
+                    break
+                if res.status == 404:  # 페이지 끝
                     break
                 st.errors.append(f"백필 {url}: {res.error}")
+                st.covered = False
                 break
             rows = self._parse_archive(src, res.text or "", day)
             out += rows
@@ -223,10 +241,11 @@ class TextCollector:
         bf = src.backfill
         out: list[Candidate] = []
         first_url = _render(bf.url_template or "", page=1, since=since, until=until)
+        reached = False  # --since보다 앞선 항목까지 닿았거나, 목록 끝(빈 페이지)까지 읽음
         for page in range(1, bf.max_pages + 1):
             template = bf.url_template if page == 1 or not bf.page_template else bf.page_template
             if page > 1 and "{page}" not in (template or ""):
-                break
+                break  # 페이지 넘김이 없는 목록
             url = _render(template or "", page=page, since=since, until=until)
             # 2페이지부터(더보기 AJAX 등)는 브라우저처럼 1페이지를 Referer로 보낸다
             headers = {"Referer": first_url, "X-Requested-With": "XMLHttpRequest"} if page > 1 else None
@@ -250,7 +269,11 @@ class TextCollector:
             out += rows
             dated = [to_kst(c.published).date() for c in rows if c.published]
             if not rows or (dated and min(dated) < since):
+                reached = True
                 break
+        if not reached:
+            st.covered = False
+            st.notes.append(f"목록 백필이 {since}까지 닿지 못함(페이지 {st.backfill_pages}, 상한 {bf.max_pages} 또는 오류)")
         return out
 
     def _parse_list(self, src: TextSource, text: str, page: int, since: date, until: date) -> list[Candidate]:
@@ -284,6 +307,10 @@ class TextCollector:
             c.published_estimated = published.hour == 0 and published.minute == 0  # 메타데이터가 날짜만 줌
         when = to_kst(c.published) or datetime.now(KST)
         estimated = c.published is None or c.published_estimated
+        since, until = self._range
+        if not since <= when.date() <= until:  # 글 페이지에서 얻은 날짜(또는 수집 시각)가 기간 밖
+            st.n_out_of_range += 1
+            return
         m = self.matcher.match(c.title, c.summary, body)
         item = {
             "source_id": src.id, "channel": "text", "kind": src.kind, "external_id": ext, "url": c.url,
@@ -337,7 +364,7 @@ class TextCollector:
     def _origin_body(self, c: Candidate
                      ) -> tuple[str | None, str, list[dict[str, Any]], str | None, datetime | None]:
         """GeekNews 토픽 페이지를 못 받을 때: 목록에서 얻은 원문 링크의 글을 본문으로(요약 대신 원문)."""
-        origin = c.extra.get("origin_url")
+        origin = c.extra.get("origin_url") or self._gn_origin_from_list(c)
         if not origin:
             self._last_error = "GeekNews 브라우저 확인 요구 + 원문 링크 없음"
             return None, "failed", [], None, None
@@ -350,6 +377,23 @@ class TextCollector:
         links = head + [x for x in links if x["url"] != origin]
         self.origin_bodies += 1
         return text, status, links, None, None  # 게시 시각은 GeekNews 목록의 것을 쓴다
+
+    def _gn_origin_from_list(self, c: Candidate) -> str | None:
+        """RSS로만 얻은 GeekNews 글: 그날의 날짜별 아카이브(목록 페이지는 브라우저 확인 대상이 아님)에서 원문 링크를 찾는다."""
+        if self._src is None or c.published is None or not self._src.backfill.url_template:
+            return None
+        day = to_kst(c.published).date()
+        if day not in self._gn_days:
+            rows: dict[str, Candidate] = {}
+            dummy = SourceStats(self._src.id)
+            for r in self._archive_day(self._src, day, dummy):
+                rows[url_id(r.url)] = r
+            self._gn_days[day] = rows
+        hit = self._gn_days[day].get(url_id(c.url))
+        if hit is None:
+            return None
+        c.summary = c.summary or hit.summary
+        return hit.extra.get("origin_url")
 
     def _extract(self, res: FetchResult
                  ) -> tuple[str | None, str, list[dict[str, Any]], str | None, datetime | None]:

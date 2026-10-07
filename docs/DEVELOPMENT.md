@@ -49,14 +49,19 @@ GITHUB_TOKEN=...             # 선택. 픽스처 README 수집에만
 `trendsit collect --since 2026-09-28 --until 2026-10-04`처럼 기간을 주면 소스마다 격리해서 돌린다(한 소스가 실패해도 나머지는 계속). 기간은 한국 시간 게시일, 끝일 포함.
 
 - **URL은 모두 `collect/fetch.py`의 safe_fetch로만.** http/https만, DNS로 푼 주소가 공인 주소가 아니면 거부(사설, 루프백, 링크로컬, 멀티캐스트, 예약, IPv4·IPv6), 리다이렉트마다 다시 검사(최대 5회). 연결 5초, 읽기 15초, 5MB, 허용 형식(html, xml, rss/atom, json, text, GitHub raw)
-- 예의: User-Agent `TrendsIT/0.1 (+https://trendsit.jiseop.com)`, 같은 도메인은 1초에 1번, 429·5xx는 지수 백오프 3회(`Retry-After` 존중). robots.txt는 목록, 아카이브, 글 페이지에서 확인하고 막히면 가져오지 않고 기록(피드와 GitHub API는 기계용이라 확인 생략)
+- 예의: User-Agent `TrendsIT/0.1 (+https://trendsit.jiseop.com)`, 같은 도메인은 1초에 1번, 429·5xx는 지수 백오프 3회(`Retry-After` 존중). robots.txt는 목록, 아카이브, 글 페이지에서 확인하고 막히면 가져오지 않고 기록(피드와 GitHub API는 기계용이라 확인 생략). robots.txt가 5xx거나 닿지 않으면 그 출처는 막힌 것으로 본다(RFC 9309). 형식 헤더가 없는 응답은 거부
 - HTTP 캐시 `data/http_cache/`(ETag, Last-Modified 조건부 요청). `--no-http-cache`로 끔
 - 글: RSS → 요청 시작일이 RSS의 가장 오래된 항목보다 앞서면 `sources.yaml`의 `backfill`로 거슬러 읽음 → 기간 필터 → 본문(`feed_full`은 피드 본문, 나머지는 원글을 trafilatura로, GeekNews는 토픽 페이지의 한국어 요약 + 원문 링크) → 링크 종류(`link_kinds.yaml`) → 키워드(`keywords.yaml`) → 칠판
-  - `day_archive`: 날짜마다 아카이브(`{date}` 또는 `{yyyy}/{Mon}/{d}`, `{page}`가 있으면 20건 미만 페이지까지)
+  - 백필 조건: 시작일이 RSS의 가장 오래된 날과 같거나 앞서면(그날을 일부만 담을 수 있어서)
+  - `day_archive`: 시작일 하루 전부터(UTC 날짜 아카이브 대응) 날짜마다 아카이브(`{date}` 또는 `{yyyy}/{Mon}/{d}`, `{page}`가 있으면 20건 미만 페이지까지)
   - `list_pages`: 1페이지는 `url_template`, 2페이지부터 `page_template`(Referer로 1페이지를 보냄). 날짜가 `--since`보다 앞선 항목이 나오면 멈춤. 목록 해석 실패는 3초 뒤 한 번 더
   - 300자 미만이면 `body_status=short`, 추출 실패면 `failed`. 이미 있는 항목은 건너뛰고 본문이 비었던 항목만 다시 시도
-- 유튜브: 채널 RSS(최근 15편) → 부족하면 `yt-dlp --flat-playlist`(다운로드 없음) → 영상마다 yt-dlp 메타데이터(길이, 수동 자막 언어, 자동 자막 유무, 챕터). yt-dlp가 없으면 null + 경고
+  - 목록에 날짜가 없던 후보는 글 페이지에서 얻은 날짜로 기간을 다시 보고, 기간 밖이면 저장하지 않음
+  - "기간 덮음"은 백필이 시작일보다 앞선 항목이나 목록 끝까지 닿았을 때만. 백필 오류나 페이지 상한이면 아님
+  - GeekNews가 브라우저 확인(Turnstile)을 요구하면 우회하지 않고 그 실행에서 토픽 페이지 요청을 멈춘다. 남은 글은 날짜별 아카이브의 원문 링크로 원문 글을 본문으로
+- 유튜브: 채널 RSS(최근 15편) → 부족하면 `yt-dlp --flat-playlist`(다운로드 없음, 날짜는 대략값이라 앞뒤 3일까지 후보) → 영상마다 yt-dlp 메타데이터(길이, 수동 자막 언어, 자동 자막 유무, 챕터, 정확한 시각으로 기간 재확인). yt-dlp가 없으면 null + 경고. 메타데이터를 못 받은 영상은 다음 실행에서 다시 시도
 - GitHub: 트렌딩 주간 페이지(실행 시점 목록, 실행 주차로 저장, 0건이면 실패), 추적 레포 `releases.atom`(기간 안), README 앞 3,000자는 추적 레포 + 키워드에 걸린 트렌딩 레포만(GitHub API, `GITHUB_TOKEN` 있으면 사용)
+- 레포 키워드: 설명(제목 자리), 토픽, README(이름은 넣지 않음). 같은 주에 다시 돌리면 그 주 트렌딩 목록을 바꾼다
 - 키워드: 제목, 요약, 본문 앞 2,000자. 영어 별칭은 단어 경계, 한국어는 부분 문자열. 점수 = 제목 키워드 × 3 + 본문 키워드 × 1. 제외어가 있고 제목에 포함 키워드가 없으면 filtered. 걸러진 항목도 이유와 함께 저장
 - 실행 기록: `runs`(kind='collect') 1행, 소스마다 `steps`(kind='code', 실패면 attention)와 `fetch_log`
 - 칠판 테이블(`PRAGMA user_version` 1): sources, fetch_log, items, item_texts(본문, 8주 뒤 지움), item_keywords, links, videos, repos, repo_trending

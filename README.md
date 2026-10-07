@@ -5,7 +5,7 @@
 [![CI](https://github.com/jjiisub/trendsit/actions/workflows/ci.yml/badge.svg)](https://github.com/jjiisub/trendsit/actions/workflows/ci.yml)
 [예시 사이트](https://trendsit.jiseop.com) · 위키(준비 중) · [프로젝트 맥락](docs/CONTEXT.md)
 
-> 현재 상태(2026-10-07): **S0 바탕 완료.** LLM 실행 기반, 비용·예산 장치, 실행 기록, 평가 틀이 동작한다. 수집(S1)부터 차례로 붙인다. 예시 사이트는 예시 데이터로 만든 화면이다.
+> 현재 상태(2026-10-07): **S1 수집 완료.** 글 6곳, 유튜브, GitHub 트렌딩을 기간으로 수집(RSS가 짧으면 백필)해 본문, 링크 종류, 키워드까지 저장한다. 그 위의 LLM 역할(1차 요약, 원본 추적 등)은 S2부터 붙인다. 예시 사이트는 예시 데이터로 만든 화면이다.
 
 ## 1. 왜 만들었나
 - 개발자로 일하며 새 기술을 따라가려면 블로그, 뉴스, 발표 영상, GitHub를 매주 따로 돌아야 했다(주 3시간 안팎)
@@ -77,7 +77,7 @@ uv run python -m trendsit cost --spec S0       # 사용액과 남은 예산
 |---|---|---|---|
 | S0 | `repo_oneliner` 픽스처 10개(generate) | 코드 채점 10/10, 정확성 평균 4.8 / 5(1점 0개), 구체성 4.9, 표현 5.0 | S0 전체 $0.052 (상한 $0.15) |
 | S0 | `lookup_agent` 도구 루프 5건(smoke) | 5/5. 깊이 상한 밖 문서는 코드가 거부 | $0 |
-| S1 | 수집 9/28~10/4(한 주) | 글 491건(GeekNews 376, AI타임스 79, OpenAI 15, Simon Willison 17, Anthropic 2, DeepMind 2), 영상 17편, 릴리스 18건, 트렌딩 11개. 6곳 모두 기간을 덮음(백필 GeekNews·AI타임스·유튜브), 중복 0. 본문 추출 성공 GeekNews 77%(사이트의 브라우저 확인으로 토픽 페이지가 막혀 원문 글로 대체), 나머지 글 소스 93~100%. 키워드 통과 207건 | LLM 없음 $0 |
+| S1 | 수집 9/28~10/4(한 주) | 글 492건(GeekNews 376, AI타임스 79, OpenAI 15, Simon Willison 18, Anthropic 2, DeepMind 2), 영상 17편, 릴리스 18건, 트렌딩 11개. 6곳 모두 기간을 덮음(백필 GeekNews·AI타임스·유튜브), 중복 0. 본문 추출 성공 GeekNews 77%(사이트의 브라우저 확인으로 토픽 페이지가 막혀 원문 글로 대체), 나머지 글 소스 93~100%. 키워드 통과 207건 | LLM 없음 $0 |
 | S1 | `repo_oneliner` 새 프롬프트 형식 + 예/아니오 채점(generate) | 코드 채점 8/10(근거 구절 검사에서 2건 실패), judge 판정 Q1·Q2·Q3 8/8(잠정, 사람 라벨 전) | S1 $0.035 (상한 $0.05) |
 
 - 같은 입력 재실행은 캐시로 0원. 채점 기준은 S1부터 예/아니오 질문 + 사람 라벨 일치율로 바뀐다

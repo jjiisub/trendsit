@@ -3,7 +3,7 @@
 import gzip
 import json
 import shutil
-from datetime import date
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
 import httpx
@@ -79,6 +79,26 @@ def run_window(tmp_path, transport=None, data_dir=None):
     res = collect(date.fromisoformat(meta["since"]), date.fromisoformat(meta["until"]), data_dir=data_dir or tmp_path,
                   fetcher=fetcher_for(transport), ytdlp=fake_ytdlp("window"), max_items=meta["max_items"])
     return res, meta, transport
+
+
+def independent_in_range(transport: "FixtureTransport", day: str) -> dict[str, int]:
+    """녹화한 피드를 feedparser로 직접 읽어 한국 시간 게시일이 day인 항목 수(수집 코드를 쓰지 않음)."""
+    from datetime import timezone
+
+    import feedparser
+
+    kst = timezone(timedelta(hours=9))
+    out = {}
+    for src in config.load("sources.yaml").text:
+        path, _ = transport.index[src.feed]
+        feed = feedparser.parse(gzip.decompress(path.read_bytes()))
+        n = 0
+        for e in feed.entries:
+            t = e.get("published_parsed") or e.get("updated_parsed")
+            if t and datetime(*t[:6], tzinfo=UTC).astimezone(kst).date().isoformat() == day:
+                n += 1
+        out[src.id] = n
+    return out
 
 
 def count(db: DB, sql: str, *args) -> int:
@@ -231,8 +251,13 @@ def test_offline_collect_matches_recording(tmp_path):
     assert count(db, "SELECT COUNT(*) FROM runs WHERE kind='collect'") == 1
     assert count(db, "SELECT COUNT(*) FROM steps WHERE kind='code' AND role='collect'") == len(meta["result"])
     assert count(db, "SELECT COUNT(*) FROM fetch_log") == len(meta["result"])
-    row = db.conn.execute("SELECT day, week, published_at FROM items WHERE source_id='openai' LIMIT 1").fetchone()
-    assert row["day"] == meta["since"] and row["week"] == "2026-W41" and row["published_at"].endswith("+09:00")
+    for row in db.conn.execute("SELECT day, week, published_at FROM items WHERE source_id != 'github_releases'"):
+        assert row["day"] == meta["since"] and row["week"] == "2026-W41" and row["published_at"].endswith("+09:00")
+    # 기간 안 후보 수(개발용 상한 적용 전)를 녹화 결과가 아니라 피드에서 직접 센 값과 비교한다
+    for sid, expect in independent_in_range(transport, meta["since"]).items():
+        assert res.sources[sid]["n_in_range"] >= expect, sid  # 백필로 더해질 수 있어 하한
+        if sid in ("openai", "deepmind", "anthropic"):  # RSS만으로 덮는 소스는 같아야 함
+            assert res.sources[sid]["n_in_range"] == expect, sid
 
 
 def test_collect_twice_is_idempotent(tmp_path):
@@ -270,7 +295,13 @@ def test_day_archive_pages_until_short_page(tmp_path):
     collect(date.fromisoformat(meta["since"]), date.fromisoformat(meta["until"]), only="geeknews", data_dir=tmp_path,
             fetcher=fetcher_for(t), max_items=meta["max_items"])
     pages = [u for u in t.requested if "past?day=" in u]
-    assert pages == [f"https://news.hada.io/past?day={meta['since']}&page={i}" for i in range(1, len(pages) + 1)]
+    # 아카이브는 시작일 하루 전부터(UTC 날짜 아카이브 대응), 날마다 1페이지부터 20건 미만 페이지까지
+    start = date.fromisoformat(meta["since"])
+    days = sorted({u.split("day=")[1].split("&")[0] for u in pages})
+    assert days[0] == (start - timedelta(days=1)).isoformat() and days[-1] == meta["since"]
+    for d in days:
+        nums = [int(u.rsplit("=", 1)[1]) for u in pages if f"day={d}&" in u]
+        assert nums == list(range(1, len(nums) + 1))
 
 
 def test_list_pages_stops_before_since(tmp_path):
@@ -412,3 +443,107 @@ def test_geeknews_browser_check_stops_and_uses_origin(tmp_path):
     assert sum("/topic?id=" in u for u in calls) == 1  # 확인 페이지를 본 뒤로는 토픽 페이지를 다시 요청하지 않음
     db = c.db
     assert count(db, "SELECT COUNT(*) FROM links WHERE role='origin_candidate'") == 2
+
+
+# ---------- 리뷰 반영 회귀 테스트 ----------
+def _collector(tmp_path, handler):
+    f = Fetcher(None, use_cache=False, transport=httpx.MockTransport(handler), resolver=lambda h: [PUBLIC_IP],
+                sleep=lambda s: None)
+    return TextCollector(DB(tmp_path / "t.db"), f, config.load("keywords.yaml"), config.load("link_kinds.yaml"), run_id="r")
+
+
+ARTICLE = "<html><body><article><h1>T</h1>" + "<p>원문 본문 문장입니다. " * 40 + "</p></article></body></html>"
+
+
+def test_rss_only_geeknews_finds_origin_from_archive_when_blocked(tmp_path):
+    """RSS로만 얻은 GeekNews 글도 브라우저 확인이 나오면 그날 목록에서 원문 링크를 찾아 원문을 받는다."""
+    from trendsit.collect.text import Candidate, SourceStats
+
+    lst = ("<div class='topic_row' data-topic-state-id='7'><div class='topictitle'><a href='https://blog.example.com/a' "
+           "class='topic-title-link'><h2>글</h2></a></div><div class='topicdesc'><a href='topic?id=7'>요약 앞부분</a></div>"
+           "<div class='topicinfo'><time datetime='2026-10-06T10:00:00+09:00'>x</time></div></div>")
+
+    def handler(r):
+        if r.url.path == "/robots.txt":
+            return httpx.Response(404)
+        if r.url.path == "/topic":
+            return httpx.Response(302, headers={"location": "/topic_browser_check?return=x"})
+        if r.url.path == "/topic_browser_check":
+            return httpx.Response(200, headers={"content-type": "text/html"}, text='<form id="browser-check"></form>')
+        if r.url.path == "/past":
+            return httpx.Response(200, headers={"content-type": "text/html"}, text=lst)
+        return httpx.Response(200, headers={"content-type": "text/html"}, text=ARTICLE)
+    c = _collector(tmp_path, handler)
+    src = next(s for s in config.load("sources.yaml").text if s.id == "geeknews")
+    c._range, c._src = (date(2026, 10, 6), date(2026, 10, 6)), src
+    st = SourceStats("geeknews")
+    cand = Candidate(url="https://news.hada.io/topic?id=7", title="글",
+                     published=datetime.fromisoformat("2026-10-06T10:00:00+09:00"))  # RSS 항목: 원문 링크 없음
+    c._save(src, cand, st)
+    assert st.body == {"ok": 1}
+    assert count(c.db, "SELECT COUNT(*) FROM links WHERE role='origin_candidate' AND url='https://blog.example.com/a'") == 1
+
+
+def test_out_of_range_date_from_page_is_not_saved(tmp_path):
+    """목록에 날짜가 없던 후보는 글 페이지에서 얻은 날짜로 기간을 다시 보고, 밖이면 저장하지 않는다."""
+    from trendsit.collect.text import Candidate, SourceStats
+
+    old = ('<html><head><meta property="article:published_time" content="2025-01-15T09:00:00Z"></head>'
+           '<body><article>' + "<p>본문입니다. " * 50 + "</p></article></body></html>")
+    c = _collector(tmp_path, lambda r: httpx.Response(404) if r.url.path == "/robots.txt" else
+                   httpx.Response(200, headers={"content-type": "text/html"}, text=old))
+    src = next(s for s in config.load("sources.yaml").text if s.id == "anthropic")
+    c._range, c._src = (date(2026, 9, 28), date(2026, 10, 4)), src
+    st = SourceStats("anthropic")
+    c._save(src, Candidate(url="https://www.anthropic.com/news/old", title=None, published=None), st)
+    assert st.n_out_of_range == 1 and st.n_new == 0
+    assert count(c.db, "SELECT COUNT(*) FROM items") == 0
+
+
+def test_list_backfill_not_reaching_since_is_not_covered(tmp_path):
+    """목록 백필이 --since까지 닿지 못하면(페이지 넘김 없음, 날짜 없음) 기간 덮음이 아니다."""
+    from trendsit.collect.text import SourceStats
+
+    c = _collector(tmp_path, lambda r: httpx.Response(404) if r.url.path == "/robots.txt" else
+                   httpx.Response(200, headers={"content-type": "text/html"}, text='<a href="/news/a">a</a>'))
+    src = next(s for s in config.load("sources.yaml").text if s.id == "anthropic")
+    st = SourceStats("anthropic")
+    rows = c._list_pages(src, date(2026, 9, 28), date(2026, 10, 4), st)
+    assert len(rows) == 1 and st.covered is False and st.notes
+
+
+def test_archive_error_marks_not_covered(tmp_path):
+    from trendsit.collect.text import SourceStats
+
+    c = _collector(tmp_path, lambda r: httpx.Response(404) if r.url.path == "/robots.txt" else httpx.Response(500))
+    src = next(s for s in config.load("sources.yaml").text if s.id == "geeknews")
+    st = SourceStats("geeknews")
+    c._archive_day(src, date(2026, 10, 1), st)
+    assert st.covered is False and st.errors
+
+
+def test_robots_5xx_or_unreachable_disallows_and_is_recorded():
+    def handler(r):
+        if r.url.path == "/robots.txt":
+            return httpx.Response(503)
+        return httpx.Response(200, headers={"content-type": "text/html"}, text="ok")
+    f = _mock(handler)
+    res = f.fetch("https://public.example/page", kind="page")
+    assert res.error.startswith("robots.txt 확인 불가") and f.blocked_by_robots
+    assert "https://public.example" in f.robots_unavailable
+    n_before = len(f.blocked_by_robots)
+    f.fetch("https://public.example/page2", kind="page")  # 출처마다 한 번만 확인
+    assert len(f.blocked_by_robots) == n_before + 1
+
+
+def test_missing_content_type_rejected():
+    f = _mock(lambda r: httpx.Response(200, content=b"%PDF-1.7 binary"))
+    assert f.fetch("https://public.example/x", kind="feed").error == "형식 헤더 없음"
+
+
+def test_retry_after_http_date():
+    from trendsit.collect.fetch import _retry_after
+
+    assert _retry_after("7") == 7.0
+    assert _retry_after("Wed, 21 Oct 2015 07:28:00 GMT") == 0.0  # 지난 시각이면 바로
+    assert _retry_after("garbage") is None

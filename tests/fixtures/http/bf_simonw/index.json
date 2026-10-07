@@ -22,5 +22,11 @@
   "status": 200,
   "content_type": "text/html; charset=utf-8",
   "location": null
+ },
+ "https://simonwillison.net/2026/Sep/25/": {
+  "file": "1e75748f904d415c9ed8.gz",
+  "status": 200,
+  "content_type": "text/html; charset=utf-8",
+  "location": null
  }
 }

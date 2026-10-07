@@ -298,5 +298,65 @@
   "status": 200,
   "content_type": "application/atom+xml; charset=utf-8",
   "location": null
+ },
+ "https://news.hada.io/past?day=2026-10-05&page=1": {
+  "file": "58c938cc55ec9528d079.gz",
+  "status": 200,
+  "content_type": "text/html; charset=UTF-8",
+  "location": null
+ },
+ "https://news.hada.io/past?day=2026-10-05&page=2": {
+  "file": "640ec4812ff3aa133ca9.gz",
+  "status": 200,
+  "content_type": "text/html; charset=UTF-8",
+  "location": null
+ },
+ "https://news.hada.io/past?day=2026-10-05&page=3": {
+  "file": "338e0dd1e7c6677f33b8.gz",
+  "status": 200,
+  "content_type": "text/html; charset=UTF-8",
+  "location": null
+ },
+ "https://news.hada.io/past?day=2026-10-05&page=4": {
+  "file": "af05ba3bc5d879aa1839.gz",
+  "status": 200,
+  "content_type": "text/html; charset=UTF-8",
+  "location": null
+ },
+ "https://news.hada.io/past?day=2026-10-06&page=1": {
+  "file": "61c5abd35135dd39c637.gz",
+  "status": 200,
+  "content_type": "text/html; charset=UTF-8",
+  "location": null
+ },
+ "https://news.hada.io/past?day=2026-10-06&page=2": {
+  "file": "5dea760a9b9a82dd8bfe.gz",
+  "status": 200,
+  "content_type": "text/html; charset=UTF-8",
+  "location": null
+ },
+ "https://news.hada.io/past?day=2026-10-06&page=3": {
+  "file": "0ce6f413fa7d78c71ab5.gz",
+  "status": 200,
+  "content_type": "text/html; charset=UTF-8",
+  "location": null
+ },
+ "https://news.hada.io/past?day=2026-10-06&page=4": {
+  "file": "57e66d1c54f21e1d2be5.gz",
+  "status": 200,
+  "content_type": "text/html; charset=UTF-8",
+  "location": null
+ },
+ "https://www.aitimes.com/news/articleList.html?sc_sdate=2026-10-06&sc_edate=2026-10-06&view_type=sm": {
+  "file": "39fa4567265680f9f4dc.gz",
+  "status": 200,
+  "content_type": "text/html; charset=utf-8",
+  "location": null
+ },
+ "https://www.aitimes.com/news/ajaxArticlePaging.php?page=2&list_per_page=20&page_per_page=10&sc_sdate=2026-10-06&sc_edate=2026-10-06&sc_order_by=E&view_type=sm": {
+  "file": "4c2aaabaefb725296619.gz",
+  "status": 200,
+  "content_type": "text/javascript; charset=utf-8",
+  "location": null
  }
 }
