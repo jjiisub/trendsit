@@ -77,17 +77,22 @@ def build(since: date, until: date, *, data_dir: Path | None = None, out: Path |
         skips = {k: q("SELECT COUNT(*) FROM items WHERE source_id=? AND body_status=? AND day BETWEEN ? AND ?",
                       (s.id, k, *rng)).fetchone()[0] for k in SKIP}
         n_skip = sum(skips.values())
+        n_noattempt = q("SELECT COUNT(*) FROM items WHERE source_id=? AND body_status='skipped' AND day BETWEEN ? AND ?",
+                        (s.id, *rng)).fetchone()[0]  # --no-body로 시도하지 않은 것도 분모에서 뺀다
         npass = q("SELECT COUNT(*) FROM items WHERE source_id=? AND filter_status='pass' AND day BETWEEN ? AND ?",
                   (s.id, *rng)).fetchone()[0]
         fetch_mode = getattr(s, "fetch", "rss + yt-dlp")
         method = s.backfill.method
         pages = d.get("backfill_pages", 0)
         covered = bool(lg) and lg.get("status") != "failed" and d.get("covered", False)  # 이 기간 기록이 없으면 아니오
+        daily_days = d.get("daily_days") or []
+        covered_txt = ("일부(평소 목록: " + ", ".join(x[5:] for x in daily_days) + ")") if covered and daily_days else (
+            "예" if covered else "아니오")
         reasons = d.get("fetch_errors") or {}
         memo = "; ".join([*(d.get("notes") or []), *(d.get("errors") or [])[:3],
-                          *(f"{k} {v}건" for k, v in sorted(reasons.items(), key=lambda kv: -kv[1])[:5])])
+                          *(f"실패: {k} {v}건" for k, v in sorted(reasons.items(), key=lambda kv: -kv[1])[:5])])
         memo = memo or (lg.get("error") or "")
-        denom = n - n_skip
+        denom = n - n_skip - n_noattempt
         rate = ok / denom if denom else 0
         if fetch_mode in ("feed_summary", "feed_title", "list_origin") and denom and rate < THRESHOLDS["body_rate"]:
             body_fail.append(f"{s.id} {rate:.0%}")
@@ -95,9 +100,10 @@ def build(since: date, until: date, *, data_dir: Path | None = None, out: Path |
         if d.get("n_self_excluded"):
             memo = f"자기 글(Show GN 등) {d['n_self_excluded']}건 제외; " + memo
         pages_txt = f"{method}, {pages}" + (f" + 평소 목록 {d['list_pages']}" if d.get("list_pages") else "")
-        L.append(f"| {s.id} | {fetch_mode} | {d.get('rss_oldest') or '-'} | {'예' if covered else '아니오'} | "
+        L.append(f"| {s.id} | {fetch_mode} | {d.get('rss_oldest') or '-'} | {covered_txt} | "
                  f"{pages_txt} | {n} | {nb} | {_pct(ok, denom)} | {skip_txt} | {_pct(npass, n)} | {memo[:220] or '-'} |")
-        verdict.setdefault("covered", {})[s.id] = bool(covered) and lg.get("status") != "failed"
+        # 평소 목록(점수순 일부)으로만 받은 날짜가 있으면 하루치 전체를 덮은 것이 아니다
+        verdict.setdefault("covered", {})[s.id] = bool(covered) and lg.get("status") != "failed" and not daily_days
     L.append("")
 
     # 1-1. 하루 신규 건수(게시일 기준). 페이지 수나 방식을 조정할 근거
@@ -187,7 +193,8 @@ def build(since: date, until: date, *, data_dir: Path | None = None, out: Path |
     denom = len(gn)
     got = sum(1 for r in gn if r["o"])
     L += ["## 6. 링크", "", "| 종류 | 링크 수 |", "|---|---|", *[f"| {r['kind']} | {r['n']} |" for r in dist], "",
-          f"- GeekNews 원문 링크 확보율: {_pct(got, denom)} (원문 링크가 GeekNews 자신인 글 {n_self}건은 수집에서 뺌)",
+          f"- GeekNews 원문 링크 확보율: {_pct(got, denom)} (원문 링크가 GeekNews 자신인 글 {n_self}건은 수집에서 뺌. "
+          "목록에서 원문 링크가 있는 글만 수집하므로 구조상 100%이고, 실제 확인은 자기 글 판정이 맞는지)",
           "- 원문이 Hacker News 토론 페이지인 GeekNews 글은 토론 속 링크가 많이 잡힘(curation 링크 대부분). "
           "S3 원본 추적에서 거를 대상", ""]
     verdict["origin_rate"] = got / denom if denom else None

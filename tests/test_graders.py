@@ -103,3 +103,10 @@ def test_clean_markdown():
     t = ('<p align="center"><img src="x.png"></p>\n# Title\n[![badge](b.svg)](ci)\n'
          '**Bold [link](http://a)** and [WSGI] and `code`.<br/>Next\n[WSGI]: https://wsgi.org')
     assert clean_markdown(t) == "Title\n\nBold link and WSGI and code.\nNext"
+
+
+def test_basis_cannot_span_readme_and_description():
+    inp = {"readme_head": "A tool for X", "description": "Y helper"}
+    out = {"basis": "for X Y helper", "oneliner": "도구", "log": "l", "attention": False}
+    r = graders.code_grade("repo_oneliner", inp, out, None, {})
+    assert not r["passed"] and any("basis" in f for f in r["failed"])

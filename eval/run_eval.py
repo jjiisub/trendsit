@@ -194,6 +194,22 @@ def write_quality(spec: str) -> Path:
             lines += ["- judge 행은 상한선 측정용. 생성과 채점이 같은 모델이라 자기 출력 채점 편향 가능성이 있음"]
         lines.append("")
 
+        # 마지막 전체 실행보다 새 부분 실행(중단, --limit)이 있으면 그것을 따로 보여 준다(기준이 바뀐 재측정 등)
+        newest = rr[-1]
+        if not _is_full(newest) and newest is not latest.get(newest["model_alias"]):
+            s2 = newest["summary"]
+            qs = ", ".join(f"{q} {v['pass']}/{v['n']}" for q, v in s2.get("questions", {}).items())
+            lines += [f"### 가장 최근 실행(부분, {newest['at']}, 프롬프트 `{newest['prompt_hash']}`)", "",
+                      f"- {newest.get('note') or ''}",
+                      f"- 픽스처 {s2['n']}개까지 진행, 코드 통과 {s2['code_pass']}/{s2['n']}" + (f", {qs}" if qs else ""),
+                      f"- 멈춘 이유: {_cell(newest.get('stopped') or '부분 실행(--limit)')}", ""]
+            lines += ["| 픽스처 | 출력 | 판정 |", "|---|---|---|"]
+            for x in newest["results"]:
+                val = (x["output"] or {}).get("oneliner" if role == "repo_oneliner" else "doc_id", x.get("error"))
+                lines.append(f"| {x['id']} | {_cell(val)} | {_tag(x) or '채점 전'} "
+                             + (f"({_cell('; '.join(x['code']['failed']))})" if x["code"]["failed"] else "") + " |")
+            lines.append("")
+
         if agree and agree["n_rows"]:
             lines += [f"### judge·사람 일치율 (라벨 {agree['n_rows']}건, {agree['report']})", "",
                       "| 질문 | 일치 | 비교 수 | 일치율 |", "|---|---|---|---|"]
@@ -222,7 +238,9 @@ def write_quality(spec: str) -> Path:
             lines.append("")
 
         gen = latest.get("generate") or next(iter(latest.values()))
-        lines += [f"### 가장 나쁜 사례 3개 ({gen['model_alias']}, {gen['at']})", ""]
+        if not _is_full(newest) and newest["model_alias"] == gen["model_alias"] and newest["at"] > gen["at"]:
+            gen = newest  # 가장 최근 기준(부분 실행이라도)의 사례를 보여 준다
+        lines += [f"### 가장 나쁜 사례 3개 ({gen['model_alias']}, {gen['at']}{', 부분 실행' if not _is_full(gen) else ''})", ""]
         for i, x in enumerate(_worst(gen["results"]), 1):
             brief = {k: (_brief(v)) for k, v in x["input"].items()}
             lines += [f"{i}. **{x['id']}**",

@@ -51,7 +51,7 @@ GITHUB_TOKEN=...             # 선택. 픽스처 README 수집에만
 - **URL은 모두 `collect/fetch.py`의 safe_fetch로만.** http/https만, DNS로 푼 주소가 공인 주소가 아니면 거부(사설, 루프백, 링크로컬, 멀티캐스트, 예약, IPv4·IPv6), 리다이렉트마다 다시 검사(최대 5회). 연결 5초, 읽기 15초, 5MB, 허용 형식(html, xml, rss/atom, json, text, GitHub raw)
 - 예의: User-Agent `TrendsIT/0.1 (+https://trendsit.jiseop.com)`, 같은 도메인은 1초에 1번, 429·5xx는 지수 백오프 3회(`Retry-After` 존중). robots.txt는 목록, 아카이브, 글 페이지에서 확인하고 막히면 가져오지 않고 기록(피드와 GitHub API는 기계용이라 확인 생략). robots.txt가 5xx거나 닿지 않으면 그 출처는 막힌 것으로 본다(RFC 9309). 형식 헤더가 없는 응답은 거부
 - HTTP 캐시 `data/http_cache/`(ETag, Last-Modified 조건부 요청). `--no-http-cache`로 끔
-- 글: RSS → 요청 시작일이 RSS의 가장 오래된 항목보다 앞서면 `sources.yaml`의 `backfill`로 거슬러 읽음 → 기간 필터 → 본문(`feed_full`은 피드 본문, 나머지는 원글을 trafilatura로, GeekNews는 토픽 페이지의 한국어 요약 + 원문 링크) → 링크 종류(`link_kinds.yaml`) → 키워드(`keywords.yaml`) → 칠판
+- 글: RSS → 요청 시작일이 RSS의 가장 오래된 항목보다 앞서면 `sources.yaml`의 `backfill`로 거슬러 읽음 → 기간 필터 → 본문(`feed_full`은 피드 본문, 나머지는 원글을 trafilatura로, GeekNews는 아래 list_origin 방식) → 링크 종류(`link_kinds.yaml`) → 키워드(`keywords.yaml`) → 칠판
   - 백필 조건: 시작일이 RSS의 가장 오래된 날과 같거나 앞서면(그날을 일부만 담을 수 있어서)
   - `day_archive`: `archive_tz: utc`면 시작일 하루 전부터(Simon Willison), 아니면 시작일부터 날짜마다 아카이브(`{date}` 또는 `{yyyy}/{Mon}/{d}`, `{page}`가 있으면 20건 미만 페이지까지)
   - `list_pages`: 1페이지는 `url_template`, 2페이지부터 `page_template`(Referer로 1페이지를 보냄). 날짜가 `--since`보다 앞선 항목이 나오면 멈춤. 목록 해석 실패는 3초 뒤 한 번 더

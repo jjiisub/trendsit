@@ -28,6 +28,11 @@ def _int(text: str) -> int | None:
     return int(m.group().replace(",", "")) if m else None
 
 
+def count_trending_articles(html: str) -> int:
+    """페이지에 보이는 레포 행 수(파서가 거르기 전). Q2 '보이는 전부'를 저장했는지 비교하는 기준."""
+    return len(doc(html).xpath("//article[contains(@class,'Box-row')]"))
+
+
 def parse_trending(html: str) -> list[dict[str, Any]]:
     """레포마다 full_name, description, language, stars_total, forks, stars_this_week, rank."""
     rows = []
@@ -77,7 +82,7 @@ class GithubCollector:
         if not res.ok:
             raise SourceFailed(f"트렌딩 페이지 실패: {res.error}")
         rows = parse_trending(res.text or "")  # 주간 페이지에 보이는 전부(S1 Q2)
-        st.page_rows = len(rows)
+        st.page_rows = count_trending_articles(res.text or "")  # 거르기 전 행 수. 저장 수와 다르면 리포트가 미달
         if not rows:
             raise SourceFailed("트렌딩 0건: 페이지 구조가 바뀌었을 수 있음")
         week = iso_week(datetime.now(KST).date())

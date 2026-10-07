@@ -42,7 +42,7 @@ GitHub 레포가 무엇을 하는 레포인지 한 문장으로 쓴다. 이 문�
 4. `attention`: 근거가 없거나 얇으면, 또는 README와 description이 서로 다른 내용이면 true
 
 ## 막혔을 때
-README에 기능을 말하는 구절이 하나도 없으면(제목, 배지, 링크뿐) `basis`와 `oneliner`를 빈 문자열로 두고 `attention`을 true로 둔다. description만 보고 문장을 지어내지 않는다. 빈칸은 사람이 확인할 항목이 되므로 정상 결과다.
+README에도 description에도 기능을 말하는 구절이 없으면(제목, 링크 이름, "My cool project" 같은 문구뿐) `basis`와 `oneliner`를 빈 문자열로 두고 `attention`을 true로 둔다. 근거 없이 문장을 지어내지 않는다. 빈칸은 사람이 확인할 항목이 되므로 정상 결과다.
 
 ## 예시
 <examples>

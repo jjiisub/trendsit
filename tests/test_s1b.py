@@ -544,7 +544,17 @@ def test_geeknews_collects_from_lists_only(tmp_path):
     d = res.sources["geeknews"]
     db = DB(tmp_path / "trendsit.db")
     n = count(db, "SELECT COUNT(*) FROM items WHERE source_id='geeknews'")
-    assert n == d["n_in_range"] and n + d["n_self_excluded"] >= n
+    assert n == d["n_in_range"]
+    # 자기 글 제외 건수를 픽스처 목록에서 직접 센 값과 비교(T1)
+    from trendsit.collect.sites import geeknews
+
+    own = set()
+    for u, (pth, _) in t.index.items():
+        if "past?day=" in u:
+            for r in geeknews.parse_list(gzip.decompress(pth.read_bytes()).decode()):
+                if r["origin_url"] is None and r["published"] and r["published"].date().isoformat() == meta["since"]:
+                    own.add(r["topic_id"])
+    assert d["n_self_excluded"] == len(own) > 0
     assert count(db, "SELECT COUNT(*) FROM items WHERE source_id='geeknews' AND external_id LIKE 'topic:%'") == n
     row = db.conn.execute("SELECT meta_json FROM items WHERE source_id='geeknews' LIMIT 1").fetchone()
     m = json.loads(row["meta_json"])
@@ -608,3 +618,91 @@ def test_trending_verdict_requires_all_page_rows(tmp_path):
     path, verdict = build(day, day, data_dir=tmp_path, out=tmp_path / "r.md")
     assert verdict["trending"] == verdict["trending_page_rows"] > 0
     assert "| 트렌딩 |" in path.read_text() and "| 통과 |" in path.read_text().split("| 트렌딩 |")[1].split("\n")[0]
+
+
+# ---------- 2차 리뷰 반영 ----------
+def _gn_page(rows: list[tuple[int, str, str]]) -> str:
+    tpl = ("<div class='topic_row' data-topic-state-id='{i}'><div class='topictitle'><a href='{href}' "
+           "class='topic-title-link'><h2>t{i}</h2></a></div><div class='topicinfo'><span id='tp{i}'>1</span>"
+           "<time datetime='{when}'>x</time><a data-topic-comment-count='0'>c</a></div></div>")
+    return "".join(tpl.format(i=i, href=h, when=w) for i, h, w in rows)
+
+
+def test_daily_vs_archive_boundary_and_interval(tmp_path):
+    """어제 이후는 평소 목록(메인), 그 앞 날짜만 날짜별 목록. 목록 요청은 request_interval_s 간격(T3)."""
+    waits = []
+    main = _gn_page([(1, "https://a.example/1", "2026-10-06T10:00:00+09:00")])
+    arch = _gn_page([(2, "https://a.example/2", "2026-10-04T10:00:00+09:00")])
+    seen = []
+
+    def handler(r):
+        seen.append(str(r.url))
+        if r.url.path == "/robots.txt":
+            return httpx.Response(404)
+        if r.url.host == "news.hada.io":
+            return httpx.Response(200, headers={"content-type": "text/html"}, text=main if r.url.path == "/" else arch)
+        return httpx.Response(200, headers={"content-type": "text/html"}, text=ARTICLE)
+    f = Fetcher(None, use_cache=False, transport=httpx.MockTransport(handler), resolver=lambda h: [PUBLIC_IP],
+                sleep=waits.append, clock=lambda: 0.0)
+    c = TextCollector(DB(tmp_path / "t.db"), f, config.load("keywords.yaml"), config.load("link_kinds.yaml"),
+                      run_id="r", today=date(2026, 10, 7))
+    src = next(s for s in config.load("sources.yaml").text if s.id == "geeknews")
+    st = c.collect(src, date(2026, 10, 4), date(2026, 10, 7))
+    hada = [u for u in seen if "news.hada.io" in u and "robots" not in u]
+    assert any("past?day=2026-10-04" in u for u in hada) and any("past?day=2026-10-05" in u for u in hada)
+    assert not any("past?day=2026-10-06" in u or "past?day=2026-10-07" in u for u in hada)
+    assert any(u.startswith("https://news.hada.io/?page=1") for u in hada)
+    assert st.daily_days == ["2026-10-06", "2026-10-07"]
+    assert waits.count(5.0) >= len(hada) - 1  # 목록 요청 사이 5초
+
+
+def test_empty_list_page_is_error(tmp_path):
+    def handler(r):
+        if r.url.path == "/robots.txt":
+            return httpx.Response(404)
+        return httpx.Response(200, headers={"content-type": "text/html"}, text="<html>바뀐 화면</html>")
+    c = _collector(tmp_path, handler)
+    c.today = date(2026, 10, 7)
+    src = next(s for s in config.load("sources.yaml").text if s.id == "geeknews")
+    st = c.collect(src, date(2026, 10, 3), date(2026, 10, 7))
+    assert st.covered is False and any("0행" in e for e in st.errors)
+
+
+def test_robots_unavailable_counts_as_failure(tmp_path):
+    """robots.txt를 못 읽은 것(5xx, 타임아웃)은 의도적 건너뜀이 아니라 실패(T4)."""
+    from trendsit.collect.text import Candidate, SourceStats
+
+    def handler(r):
+        if r.url.path == "/robots.txt":
+            return httpx.Response(503)
+        return httpx.Response(200, headers={"content-type": "text/html"}, text=ARTICLE)
+    c = _collector(tmp_path, handler)
+    src = next(s for s in config.load("sources.yaml").text if s.id == "geeknews")
+    c._range = (date(2026, 10, 3), date(2026, 10, 3))
+    st = SourceStats("geeknews")
+    c._save(src, Candidate(url="https://news.hada.io/topic?id=1", title="t",
+                           published=datetime.fromisoformat("2026-10-03T10:00:00+09:00"),
+                           extra={"origin_url": "https://down.example/x", "external_id": "topic:1"}), st)
+    assert st.body == {"failed": 1} and not st.skip_reasons
+
+
+def test_self_post_detection_by_host():
+    from trendsit.collect.sites.geeknews import is_own
+
+    assert is_own("topic?id=1") and is_own("https://news.hada.io/topic?id=1") and is_own(None)
+    assert not is_own("https://blog.example.com/post?ref=news.hada.io")
+
+
+def test_trending_verdict_fails_when_a_row_is_dropped(tmp_path):
+    """페이지에 보인 행보다 저장한 행이 적으면(파서가 거른 행) 트렌딩 기준 미달(T2)."""
+    from trendsit.collect.report import build
+
+    url = config.load("sources.yaml").github.trending.url
+    page = ('<article class="Box-row"><h2><a href="/a/b">a/b</a></h2><span>12 stars this week</span></article>'
+            '<article class="Box-row"><h2><a href="/broken">x</a></h2></article>')
+    t = FixtureTransport("window", extra={url: (200, "text/html", page)})
+    _, meta, _ = run_window(tmp_path, transport=t)
+    day = date.fromisoformat(meta["since"])
+    path, verdict = build(day, day, data_dir=tmp_path, out=tmp_path / "r.md")
+    assert verdict["trending_page_rows"] == 2 and verdict["trending"] == 1
+    assert "| 미달 |" in path.read_text().split("| 트렌딩 |")[1].split("\n")[0]

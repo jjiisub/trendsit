@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import re
 from typing import Any
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlsplit
 
 from .common import doc, parse_iso, text_of
 
@@ -15,8 +15,11 @@ BASE = "https://news.hada.io/"
 
 
 def is_own(url: str | None) -> bool:
-    """원문 링크가 GeekNews 자신(Show GN, Ask GN 등 자기 글)."""
-    return not url or url.startswith(("topic?", "/topic")) or "news.hada.io" in url
+    """원문 링크가 GeekNews 자신(Show GN, Ask GN 등 자기 글): 상대 주소이거나 호스트가 news.hada.io(하위 도메인 포함)."""
+    if not url:
+        return True
+    host = (urlsplit(url).hostname or "").lower()
+    return host == "" or host == "news.hada.io" or host.endswith(".news.hada.io")
 
 
 def _int(text: str | None) -> int | None:

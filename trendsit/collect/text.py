@@ -59,6 +59,9 @@ class SourceStats:
     errors: list[str] = field(default_factory=list)
     notes: list[str] = field(default_factory=list)
     fetch_errors: dict[str, int] = field(default_factory=dict)  # 본문 가져오기 실패 이유별 건수
+    skip_reasons: dict[str, int] = field(default_factory=dict)  # 의도적으로 건너뛴 이유별 건수(robots, 형식, 영상)
+    n_undated: int = 0  # 게시 시각이 없어 기간을 판단할 수 없는 목록 행(list_origin)
+    daily_days: list[str] = field(default_factory=list)  # 평소 목록(점수순 일부)으로만 받은 날짜
 
     def summary_text(self) -> str:
         parts = [f"{self.source_id}: 신규 {self.n_new}건"]
@@ -70,6 +73,8 @@ class SourceStats:
         if self.fetch_errors:
             top = sorted(self.fetch_errors.items(), key=lambda kv: -kv[1])[:2]
             parts.append("실패 이유 " + ", ".join(f"{k} {v}건" for k, v in top))
+        if self.skip_reasons:
+            parts.append(f"의도적 건너뜀 {sum(self.skip_reasons.values())}건")
         if self.n_skipped:
             parts.append(f"기존 {self.n_skipped}건 건너뜀")
         if self.n_self_excluded:
@@ -199,7 +204,12 @@ class TextCollector:
         rows: list[Candidate] = []
         if until >= yesterday:
             rows += self._daily_pages(src, st)
-            st.notes.append(f"평소 목록(점수순 {src.daily.max_pages if src.daily else 0}페이지)은 하루치 전체가 아님")
+            d = max(since, yesterday)
+            while d <= until:  # 이 날짜들은 점수순 상위 페이지로만 받았다(하루치 전체가 아님). 리포트가 따로 표시
+                st.daily_days.append(d.isoformat())
+                d += timedelta(days=1)
+            st.notes.append(f"평소 목록(점수순 {src.daily.max_pages if src.daily else 0}페이지)으로 받은 날짜 "
+                            f"{', '.join(st.daily_days)}: 하루치 전체가 아님")
         day, last = since, min(until, yesterday - timedelta(days=1))
         while day <= last:
             rows += [c for c in self._archive_day(src, day, st)]
@@ -207,6 +217,9 @@ class TextCollector:
         merged: dict[str, Candidate] = {}
         for c in rows:
             merged.setdefault(c.extra["external_id"], c)
+        st.n_undated = sum(1 for c in merged.values() if not c.published)
+        if st.n_undated:
+            st.notes.append(f"게시 시각이 없어 기간을 판단할 수 없는 목록 행 {st.n_undated}건(수집 안 함)")
         in_range = [c for c in merged.values() if c.published and since <= to_kst(c.published).date() <= until]
         st.n_self_excluded = sum(1 for c in in_range if not c.extra.get("origin_url"))
         in_range = [c for c in in_range if c.extra.get("origin_url")]
@@ -233,6 +246,9 @@ class TextCollector:
                 c.via = "list"
             out += rows
             if not rows:
+                if page == 1:  # 메인 1페이지가 비면 구조 변경이나 차단 화면 의심(조용히 0건으로 끝내지 않음)
+                    st.errors.append(f"목록 {url}: 200인데 0행(구조 변경이나 확인 화면 의심)")
+                    st.covered = False
                 break
         return out
 
@@ -273,8 +289,17 @@ class TextCollector:
                 break
             rows = self._parse_archive(src, res.text or "", day)
             out += rows
+            if not rows and page in (None, 1) and src.fetch == "list_origin":
+                # GeekNews는 매일 글이 있다. 1페이지 0행은 구조 변경이나 확인 화면 의심
+                st.errors.append(f"백필 {url}: 200인데 0행(구조 변경이나 확인 화면 의심)")
+                st.covered = False
+                break
             if not rows or page is None or len(rows) < 20:  # 빈 페이지나 마지막 페이지
                 break
+        else:
+            if pages and len(pages) > 1:  # 페이지 상한까지 읽고도 끝나지 않음
+                st.covered = False
+                st.notes.append(f"아카이브 {day}가 페이지 상한 {src.backfill.max_pages}에 닿음")
         return out
 
     def _parse_archive(self, src: TextSource, text: str, day: date) -> list[Candidate]:
@@ -356,9 +381,12 @@ class TextCollector:
         st.n_seen += 1
         self._last_error = None
         body, status, links, origin_summary, published = self._body(src, c)
-        if status == "failed" or status.startswith("skip_"):
+        if status == "failed":
             reason = (self._last_error or "본문 추출 실패")[:80]
             st.fetch_errors[reason] = st.fetch_errors.get(reason, 0) + 1
+        elif status.startswith("skip_"):
+            reason = (self._last_error or status)[:80]
+            st.skip_reasons[reason] = st.skip_reasons.get(reason, 0) + 1
         if c.published is None and published is not None:
             c.published = published
             c.published_estimated = published.hour == 0 and published.minute == 0  # 메타데이터가 날짜만 줌
@@ -415,7 +443,7 @@ class TextCollector:
         if not res.ok or not res.text:
             self._last_error = res.error or "본문 없음"
             err = res.error or ""
-            if err.startswith("robots.txt"):
+            if err.startswith("robots.txt가 막음"):  # robots.txt를 못 읽은 경우(타임아웃, 5xx)는 실패로 센다
                 return None, "skip_robots", [], None, None
             if err.startswith("허용 밖 형식"):
                 return None, "skip_type", [], None, None
