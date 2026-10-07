@@ -1,0 +1,10 @@
+[
+  {"video_id": "AAAAAAAAAAA", "mode": "whisper+slides", "start_sec": null, "end_sec": null,
+   "reason": "컨퍼런스 발표, 수동 자막 없음, 슬라이드 수치 많음"},
+  {"video_id": "BBBBBBBBBBB", "mode": "whisper", "start_sec": 0, "end_sec": 3600,
+   "reason": "대담 95분, 앞 60분만"},
+  {"video_id": "CCCCCCCCCCC", "mode": "captions", "start_sec": null, "end_sec": null,
+   "reason": "업로더 한국어 자막 있음, 짧은 소식"},
+  {"video_id": "DDDDDDDDDDD", "mode": "skip", "start_sec": null, "end_sec": null,
+   "reason": "키워드와 무관한 행사 안내"}
+]

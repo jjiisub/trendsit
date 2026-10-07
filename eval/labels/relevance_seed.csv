@@ -1,0 +1,14 @@
+source,title,expected,why
+geeknews,LLM Wiki의 불량 페이지를 Jev로 선별하는 것이 가능할까?,keep,LLM 활용 실무
+geeknews,Pluto - SOTA 스타크래프트 AI,keep,AI 에이전트 사례
+techbridge,[한영자막] 400개 기업 데이터로 본 소프트웨어 개발 AI의 현주소입니다,keep,개발 AI 동향
+techbridge,[한영자막] 팟캐스트 풀버전 - SpaceX에서 매달 수천 개의 PR을 반영하는 방법을 알아봅니다 | Cursor & Grok Bot 개발자 L,keep,코딩 에이전트 실무
+techbridge,AI로 무엇이든 효과적으로 학습하는 방법,keep,AI 활용 경험
+aitimes,"스캐터랩, 캐릭터챗 '제타' 신규 기능 출시...""대화 따라 표정·배경 바뀐다""",keep,AI 서비스 출시
+deepmind,Introducing SynthID Bio,keep,AI 워터마크·안전
+openai,Chatham scales its capital markets expertise with OpenAI,drop,고객 사례 홍보
+anthropic,Barclays scales Claude to upgrade operations and improve client experience,drop,고객 사례 홍보
+anthropic,"Anthropic invests $100 million to train 10,000 engineers and tackle the enterpri",keep,AI 시장 경향
+geeknews,생각을 정리하는 도구로서의 커밋 설명,keep,개발 실무·경험
+aitimes,"텐센트, 오라클서 AI 칩 10만개 임대…규제 피하려 동남아로",keep,AI 시장 경향(인프라)
+aitimes,"알트먼 ""기업공개 압박 없이 AI 안전 확보가 우선""",keep,AI 시장 경향
