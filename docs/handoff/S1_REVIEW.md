@@ -35,7 +35,8 @@
 - 6주차 모델 비교에서 작은 모델의 도구 호출 실패 원인이 중첩 인자 형식이었다. 거부 메시지에 pydantic 오류의 필드 경로(`origin.kind: 허용 값 아님`)를 넣는다. 공통 코어 `agent.py` 수정이므로 0단계 PR에 함께 넣어도 된다
 
 ### M5 키워드 조정 (낮음, 설계 세션)
-- 사용자가 수집 샘플(`reports/S1_collection.md` 5장)을 표시한 결과로 설계 세션이 `config/keywords.yaml`을 고쳐 main에 넣는다. 코드 세션은 keywords.yaml을 고치지 않는다
+- 사용자가 수집 샘플(`reports/S1_collection.md` 5장)을 표시한 결과로 설계 세션이 키워드 안을 만들었다: `docs/handoff/keywords_next.yaml`(키워드 13개)
+- 묶음 A는 2a 첫 커밋에서 이 파일을 `config/keywords.yaml`로 옮긴다(내용은 고치지 않음). 지금 S1 테스트 일부(수집 리포트의 "놓침" 샘플 등)가 실제 `config/keywords.yaml`에 기대고 있어, 키워드가 넓어지면 녹화 픽스처의 걸러진 글이 사라져 깨진다. 같은 커밋에서 이런 테스트를 테스트 전용 키워드 파일(`tests/fixtures/keywords_test.yaml`, 지금 S1 키워드 그대로)로 바꿔 실제 설정과 분리한다. 그 밖에는 코드 세션이 keywords.yaml을 고치지 않는다
 - 방향(2026-10-08 사용자): AI 시장 경향과 개발 실무·경험 글도 관심 범위. 키워드는 넓은 1차 그물로 두고, 정밀한 판단은 S2 임베딩 필터와 글 1차 요약의 관련성으로 한다
 - 묶음 A는 S2 2a에서 바뀐 keywords.yaml로 `collect`의 키워드 판정을 다시 계산하는 명령을 만든다(수집을 다시 하지 않고 저장된 본문으로, `rematch`)
 
