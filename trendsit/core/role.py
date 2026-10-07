@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import hashlib
-import json
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
@@ -15,6 +15,7 @@ from .artifacts import INPUTS, OUTPUTS, RoleInput, RoleOutput
 from .budget import BudgetExceeded
 from .config import ROOT, ConfigError, ModelsConfig, Strict, loc_to_path
 from .llm import LLMError
+from .render import render_data
 
 if TYPE_CHECKING:
     from .context import Ctx
@@ -42,6 +43,8 @@ class RoleSpec(Strict):
     max_tokens: int = Field(gt=0)
     temperature: float = Field(default=0.2, ge=0, le=2)
     includes: list[str] = []
+    task: str = Field(min_length=1)  # user 메시지의 과제 줄
+    core_rules: list[str] = Field(default=[], max_length=3)  # user 메시지 끝에 다시 붙는 핵심 규칙
 
 
 @dataclass
@@ -58,6 +61,13 @@ class Role:
     def name(self) -> str:
         return self.spec.name
 
+    def instructions(self) -> str:
+        """user 메시지에서 자료 뒤에 붙는 부분: 과제 → 핵심 규칙."""
+        text = self.spec.task.strip()
+        if self.spec.core_rules:
+            text += "\n\n핵심 규칙:\n" + "\n".join(f"- {r}" for r in self.spec.core_rules)
+        return text
+
 
 def split_frontmatter(text: str) -> tuple[dict[str, Any], str]:
     if not text.startswith("---"):
@@ -73,13 +83,17 @@ def role_path(name_or_path: str | Path, root: Path = ROOT) -> Path:
     return root / "roles" / f"{name_or_path}.md"
 
 
+def _rel(path: Path, root: Path) -> str:
+    return str(path.relative_to(root)) if path.is_relative_to(root) else str(path)
+
+
 def load_role(name_or_path: str | Path, models: ModelsConfig, root: Path = ROOT,
               extra_includes: tuple[str, ...] = ()) -> Role:
     """앞부분을 검증하고 시스템 프롬프트를 조립한다. 없는 별칭, 출력 클래스, 도구면 ConfigError."""
     from ..tools import TOOLS
 
     path = role_path(name_or_path, root)
-    rel = str(path.relative_to(root)) if path.is_relative_to(root) else str(path)
+    rel = _rel(path, root)
     try:
         head, body = split_frontmatter(path.read_text(encoding="utf-8"))
     except FileNotFoundError as e:
@@ -110,32 +124,60 @@ def load_role(name_or_path: str | Path, models: ModelsConfig, root: Path = ROOT,
         parts.append(inc_path.read_text(encoding="utf-8").strip())
     parts.append(DATA_RULE)
     system_prompt = "\n\n".join(parts)
-    prompt_hash = hashlib.sha256(system_prompt.encode("utf-8")).hexdigest()[:12]
-    return Role(spec, path, body, system_prompt, prompt_hash, INPUTS[spec.input], OUTPUTS[spec.output])
+    role = Role(spec, path, body, system_prompt, "", INPUTS[spec.input], OUTPUTS[spec.output])
+    # 프롬프트 해시 = system + task + core_rules. 입력은 들어가지 않는다(같은 md면 입력이 달라도 같은 해시)
+    role.prompt_hash = hashlib.sha256(f"{system_prompt}\n{role.instructions()}".encode()).hexdigest()[:12]
+    return role
+
+
+# ---------- 역할 md 검사 (COMMON 6.1) ----------
+SECTIONS = ("## 목표", "## 입력", "## 판단 기준", "## 출력", "## 막혔을 때", "## 예시")
+_EXAMPLE = re.compile(r"<example[\s>]")
+_BOLD = re.compile(r"\*\*[^*\n]+\*\*")
+
+
+def lint_body(rel: str, body: str) -> list[ConfigError]:
+    """고정 섹션 6개가 이 순서로 있음(사이에 다른 섹션은 허용), 예시 3~5개, 굵게 강조 1개 이하."""
+    errors = []
+    headings = [line.strip() for line in body.splitlines() if line.startswith("## ")]
+    pos = -1
+    for sec in SECTIONS:
+        idx = next((i for i, h in enumerate(headings) if i > pos and h == sec), None)
+        if idx is None:
+            where = "없음" if sec not in headings else "순서가 틀림"
+            errors.append(ConfigError(rel, sec, f"섹션 {where} (순서: {' / '.join(SECTIONS)})"))
+        else:
+            pos = idx
+    n = len(_EXAMPLE.findall(body))
+    if not 3 <= n <= 5:
+        errors.append(ConfigError(rel, "## 예시", f"<example>이 {n}개 (3~5개여야 함)"))
+    bold = _BOLD.findall(body)
+    if len(bold) > 1:
+        errors.append(ConfigError(rel, "본문", f"굵게 강조 {len(bold)}개 (1개 이하): {', '.join(bold[:3])}"))
+    return errors
+
+
+def role_files(root: Path = ROOT) -> list[Path]:
+    """검사 대상: roles/*.md + 채점자 역할 eval/judge.md."""
+    return sorted((root / "roles").glob("*.md")) + [p for p in [root / "eval" / "judge.md"] if p.exists()]
 
 
 def check_roles(models: ModelsConfig, root: Path = ROOT) -> list[ConfigError]:
     errors = []
-    for path in sorted((root / "roles").glob("*.md")):
+    for path in role_files(root):
         try:
-            load_role(path, models, root)
+            role = load_role(path, models, root)
         except ConfigError as e:
             errors.append(e)
+            continue
+        errors += lint_body(_rel(path, root), role.body)
     return errors
 
 
-def wrap_data(obj: Any) -> str:
-    """수집한 내용을 <data>로 감싼다. 안쪽의 닫는 태그는 무력화해 경계를 못 넘게 한다."""
-    if isinstance(obj, BaseModel):
-        obj = obj.model_dump()
-    text = obj if isinstance(obj, str) else json.dumps(obj, ensure_ascii=False, indent=1)
-    text = text.replace("</data", "<\\/data").replace("<data", "<\\data")
-    return f"<data>\n{text}\n</data>"
-
-
 def initial_messages(role: Role, inp: RoleInput) -> list[dict[str, Any]]:
+    """system = 역할 md(정적). user = <data> 자료 → 과제 → 핵심 규칙 (자료는 위, 핵심 지시는 처음과 끝)."""
     return [{"role": "system", "content": role.system_prompt},
-            {"role": "user", "content": wrap_data(inp)}]
+            {"role": "user", "content": f"{render_data(inp)}\n\n{role.instructions()}"}]
 
 
 def record_llm(ctx: Ctx, role: Role, res: Any, *, text: str, attention: bool = False,
@@ -176,7 +218,7 @@ def run_role(role: Role, inp: RoleInput, ctx: Ctx) -> RoleOutput:
                                       error=last_error, detail={"attempt": attempt + 1})
         messages = [*messages, {"role": "assistant", "content": res.content or ""},
                     {"role": "user", "content": f"직전 출력이 스키마 검증에 실패함: {last_error}\n"
-                                                "같은 내용을 스키마에 맞는 JSON 하나로만 다시 출력할 것."}]
+                                                "위 오류를 고친 JSON 하나로만 다시 출력할 것."}]
     raise RoleFailed(f"{role.name}: 스키마 검증 {ROLE_RETRIES + 1}회 실패 ({last_error})")
 
 

@@ -6,13 +6,14 @@ import json
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
-from pydantic import ValidationError
+from pydantic import BaseModel, ValidationError
 
 from ..tools import TOOLS, ToolOutput, ToolRejected
 from .artifacts import RoleInput, RoleOutput
 from .budget import BudgetExceeded
 from .llm import LLMError, parse_json_output, strict_json_schema
-from .role import Role, initial_messages, record_llm, wrap_data
+from .render import render_data
+from .role import Role, initial_messages, record_llm
 
 if TYPE_CHECKING:
     from .context import Ctx
@@ -67,15 +68,40 @@ def _tool_message(call_id: str, content: str) -> dict[str, Any]:
     return {"role": "tool", "tool_call_id": call_id, "content": content}
 
 
+NULL_STRINGS = {"None", "none", "null", "NULL", "Null", ""}
+
+
+def nullable_fields(model: type[BaseModel]) -> set[str]:
+    """스키마상 null을 허용하는 칸."""
+    out = set()
+    for name, f in model.model_fields.items():
+        if f.annotation is None or type(None) in getattr(f.annotation, "__args__", ()):
+            out.add(name)
+    return out
+
+
+def normalize_nulls(model: type[BaseModel], args: dict[str, Any]) -> list[str]:
+    """null을 허용하는 칸에 들어온 "None", "null", ""를 null로 바꾼다(소형 모델의 흔한 실수). 바꾼 칸 이름을 돌려준다."""
+    changed = []
+    for name in nullable_fields(model):
+        if isinstance(args.get(name), str) and args[name].strip() in NULL_STRINGS:
+            args[name] = None
+            changed.append(name)
+    return sorted(changed)
+
+
 def execute_tool(name: str, raw_args: str, allowed: set[str], state: AgentState) -> tuple[str, dict[str, Any]]:
-    """도구 하나 실행. 결과 문자열(모델에게 줄 것)과 기록용 정보를 돌려준다. 거부도 결과로 돌려준다."""
-    info: dict[str, Any] = {"name": name, "args": None, "error": None, "depth": None, "truncated": False}
+    """도구 하나 실행. 결과 문자열(모델에게 줄 것)과 기록용 정보를 돌려준다. 거부와 도구 실패도 결과로 돌려준다."""
+    info: dict[str, Any] = {"name": name, "args": None, "error": None, "depth": None, "truncated": False,
+                            "normalized": []}
     try:
         if name not in allowed:
             raise ToolRejected(f"허용되지 않은 도구 '{name}'. 사용 가능: {', '.join(sorted(allowed))}, {FINISH}")
         tool = TOOLS[name]
         try:
             args_dict = json.loads(raw_args or "{}")
+            if isinstance(args_dict, dict):
+                info["normalized"] = normalize_nulls(tool.args, args_dict)
             args = tool.args.model_validate(args_dict)
         except (json.JSONDecodeError, ValidationError) as e:
             raise ToolRejected(f"인자 형식 오류: {str(e)[:300]}") from e
@@ -84,7 +110,12 @@ def execute_tool(name: str, raw_args: str, allowed: set[str], state: AgentState)
         if tool.depth_target:
             depth = state.depth.resolve(getattr(args, tool.depth_target), getattr(args, "parent", None))
             info["depth"] = depth
-        out: ToolOutput = tool.fn(args, state)
+        try:
+            out: ToolOutput = tool.fn(args, state)
+        except (ToolRejected, BudgetExceeded):
+            raise
+        except Exception as e:  # noqa: BLE001 - 네트워크 오류 등은 루프를 멈추지 않고 모델에게 결과로 알린다
+            raise ToolRejected(f"도구 실패({type(e).__name__}): {str(e)[:200]}") from e
         state.depth.roots.update(out.roots)
         if tool.depth_target and depth is not None:
             state.depth.visited(getattr(args, tool.depth_target), depth, out.links)
@@ -92,7 +123,7 @@ def execute_tool(name: str, raw_args: str, allowed: set[str], state: AgentState)
         if len(text) > TOOL_RESULT_LIMIT:
             info["truncated"] = True
             text = text[:TOOL_RESULT_LIMIT] + f"\n[잘림: 전체 {len(text)}자 중 앞 {TOOL_RESULT_LIMIT}자]"
-        return wrap_data(text), info
+        return render_data(text), info
     except ToolRejected as e:
         info["error"] = str(e)
         state.rejected.append(str(e))
@@ -157,7 +188,7 @@ def run_agent(role: Role, inp: RoleInput, ctx: Ctx) -> RoleOutput:
             ctx.tracer.step(kind="tool", role=role.name,
                             text=f"{tc['name']}: {_args_summary(info['args'] or {})}",
                             error=info["error"], attention=bool(info["error"]),
-                            detail={k: info[k] for k in ("args", "depth", "truncated")})
+                            detail={k: info[k] for k in ("args", "depth", "truncated", "normalized")})
             messages.append(_tool_message(tc["id"], content))
         if final is not None:
             return finish_with(final, "finish")

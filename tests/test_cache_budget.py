@@ -9,7 +9,8 @@ from trendsit.core.cache import cache_key
 from trendsit.core.role import load_role, run_role
 
 INPUT = RepoOnelinerInput(full_name="a/b", readme_head="# B")
-GOOD = json.dumps({"oneliner": "테스트용 도구", "log": "README 근거", "attention": False}, ensure_ascii=False)
+GOOD = json.dumps({"basis": "# B", "oneliner": "테스트용 도구", "log": "README 근거", "attention": False},
+                  ensure_ascii=False)
 MSG = [{"role": "user", "content": "hi"}]
 
 

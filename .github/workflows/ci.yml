@@ -1,0 +1,18 @@
+# 네트워크와 비밀 없이 도는 검사만(API 키를 CI에 넣지 않음). 비공개 저장소 무료 Actions 시간 안에서 가볍게
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv sync --locked
+      - run: uv run ruff check .
+      - run: uv run pytest -q

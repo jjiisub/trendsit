@@ -1,6 +1,6 @@
 # 27. MVP 소스와 키워드 설정 (고정값)
 
-작성: 2026-10-07. MVP는 소스와 키워드를 설정 파일로 고정한다(화면에서 바꾸는 기능은 MVP 밖).
+작성: 2026-10-07 (같은 날 수정: GitHub 트렌딩 출처를 OSS Insight → GitHub Trending 페이지. S0 묶음의 config는 이전 값이라 S1 handoff에서 갱신). MVP는 소스와 키워드를 설정 파일로 고정한다(화면에서 바꾸는 기능은 MVP 밖).
 아래 두 블록을 코드 저장소의 `config/sources.yaml`, `config/keywords.yaml`로 그대로 쓴다. 피드 주소는 2026-10-07에 열리는 것을 확인했다(Anthropic 커뮤니티 피드, 추적 레포 릴리스 피드는 구현 때 재확인).
 
 ## 1. 구성 요약
@@ -11,25 +11,32 @@
 | | GeekNews, Simon Willison's Weblog | 큐레이션 (국내, 해외) |
 | | AI타임스 | 국내 뉴스 |
 | 영상 (1) | Tech Bridge (@TechBridge-KR) | 해외 기술 발표 + 한국어 자막 |
-| GitHub | OSS Insight 주간 트렌딩 + 추적 레포 4개 | ollama, hermes-agent, codex, claude-code |
+| GitHub | GitHub Trending 주간 페이지('이번 주 별' 그대로) + 추적 레포 4개 릴리스 | ollama, hermes-agent, codex, claude-code |
 
 - 같은 소식이 1차 자료 → 큐레이션 → 국내 기사 → 발표 영상으로 여러 번 나타나도록 고른 구성(교차 연계 D2, 원본 추적)
 - 필터 전 글 양은 하루 50건 안팎(GeekNews, AI타임스가 대부분). 키워드 필터를 통과한 것만 LLM 요약
 
-## 2. config/sources.yaml
+## 2. config/sources.yaml (S1 버전: 백필 방법, GitHub 트렌딩 페이지)
 
 ```yaml
-# MVP 고정 소스. fetch 값:
+# MVP 고정 소스 (S1에서 갱신: 백필 방법, GitHub 트렌딩 출처 변경)
+# fetch:
 #   feed_full    피드에 본문 전체가 있음
 #   feed_summary 피드에는 요약만 → 원글 페이지에서 본문 추출(trafilatura)
 #   feed_title   피드에는 제목, 링크만 → 원글 페이지에서 본문 추출
+# backfill: RSS가 요청 기간을 다 담지 못할 때 쓰는 방법
+#   rss_only     RSS로 충분(예상). 부족하면 리포트에 적기
+#   list_pages   목록 페이지를 넘겨 가며 읽기 (url_template의 {page})
+#   day_archive  날짜별 아카이브 페이지 읽기 (url_template의 {yyyy} {Mon} {d})
+# 아래 백필 URL은 설계 세션이 확인하지 못한 후보다. 구현 전에 실제로 열어 확인하고, 다르면 고친 뒤 리포트에 적는다.
 text:
   - id: openai
     name: OpenAI News
-    kind: primary          # primary(1차 자료) / curation / news
+    kind: primary
     lang: en
     feed: https://openai.com/news/rss.xml
     fetch: feed_summary
+    backfill: {method: rss_only}
     note: 기업 사례 글이 많음. 필터로 거름
 
   - id: anthropic
@@ -37,9 +44,8 @@ text:
     kind: primary
     lang: en
     feed: https://raw.githubusercontent.com/Olshansk/rss-feeds/main/feeds/feed_anthropic_news.xml
-    fallback_list: https://www.anthropic.com/news   # 공식 RSS 없음. 커뮤니티 피드가 멈추면 목록 페이지를 직접 파싱
     fetch: feed_summary
-    note: 커뮤니티가 매시간 생성하는 피드(공식 아님)
+    backfill: {method: list_pages, url_template: "https://www.anthropic.com/news", note: "공식 RSS 없음. 커뮤니티 피드가 멈추면 목록 페이지 파싱"}
 
   - id: deepmind
     name: Google DeepMind Blog
@@ -47,6 +53,7 @@ text:
     lang: en
     feed: https://deepmind.google/blog/rss.xml
     fetch: feed_summary
+    backfill: {method: rss_only}
 
   - id: geeknews
     name: GeekNews
@@ -54,7 +61,8 @@ text:
     lang: ko
     feed: https://news.hada.io/rss/news
     fetch: feed_summary
-    note: 기술 외 글이 섞임. 글마다 원문 링크가 있어 원본 추적 대상
+    backfill: {method: list_pages, url_template: "https://news.hada.io/?page={page}"}
+    note: RSS는 최근 50건(약 24시간). 기술 외 글이 섞임. 토픽 페이지의 한국어 요약 + 원문 링크를 함께 저장
 
   - id: simonw
     name: Simon Willison's Weblog
@@ -62,7 +70,8 @@ text:
     lang: en
     feed: https://simonwillison.net/atom/everything/
     fetch: feed_full
-    note: 전문 + 원본 링크가 많음. 짧은 링크 글이 많아 하루 여러 건
+    backfill: {method: day_archive, url_template: "https://simonwillison.net/{yyyy}/{Mon}/{d}/"}
+    note: 피드 20건(약 9일). 전문 + 원본 링크가 많음
 
   - id: aitimes
     name: AI타임스
@@ -70,7 +79,8 @@ text:
     lang: ko
     feed: https://www.aitimes.com/rss/allArticle.xml
     fetch: feed_summary
-    note: 하루 20~25건. 국내 업계 소식. 필터 필수
+    backfill: {method: list_pages, url_template: "https://www.aitimes.com/news/articleList.html?page={page}&view_type=sm"}
+    note: RSS는 50건(약 1.5일), 하루 20~25건. 필터 필수
 
 video:
   - id: techbridge
@@ -79,15 +89,14 @@ video:
     channel_handle: "@TechBridge-KR"
     channel_id: UC895rbZX2iXLTDfji7W4PfA
     feed: https://www.youtube.com/feeds/videos.xml?channel_id=UC895rbZX2iXLTDfji7W4PfA
-    note: 해외 발표를 번역한 영상. 설명란의 원본 영상 링크는 이후 원본 추적 후보
+    backfill: {method: channel_listing, note: "RSS는 최근 15편. 더 필요하면 yt-dlp 채널 목록(다운로드 없음)"}
 
 github:
   trending:
-    source: ossinsight
-    period: past_week
-    language: null           # 전체. 관련성은 레포 분석가가 키워드로 판단
-    top_n: 30                # 얕게 훑기에서 볼 후보 수
-  tracked:                   # 릴리스를 매주 챙겨 보는 레포
+    source: github_trending_page   # OSS Insight Trends API가 현재 빈 데이터(2026-10-07). 별 스냅샷은 하지 않음
+    url: https://github.com/trending?since=weekly
+    top_n: 25                      # 페이지에 보이는 전체(보통 25)
+  tracked:                         # 릴리스 소식만 받음
     - repo: ollama/ollama
       why: 로컬 전환 때 쓸 실행 환경
     - repo: NousResearch/hermes-agent
@@ -96,7 +105,7 @@ github:
       why: 코딩 에이전트. OpenAI 글과 교차
     - repo: anthropics/claude-code
       why: 코딩 에이전트. Anthropic 글과 교차
-  # 릴리스 피드: https://github.com/<repo>/releases.atom, 메타데이터와 커밋은 GitHub API(토큰)
+  # 릴리스 피드: https://github.com/<repo>/releases.atom / README: GitHub API(토큰 있으면 사용)
 ```
 
 ## 3. config/keywords.yaml

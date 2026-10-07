@@ -38,7 +38,9 @@ def cmd_check_config(args: argparse.Namespace) -> int:
         for e in errors:
             print(f"FAIL {e.file}: {e.path or '(최상위)'}: {e.reason}")
         return 1
-    n_roles = len(list((root / "roles").glob("*.md")))
+    from .core.role import role_files
+
+    n_roles = len(role_files(root))
     print(f"OK 설정 {len(config.FILES)}개, 역할 {n_roles}개")
     return 0
 
@@ -115,14 +117,35 @@ def _replay(ctx: Any, step_id: int, model: str | None) -> Any:
 
 # ---------- eval ----------
 def cmd_eval(args: argparse.Namespace) -> int:
-    from eval.run_eval import run_eval
+    from eval.run_eval import agreement, make_labels, run_eval
+
+    if args.label:
+        path = make_labels(args.role, config.current_spec(args.spec))
+        print(f"라벨 파일: {path.relative_to(ROOT)} (Q*_pass에 pass/fail, Q*_critique에 한 줄 비평을 채운다)")
+        return 0
+    if args.agreement:
+        a = agreement(args.role, config.current_spec(args.spec))
+        if a is None or not a["n_rows"]:
+            print(f"채운 라벨 없음: eval/labels/{args.role}.csv")
+            return 1
+        print(f"| 질문 | 일치 | 비교 수 | 일치율 |  (라벨 {a['n_rows']}건, {a['report']})")
+        print("|---|---|---|---|")
+        for q, v in a["questions"].items():
+            print(f"| {q} | {v['agree']} | {v['n']} | {v['rate']} |")
+        print(f"| 전체 | {a['total']['agree']} | {a['total']['n']} | {a['total']['rate']} |")
+        low = [q for q, v in a["questions"].items() if v["rate"] is not None and v["rate"] < 0.8]
+        if low:
+            print(f"80% 미만: {', '.join(low)} → 사람 비평을 채점 프롬프트 예시로 넣고 다시 잴 것(COMMON 2장)")
+        return 0
 
     report = run_eval(args.role, model=args.model, limit=args.limit, spec=args.spec, no_cache=args.no_cache,
                       note=args.note)
     s = report["summary"]
     print(f"{report['role']} / {report['model_alias']} ({report['model_id']}): 코드 통과 {s['code_pass']}/{s['n']}")
+    for q, v in s.get("questions", {}).items():
+        print(f"  {q}: 통과 {v['pass']}/{v['n']}")
     for c, v in s["criteria"].items():
-        print(f"  {c}: 평균 {v['avg']}, 1점 {v['ones']}개 (n={v['n']})")
+        print(f"  {c}(보고용): 평균 {v['avg']} (n={v['n']})")
     print(f"  문턱값: {'통과' if s['passed'] else '미달 - ' + '; '.join(s['fail_reasons'])}")
     print(f"  비용 ${report['cost_usd']:.4f}, 리포트 {report['path']}, reports/{report['spec']}_quality.md")
     return 0 if not report["stopped"] else 1
@@ -199,6 +222,8 @@ def main(argv: list[str] | None = None) -> int:
     e.add_argument("--no-cache", action="store_true")
     e.add_argument("--spec")
     e.add_argument("--note", help="반복 기록에 남길 메모(이번 수정의 이유 등)")
+    e.add_argument("--label", action="store_true", help="최근 eval 결과로 사람 라벨 CSV(eval/labels/<역할>.csv) 생성")
+    e.add_argument("--agreement", action="store_true", help="사람 라벨과 judge 판정의 질문별 일치율")
     e.set_defaults(fn=cmd_eval)
 
     k = sub.add_parser("cost", help="스펙별, 모델별 사용액과 남은 예산")

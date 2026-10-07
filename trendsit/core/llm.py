@@ -107,7 +107,11 @@ def _short_validation(e: ValidationError) -> str:
     parts = []
     for err in e.errors()[:5]:
         loc = ".".join(str(p) for p in err["loc"]) or "(전체)"
-        parts.append(f"{loc}: {err['msg']}")
+        if err["type"] == "string_too_long":  # 모델이 무엇을 고칠지 알 수 있게 길이를 함께 알린다
+            limit, now = err["ctx"]["max_length"], len(err["input"])
+            parts.append(f"{loc}: {limit}자 이하여야 함(지금 {now}자). 같은 내용을 {limit}자 안으로 줄일 것")
+        else:
+            parts.append(f"{loc}: {err['msg']}")
     return "; ".join(parts)
 
 

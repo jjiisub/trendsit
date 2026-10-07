@@ -123,7 +123,9 @@ T8=$(uv run --quiet pytest -q tests/test_agent.py 2>&1 | tail -1)
 [[ "$T8" == *passed* && "$T8" != *failed* ]] && pass A8 "max_steps 대체 출력, 깊이 4 거부, 허용 밖 도구 거부, 도구 호출 kind='tool' 기록 ($T8)" || fail A8 "$T8"
 
 # A9 비밀 없음
-LEAK=$(git grep -nIE --untracked 'sk-or-v1-[0-9a-f]{20,}|ghp_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}' -- . ':!data' 2>/dev/null | head -3)
+# 제외는 git이 무시하는 실행 산출물만. 추적 중인 data/ 파일(make_data.py, trendsit-example.json)은 검사한다
+LEAK=$(git grep -nIE --untracked 'sk-or-v1-[0-9a-f]{20,}|ghp_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}' -- . \
+  ':!data/trendsit.db*' ':!data/cache' ':!data/http_cache' ':!data/budget_state.json' ':!data/prices.json' 2>/dev/null | head -3)
 IGN_ENV=$(git check-ignore -q .env && echo 1 || echo 0)
 IGN_DATA=$(git check-ignore -q data/trendsit.db && echo 1 || echo 0)
 TRACKED=$(git ls-files | grep -E '(^|/)\.env$|^data/(trendsit\.db|cache/|budget_state)' | head -3)

@@ -7,7 +7,9 @@ from dataclasses import replace
 from pathlib import Path
 from typing import Any
 
-from trendsit.core.artifacts import JudgeInput, JudgeResult
+from pydantic import BaseModel
+
+from trendsit.core.artifacts import Document, JudgeInput, JudgeResult, RoleInput
 from trendsit.core.config import ROOT
 from trendsit.core.context import Ctx
 from trendsit.core.role import load_role, run_role
@@ -25,9 +27,9 @@ EVAL_WORDS = ("혁신적", "강력한", "놀라운", "최고의", "획기적", "
 SENTENCE_END = re.compile(r"(다|요|까|죠|니다|네)[.!?…]*$|[.!?]$")
 
 # 관문 B 문턱값 (S0_TASK 7장). 채점표 항목 이름 기준
+# 관문 B 문턱값. 질문별 통과율(코드 채점 통과분 중). repo_oneliner: S0_ADDENDUM 1.7 (Q1 10/10, Q2·Q3 9/10 이상)
 THRESHOLDS: dict[str, dict[str, Any]] = {
-    "repo_oneliner": {"primary": "정확성", "primary_avg": 4.5, "primary_ones": 0, "others_avg": 4.0,
-                      "below3": 0, "code_pass_all": True},
+    "repo_oneliner": {"questions": {"Q1": 1.0, "Q2": 0.9, "Q3": 0.9}, "code_pass_all": True},
     "lookup_agent": {"code_pass_all": True},
 }
 
@@ -61,13 +63,24 @@ def style_checks(output: dict[str, Any]) -> list[dict[str, Any]]:
     return checks
 
 
+def _norm(text: str) -> str:
+    return " ".join(text.replace("&lt;", "<").split())
+
+
 def code_repo_oneliner(inp: dict[str, Any], out: dict[str, Any], expect: dict[str, Any]) -> list[dict[str, Any]]:
     line = out["oneliner"].strip()
+    basis = out.get("basis", "").strip()
+    readme = inp.get("readme_head") or ""
+    readme = readme.get("text", "") if isinstance(readme, dict) else readme
     checks = [
         check("길이 상한", len(line) <= expect.get("max_len", 60), f"{len(line)}자"),
         check("명사형 끝", not SENTENCE_END.search(line), line[-8:]),
         check("평가어 없음", not [w for w in EVAL_WORDS if w in line],
               ", ".join(w for w in EVAL_WORDS if w in line)),
+        # basis는 README에 있는 구절 그대로여야 한다(공백 정규화 후 부분 문자열)
+        check("basis가 README 안에 있음", _norm(basis) in _norm(readme), basis[:60]),
+        check("문장이 있으면 basis도 있음", not line or bool(basis), "basis 비어 있음"),
+        check("빈 문장이면 attention", bool(line) or out["attention"] is True, "oneliner 비었는데 attention=false"),
     ]
     must = expect.get("must_include_any")
     if must:
@@ -105,27 +118,54 @@ def rubric_path(role: str) -> Path:
     return RUBRICS / f"{role}.md"
 
 
-def rubric_criteria(role: str) -> list[str]:
-    """채점표 표의 첫 칸(항목 이름)."""
-    names = []
+def _table_rows(role: str) -> list[list[str]]:
+    rows = []
     for line in rubric_path(role).read_text(encoding="utf-8").splitlines():
-        cells = [c.strip() for c in line.strip().strip("|").split("|")]
-        if line.strip().startswith("|") and cells and cells[0] not in ("항목", "") and not set(cells[0]) <= {"-"}:
-            names.append(cells[0])
-    return names
+        if line.strip().startswith("|"):
+            cells = [c.strip() for c in line.strip().strip("|").split("|")]
+            if cells and cells[0] not in ("id", "항목", "") and not set(cells[0]) <= {"-"}:
+                rows.append(cells)
+    return rows
 
 
-def llm_grade(role: str, inp: dict[str, Any], out: dict[str, Any], ctx: Ctx) -> dict[str, Any]:
-    """채점표를 시스템 프롬프트에 그대로 넣은 채점자 역할(judge)을 1회 실행."""
+def rubric_questions(role: str) -> dict[str, str]:
+    """통과 질문 표: id → 질문."""
+    return {r[0]: r[1] for r in _table_rows(role) if re.fullmatch(r"Q\d+", r[0])}
+
+
+def rubric_criteria(role: str) -> list[str]:
+    """보고용 점수표의 항목 이름."""
+    return [r[0] for r in _table_rows(role) if not re.fullmatch(r"Q\d+", r[0])]
+
+
+def judge_input(inp: RoleInput, out: dict[str, Any]) -> JudgeInput:
+    """채점 대상 역할의 입력을 근거 문서와 짧은 칸으로 나눈다(역할 무관)."""
+    docs: list[Document] = []
+    fields: dict[str, Any] = {}
+    for name in type(inp).model_fields:
+        v = getattr(inp, name)
+        if isinstance(v, Document):
+            docs.append(v)
+        elif isinstance(v, list) and v and all(isinstance(x, Document) for x in v):
+            docs.extend(v)
+        else:
+            fields[name] = v.model_dump() if isinstance(v, BaseModel) else v
+    shown = {k: v for k, v in out.items() if k not in ("log", "attention")}
+    return JudgeInput(source_documents=docs, source_fields=fields, output=shown)
+
+
+def llm_grade(role: str, inp: RoleInput, out: dict[str, Any], ctx: Ctx) -> dict[str, Any]:
+    """역할 무관한 채점자(eval/judge.md) + 역할별 채점표(includes)를 1회 실행."""
     judge = load_role(JUDGE_ROLE, ctx.models, extra_includes=(str(rubric_path(role).relative_to(ROOT)),))
     judge_ctx = replace(ctx, model=None)  # 채점자는 항상 judge 별칭
-    shown = {k: v for k, v in out.items() if k not in ("log", "attention")}
-    result: JudgeResult = run_role(judge, JudgeInput(task_input=inp, output=shown), judge_ctx)  # type: ignore[assignment]
+    result: JudgeResult = run_role(judge, judge_input(inp, out), judge_ctx)  # type: ignore[assignment]
     ctx.last_step_id = judge_ctx.last_step_id
-    criteria = rubric_criteria(role)
+    questions, criteria = rubric_questions(role), rubric_criteria(role)
+    verdicts = {v.question: {"verdict": v.verdict, "critique": v.critique} for v in result.verdicts}
     scores = {s.criterion: {"score": s.score, "reason": s.reason} for s in result.scores}
-    missing = [c for c in criteria if c not in scores]
-    return {"scores": {c: scores[c] for c in criteria if c in scores}, "missing": missing,
+    missing = [q for q in questions if q not in verdicts]
+    return {"verdicts": {q: verdicts[q] for q in questions if q in verdicts},
+            "scores": {c: scores[c] for c in criteria if c in scores}, "missing": missing,
             "judge_prompt_hash": judge.prompt_hash, "judge_step_id": judge_ctx.last_step_id}
 
 
@@ -133,39 +173,31 @@ def summarize(role: str, results: list[dict[str, Any]]) -> dict[str, Any]:
     th = THRESHOLDS.get(role, {"code_pass_all": True})
     n = len(results)
     code_pass = sum(1 for r in results if r["code"]["passed"])
-    summary: dict[str, Any] = {"n": n, "code_pass": code_pass, "criteria": {}}
-    criteria = rubric_criteria(role) if rubric_path(role).exists() else []
-    below3 = 0
-    for c in criteria:
-        vals = [r["llm"]["scores"][c]["score"] for r in results if r.get("llm") and c in r["llm"]["scores"]]
-        summary["criteria"][c] = {"avg": round(sum(vals) / len(vals), 2) if vals else None,
-                                  "ones": sum(1 for v in vals if v == 1), "n": len(vals)}
-        below3 += sum(1 for v in vals if v < 3)
-    summary["below3"] = below3
+    summary: dict[str, Any] = {"n": n, "code_pass": code_pass, "questions": {}, "criteria": {}}
+    has_rubric = rubric_path(role).exists()
+    questions = rubric_questions(role) if has_rubric else {}
+    judged = [r for r in results if r.get("llm")]
+    for q in questions:
+        vals = [r["llm"]["verdicts"][q]["verdict"] == "pass" for r in judged if q in r["llm"]["verdicts"]]
+        summary["questions"][q] = {"pass": sum(vals), "n": len(vals),
+                                   "rate": round(sum(vals) / len(vals), 3) if vals else None}
+    for c in rubric_criteria(role) if has_rubric else []:  # 보고용
+        vals = [r["llm"]["scores"][c]["score"] for r in judged if c in r["llm"]["scores"]]
+        summary["criteria"][c] = {"avg": round(sum(vals) / len(vals), 2) if vals else None, "n": len(vals)}
     reasons = []
-    missing = sum(1 for r in results if r.get("llm") and r["llm"].get("missing"))
-    if missing:  # 채점자가 항목을 빠뜨리면 그 항목 평균이 적은 표본으로 계산되므로 미달
-        reasons.append(f"채점 항목 누락 {missing}건")
     if th.get("code_pass_all") and code_pass < n:
         reasons.append(f"코드 채점 통과 {code_pass}/{n}")
-    if criteria:
+    if questions:
         missing_llm = sum(1 for r in results if r["code"]["passed"] and not r.get("llm"))
         if missing_llm:
             reasons.append(f"LLM 채점 누락 {missing_llm}건")
-        p = th.get("primary")
-        if p:
-            pc = summary["criteria"].get(p, {})
-            if pc.get("avg") is None or pc["avg"] < th["primary_avg"]:
-                reasons.append(f"{p} 평균 {pc.get('avg')} < {th['primary_avg']}")
-            if pc.get("ones", 0) > th["primary_ones"]:
-                reasons.append(f"{p} 1점 {pc['ones']}개")
-            for c in criteria:
-                if c != p:
-                    a = summary["criteria"][c]["avg"]
-                    if a is None or a < th["others_avg"]:
-                        reasons.append(f"{c} 평균 {a} < {th['others_avg']}")
-        if below3 > th.get("below3", 0):
-            reasons.append(f"3점 미만 항목 {below3}개")
+        missing = sum(1 for r in judged if r["llm"].get("missing"))
+        if missing:  # 채점자가 질문을 빠뜨리면 그 질문 통과율이 적은 표본으로 계산되므로 미달
+            reasons.append(f"채점 질문 누락 {missing}건")
+        for q, need in th.get("questions", {}).items():
+            st = summary["questions"].get(q, {})
+            if st.get("rate") is None or st["rate"] < need:
+                reasons.append(f"{q} 통과 {st.get('pass')}/{st.get('n')} < {need:.0%}")
     summary["passed"] = not reasons
     summary["fail_reasons"] = reasons
     return summary

@@ -1,4 +1,4 @@
 phase: mvp
-phase_total_usd: 20.00         # 키 전체 크레딧은 50달러. 이번 단계 상한 20달러는 코드가 지킴(2026-10-07 사용자 정정, 원안 2달러)
-specs: {S0: 0.15}
+phase_total_usd: 20.00         # 키에는 공통 한도 50달러가 따로 있음. 20달러는 코드가 지킴 (2026-10-07 2→20 수정)
+specs: {S0: 0.15, S1: 0.05}    # S1은 1a S0 보완(repo_oneliner 관문 B 재실행)만 사용, 1b 수집은 0
 # 단계 기준값(phase_baseline_usd)은 첫 실행 때 /api/v1/key의 usage로 data/budget_state.json에 저장
