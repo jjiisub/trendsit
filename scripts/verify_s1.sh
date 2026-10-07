@@ -36,7 +36,8 @@ pt P3 "자료 탈출 방지: </document>, </data> 등이 태그 밖으로 나가
 pt P4 "스키마 순서: 모든 출력의 마지막 두 칸 log, attention, basis가 oneliner 앞" tests/test_s1a.py -k "schema_ends or basis_before"
 pt P5 "라벨 도구: --label CSV 생성, 모의 라벨로 --agreement 일치율" tests/test_s1a.py -k "label"
 P6_MISS=""
-HEADS=("한 줄 소개" "왜 만들었나" "핵심 기능" "아키텍처" "빠른 시작" "사용 예시와 결과물" "성과와 평가" "기술적 도전" "기술 스택과 선택 이유" "폴더 구조" "로드맵과 한계" "만든 사람")
+# 지금 README의 제목(PR #2 판) 기준: 맨 위 한 줄 소개(제목 없음) + 아래 11개
+HEADS=("1. 왜 만들었나" "2. 핵심 기능" "3. 아키텍처" "4. 빠른 시작" "5. 사용 예시 / 결과물" "6. 성과와 평가" "7. 기술적 도전" "8. 기술 스택" "9. 폴더 구조" "10. 로드맵 / 한계" "만든 사람")
 ORDER=$(grep -n '^## ' README.md | sed 's/^\([0-9]*\):## /\1 /')
 last=0
 for h in "${HEADS[@]}"; do
@@ -47,7 +48,9 @@ for f in .github/pull_request_template.md .github/workflows/ci.yml docs/RULES.md
   [ -f "$f" ] || P6_MISS+=" $f"
 done
 uv run --quiet python -c "import yaml; yaml.safe_load(open('.github/workflows/ci.yml'))" 2>/dev/null || P6_MISS+=" ci.yml 문법"
-[ -z "$P6_MISS" ] && pass P6 "README 12개 제목 순서, PR 양식, CI(YAML 통과), RULES.md, ADR 틀 (CI 초록은 PR에서 확인)" || fail P6 "없음:$P6_MISS"
+head -1 README.md | grep -q '^# TrendsIT' && sed -n '2,4p' README.md | grep -q '^> ' || P6_MISS+=" README:맨 위 한 줄 소개"
+grep -q 'actions/workflows/ci.yml/badge.svg' README.md || P6_MISS+=" README:CI 배지"
+[ -z "$P6_MISS" ] && pass P6 "README 한 줄 소개 + 제목 11개 순서, CI 배지, PR 양식, CI(YAML 통과), RULES.md, ADR 틀 (CI 초록은 PR에서 확인)" || fail P6 "없음:$P6_MISS"
 
 # ---------- 1a: S0 리뷰 반영 (S0_REVIEW 4장) ----------
 pt R1 "태그 탈출 대소문자: </DATA>, </Data >, </document >, <DOCUMENT id=\"x\">" tests/test_s1a.py -k "escape"
