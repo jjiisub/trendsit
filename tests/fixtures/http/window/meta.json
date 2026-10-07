@@ -4,7 +4,7 @@
  "max_items": 3,
  "source": null,
  "today": "2026-10-07",
- "recorded_at": "2026-10-07T13:27:10+00:00",
+ "recorded_at": "2026-10-07T22:10:10+00:00",
  "result": {
   "openai": {
    "status": "ok",
@@ -27,8 +27,8 @@
   "geeknews": {
    "status": "ok",
    "n_new": 3,
-   "n_backfilled": 0,
-   "backfill_pages": 0
+   "n_backfilled": 3,
+   "backfill_pages": 1
   },
   "simonw": {
    "status": "ok",

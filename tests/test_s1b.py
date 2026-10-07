@@ -628,32 +628,36 @@ def _gn_page(rows: list[tuple[int, str, str]]) -> str:
     return "".join(tpl.format(i=i, href=h, when=w) for i, h, w in rows)
 
 
-def test_daily_vs_archive_boundary_and_interval(tmp_path):
-    """어제 이후는 평소 목록(메인), 그 앞 날짜만 날짜별 목록. 목록 요청은 request_interval_s 간격(T3)."""
-    waits = []
-    main = _gn_page([(1, "https://a.example/1", "2026-10-06T10:00:00+09:00")])
-    arch = _gn_page([(2, "https://a.example/2", "2026-10-04T10:00:00+09:00")])
-    seen = []
+def test_geeknews_days_pages_per_day_and_interval(tmp_path):
+    """매일 수집과 백필 모두 날짜별 목록만(메인 화면 없음, S1 Q5). 오늘은 읽지 않고, 날짜당 pages_per_day페이지.
+    목록 요청은 request_interval_s 간격."""
+    waits, seen = [], []
+    full = _gn_page([(i, f"https://a.example/{i}", "2026-10-05T10:00:00+09:00") for i in range(1, 21)])  # 20행
 
     def handler(r):
         seen.append(str(r.url))
         if r.url.path == "/robots.txt":
             return httpx.Response(404)
         if r.url.host == "news.hada.io":
-            return httpx.Response(200, headers={"content-type": "text/html"}, text=main if r.url.path == "/" else arch)
+            return httpx.Response(200, headers={"content-type": "text/html"}, text=full)
         return httpx.Response(200, headers={"content-type": "text/html"}, text=ARTICLE)
     f = Fetcher(None, use_cache=False, transport=httpx.MockTransport(handler), resolver=lambda h: [PUBLIC_IP],
                 sleep=waits.append, clock=lambda: 0.0)
     c = TextCollector(DB(tmp_path / "t.db"), f, config.load("keywords.yaml"), config.load("link_kinds.yaml"),
-                      run_id="r", today=date(2026, 10, 7))
+                      run_id="r", today=date(2026, 10, 7), no_body=True)
     src = next(s for s in config.load("sources.yaml").text if s.id == "geeknews")
-    st = c.collect(src, date(2026, 10, 4), date(2026, 10, 7))
+    assert src.backfill.pages_per_day == 1
+    st = c.collect(src, date(2026, 10, 5), date(2026, 10, 7))
     hada = [u for u in seen if "news.hada.io" in u and "robots" not in u]
-    assert any("past?day=2026-10-04" in u for u in hada) and any("past?day=2026-10-05" in u for u in hada)
-    assert not any("past?day=2026-10-06" in u or "past?day=2026-10-07" in u for u in hada)
-    assert any(u.startswith("https://news.hada.io/?page=1") for u in hada)
-    assert st.daily_days == ["2026-10-06", "2026-10-07"]
+    assert hada == ["https://news.hada.io/past?day=2026-10-05&page=1", "https://news.hada.io/past?day=2026-10-06&page=1"]
+    assert st.notes and "오늘" in st.notes[0]
     assert waits.count(5.0) >= len(hada) - 1  # 목록 요청 사이 5초
+    # 날짜당 2페이지로 바꾸면 20행 페이지 다음 페이지까지 읽는다
+    src2 = src.model_copy(update={"backfill": src.backfill.model_copy(update={"pages_per_day": 2})})
+    seen.clear()
+    c.collect(src2, date(2026, 10, 5), date(2026, 10, 5))
+    assert [u for u in seen if "past?day=" in u] == ["https://news.hada.io/past?day=2026-10-05&page=1",
+                                                     "https://news.hada.io/past?day=2026-10-05&page=2"]
 
 
 def test_empty_list_page_is_error(tmp_path):

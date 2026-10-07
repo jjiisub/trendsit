@@ -11,18 +11,6 @@
   "content_type": "text/html; charset=UTF-8",
   "location": null
  },
- "https://news.hada.io/past?day=2026-10-04&page=2": {
-  "file": "3bae81675202a85d0d22.gz",
-  "status": 200,
-  "content_type": "text/html; charset=UTF-8",
-  "location": null
- },
- "https://news.hada.io/past?day=2026-10-04&page=3": {
-  "file": "02ff21657ad7c751659c.gz",
-  "status": 200,
-  "content_type": "text/html; charset=UTF-8",
-  "location": null
- },
  "https://github.com/robots.txt": {
   "file": "6f12b3a8ea73b7281526.gz",
   "status": 200,

@@ -39,13 +39,12 @@ text:
     name: GeekNews
     kind: curation
     lang: ko
-    # 2026-10-07 설계 결정(S1 Q1): RSS를 쓰지 않는다(RSS 링크는 모두 상세 페이지라 원문 링크가 없음).
-    # 상세 페이지(topic?id=)는 요청하지 않는다(짧은 시간에 여러 번 받으면 브라우저 확인이 나옴).
-    # 목록에서 제목, 원문 링크, 요약 앞부분, 점수, 댓글 수를 받고 본문은 원문 링크에서. 같은 글은 topic id로 한 번만
-    # 원문 링크가 GeekNews 자신인 글(Show GN 등)은 수집에서 빼고 건수만 기록
+    # 설계 결정(S1 Q1, Q5): RSS, 상세 페이지(topic?id=), 메인 화면을 쓰지 않는다.
+    # 매일 수집과 백필 모두 날짜별 목록 past?day=<날짜>에서 날짜당 pages_per_day페이지(1이면 그날 점수 상위 약 20건).
+    # 목록에서 제목, 원문 링크, 요약 앞부분, 점수, 댓글 수를 받고 본문은 원문 링크에서. 같은 글은 topic id로 한 번
+    # 원문 링크가 GeekNews 자신인 글(Show GN 등)은 수집에서 빼고 건수만 기록. 오늘은 하루가 끝나지 않아 읽지 않는다
     fetch: list_origin
-    daily: {url_template: "https://news.hada.io/?page={page}", max_pages: 2}   # 평소: 메인(점수순) 1~2페이지
-    backfill: {method: day_archive, url_template: "https://news.hada.io/past?day={date}&page={page}", note: "지난 기간: 날짜별 목록(하루치를 20건씩 페이지로)"}
+    backfill: {method: day_archive, url_template: "https://news.hada.io/past?day={date}&page={page}", pages_per_day: 1}
     request_interval_s: 5   # 목록 요청은 천천히
     note: 기술 외 글이 섞임. 원문 링크가 원본 추적(S3)의 출발점
 

@@ -22,7 +22,7 @@ HANDOFF_CANDIDATES = {
     "techbridge": "channel_listing (yt-dlp)",
 }
 CHECK_NOTES = {
-    "geeknews": "설계 결정(Q1): RSS·상세 페이지를 쓰지 않음. 평소는 메인(점수순) 1~2페이지, 지난 기간은 날짜별 목록 past?day=(20건씩 페이지). 본문은 원문 링크에서",
+    "geeknews": "설계 결정(Q1, Q5): RSS·상세 페이지·메인 화면을 쓰지 않음. 매일 수집과 백필 모두 날짜별 목록 past?day=에서 날짜당 pages_per_day페이지(기본 1 = 그날 점수 상위 약 20건). 본문은 원문 링크에서",
     "aitimes": "목록의 page 값이 무시됨(더보기는 JS) → 1페이지는 sc_sdate/sc_edate로 거른 HTML, 2페이지부터 ajaxArticlePaging.php(JSON)",
     "anthropic": "목록은 최신 10건 안팎, 페이지 넘김 없음. 커뮤니티 피드가 2021년부터 담고 있어 대체 수단으로만",
     "simonw": "후보 그대로 동작(조각마다 고유 주소, 시각)",
@@ -85,9 +85,8 @@ def build(since: date, until: date, *, data_dir: Path | None = None, out: Path |
         method = s.backfill.method
         pages = d.get("backfill_pages", 0)
         covered = bool(lg) and lg.get("status") != "failed" and d.get("covered", False)  # 이 기간 기록이 없으면 아니오
-        daily_days = d.get("daily_days") or []
-        covered_txt = ("일부(평소 목록: " + ", ".join(x[5:] for x in daily_days) + ")") if covered and daily_days else (
-            "예" if covered else "아니오")
+        per_day = d.get("pages_per_day")
+        covered_txt = (f"예(날짜당 {per_day}페이지)" if per_day else "예") if covered else "아니오"
         reasons = d.get("fetch_errors") or {}
         memo = "; ".join([*(d.get("notes") or []), *(d.get("errors") or [])[:3],
                           *(f"실패: {k} {v}건" for k, v in sorted(reasons.items(), key=lambda kv: -kv[1])[:5])])
@@ -99,11 +98,10 @@ def build(since: date, until: date, *, data_dir: Path | None = None, out: Path |
         skip_txt = ", ".join(f"{SKIP[k]} {v}" for k, v in skips.items() if v) or "-"
         if d.get("n_self_excluded"):
             memo = f"자기 글(Show GN 등) {d['n_self_excluded']}건 제외; " + memo
-        pages_txt = f"{method}, {pages}" + (f" + 평소 목록 {d['list_pages']}" if d.get("list_pages") else "")
+        pages_txt = f"{method}, {pages}"
         L.append(f"| {s.id} | {fetch_mode} | {d.get('rss_oldest') or '-'} | {covered_txt} | "
                  f"{pages_txt} | {n} | {nb} | {_pct(ok, denom)} | {skip_txt} | {_pct(npass, n)} | {memo[:220] or '-'} |")
-        # 평소 목록(점수순 일부)으로만 받은 날짜가 있으면 하루치 전체를 덮은 것이 아니다
-        verdict.setdefault("covered", {})[s.id] = bool(covered) and lg.get("status") != "failed" and not daily_days
+        verdict.setdefault("covered", {})[s.id] = bool(covered) and lg.get("status") != "failed"
     L.append("")
 
     # 1-1. 하루 신규 건수(게시일 기준). 페이지 수나 방식을 조정할 근거

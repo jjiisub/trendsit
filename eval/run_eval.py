@@ -291,7 +291,7 @@ def _input_summary(inp: dict[str, Any]) -> str:
 
 
 def make_labels(role: str, spec: str) -> Path:
-    """최근 전체 eval 결과로 라벨 CSV를 만든다. 이미 채운 칸은 보존한다."""
+    """최근 전체 eval 결과로 라벨 CSV를 만든다. 출력이 이전 CSV와 같은 행만 채운 라벨을 보존하고, 바뀐 행은 비운다."""
     rep = _latest_full(role, spec)
     if rep is None:
         raise SystemExit(f"{role}: 전체 eval 결과가 없음. 먼저 eval {role}을 돌릴 것")
@@ -311,9 +311,11 @@ def make_labels(role: str, spec: str) -> Path:
             row = {"id": x["id"], "input_summary": _input_summary(x["input"]),
                    "output": json.dumps(shown, ensure_ascii=False) if x["output"] else f"(오류) {x.get('error')}",
                    "eval_report": rep["path"]}
-            for q in questions:  # 사람이 채우는 칸. 이미 채웠으면 보존
-                row[f"{q}_pass"] = old.get(x["id"], {}).get(f"{q}_pass", "")
-                row[f"{q}_critique"] = old.get(x["id"], {}).get(f"{q}_critique", "")
+            prev = old.get(x["id"], {})
+            same = prev.get("output") == row["output"]  # 출력이 이전과 같을 때만 사람 라벨을 이어 쓴다
+            for q in questions:
+                row[f"{q}_pass"] = prev.get(f"{q}_pass", "") if same else ""
+                row[f"{q}_critique"] = prev.get(f"{q}_critique", "") if same else ""
             w.writerow(row)
     return path
 

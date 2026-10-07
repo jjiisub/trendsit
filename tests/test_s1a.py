@@ -243,9 +243,18 @@ def test_label_csv_and_agreement(tmp_path, monkeypatch):
     assert a["questions"]["Q1"] == {"agree": 3, "n": 4, "rate": 0.75}
     assert a["questions"]["Q2"]["rate"] == 1.0
     assert a["total"] == {"agree": 11, "n": 12, "rate": 0.917}
-    # 다시 만들어도 채운 라벨은 보존
+    # 다시 만들어도 출력이 같은 행은 채운 라벨을 보존
     run_eval.make_labels("repo_oneliner", "S1")
-    assert list(csv.DictReader(path.open(encoding="utf-8")))[0]["Q1_pass"] == rows[0]["Q1_pass"]
+    again = list(csv.DictReader(path.open(encoding="utf-8")))
+    assert again[0]["Q1_pass"] == rows[0]["Q1_pass"] and again[1]["Q2_pass"] == rows[1]["Q2_pass"]
+    # 출력이 바뀐 행은 라벨을 비운다
+    rep["results"][0]["output"] = {"basis": "b2", "oneliner": "바뀐 출력", "log": "l", "attention": False}
+    rep["at"] = "2026-10-08T00:00:00+09:00"
+    (tmp_path / "reports/eval/repo_oneliner_generate_y.json").write_text(json.dumps(rep, ensure_ascii=False))
+    run_eval.make_labels("repo_oneliner", "S1")
+    third = list(csv.DictReader(path.open(encoding="utf-8")))
+    assert third[0]["Q1_pass"] == "" and third[0]["Q1_critique"] == ""
+    assert third[1]["Q2_pass"] == rows[1]["Q2_pass"]
 
 
 def test_config_still_valid():

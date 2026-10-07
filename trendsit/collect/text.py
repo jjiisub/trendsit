@@ -51,7 +51,6 @@ class SourceStats:
     n_skipped: int = 0  # 이미 있음
     n_out_of_range: int = 0  # 글 페이지에서 얻은 게시 시각이 기간 밖이라 저장하지 않음
     n_self_excluded: int = 0  # 원문 링크가 소스 자신인 글(GeekNews Show GN 등). 수집에서 빼고 건수만
-    list_pages: int = 0  # 평소 목록 페이지 수(list_origin)
     backfill_pages: int = 0
     rss_oldest: str | None = None
     covered: bool = True
@@ -61,7 +60,7 @@ class SourceStats:
     fetch_errors: dict[str, int] = field(default_factory=dict)  # 본문 가져오기 실패 이유별 건수
     skip_reasons: dict[str, int] = field(default_factory=dict)  # 의도적으로 건너뛴 이유별 건수(robots, 형식, 영상)
     n_undated: int = 0  # 게시 시각이 없어 기간을 판단할 수 없는 목록 행(list_origin)
-    daily_days: list[str] = field(default_factory=list)  # 평소 목록(점수순 일부)으로만 받은 날짜
+    pages_per_day: int | None = None  # 날짜별 목록에서 날짜당 읽은 페이지 수 상한(설정값)
 
     def summary_text(self) -> str:
         parts = [f"{self.source_id}: 신규 {self.n_new}건"]
@@ -159,7 +158,7 @@ class TextCollector:
         st = SourceStats(src.id)
         self._range, self._src = (since, until), src
         if src.request_interval_s:  # 이 소스 도메인은 천천히
-            for u in (src.feed, src.daily.url_template if src.daily else None, src.backfill.url_template):
+            for u in (src.feed, src.backfill.url_template):
                 if u:
                     self.fetcher.set_interval(urlsplit(u).hostname or "", src.request_interval_s)
         if src.fetch == "list_origin":
@@ -198,21 +197,16 @@ class TextCollector:
 
     # ---------- 목록 수집(list_origin, GeekNews) ----------
     def _collect_lists(self, src: TextSource, since: date, until: date, st: SourceStats) -> SourceStats:
-        """RSS와 상세 페이지 없이 목록만(S1 Q1). 어제 이후가 기간에 들어 있으면 평소 목록(점수순 상위 페이지),
-        그 앞의 날짜는 날짜별 목록. 같은 글은 topic id로 한 번. 원문 링크가 자기 자신인 글은 빼고 센다."""
-        yesterday = self.today - timedelta(days=1)
+        """RSS, 상세 페이지, 메인 화면 없이 날짜별 목록만(S1 Q1, Q5). 매일 수집(어제)과 백필이 같은 방식이고,
+        날짜당 backfill.pages_per_day페이지. 오늘은 하루가 끝나지 않아 읽지 않는다. 같은 글은 topic id로 한 번.
+        원문 링크가 자기 자신인 글은 빼고 센다."""
+        last = min(until, self.today - timedelta(days=1))
+        if until > last:
+            st.notes.append(f"오늘({self.today})은 하루가 끝나지 않아 날짜별 목록을 읽지 않음")
         rows: list[Candidate] = []
-        if until >= yesterday:
-            rows += self._daily_pages(src, st)
-            d = max(since, yesterday)
-            while d <= until:  # 이 날짜들은 점수순 상위 페이지로만 받았다(하루치 전체가 아님). 리포트가 따로 표시
-                st.daily_days.append(d.isoformat())
-                d += timedelta(days=1)
-            st.notes.append(f"평소 목록(점수순 {src.daily.max_pages if src.daily else 0}페이지)으로 받은 날짜 "
-                            f"{', '.join(st.daily_days)}: 하루치 전체가 아님")
-        day, last = since, min(until, yesterday - timedelta(days=1))
+        day = since
         while day <= last:
-            rows += [c for c in self._archive_day(src, day, st)]
+            rows += self._archive_day(src, day, st)
             day += timedelta(days=1)
         merged: dict[str, Candidate] = {}
         for c in rows:
@@ -229,28 +223,6 @@ class TextCollector:
         for c in in_range:
             self._save(src, c, st)
         return st
-
-    def _daily_pages(self, src: TextSource, st: SourceStats) -> list[Candidate]:
-        assert src.daily is not None
-        out: list[Candidate] = []
-        for page in range(1, src.daily.max_pages + 1):
-            url = _render(src.daily.url_template, page=page)
-            res = self.fetcher.fetch(url, kind="page")
-            st.list_pages += 1
-            if not res.ok:
-                st.errors.append(f"목록 {url}: {res.error}")
-                st.covered = False
-                break
-            rows = self._parse_archive(src, res.text or "", self.today)
-            for c in rows:
-                c.via = "list"
-            out += rows
-            if not rows:
-                if page == 1:  # 메인 1페이지가 비면 구조 변경이나 차단 화면 의심(조용히 0건으로 끝내지 않음)
-                    st.errors.append(f"목록 {url}: 200인데 0행(구조 변경이나 확인 화면 의심)")
-                    st.covered = False
-                break
-        return out
 
     # ---------- 백필 ----------
     def _backfill(self, src: TextSource, since: date, until: date, oldest: date | None,
@@ -272,7 +244,9 @@ class TextCollector:
 
     def _archive_day(self, src: TextSource, day: date, st: SourceStats) -> list[Candidate]:
         template = src.backfill.url_template or ""
-        pages = range(1, src.backfill.max_pages + 1) if "{page}" in template else [None]
+        per_day = src.backfill.pages_per_day  # 날짜당 페이지 수(예: GeekNews 1 = 그날 점수 상위 약 20건)
+        st.pages_per_day = per_day
+        pages = range(1, (per_day or src.backfill.max_pages) + 1) if "{page}" in template else [None]
         out: list[Candidate] = []
         for page in pages:
             url = _render(template, page=page, day=day)
@@ -297,7 +271,7 @@ class TextCollector:
             if not rows or page is None or len(rows) < 20:  # 빈 페이지나 마지막 페이지
                 break
         else:
-            if pages and len(pages) > 1:  # 페이지 상한까지 읽고도 끝나지 않음
+            if pages and len(pages) > 1 and per_day is None:  # 페이지 상한까지 읽고도 끝나지 않음
                 st.covered = False
                 st.notes.append(f"아카이브 {day}가 페이지 상한 {src.backfill.max_pages}에 닿음")
         return out

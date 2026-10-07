@@ -77,52 +77,34 @@
   "content_type": "text/plain; charset=utf-8",
   "location": null
  },
- "https://news.hada.io/?page=1": {
-  "file": "7771cf89c5835989270c.gz",
+ "https://news.hada.io/past?day=2026-10-06&page=1": {
+  "file": "61c5abd35135dd39c637.gz",
   "status": 200,
   "content_type": "text/html; charset=UTF-8",
   "location": null
  },
- "https://news.hada.io/?page=2": {
-  "file": "b1fc52a4dbe17b4c5368.gz",
+ "https://github.com/robots.txt": {
+  "file": "6f12b3a8ea73b7281526.gz",
   "status": 200,
-  "content_type": "text/html; charset=UTF-8",
+  "content_type": "text/plain",
   "location": null
  },
- "https://qlabs.sh/robots.txt": {
-  "file": "8ee3cdbff6b9ed991d3b.gz",
-  "status": 200,
-  "content_type": "text/plain; charset=utf-8",
-  "location": null
- },
- "https://qlabs.sh/research/dust": {
-  "file": "4b350aa2264060c3cebc.gz",
+ "https://github.com/mvschwarz/openrig": {
+  "file": "a5babe6eb0c3a37fb08e.gz",
   "status": 200,
   "content_type": "text/html; charset=utf-8",
   "location": null
  },
- "https://www.vivienhenz.com/robots.txt": {
-  "file": "94ea4c878c2cf89e303a.gz",
-  "status": 404,
-  "content_type": "text/html; charset=utf-8",
+ "https://danbom425.tistory.com/robots.txt": {
+  "file": "c0befffb2b4409ededf5.gz",
+  "status": 200,
+  "content_type": "text/plain;charset=UTF-8",
   "location": null
  },
- "https://www.vivienhenz.com/common-lisp": {
-  "file": "6f6d21ae5ee6fba679d6.gz",
+ "https://danbom425.tistory.com/113": {
+  "file": "376fe96b84a392094899.gz",
   "status": 200,
-  "content_type": "text/html; charset=utf-8",
-  "location": null
- },
- "https://terrytao.wordpress.com/robots.txt": {
-  "file": "8aea203920c1fdf216ff.gz",
-  "status": 200,
-  "content_type": "text/plain; charset=utf-8",
-  "location": null
- },
- "https://terrytao.wordpress.com/2026/10/05/the-future-of-mathematics/": {
-  "file": "ed5197d10f48dfb1b2f2.gz",
-  "status": 200,
-  "content_type": "text/html; charset=UTF-8",
+  "content_type": "text/html;charset=UTF-8",
   "location": null
  },
  "https://simonwillison.net/atom/everything/": {
@@ -195,12 +177,6 @@
   "file": "b0b492b2590f0ff2c1ed.gz",
   "status": 200,
   "content_type": "text/xml; charset=UTF-8",
-  "location": null
- },
- "https://github.com/robots.txt": {
-  "file": "6f12b3a8ea73b7281526.gz",
-  "status": 200,
-  "content_type": "text/plain",
   "location": null
  },
  "https://github.com/trending?since=weekly": {

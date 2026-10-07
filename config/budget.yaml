@@ -1,4 +1,4 @@
 phase: mvp
 phase_total_usd: 20.00         # 키에는 공통 한도 50달러가 따로 있음. 20달러는 코드가 지킴 (2026-10-07 2→20 수정)
-specs: {S0: 0.15, S1: 0.05}    # S1은 1a S0 보완(repo_oneliner 관문 B 재실행)만 사용, 1b 수집은 0
+specs: {S0: 0.15, S1: 0.06}    # S1은 1a S0 보완(repo_oneliner 관문 B)만 사용, 1b 수집은 0. 0.05 → 0.06은 설계 결정(2026-10-08, Q3 재측정 완료용)
 # 단계 기준값(phase_baseline_usd)은 첫 실행 때 /api/v1/key의 usage로 data/budget_state.json에 저장

@@ -11,7 +11,7 @@
 | openai | feed_summary | 2015-12-11 | 예 | rss_only, 0 | 15 | 0 | 93% (14/15) | - | 73% (11/15) | - |
 | anthropic | feed_summary | 2021-05-28 | 예 | list_pages, 0 | 2 | 0 | 100% (2/2) | - | 100% (2/2) | - |
 | deepmind | feed_summary | 2025-11-11 | 예 | rss_only, 0 | 2 | 0 | 100% (2/2) | - | 50% (1/2) | - |
-| geeknews | list_origin | - | 예 | day_archive, 23 | 319 | 319 | 93% (276/296) | robots 차단 16, 허용 밖 형식(PDF 등) 4, 영상 3 | 37% (117/319) | 자기 글(Show GN 등) 57건 제외; 실패: HTTP 403 10건; 실패: 본문 추출 실패 4건; 실패: robots.txt 확인 불가로 건너뜀(ReadTimeout: The read operation timed out) 2건 |
+| geeknews | list_origin | - | 예(날짜당 1페이지) | day_archive, 7 | 83 | 83 | 98% (78/80) | robots 차단 1, 영상 2 | 63% (52/83) | 자기 글(Show GN 등) 57건 제외; 실패: 본문 추출 실패 1건 |
 | simonw | feed_full | 2026-09-28 | 예 | day_archive, 2 | 18 | 1 | 94% (17/18) | - | 67% (12/18) | - |
 | aitimes | feed_summary | 2026-10-06 | 예 | list_pages, 11 | 188 | 188 | 100% (188/188) | - | 56% (106/188) | - |
 | techbridge | rss + yt-dlp | 2026-10-02 | 예 | channel_listing, 1 | 17 | 10 | 94% (16/17) | - | 82% (14/17) | - |
@@ -23,7 +23,7 @@
 | openai | 3 | 5 | 2 | 1 | 3 | 1 | 0 | 2.1 |
 | anthropic | 0 | 0 | 0 | 1 | 1 | 0 | 0 | 0.3 |
 | deepmind | 0 | 0 | 0 | 2 | 0 | 0 | 0 | 0.3 |
-| geeknews | 54 | 50 | 37 | 51 | 51 | 34 | 42 | 45.6 |
+| geeknews | 9 | 15 | 9 | 13 | 11 | 11 | 15 | 11.9 |
 | simonw | 5 | 3 | 4 | 2 | 1 | 1 | 2 | 2.6 |
 | aitimes | 31 | 31 | 30 | 40 | 30 | 14 | 12 | 26.9 |
 | techbridge | 2 | 2 | 2 | 3 | 3 | 2 | 3 | 2.4 |
@@ -35,7 +35,7 @@
 | openai | `rss_only` | `rss_only` | 후보 그대로 |
 | anthropic | `list_pages https://www.anthropic.com/news` | `list_pages https://www.anthropic.com/news` | 목록은 최신 10건 안팎, 페이지 넘김 없음. 커뮤니티 피드가 2021년부터 담고 있어 대체 수단으로만 |
 | deepmind | `rss_only` | `rss_only` | 후보 그대로 |
-| geeknews | `RSS + list_pages https://news.hada.io/?page={page}` | `day_archive https://news.hada.io/past?day={date}&page={page}` | 설계 결정(Q1): RSS·상세 페이지를 쓰지 않음. 평소는 메인(점수순) 1~2페이지, 지난 기간은 날짜별 목록 past?day=(20건씩 페이지). 본문은 원문 링크에서 |
+| geeknews | `RSS + list_pages https://news.hada.io/?page={page}` | `day_archive https://news.hada.io/past?day={date}&page={page}` | 설계 결정(Q1, Q5): RSS·상세 페이지·메인 화면을 쓰지 않음. 매일 수집과 백필 모두 날짜별 목록 past?day=에서 날짜당 pages_per_day페이지(기본 1 = 그날 점수 상위 약 20건). 본문은 원문 링크에서 |
 | simonw | `day_archive https://simonwillison.net/{yyyy}/{Mon}/{d}/` | `day_archive https://simonwillison.net/{yyyy}/{Mon}/{d}/` | 후보 그대로 동작(조각마다 고유 주소, 시각) |
 | aitimes | `list_pages https://www.aitimes.com/news/articleList.html?page={page}&view_type=sm` | `list_pages https://www.aitimes.com/news/articleList.html?sc_sdate={since}&sc_edate={until}&view_type=sm / 2페이지부터 https://www.aitimes.com/news/ajaxArticlePaging.php?page={page}&list_per_page=20&page_per_page=10&sc_sdate={since}&sc_edate={until}&sc_order_by=E&view_type=sm` | 목록의 page 값이 무시됨(더보기는 JS) → 1페이지는 sc_sdate/sc_edate로 거른 HTML, 2페이지부터 ajaxArticlePaging.php(JSON) |
 | techbridge | `channel_listing (yt-dlp)` | `channel_listing` | yt-dlp 채널 목록(flat, approximate_date) 동작. 정확한 시각은 영상별 메타데이터 |
@@ -94,18 +94,18 @@
   - [ ] 놓침 · The Lenfest Institute grows landmark program with expanded OpenAI support (no_keyword)
   - [ ] 놓침 · Helping small businesses put AI to work (no_keyword)
 - 통과한 글
-  - [ ] 잘못 통과 · Introducing GPT-6.1 Sol (점수 5)
-  - [ ] 잘못 통과 · Towards safety cases for frontier AI training (점수 2)
+  - [ ] 잘못 통과 · Disrupting a coordinated model-distillation campaign (점수 1)
   - [ ] 잘못 통과 · Chatham scales its capital markets expertise with OpenAI (점수 2)
-  - [ ] 잘못 통과 · How we will do better for Australia (점수 2)
   - [ ] 잘못 통과 · Are you a Codex Original? (점수 3)
+  - [ ] 잘못 통과 · A model guide for the GPT-6 family (점수 4)
+  - [ ] 잘못 통과 · Towards safety cases for frontier AI training (점수 2)
 
 ### anthropic
 - 걸러진 글
   - (없음)
 - 통과한 글
-  - [ ] 잘못 통과 · Anthropic invests $100 million to train 10,000 engineers and tackle the enterpri (점수 1)
   - [ ] 잘못 통과 · Barclays scales Claude to upgrade operations and improve client experience (점수 5)
+  - [ ] 잘못 통과 · Anthropic invests $100 million to train 10,000 engineers and tackle the enterpri (점수 1)
 
 ### deepmind
 - 걸러진 글
@@ -115,45 +115,45 @@
 
 ### geeknews
 - 걸러진 글
-  - [ ] 놓침 · ADHD, 자폐증, 아니면 복합 트라우마인가? [PDF] (no_keyword)
-  - [ ] 놓침 · DuckDB 2.0이 더 빠른 이유 (no_keyword)
-  - [ ] 놓침 · 서버 모니터링 분석 가이드 (no_keyword)
-  - [ ] 놓침 · Hacker News가 AI에 제시한 도전 과제 중 무엇이 달성됐는지 투표하기 (no_keyword)
-  - [ ] 놓침 · 우크라이나에서 분산형 재생에너지가 러시아의 공격을 무력화하다 (no_keyword)
+  - [ ] 놓침 · PostgreSQL JSONB: JSON 데이터 조회, 수정 및 인덱싱 (no_keyword)
+  - [ ] 놓침 · 소프트웨어 품질의 시대인가, 타조의 시대인가? (no_keyword)
+  - [ ] 놓침 · LLM Wiki의 불량 페이지를 Jev로 선별하는 것이 가능할까? (no_keyword)
+  - [ ] 놓침 · Pluto - SOTA 스타크래프트 AI (no_keyword)
+  - [ ] 놓침 · 왜 더 많은 개발자가 “플랫폼을 활용”하지 않을까? (no_keyword)
 - 통과한 글
-  - [ ] 잘못 통과 · 휴가에서 돌아오나요? 미국 정부는 영장 없이 휴대전화를 수색할 수 있음 (점수 2)
+  - [ ] 잘못 통과 · 문제는 AI 코드가 아니라, 이제 아무도 아무것도 모른다는 것이다 (점수 3)
   - [ ] 잘못 통과 · DeepSeek Harness, 맥·윈도우용 데스크톱 앱 공개 (점수 4)
-  - [ ] 잘못 통과 · Claude와 Claude Code에서 Opus 5.5를 최대한 활용하는 방법 (점수 6)
-  - [ ] 잘못 통과 · ChatGPT, 월 500달러 Pro 요금제 추가…기존 Pro 200 사용량 축소 (점수 1)
-  - [ ] 잘못 통과 · Apple, macOS ‘전체 디스크 접근’ 권한 통제 강화 예고 (점수 1)
+  - [ ] 잘못 통과 · 텍스트 분류를 위한 언어 모델: Bag-of-Words에서 Jev까지 (점수 2)
+  - [ ] 잘못 통과 · 바이브 코딩한 웹사이트를 디자이너가 만든 것처럼 보이게 한 방법 (점수 2)
+  - [ ] 잘못 통과 · 생각을 정리하는 도구로서의 커밋 설명 (점수 2)
 
 ### simonw
 - 걸러진 글
-  - [ ] 놓침 · S3 Is the Future, S3 Is the Past (no_keyword)
+  - [ ] 놓침 · September sponsors-only newsletter (no_keyword)
+  - [ ] 놓침 · Rex's Dino Store (no_keyword)
   - [ ] 놓침 · Bluesky reply bot checker (no_keyword)
   - [ ] 놓침 · He Built This City (no_keyword)
-  - [ ] 놓침 · Rex's Dino Store (no_keyword)
   - [ ] 놓침 · sighting 404239413 (no_keyword)
 - 통과한 글
   - [ ] 잘못 통과 · Photo Scrubber — local face blur & metadata removal (점수 2)
-  - [ ] 잘못 통과 · We're going to need default hard budget caps on pretty much everything (점수 1)
-  - [ ] 잘못 통과 · GPT 6.1 Sol: Near-Astra intelligence for a fifth of the price (점수 3)
+  - [ ] 잘못 통과 · Quoting Anthropic Frontier Red Team (점수 5)
+  - [ ] 잘못 통과 · Quoting Matthew Green (점수 1)
+  - [ ] 잘못 통과 · OpenAI DevDay 2026 live blog (점수 3)
   - [ ] 잘못 통과 · Claude Sonnet 5.5 (점수 5)
-  - [ ] 잘못 통과 · 2026 in LLMs (so far) (점수 6)
 
 ### aitimes
 - 걸러진 글
-  - [ ] 놓침 · "다섯 손가락 필요 없다"...보스턴 다이내믹스, 네 손가락 로봇 손 공개 (no_keyword)
-  - [ ] 놓침 · 세계 태양광, 지난해 직류 기준 690GW 추가…중국이 60% (excluded:정치)
-  - [ ] 놓침 · 머스크, 미 국방부 '미래 전쟁' 자문으로 공직 복귀...AI·드론 중심 미래전 대비 (no_keyword)
-  - [ ] 놓침 · 스페인 연구진, 태양광발전소 맹금류 행동 추적…사냥·휴식 공간 활용 (no_keyword)
-  - [ ] 놓침 · "GPU인 줄 알고 훔쳤는데 모래만 18톤"...엔비디아 로고 트럭 절도 해프닝 (no_keyword)
+  - [ ] 놓침 · 카카오, CA협의체 공동 의장에 김도영 카카오X 대표 내정자 확정 (no_keyword)
+  - [ ] 놓침 · 우크라이나, '로봇 군단' 발족...드론 이어 지상 전장 무인화 박차 (no_keyword)
+  - [ ] 놓침 · 미국 태양광 모듈값 하락에도 상업·대규모 시스템 가격 상승 (no_keyword)
+  - [ ] 놓침 · 기업 태양광에 배터리 지원…그리스, 815만유로 배정 (no_keyword)
+  - [ ] 놓침 · 스캐터랩, 캐릭터챗 '제타' 신규 기능 출시..."대화 따라 표정·배경 바뀐다" (no_keyword)
 - 통과한 글
-  - [ ] 잘못 통과 · 구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 "일반 사용 제한" (점수 3)
-  - [ ] 잘못 통과 · 모빌린트 “LG·두산·대동 로봇 맞춤형 온디바이스 AI 반도체 개발할 것” (점수 1)
-  - [ ] 잘못 통과 · [10월2일] "뜻밖의 주인공은 로그인과 플러그인"…알트먼이 보여준 챗GPT의 다음 무대 (점수 4)
-  - [ ] 잘못 통과 · "콜센터 AI 말 끊어도 알아듣는다"...포지큐브, 차세대 AICC 개발 (점수 1)
-  - [ ] 잘못 통과 · 메타, 소상공인용 AI 에이전트 출시…‘뮤즈’로 B2B 시장 확대 (점수 3)
+  - [ ] 잘못 통과 · 알트먼 "기업공개 압박 없이 AI 안전 확보가 우선" (점수 2)
+  - [ ] 잘못 통과 · 일레븐랩스, 감정 표현·지연 시간 혁신한 '일레븐 v4' 공개…TTS 아레나 1위 (점수 6)
+  - [ ] 잘못 통과 · 텐센트, 오라클서 AI 칩 10만개 임대…규제 피하려 동남아로 (점수 1)
+  - [ ] 잘못 통과 · [9월28일] 메타 '뮤즈'가 찾아낸 새로운 유즈 케이스는 '구독 해지' (점수 1)
+  - [ ] 잘못 통과 · AI '생각의 사슬' 무력화되나…'순환 깊이' 기술이 부른 불투명성 우려 (점수 2)
 
 ### techbridge
 - 걸러진 글
@@ -161,26 +161,26 @@
   - [ ] 놓침 · [한영자막] 400개 기업 데이터로 본 소프트웨어 개발 AI의 현주소입니다 (excluded:채용)
   - [ ] 놓침 · [한영자막] 팟캐스트 풀버전 - SpaceX에서 매달 수천 개의 PR을 반영하는 방법을 알아봅니다 | Cursor & Grok Bot 개발자 L (no_keyword)
 - 통과한 글
-  - [ ] 잘못 통과 · Lauren Tan(SpaceX - Cursor & Grok Bot 개발자)의 AI 에이전트 개발 워크플로우 (점수 4)
-  - [ ] 잘못 통과 · [한영자막] AI 시대, 스펙 기반 개발(SDD)을 실무에 적용하며 배운 교훈들 (점수 2)
   - [ ] 잘못 통과 · [한영자막] MS 사티아 나델라가 밝힌 AI 미래: 코파일럿과 오토파일럿, 그리고 다가올 제품 경쟁 (점수 1)
+  - [ ] 잘못 통과 · [한영자막] 소프트웨어 엔지니어링은 이제 소프트웨어 공장을 짓는 일이 될 것입니다 — Zach Lloyd (Warp) (점수 2)
+  - [ ] 잘못 통과 · [한영자막] 진짜 '소프트웨어 팩토리'를 만들려면 무엇이 필요할까요? — Factory Tereza (점수 4)
+  - [ ] 잘못 통과 · [한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex (점수 6)
   - [ ] 잘못 통과 · [한영자막] 스스로 개선되는 AI 에이전트는 어떻게 만들었을까요? | Weights & Biases (점수 6)
-  - [ ] 잘못 통과 · [한영자막] Claude Code와 Codex를 인간 연구자들과 경쟁시켰습니다 — Elie Bakouch, Prime Intellect (점수 8)
 
 ## 6. 링크
 
 | 종류 | 링크 수 |
 |---|---|
-| other | 1757 |
-| curation | 838 |
-| repo | 232 |
-| social | 167 |
-| official | 103 |
-| paper | 72 |
-| news | 27 |
-| press | 16 |
+| other | 587 |
+| social | 99 |
+| repo | 98 |
+| official | 76 |
+| paper | 50 |
+| curation | 12 |
+| news | 6 |
+| press | 1 |
 
-- GeekNews 원문 링크 확보율: 100% (319/319) (원문 링크가 GeekNews 자신인 글 57건은 수집에서 뺌. 목록에서 원문 링크가 있는 글만 수집하므로 구조상 100%이고, 실제 확인은 자기 글 판정이 맞는지)
+- GeekNews 원문 링크 확보율: 100% (83/83) (원문 링크가 GeekNews 자신인 글 57건은 수집에서 뺌. 목록에서 원문 링크가 있는 글만 수집하므로 구조상 100%이고, 실제 확인은 자기 글 판정이 맞는지)
 - 원문이 Hacker News 토론 페이지인 GeekNews 글은 토론 속 링크가 많이 잡힘(curation 링크 대부분). S3 원본 추적에서 거를 대상
 
 ## 7. 문턱값 (S1_TASK 7장)
@@ -189,6 +189,6 @@
 |---|---|---|---|
 | 글 소스 6곳 기간 덮음 | RSS 또는 백필 | 못 덮음: 없음 | 통과 |
 | 본문 추출 성공률 | 소스별 90% 이상(feed_full 제외) | 미달: 없음 | 통과 |
-| GeekNews 원문 링크 확보율 | 95% 이상 | 100% (319/319) | 통과 |
+| GeekNews 원문 링크 확보율 | 95% 이상 | 100% (83/83) | 통과 |
 | 트렌딩 | 주간 페이지에 보이는 전부, stars_this_week 누락 0, 0개면 실패(설계 결정 Q2) | 페이지 11개 중 11개, 누락 0 | 통과 |
 | 중복 | 0 | 0 | 통과 |
