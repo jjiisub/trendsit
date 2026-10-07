@@ -24,6 +24,7 @@ class Ctx:
     no_cache: bool = False
     model: str | None = None  # 별칭 덮어쓰기(--model)
     last_step_id: int | None = None
+    stopped: str | None = None  # 예산 초과 등으로 대체 출력을 내고 멈춘 이유(실행 상태 stopped)
 
 
 def open_ctx(kind: str | None, *, spec: str | None = None, no_cache: bool = False, model: str | None = None,

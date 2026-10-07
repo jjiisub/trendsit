@@ -14,7 +14,7 @@ from .core.config import ROOT, ConfigError
 from .core.context import open_ctx
 from .core.db import DB
 from .core.llm import LLMError
-from .core.role import Role, RoleFailed, load_role, record_llm, role_path, run
+from .core.role import Role, load_role, record_llm, role_path, run
 
 
 def _print_json(obj: Any) -> None:
@@ -62,7 +62,7 @@ def cmd_role(args: argparse.Namespace) -> int:
         return 2
     ctx = open_ctx("role", spec=args.spec, no_cache=args.no_cache, model=args.model,
                    note=f"replay {args.replay}" if args.replay else f"role {args.name}")
-    status = "ok"
+    status = "failed"  # 성공으로 끝났을 때만 ok
     try:
         if args.replay is not None:
             out = _replay(ctx, args.replay, args.model)
@@ -70,8 +70,13 @@ def cmd_role(args: argparse.Namespace) -> int:
             role = load_role(args.name, ctx.models)
             out = run(role, role.input_cls.model_validate(_read_input(args.input)), ctx).model_dump()
         _print_json(out)
-    except (RoleFailed, BudgetExceeded, LLMError, PriceUnknown) as e:
-        status = "stopped" if isinstance(e, BudgetExceeded) else "failed"
+        status = "stopped" if ctx.stopped else "ok"
+        if ctx.stopped:
+            print(ctx.stopped, file=sys.stderr)
+    except (BudgetExceeded, PriceUnknown) as e:
+        status = "stopped"
+        print(f"{type(e).__name__}: {e}", file=sys.stderr)
+    except Exception as e:  # noqa: BLE001 - 어떤 실패든 run을 failed로 닫고 이유를 출력
         print(f"{type(e).__name__}: {e}", file=sys.stderr)
     finally:
         ctx.tracer.finish(status)
@@ -140,8 +145,7 @@ def cmd_cost(args: argparse.Namespace) -> int:
     b = ctx.budget
     cap = b.cfg.specs.get(ctx.spec)
     print()
-    print(f"- 스펙 {ctx.spec}: 기록 합 ${ctx.db.spent(ctx.spec):.6f} / 상한 "
-          f"{'$' + format(cap, '.2f') if cap is not None else '없음'}")
+    print(f"- 스펙 {ctx.spec}: 기록 합 ${ctx.db.spent(ctx.spec):.6f} / 상한 ${cap:.2f}")
     if b.source == "key":
         print(f"- 단계({b.cfg.phase}) 사용액: ${b.phase_used:.6f} / 상한 ${b.cfg.phase_total_usd:.2f}, "
               f"남은 예산 ${b.cfg.phase_total_usd - b.phase_used:.6f}")

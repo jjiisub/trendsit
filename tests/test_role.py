@@ -103,3 +103,20 @@ def test_unknown_config_alias_override(tmp_path, models):
     with pytest.raises(Exception, match="없는 별칭"):
         run_role(load_role("repo_oneliner", models), INPUT, ctx)
     assert config.load("models.yaml")
+
+
+def test_strict_schema_keeps_field_names_that_look_like_keywords():
+    from pydantic import Field
+
+    from trendsit.core.artifacts import RoleOutput
+    from trendsit.core.llm import strict_json_schema
+
+    class Card(RoleOutput):
+        title: str = Field(max_length=10)
+        format: str
+        pattern: str | None = None
+
+    s = strict_json_schema(Card)
+    assert list(s["properties"]) == ["title", "format", "pattern", "log", "attention"]
+    assert s["required"] == list(s["properties"])
+    assert "maxLength" not in s["properties"]["title"] and "title" not in s["properties"]["title"]

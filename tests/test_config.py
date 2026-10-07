@@ -43,9 +43,7 @@ def test_negative_budget_points_to_path(tmp_path):
     root = copy_root(tmp_path)
     edit_yaml(root / "config/budget.yaml", lambda d: d["specs"].__setitem__("S0", -1))
     errors = config.check_all(root / "config")
-    assert len(errors) == 1
-    assert errors[0].file == "budget.yaml" and errors[0].path == "specs"
-    assert "S0" in errors[0].reason
+    assert [(e.file, e.path) for e in errors] == [("budget.yaml", "specs.S0")]
 
 
 def test_missing_required_alias(tmp_path):

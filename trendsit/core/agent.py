@@ -11,7 +11,7 @@ from pydantic import ValidationError
 from ..tools import TOOLS, ToolOutput, ToolRejected
 from .artifacts import RoleInput, RoleOutput
 from .budget import BudgetExceeded
-from .llm import parse_json_output, strict_json_schema
+from .llm import LLMError, parse_json_output, strict_json_schema
 from .role import Role, initial_messages, record_llm, wrap_data
 
 if TYPE_CHECKING:
@@ -123,7 +123,11 @@ def run_agent(role: Role, inp: RoleInput, ctx: Ctx) -> RoleOutput:
                                temperature=role.spec.temperature, no_cache=ctx.no_cache)
         except BudgetExceeded as e:
             ctx.tracer.step(kind="code", role=role.name, text="예산 초과로 중단", attention=True, error=str(e))
+            ctx.stopped = f"BudgetExceeded: {e}"
             return finish_with(role.output_cls.fallback("예산 초과", inp), "budget")
+        except LLMError as e:
+            ctx.tracer.step(kind="code", role=role.name, text="LLM 호출 실패", attention=True, error=str(e))
+            raise
         messages.append(res.assistant_message)
 
         if not res.tool_calls:

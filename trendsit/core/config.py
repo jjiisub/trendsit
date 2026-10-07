@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
-from typing import Any, Literal
+from typing import Annotated, Any, Literal
 
 import yaml
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator, model_validator
@@ -74,15 +74,7 @@ class ModelsConfig(Strict):
 class BudgetConfig(Strict):
     phase: str
     phase_total_usd: float = Field(ge=0)
-    specs: dict[str, float]
-
-    @field_validator("specs")
-    @classmethod
-    def _non_negative(cls, v: dict[str, float]) -> dict[str, float]:
-        for k, amount in v.items():
-            if amount < 0:
-                raise ValueError(f"{k}: 예산은 0 이상이어야 함 (값 {amount})")
-        return v
+    specs: dict[str, Annotated[float, Field(ge=0)]]  # 음수면 경로 specs.S0로 짚음
 
 
 # ---------- sources.yaml ----------

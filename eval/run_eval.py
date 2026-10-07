@@ -8,7 +8,9 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from trendsit.core.budget import BudgetExceeded
+from pydantic import ValidationError
+
+from trendsit.core.budget import BudgetExceeded, PriceUnknown
 from trendsit.core.config import ROOT
 from trendsit.core.context import open_ctx
 from trendsit.core.db import KST
@@ -31,6 +33,17 @@ def load_fixtures(role: str, limit: int | None = None) -> list[tuple[str, dict[s
 def run_eval(role_name: str, model: str | None = None, limit: int | None = None, spec: str | None = None,
              no_cache: bool = False, note: str | None = None) -> dict[str, Any]:
     ctx = open_ctx("eval", spec=spec, model=model, no_cache=no_cache, note=f"eval {role_name} {model or ''}")
+    status = "failed"  # 어떤 예외로 끝나도 run을 닫는다
+    try:
+        report = _evaluate(ctx, role_name, model, limit, note)
+        status = "stopped" if report["stopped"] else "ok"
+    finally:
+        ctx.tracer.finish(status)
+    write_quality(ctx.spec)
+    return report
+
+
+def _evaluate(ctx: Any, role_name: str, model: str | None, limit: int | None, note: str | None) -> dict[str, Any]:
     role = load_role(role_name, ctx.models)
     alias = model or role.spec.model
     with_llm = graders.rubric_path(role_name).exists()
@@ -43,10 +56,14 @@ def run_eval(role_name: str, model: str | None = None, limit: int | None = None,
         try:
             out = run(role, role.input_cls.model_validate(fx["input"]), ctx).model_dump()
             rec["step_id"] = ctx.last_step_id
-        except RoleFailed as e:
-            error = str(e)
-        except (BudgetExceeded, LLMError) as e:
+        except (RoleFailed, ValidationError) as e:  # 출력 검증 실패, 픽스처 입력 형식 오류는 그 항목의 실패
+            error = f"{type(e).__name__}: {e}"
+        except (BudgetExceeded, LLMError, PriceUnknown) as e:
             stopped = f"{type(e).__name__}: {e}"
+            print(f"[eval] 중단: {stopped}", file=sys.stderr)
+            break
+        if ctx.stopped:  # 에이전트가 예산 초과로 대체 출력을 내고 멈춤
+            stopped = ctx.stopped
             print(f"[eval] 중단: {stopped}", file=sys.stderr)
             break
         rec["output"], rec["error"] = out, error
@@ -54,7 +71,7 @@ def run_eval(role_name: str, model: str | None = None, limit: int | None = None,
         if with_llm and rec["code"]["passed"]:
             try:
                 rec["llm"] = graders.llm_grade(role_name, fx["input"], out, ctx)  # type: ignore[arg-type]
-            except (BudgetExceeded, LLMError, RoleFailed) as e:
+            except (BudgetExceeded, LLMError, PriceUnknown, RoleFailed) as e:
                 stopped = f"채점 {type(e).__name__}: {e}"
                 print(f"[eval] 채점 중단: {stopped}", file=sys.stderr)
                 results.append(rec)
@@ -73,17 +90,21 @@ def run_eval(role_name: str, model: str | None = None, limit: int | None = None,
     report = {
         "role": role_name, "model_alias": alias, "model_id": ctx.models.models[alias].id,
         "prompt_hash": role.prompt_hash, "spec": ctx.spec, "run_id": ctx.tracer.run_id,
-        "at": now.isoformat(timespec="seconds"), "note": note, "stopped": stopped,
+        "at": now.isoformat(timespec="seconds"), "note": note, "stopped": stopped, "limit": limit,
         "cost_usd": round(ctx.budget.session_cost, 6), "summary": summary, "results": results,
     }
-    ctx.tracer.finish("stopped" if stopped else "ok")
     out_dir = REPORTS / "eval"
     out_dir.mkdir(parents=True, exist_ok=True)
     path = out_dir / f"{role_name}_{alias}_{now:%Y%m%d-%H%M%S}.json"
     path.write_text(json.dumps(report, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     report["path"] = str(path.relative_to(ROOT))
-    write_quality(ctx.spec)
     return report
+
+
+def _is_full(r: dict[str, Any]) -> bool:
+    """픽스처 전체를 돈 실행인지(--limit 부분 실행, 중단된 실행 제외)."""
+    total = len(list((FIXTURES / r["role"]).glob("*.json")))
+    return not r.get("limit") and not r.get("stopped") and r["summary"]["n"] == total
 
 
 # ---------- 사람이 읽는 리포트 ----------
@@ -117,9 +138,13 @@ def write_quality(spec: str) -> Path:
              "> `python -m trendsit eval`이 자동 생성한다. 원자료는 `reports/eval/*.json`.", ""]
     for role in dict.fromkeys(r["role"] for r in reps):
         rr = [r for r in reps if r["role"] == role]
-        latest: dict[str, dict[str, Any]] = {}
+        latest: dict[str, dict[str, Any]] = {}  # 모델별 가장 최근의 전체 실행
         for r in rr:
-            latest[r["model_alias"]] = r
+            if _is_full(r):
+                latest[r["model_alias"]] = r
+        if not latest:
+            lines += [f"## {role}", "", "전체 픽스처를 돈 실행 없음(부분 실행만 있음)", ""]
+            continue
         criteria = graders.rubric_criteria(role) if graders.rubric_path(role).exists() else []
         th = graders.THRESHOLDS.get(role, {})
         lines += [f"## {role}", ""]
@@ -129,7 +154,7 @@ def write_quality(spec: str) -> Path:
         elif th:
             lines += ["문턱값: 코드 채점 전부 통과", ""]
         head = ["모델", "코드 통과"] + [f"{c} 평균(1점)" for c in criteria] + ["3점 미만", "문턱값", "비용", "프롬프트"]
-        lines += ["### 모델별 최신 결과", "", "| " + " | ".join(head) + " |", "|" + "---|" * len(head)]
+        lines += ["### 모델별 최신 결과 (전체 실행만)", "", "| " + " | ".join(head) + " |", "|" + "---|" * len(head)]
         for alias, r in latest.items():
             s = r["summary"]
             row = [f"{alias} (`{r['model_id']}`)", f"{s['code_pass']}/{s['n']}"]
@@ -185,7 +210,7 @@ def write_quality(spec: str) -> Path:
             s = r["summary"]
             crit = ", ".join(f"{c} {s['criteria'][c]['avg']}" for c in criteria)
             res = f"코드 {s['code_pass']}/{s['n']}" + (f", {crit}" if crit else "") + (
-                ", 통과" if s["passed"] else ", 미달")
+                ", 통과" if s["passed"] else ", 미달") + ("" if _is_full(r) else " (부분 실행)")
             lines.append(f"| {r['at']} | {r['model_alias']} | `{r['prompt_hash']}` | {_cell(res)} | "
                          f"${r['cost_usd']:.4f} | {_cell(r.get('note') or '')} |")
         lines.append("")

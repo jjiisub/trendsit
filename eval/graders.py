@@ -143,6 +143,9 @@ def summarize(role: str, results: list[dict[str, Any]]) -> dict[str, Any]:
         below3 += sum(1 for v in vals if v < 3)
     summary["below3"] = below3
     reasons = []
+    missing = sum(1 for r in results if r.get("llm") and r["llm"].get("missing"))
+    if missing:  # 채점자가 항목을 빠뜨리면 그 항목 평균이 적은 표본으로 계산되므로 미달
+        reasons.append(f"채점 항목 누락 {missing}건")
     if th.get("code_pass_all") and code_pass < n:
         reasons.append(f"코드 채점 통과 {code_pass}/{n}")
     if criteria:

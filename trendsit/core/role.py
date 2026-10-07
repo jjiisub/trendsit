@@ -12,7 +12,9 @@ import yaml
 from pydantic import BaseModel, Field, ValidationError
 
 from .artifacts import INPUTS, OUTPUTS, RoleInput, RoleOutput
+from .budget import BudgetExceeded
 from .config import ROOT, ConfigError, ModelsConfig, Strict, loc_to_path
+from .llm import LLMError
 
 if TYPE_CHECKING:
     from .context import Ctx
@@ -144,6 +146,7 @@ def record_llm(ctx: Ctx, role: Role, res: Any, *, text: str, attention: bool = F
         output=output.model_dump() if isinstance(output, BaseModel) else output,
         prompt_hash=prompt_hash or role.prompt_hash, model=res.model, provider=res.provider,
         tokens_in=res.tokens_in, tokens_out=res.tokens_out, cost_usd=res.cost_usd,
+        reasoning_tokens=res.reasoning_tokens, cached_tokens=res.cached_tokens,
         cost_estimated=res.cost_estimated, latency_ms=res.latency_ms, cache_hit=res.cache_hit,
         request=res.request, response=res.response,
     )
@@ -155,8 +158,14 @@ def run_role(role: Role, inp: RoleInput, ctx: Ctx) -> RoleOutput:
     messages = initial_messages(role, inp)
     last_error = ""
     for attempt in range(ROLE_RETRIES + 1):
-        res = ctx.llm.chat(alias, messages, schema=role.output_cls, max_tokens=role.spec.max_tokens,
-                           temperature=role.spec.temperature, no_cache=ctx.no_cache)
+        try:
+            res = ctx.llm.chat(alias, messages, schema=role.output_cls, max_tokens=role.spec.max_tokens,
+                               temperature=role.spec.temperature, no_cache=ctx.no_cache)
+        except (BudgetExceeded, LLMError) as e:
+            # 호출 전 예산 초과, 제공사 오류도 실행 기록에 남긴다(이유를 찾을 수 있게)
+            ctx.tracer.step(kind="code", role=role.name, text=f"{type(e).__name__}로 중단", attention=True,
+                            error=str(e), detail={"attempt": attempt + 1})
+            raise
         if res.parsed is not None:
             out: RoleOutput = res.parsed
             ctx.last_step_id = record_llm(ctx, role, res, text=out.log, attention=out.attention, output=out,

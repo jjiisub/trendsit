@@ -67,7 +67,10 @@ def strict_json_schema(model: type[BaseModel]) -> dict[str, Any]:
             return node
         if "$ref" in node:
             return walk(copy.deepcopy(defs[node["$ref"].split("/")[-1]]))
-        out = {k: walk(v) for k, v in node.items() if k not in _DROP_KEYS}
+        # 키워드만 거른다. properties 안의 키는 필드 이름이라(title, format 등) 그대로 둔다
+        out = {k: walk(v) for k, v in node.items() if k not in _DROP_KEYS and k != "properties"}
+        if "properties" in node:
+            out["properties"] = {name: walk(sub) for name, sub in node["properties"].items()}
         if out.get("type") == "object" and "properties" in out:
             props = out["properties"]
             order = [k for k in props if k not in _TAIL_FIELDS] + [k for k in _TAIL_FIELDS if k in props]
@@ -233,10 +236,12 @@ class LLMClient:
         self.network_calls += 1
         response = self.transport(body, base_url, api_key or "ollama")
         latency = int((time.monotonic() - started) * 1000)
-        if response.get("error"):
-            raise LLMError(f"제공사 오류: {json.dumps(response['error'], ensure_ascii=False)[:500]}")
-        if not response.get("choices"):
-            raise LLMError("응답에 choices 없음")
+        if response.get("error") or not response.get("choices"):
+            # 실패 응답에도 청구액이 있으면 예산에 더한다(키 usage로도 나중에 맞춰짐)
+            if self.budget is not None:
+                self.budget.add(float((response.get("usage") or {}).get("cost") or 0))
+            detail = json.dumps(response.get("error"), ensure_ascii=False)[:500] if response.get("error") else ""
+            raise LLMError(f"제공사 오류: {detail}" if detail else "응답에 choices 없음")
 
         result = self._result(alias, request, response, latency_ms=latency, cache_hit=False, schema=schema)
         if result.cost_usd == 0 and not self._free(alias):

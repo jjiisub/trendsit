@@ -152,3 +152,14 @@ def test_lagging_key_usage_uses_records(tmp_path, models):
     run_role(load_role("repo_oneliner", models), INPUT, ctx)
     ctx.budget.refresh()  # 키 usage는 아직 1.0 그대로(반영 지연)
     assert ctx.budget.key_phase_used == 0 and ctx.budget.phase_used == pytest.approx(0.05)
+
+
+def test_unknown_spec_is_refused(tmp_path):
+    from trendsit.core.budget import Budget, PriceBook
+    from trendsit.core.config import BudgetConfig, ConfigError
+    from trendsit.core.db import DB
+
+    cfg = BudgetConfig(phase="mvp", phase_total_usd=20, specs={"S0": 0.15})
+    for spec in ("S1", "s0"):
+        with pytest.raises(ConfigError, match="상한이 없음"):
+            Budget(cfg, spec, DB(tmp_path / "t.db"), tmp_path / "b.json", None, PriceBook(tmp_path / "p.json"))

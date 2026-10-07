@@ -18,7 +18,7 @@ from typing import Any
 
 import httpx
 
-from .config import BudgetConfig, ModelSpec
+from .config import BudgetConfig, ConfigError, ModelSpec
 from .db import DB, now_kst
 
 PRICE_TTL_S = 24 * 3600
@@ -108,7 +108,9 @@ class Budget:
         self.cfg, self.spec, self.db, self.state_path = cfg, spec, db, state_path
         self.key_status = key_status
         self.prices = prices
-        self.spec_cap = cfg.specs.get(spec)
+        if spec not in cfg.specs:  # 상한 없는 스펙(오타 포함)으로는 실행하지 않는다
+            raise ConfigError("budget.yaml", "specs", f"스펙 '{spec}'의 상한이 없음 (있는 스펙: {', '.join(cfg.specs)})")
+        self.spec_cap: float = cfg.specs[spec]
         self.session_cost = 0.0
         self.phase_used_at_refresh = 0.0
         self.spec_spent_at_refresh = 0.0
@@ -180,7 +182,7 @@ class Budget:
         return tokens_in * pin + tokens_out * pout
 
     def check(self, estimate: float, attempted: str) -> None:
-        if self.spec_cap is not None and self.spec_spent + estimate > self.spec_cap:
+        if self.spec_spent + estimate > self.spec_cap:
             raise BudgetExceeded(
                 f"스펙 {self.spec} 상한 초과: 누적 ${self.spec_spent:.4f} + 예상 ${estimate:.4f} "
                 f"> 상한 ${self.spec_cap:.2f} (시도: {attempted})")

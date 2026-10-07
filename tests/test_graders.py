@@ -60,3 +60,12 @@ def test_summarize_thresholds():
     assert any("3점 미만" in r for r in graders.summarize("repo_oneliner", low)["fail_reasons"])
     code_fail = [_res((5, 5, 5))] * 9 + [_res((), code=False)]
     assert any("코드 채점" in r for r in graders.summarize("repo_oneliner", code_fail)["fail_reasons"])
+
+
+def test_missing_criterion_fails():
+    rows = [_res((5, 5, 5))] * 10
+    rows[0] = {"code": {"passed": True}, "llm": {"scores": {"구체성": {"score": 5, "reason": ""},
+                                                            "표현": {"score": 5, "reason": ""}},
+                                               "missing": ["정확성"]}}
+    s = graders.summarize("repo_oneliner", rows)
+    assert not s["passed"] and any("누락" in r for r in s["fail_reasons"])

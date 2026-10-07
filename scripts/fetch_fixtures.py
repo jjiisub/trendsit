@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import sys
+from datetime import date
 from pathlib import Path
 
 import httpx
@@ -48,6 +49,8 @@ def main() -> None:
                 continue
             meta = gh.get(f"/repos/{full_name}").raise_for_status().json()
             r = gh.get(f"/repos/{full_name}/readme", headers={"Accept": "application/vnd.github.raw"})
+            if r.status_code not in (200, 404):  # 404만 "README 없음". 한도 초과(403) 등은 멈춤
+                r.raise_for_status()
             readme = r.text if r.status_code == 200 else ""
             expect = {"max_len": 60, "must_include_any": must}
             if empty:
@@ -61,7 +64,7 @@ def main() -> None:
                 },
                 "expect": expect,
                 "note": f"{kind}. README {len(readme)}자 중 앞 {min(len(readme), README_HEAD)}자. "
-                        f"수집 {meta.get('pushed_at', '')[:10]} 기준",
+                        f"수집 {date.today()}, 레포 최근 push {meta.get('pushed_at', '')[:10]}",
             }
             path.write_text(json.dumps(fixture, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
             print(f"저장: {path.name} (README {len(readme)}자)")

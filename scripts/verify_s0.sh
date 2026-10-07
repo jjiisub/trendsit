@@ -41,7 +41,7 @@ rc=$(broken alias "import pathlib; p=pathlib.Path('roles/repo_oneliner.md'); p.w
 rc=$(broken keyword "import pathlib,re; p=pathlib.Path('config/keywords.yaml'); s=p.read_text(); s=s.replace('aliases: [RAG, retrieval', 'aliases: RAG\n    x: [retrieval', 1); p.write_text(s)")
 [ "$rc" = 1 ] && grep -q "keywords.yaml: keywords\[4\]" "$TMP/keyword.out" || { A3_OK=0; A3_MSG+=" 키워드 형식($(head -1 "$TMP/keyword.out"))"; }
 rc=$(broken budget "import pathlib; p=pathlib.Path('config/budget.yaml'); p.write_text(p.read_text().replace('S0: 0.15','S0: -0.15'))")
-[ "$rc" = 1 ] && grep -q "budget.yaml: specs: .*S0" "$TMP/budget.out" || { A3_OK=0; A3_MSG+=" 예산 음수($(head -1 "$TMP/budget.out"))"; }
+[ "$rc" = 1 ] && grep -q "budget.yaml: specs.S0:" "$TMP/budget.out" || { A3_OK=0; A3_MSG+=" 예산 음수($(head -1 "$TMP/budget.out"))"; }
 if [ $A3_OK = 1 ]; then
   pass A3 "정상 통과 / $(head -1 "$TMP/alias.out") / $(head -1 "$TMP/keyword.out") / $(head -1 "$TMP/budget.out")"
 else
@@ -102,14 +102,16 @@ print('OK' if s and s['cache_hit'] == 1 and (s['cost_usd'] or 0) == 0 else f'FAI
   fi
 
   # A6 재생: 같은 요청으로 실행되고 새 step
-  py -m trendsit role --replay "$S4" >/dev/null 2>"$TMP/a6.err"
+  py -m trendsit role --replay "$S4" --no-cache >/dev/null 2>"$TMP/a6.err"  # 캐시 없이 실제 재전송
   S6=$(step_of "$TMP/a6.err")
   R6=$(py -c "
 from trendsit.core.config import ROOT; from trendsit.core.db import DB
 db = DB(ROOT/'data'/'trendsit.db'); a, b = db.llm_call(int('$S4')), db.llm_call(int('${S6:-0}'))
 same = a and b and a['request']['body'] == b['request']['body']
-print('OK' if same and int('${S6:-0}') > int('$S4') else 'FAIL 요청 불일치 또는 새 step 없음')")
-  if [ "$R6" = OK ]; then pass A6 "step $S4 재생 → 새 step $S6, 요청 본문 동일"; else fail A6 "$R6 $(tail -1 "$TMP/a6.err")"; fi
+s6 = db.step(int('${S6:-0}'))
+ok = same and int('${S6:-0}') > int('$S4') and s6['cache_hit'] == 0
+print('OK' if ok else 'FAIL 요청 불일치, 새 step 없음, 또는 캐시 적중')")
+  if [ "$R6" = OK ]; then pass A6 "step $S4 재생(캐시 없이 재전송) → 새 step $S6, 요청 본문 동일"; else fail A6 "$R6 $(tail -1 "$TMP/a6.err")"; fi
 fi
 
 # A7 예산 장치 (모의)

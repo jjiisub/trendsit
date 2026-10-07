@@ -41,7 +41,9 @@ CREATE TABLE IF NOT EXISTS steps (
     latency_ms INTEGER,
     cache_hit INTEGER NOT NULL DEFAULT 0,
     error TEXT,
-    output TEXT
+    output TEXT,
+    reasoning_tokens INTEGER,
+    cached_tokens INTEGER
 );
 CREATE INDEX IF NOT EXISTS steps_run ON steps(run_id, seq);
 CREATE TABLE IF NOT EXISTS llm_calls (
@@ -54,8 +56,10 @@ CREATE TABLE IF NOT EXISTS llm_calls (
 STEP_COLUMNS = (
     "run_id", "seq", "t", "role", "kind", "text", "attention", "detail", "prompt_hash", "model",
     "provider", "tokens_in", "tokens_out", "cost_usd", "cost_estimated", "latency_ms", "cache_hit",
-    "error", "output",
+    "error", "output", "reasoning_tokens", "cached_tokens",
 )
+# 스키마를 늘릴 때 기존 DB에 붙일 칸(칸 이름, 타입)
+ADDED_STEP_COLUMNS = (("reasoning_tokens", "INTEGER"), ("cached_tokens", "INTEGER"))
 
 
 def now_kst() -> str:
@@ -77,6 +81,10 @@ class DB:
         self.conn.execute("PRAGMA journal_mode=WAL")
         self.conn.execute("PRAGMA busy_timeout=5000")
         self.conn.executescript(SCHEMA)
+        have = {r["name"] for r in self.conn.execute("PRAGMA table_info(steps)")}
+        for name, kind in ADDED_STEP_COLUMNS:
+            if name not in have:
+                self.conn.execute(f"ALTER TABLE steps ADD COLUMN {name} {kind}")
 
     def close(self) -> None:
         self.conn.close()
