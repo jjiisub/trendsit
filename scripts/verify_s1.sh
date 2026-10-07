@@ -29,6 +29,30 @@ else
   fail A2 "$(tail -1 "$TMP/ruff") / $(tail -1 "$TMP/pt")"
 fi
 
+# ---------- 1b 수집 (S1_TASK 6장). 네트워크 없이 저장한 응답(tests/fixtures/http)으로 ----------
+if uv run --quiet python -m trendsit check-config >"$TMP/a3" 2>&1; then
+  pt A3 "새 sources.yaml, link_kinds.yaml 통과 + 잘못된 backfill method, 없는 kind가 경로를 짚어 실패" \
+    tests/test_s1b.py -k "new_config or bad_backfill or backfill_needs"
+else
+  fail A3 "$(head -2 "$TMP/a3" | tr '\n' ' ')"
+fi
+pt A4 "SSRF: 127.0.0.1, 10.0.0.5, 169.254.169.254, [::1], 사설 IP로 리다이렉트, 5MB 초과, 허용 밖 형식 거부" \
+  tests/test_s1b.py -k "private_addresses or dangerous_urls or redirect_to_private or size_and_content"
+pt A5 "오프라인 collect(녹화에 없는 URL은 차단): 소스별 기대 건수, 본문, 링크, 키워드 저장" tests/test_s1b.py -k "offline_collect"
+pt A6 "같은 collect 두 번: 항목 수 그대로, 중복 0" tests/test_s1b.py -k "idempotent"
+pt A7 "백필: list_pages(AI타임스)와 day_archive(GeekNews, Simon Willison), 유튜브 채널 목록, --since 앞에서 멈춤" \
+  tests/test_s1b.py -k "backfill_from_saved or day_archive_pages or stops_before_since"
+pt A8 "실패 격리: 한 소스 500이어도 나머지 수집, fetch_log failed + 실행 기록 attention" tests/test_s1b.py -k "one_source_failing"
+pt A9 "트렌딩 파서: 저장한 페이지의 레포 전부, stars_this_week 모두 숫자, 빈 페이지는 실패로 기록" \
+  tests/test_s1b.py -k "trending_parser or empty_trending"
+pt A10 "키워드: 제목 매칭 3점, 단어 경계(eval ≠ evaluate), 제외어 규칙" tests/test_s1b.py -k "keyword_rules"
+pt A11 "robots: 막힌 경로는 가져오지 않고 기록" tests/test_s1b.py -k "robots"
+A12_MISS=""
+grep -q "collect" README.md || A12_MISS+=" README:collect"
+grep -q "trendsit collect" docs/DEVELOPMENT.md || A12_MISS+=" DEVELOPMENT:collect"
+grep -q "## 1b 수집" reports/S1_report.md 2>/dev/null || A12_MISS+=" reports/S1_report.md(1b)"
+[ -z "$A12_MISS" ] && pass A12 "README와 DEVELOPMENT.md에 수집 명령, reports/S1_report.md" || fail A12 "없음:$A12_MISS"
+
 # ---------- 1a: S0 보완 (S0_ADDENDUM 2장) ----------
 pt P1 "역할 md 검사: 전부 통과 + 섹션 누락, core_rules 4개가 경로를 짚어 실패" tests/test_s1a.py -k "lint"
 pt P2 "메시지 조립: system에 입력 없음, <data> → task → 핵심 규칙, 해시는 입력과 무관" tests/test_s1a.py -k "message_order or prompt_hash or render_uses"

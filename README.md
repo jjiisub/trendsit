@@ -15,7 +15,7 @@
 ## 2. 핵심 기능
 | 기능 | 내용 | 상태 |
 |---|---|---|
-| 멀티모달 수집 ★ | 글 6곳 + 유튜브 발표 영상(음성 전사 + 슬라이드 판독) + GitHub 주간 트렌딩 | S1, S4 |
+| 멀티모달 수집 ★ | 글 6곳 + 유튜브 발표 영상(음성 전사 + 슬라이드 판독) + GitHub 주간 트렌딩 | 수집·백필 **S1 완료**, 영상 분석 S4 |
 | 원본 추적 ★ | 큐레이션 글이 가리키는 1차 자료(논문, 공식 글, 레포)까지 링크를 따라가 대조 | S3 |
 | 소스 간 교차 연계 ★ | 같은 주제의 글, 영상, 레포를 한 토픽으로 묶어 연결 서술 | S5 |
 | 근거 검수 | 작성자 ⇄ 검수자 루프. 근거와 맞지 않는 문장은 반려하거나 '확인 필요'로 표시 | S5 |
@@ -60,9 +60,11 @@ uv sync                                        # 파이썬 3.12 + 의존성
 export OPENROUTER_API_KEY=...                  # 또는 ~/.config/trendsit/.env (변수 이름은 .env.example)
 uv run python -m trendsit check-config         # 설정과 역할 정의 검증
 uv run python -m trendsit role repo_oneliner --input eval/fixtures/repo_oneliner/ollama__ollama.json
+uv run python -m trendsit collect --since 2026-09-28 --until 2026-10-04   # 기간 수집(RSS가 짧으면 백필)
+uv run python -m trendsit report collection --since 2026-09-28 --until 2026-10-04
 uv run python -m trendsit cost --spec S0       # 사용액과 남은 예산
 ```
-그 밖의 명령: 기록된 호출 다시 실행 `role --replay <step_id> [--model 별칭]`, 평가 `eval <역할> [--model 별칭]`, 실행 기록 보기 `trace <run_id>`. 전체 명령표와 동작 방식은 [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
+그 밖의 명령: 수집 항목 보기 `items [--week 2026-W40] [--status pass]`, 기록된 호출 다시 실행 `role --replay <step_id> [--model 별칭]`, 평가 `eval <역할> [--model 별칭]`, 실행 기록 보기 `trace <run_id>`. 전체 명령표와 동작 방식은 [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
 
 ## 5. 사용 예시 / 결과물
 - 지금 나오는 것: 레포 한 줄 설명. 예) `encode/httpx` → "Python용 동기·비동기 API와 HTTP/2 지원, 내장 CLI를 갖춘 HTTP 클라이언트 라이브러리"
@@ -75,9 +77,11 @@ uv run python -m trendsit cost --spec S0       # 사용액과 남은 예산
 |---|---|---|---|
 | S0 | `repo_oneliner` 픽스처 10개(generate) | 코드 채점 10/10, 정확성 평균 4.8 / 5(1점 0개), 구체성 4.9, 표현 5.0 | S0 전체 $0.052 (상한 $0.15) |
 | S0 | `lookup_agent` 도구 루프 5건(smoke) | 5/5. 깊이 상한 밖 문서는 코드가 거부 | $0 |
+| S1 | 수집 9/28~10/4(한 주) | 글 491건(GeekNews 376, AI타임스 79, OpenAI 15, Simon Willison 17, Anthropic 2, DeepMind 2), 영상 17편, 릴리스 18건, 트렌딩 11개. 6곳 모두 기간을 덮음(백필 GeekNews·AI타임스·유튜브), 중복 0. 본문 추출 성공 GeekNews 77%(사이트의 브라우저 확인으로 토픽 페이지가 막혀 원문 글로 대체), 나머지 글 소스 93~100%. 키워드 통과 207건 | LLM 없음 $0 |
+| S1 | `repo_oneliner` 새 프롬프트 형식 + 예/아니오 채점(generate) | 코드 채점 8/10(근거 구절 검사에서 2건 실패), judge 판정 Q1·Q2·Q3 8/8(잠정, 사람 라벨 전) | S1 $0.035 (상한 $0.05) |
 
 - 같은 입력 재실행은 캐시로 0원. 채점 기준은 S1부터 예/아니오 질문 + 사람 라벨 일치율로 바뀐다
-- 상세: [reports/S0_quality.md](reports/S0_quality.md), [reports/S0_report.md](reports/S0_report.md)
+- 상세: [reports/S0_quality.md](reports/S0_quality.md), [reports/S0_report.md](reports/S0_report.md), [reports/S1_collection.md](reports/S1_collection.md), [reports/S1_report.md](reports/S1_report.md)
 
 ## 7. 기술적 도전
 | 문제 | 시도 | 해결 | 결과 |
@@ -116,7 +120,7 @@ data/        실행 기록 DB, 캐시(git 제외), 예시 사이트 데이터(�
 
 ## 10. 로드맵 / 한계
 - [x] S0 바탕: LLM 호출, 비용·예산, 캐시, 실행 기록, 평가 틀
-- [ ] S1 수집: 글 6곳(RSS + 백필), 유튜브, GitHub 트렌딩, SSRF 방어
+- [x] S1 수집: 글 6곳(RSS + 백필), 유튜브, GitHub 트렌딩, SSRF 방어
 - [ ] S2 글 1차 요약 + 임베딩 필터
 - [ ] S3 깊게 보기: 편집장 계획, 글 분석가(원본 추적), 레포 분석가
 - [ ] S4 영상 분석가(전사 + 슬라이드 판독)

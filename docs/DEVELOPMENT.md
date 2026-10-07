@@ -26,6 +26,10 @@ GITHUB_TOKEN=...             # 선택. 픽스처 README 수집에만
 | `uv run python -m trendsit eval <역할> --agreement` | 사람 라벨과 judge 판정의 질문별·전체 일치율. 라벨 빈칸 행은 제외. 80% 미만이면 사람 비평을 채점 예시로 넣고 다시 잰다(COMMON 2장) |
 | `uv run python -m trendsit cost [--spec S0]` | 스펙별, 모델별 사용액(실행 기록) + 키 기준 단계 사용액, 남은 예산, `limit_remaining` |
 | `uv run python -m trendsit trace <run_id>` | 실행 1건의 걸음(시각, 역할, kind, text, 비용) |
+| `uv run python -m trendsit collect [--source ID] [--since DATE] [--until DATE] [--no-body] [--no-http-cache] [--max-items N]` | 기간 수집(글 6곳, 유튜브, GitHub 트렌딩, 추적 레포 릴리스). 기본 기간은 최근 1일. RSS가 기간을 못 덮으면 백필 |
+| `uv run python -m trendsit items [--week 2026-W40] [--source ID] [--status pass\|filtered] [--limit N]` | 수집 항목 목록(날짜, 소스, 필터 상태, 본문 상태, 키워드, 제목) |
+| `uv run python -m trendsit report collection [--since DATE] [--until DATE]` | `reports/S1_collection.md`: 소스별 표, 백필 확인, GitHub, 유튜브, 사람 확인용 샘플, 링크 분포, 문턱값 |
+| `uv run python scripts/record_http_fixtures.py <이름> --since D --until D [--source ID] [--max-items N]` | 수집 테스트용 응답 녹화(`tests/fixtures/http/<이름>/`, 피드와 HTML은 줄여서 gzip) |
 
 - `--input`은 JSON 파일 경로나 JSON 문자열. 픽스처 파일(`{"input", "expect"}`)이면 `input` 칸을 쓴다
 - `--no-cache`는 캐시 읽기만 끈다. 새 응답은 캐시에 저장된다
@@ -41,15 +45,33 @@ GITHUB_TOKEN=...             # 선택. 픽스처 README 수집에만
 - 출력 스키마 칸 순서: 인용·이유 칸 먼저, 결론 칸 나중, `log`, `attention` 맨 끝(모델에 넘기는 스키마에서 코드가 정렬)
 - 채점자(`eval/judge.md`)는 역할 무관. 역할별 질문(`Q<n>`)과 보고용 점수표는 `eval/rubrics/<역할>.md`에 두고 includes로 붙인다
 
+## 수집 (S1)
+`trendsit collect --since 2026-09-28 --until 2026-10-04`처럼 기간을 주면 소스마다 격리해서 돌린다(한 소스가 실패해도 나머지는 계속). 기간은 한국 시간 게시일, 끝일 포함.
+
+- **URL은 모두 `collect/fetch.py`의 safe_fetch로만.** http/https만, DNS로 푼 주소가 공인 주소가 아니면 거부(사설, 루프백, 링크로컬, 멀티캐스트, 예약, IPv4·IPv6), 리다이렉트마다 다시 검사(최대 5회). 연결 5초, 읽기 15초, 5MB, 허용 형식(html, xml, rss/atom, json, text, GitHub raw)
+- 예의: User-Agent `TrendsIT/0.1 (+https://trendsit.jiseop.com)`, 같은 도메인은 1초에 1번, 429·5xx는 지수 백오프 3회(`Retry-After` 존중). robots.txt는 목록, 아카이브, 글 페이지에서 확인하고 막히면 가져오지 않고 기록(피드와 GitHub API는 기계용이라 확인 생략)
+- HTTP 캐시 `data/http_cache/`(ETag, Last-Modified 조건부 요청). `--no-http-cache`로 끔
+- 글: RSS → 요청 시작일이 RSS의 가장 오래된 항목보다 앞서면 `sources.yaml`의 `backfill`로 거슬러 읽음 → 기간 필터 → 본문(`feed_full`은 피드 본문, 나머지는 원글을 trafilatura로, GeekNews는 토픽 페이지의 한국어 요약 + 원문 링크) → 링크 종류(`link_kinds.yaml`) → 키워드(`keywords.yaml`) → 칠판
+  - `day_archive`: 날짜마다 아카이브(`{date}` 또는 `{yyyy}/{Mon}/{d}`, `{page}`가 있으면 20건 미만 페이지까지)
+  - `list_pages`: 1페이지는 `url_template`, 2페이지부터 `page_template`(Referer로 1페이지를 보냄). 날짜가 `--since`보다 앞선 항목이 나오면 멈춤. 목록 해석 실패는 3초 뒤 한 번 더
+  - 300자 미만이면 `body_status=short`, 추출 실패면 `failed`. 이미 있는 항목은 건너뛰고 본문이 비었던 항목만 다시 시도
+- 유튜브: 채널 RSS(최근 15편) → 부족하면 `yt-dlp --flat-playlist`(다운로드 없음) → 영상마다 yt-dlp 메타데이터(길이, 수동 자막 언어, 자동 자막 유무, 챕터). yt-dlp가 없으면 null + 경고
+- GitHub: 트렌딩 주간 페이지(실행 시점 목록, 실행 주차로 저장, 0건이면 실패), 추적 레포 `releases.atom`(기간 안), README 앞 3,000자는 추적 레포 + 키워드에 걸린 트렌딩 레포만(GitHub API, `GITHUB_TOKEN` 있으면 사용)
+- 키워드: 제목, 요약, 본문 앞 2,000자. 영어 별칭은 단어 경계, 한국어는 부분 문자열. 점수 = 제목 키워드 × 3 + 본문 키워드 × 1. 제외어가 있고 제목에 포함 키워드가 없으면 filtered. 걸러진 항목도 이유와 함께 저장
+- 실행 기록: `runs`(kind='collect') 1행, 소스마다 `steps`(kind='code', 실패면 attention)와 `fetch_log`
+- 칠판 테이블(`PRAGMA user_version` 1): sources, fetch_log, items, item_texts(본문, 8주 뒤 지움), item_keywords, links, videos, repos, repo_trending
+- 테스트는 `tests/fixtures/http/`의 녹화 응답만 쓴다(녹화에 없는 URL은 연결 실패로 처리해 네트워크가 새지 않게)
+
 ## 구조 상세
 ```
-config/      models.yaml(모델 별칭, 제공사 고정) budget.yaml(예산) sources.yaml keywords.yaml
+config/      models.yaml(모델 별칭, 제공사 고정) budget.yaml(예산) sources.yaml(소스, 백필) keywords.yaml link_kinds.yaml(링크 종류)
 roles/       역할 정의 md: 앞부분 실행 설정(모델, 입출력 스키마, 도구, 상한) + 본문 역할 카드
 skills/      여러 역할이 같이 쓰는 지침 md(style_ko)
 trendsit/
   cli.py
   core/      config llm cache budget render(자료 렌더) role(run_role, 역할 md 검사) agent(run_agent) trace db artifacts(스키마) context
   tools/     registry(도구 등록) lookup(테스트용 가짜 도구)
+  collect/   fetch(safe_fetch) text(글, 백필) youtube github links keywords report run, sites/(geeknews, aitimes, simonw, anthropic)
 eval/        fixtures/<역할>/ rubrics/ judge.md(채점자 역할) labels/(사람 라벨 CSV) graders.py run_eval.py
 tests/       단위 테스트(LLM은 모의 전송)
 scripts/     verify_s<n>.sh, fetch_fixtures.py(픽스처 README 수집)

@@ -1,0 +1,38 @@
+{
+ "https://www.aitimes.com/rss/allArticle.xml": {
+  "file": "315b4e52b4ddf0528fc3.gz",
+  "status": 200,
+  "content_type": "application/xml",
+  "location": null
+ },
+ "https://www.aitimes.com/robots.txt": {
+  "file": "dda2488fe73e642a7eb6.gz",
+  "status": 200,
+  "content_type": "text/plain; charset=utf-8",
+  "location": null
+ },
+ "https://www.aitimes.com/news/articleList.html?sc_sdate=2026-10-03&sc_edate=2026-10-04&view_type=sm": {
+  "file": "36682602907cebadcaf4.gz",
+  "status": 200,
+  "content_type": "text/html; charset=utf-8",
+  "location": null
+ },
+ "https://www.aitimes.com/news/ajaxArticlePaging.php?page=2&list_per_page=20&page_per_page=10&sc_sdate=2026-10-03&sc_edate=2026-10-04&sc_order_by=E&view_type=sm": {
+  "file": "82fd2d5c803a7f75eb49.gz",
+  "status": 200,
+  "content_type": "text/javascript; charset=utf-8",
+  "location": null
+ },
+ "https://www.aitimes.com/news/articleView.html?idxno=215688": {
+  "file": "482e28affd2cfd7fe3ff.gz",
+  "status": 200,
+  "content_type": "text/html; charset=utf-8",
+  "location": null
+ },
+ "https://www.aitimes.com/news/articleView.html?idxno=215945": {
+  "file": "b7a94f9958ac45c135f1.gz",
+  "status": 200,
+  "content_type": "text/html; charset=utf-8",
+  "location": null
+ }
+}

@@ -1,0 +1,44 @@
+{
+ "https://news.hada.io/rss/news": {
+  "file": "c04fef880853c73e7038.gz",
+  "status": 200,
+  "content_type": "application/atom+xml; charset=UTF-8",
+  "location": null
+ },
+ "https://news.hada.io/robots.txt": {
+  "file": "dee8e9efbc57787178ae.gz",
+  "status": 200,
+  "content_type": "text/plain; charset=utf-8",
+  "location": null
+ },
+ "https://news.hada.io/past?day=2026-10-04&page=1": {
+  "file": "6c471dbd75600b33fb94.gz",
+  "status": 200,
+  "content_type": "text/html; charset=UTF-8",
+  "location": null
+ },
+ "https://news.hada.io/past?day=2026-10-04&page=2": {
+  "file": "3bae81675202a85d0d22.gz",
+  "status": 200,
+  "content_type": "text/html; charset=UTF-8",
+  "location": null
+ },
+ "https://news.hada.io/past?day=2026-10-04&page=3": {
+  "file": "02ff21657ad7c751659c.gz",
+  "status": 200,
+  "content_type": "text/html; charset=UTF-8",
+  "location": null
+ },
+ "https://news.hada.io/topic?id=34739": {
+  "file": "9ff68e8f51738806ac5c.gz",
+  "status": 200,
+  "content_type": "text/html; charset=UTF-8",
+  "location": null
+ },
+ "https://news.hada.io/topic?id=34752": {
+  "file": "a0c5ff7f246b14f80c4d.gz",
+  "status": 200,
+  "content_type": "text/html; charset=UTF-8",
+  "location": null
+ }
+}

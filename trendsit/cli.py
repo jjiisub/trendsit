@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -12,7 +13,7 @@ from .core import config
 from .core.budget import BudgetExceeded, PriceUnknown
 from .core.config import ROOT, ConfigError
 from .core.context import open_ctx
-from .core.db import DB
+from .core.db import DB, KST
 from .core.llm import LLMError
 from .core.role import Role, load_role, record_llm, role_path, run
 
@@ -198,11 +199,73 @@ def cmd_trace(args: argparse.Namespace) -> int:
     return 0
 
 
+# ---------- 수집 (S1) ----------
+def _parse_date(text: str | None) -> date | None:
+    return date.fromisoformat(text) if text else None
+
+
+def cmd_collect(args: argparse.Namespace) -> int:
+    from .collect.run import collect
+
+    today = datetime.now(KST).date()
+    until = _parse_date(args.until) or today
+    since = _parse_date(args.since) or until - timedelta(days=1)
+    if since > until:
+        print("--since가 --until보다 늦음", file=sys.stderr)
+        return 2
+    res = collect(since, until, only=args.source, no_body=args.no_body, use_http_cache=not args.no_http_cache,
+                  max_items=args.max_items, spec=args.spec)
+    print(f"run_id={res.run_id} 기간 {res.since}~{res.until} 요청 {res.requests}회")
+    for sid, d in res.sources.items():
+        if d["status"] == "failed":
+            print(f"  {sid}: 실패 - {d['error']}")
+        elif "n_new" in d:
+            body = ", ".join(f"{k} {v}" for k, v in d.get("body", {}).items())
+            print(f"  {sid}: {d['status']} 신규 {d['n_new']}(백필 {d['n_backfilled']}), 기존 {d['n_skipped']}, "
+                  f"백필 페이지 {d['backfill_pages']}, 본문 [{body}]" + (" 기간 부족" if not d.get("covered") else ""))
+        else:
+            print(f"  {sid}: {d['status']} " + ", ".join(f"{k} {v}" for k, v in d.items()
+                                                       if k not in ("status", "errors") and v))
+    if res.robots_blocked:
+        print(f"  robots.txt로 건너뜀 {len(res.robots_blocked)}건")
+    return 1 if res.failed else 0
+
+
+def cmd_items(args: argparse.Namespace) -> int:
+    db = DB(ROOT / "data" / "trendsit.db")
+    sql = ("SELECT i.*, (SELECT group_concat(keyword_id, ',') FROM item_keywords k WHERE k.item_id=i.id) kws "
+           "FROM items i WHERE 1=1")
+    params: list[Any] = []
+    for col, val in (("week", args.week), ("source_id", args.source), ("filter_status", args.status)):
+        if val:
+            sql += f" AND i.{col}=?"
+            params.append(val)
+    sql += " ORDER BY i.published_at DESC LIMIT ?"
+    params.append(args.limit)
+    rows = db.conn.execute(sql, params).fetchall()
+    for r in rows:
+        print(f"{r['day']} {r['source_id']:<16} {r['filter_status']:<8} {r['body_status'] or '-':<7} "
+              f"[{r['kws'] or r['filter_reason'] or ''}] {(r['title'] or '')[:80]}")
+    print(f"({len(rows)}건)", file=sys.stderr)
+    return 0
+
+
+def cmd_report(args: argparse.Namespace) -> int:
+    from .collect.report import build
+
+    until = _parse_date(args.until) or datetime.now(KST).date()
+    since = _parse_date(args.since) or until - timedelta(days=6)
+    path, verdict = build(since, until)
+    print(f"{path.relative_to(ROOT)}: 트렌딩 {verdict['trending']}개, 중복 {verdict['duplicates']}, "
+          f"GeekNews 원문 확보율 {verdict['origin_rate']}, 본문 미달 {verdict['body_fail'] or '없음'}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="trendsit")
     sub = p.add_subparsers(dest="cmd", required=True)
 
-    c = sub.add_parser("check-config", help="설정 네 파일과 역할 정의 검증")
+    c = sub.add_parser("check-config", help="설정 파일과 역할 정의 검증")
     c.add_argument("--root", help="config/, roles/가 있는 폴더 (기본: 저장소 루트)")
     c.set_defaults(fn=cmd_check_config)
 
@@ -233,6 +296,29 @@ def main(argv: list[str] | None = None) -> int:
     t = sub.add_parser("trace", help="실행 1건의 걸음 목록")
     t.add_argument("run_id")
     t.set_defaults(fn=cmd_trace)
+
+    co = sub.add_parser("collect", help="기간 수집(글, 유튜브, GitHub). RSS가 짧으면 백필")
+    co.add_argument("--source", help="소스 하나만(sources.yaml의 id, github_trending, github_releases)")
+    co.add_argument("--since", help="시작일 YYYY-MM-DD(한국 시간, 포함). 기본: --until 하루 전")
+    co.add_argument("--until", help="끝일 YYYY-MM-DD(포함). 기본: 오늘")
+    co.add_argument("--no-body", action="store_true", help="본문 추출 생략(목록과 링크만)")
+    co.add_argument("--no-http-cache", action="store_true", help="HTTP 캐시(ETag) 끔")
+    co.add_argument("--max-items", type=int, help="개발용: 소스마다 앞의 N건만")
+    co.add_argument("--spec")
+    co.set_defaults(fn=cmd_collect)
+
+    it = sub.add_parser("items", help="수집 항목 목록")
+    it.add_argument("--week", help="ISO 주차(예: 2026-W40)")
+    it.add_argument("--source")
+    it.add_argument("--status", choices=["pass", "filtered"])
+    it.add_argument("--limit", type=int, default=50)
+    it.set_defaults(fn=cmd_items)
+
+    rp = sub.add_parser("report", help="리포트 생성")
+    rp.add_argument("what", choices=["collection"])
+    rp.add_argument("--since")
+    rp.add_argument("--until")
+    rp.set_defaults(fn=cmd_report)
 
     args = p.parse_args(argv)
     try:
