@@ -1,4 +1,4 @@
-"""예산 장치. 2달러 단계 상한과 스펙별 상한은 코드가 지킨다.
+"""예산 장치. 단계 상한(budget.yaml phase_total_usd)과 스펙별 상한은 코드가 지킨다.
 
 - 단계 기준값: 처음 실행할 때 /api/v1/key 의 usage(누적)를 data/budget_state.json에 저장
 - 단계 사용액 = 현재 key usage - 기준값. 실행 시작마다 refresh()로 다시 조회
