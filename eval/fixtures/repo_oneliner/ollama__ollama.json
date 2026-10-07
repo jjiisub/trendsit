@@ -1,0 +1,33 @@
+{
+ "input": {
+  "full_name": "ollama/ollama",
+  "description": "Get up and running with Kimi, GLM, MiniMax, DeepSeek, gpt-oss, Qwen, Gemma and other models.",
+  "topics": [
+   "deepseek",
+   "gemma",
+   "gemma3",
+   "glm",
+   "go",
+   "golang",
+   "gpt-oss",
+   "llama",
+   "llama3",
+   "llm",
+   "llms",
+   "minimax",
+   "mistral",
+   "ollama",
+   "qwen"
+  ],
+  "readme_head": "<p align=\"center\">\n  <a href=\"https://ollama.com\">\n    <img src=\"https://github.com/ollama/ollama/assets/3325447/0d0b44e2-8f4a-4e99-9b52-a5c1c741c8f7\" alt=\"ollama\" width=\"200\"/>\n  </a>\n</p>\n\n# Ollama\n\nStart building with open models.\n\n## Download\n\n### macOS\n\n```shell\ncurl -fsSL https://ollama.com/install.sh | sh\n```\n\nor [download manually](https://ollama.com/download/Ollama.dmg)\n\n### Windows\n\n```shell\nirm https://ollama.com/install.ps1 | iex\n```\n\nor [download manually](https://ollama.com/download/OllamaSetup.exe)\n\n### Linux\n\n```shell\ncurl -fsSL https://ollama.com/install.sh | sh\n```\n\n[Manual install instructions](https://docs.ollama.com/linux#manual-install)\n\n### Docker\n\nThe official [Ollama Docker image](https://hub.docker.com/r/ollama/ollama) `ollama/ollama` is available on Docker Hub.\n\n### Libraries\n\n- [ollama-python](https://github.com/ollama/ollama-python)\n- [ollama-js](https://github.com/ollama/ollama-js)\n\n### Community\n\n- [Discord](https://discord.gg/ollama)\n- [𝕏 (Twitter)](https://x.com/ollama)\n- [Reddit](https://reddit.com/r/ollama)\n\n## Get started\n\n```\nollama\n```\n\nYou'll be prompted to run a model or connect Ollama to your existing agents or applications such as `Claude Code`, `OpenClaw`, `OpenCode` , `Codex`, `Copilot`,  and more.\n\n### Coding\n\nTo launch a specific integration:\n\n```\nollama launch claude\n```\n\nSupported integrations include [Claude Code](https://docs.ollama.com/integrations/claude-code), [Codex](https://docs.ollama.com/integrations/codex), [Copilot CLI](https://docs.ollama.com/integrations/copilot-cli), [DeepSeek Harness](https://docs.ollama.com/integrations/deepseek-harness), [Droid](https://docs.ollama.com/integrations/droid), and [OpenCode](https://docs.ollama.com/integrations/opencode).\n\n### AI assistant\n\nUse [OpenClaw](https://docs.ollama.com/integrations/openclaw) to turn Ollama into a personal AI assistant across WhatsApp, Telegram, Slack, Discord, and more:\n\n```\nollama launch openclaw\n```\n\n### Chat with a model\n\nRun and chat with [Gemma 4](https://ollama.com/library/gemma4):\n\n```\nollama run gemma4\n```\n\nSee [ollama.com/library](https://ollama.com/library) for the full list.\n\nSee the [quickstart guide](https://docs.ollama.com/quickstart) for more details.\n\n## REST API\n\nOllama has a REST API for running and managing models.\n\n```\ncurl http://localhost:11434/api/chat -d '{\n  \"model\": \"gemma4\",\n  \"messages\": [{\n    \"role\": \"user\",\n    \"content\": \"Why is the sky blue?\"\n  }],\n  \"stream\": false\n}'\n```\n\nSee the [API documentation](https://docs.ollama.com/api) for all endpoints.\n\n### Python\n\n```\npip install ollama\n```\n\n```python\nfrom ollama import chat\n\nresponse = chat(model='gemma4', messages=[\n  {\n    'role': 'user',\n    'content': 'Why is the sky blue?',\n  },\n])\nprint(response.message.content)\n```\n\n### JavaScript\n\n```\nnpm i ollama\n```\n\n```javascript\nimport ollama from \"ollama\";\n\nconst response = await ollama.chat({\n  model: \"gemma4\",\n  messages: [{ role: \"user\", content: \"Why is the sky blue?\" }],\n});\nconsole.log(response"
+ },
+ "expect": {
+  "max_len": 60,
+  "must_include_any": [
+   "LLM",
+   "모델",
+   "언어 모델"
+  ]
+ },
+ "note": "추적 레포: 로컬 LLM 실행 환경. README 19222자 중 앞 3000자. 수집 2026-10-07 기준"
+}

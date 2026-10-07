@@ -1,0 +1,284 @@
+{
+ "role": "lookup_agent",
+ "model_alias": "smoke",
+ "model_id": "nvidia/nemotron-3-super-120b-a12b:free",
+ "prompt_hash": "8543e77a09df",
+ "spec": "S0",
+ "run_id": "20261007-154337-eval-ed97",
+ "at": "2026-10-07T15:44:47+09:00",
+ "note": "smoke 모델로 도구 루프 실제 1회 확인",
+ "stopped": null,
+ "cost_usd": 0.0,
+ "summary": {
+  "n": 5,
+  "code_pass": 5,
+  "criteria": {},
+  "below3": 0,
+  "passed": true,
+  "fail_reasons": []
+ },
+ "results": [
+  {
+   "id": "depth1_root",
+   "input": {
+    "question": "숫자 6614가 처음 나오는 문서 id를 찾아라."
+   },
+   "expect": {
+    "doc_id": "r2"
+   },
+   "note": "시작 문서 r2(깊이 1)",
+   "step_id": 105,
+   "output": {
+    "log": "r2에서 6614 확인, 깊이 0",
+    "attention": false,
+    "doc_id": "r2"
+   },
+   "error": null,
+   "code": {
+    "passed": true,
+    "checks": [
+     {
+      "name": "스키마",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "doc_id",
+      "passed": true,
+      "detail": "기대 r2, 출력 r2"
+     },
+     {
+      "name": "해요체 없음(log)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(log)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "해요체 없음(doc_id)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(doc_id)",
+      "passed": true,
+      "detail": ""
+     }
+    ],
+    "failed": []
+   },
+   "cost_usd": 0.0
+  },
+  {
+   "id": "depth2_shallowest",
+   "input": {
+    "question": "숫자 2836이 처음 나오는 문서 id를 찾아라."
+   },
+   "expect": {
+    "doc_id": "b2"
+   },
+   "note": "b2(깊이 2)와 c3(깊이 3)에 있음. 처음 = b2",
+   "step_id": 120,
+   "output": {
+    "log": "b2에서 2836 확인, 깊이 1",
+    "attention": false,
+    "doc_id": "b2"
+   },
+   "error": null,
+   "code": {
+    "passed": true,
+    "checks": [
+     {
+      "name": "스키마",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "doc_id",
+      "passed": true,
+      "detail": "기대 b2, 출력 b2"
+     },
+     {
+      "name": "해요체 없음(log)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(log)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "해요체 없음(doc_id)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(doc_id)",
+      "passed": true,
+      "detail": ""
+     }
+    ],
+    "failed": []
+   },
+   "cost_usd": 0.0
+  },
+  {
+   "id": "depth3_found",
+   "input": {
+    "question": "숫자 4172가 처음 나오는 문서 id를 찾아라."
+   },
+   "expect": {
+    "doc_id": "a3"
+   },
+   "note": "a3(깊이 3)과 a4(깊이 4)에 모두 있음. 처음 = 더 얕은 a3",
+   "step_id": 143,
+   "output": {
+    "log": "a3에서 4172 확인, 깊이 3",
+    "attention": false,
+    "doc_id": "a3"
+   },
+   "error": null,
+   "code": {
+    "passed": true,
+    "checks": [
+     {
+      "name": "스키마",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "doc_id",
+      "passed": true,
+      "detail": "기대 a3, 출력 a3"
+     },
+     {
+      "name": "해요체 없음(log)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(log)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "해요체 없음(doc_id)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(doc_id)",
+      "passed": true,
+      "detail": ""
+     }
+    ],
+    "failed": []
+   },
+   "cost_usd": 0.0
+  },
+  {
+   "id": "depth4_only",
+   "input": {
+    "question": "숫자 9051이 처음 나오는 문서 id를 찾아라."
+   },
+   "expect": {
+    "doc_id": null,
+    "attention": true
+   },
+   "note": "a4(깊이 4)에만 있음. max_depth 3이면 못 찾아야 함(null, attention=true)",
+   "step_id": 168,
+   "output": {
+    "log": "답 없이 종료: 걸음 상한 12 도달",
+    "attention": true,
+    "doc_id": null
+   },
+   "error": null,
+   "code": {
+    "passed": true,
+    "checks": [
+     {
+      "name": "스키마",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "doc_id",
+      "passed": true,
+      "detail": "기대 None, 출력 None"
+     },
+     {
+      "name": "attention",
+      "passed": true,
+      "detail": "기대 True, 출력 True"
+     },
+     {
+      "name": "해요체 없음(log)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(log)",
+      "passed": true,
+      "detail": ""
+     }
+    ],
+    "failed": []
+   },
+   "cost_usd": 0.0
+  },
+  {
+   "id": "depth4_other_branch",
+   "input": {
+    "question": "숫자 7380이 처음 나오는 문서 id를 찾아라."
+   },
+   "expect": {
+    "doc_id": null,
+    "attention": true
+   },
+   "note": "c4(깊이 4)에만 있음. 못 찾아야 함",
+   "step_id": 193,
+   "output": {
+    "log": "답 없이 종료: 걸음 상한 12 도달",
+    "attention": true,
+    "doc_id": null
+   },
+   "error": null,
+   "code": {
+    "passed": true,
+    "checks": [
+     {
+      "name": "스키마",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "doc_id",
+      "passed": true,
+      "detail": "기대 None, 출력 None"
+     },
+     {
+      "name": "attention",
+      "passed": true,
+      "detail": "기대 True, 출력 True"
+     },
+     {
+      "name": "해요체 없음(log)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(log)",
+      "passed": true,
+      "detail": ""
+     }
+    ],
+    "failed": []
+   },
+   "cost_usd": 0.0
+  }
+ ]
+}

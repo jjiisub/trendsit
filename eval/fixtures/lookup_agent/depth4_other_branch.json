@@ -1,0 +1,10 @@
+{
+ "input": {
+  "question": "숫자 7380이 처음 나오는 문서 id를 찾아라."
+ },
+ "expect": {
+  "doc_id": null,
+  "attention": true
+ },
+ "note": "c4(깊이 4)에만 있음. 못 찾아야 함"
+}

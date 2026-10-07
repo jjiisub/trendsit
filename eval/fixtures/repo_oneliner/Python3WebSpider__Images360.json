@@ -1,0 +1,16 @@
+{
+ "input": {
+  "full_name": "Python3WebSpider/Images360",
+  "description": "Download Images From 360 Using Scrapy",
+  "topics": [],
+  "readme_head": "# Images360\n\nDownload Images From 360 Using Scrapy"
+ },
+ "expect": {
+  "max_len": 60,
+  "must_include_any": [
+   "이미지"
+  ],
+  "attention": true
+ },
+ "note": "README가 거의 빈 레포(제목 + 한 줄). README 50자 중 앞 50자. 수집 2020-07-14 기준"
+}

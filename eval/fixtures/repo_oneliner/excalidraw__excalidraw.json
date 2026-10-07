@@ -1,0 +1,27 @@
+{
+ "input": {
+  "full_name": "excalidraw/excalidraw",
+  "description": "Virtual whiteboard for sketching hand-drawn like diagrams",
+  "topics": [
+   "canvas",
+   "collaboration",
+   "diagrams",
+   "drawing",
+   "hacktoberfest",
+   "productivity",
+   "whiteboard"
+  ],
+  "readme_head": "<a href=\"https://excalidraw.com/\" target=\"_blank\" rel=\"noopener\">\n  <picture>\n    <source media=\"(prefers-color-scheme: dark)\" alt=\"Excalidraw\" srcset=\"https://excalidraw.nyc3.cdn.digitaloceanspaces.com/github/excalidraw_github_cover_2_dark.png\" />\n    <img alt=\"Excalidraw\" src=\"https://excalidraw.nyc3.cdn.digitaloceanspaces.com/github/excalidraw_github_cover_2.png\" />\n  </picture>\n</a>\n\n<h4 align=\"center\">\n  <a href=\"https://excalidraw.com\">Excalidraw Editor</a> |\n  <a href=\"https://plus.excalidraw.com/blog\">Blog</a> |\n  <a href=\"https://docs.excalidraw.com\">Documentation</a> |\n  <a href=\"https://plus.excalidraw.com\">Excalidraw+</a>\n</h4>\n\n<div align=\"center\">\n  <h2>\n    An open source virtual hand-drawn style whiteboard. </br>\n    Collaborative and end-to-end encrypted. </br>\n  <br />\n  </h2>\n</div>\n\n<br />\n<p align=\"center\">\n  <a href=\"https://github.com/excalidraw/excalidraw/blob/master/LICENSE\">\n    <img alt=\"Excalidraw is released under the MIT license.\" src=\"https://img.shields.io/badge/license-MIT-blue.svg\"  /></a>\n  <a href=\"https://www.npmjs.com/package/@excalidraw/excalidraw\">\n    <img alt=\"npm downloads/month\" src=\"https://img.shields.io/npm/dm/@excalidraw/excalidraw\"  /></a>\n  <a href=\"https://docs.excalidraw.com/docs/introduction/contributing\">\n    <img alt=\"PRs welcome!\" src=\"https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat\"  /></a>\n  <a href=\"https://discord.gg/UexuTaE\">\n    <img alt=\"Chat on Discord\" src=\"https://img.shields.io/discord/723672430744174682?color=738ad6&label=Chat%20on%20Discord&logo=discord&logoColor=ffffff&widget=false\"/></a>\n  <a href=\"https://deepwiki.com/excalidraw/excalidraw\">\n    <img alt=\"Ask DeepWiki\" src=\"https://deepwiki.com/badge.svg\" /></a>\n  <a href=\"https://twitter.com/excalidraw\">\n    <img alt=\"Follow Excalidraw on Twitter\" src=\"https://img.shields.io/twitter/follow/excalidraw.svg?label=follow+@excalidraw&style=social&logo=twitter\"/></a>\n</p>\n\n<div align=\"center\">\n  <figure>\n    <a href=\"https://excalidraw.com\" target=\"_blank\" rel=\"noopener\">\n      <img src=\"https://excalidraw.nyc3.cdn.digitaloceanspaces.com/github%2Fproduct_showcase.png\" alt=\"Product showcase\" />\n    </a>\n    <figcaption>\n      <p align=\"center\">\n        Create beautiful hand-drawn like diagrams, wireframes, or whatever you like.\n      </p>\n    </figcaption>\n  </figure>\n</div>\n\n## Features\n\nThe Excalidraw editor (npm package) supports:\n\n- 💯&nbsp;Free & open-source.\n- 🎨&nbsp;Infinite, canvas-based whiteboard.\n- ✍️&nbsp;Hand-drawn like style.\n- 🌓&nbsp;Dark mode.\n- 🏗️&nbsp;Customizable.\n- 📷&nbsp;Image support.\n- 😀&nbsp;Shape libraries support.\n- 🌐&nbsp;Localization (i18n) support.\n- 🖼️&nbsp;Export to PNG, SVG & clipboard.\n- 💾&nbsp;Open format - export drawings as an `.excalidraw` json file.\n- ⚒️&nbsp;Wide range of tools - rectangle, circle, diamond, arrow, line, free-draw, eraser...\n- ➡️&nbsp;Arrow-binding & labeled arrows.\n- 🔙&nbsp;Undo / Redo.\n- 🔍&nbsp;Zoom and panning support.\n\n## Excalidraw.com\n\nThe app hosted at"
+ },
+ "expect": {
+  "max_len": 60,
+  "must_include_any": [
+   "화이트보드",
+   "다이어그램",
+   "드로잉",
+   "스케치",
+   "그림"
+  ]
+ },
+ "note": "앱. README 7694자 중 앞 3000자. 수집 2026-10-06 기준"
+}

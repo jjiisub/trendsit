@@ -1,0 +1,36 @@
+{
+ "input": {
+  "full_name": "fastapi/full-stack-fastapi-template",
+  "description": "Full-stack web application template with FastAPI, React, SQLModel, PostgreSQL, Vite, Tailwind CSS, shadcn/ui, FastAPI Cloud, and Docker Compose.",
+  "topics": [
+   "docker",
+   "docker-compose",
+   "fastapi",
+   "fastapi-cloud",
+   "full-stack",
+   "github-actions",
+   "jwt",
+   "openapi",
+   "playwright",
+   "postgresql",
+   "pytest",
+   "python",
+   "react",
+   "shadcn-ui",
+   "sqlmodel",
+   "tailwindcss",
+   "tanstack-query",
+   "tanstack-router",
+   "typescript",
+   "vite"
+  ],
+  "readme_head": "# Full Stack FastAPI Template\n\n[![Test Docker Compose](../../actions/workflows/test-docker-compose.yml/badge.svg)](../../actions/workflows/test-docker-compose.yml)\n[![Test Backend](../../actions/workflows/test-backend.yml/badge.svg)](../../actions/workflows/test-backend.yml)\n\n## Technology Stack and Features\n\n- ⚡ [**FastAPI**](https://fastapi.tiangolo.com) for the Python backend API.\n  - 🧰 [SQLModel](https://sqlmodel.tiangolo.com) for the Python SQL database interactions (ORM).\n  - 🔍 [Pydantic](https://docs.pydantic.dev), used by FastAPI, for the data validation and settings management.\n  - 💾 [PostgreSQL](https://www.postgresql.org) as the SQL database.\n- 🚀 [React](https://react.dev) for the frontend.\n  - 🧩 Built into the backend application and served by FastAPI on the same domain as the API.\n  - 💃 Using TypeScript, hooks, [Vite](https://vitejs.dev), and other parts of a modern frontend stack.\n  - 🎨 [Tailwind CSS](https://tailwindcss.com) and [shadcn/ui](https://ui.shadcn.com) for the frontend components.\n  - 🤖 An automatically generated frontend client.\n  - 🧪 [Playwright](https://playwright.dev) for end-to-end testing.\n  - 🦇 Dark mode support.\n- ☁️ [FastAPI Cloud](https://fastapicloud.com) for deployment.\n- 🐋 [Docker Compose](https://www.docker.com) for local services and self-hosted deployment.\n  - 📞 [Traefik](https://traefik.io) as a reverse proxy with automatic HTTPS.\n- 🔒 Secure password hashing by default.\n- 🔑 JWT (JSON Web Token) authentication.\n- 📫 Email-based password recovery.\n- ✉️ [React Email](https://react.email) for email templates.\n- 📬 [Mailpit](https://mailpit.axllent.org) for local email testing during development.\n- ✅ Tests with [Pytest](https://pytest.org).\n- 🏭 CI (continuous integration) and CD (continuous deployment) based on GitHub Actions.\n\n### Dashboard Login\n\n![Dashboard login screenshot](img/login.png)\n\n### Dashboard - Admin\n\n![Admin dashboard screenshot](img/dashboard.png)\n\n### Dashboard - Items\n\n![Items dashboard screenshot](img/dashboard-items.png)\n\n### Dashboard - Dark Mode\n\n![Dark mode dashboard screenshot](img/dashboard-dark.png)\n\n### React Email Templates\n\n![Email templates screenshot](img/react-email.png)\n\n### Mailpit - Local Email Testing\n\n![Mailpit screenshot](img/mailpit.png)\n\n### Interactive API Documentation\n\n![API docs](img/docs.png)\n\n## How to Use It\n\nClick the **Use this template** button at the top of this page to create a new repository.\n\n## Backend Development\n\nBackend docs: [backend/README.md](./backend/README.md).\n\n## Frontend Development\n\nFrontend docs: [frontend/README.md](./frontend/README.md).\n\n## Deployment\n\nFastAPI Cloud deployment: [deployment.md](./deployment.md).\n\nSelf-hosted deployment with Docker Compose: [deployment-docker-compose.md](./deployment-docker-compose.md).\n\n## Development\n\nGeneral development docs: [development.md](./development.md).\n\nThis includes the local FastAPI and Vite workflow, Docker Compose services, `.env` configuration, and more.\n\n## Release Notes\n\nCheck the file [re"
+ },
+ "expect": {
+  "max_len": 60,
+  "must_include_any": [
+   "템플릿"
+  ]
+ },
+ "note": "템플릿. README 3130자 중 앞 3000자. 수집 2026-10-06 기준"
+}
