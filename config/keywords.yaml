@@ -1,10 +1,7 @@
 # 포함 키워드: 필터(걸린 글만 LLM 요약)와 토픽 묶기 기준을 겸함
-# 2026-10-08 갱신(S1 리뷰 M5, 사용자 샘플 표시 반영): 키워드는 넓은 1차 그물. 정밀한 관련성 판단은 S2 임베딩 필터와 글 1차 요약
-#   - 추가: ai-general(넓은 그물), ai-industry(AI 시장·산업), dev-practice(개발 실무·경험)
-#   - eval의 "평가"를 구체적 표현으로(과대평가 오탐), SynthID·워터마크를 AI 보안에, Cursor를 코딩 에이전트에
 # 매칭 규칙(코드):
 #   - 대소문자 무시
-#   - 영어 별칭은 단어 경계로 매칭 (예: "eval"이 "evaluate" 안에서 걸리지 않게)
+#   - 영어 별칭은 단어 경계로 매칭 (예: "eval"이 "evaluate" 안에서 걸리지 않게 word: true)
 #   - 한국어 별칭은 부분 문자열 매칭
 #   - 제목 매칭은 본문 매칭보다 가중치 높게
 keywords:
@@ -14,7 +11,7 @@ keywords:
 
   - id: coding-agent
     canonical: 코딩 에이전트
-    aliases: [coding agent, Codex, Claude Code, Cursor, 하네스, harness, 코딩 에이전트]
+    aliases: [coding agent, Codex, Claude Code, 하네스, harness, 코딩 에이전트]
 
   - id: mcp-tools
     canonical: MCP · 도구 호출
@@ -38,30 +35,16 @@ keywords:
 
   - id: eval
     canonical: 평가 · 벤치마크
-    aliases: [eval, evals, evaluation, benchmark, leaderboard, 벤치마크, 리더보드, 성능 평가, 모델 평가, 평가 지표, 평가 데이터]
+    aliases: [eval, evals, evaluation, benchmark, leaderboard, 벤치마크, 리더보드, 평가]
 
   - id: ai-security
     canonical: AI 보안
-    aliases: [prompt injection, 프롬프트 인젝션, jailbreak, 탈옥, guardrail, 가드레일, red team, 레드팀, AI safety, SynthID, watermark, 워터마크]
+    aliases: [prompt injection, 프롬프트 인젝션, jailbreak, 탈옥, guardrail, 가드레일, red team, 레드팀, AI safety]
 
   - id: frontier-release
     canonical: 프런티어 모델 출시
     aliases: [GPT, Claude, Gemini, 새 모델, model release, 모델 공개, 모델 출시]
     note: 이름만으로 넓게 걸림. 출시, 공개 글인지는 1차 요약의 관련성 판단에 맡김
-
-  - id: ai-industry
-    canonical: AI 산업 · 시장
-    aliases: [OpenAI, Anthropic, DeepMind, xAI, AI 투자, 투자 유치, IPO, 기업공개, 상장, 데이터센터, data center, GPU, AI 칩, AI 반도체, NVIDIA, 엔비디아, 밸류에이션]
-    note: 시장 경향 글(투자, 인프라, 회사 동향). 고객 사례 홍보 글도 회사 이름으로 걸리므로 관련성은 S2에서 거름
-
-  - id: dev-practice
-    canonical: 개발 실무 · 경험
-    aliases: [software engineering, 소프트웨어 엔지니어링, code review, 코드 리뷰, commit, 커밋, pull request, PR, refactoring, 리팩터링, 개발 생산성, developer productivity, vibe coding, 바이브 코딩, 개발 경험]
-
-  - id: ai-general
-    canonical: AI 일반
-    aliases: [AI, 인공지능, LLM, LLMs, 언어 모델, 생성형 AI, 챗봇, chatbot, 캐릭터챗]
-    note: 놓치는 글을 줄이기 위한 넓은 그물. 묶기(S5)의 주제 키워드로는 쓰지 않음
 
 # 제외어: 기술과 무관한 글 거르기
 # 규칙: 제외어가 있고 포함 키워드가 제목에 하나도 없으면 제외 (포함 키워드가 본문에만 있으면 제외됨)

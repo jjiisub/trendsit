@@ -22,7 +22,7 @@
 | docs/handoff/COMMON.md | 8장 목표일 열 삭제, 9장 병행 개발, 10장 검증 산출물, 11장 맥 확인 단계, 설정 파일 소유 |
 | docs/CONTEXT.md | 현재 상태와 결정 기록(S1 병합, 6주차 결정, 병행 handoff) |
 | config/budget.yaml | S2 1.00, S3 2.00, S4 0.80 추가 |
-| config/keywords.yaml | 키워드 13개(ai-general, ai-industry, dev-practice 추가), eval 별칭 구체화, SynthID·Cursor 추가 |
+| docs/handoff/keywords_next.yaml | 키워드 안 13개(ai-general, ai-industry, dev-practice 추가, eval 별칭 구체화, SynthID·Cursor 추가). S2~S3 2a에서 `config/keywords.yaml`로 옮김(S1_REVIEW M5) (새 파일) |
 | eval/labels/repo_oneliner.csv | 사용자 라벨 10행 채움(9건 통과, hermes-agent Q2 실패) |
 | eval/labels/relevance_seed.csv | 수집 샘플 사용자 판정 13건(S2 관련성 필터 기준) (새 파일) |
 | tests/fixtures/contracts/video_queue.json | 영상 처리 지시 계약 픽스처(두 묶음 공용) (새 파일) |
