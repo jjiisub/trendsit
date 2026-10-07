@@ -4,4 +4,10 @@ site/
 .env
 site_src/shots/
 __pycache__/
-data/*.before*.json
+.venv/
+.pytest_cache/
+.ruff_cache/
+# data/는 실행 기록과 캐시. 예시 사이트의 출력 계약 파일만 예외로 추적
+data/*
+!data/trendsit-example.json
+!data/make_data.py

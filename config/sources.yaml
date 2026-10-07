@@ -1,0 +1,78 @@
+# MVP 고정 소스. fetch 값:
+#   feed_full    피드에 본문 전체가 있음
+#   feed_summary 피드에는 요약만 → 원글 페이지에서 본문 추출(trafilatura)
+#   feed_title   피드에는 제목, 링크만 → 원글 페이지에서 본문 추출
+text:
+  - id: openai
+    name: OpenAI News
+    kind: primary          # primary(1차 자료) / curation / news
+    lang: en
+    feed: https://openai.com/news/rss.xml
+    fetch: feed_summary
+    note: 기업 사례 글이 많음. 필터로 거름
+
+  - id: anthropic
+    name: Anthropic News
+    kind: primary
+    lang: en
+    feed: https://raw.githubusercontent.com/Olshansk/rss-feeds/main/feeds/feed_anthropic_news.xml
+    fallback_list: https://www.anthropic.com/news   # 공식 RSS 없음. 커뮤니티 피드가 멈추면 목록 페이지를 직접 파싱
+    fetch: feed_summary
+    note: 커뮤니티가 매시간 생성하는 피드(공식 아님)
+
+  - id: deepmind
+    name: Google DeepMind Blog
+    kind: primary
+    lang: en
+    feed: https://deepmind.google/blog/rss.xml
+    fetch: feed_summary
+
+  - id: geeknews
+    name: GeekNews
+    kind: curation
+    lang: ko
+    feed: https://news.hada.io/rss/news
+    fetch: feed_summary
+    note: 기술 외 글이 섞임. 글마다 원문 링크가 있어 원본 추적 대상
+
+  - id: simonw
+    name: Simon Willison's Weblog
+    kind: curation
+    lang: en
+    feed: https://simonwillison.net/atom/everything/
+    fetch: feed_full
+    note: 전문 + 원본 링크가 많음. 짧은 링크 글이 많아 하루 여러 건
+
+  - id: aitimes
+    name: AI타임스
+    kind: news
+    lang: ko
+    feed: https://www.aitimes.com/rss/allArticle.xml
+    fetch: feed_summary
+    note: 하루 20~25건. 국내 업계 소식. 필터 필수
+
+video:
+  - id: techbridge
+    name: Tech Bridge
+    lang: ko                 # 전사는 로컬 Whisper(원음, 주로 영어). 수동 자막은 보조, 자동 자막은 쓰지 않음
+    channel_handle: "@TechBridge-KR"
+    channel_id: UC895rbZX2iXLTDfji7W4PfA
+    feed: https://www.youtube.com/feeds/videos.xml?channel_id=UC895rbZX2iXLTDfji7W4PfA
+    note: 해외 발표를 번역한 영상. 설명란의 원본 영상 링크는 이후 원본 추적 후보
+
+github:
+  trending:
+    source: ossinsight
+    period: past_week
+    language: null           # 전체. 관련성은 레포 분석가가 키워드로 판단
+    top_n: 30                # 얕게 훑기에서 볼 후보 수
+  tracked:                   # 릴리스를 매주 챙겨 보는 레포
+    - repo: ollama/ollama
+      why: 로컬 전환 때 쓸 실행 환경
+    - repo: NousResearch/hermes-agent
+      why: 10주차 수업 도구
+    - repo: openai/codex
+      why: 코딩 에이전트. OpenAI 글과 교차
+    - repo: anthropics/claude-code
+      why: 코딩 에이전트. Anthropic 글과 교차
+  # 릴리스 피드: https://github.com/<repo>/releases.atom, 메타데이터와 커밋은 GitHub API(토큰)

@@ -1,0 +1,4 @@
+phase: mvp
+phase_total_usd: 2.00          # 키에는 공통 한도 5달러가 따로 있음. 2달러는 코드가 지킴
+specs: {S0: 0.15}
+# 단계 기준값(phase_baseline_usd)은 첫 실행 때 /api/v1/key의 usage로 data/budget_state.json에 저장
