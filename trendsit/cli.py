@@ -134,6 +134,8 @@ def cmd_eval(args: argparse.Namespace) -> int:
         for q, v in a["questions"].items():
             print(f"| {q} | {v['agree']} | {v['n']} | {v['rate']} |")
         print(f"| 전체 | {a['total']['agree']} | {a['total']['n']} | {a['total']['rate']} |")
+        if a.get("judged_enforced"):
+            print(f"judge = enforce 후 출력, 라벨 = 원래 출력: {', '.join(a['judged_enforced'])}")
         low = [q for q, v in a["questions"].items() if v["rate"] is not None and v["rate"] < 0.8]
         if low:
             print(f"80% 미만: {', '.join(low)} → 사람 비평을 채점 프롬프트 예시로 넣고 다시 잴 것(COMMON 2장)")
@@ -143,7 +145,7 @@ def cmd_eval(args: argparse.Namespace) -> int:
                       note=args.note)
     s = report["summary"]
     print(f"{report['role']} / {report['model_alias']} ({report['model_id']}): 코드 통과 {s['code_pass']}/{s['n']} "
-          f"(enforce 후 {s['code_pass_enforced']}/{s['n']})")
+          f"(enforce 후 {s['code_pass_enforced']}/{s['n']}, 통과 판정 기준 {s.get('code_pass_basis', s['code_pass'])}/{s['n']})")
     for q, v in s.get("questions", {}).items():
         print(f"  {q}: 통과 {v['pass']}/{v['n']}")
     for c, v in s["criteria"].items():
