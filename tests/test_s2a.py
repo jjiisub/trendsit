@@ -208,7 +208,8 @@ def test_real_embedder_scores_fixtures_in_range():
     from trendsit.filter.embed import SentenceEmbedder, best_interest
 
     c = config.load("filter.yaml")
-    e = SentenceEmbedder(c.model, c.instruction, device="cpu")
+    # 장치는 운영과 같이 자동(맥 MPS, 리눅스 CPU). 맥 CPU는 bf16 가중치를 하드웨어 지원 없이 계산해 1시간 넘게 걸림(S2 리포트)
+    e = SentenceEmbedder(c.model, c.instruction)
     interests = list(zip([x.keyword_id for x in c.interests], e.embed_queries([x.text for x in c.interests]),
                          strict=True))
     fx = load_filter_fixtures()
