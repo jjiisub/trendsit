@@ -22,7 +22,7 @@
 편집장이 세 채널 후보와 예산으로 계획을 세우면(모델 실패 시 규칙 기반 계획), 코드가 예산·깊이·id를 검증해 자르고, 레포 분석가가 GitHub 도구로 관련성·뜨는 이유·과열을, 글 분석가가 원문 링크를 따라 원본을 찾아 수치를 대조한다. 도구 사용 범위와 횟수, 문서 깊이, 근거 없는 판정은 코드가 막는다.
 
 ## 2. 관문 A
-**맥(2026-10-08, 결정 반영 뒤 마지막 커밋)**: `verify_s2.sh`·`verify_s3.sh` 전부 PASS(A1 포함, FAIL 0), pytest 273 passed + 1 skipped(embed 없이), `uv run --extra embed pytest -q` 274 passed. 중간에 verify_s0 A9(키 문자열 검사)가 테스트의 가짜 토큰 문자열을 잡아 테스트에서 이어 붙여 만들도록 고침(검사 규칙은 그대로)
+**맥(2026-10-08, main(S4) 병합·라벨 칸 반영 뒤 마지막 커밋)**: `verify_s2.sh`·`verify_s3.sh` 전부 PASS(A1 포함, 25개, FAIL 0), pytest 401 passed + 2 skipped(embed 없이), `uv run --extra embed pytest -q` 402 passed + 1 skipped(S4 `video` 묶음 전용 테스트). 토큰 값 대조: 저장소·data·작업 로그에 없음. 중간에 verify_s0 A9(키 문자열 검사)가 테스트의 가짜 토큰 문자열을 잡아 테스트에서 이어 붙여 만들도록 고침(검사 규칙은 그대로)
 
 `bash scripts/verify_s3.sh` (2026-10-08, 두 번째 클라우드 세션, 키 있음)
 ```
