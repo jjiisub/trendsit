@@ -474,11 +474,12 @@ class ItemCardV2(RoleOutput):
         return out
 
     def demote_partial(self, inp: TextAnalystInput) -> Self:
-        """confirmed/differs인데 check 문장의 수치가 인용에 없으면 부분 확인으로 보고 not_found(PR #6 리뷰 R3).
+        """confirmed인데 check 문장의 수치가 인용에 없으면 부분 확인으로 보고 not_found(PR #6 리뷰 R3).
+        differs는 그대로 둔다(요약과 원본 수치가 다르다는 판정이라 check 수치가 인용에 없는 것이 정상).
         가져온 페이지 없이 출력과 입력만 보므로 eval --regrade가 저장된 출력에 다시 적용할 수 있다."""
         checks = {c.n: c.text for c in inp.checks}
         quoted = " ".join(q.text for q in self.quotes)
-        ver = [v if v.status == "not_found" or all(number_in(n, quoted) for n in figures(checks.get(v.check_n, "")))
+        ver = [v if v.status != "confirmed" or all(number_in(n, quoted) for n in figures(checks.get(v.check_n, "")))
                else v.model_copy(update={"status": "not_found", "quote_n": None}) for v in self.verified]
         return self.fix("verified", ver, PARTIAL_RULE) if ver != self.verified else self
 

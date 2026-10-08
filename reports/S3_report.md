@@ -149,7 +149,7 @@ PASS A14 README(빠른 시작, 성과 행), DEVELOPMENT 명령표, S3 리포트,
 | Q7 | S3 상한 2.00 그대로, 주석만. 합계 $0.561 | `90c4f74` |
 | 라벨(리뷰 부록 C~F) | repo_analyst 10, editor_plan 3, editor_plan_mode 17, text_analyst 16에 2차 채점(labeler opus-5.5). 집계가 리뷰 3장 표와 같음 | `9f8b116` |
 | R1 | `core/agent.py`가 실행마다 `ctx.resources["tool_results"]`(공통 코어, 별도) → `RepoCard.tool_rules`(enforce), `graders_text.tool_check_repo_analyst`(원래 출력 검사), 테스트 `test_r1_all_github_tools_fail_403`(403 녹화) | `285e1ee`(별도), `d4c77b3` |
-| R3 | `artifacts_text.figures`(%·배·소수·네 자리 이상, 모델·버전 이름·한국어 큰 단위·작은 개수 제외), `ItemCardV2.demote_partial`(enforce 끝, 규칙 `PARTIAL_RULE`). regrade에서는 저장된 enforce 후 출력에 이어 적용(가져온 페이지 없이) | `d4c77b3` |
+| R3 | `artifacts_text.figures`(%·배·소수·네 자리 이상, 모델·버전 이름·한국어 큰 단위·작은 개수 제외), `ItemCardV2.demote_partial`(enforce 끝, 규칙 `PARTIAL_RULE`, **confirmed에만** 적용하고 differs는 그대로: 리뷰 R3 문구의 "confirmed/differs"는 오류로 반영 확인 때 정정, 재채점 결과 같음 `…-20261009-011148.json`). regrade에서는 저장된 enforce 후 출력에 이어 적용(가져온 페이지 없이) | `d4c77b3` |
 | R4 | `code_repo_analyst`: "근거 없는 why_trending이면 attention" → "evidence 없이 why_trending을 쓰지 않음"(원래 출력). 해당 0건 | `d4c77b3` |
 | N1 | `aggregate_repo_analyst` 무효 기준(위 6장). 리포트 지표 "GitHub 도구 오류율", "GitHub 도구 성공 0 항목" | `d4c77b3` |
 | N2 | `aggregate_text_analyst` 지표 "부분 확인 내림(보고용, N2)" 5, 근거 없는 판정 집계에서 제외. S5 handoff에 "S5부터 같은 문턱값"(6장 S5로 넘김) | `d4c77b3` |

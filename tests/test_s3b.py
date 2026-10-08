@@ -274,3 +274,14 @@ def test_r3_n2_regrade_saved_text_analyst():
     assert changed == ["it201", "it933", "it997"]
     metrics, reasons = aggregate_text_analyst(results)
     assert metrics["부분 확인 내림(보고용, N2)"] == 5 and metrics["근거 없는 판정(enforce 전)"] == 0 and reasons == []
+
+
+def test_r3_differs_kept():
+    """differs는 부분 확인 내림 대상이 아니다(요약 수치와 원본이 다르다는 판정이라 check 수치가 인용에 없는 것이 정상)."""
+    inp = TextAnalystInput.model_validate({"item_id": 6, "title": "t", "source_name": "GeekNews", "url": TOPIC,
+                                           "max_depth": 2, "card_v1": V1, "links": [], "checks": [
+                                               {"n": 1, "kind": "number", "text": "속도 2.62배 향상", "quote": "q"}]})
+    out = ItemCardV2.model_validate(v2(verified=[{"check_n": 1, "quote_n": 1, "status": "differs"}],
+                                       differences=["요약 '2.62배', 원본에는 다른 수치"]))
+    got = out.demote_partial(inp)
+    assert got is out and got.verified[0].status == "differs" and got.enforced == []
