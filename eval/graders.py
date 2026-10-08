@@ -104,6 +104,10 @@ def code_lookup_agent(inp: dict[str, Any], out: dict[str, Any], expect: dict[str
 
 
 ROLE_CHECKS = {"repo_oneliner": code_repo_oneliner, "lookup_agent": code_lookup_agent}
+# 문체 검사를 할 칸(없으면 출력 전체). 본문을 그대로 옮긴 인용 칸은 원문 문체라 검사하지 않는다
+ROLE_STYLE_FIELDS: dict[str, tuple[str, ...]] = {}
+# 픽스처 전체를 모아 보는 기준(예: 인용 일치율 95%). role → results → (지표, 미달 이유 목록)
+AGGREGATES: dict[str, Any] = {}
 
 
 def code_grade(role: str, inp: dict[str, Any], out: dict[str, Any] | None, error: str | None,
@@ -111,7 +115,9 @@ def code_grade(role: str, inp: dict[str, Any], out: dict[str, Any] | None, error
     if out is None:
         checks = [check("스키마", False, error or "출력 없음")]
     else:
-        checks = [check("스키마", True)] + ROLE_CHECKS[role](inp, out, expect) + style_checks(out)
+        fields = ROLE_STYLE_FIELDS.get(role)
+        styled = {k: out[k] for k in fields if k in out} if fields else out
+        checks = [check("스키마", True)] + ROLE_CHECKS[role](inp, out, expect) + style_checks(styled)
     return {"passed": all(c["passed"] for c in checks), "checks": checks,
             "failed": [f"{c['name']}: {c['detail']}" for c in checks if not c["passed"]]}
 
@@ -207,3 +213,18 @@ def summarize(role: str, results: list[dict[str, Any]]) -> dict[str, Any]:
     summary["passed"] = not reasons
     summary["fail_reasons"] = reasons
     return summary
+
+
+# ---------- 스펙별 채점 모듈(COMMON 9장): ROLE_CHECKS, ROLE_STYLE_FIELDS, THRESHOLDS, AGGREGATES에 등록 ----------
+def _load(module: str) -> None:
+    import importlib
+
+    try:
+        importlib.import_module(f"eval.{module}")
+    except ModuleNotFoundError as e:
+        if e.name != f"eval.{module}":
+            raise
+
+
+_load("graders_text")  # S2~S3
+_load("graders_video")  # S4
