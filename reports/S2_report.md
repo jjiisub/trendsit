@@ -1,6 +1,7 @@
 # S2 리포트: 0단계(S1 리뷰 반영) + 2a 필터 + 2b 글 1차 요약
 
-> 상태: 클라우드 구현 끝 + **클라우드 관문 B(픽스처 범위만, 2026-10-08 두 번째 클라우드 세션)** 끝, 맥 확인 대기(`reports/S2S3_mac_todo.md`).
+> 상태: 클라우드 구현 끝 + 클라우드 관문 B(픽스처 범위) 끝 + **맥 확인(2026-10-08)**: 설계 결정 Q1~Q7 반영, 실제 한 주 rematch·filter·summarize, item_card 관문 B 21건. 사람 라벨(relevance 40, item_card 21)과 문턱값 확정은 라벨 대기.
+> 맥 실행 환경: M1 Max, macOS, 파이썬 3.12.14, 임베딩 MPS. 데이터는 맥 S1 DB(`../trendsit/data`) 사본
 > **클라우드 관문 B의 범위**: 저장소에 있는 픽스처(item_card 17건, 임베딩 재현 20건, repo_oneliner 10건)와 녹화 응답으로 만든 개발 DB(25건)만으로 돌렸다. 실제 한 주 데이터(맥의 `data/trendsit.db`)로 하는 `rematch`·`filter`·`summarize`, 시드 13건, 문턱값 확정, 사람 라벨 일치율은 맥 몫으로 남는다. judge 판정은 라벨이 없어 모두 **잠정**
 
 > 진행 체크리스트(COMMON 8장). 맥락이 끊기면 여기서 이어 간다. S3(3c, 3a, 3b)는 `reports/S3_report.md`.
@@ -19,10 +20,13 @@
 - [x] 2a `rematch`
 - [x] 2a 임베딩 필터(실제·모의 임베더, 네 갈래 판정, 임베딩 재사용), URL 중복 연결, 검증 산출물·라벨 생성기, 재현 픽스처 20건
 - [x] 2a 실제 임베딩 모델 테스트, 재현 픽스처 CPU 점수 기록(두 번째 클라우드 세션)
-- [ ] 2a 실제 한 주 점수 분포, 문턱값 확정, 시드 13건, 검증 산출물, MPS 점수(맥)
+- [x] 2a 실제 한 주 점수 분포, 시드 13건, 검증 산출물, MPS 점수(맥)
+- [ ] 2a 문턱값 확정(relevance 라벨 40건 대기)
+- [x] 설계 결정 Q1(채점 두 갈래), Q5(라벨 경로), Q6(긴 인용 자르기), Q7(예산) 반영(맥)
 - [x] 2b `item_card` 스키마·enforce·역할 md·채점기·채점표, `summarize`, 픽스처 17건(녹화 글 16 + 인젝션 1)
 - [x] 2b 관문 B 픽스처 17건(두 번째 클라우드 세션, 반복 3회): 코드 16/17로 미달 1건, judge 잠정 통과
-- [ ] 2b 픽스처 3건 추가(20건), 라벨 20건, 한 주 실행(맥)
+- [x] 2b 픽스처 4건 추가(21건), 관문 B 재실행, 한 주 실행(맥)
+- [ ] 2b 라벨 21건 일치율(라벨 대기)
 
 ## 0단계 (S1 리뷰 반영, `s2-0-base` PR)
 
@@ -44,6 +48,14 @@ PASS M6 낡은 문구 두 개(geeknews.py 설명, report.py 계획 표기) 없�
 - A1 FAIL은 코드가 아니라 환경 때문이다. `verify_s0.sh`의 A4~A6은 smoke(무료) 모델을 실제로 부르는데 이 세션에 키가 없고 openrouter.ai도 막혀 있다. verify_s0의 나머지 7개(A1~A3, A7~A10)와 verify_s1의 나머지 23개는 PASS. 키가 있는 곳(맥)에서 `bash scripts/verify_s2.sh --stage 0`을 한 번 돌려 A1을 확인해야 한다
 
 ### 3. 관문 B (repo_oneliner)
+**맥 재채점(설계 결정 Q1, 2026-10-08)**: 재생성 없이 `eval repo_oneliner --regrade reports/eval/repo_oneliner_generate_20261008-104252.json`(→ `…-140318.json`). attention은 코드 소유 칸이라 enforce 후 값으로 채점
+
+| 기준 | 결과 |
+|---|---|
+| 코드 채점(통과 판정: 원래 출력 + 코드 소유 칸만 enforce 후) | **10/10 통과** |
+| 모델 일치율(attention) | 9/10(Images360만 코드가 true로) |
+| judge Q1·Q2·Q3 | 각 10/10(새로 통과한 Images360 1건만 judge 추가 호출, $0.0011) |
+
 **두 번째 클라우드 세션 재실행(2026-10-08)**: `eval repo_oneliner --spec S2`(`reports/eval/repo_oneliner_generate_20261008-104252.json`, 프롬프트 `a1a38c7f4dfe`, $0.0155)
 
 | 기준 | 결과 |
@@ -129,11 +141,15 @@ PASS M6 낡은 문구 두 개(geeknews.py 설명, report.py 계획 표기) 없�
 ### 2. 관문 A
 `bash scripts/verify_s2.sh`(전체) 출력은 아래 "S2 관문 A 전체"에.
 
-### 3. 관문 B (맥 확인 후)
+### 3. 관문 B
+**맥(2026-10-08)**: `rematch` 343건 중 295건 바뀜(filtered→pass 89, 통과 305건 > 184), 다시 돌려 0건. `filter --embedder real`(MPS) 325건(글 308, 영상 17) 155.4초, keep 281 / drop 44(키워드 통과 278, 되살림 3, 낮은 유사도 9, 키워드 없음 23, 제외어 12). 산출물 `reports/S2_filter/`
+
 | 기준 | 결과 |
 |---|---|
-| `relevance_seed.csv` 13건 85% 이상 | 맥 확인 후(실제 한 주 DB 필요) |
-| 라벨 40건 keep 정밀도·재현율 | 맥 확인 후 |
+| `relevance_seed.csv` 13건 85% 이상 | **11/13(84.6%) 미달**. 틀린 2건은 고객 사례 글(OpenAI Chatham 0.356, Anthropic Barclays 0.329, 기대 drop)이 키워드 통과로 keep. 잠정 문턱값 기준 |
+| 라벨 40건 keep 정밀도·재현율 | 라벨 대기(`eval/labels/relevance.csv` 40행 생성, 빈칸) |
+| (보조) 재현 픽스처 CPU↔MPS 최대 차이 0.001 이하 | **0.0050 미달**. 클라우드 리눅스 CPU 기록과 맥 MPS 모두 bf16이라 생기는 차이로 본다. 잠정 문턱값(0.30, 0.45)을 사이에 두고 판정이 갈리는 픽스처는 없음(가장 가까운 aitimes-215688 CPU 0.4612 / MPS 0.4562). 기준은 그대로 두고 설계 세션 판단에 남김 |
+| (보조) 실제 임베딩 모델 테스트(맥) | 통과. 단 테스트가 장치를 `cpu`로 고정해 맥에서는 bf16 가중치를 하드웨어 지원 없이 계산해 70분이 넘어도 끝나지 않았다 → 운영과 같은 자동 선택(맥 MPS)으로 바꿔 45초. 점수·문턱값 변경 없음 |
 | (보조) 실제 임베딩 모델 테스트 | 통과(두 번째 클라우드 세션, `uv run --extra embed pytest -k real_embedder`, 모델 받기 포함 223초) |
 | (보조) 재현 픽스처 20건 CPU 점수 | `reports/S2_filter/fixture_scores.json`에 기록(0.312~0.577, 200초). MPS 비교는 맥 |
 - 두 번째 클라우드 세션(실제 임베더 CPU, 녹화 응답으로 다시 만든 개발 DB 25건): `rematch` 18건 바뀜(filtered→pass 1). `filter` 17건 새 임베딩 188.7초, keep 16 / drop 1(excluded:정치). 개발 DB 점수는 문턱값 근거가 아니다(표본이 작고 실제 한 주가 아님)
@@ -165,9 +181,22 @@ PASS M6 낡은 문구 두 개(geeknews.py 설명, report.py 계획 표기) 없�
 ### 1. 한 줄 요약
 필터 keep이고 같은 URL 묶음의 기준 항목인 글마다, 본문 문장을 그대로 옮긴 인용을 먼저 뽑고 수치·주장을 인용 번호로 다는 카드(ItemCard v1)를 만든다. 본문에 없는 인용, 인용에 없는 수치, 목록 밖 키워드·링크는 코드(enforce)가 지우고 기록한다.
 
-### 3. 관문 B (맥 확인 후)
+### 3. 관문 B
+**맥(2026-10-08)**: 설계 결정 Q1·Q6 반영 + 실제 한 주 픽스처 4건 추가 뒤 재실행(설계 변경 재실행이라 COMMON 3장 개선 횟수에 넣지 않음). `reports/eval/item_card_generate_20261008-152008.json`, 프롬프트 `2691c9a33fbc`, $0.0914(응답 캐시가 없어 21건 모두 새로 생성·채점)
+
 | 기준 | 결과 |
 |---|---|
+| 코드 채점 전부(통과 판정: 원래 출력 + 코드 소유 칸만 enforce 후) | **20/21 미달**: simonw__kakapo-party 모델이 본문에 없는 수치 "15s"를 quote 5에 붙임(품질 정리 대상, 원래 출력으로 채점). 클라우드 실행에서는 같은 픽스처가 통과해 생성 편차로 본다. 개선 반복 3회는 클라우드에서 다 써 더 돌리지 않았다 |
+| 인용 본문 일치 95% 이상 | 108/108 (100%) |
+| judge Q1 / Q2 / Q3 각 80% | 20/20, 20/20, 19/20(잠정). Q3 실패: aitimes-215937(링크 없는 글인데 needs_original=true) |
+| 잘린 인용(Q6, 보고용) | 5/108 (4.6%). jump-trading(클라우드 미달 원인)은 코드가 잘라 통과 |
+| 모델 일치율(코드 소유 칸) | attention 20/21, quotes(자르기) 16/21 |
+| 라벨 21건 일치율 80% | 라벨 대기(`eval/labels/item_card.csv` 21행, 빈칸) |
+| 한 주 전체 | 264건 중 264건(대체 1), relevance high 134 / mid 91 / low 39, 원본 확인 필요 158건(59.8%), 잘린 인용 56/1352(4.1%, 다시 볼 기준 5% 아래), **$0.5934** |
+
+- 추가 픽스처 4건(실제 한 주, 기존 17건은 그대로): `deepmind__blog-gemini-4-argon-…`(DeepMind, 숫자 표현 34), `aitimes__articleView-html-idxno-215937`(DGX 스파크, 44), `aitimes__articleView-html-idxno-215863`(AI 가격 급락, 36), `openai__index-basis-tax-workbook-with-astra`(21)
+- 클라우드(17건)↔맥 건별 비교: 코드 판정이 바뀐 것은 jump-trading(F→P, Q6), kakapo-party(P→F). relevance가 바뀐 것 3건(215688 mid→high, 34739 low→mid, john-gruber mid→high), quote 수 ±1이 5건. judge 판정은 공통 16건 모두 같음
+
 두 번째 클라우드 세션, **픽스처 17건 범위만**(`reports/eval/item_card_generate_20261008-120344.json`, 프롬프트 `2691c9a33fbc`, max_tokens 2000)
 
 | 기준 | 결과 |
@@ -219,6 +248,19 @@ PASS M6 낡은 문구 두 개(geeknews.py 설명, report.py 계획 표기) 없�
 - `S2_quality.md` item_card 표의 비용 $0.0000은 캐시로 다시 기록한 최종 실행 값이다. 실제 사용액은 위 반복 기록과 7장
 - 픽스처 3건 추가, 라벨 20건, 한 주 실행 → 맥
 
+## 결정 반영 (설계 결정 Q1~Q7, `docs/handoff/S2S3_DECISIONS.md`)
+| 결정 | 반영 위치 | 커밋 |
+|---|---|---|
+| 기록 | `docs/handoff/S2S3_DECISIONS.md`(PR #6 댓글 전문) | `5527d29` |
+| Q1 공통 코어 | `core/artifacts.py` `RoleOutput.ENFORCED_FIELDS`(ClassVar), `fix(..., owned=)`(기본은 칸이 ENFORCED_FIELDS에 있는지), `graded_output`/`graded_dump`. `eval/run_eval.py`: 코드 채점·judge는 채점 보기(원래 출력에 코드 소유 변경만 덮음), `graded_output` 기록, `regrade`. `eval/graders.py` `model_agreement`, `summarize(…, owned_fields)`. `cli.py` `eval --regrade` | `aeac887`(별도) |
+| Q1 역할별 칸 | `RepoOneliner`·`ItemCardV1`·`CollectionPlan`·`ItemCardV2` = attention, `RepoCard` = signal·hype_flags·attention. 품질 정리(인용·수치·키워드·링크 삭제, 없는 id·깊이·예산 꼬리, 근거 없는 판정 등)는 원래 출력 기준 그대로 | `f20d8d2` |
+| Q1 분류가 애매한 것 | editor_plan의 `log` 덧붙이기("잘림·정리: …")는 기록용이라 품질 쪽(원래 출력)으로 둠. 채점에는 문체 검사만 걸림 | - |
+| Q1 repo_oneliner | 재생성 없이 클라우드 2차 결과 재채점: 코드 10/10, 모델 일치율 attention 9/10(위 0단계 3) | - |
+| Q5 | S3 몫(`reports/S3_report.md` 결정 반영) | `6665044` |
+| Q6 | `core/artifacts_text.py`: `QUOTE_SCHEMA_MAX = 1000`(스키마), `QUOTE_CHARS = 200`, `clip_quote`(단어 경계, 연속 부분 문자열, 수치가 모두 들어가는 가장 앞 구간 → 없으면 앞에서부터, 공백 없는 덩어리는 글자 단위), `ItemCardV1.clip_quotes`(owned=True, 잘려 나간 수치만 코드 소유로 삭제, attention 안 켬). 역할 md "200자 이내"는 그대로. 집계: `eval/graders_text.py` "잘린 인용", `summarize.py` 요약 줄 | `0a1ecab` |
+| Q6 재실행 | item_card 관문 B 21건(위 2b 3). 잘린 인용 픽스처 4.6%, 한 주 4.1%(다시 볼 조건 5% 아래) | `ad8109b` |
+| Q7 | `config/budget.yaml` S2 1.50, S3 주석. 실행 전 `cost` 기록, 합계 S2 $1.057 / 1.50 | `90c4f74` |
+
 ## S2 관문 A 전체
 `bash scripts/verify_s2.sh` (2026-10-08, 두 번째 클라우드 세션, 키 있음)
 ```
@@ -243,6 +285,7 @@ PASS A14 README(기능, 빠른 시작, 성과 행), DEVELOPMENT 명령표, S2 �
 ## S2 공통 코어 수정
 | 커밋 | 파일 | 내용 |
 |---|---|---|
+| `aeac887`(맥, 별도 커밋) | `core/artifacts.py`, `eval/graders.py`, `eval/run_eval.py`, `cli.py` | 설계 결정 Q1: `ENFORCED_FIELDS`·`fix(owned=)`, 채점 보기(원래 출력 + 코드 소유 변경), 칸별 모델 일치율, `eval --regrade` |
 | 0단계(PR #5) | `core/db.py`, `core/migrations.py`, `core/artifacts.py`, `role.py`, `agent.py`, `eval/run_eval.py`, `graders.py` | 마이그레이션 번호 키, enforce 훅, 거부 메시지 경로 |
 | `beb1c94` | `eval/graders.py`, `eval/run_eval.py` | 스펙별 채점 모듈 자리(ROLE_STYLE_FIELDS, AGGREGATES, _load) |
 
@@ -251,7 +294,8 @@ PASS A14 README(기능, 빠른 시작, 성과 행), DEVELOPMENT 명령표, S2 �
 |---|---|
 | 클라우드(첫 세션) | $0(LLM 호출 없음, 키 없음) |
 | 클라우드(두 번째 세션) | **$0.3707** / 클라우드 몫 0.80 (qwen3.8-27b $0.2322, gemini-3.8-flash $0.1385. `cost --spec S2`) |
-| 맥 | 맥 확인 후. 스펙 상한 1.00에서 클라우드 사용액을 빼고 확인 |
+| 맥 | **$0.6860** / 맥 몫 약 1.12(상한 1.50 − 클라우드 0.37, 설계 결정 Q7). repo_oneliner 재채점 $0.0011, item_card 평가 $0.0914, 한 주 summarize $0.5934 |
+| 합계 | $1.0567 / 상한 1.50 |
 
 - 두 번째 세션 내역: repo_oneliner 재평가 $0.0155, item_card 평가 6회(첫 실행, 채점기 수정 뒤, 반복 1~3, 최종) $0.334, 개발 DB summarize $0.0213. verify_s0 A4~A6 smoke는 무료 모델
 
