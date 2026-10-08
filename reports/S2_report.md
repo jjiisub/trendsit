@@ -205,3 +205,6 @@ PASS A14 README(기능, 빠른 시작, 성과 행), DEVELOPMENT 명령표, S2 �
 ## 7-1. README, 위키 메모 (S2)
 - README: 역할 표의 글 1차 요약 상태, 빠른 시작(rematch, filter, summarize), 성과 표 S2 행(맥 확인 뒤 수치). DEVELOPMENT: 명령 4개, 필터와 1차 요약 동작
 - 위키 메모: 녹화 픽스처가 실제 키워드 설정에 기대고 있어 키워드를 넓히자 녹화에 없는 URL(README 요청)이 생겨 테스트가 깨짐 → 테스트 전용 키워드 파일로 분리. 원문 인용 칸까지 문체 검사를 하면 원문 "~요"가 걸려 거짓 실패 → 역할별 문체 검사 칸
+
+## 8. 서브에이전트 리뷰 (2a, 2b)
+S2·S3를 함께 리뷰받았다. 지적과 처리는 `reports/S3_report.md` 8장. S2 몫: 같은 URL 기준 항목이 drop이면 keep 경유 항목을 대표로(`summarize.targets`), 스키마 모듈 import 순서(자기 등록), 리포트 출력 갱신
