@@ -6,7 +6,7 @@ output: ItemCardV1
 tools: []
 max_steps: 1
 max_depth: null
-max_tokens: 1400
+max_tokens: 2000
 temperature: 0.2
 includes: [skills/style_ko.md]
 task: "위 글 한 건을 인용 근거가 달린 1차 요약 카드로 정리하고, 원본을 더 봐야 하는지 판정한다."
@@ -40,7 +40,7 @@ core_rules:
 
 ## 출력
 칸 순서대로 채운다. 인용을 먼저 적어야 이후 칸이 인용을 따른다.
-1. `quotes`: 최대 8개, n은 1부터
+1. `quotes`: 핵심만 3~6개(스키마 상한 8), 각 200자 이하, n은 1부터. 인용이 많거나 길면 출력이 길이 상한에서 잘려 카드 전체가 실패한다
 2. `numbers`: 없으면 빈 목록이 정상
 3. `claims`: 1~4개
 4. `summary`: 2~3문장, 300자 이내, "~다"
