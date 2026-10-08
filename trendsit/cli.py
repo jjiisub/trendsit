@@ -151,6 +151,8 @@ def cmd_eval(args: argparse.Namespace) -> int:
         print(f"  {q}: 통과 {v['pass']}/{v['n']}")
     for c, v in s["criteria"].items():
         print(f"  {c}(보고용): 평균 {v['avg']} (n={v['n']})")
+    if s.get("model_agreement"):
+        print("  모델 일치율(코드 소유 칸): " + ", ".join(f"{k} {v}" for k, v in s["model_agreement"].items()))
     print(f"  문턱값: {'통과' if s['passed'] else '미달 - ' + '; '.join(s['fail_reasons'])}")
     print(f"  비용 ${report['cost_usd']:.4f}, 리포트 {report['path']}, reports/{report['spec']}_quality.md")
     return 0 if not report["stopped"] else 1

@@ -45,7 +45,7 @@ fi
 # ---------- S1 리뷰 반영 (S1_REVIEW 4장) ----------
 pt M1 "마이그레이션 번호 키: user_version 2 기존 DB 재적용 없음, 10·20 등록 순서 무관, 늦게 추가된 10번 적용, 실패는 기록 없이 재시도" \
   tests/test_s2_migrations.py
-pt M2 "enforce 훅: 칸을 바꾸면 step detail enforced 기록, eval이 원래·enforce 후를 모두 기록(판정은 원래 출력), repo_oneliner README 200자 규칙" \
+pt M2 "enforce 훅: 칸을 바꾸면 step detail enforced 기록, eval이 원래·enforce 후를 모두 기록(판정은 원래 출력 + 코드 소유 칸만 enforce 후, 설계 결정 Q1), repo_oneliner README 200자 규칙" \
   tests/test_s2_enforce.py -k "enforce or eval_records"
 pt M4 "도구 거부 메시지: 중첩 인자 오류에 칸 경로(origin.kind, pages[1])" tests/test_s2_enforce.py -k "nested_arg or bad_json"
 M6_HIT=$(grep -rn "메인(점수순)\|RSS + list_pages" trendsit/ 2>/dev/null)

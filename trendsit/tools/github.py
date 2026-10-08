@@ -136,11 +136,13 @@ def contributors(args: RepoArgs, state: Any) -> ToolOutput:
 
 @tool(RepoArgs)
 def releases(args: RepoArgs, state: Any) -> ToolOutput:
-    """최근 릴리스 5개: 태그, 날짜, 이름, 노트 앞 300자.
+    """최근 릴리스 5개: 태그, 날짜, 이름, 프리릴리스 여부, 노트 앞 300자.
     언제 쓰나: 이번 주에 새 버전이 나와서 뜨는 것인지 확인할 때.
     언제 쓰지 않나: 관련성이 낮은 레포.
     인자 예: {"name": "ollama/ollama"}"""
     _, data = api_get(state, f"/repos/{args.name}/releases?per_page=5")
+    # 실제 녹화(설계 결정 Q3): 매 커밋 갱신되는 dev 같은 프리릴리스가 앞에 오고 published_at은 처음 날짜라 표시해 둔다
     out = [{"tag": r.get("tag_name"), "date": (r.get("published_at") or "")[:10], "name": r.get("name"),
+            "prerelease": bool(r.get("prerelease")),
             "notes_head": clean_markdown(r.get("body") or "")[:300]} for r in (data or [])]
     return ToolOutput(content={"releases": out} if out else {"releases": [], "note": "릴리스 없음"})

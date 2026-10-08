@@ -1,9 +1,10 @@
 """S3 3c 레포 분석가: 오프라인 에이전트 루프(A9), 깊이별 허용 도구·도구 상한(A10), 과열 규칙, 규칙 기반 큐, enforce.
 
-GitHub 응답은 tests/fixtures/http/repo_tools(레포 정보·README는 S1 녹화, 커밋·기여자·릴리스는 합성), LLM은 모의 전송.
+GitHub 응답은 tests/fixtures/http/repo_tools(레포 정보·README는 S1 녹화, ollama·hermes 커밋·기여자·릴리스는 합성, 실제 녹화 3개 레포 추가), LLM은 모의 전송.
 """
 
 import json
+from pathlib import Path
 from datetime import date
 
 import pytest
@@ -192,3 +193,45 @@ def test_tool_call_limit_from_deep_yaml(ctx):
     assert inp.tool_call_limit(6) == 2
     inp = build_input(c, QueueItem("ollama/ollama", 2, "r"), WEEK, config.load("keywords.yaml"))
     assert inp.tool_calls == config.load("deep.yaml").repo_tool_calls_per_item
+
+
+# ---------- 설계 결정 Q3: 실제 GitHub 녹화(recorded) 정상 경로 ----------
+REAL = {"active": "NVIDIA/OpenShell", "release": "tile-ai/tilelang", "small": "pablostanley/yoinks"}
+
+
+def real_state():
+    from types import SimpleNamespace
+
+    return SimpleNamespace(extras={"fetcher": fetcher_for(FixtureTransport("repo_tools")), "github_headers": {},
+                                   "today": date(2026, 10, 8)})
+
+
+def test_recorded_github_responses_normal_path():
+    from trendsit.tools.github import CommitsArgs, RepoArgs, contributors, github_repo, recent_commits, releases
+
+    st = real_state()
+    info = github_repo(RepoArgs(name=REAL["active"]), st).content
+    assert info["full_name"] == REAL["active"] and info["stars"] > 10000 and info["readme_head"]
+    active = recent_commits(CommitsArgs(name=REAL["active"]), st).content
+    assert active["commits"] > 20 and active["authors"] > 5 and active["last_commit"]["date"].startswith("2026-10")
+    assert contributors(RepoArgs(name=REAL["active"]), st).content["total"] == "100+"
+    rel = releases(RepoArgs(name=REAL["active"]), st).content["releases"]
+    assert rel[0]["tag"] == "dev" and rel[0]["prerelease"] is True and rel[1]["prerelease"] is False
+    tl = releases(RepoArgs(name=REAL["release"]), st).content["releases"]
+    assert tl[0]["date"] >= "2026-09-28" and tl[0]["prerelease"] is False
+    small = recent_commits(CommitsArgs(name=REAL["small"]), st).content
+    assert small == {"days": 7, "since": "2026-10-01T00:00:00Z", "commits": 0, "authors": 0, "last_commit": None}
+    assert contributors(RepoArgs(name=REAL["small"]), st).content["total"] == 1
+    assert releases(RepoArgs(name=REAL["small"]), st).content == {"releases": [], "note": "릴리스 없음"}
+
+
+def test_recorded_fixtures_have_no_secrets_and_keep_synthetic():
+    import gzip
+
+    fix = Path(__file__).parent / "fixtures" / "http" / "repo_tools"
+    idx = json.loads((fix / "index.json").read_text())
+    assert sum(1 for m in idx.values() if m.get("synthetic")) == 5  # 합성(경계 사례) 유지
+    assert sum(1 for u, m in idx.items() if m.get("recorded") and any(r in u for r in REAL.values())) == 15
+    for m in idx.values():
+        body = gzip.decompress((fix / m["file"]).read_bytes())
+        assert not any(p in body for p in (b"ghp_", b"github_pat_", b"gho_", b"sk-or-"))

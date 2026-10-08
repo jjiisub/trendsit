@@ -61,5 +61,110 @@
   "content_type": "application/json; charset=utf-8",
   "location": null,
   "synthetic": true
+ },
+ "https://api.github.com/repos/NVIDIA/OpenShell": {
+  "file": "8d1941e01ed7d9c0b71e.gz",
+  "status": 200,
+  "content_type": "application/json; charset=utf-8",
+  "location": null,
+  "recorded": true
+ },
+ "https://api.github.com/repos/NVIDIA/OpenShell/readme": {
+  "file": "e15d2b6a0015877630c9.gz",
+  "status": 200,
+  "content_type": "application/vnd.github.raw; charset=utf-8",
+  "location": null,
+  "recorded": true
+ },
+ "https://api.github.com/repos/NVIDIA/OpenShell/commits?since=2026-10-01T00:00:00Z&per_page=100": {
+  "file": "aba0fafa04147e143d3d.gz",
+  "status": 200,
+  "content_type": "application/json; charset=utf-8",
+  "location": null,
+  "recorded": true
+ },
+ "https://api.github.com/repos/NVIDIA/OpenShell/contributors?per_page=100&anon=1": {
+  "file": "6d52ca023fd3cebf7503.gz",
+  "status": 200,
+  "content_type": "application/json; charset=utf-8",
+  "location": null,
+  "recorded": true
+ },
+ "https://api.github.com/repos/NVIDIA/OpenShell/releases?per_page=5": {
+  "file": "9af348520e87e514d3fd.gz",
+  "status": 200,
+  "content_type": "application/json; charset=utf-8",
+  "location": null,
+  "recorded": true
+ },
+ "https://api.github.com/repos/tile-ai/tilelang": {
+  "file": "fdc25b645575ca5affd3.gz",
+  "status": 200,
+  "content_type": "application/json; charset=utf-8",
+  "location": null,
+  "recorded": true
+ },
+ "https://api.github.com/repos/tile-ai/tilelang/readme": {
+  "file": "25983dd6fe43fcd30213.gz",
+  "status": 200,
+  "content_type": "application/vnd.github.raw; charset=utf-8",
+  "location": null,
+  "recorded": true
+ },
+ "https://api.github.com/repos/tile-ai/tilelang/commits?since=2026-10-01T00:00:00Z&per_page=100": {
+  "file": "0080bc1449ad53ffa9d4.gz",
+  "status": 200,
+  "content_type": "application/json; charset=utf-8",
+  "location": null,
+  "recorded": true
+ },
+ "https://api.github.com/repos/tile-ai/tilelang/contributors?per_page=100&anon=1": {
+  "file": "9f0c5b0055b8271b9402.gz",
+  "status": 200,
+  "content_type": "application/json; charset=utf-8",
+  "location": null,
+  "recorded": true
+ },
+ "https://api.github.com/repos/tile-ai/tilelang/releases?per_page=5": {
+  "file": "ca2d870765432d8f6786.gz",
+  "status": 200,
+  "content_type": "application/json; charset=utf-8",
+  "location": null,
+  "recorded": true
+ },
+ "https://api.github.com/repos/pablostanley/yoinks": {
+  "file": "27466203a227400b8815.gz",
+  "status": 200,
+  "content_type": "application/json; charset=utf-8",
+  "location": null,
+  "recorded": true
+ },
+ "https://api.github.com/repos/pablostanley/yoinks/readme": {
+  "file": "f21f7678d68c1e243431.gz",
+  "status": 200,
+  "content_type": "application/vnd.github.raw; charset=utf-8",
+  "location": null,
+  "recorded": true
+ },
+ "https://api.github.com/repos/pablostanley/yoinks/commits?since=2026-10-01T00:00:00Z&per_page=100": {
+  "file": "22ac50f4e00b16c87ec7.gz",
+  "status": 200,
+  "content_type": "application/json; charset=utf-8",
+  "location": null,
+  "recorded": true
+ },
+ "https://api.github.com/repos/pablostanley/yoinks/contributors?per_page=100&anon=1": {
+  "file": "4e1a06e4d0df3947bec0.gz",
+  "status": 200,
+  "content_type": "application/json; charset=utf-8",
+  "location": null,
+  "recorded": true
+ },
+ "https://api.github.com/repos/pablostanley/yoinks/releases?per_page=5": {
+  "file": "58e5b6a5db6d21569137.gz",
+  "status": 200,
+  "content_type": "application/json; charset=utf-8",
+  "location": null,
+  "recorded": true
  }
 }
