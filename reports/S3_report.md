@@ -1,6 +1,7 @@
 # S3 리포트: 깊게 보기 (3c 레포 분석가 → 3a 편집장 계획 → 3b 글 분석가)
 
-> 진행 체크리스트(COMMON 8장). 상태: 클라우드 구현 끝 + **클라우드 관문 B(픽스처 범위만, 2026-10-08 두 번째 클라우드 세션)** 끝, 맥 확인 대기(`reports/S2S3_mac_todo.md`).
+> 진행 체크리스트(COMMON 8장). 상태: 클라우드 구현 끝 + 클라우드 관문 B(픽스처 범위) 끝 + **맥 확인(2026-10-08)**: 실제 GitHub(토큰), 실제 한 주(2026-W41, 2026-10-04 계획)로 관문 B 세 역할 통과(judge 잠정). 라벨은 리뷰 세션 독립 채점 + 사용자 불일치 판정 방식으로 바뀌어 파일만 만들어 둠.
+> 맥 실행 환경: M1 Max, 파이썬 3.12.14, `GITHUB_TOKEN`(fine-grained, 공개 저장소 읽기 전용, `~/.config/trendsit/.env`). 토큰 값이 저장소·data·로그에 없음을 값 대조로 확인
 > **클라우드 관문 B의 범위**: editor_plan 2건, text_analyst 6건의 픽스처를 녹화 응답으로 만든 개발 DB(글 15건 1차 요약, 영상 1편, 트렌딩 11행)에서 뽑아 돌렸다. 스펙 수(영상 10편 계획, 글 10건)에 못 미치고 실제 한 주가 아니다. repo_analyst는 GitHub API가 이 저장소 밖으로 막혀 돌리지 않았다. 실제 한 주 픽스처, 검증 산출물(`S3_traces/`, `S3_plan.md`), 사람 라벨은 맥 몫. judge 판정은 모두 **잠정**
 > 실행 환경(두 번째 클라우드 세션): 키 있음, openrouter.ai·export.arxiv.org·일반 원문 사이트 열림. github.com(레포 페이지), 이 저장소 밖 GitHub API, news.hada.io는 막힘
 > 실행 환경(첫 클라우드 세션): 클라우드(리눅스, 파이썬 3.13), `OPENROUTER_API_KEY` 없음. GitHub API는 이 저장소만, github.com·export.arxiv.org·원문 사이트는 막힘.
@@ -13,7 +14,9 @@
 - [x] 3b `text_analyst`: 스키마·enforce, fetch_page·read_more·arxiv, 원본 추적 지침, `deep text`, 채점
 - [x] `scripts/verify_s3.sh`
 - [x] 관문 B editor_plan(픽스처 2건), text_analyst(픽스처 6건): 두 번째 클라우드 세션, 잠정 통과
-- [ ] 관문 B repo_analyst(GitHub API 필요), 실제 한 주 픽스처, 검증 산출물(`S3_traces/`, `S3_plan.md`), 라벨(맥)
+- [x] 관문 B repo_analyst(맥, 반복 1), editor_plan·text_analyst 실제 한 주 픽스처(맥), 검증 산출물(`S3_traces/`, `S3_plan.md`), 라벨 파일(맥)
+- [x] 설계 결정 Q3(실제 녹화), Q4(픽스처), Q5(라벨 경로) 반영(맥)
+- [ ] 라벨 일치율(리뷰 세션 독립 채점 + 사용자 불일치 판정, 영상 mode는 사용자)
 
 ## 1. 한 줄 요약
 편집장이 세 채널 후보와 예산으로 계획을 세우면(모델 실패 시 규칙 기반 계획), 코드가 예산·깊이·id를 검증해 자르고, 레포 분석가가 GitHub 도구로 관련성·뜨는 이유·과열을, 글 분석가가 원문 링크를 따라 원본을 찾아 수치를 대조한다. 도구 사용 범위와 횟수, 문서 깊이, 근거 없는 판정은 코드가 막는다.
@@ -35,7 +38,34 @@ PASS A14 README(빠른 시작, 성과 행), DEVELOPMENT 명령표, S3 리포트,
 ```
 - A1까지 전부 PASS(첫 클라우드 세션 때는 키가 없어 A1만 FAIL)
 
-## 3. 관문 B (클라우드는 픽스처 범위만, 나머지 맥)
+## 3. 관문 B
+**맥(2026-10-08)**: 응답 캐시가 없어 클라우드 `dev-` 픽스처도 새로 생성·채점. judge는 모두 **잠정**(라벨 대기)
+
+| 역할 | 통과 기준 | 맥 결과 |
+|---|---|---|
+| repo_analyst | judge Q1~Q3 각 80% + 관련 낮은 레포 80% 이상 커밋 도구 없이 finish + 평균 도구 호출 4회 이하 | **통과(반복 1)**: 2026-W41 트렌딩 10개(키워드 통과 5, 걸러짐 4 + 경계 tilelang). 코드 10/10, Q1~Q3 각 10/10, 평균 도구 호출 3.4, 관련 낮음 4/5 얕게 끝냄, 도구 오류 0. `reports/eval/repo_analyst_generate_20261008-182928.json`, $0.0350 |
+| editor_plan | 코드 채점 전부 + judge Q1~Q2 80% + 영상 mode 동의율 80% | **통과(반복 없음)**: 픽스처 3건(실제 2026-10-04: 영상 17, 글 158, 레포 4 + dev 2). 코드 3/3, Q1·Q2 각 3/3, 모델 일치율 attention 2/3(dev-10-06 레포 10/10이 80% 초과). 실제 계획: 영상 5편 whisper(84분), 글 5, 레포 4. mode 동의율은 사용자 라벨 대기(`editor_plan_mode.csv` 17행) |
+| text_analyst | enforce 전 근거 없는 confirmed/differs 0~1건 + judge Q1~Q3 각 80% | **통과(반복 1)**: 픽스처 16건(실제 한 주 10 + dev 6). 근거 없는 판정 0, 코드 16/16, Q1~Q3 각 16/16, 원본 확보 14/16(깊이 2: 13, 3: 1. 못 찾음: it240 X 트윗 robots 차단, it959). dev-it5·it21은 github.com이 열려 원본 문장 대조 6/6(클라우드 4/6). `…-191228.json`, $0.1511 |
+
+**repo_analyst 반복 기록**
+
+| 회차 | 실행 | 바꾼 것 | 결과 | 원인 |
+|---|---|---|---|---|
+| 0 | `…-164718` | - | 코드 4/10 | evidence의 tool 칸에 입력 칸 이름(trending, hype)을 적음 6건(지시를 어김) |
+| (무효) | `…-165334` | md 문구 | 코드 10/10, Q 10/10이지만 **무효** | GitHub 비인증 한도 소진으로 도구 41회 중 33회 HTTP 403(아래 6장 사례). 반복 횟수에 넣지 않음 |
+| 1 | `…-182928` | md 문구: tool 칸은 도구 이름만, 입력 수치는 signal_reason에 | **통과** | 토큰으로 같은 md 재실행 |
+
+**text_analyst 반복 기록**
+
+| 회차 | 실행 | 바꾼 것 | 결과 | 원인 |
+|---|---|---|---|---|
+| 0 | `…-185127` | - | 근거 없는 판정 7 | 5건(dev-it5)은 평가 버그: `run_eval`이 `fetched_pages`를 지우기만 해 github_repo가 첫 호출이면 README가 가져온 페이지로 등록되지 않음 → 공통 코어 수정(`b09261f`, 개선 횟수 아님) |
+| 0' | `…-185514` | 평가 버그 수정 | 근거 없는 판정 2(it201) | 모델이 Nature 본문의 `AF3’s`(U+2019)를 `AF3's`로 옮겨 인용 대조 실패(지시를 어김/모델 한계) |
+| 1 | `…-191228` | md 문구: 따옴표·대시 모양까지 그대로 | **통과**(0건) | |
+
+- 이전 클라우드 세션 기록(픽스처 범위)은 아래에 그대로 둔다
+
+### 클라우드 기록 (픽스처 범위만)
 | 역할 | 통과 기준 | 결과 |
 |---|---|---|
 | repo_analyst | judge Q1~Q3 각 80% + 관련 낮은 레포 80% 이상 커밋 도구 없이 finish + 평균 도구 호출 4회 이하 | **실행 안 함**: 도구(커밋·기여자·릴리스·README)가 GitHub API를 부르는데 이 클라우드는 이 저장소 밖이 403. 녹화는 2개 레포뿐이고 커밋 등은 합성. 맥 확인 후 |
@@ -89,6 +119,18 @@ PASS A14 README(빠른 시작, 성과 행), DEVELOPMENT 명령표, S3 리포트,
 ### 스펙과 다르게 한 것
 - 오프라인 테스트는 S1 녹화의 GeekNews 원문 페이지(danbom425.tistory.com/113) 하나로 세 경우(깊이 2에서 찾음 / 계획 깊이 1이라 못 찾음 / parent 없이 읽기 함정)를 만들었다. 그 페이지의 본문에서 추출되는 링크가 없어 "깊이 상한 밖 문서"는 계획 깊이 1로 원문(깊이 2)을 막는 경우로, 함정은 "parent 없이 읽기"와 "아직 읽지 않은 문서를 parent로 대기" 거부로 확인했다
 
+## 결정 반영 (설계 결정, `docs/handoff/S2S3_DECISIONS.md`)
+| 결정 | 반영 위치 | 커밋 |
+|---|---|---|
+| Q1(S3 역할) | `RepoCard.ENFORCED_FIELDS = (signal, hype_flags, attention)`, `CollectionPlan`·`ItemCardV2` = attention. 공통 코어는 S2 리포트 결정 반영 | `f20d8d2`, `aeac887` |
+| Q1 결과 | 모델 일치율: repo_analyst signal·hype_flags·attention 각 10/10, editor_plan attention 2/3, text_analyst attention 16/16 | - |
+| Q2 | 코드 세션 할 일 없음(환경 설정은 설계 세션·사용자) | - |
+| Q3 | `scripts/record_repo_tools.py`(새), `tests/fixtures/http/repo_tools`에 NVIDIA/OpenShell(활발)·tile-ai/tilelang(릴리스)·pablostanley/yoinks(작은 개인) 각 5개 응답 추가(`recorded: true`), 합성 5개 유지·기대값 미변경, `test_recorded_github_responses_normal_path`. 녹화에서 본 형식 차이: 매 커밋 갱신되는 `dev` 프리릴리스가 목록 맨 앞에 오고 published_at은 처음 날짜(2026-03-18) → `releases` 도구 출력에 `prerelease` 칸. 빈 레포 409 같은 오류 형식은 이번 녹화에 없었다 | `7332d72` |
+| Q3 비밀 | 첫 녹화는 토큰 없이. 토큰 도입 뒤 녹화 스크립트 2개가 저장 전 비밀 값 지우기, 요청 헤더 미저장. `tests/test_secret_safety.py`(녹화에 Authorization 헤더 형태·토큰 형태·.env 값 없음, index 허용 칸만, 리다이렉트), `test_github_token_not_persisted_or_sent_to_llm`. 본문 산문의 "authorization" 단어 2곳(S1 녹화 기사, OpenShell 커밋 메시지)은 비밀이 아니라 그대로 | `e3ec37f` |
+| Q4 | repo_analyst 10(2026-W41), editor_plan 1(실제 2026-10-04, 영상 17편), text_analyst 10(계획 큐 5 + 수동 5: 933, 201, 972, 959, 240). `dev-` 픽스처 그대로 | `51f5a95` 외 |
+| Q5 | `cli_text.PLAN_LABELS = eval/labels/editor_plan_mode.csv`, judge 라벨은 `editor_plan.csv`. `docs/DEVELOPMENT.md`, 맥 확인 목록 명령, `test_mode_labels_and_judge_labels_are_separate_files` | `6665044` |
+| Q7 | S3 상한 2.00 그대로, 주석만. 합계 $0.561 | `90c4f74` |
+
 ## 4. 공통 코어 수정
 | 커밋 | 파일 | 내용 |
 |---|---|---|
@@ -98,6 +140,9 @@ PASS A14 README(빠른 시작, 성과 행), DEVELOPMENT 명령표, S3 리포트,
 | `23cfb17`(3b 커밋 안) | `core/artifacts.py`, `eval/run_eval.py` | 반쯤 읽힌 스키마 모듈을 오류로, 픽스처마다 연 페이지 기록 비움 |
 | 리뷰 반영 커밋 | `core/artifacts.py`, `agent.py` | 스펙별 스키마 자기 등록(`register_schemas`), 입력별 도구 호출 상한(`tool_call_limit`) |
 - `c72908a`, `23cfb17`은 기능 커밋 안에 섞였다(COMMON 9장은 별도 커밋). 다음부터 분리
+| `aeac887`(맥, 별도) | `core/artifacts.py`, `eval/graders.py`, `eval/run_eval.py`, `cli.py` | 설계 결정 Q1 채점 두 갈래(S2 리포트 결정 반영) |
+| `b09261f`(맥, 별도) | `eval/run_eval.py` | 평가도 항목마다 `fetched_pages`·`page_depth`를 새로(운영과 같게). 테스트 `test_eval_registers_github_readme_as_fetched_page` |
+| `e3ec37f`(맥) | `core/config.py`, `collect/fetch.py`, 녹화 스크립트 2개 | 녹화 저장 전 비밀 값 지우기(`redact_secrets`), 다른 호스트 리다이렉트에 Authorization 안 넘김 |
 
 ## 5. 마이그레이션
 | 번호 | 단계 | 테이블 |
@@ -108,8 +153,11 @@ PASS A14 README(빠른 시작, 성과 행), DEVELOPMENT 명령표, S3 리포트,
 | 13 | 3a | plans |
 
 ## 6. 남은 문제, 다음 스펙 제안
-- repo_analyst 관문 B 전체, editor_plan·text_analyst의 실제 한 주 픽스처(영상 10편, 글 10건), 라벨, 산출물 → 맥
-- editor_plan 라벨 경로 겹침(질문 Q5)
+- **(지적, 리뷰 때 결정) 도구가 전부 실패해도 관문 B가 통과한 사례**: repo_analyst 무효 실행(`reports/eval/repo_analyst_generate_20261008-165334.json`). GitHub 비인증 한도 소진으로 GitHub 도구 41회 중 33회가 HTTP 403(성공은 search_items 8회뿐)이었는데 **코드 10/10, judge Q1~Q3 각 10/10**으로 통과 판정이 났다. 모델은 "막혔을 때" 지시대로 10개 모두 attention=true, why_trending 빈칸, evidence에 "github_repo, releases, … 모두 HTTP 403으로 실패"를 적었고 relevant·signal은 입력(트렌딩 수치, 설명)만으로 정했다. judge는 "403이라 why_trending을 비운 처리가 규칙에 부합"으로 pass. 지금 채점은 "실패를 정직하게 적었는가"만 보고 "근거를 실제로 얻었는가"는 보지 않는다. 코드 규칙 후보(지금은 넣지 않음): 이 항목의 GitHub 도구 호출이 전부 오류면 attention 고정 + 카드 내용(relevant, signal) 무효 표시, 평가에서는 도구 오류율이 높은 실행을 무효로. 리뷰 세션 결정 대기
+- 평가 실행 경로와 운영 경로의 자원 초기화가 달랐던 문제(`b09261f`로 고침)는 클라우드에서 github.com이 막혀 드러나지 않았다. 도구 결과를 근거로 등록하는 다른 경로(arxiv 등)도 평가·운영이 같은 초기화를 쓰는지 리뷰 때 함께 볼 것
+- 인용 대조의 따옴표 모양: 모델이 ’를 '로 옮기는 일이 반복되면(text_analyst 반복 1로 이번에는 0건) enforce의 공백 정리에 따옴표·대시 정규화를 더할지 설계 세션 판단. 채점·enforce 규칙 변경이라 손대지 않음
+- it982 원본이 공식 발표가 아니라 언론(thenewstack.io)인데 judge Q1 pass. 라벨 비교 때 확인할 것
+- 라벨 일치율: 리뷰 세션 독립 채점 + 사용자 불일치 판정(item_card, repo_analyst, editor_plan judge, text_analyst), 영상 mode는 사용자
 - 다음 스펙(S5) 제안: 유사 쌍 상위 30(맥 실행 뒤 `reports/S2_filter/README.md`)으로 묶기 기준, ItemCard 중 묶기에 쓸 칸(entities, keywords, claims), 원본 깊이 분포로 기본 깊이 결정
 - 슬라이드 예산만 넘는 영상을 빼지 않고 whisper로 낮출지(S4 결과 보고)
 
@@ -118,7 +166,8 @@ PASS A14 README(빠른 시작, 성과 행), DEVELOPMENT 명령표, S3 리포트,
 |---|---|
 | 클라우드(첫 세션) | $0(LLM 호출 없음, 키 없음) |
 | 클라우드(두 번째 세션) | **$0.0625** / 클라우드 몫 1.60 (`cost --spec S3`. editor_plan $0.0083, text_analyst $0.0499 + 픽스처 이름 변경 뒤 재기록 $0.0043(원문 페이지를 새로 받아 캐시 일부만 맞음, 결과 같음)) |
-| 맥 | 맥 확인 후. 스펙 상한 2.00에서 클라우드 사용액을 빼고 확인 |
+| 맥 | **$0.4988** / 맥 몫 약 1.93(상한 2.00 − 클라우드 0.06, 설계 결정 Q7). repo_analyst 평가 3회 $0.096(첫 실행 $0.0261, 무효 $0.0348, 반복 1 $0.0350) + repo-analyze 실행·추적, editor_plan 평가 $0.0283 + 계획 실행, text_analyst 평가 3회 $0.319 + 추적 |
+| 합계 | $0.5613 / 상한 2.00 |
 
 ## 7-1. README, 위키 메모
 - README: 역할 표 상태, 빠른 시작(repo-analyze, plan, deep text), 성과 표 S3 행. DEVELOPMENT: 명령 5개, 깊게 보기 동작
