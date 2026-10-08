@@ -1,6 +1,6 @@
 # S2 리포트: 0단계(S1 리뷰 반영) + 2a 필터 + 2b 글 1차 요약
 
-> 상태: 클라우드 구현 끝 + 클라우드 관문 B(픽스처 범위) 끝 + **맥 확인(2026-10-08)**: 설계 결정 Q1~Q7 반영, 실제 한 주 rematch·filter·summarize, item_card 관문 B 21건. 사람 라벨(relevance 40, item_card 21)과 문턱값 확정은 라벨 대기.
+> 상태: 클라우드 구현 끝 + 클라우드 관문 B(픽스처 범위) 끝 + **맥 확인(2026-10-08)**: 설계 결정 Q1~Q7 반영, 실제 한 주 rematch·filter·summarize, item_card 관문 B 21건. 라벨(relevance 40, item_card 21)은 MVP 동안 사람이 달지 않고 PR 리뷰 세션 Opus 5.5가 2차 채점(설계 결정 D1-3). 필터 문턱값과 `--agreement`는 **리뷰 채점 대기**(반영 단계에서 "잠정"으로 확정)
 > 맥 실행 환경: M1 Max, macOS, 파이썬 3.12.14, 임베딩 MPS. 데이터는 맥 S1 DB(`../trendsit/data`) 사본
 > **클라우드 관문 B의 범위**: 저장소에 있는 픽스처(item_card 17건, 임베딩 재현 20건, repo_oneliner 10건)와 녹화 응답으로 만든 개발 DB(25건)만으로 돌렸다. 실제 한 주 데이터(맥의 `data/trendsit.db`)로 하는 `rematch`·`filter`·`summarize`, 시드 13건, 문턱값 확정, 사람 라벨 일치율은 맥 몫으로 남는다. judge 판정은 라벨이 없어 모두 **잠정**
 
@@ -21,12 +21,12 @@
 - [x] 2a 임베딩 필터(실제·모의 임베더, 네 갈래 판정, 임베딩 재사용), URL 중복 연결, 검증 산출물·라벨 생성기, 재현 픽스처 20건
 - [x] 2a 실제 임베딩 모델 테스트, 재현 픽스처 CPU 점수 기록(두 번째 클라우드 세션)
 - [x] 2a 실제 한 주 점수 분포, 시드 13건, 검증 산출물, MPS 점수(맥)
-- [ ] 2a 문턱값 확정(relevance 라벨 40건 대기)
+- [ ] 2a 문턱값 확정(리뷰 채점 대기, 반영 단계에서 잠정 확정)
 - [x] 설계 결정 Q1(채점 두 갈래), Q5(라벨 경로), Q6(긴 인용 자르기), Q7(예산) 반영(맥)
 - [x] 2b `item_card` 스키마·enforce·역할 md·채점기·채점표, `summarize`, 픽스처 17건(녹화 글 16 + 인젝션 1)
 - [x] 2b 관문 B 픽스처 17건(두 번째 클라우드 세션, 반복 3회): 코드 16/17로 미달 1건, judge 잠정 통과
 - [x] 2b 픽스처 4건 추가(21건), 관문 B 재실행, 한 주 실행(맥)
-- [ ] 2b 라벨 21건 일치율(라벨 대기)
+- [ ] 2b 라벨 21건 일치율(리뷰 채점 대기)
 
 ## 0단계 (S1 리뷰 반영, `s2-0-base` PR)
 
@@ -147,7 +147,7 @@ PASS M6 낡은 문구 두 개(geeknews.py 설명, report.py 계획 표기) 없�
 | 기준 | 결과 |
 |---|---|
 | `relevance_seed.csv` 13건 85% 이상 | **11/13(84.6%) 미달**. 틀린 2건은 고객 사례 글(OpenAI Chatham 0.356, Anthropic Barclays 0.329, 기대 drop)이 키워드 통과로 keep. 잠정 문턱값 기준 |
-| 라벨 40건 keep 정밀도·재현율 | 라벨 대기(`eval/labels/relevance.csv` 40행 생성, 빈칸) |
+| 라벨 40건 keep 정밀도·재현율 | **리뷰 채점 대기**(`eval/labels/relevance.csv` 40행, 빈칸, `labeler` 칸) |
 | (보조) 재현 픽스처 CPU↔MPS 최대 차이 0.001 이하 | **0.0050 미달**. 클라우드 리눅스 CPU 기록과 맥 MPS 모두 bf16이라 생기는 차이로 본다. 잠정 문턱값(0.30, 0.45)을 사이에 두고 판정이 갈리는 픽스처는 없음(가장 가까운 aitimes-215688 CPU 0.4612 / MPS 0.4562). 기준은 그대로 두고 설계 세션 판단에 남김 |
 | (보조) 실제 임베딩 모델 테스트(맥) | 통과. 단 테스트가 장치를 `cpu`로 고정해 맥에서는 bf16 가중치를 하드웨어 지원 없이 계산해 70분이 넘어도 끝나지 않았다 → 운영과 같은 자동 선택(맥 MPS)으로 바꿔 45초. 점수·문턱값 변경 없음 |
 | (보조) 실제 임베딩 모델 테스트 | 통과(두 번째 클라우드 세션, `uv run --extra embed pytest -k real_embedder`, 모델 받기 포함 223초) |
@@ -191,7 +191,7 @@ PASS M6 낡은 문구 두 개(geeknews.py 설명, report.py 계획 표기) 없�
 | judge Q1 / Q2 / Q3 각 80% | 20/20, 20/20, 19/20(잠정). Q3 실패: aitimes-215937(링크 없는 글인데 needs_original=true) |
 | 잘린 인용(Q6, 보고용) | 5/108 (4.6%). jump-trading(클라우드 미달 원인)은 코드가 잘라 통과 |
 | 모델 일치율(코드 소유 칸) | attention 20/21, quotes(자르기) 16/21 |
-| 라벨 21건 일치율 80% | 라벨 대기(`eval/labels/item_card.csv` 21행, 빈칸) |
+| 라벨 21건 일치율 80% | **리뷰 채점 대기**(`eval/labels/item_card.csv` 21행, 빈칸, `labeler` 칸) |
 | 한 주 전체 | 264건 중 264건(대체 1), relevance high 134 / mid 91 / low 39, 원본 확인 필요 158건(59.8%), 잘린 인용 56/1352(4.1%, 다시 볼 기준 5% 아래), **$0.5934** |
 
 - 추가 픽스처 4건(실제 한 주, 기존 17건은 그대로): `deepmind__blog-gemini-4-argon-…`(DeepMind, 숫자 표현 34), `aitimes__articleView-html-idxno-215937`(DGX 스파크, 44), `aitimes__articleView-html-idxno-215863`(AI 가격 급락, 36), `openai__index-basis-tax-workbook-with-astra`(21)
@@ -252,14 +252,28 @@ PASS M6 낡은 문구 두 개(geeknews.py 설명, report.py 계획 표기) 없�
 | 결정 | 반영 위치 | 커밋 |
 |---|---|---|
 | 기록 | `docs/handoff/S2S3_DECISIONS.md`(PR #6 댓글 전문) | `5527d29` |
-| Q1 공통 코어 | `core/artifacts.py` `RoleOutput.ENFORCED_FIELDS`(ClassVar), `fix(..., owned=)`(기본은 칸이 ENFORCED_FIELDS에 있는지), `graded_output`/`graded_dump`. `eval/run_eval.py`: 코드 채점·judge는 채점 보기(원래 출력에 코드 소유 변경만 덮음), `graded_output` 기록, `regrade`. `eval/graders.py` `model_agreement`, `summarize(…, owned_fields)`. `cli.py` `eval --regrade` | `aeac887`(별도) |
-| Q1 역할별 칸 | `RepoOneliner`·`ItemCardV1`·`CollectionPlan`·`ItemCardV2` = attention, `RepoCard` = signal·hype_flags·attention. 품질 정리(인용·수치·키워드·링크 삭제, 없는 id·깊이·예산 꼬리, 근거 없는 판정 등)는 원래 출력 기준 그대로 | `f20d8d2` |
+| Q1 공통 코어 | 처음엔 `core/artifacts.py`에 채점 보기(`graded_output`)를 따로 만들었으나(`aeac887`, 별도 커밋), 같은 결정을 S4가 먼저 main에 구현(`graders.ENFORCED_FIELDS` dict, `basis_output`, `code_pass_basis`, judge 대상 D2-4)해 main 병합(`aa0b6c8`) 때 채점 흐름은 main 것으로 통일. 남은 것: `RoleOutput.ENFORCED_FIELDS`(ClassVar, 칸 목록을 정하는 곳), `fix(..., owned=)`(기록·모델 일치율용), `graders.model_agreement`(보고용), `eval --regrade`(main 기록 형식). 기록: `code` = 원래 출력(모델 품질), `code_basis` = 통과 판정 | `aeac887`, `aa0b6c8` |
+| Q1 역할별 칸 | `RepoOneliner`·`ItemCardV1`·`CollectionPlan`·`ItemCardV2` = attention, `RepoCard` = signal·hype_flags·attention. 출력 클래스에 선언하고 `eval/graders.py`·`graders_text.py`가 `graders.ENFORCED_FIELDS`에 등록. 품질 정리(인용·수치·키워드·링크 삭제, 없는 id·깊이·예산 꼬리, 근거 없는 판정 등)는 원래 출력 기준 | `f20d8d2`, `aa0b6c8` |
+| 병합 뒤 재채점 | 병합 전 S2·S3 평가 결과 5개를 생성 재실행 없이 main 기록 형식으로 재채점(`…-1955xx.json`). 판정 변화 없음. item_card kakapo-party만 D2-4대로 enforce 후 출력을 judge($0.0022) | `1fd6cce` |
+| 라벨(D1-3) | MVP 동안 사람 라벨 없음, 리뷰 세션 Opus 5.5 2차 채점. 라벨 파일 전부 `labeler` 칸(relevance·영상 mode 생성기에 추가), 빈칸. 문턱값·`--agreement`는 리뷰 채점 대기 | `1fd6cce` |
 | Q1 분류가 애매한 것 | editor_plan의 `log` 덧붙이기("잘림·정리: …")는 기록용이라 품질 쪽(원래 출력)으로 둠. 채점에는 문체 검사만 걸림 | - |
 | Q1 repo_oneliner | 재생성 없이 클라우드 2차 결과 재채점: 코드 10/10, 모델 일치율 attention 9/10(위 0단계 3) | - |
 | Q5 | S3 몫(`reports/S3_report.md` 결정 반영) | `6665044` |
 | Q6 | `core/artifacts_text.py`: `QUOTE_SCHEMA_MAX = 1000`(스키마), `QUOTE_CHARS = 200`, `clip_quote`(단어 경계, 연속 부분 문자열, 수치가 모두 들어가는 가장 앞 구간 → 없으면 앞에서부터, 공백 없는 덩어리는 글자 단위), `ItemCardV1.clip_quotes`(owned=True, 잘려 나간 수치만 코드 소유로 삭제, attention 안 켬). 역할 md "200자 이내"는 그대로. 집계: `eval/graders_text.py` "잘린 인용", `summarize.py` 요약 줄 | `0a1ecab` |
 | Q6 재실행 | item_card 관문 B 21건(위 2b 3). 잘린 인용 픽스처 4.6%, 한 주 4.1%(다시 볼 조건 5% 아래) | `ad8109b` |
 | Q7 | `config/budget.yaml` S2 1.50, S3 주석. 실행 전 `cost` 기록, 합계 S2 $1.057 / 1.50 | `90c4f74` |
+
+## 사람 확인 부채 (S2, 고도화 단계에서 처리)
+MVP 동안 사람 라벨을 하지 않는다(설계 결정 D1-3). 아래 라벨은 PR 리뷰 세션 Opus 5.5가 2차 채점하고(`labeler` 칸에 기록), 그 값으로 낸 수치는 **잠정**이다. 고도화 단계에서 사람이 확인한다.
+
+| 라벨 파일 | 규모 | 무엇을 정하는가 | 2차 채점 뒤 반영(잠정) | 사람이 볼 것 |
+|---|---|---|---|---|
+| `eval/labels/relevance.csv` | 40행(키워드 통과 20, 걸러짐 20), `expected` keep/drop | 임베딩 필터 keep 정밀도·재현율 | `config/filter.yaml` 문턱값(`thresholds_status`는 잠정 표시), S2 리포트 2a | 문턱값 근처 글, 고객 사례 글(시드 13건 중 틀린 2건과 같은 유형) |
+| `eval/labels/item_card.csv` | 21행 × Q1~Q3 | judge 판정 일치율(`eval item_card --agreement`) | S2 품질 리포트 judge 행 | judge·라벨 불일치 행, Q3(needs_original) 판정 |
+| `eval/labels/relevance_seed.csv` | 13행(사용자가 이미 채움) | 시드 정확도(11/13) | - | 이미 사람 라벨. 부채 아님 |
+
+- 라벨 없이 이미 확정된 것: 코드 채점(인용 일치 108/108 등)은 사람 라벨과 무관
+- 같은 표의 S3 몫은 `reports/S3_report.md` "사람 확인 부채"
 
 ## S2 관문 A 전체
 **맥(2026-10-08, 결정 반영 뒤 마지막 커밋)**: `verify_s2.sh`·`verify_s3.sh` 전부 PASS(A1 포함, FAIL 0), pytest 273 passed + 1 skipped(embed 없이), `uv run --extra embed pytest -q` 274 passed. 중간에 verify_s0 A9(키 문자열 검사)가 테스트의 가짜 토큰 문자열을 잡아 테스트에서 이어 붙여 만들도록 고침(검사 규칙은 그대로)
