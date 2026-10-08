@@ -196,6 +196,8 @@ def write_quality(spec: str) -> Path:
             lines.append("| " + " | ".join(row) + " |")
         lines.append("")
         for alias, r in latest.items():
+            if r["summary"].get("aggregate"):
+                lines.append(f"- {alias} 전체 지표: " + ", ".join(f"{k} {v}" for k, v in r["summary"]["aggregate"].items()))
             if r["summary"]["fail_reasons"]:
                 lines.append(f"- {alias} 미달 이유: {'; '.join(r['summary']['fail_reasons'])}")
         if "judge" in latest and questions:
