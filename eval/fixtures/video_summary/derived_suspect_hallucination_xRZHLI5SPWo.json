@@ -564,6 +564,14 @@
     "confidence": "high"
    },
    {
+    "fact": "new engineers become productive within",
+    "value": "~2",
+    "unit": "weeks",
+    "sec": 1014,
+    "evidence": "vd:15@1014",
+    "confidence": "high"
+   },
+   {
     "fact": "of all incidents at Spotify",
     "value": "90%",
     "unit": "%",

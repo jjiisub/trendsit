@@ -12,6 +12,7 @@
 - [x] 파이프라인, 저장, CLI(`video run·purge·report`)
 - [x] 관문 B(실제 영상 10편), 비교, 검증 산출물(`reports/S4_video/`)
 - [x] 관문 A 전부 PASS
+- [x] 서브에이전트 리뷰(13건 반영), PR
 - [ ] 사용자 라벨(리뷰 때): `eval/labels/video_summary.csv` 12행, `reports/S4_video/README.md`의 체크 칸
 
 ## 준비물 (S4_TASK 2장)
@@ -29,18 +30,18 @@
 맥에서 `bash scripts/verify_s4.sh`(video 묶음 포함, 맥 전용 테스트까지 실행):
 ```
 PASS A1 verify_s0.sh 10개, verify_s1.sh 24개 전부 PASS
-PASS A2 ruff 0, pytest 267 passed in 50.41s (건너뜀 0건은 맥 전용 표시뿐)
-PASS A3 check-config 통과(OK 설정 6개, 역할 5개) + 잘못된 mode·상한이 경로를 짚어 실패 (6 passed, 34 deselected in 1.48s)
-PASS A4 video_slide, video_summary 역할 md 검사 통과, 예시 3개 (4 passed, 23 deselected in 0.69s)
-PASS A5 픽스처 MediaResult 계약 통과 + 깨뜨린 사본(시간 역순, 상한 초과, 작업 폴더 밖 경로 등) 실패 (2 passed, 38 deselected in 0.57s)
-PASS A6 큐 계약 JSON → mode별 설정, captions에 수동 자막 없으면 건너뜀(올리지 않음) (4 passed, 48 deselected in 1.35s)
-PASS A7 suspect_hallucination·empty에서 전사를 근거로 쓰지 않음, 둘 다 없으면 내용 없음 + attention (7 passed, 16 deselected in 1.83s)
-PASS A8 대조: 다른 표기의 같은 수치는 대조됨, 30초 밖은 slide_only, check는 따로 (34 passed in 0.28s)
-PASS A9 enforce: 판독 수치(ocr_text 안), 표기 쌍, 근거·타임라인 초 범위(모의 LLM) (3 passed, 8 deselected in 0.54s)
-PASS A10 이미지 입력: 메시지 모양, 캐시 키가 이미지 바이트에 따름, 기록·캐시에 원본 없음, 예상 비용 (5 passed, 6 deselected in 0.48s)
-PASS A11 보관: purge는 7일 지난 작업 폴더만, DB 텍스트 유지, 8주 지난 segments 텍스트 삭제 (2 passed, 50 deselected in 1.18s)
-PASS A12 마이그레이션 대역: S4 번호 모두 20~29, video_ 표만, 묶음 A 번호와 순서 무관 (2 passed, 10 deselected in 1.72s)
-PASS A13 자동 자막 경로 없음(자동 자막만 있는 메타데이터에서 captions는 건너뜀) (2 passed, 38 deselected in 0.97s)
+PASS A2 ruff 0, pytest 286 passed in 66.11s (0:01:06) (건너뜀 0건은 맥 전용 표시뿐)
+PASS A3 check-config 통과(OK 설정 6개, 역할 5개) + 잘못된 mode·상한이 경로를 짚어 실패 (6 passed, 35 deselected in 0.85s)
+PASS A4 video_slide, video_summary 역할 md 검사 통과, 예시 3개 (4 passed, 23 deselected in 1.09s)
+PASS A5 픽스처 MediaResult 계약 통과 + 깨뜨린 사본(시간 역순, 상한 초과, 작업 폴더 밖 경로 등) 실패 (2 passed, 39 deselected in 0.71s)
+PASS A6 큐 계약 JSON → mode별 설정, captions에 수동 자막 없으면 건너뜀(올리지 않음) (12 passed, 45 deselected in 3.33s)
+PASS A7 suspect_hallucination·empty에서 전사를 근거로 쓰지 않음, 둘 다 없으면 내용 없음 + attention (7 passed, 21 deselected in 4.16s)
+PASS A8 대조: 다른 표기의 같은 수치는 대조됨, 30초 밖은 slide_only, check는 따로 (47 passed in 0.55s)
+PASS A9 enforce: 판독 수치(ocr_text 안), 표기 쌍, 근거·타임라인 초 범위(모의 LLM) (3 passed, 9 deselected in 0.43s)
+PASS A10 이미지 입력: 메시지 모양, 캐시 키가 이미지 바이트에 따름, 기록·캐시에 원본 없음, 예상 비용 (5 passed, 7 deselected in 0.70s)
+PASS A11 보관: purge는 7일 지난 작업 폴더만, DB 텍스트 유지, 8주 지난 segments 텍스트 삭제 (2 passed, 55 deselected in 1.75s)
+PASS A12 마이그레이션 대역: S4 번호 모두 20~29, video_ 표만, 묶음 A 번호와 순서 무관 (2 passed, 14 deselected in 11.34s)
+PASS A13 자동 자막 경로 없음(자동 자막만 있는 메타데이터에서 captions는 건너뜀) (2 passed, 39 deselected in 7.62s)
 PASS A14 README(기능, 빠른 시작, 시스템 의존성), DEVELOPMENT.md 명령표, 리포트
 ```
 
@@ -52,7 +53,7 @@ PASS A14 README(기능, 빠른 시작, 시스템 의존성), DEVELOPMENT.md 명�
 | 1차 처리 | 10편 모두 성공 또는 실패 이유, 계약 검사 전부 통과 | 10/10 성공, 계약 위반 0. 전사 품질 10편 모두 ok. 10~31분 영상 전사 58~150초(모델 적재 포함) |
 | 판독 수치 정확도 | 사용자 라벨에서 slide_only_facts가 화면에 있는 비율 90% | 라벨 대기. 124개(영상별 44, 3, 1, 43, 26, 7, 0). 판독 139/140장(1장은 큰 표가 출력 상한 1600토큰을 넘어 실패) |
 | 슬라이드 전용 정보 포착률 | 사용자 라벨 80% | 라벨 대기. 썸네일 35장에 "놓친 수치 있음" 칸 |
-| video_summary | judge Q1~Q3 각 80% + 라벨 일치 80% | Q1·Q2·Q3 8/8(코드 채점 통과분, 잠정). 코드 채점 8/12, enforce 후 11/12. 내부 문턱값(코드 채점 전부 통과) 미달 |
+| video_summary | judge Q1~Q3 각 80% + 라벨 일치 80% | Q1·Q2·Q3 8/8(코드 채점 통과분만 채점, 잠정). 코드 채점 8/12, enforce 후 11/12. 내부 문턱값(코드 채점 전부 통과) 미달. 코드 실패 4편(슬라이드 발표)은 judge를 받지 않았으므로 Q1·Q2는 사람 라벨로 확인 필요 |
 | 비교(whisper만 vs whisper+slides) | 슬라이드가 더한 정보 | 2편, 같은 전사로 요약만 다시. 잘못 들은 수치가 화면 값으로 바뀜("Sweebench Pro 88%" → "SWE-Bench Pro 80.3%", "약 74개" → "73개"), 발화에 없던 그래프 값("Q3 2025 78 → Q2 2026 114") 추가 |
 | captions 비교 | 수동 자막이 있는 1편 | 하지 못함. Tech Bridge 60편 모두 업로더 자막 트랙 없음(하드 자막) |
 
@@ -64,10 +65,10 @@ PASS A14 README(기능, 빠른 시작, 시스템 의존성), DEVELOPMENT.md 명�
 | video_slide | 1 | max_tokens 900 → 1600 | 판독 실패 3/140 → 1/140 | 같음 |
 | (대조 코드) | 1 | 수치가 아닌 판독 제외(단위 없는 연도, 이름에 붙은 버전, 슬라이드 번호) | 13개 제외(excluded로 기록) | - |
 | video_summary | 1 | max_tokens 1800 → 3500(챕터 20여 개 영상에서 JSON이 잘림) | 요약 실패 1/10 → 0/10 | `b671…` 이전 |
-| video_summary | 2 | md 문구: 포인트 명사형·6개 상한, 표기 쌍 screen은 판독에 있는 표기만 | 코드 채점 2/12 → 8/12(채점기 문체 칸 수정 포함, 아래) | `b671779982e1` |
+| video_summary | 2 | md 문구: 포인트 명사형·6개 상한, 표기 쌍 screen은 판독에 있는 표기만 | 기록상 2/12 → 8/12. 같은 최종 채점기로 다시 매기면 1회 4/12 → 2회 8/12(채점기 수정 몫 +2, 프롬프트 몫 +4) | `b671779982e1` |
 | video_summary | 3 | 예시 1에 표기 쌍에서 빼는 경우 추가 | 8/12 그대로, 예시의 "Llama 3.1" 쌍을 베낀 출력이 생김 → 2회로 되돌림 | `8ee3fccb5714`(폐기) |
 
-채점기 수정(이 스펙의 채점기, 통과를 위한 기준 완화가 아니라 오탐 제거라 따로 적음):
+채점기 수정(이 스펙의 채점기, 통과를 위한 기준 완화가 아니라 오탐 제거라 따로 적음). 2회·3회 때 프롬프트와 같은 실행에서 바꿔 효과가 섞였으므로, 모든 회차의 저장된 출력을 최종 채점기로 다시 매겨 위 표에 나눠 적음(1회 4/12, 2회 8/12, 3회 8/12). 문턱값(코드 채점 전부 통과)은 그대로:
 - 문체 검사는 `summary` 칸만(`ROLE_STYLE_FIELDS`, S2~S3 브랜치와 같은 코드). `chapters`는 업로더 제목을, `name_pairs`는 화면 표기를 그대로 옮긴 칸이라 해요체 검사 대상이 아님("…인가요?" 같은 챕터 제목이 실패로 잡혔음)
 - 포인트·라벨 명사형 검사는 자체 정규식. 공통 `SENTENCE_END`, `HAEYO`는 "개요", "필요"처럼 요로 끝나는 명사도 문장 끝으로 잡음(공통 채점기 문제, 6장 질문)
 
@@ -83,15 +84,16 @@ PASS A14 README(기능, 빠른 시작, 시스템 의존성), DEVELOPMENT.md 명�
 2. 프레임 경로는 작업 폴더 기준 상대 경로, `work_dir`는 절대 경로. 계약 검사가 "작업 폴더 안"을 경로 문자열로 확인(절대 경로, `..` 금지)
 3. 프레임마다 `segment_index`·`spoken_text` 칸은 항상 있고, 프레임 시각 2초 안에 발화가 없으면 null·빈 문자열(스킬과 같은 허용 오차)
 4. 전사 segments는 시간 역순·겹침·구간 밖·빈 글자를 전사 단계에서 정리(계약의 "겹침 없음"). 실측: 7분 영상 끝에서 글자 없는 segment 31건, 깨진 문자(U+FFFD)
-5. 전사 품질이 ok가 아니면 대조에서도 발화를 없는 것으로 봄(환각 전사가 화면 수치를 "발화에 있음"으로 덮지 않게)
+5. 전사 품질이 ok가 아니면 대조에서도 발화(segments와 프레임 spoken_text 모두)를 없는 것으로 봄(환각 전사가 화면 수치를 "발화에 있음"으로 덮지 않게, `align(spoken_usable=False)`)
 6. 마이그레이션은 20번 하나에 표 네 개(한 트랜잭션). 21~29는 비워 둠
 7. `video` 명령은 `--spec`과 `TRENDSIT_SPEC`이 없으면 S4로 기록
 8. 1차 처리 결과를 작업 폴더에 `media_result.json`으로 남김(7일 정리와 함께 지워짐). `--reuse-media`, `--from-json`으로 전사 없이 판독 이후만 다시(관문 B 반복이 전사 없이 돎)
 9. 요약 입력의 전사는 `[초] 문장` 줄 한 문서(id `vd:{item}@{구간 시작}`), 판독은 프레임별 문서(id `vd:{item}@{초}`, 같은 글자의 슬라이드는 하나만). 전사도 판독도 없으면 LLM을 부르지 않음
 10. 이미지 입력: 메시지·캐시 키·실행 기록에는 `image:sha256=…`와 경로만, 전송 직전에만 data URI. 캐시 키는 경로가 아니라 바이트 해시(폴더를 옮겨도 캐시 유지). 예상 비용은 장당 1500토큰(실측 약 300, 상한 쪽)
 11. `RoleOutput` 등록: main의 `_merge`는 스펙 모듈이 먼저 읽히면(순환) 빈 모듈을 보므로 `artifacts_video.py` 끝에서도 등록(S2~S3 브랜치의 `register_schemas`로 병합 때 바꿀 수 있음)
-12. 평가 픽스처에 파생 2편(전사 품질을 suspect_hallucination, empty로 바꾼 사본, 이름 `derived_`). 실제 Tech Bridge 영상은 전사가 모두 ok라 Q3(품질이 나쁠 때 지어내지 않음)를 재려고 추가. 라벨 파일은 12행
+12. 평가 픽스처에 파생 2편(그중 `derived_empty`는 전사도 판독도 없는 경우로, 실제 파이프라인은 LLM을 부르지 않는 길이라 eval에서만 모델을 부른다. 모델이 지어내지 않는지 보려는 것)(전사 품질을 suspect_hallucination, empty로 바꾼 사본, 이름 `derived_`). 실제 Tech Bridge 영상은 전사가 모두 ok라 Q3(품질이 나쁠 때 지어내지 않음)를 재려고 추가. 라벨 파일은 12행
 13. `eval/graders.py` 끝에 스펙별 채점 모듈을 읽는 `_load` 자리와 `ROLE_STYLE_FIELDS`(S2~S3 브랜치와 같은 코드)
+14. 수치 정규화: 한 글자 크기 단위는 대문자 K·M·B·T와 소문자 k만(소문자 m·b·t는 미터·바이트·톤일 수 있음). unit 칸이 B 하나면 10억으로 봄(슬라이드에서 바이트는 GB, MB로 씀). 영어 수사는 'and'를 hundred·thousand 뒤에서만 잇고 'two three'처럼 이어진 단위 수사는 따로 셈. 한국어 천만·백만·천억, '만큼'의 만은 크기 아님
 
 ## 5. 스펙과 다르게 한 것과 이유
 1. whisper+slides 기본 해상도 1024(스펙: 기본 768, 수치 많은 발표는 1024). 768px에서 그래프 데이터 레이블 4개 중 3개를 축 눈금으로 짐작해 틀렸고(high 확신도), 1024px에서 4개 모두 맞음. 장당 약 0.0001달러 더 듦. 영상 처리 지시 계약에는 해상도 칸이 없어 편집장 계획이 1024를 고를 방법이 없음. `--res`로 영상별 덮어쓰기 가능
@@ -105,6 +107,7 @@ PASS A14 README(기능, 빠른 시작, 시스템 의존성), DEVELOPMENT.md 명�
   - `reports/S4_quality.md`가 113KB: 공통 `write_quality`의 "가장 나쁜 사례"가 중첩 입력(전사 문서)을 줄이지 않고 씀
   - 작업 폴더마다 `data/budget_state.json`이 따로라 이 폴더의 단계 기준값은 S4 시작 때의 키 사용액($1.079). 단계 사용액은 키 기준이라 다른 폴더 사용분도 잡히지만 그 이전 사용분은 빠짐
 - `uv run`은 선택 묶음을 지운다. 영상 명령과 관문 A는 `uv run --extra video`(README, DEVELOPMENT에 적음). S2~S3의 embed 묶음도 같은 문제
+- `roles/video_slide.md`의 "가로 768px 안팎" 문구를 1024로(리뷰 9, 다음 판독 개선 때)
 - 확신도 check가 0건: 사용자 라벨에서 판독 정확도가 낮으면 다음 개선은 "자신 없는 값은 check" 예시 보강이나 1280px
 - 도식 속 예시 값(가치 흐름도 등)은 수치로 쓰면 안 되는데 판독이 그대로 옮김. 묶기(S5)에서 slide_only_facts를 쓸 때 "도식" 판독(같은 프레임 수치 10개 이상 등)을 낮게 보는 규칙 제안
 - 편집장 계획 mode 기준(실측): whisper+slides는 20분 발표에 전사 약 2분 + 판독 20장 약 1.5분, 비용 약 0.011~0.016달러(판독 20장 약 0.011 + 요약 약 0.003). whisper만은 약 0.003달러. 대담·인터뷰는 whisper로 충분(슬라이드 없음)
@@ -115,11 +118,11 @@ PASS A14 README(기능, 빠른 시작, 시스템 의존성), DEVELOPMENT.md 명�
 ## 7. 사용액 (`trendsit cost --spec S4`)
 | 스펙 | 모델 | 호출 | 캐시 적중 | 입력 토큰 | 출력 토큰 | 사용액(달러) |
 |---|---|---|---|---|---|---|
-| S4 | qwen/qwen3.8-27b | 624 | 259 | 2,547,093 | 229,121 | 0.410455 |
-| S4 | google/gemini-3.8-flash | 26 | 10 | 247,013 | 11,494 | 0.076064 |
-| 합계 | | | | | | 0.486519 |
+| S4 | qwen/qwen3.8-27b | 788 | 422 | 3,214,871 | 287,531 | 0.414395 |
+| S4 | google/gemini-3.8-flash | 34 | 17 | 324,235 | 15,011 | 0.081236 |
+| 합계 | | | | | | 0.495631 |
 
-- 상한 0.80 중 0.487. 단계별: 이미지 입력 확인 0.0002, 개발 중 판독·요약 약 0.07, 관문 B 10편 판독·요약 약 0.15, 판독 재실행(max_tokens, 1024 반영) 약 0.08, 요약 개선 3회 eval 약 0.18(대부분 긴 전사 재생성), 채점 약 0.08
+- 상한 0.80 중 0.496(리뷰 반영 뒤 재채점 포함). 단계별: 이미지 입력 확인 0.0002, 개발 중 판독·요약 약 0.07, 관문 B 10편 판독·요약 약 0.15, 판독 재실행(max_tokens, 1024 반영) 약 0.08, 요약 개선 3회 eval 약 0.18(대부분 긴 전사 재생성), 채점 약 0.08
 - 영상 한 편(whisper+slides, 20분 안팎): 약 0.011~0.016달러
 
 ## 7-1. README 갱신, 위키 메모
@@ -134,7 +137,25 @@ PASS A14 README(기능, 빠른 시작, 시스템 의존성), DEVELOPMENT.md 명�
   - 같은 전사에 슬라이드를 더하면 잘못 들은 수치가 화면 값으로 바뀜(SWE-Bench Pro 88% → 80.3%)
 
 ## 8. 서브에이전트 리뷰 지적과 처리
-(리뷰 뒤 채움)
+새 컨텍스트의 리뷰 에이전트(code-reviewer)에게 스펙 문서, diff, 이 리포트만 주고 대조 리뷰를 받았다. 지적 13건 모두 반영하거나 이유를 적었다.
+
+| # | 지적(심각도) | 처리 |
+|---|---|---|
+| 1 | captions 모드의 받기 오류, 받은 파일 ffprobe 실패가 MediaFailed가 아니라서 fetch_log·video_runs 없이 새고 CLI 큐 전체가 멈춤(높음) | captions의 메타데이터·자막 받기 1회 재시도 후 MediaFailed, ProbeError → MediaFailed, CLI는 영상별로 예상 밖 오류를 기록(video_runs failed + attention)하고 다음 영상으로. 테스트 3개 |
+| 2 | `--from-json`이 mode를 확인하지 않아 whisper 지시에 슬라이드 판독(높음) | `analyze`가 저장한 결과의 mode가 지시와 다르면 판독 없이 실패 기록, CLI도 거부. 테스트 |
+| 3 | 전사 품질 미달이어도 프레임 spoken_text가 대조에 들어감(중간) | `align(spoken_usable=False)`면 spoken_text도 쓰지 않음. 결정 5 문구 고침. 테스트 |
+| 4 | 수치 정규화 오류("five and ten" → 15, 단위 m을 백만으로, "5천만" → 5천 등)(중간) | 수사 묶음 규칙, 대소문자 구분 크기 단위, unit 크기 단위 목록, 한국어 복합 단위. 결정 14. 테스트 12개 |
+| 5 | verify_s4.sh A6가 `-k` 두 번이라 큐 테스트가 빠짐(중간) | `-k "queue or captions"` 하나로 |
+| 6 | 채점기와 프롬프트를 같은 회차에 바꿔 효과를 나눌 수 없음(중간) | 모든 회차 출력을 최종 채점기로 다시 매겨 반복 기록에 나눠 적음(채점기 +2, 프롬프트 +4). "~까요" 미검출도 고침 |
+| 7 | enforce가 check 수치("1?8")를 ocr_text에 없다고 지움(중간) | check는 글자 일치 규칙에서 제외(사람 확인 목록으로). 테스트. 관문 B 판독에서 check가 0건이었던 것과의 관계는 확인 못 함(그 영상들의 판독 출력에도 check가 없었음) |
+| 8 | 계약 검사가 mode와 transcript_source를 묶지 않음(중간) | captions ⇔ manual 검사 추가, 깨뜨린 사본에 추가 |
+| 9 | video_slide md의 "가로 768px 안팎"이 1024와 다름(낮음) | md는 그대로 둠: 고치면 프롬프트 해시가 바뀌어 관문 B 판독 140장이 다른 버전이 됨. 다음 판독 개선 때 함께 고침(6장) |
+| 10 | 60분 상한 이유가 log에 없음(낮음) | 구간을 정한 이유(`resolve_span` 문구)를 log에 |
+| 11 | PriceUnknown이 영상별로 기록되지 않음(낮음) | BudgetExceeded와 같이 처리 |
+| 12 | video_frames 기본 키(video_id, t)로 같은 시각 프레임의 판독이 조용히 덮임(낮음) | 저장 때 판독이 있는 쪽을 남기고 빠진 수를 step(attention)으로. 테스트 |
+| 13 | judge 8/8이 보이는 것보다 약함(코드 실패 4편은 judge 안 받음, derived_empty는 실제로는 LLM을 안 부르는 길)(낮음) | 결정 12와 3장에 적음. 사람 라벨 12행으로 확인 필요 |
+
+리뷰 반영 뒤 관문 B 결과를 최종 코드로 다시 계산(판독·요약은 캐시): 영상별 수치와 요약은 같음. 파생 suspect 픽스처만 대조가 바뀌어 다시 생성·채점(0.009달러).
 
 ## 스킬에서 옮긴 코드 (맥 `~/.claude/skills/youtube-analyze/scripts/`)
 | TrendsIT 파일 | 원본 | 옮긴 것 | 바꾼 것 |
