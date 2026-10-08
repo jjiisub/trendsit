@@ -24,8 +24,8 @@ GITHUB_TOKEN=...             # 선택. 픽스처 README 수집에만
 | `uv run python -m trendsit role <이름> --input <json> [--model 별칭] [--no-cache]` | 역할 1회 실행. 출력 JSON, stderr에 run_id, step_id, 비용 |
 | `uv run python -m trendsit role --replay <step_id> [--model 별칭] [--no-cache]` | 기록된 요청으로 다시 실행. `--model`로 다른 모델 비교 |
 | `uv run python -m trendsit eval <역할> [--model 별칭] [--limit N] [--note 메모]` | 픽스처 실행 → 코드 채점 → judge 판정(질문별 pass/fail, 1~5점은 보고용) → `reports/eval/*.json`, `reports/<스펙>_quality.md` |
-| `uv run python -m trendsit eval <역할> --label` | 최근 전체 eval 결과로 사람 라벨 파일 `eval/labels/<역할>.csv` 생성. 출력이 이전 파일과 같은 행만 채운 라벨을 보존하고, 출력이 바뀐 행은 라벨 칸을 비운다 |
-| `uv run python -m trendsit eval <역할> --agreement` | 사람 라벨과 judge 판정의 질문별·전체 일치율. 라벨 빈칸 행은 제외. 80% 미만이면 사람 비평을 채점 예시로 넣고 다시 잰다(COMMON 2장) |
+| `uv run python -m trendsit eval <역할> --label` | 최근 전체 eval 결과로 라벨 파일 `eval/labels/<역할>.csv` 생성(`labeler` 칸: 누가 달았나, 사람이 아니면 잠정으로 표시). 출력이 이전 파일과 같은 행만 채운 라벨을 보존하고, 출력이 바뀐 행은 라벨 칸을 비운다 |
+| `uv run python -m trendsit eval <역할> --agreement` | 라벨과 judge 판정의 질문별·전체 일치율(labeler 표시). 라벨 빈칸 행은 제외. 80% 미만이면 사람 비평을 채점 예시로 넣고 다시 잰다(COMMON 2장) |
 | `uv run python -m trendsit cost [--spec S0]` | 스펙별, 모델별 사용액(실행 기록) + 키 기준 단계 사용액, 남은 예산, `limit_remaining` |
 | `uv run python -m trendsit trace <run_id>` | 실행 1건의 걸음(시각, 역할, kind, text, 비용) |
 | `uv run python -m trendsit collect [--source ID] [--since DATE] [--until DATE] [--no-body] [--no-http-cache] [--max-items N]` | 기간 수집(글 6곳, 유튜브, GitHub 트렌딩, 추적 레포 릴리스). 기본 기간은 최근 1일. RSS가 기간을 못 덮으면 백필 |
@@ -52,6 +52,7 @@ GITHUB_TOKEN=...             # 선택. 픽스처 README 수집에만
 - 자료 렌더(`core/render.py`): `Document` 칸은 `<document id="rp:owner/name" source="GitHub README">본문</document>`, 짧은 칸은 `이름: 값` 줄. 자료 안의 `<`는 모두 `&lt;`로 바꿔 태그 밖으로 못 나가게 한다
 - 출력 스키마 칸 순서: 인용·이유 칸 먼저, 결론 칸 나중, `log`, `attention` 맨 끝(모델에 넘기는 스키마에서 코드가 정렬)
 - 코드 규칙은 출력 클래스의 `enforce(inp, ctx)`에(S1 리뷰 M2). `run_role`/`run_agent`가 스키마 검증 뒤, 저장 전에 부른다. 칸은 `self.fix(칸, 값, 규칙)`으로 바꿔 step detail의 `enforced`에 `{field, before, after, rule}`가 남게 한다. `eval`은 원래 출력(통과 판정)과 enforce 후 출력(보고용)을 둘 다 기록. `role --replay`는 입력이 없어 enforce 전 출력을 낸다(원래 step에는 enforce 후가 저장됨)
+- 코드 소유 칸(`graders.ENFORCED_FIELDS`, 예: video_summary의 `name_pairs`): 규칙이 문자열로 확정 판정되는 칸은 그 칸만 enforce 후 값으로 통과 판정(`code_pass_basis`). 원래 출력 점수는 모델 품질로 따로. 이 칸을 선언한 역할은 원래 출력이 코드 채점에 실패해도 enforce 후 출력이 통과하면 그 출력을 judge가 채점(`judged_output`)
 - 채점자(`eval/judge.md`)는 역할 무관. 역할별 질문(`Q<n>`)과 보고용 점수표는 `eval/rubrics/<역할>.md`에 두고 includes로 붙인다
 
 ## 수집 (S1)

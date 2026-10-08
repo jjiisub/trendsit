@@ -1,7 +1,7 @@
 # S4 리포트: 영상 분석가 (전사 + 슬라이드 판독, 맥)
 
 ## 1. 한 줄 요약
-`trendsit video run --queue q.json`(또는 `--video-id ID --mode whisper+slides`)이 영상을 받아 로컬 mlx-whisper로 전사하고, 슬라이드 프레임을 골라 판독하고, 발화에 없고 화면에만 있는 수치를 시각 근거 id와 함께 뽑아 요약·타임라인과 함께 VideoDigest로 저장한다. Tech Bridge 10편에서 1차 처리 10/10, 판독 139/140장, 슬라이드 전용 수치 124개. 요약은 judge Q1~Q3 8/8(잠정)이지만 코드 채점 8/12로 내부 문턱값 미달(3회 개선 후 멈춤, 4장).
+`trendsit video run --queue q.json`(또는 `--video-id ID --mode whisper+slides`)이 영상을 받아 로컬 mlx-whisper로 전사하고, 슬라이드 프레임을 골라 판독하고, 발화에 없고 화면에만 있는 수치를 시각 근거 id와 함께 뽑아 요약·타임라인과 함께 VideoDigest로 저장한다. Tech Bridge 10편에서 1차 처리 10/10, 판독 139/140장, 슬라이드 전용 수치 124개. 관문 B(잠정, labeler opus-5.5): 판독 수치 정확도 98.2%, 포착률 87.9%로 통과, video_summary Q1 67%·Q2 42%·Q3 75%로 미달(설계 결정 D2·D5대로 4회차 개선 없이 기록, S5에서 다룸).
 
 ## 진행 체크리스트
 - [x] 준비물 확인(2장)
@@ -13,7 +13,8 @@
 - [x] 관문 B(실제 영상 10편), 비교, 검증 산출물(`reports/S4_video/`)
 - [x] 관문 A 전부 PASS
 - [x] 서브에이전트 리뷰(13건 반영), PR
-- [ ] 사용자 라벨(리뷰 때): `eval/labels/video_summary.csv` 12행, `reports/S4_video/README.md`의 체크 칸
+- [x] 관문 B 2차 채점 기록(labeler opus-5.5, 잠정): `eval/labels/video_summary.csv` 12행, `reports/S4_video/README.md` 체크 칸
+- [x] 2차 리뷰(PR #7 댓글) 4장 체크리스트 반영(9장)
   - 채점표 준비 완료: 판독 수치는 `reports/S4_video/README.md` 4장(124행 전부 썸네일, '쓸 수 없음' 칸), 요약은 `reports/S4_video/label_summary.md`(12절, Q1~Q3 칸). `scripts/s4_label_sheets.py`
 
 ## 준비물 (S4_TASK 2장)
@@ -47,14 +48,16 @@ PASS A14 README(기능, 빠른 시작, 시스템 의존성), DEVELOPMENT.md 명�
 ```
 
 ## 3. 관문 B (실제 영상, 맥)
-대상: `reports/S4_video/queue_gateB.json`(사람이 만든 큐). 슬라이드 발표 7편 `whisper+slides`, 대담·인터뷰 3편 `whisper`. 상세와 사람 확인 칸은 [`reports/S4_video/README.md`](S4_video/README.md), 요약 품질은 [`S4_quality.md`](S4_quality.md).
+대상: `reports/S4_video/queue_gateB.json`(사람이 만든 큐). 슬라이드 발표 7편 `whisper+slides`, 대담·인터뷰 3편 `whisper`. 상세와 확인 칸은 [`reports/S4_video/README.md`](S4_video/README.md), 요약 품질은 [`S4_quality.md`](S4_quality.md).
 
 | 항목 | 기준 | 결과 |
 |---|---|---|
 | 1차 처리 | 10편 모두 성공 또는 실패 이유, 계약 검사 전부 통과 | 10/10 성공, 계약 위반 0. 전사 품질 10편 모두 ok. 10~31분 영상 전사 58~150초(모델 적재 포함) |
-| 판독 수치 정확도 | 사용자 라벨에서 slide_only_facts가 화면에 있는 비율 90% | 라벨 대기. 124개(영상별 44, 3, 1, 43, 26, 7, 0). 판독 139/140장(1장은 큰 표가 출력 상한 1600토큰을 넘어 실패) |
-| 슬라이드 전용 정보 포착률 | 사용자 라벨 80% | 라벨 대기. 썸네일 35장에 "놓친 수치 있음" 칸 |
-| video_summary | judge Q1~Q3 각 80% + 라벨 일치 80% | Q1·Q2·Q3 8/8(코드 채점 통과분만 채점, 잠정). 코드 채점 8/12, enforce 후 11/12. 내부 문턱값(코드 채점 전부 통과) 미달. 코드 실패 4편(슬라이드 발표)은 judge를 받지 않았으므로 Q1·Q2는 사람 라벨로 확인 필요 |
+| 판독 수치 정확도 | slide_only_facts가 화면에 있는 비율 90% | **잠정, labeler opus-5.5: 98.2% 통과**(화면에 있음 111 / 없음 2 / 판단 불가 11, 판단 불가 제외. 판단 불가를 실패로 보면 89.5%). 쓸 수 있는 수치만 60/62 = 96.8%. 124개(영상별 44, 3, 1, 43, 26, 7, 0), 판독 139/140장 |
+| 슬라이드 전용 정보 포착률 | 80% | **잠정, labeler opus-5.5: 87.9% 통과**(놓침 4 / 놓치지 않음 29 / 판단 불가 2. 보수 82.9%). 놓친 수치는 브리핑에 쓸 수 있는 결과·규모 수치만 셈 |
+| video_summary | Q1~Q3 각 80% + judge·라벨 일치 80% | **잠정, labeler opus-5.5: Q1 8/12 67%, Q2 5/12 42%(두 부분 라벨 규칙을 완화하면 9/12 75%), Q3 9/12 75% → 미달.** judge는 12/12 모두 pass(그중 4건은 enforce 후 출력으로 채점) → judge·라벨 일치 12행 Q1 66.7%, Q2 41.7%, Q3 75%(원래 judge를 받은 8행만 보면 Q1 75%, Q2 50%, Q3 100%). 불일치는 모두 judge가 놓친 fail(근거 창 밖 내용을 합친 포인트, 그 초에 아직 나오지 않은 내용을 붙인 라벨) |
+| video_summary 코드 채점 | (내부) 코드 채점 전부 통과 | 나란히: 원래 출력 8/12(모델 품질) / 통과 판정 11/12(코드 소유 칸 `name_pairs`만 enforce 후, D2-1) / enforce 후 전체 12/12. 남은 1건은 S-bRN-avZ4Q 포인트 하나의 근거 id 5개(`key_points`는 코드 소유 칸이 아니라 원래 값으로 판정, 저장 출력은 D2-2 상한으로 3개) |
+| "쓸 수 없음"(S5 묶기 근거) | - | 62/124(50%): 도식 예시 29, UI 값 28, 슬라이드 번호 2, 기타(연대·지표 이름) 2, 버전 1 |
 | 비교(whisper만 vs whisper+slides) | 슬라이드가 더한 정보 | 2편, 같은 전사로 요약만 다시. 잘못 들은 수치가 화면 값으로 바뀜("Sweebench Pro 88%" → "SWE-Bench Pro 80.3%", "약 74개" → "73개"), 발화에 없던 그래프 값("Q3 2025 78 → Q2 2026 114") 추가 |
 | captions 비교 | 수동 자막이 있는 1편 | 하지 못함. Tech Bridge 60편 모두 업로더 자막 트랙 없음(하드 자막) |
 
@@ -78,7 +81,7 @@ PASS A14 README(기능, 빠른 시작, 시스템 의존성), DEVELOPMENT.md 명�
 ### 가장 나쁜 사례(판독)
 1. xRZHLI5SPWo 966초: 가치 흐름도 그림 속 예시 값 29개를 수치로 판독, 일부는 잘못 읽음("CT = 6 s"를 8 s로). 화면에는 있으므로 "화면에 있음" 라벨로는 잡히지 않을 수 있지만 브리핑에 쓸 수치는 아님
 2. 31XD1O74pks 488초: 터미널을 흉내 낸 데모 슬라이드의 실행 시간·줄 수(0.8s, 42 lines)를 수치로 판독(frame_kind demo가 맞음)
-3. 확신도 check를 한 번도 쓰지 않음(140장). 1024px로 올린 뒤 흐린 값이 줄었지만, 모델이 자신 없는 값도 high로 내는지는 사용자 라벨로 확인해야 함
+3. 확신도 check를 한 번도 쓰지 않음(140장). 1024px로 올린 뒤 흐린 값이 줄었지만, 모델이 자신 없는 값도 high로 내는지는 판단 불가 11줄을 원본 해상도로 확인해야 함(사람 확인 부채, CONTEXT 17장)
 
 ## 4. 결정한 것(스펙에 없어서 정한 것과 이유)
 1. 프레임 reason은 계약의 네 값으로: 스킬의 keyframe 후보는 scene-change로, 발화 공백 신호(gap)는 transcript-cue로 묶음. 후보 엔진은 `frames_meta.engine`에 남음
@@ -109,7 +112,7 @@ PASS A14 README(기능, 빠른 시작, 시스템 의존성), DEVELOPMENT.md 명�
   - 작업 폴더마다 `data/budget_state.json`이 따로라 이 폴더의 단계 기준값은 S4 시작 때의 키 사용액($1.079). 단계 사용액은 키 기준이라 다른 폴더 사용분도 잡히지만 그 이전 사용분은 빠짐
 - `uv run`은 선택 묶음을 지운다. 영상 명령과 관문 A는 `uv run --extra video`(README, DEVELOPMENT에 적음). S2~S3의 embed 묶음도 같은 문제
 - `roles/video_slide.md`의 "가로 768px 안팎" 문구를 1024로(리뷰 9, 다음 판독 개선 때)
-- 확신도 check가 0건: 사용자 라벨에서 판독 정확도가 낮으면 다음 개선은 "자신 없는 값은 check" 예시 보강이나 1280px
+- 확신도 check가 0건: 판독 정확도가 낮게 확인되면 다음 개선은 "자신 없는 값은 check" 예시 보강이나 1280px
 - 도식 속 예시 값(가치 흐름도 등)은 수치로 쓰면 안 되는데 판독이 그대로 옮김. 묶기(S5)에서 slide_only_facts를 쓸 때 "도식" 판독(같은 프레임 수치 10개 이상 등)을 낮게 보는 규칙 제안
 - 편집장 계획 mode 기준(실측): whisper+slides는 20분 발표에 전사 약 2분 + 판독 20장 약 1.5분, 비용 약 0.011~0.016달러(판독 20장 약 0.011 + 요약 약 0.003). whisper만은 약 0.003달러. 대담·인터뷰는 whisper로 충분(슬라이드 없음)
 - `config/deep.yaml` 영상 예산 실측: 영상당 프레임 20장, 판독 장당 입력 약 2,500토큰(시스템 프롬프트 포함, 1024px), 요약 입력 영상 길이에 따라 4천~1만5천 토큰
@@ -119,11 +122,11 @@ PASS A14 README(기능, 빠른 시작, 시스템 의존성), DEVELOPMENT.md 명�
 ## 7. 사용액 (`trendsit cost --spec S4`)
 | 스펙 | 모델 | 호출 | 캐시 적중 | 입력 토큰 | 출력 토큰 | 사용액(달러) |
 |---|---|---|---|---|---|---|
-| S4 | qwen/qwen3.8-27b | 788 | 422 | 3,214,871 | 287,531 | 0.414395 |
-| S4 | google/gemini-3.8-flash | 34 | 17 | 324,235 | 15,011 | 0.081236 |
-| 합계 | | | | | | 0.495631 |
+| S4 | qwen/qwen3.8-27b | 801 | 434 | 3,341,312 | 304,069 | 0.414637 |
+| S4 | google/gemini-3.8-flash | 46 | 25 | 460,320 | 20,258 | 0.106554 |
+| 합계 | | | | | | 0.521191 |
 
-- 상한 0.80 중 0.496(리뷰 반영 뒤 재채점 포함). 단계별: 이미지 입력 확인 0.0002, 개발 중 판독·요약 약 0.07, 관문 B 10편 판독·요약 약 0.15, 판독 재실행(max_tokens, 1024 반영) 약 0.08, 요약 개선 3회 eval 약 0.18(대부분 긴 전사 재생성), 채점 약 0.08
+- 상한 0.80 중 0.521(1차 리뷰 반영 뒤 재채점, 2차 리뷰 D2-4 judge 4건 0.025, R7 실측 0.0002 포함). 단계별: 이미지 입력 확인 0.0002, 개발 중 판독·요약 약 0.07, 관문 B 10편 판독·요약 약 0.15, 판독 재실행(max_tokens, 1024 반영) 약 0.08, 요약 개선 3회 eval 약 0.18(대부분 긴 전사 재생성), 채점 약 0.08
 - 영상 한 편(whisper+slides, 20분 안팎): 약 0.011~0.016달러
 
 ## 7-1. README 갱신, 위키 메모
@@ -148,13 +151,13 @@ PASS A14 README(기능, 빠른 시작, 시스템 의존성), DEVELOPMENT.md 명�
 | 4 | 수치 정규화 오류("five and ten" → 15, 단위 m을 백만으로, "5천만" → 5천 등)(중간) | 수사 묶음 규칙, 대소문자 구분 크기 단위, unit 크기 단위 목록, 한국어 복합 단위. 결정 14. 테스트 12개 |
 | 5 | verify_s4.sh A6가 `-k` 두 번이라 큐 테스트가 빠짐(중간) | `-k "queue or captions"` 하나로 |
 | 6 | 채점기와 프롬프트를 같은 회차에 바꿔 효과를 나눌 수 없음(중간) | 모든 회차 출력을 최종 채점기로 다시 매겨 반복 기록에 나눠 적음(채점기 +2, 프롬프트 +4). "~까요" 미검출도 고침 |
-| 7 | enforce가 check 수치("1?8")를 ocr_text에 없다고 지움(중간) | check는 글자 일치 규칙에서 제외(사람 확인 목록으로). 테스트. 관문 B 판독에서 check가 0건이었던 것과의 관계는 확인 못 함(그 영상들의 판독 출력에도 check가 없었음) |
+| 7 | enforce가 check 수치("1?8")를 ocr_text에 없다고 지움(중간) | check는 글자 일치 규칙에서 제외(확인 필요 목록으로). 테스트. 관문 B 판독에서 check가 0건이었던 것과의 관계는 확인 못 함(그 영상들의 판독 출력에도 check가 없었음) |
 | 8 | 계약 검사가 mode와 transcript_source를 묶지 않음(중간) | captions ⇔ manual 검사 추가, 깨뜨린 사본에 추가 |
 | 9 | video_slide md의 "가로 768px 안팎"이 1024와 다름(낮음) | md는 그대로 둠: 고치면 프롬프트 해시가 바뀌어 관문 B 판독 140장이 다른 버전이 됨. 다음 판독 개선 때 함께 고침(6장) |
 | 10 | 60분 상한 이유가 log에 없음(낮음) | 구간을 정한 이유(`resolve_span` 문구)를 log에 |
 | 11 | PriceUnknown이 영상별로 기록되지 않음(낮음) | BudgetExceeded와 같이 처리 |
 | 12 | video_frames 기본 키(video_id, t)로 같은 시각 프레임의 판독이 조용히 덮임(낮음) | 저장 때 판독이 있는 쪽을 남기고 빠진 수를 step(attention)으로. 테스트 |
-| 13 | judge 8/8이 보이는 것보다 약함(코드 실패 4편은 judge 안 받음, derived_empty는 실제로는 LLM을 안 부르는 길)(낮음) | 결정 12와 3장에 적음. 사람 라벨 12행으로 확인 필요 |
+| 13 | judge 8/8이 보이는 것보다 약함(코드 실패 4편은 judge 안 받음, derived_empty는 실제로는 LLM을 안 부르는 길)(낮음) | 결정 12와 3장에 적음. 2차 리뷰 D2-4로 4건도 enforce 후 출력으로 judge 채점(12행) |
 
 리뷰 반영 뒤 관문 B 결과를 최종 코드로 다시 계산(판독·요약은 캐시): 영상별 수치와 요약은 같음. 파생 suspect 픽스처만 대조가 바뀌어 다시 생성·채점(0.009달러).
 
@@ -177,3 +180,21 @@ PASS A14 README(기능, 빠른 시작, 시스템 의존성), DEVELOPMENT.md 명�
 
 ## 마이그레이션 번호
 - 20: `video_runs`, `video_segments`, `video_frames`, `video_digests`
+
+## 9. 2차 리뷰(PR #7 리뷰 댓글, 설계 결정 D1~D4) 처리
+채점 방식(D1-3): MVP 동안 관문 B 사람 채점은 하지 않고 opus-5.5(설계 세션)가 2차 채점. 이 리포트의 관문 B 판정은 모두 잠정이다. 라벨은 `eval/labels/video_summary.csv`(labeler 칸 `opus-5.5`), 판독 체크 칸은 `reports/S4_video/README.md` 3·4장(표 위에 labeler 표시). 사람이 나중에 확인할 것은 `docs/CONTEXT.md` 17장.
+
+| # | 지적 | 처리 |
+|---|---|---|
+| R1 | 코드 소유 칸(`ENFORCED_FIELDS`) 장치 없음 | 공통 채점기에 장치(별도 커밋 `c0c3178`): `graders.ENFORCED_FIELDS`, `basis_output`, `summarize`의 통과 판정(`code_pass_basis`), `run_eval`의 `code_basis`와 judge 대상(칸을 선언한 역할은 원래 출력이 실패해도 enforce 후 출력이 통과하면 그 출력, `judged_output` 표시), `agreement`에 표시. 칸을 선언하지 않은 역할은 동작 그대로. video_summary는 `name_pairs` 선언. 테스트 `tests/test_eval_enforced_fields.py` |
+| R2 | 표기 쌍 spoken ≠ screen 규칙 없음 | enforce와 코드 채점에 같은 표기 제외(`same_spelling`). 띄어쓰기만 다른 쌍은 상수 `NAME_PAIR_SPACING_ONLY_SAME = True`로 같은 표기(제외), 대소문자만 다른 쌍은 남김. 테스트 |
+| D2-2 | 근거 3개 상한 | `MAX_EVIDENCE = 3`, 넘으면 앞 3개(enforced 기록). 테스트 |
+| D2-4 | judge 못 받은 4건 | enforce 후 출력으로 judge 채점(0.025달러, 요약 출력은 재생성 없음). 4건은 "judge = enforce 후 출력, 라벨 = 원래 출력"(`eval --agreement` 출력에도 표시) |
+| 라벨 | labeler 칸 | `make_labels`가 `labeler` 칸을 보존, `agreement`·`eval --agreement`·품질 리포트가 "labeler opus-5.5, 잠정"으로 표시(별도 커밋 `02a1255`, 공통 코어). 테스트 `tests/test_eval_labeler.py` |
+| R3 | 병합 충돌 예상 | #6이 main을 받을 때 처리(이 PR은 할 것 없음) |
+| R4 | `eval/graders.py`는 #6의 부분집합 | PR 설명 문구 정정: #6에는 `NOUN_YO`와 `summarize`의 AGGREGATES 적용이 더 있음. 이 PR은 그 부분집합 + R1 장치 |
+| R5, R6 | ImageError 경로, 중첩 이미지 칸 | S5 공통 수정 PR(리뷰 처리대로) |
+| R7 | `IMAGE_TOKENS_EST` 주석 | 1024px 실측으로 갱신: 같은 프레임·문구에서 1024px 요청 626토큰(이미지 약 540), 768px 386토큰(약 300), 관문 B 판독 1장 평균 입력 약 3,030토큰. 상수 1500은 그대로(상한 쪽). 실측 0.0002달러 |
+| R8~R11 | 판독 includes, 요약 품질, judge, 쓸 수 없음 거르기 | 출력 재생성이 필요해 S5로 넘김(이 PR에서 재생성 안 함) |
+| D3② | 공개 전 정리 | `docs/CONTEXT.md` 15장에 한 줄 |
+| 부채 | 사람 확인 부채 | `docs/CONTEXT.md` 17장 |
