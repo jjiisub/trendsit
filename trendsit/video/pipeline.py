@@ -148,6 +148,8 @@ def _analyze(item: VideoQueueItem, ctx: Ctx, cfg: VideoConfig, media_root: Path,
                          error=str(e)[:500], detail={"video_id": item.video_id, "stage": "video_analyst"})
             store.save_run(db, item_id=item_id, status="failed", note=str(e)[:500], **base)
             return VideoOutcome(item.video_id, "failed", str(e))
+        # 작업 폴더에 1차 처리 결과를 남겨 판독 이후만 다시 돌릴 수 있게(video run --from-json, 7일 정리와 함께 지워짐)
+        (Path(media.work_dir) / "media_result.json").write_text(media.model_dump_json(indent=1), encoding="utf-8")
     t = media.env.timings_sec
     _step(ctx, f"받기 {t.get('download', 0):.0f}초", detail={"title": media.title, "duration_sec": media.duration_sec,
                                                           "span": media.span.model_dump()})

@@ -9,4 +9,6 @@ align_window_sec: 30                # 판독 수치를 찾을 발화 범위(프�
 modes:
   captions: {transcript: manual, frames: "off"}
   whisper: {transcript: whisper, frames: "off"}
-  whisper+slides: {transcript: whisper, frames: auto, frames_res: 768, frames_cap: 20}   # 수치 많은 발표는 --res 1024, 장면 전환이 많은 슬라이드 발표는 --frames full
+  # 해상도 1024: 768에서는 그래프 데이터 레이블(작은 숫자)을 축 눈금으로 짐작해 틀림, 1024에서 맞음(2026-10-08 실측, S4 리포트).
+  # 장당 약 0.0001달러 더 듦. 장면 전환이 많은 슬라이드 발표는 --frames full
+  whisper+slides: {transcript: whisper, frames: auto, frames_res: 1024, frames_cap: 20}

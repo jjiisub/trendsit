@@ -28,7 +28,9 @@ core_rules:
 
 ## 판단 기준
 - 화면 종류(frame_kind): 글자·도표가 화면의 주인공이면 slide, 코드 편집기·브라우저·터미널 시연이면 demo, 사람이 주인공이고 글자는 자막·이름표뿐이면 speaker, 나머지(행사 로고, 전환 화면, 청중)는 other
+- 읽는 범위는 슬라이드 사각형 안쪽뿐이다. 행사 화면은 슬라이드 옆에 행사 배너("World's Fair", "PRESENTED BY …"), 발표자 카메라, 무대 글자가 함께 나오는데 이것들은 슬라이드가 아니다
 - 옮기지 않는 줄: 화면 아래쪽에 입힌 자막(영어 한 줄 + 한국어 한두 줄처럼 발화를 옮긴 문장), 채널이 덧붙인 왼쪽 위 구간 제목과 "Source: 날짜 · 출처" 줄, 채널 로고, 발표자 이름표. 이것들은 슬라이드 내용이 아니라 영상 편집이 얹은 것이라, 옮기면 발화 수치가 화면 수치로 둔갑한다
+- 그래프: 축 눈금(0, 20, 40 … 또는 30%, 40% …)은 수치가 아니다. 수치는 막대·점 옆에 적힌 값(데이터 레이블), 표 칸, 큰 글씨로 강조한 값처럼 무엇의 값인지 화면에 적힌 것만이다. 데이터 레이블이 작아서 읽을 수 없으면 축 눈금이나 선의 높이로 값을 짐작하지 말고 check로 둔다. 짐작한 값은 그럴듯해 보여도 틀린 수치다
 - 수치(numbers): 슬라이드에 적힌 숫자만. value는 화면 표기 그대로(쉼표, 소수점, K/M/B, %, x 포함). 단위를 붙여 읽을 수 있으면 unit에 따로, what에는 무엇의 수치인지 화면 표현 그대로 짧게
 - 확신도(confidence): 글자가 또렷하면 high, 읽었지만 흐리거나 일부가 가려졌으면 low, 자릿수나 숫자 하나라도 확신이 없으면 check. check일 때 value에는 보이는 만큼만 적고(예: "1?8") 빈자리를 그럴듯한 숫자로 채우지 않는다
 - 표(table): 행과 열이 있는 표만 행 목록으로. 글머리표 목록은 표가 아니다
@@ -38,7 +40,7 @@ core_rules:
 칸 순서대로 채운다. 화면 종류와 글자를 먼저 적어야 수치가 글자를 따른다.
 1. `frame_kind`: slide / demo / speaker / other
 2. `ocr_text`: 슬라이드 글자를 줄마다 그대로(번역 금지, 옮기지 않는 줄 제외). slide가 아니면 빈 문자열
-3. `numbers`: 칸 순서 confidence → value → unit → what. value는 ocr_text 안의 문자열 그대로여야 한다(코드가 검사해서 없으면 지움). slide가 아니거나 숫자가 없으면 빈 목록. 연도, 쪽 번호, 목록 번호(1. 2. 3.)는 수치가 아니다
+3. `numbers`: 칸 순서 confidence → value → unit → what. value는 ocr_text 안의 문자열 그대로여야 한다(코드가 검사해서 없으면 지움). slide가 아니거나 숫자가 없으면 빈 목록. 연도, 분기(Q1 2026), 쪽 번호, 목록 번호(1. 2. 3.), 축 눈금은 수치가 아니다
 4. `table`: 표가 있으면 첫 행(머리글)부터 행 목록, 없으면 null
 5. `title`: 슬라이드 제목 그대로. 없으면 빈 문자열
 6. `log`: 한 줄 기록, 명사형(예: "슬라이드, 수치 3개", "발표자 화면, 판독 없음")
@@ -62,9 +64,9 @@ core_rules:
 "500"은 자막(발화)에만 있고 슬라이드에는 없으므로 수치로 넣지 않는다.
 </example>
 <example>
-함정: 흐린 숫자가 섞인 표
-화면: 제목 "Latency by model", 표 머리글 "Model | p95 (ms)", 행 "Small | 120", 행 "Large | 4?0"(가운데 숫자가 압축 노이즈로 뭉개짐)
-출력: `{"frame_kind": "slide", "ocr_text": "Latency by model\nModel p95 (ms)\nSmall 120\nLarge 4?0", "numbers": [{"confidence": "high", "value": "120", "unit": "ms", "what": "Small p95"}, {"confidence": "check", "value": "4?0", "unit": "ms", "what": "Large p95"}], "table": [["Model", "p95 (ms)"], ["Small", "120"], ["Large", "4?0"]], "title": "Latency by model", "log": "슬라이드 표, 수치 2개 중 1개 확인 필요", "attention": true}`
-뭉개진 자리를 "420"이나 "480"으로 채우면 틀린 수치가 출처를 달고 나간다. 보이는 만큼만 적고 check로 둔다.
+함정: 데이터 레이블이 작은 그래프(행사 배너, 자막과 함께)
+화면: 왼쪽에 행사 배너 "World's Fair", "PRESENTED BY Microsoft"와 발표자 카메라. 오른쪽 슬라이드에 제목 "Deployment frequency steadily increasing", 세로축 눈금 0·20·40·60·80·100·120, 가로축 "Q3 2025", "Q4 2025", "Q1 2026", "Q2 2026", 점 옆의 작은 레이블 네 개(첫 값은 "78"로 읽히고 나머지 셋은 뭉개짐). 아래쪽 자막 "Here is our DORA metric for deployment frequency." / "화면에 보이는 것이 배포 빈도에 대한 DORA 지표입니다."
+출력: `{"frame_kind": "slide", "ocr_text": "Deployment frequency steadily increasing\n78\nQ3 2025\nQ4 2025\nQ1 2026\nQ2 2026", "numbers": [{"confidence": "low", "value": "78", "unit": "", "what": "Q3 2025 deployment frequency"}], "table": null, "title": "Deployment frequency steadily increasing", "log": "슬라이드 그래프, 데이터 레이블 4개 중 1개만 읽음", "attention": true}`
+축 눈금(0~120)을 분기별 값으로 옮기거나 선의 높이로 나머지 레이블을 짐작하면 틀린 수치가 출처를 달고 나간다. 행사 배너와 자막은 슬라이드 밖이라 옮기지 않는다. 읽지 못한 레이블이 있으므로 attention을 true로 둔다.
 </example>
 </examples>
