@@ -55,3 +55,28 @@
 Q1 분류가 위 표와 같은지·문턱값 미하향·별도 커밋 / Q6 자른 quote가 본문 연속 부분 문자열인지·잘린 비율 / Q5 두 라벨 파일이 서로 덮어쓰지 않는지 / Q3 녹화에 비밀 없음·합성 기대값 미변경 / 예산 합이 상한 이내
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+
+## 리뷰 뒤 결정 N1~N6
+
+# 설계 결정: 리뷰 댓글 5장 N1~N6 (2026-10-08, 사용자 승인)
+
+> 대상: [리뷰 댓글](https://github.com/jjiisub/trendsit/pull/6#issuecomment-6062704760) 5장. N1~N5는 권장안대로 확정, **이번 반영에 포함**. N6은 S5 시작 때 설계 세션이 반영(이번 PR에서 `keywords.yaml` 고치지 않음).
+> **맥 세션 할 일**: 이 댓글 전문을 `docs/handoff/S2S3_DECISIONS.md` 끝에 "## 리뷰 뒤 결정 N1~N6"으로 덧붙여 커밋(`docs(s2,s3): 설계 결정 N1~N6 기록`). 반영 위치는 S2·S3 리포트 "결정 반영" 표에 행 추가.
+
+| # | 결정 | 반영 |
+|---|---|---|
+| N1 | repo_analyst 평가 무효 기준: 한 항목이라도 GitHub 도구(github_repo·recent_commits·contributors·releases) 성공 0이거나, 실행 전체 GitHub 도구 오류율 20% 초과면 summarize 실패 이유 "도구 오류로 무효"(통과 판정 불가). 상수 이름으로 두고 리포트에 | `graders_text.aggregate_repo_analyst` + 테스트(…-165334를 재채점하면 무효로 나와야 함). 정상 실행 …-182928은 오류 0이라 판정 불변 |
+| N2 | R3(부분 확인 내림)는 이번에는 별도 지표 "부분 확인 내림 N건"(보고용)으로 기록, "근거 없는 confirmed/differs 0~1건" 문턱값에는 넣지 않음. **S5부터 같은 문턱값에 포함** | `aggregate_text_analyst`에 지표 추가, S5 handoff에 기록 |
+| N3 | item_card Q1은 채점표 문구(인용 기준, 엄격) 유지. 모델 대 모델 일치율은 엄격 47.6%와 완화(본문 기준) 85.7%를 병기. 개선(md·judge 예시)은 S5(R10) | 리포트·README 성과 행 표기 |
+| N4 | 시드 85% 기준 유지. 11/13은 "미달: 임베딩으로 고객 사례를 못 가름(Barclays 0.329 ↔ keep 0.330)"으로 기록하고 **병합 허용**. 고객 사례 판정은 item_card relevance로(R9, S5) | S2 리포트 2a 관문 B 표, PR 설명 미달 목록 |
+| N5 | CPU↔MPS 재현 기준 변경: "판정(keep/drop)이 바뀐 픽스처 0건 + 최대 점수 차이 0.01 이하". 이번 결과(최대 0.0050, 판정 변화 0)는 **통과** | 맥 확인 목록·S2 리포트의 기준 문구, 이 기준을 검사하는 코드가 있으면 상수 |
+| N6 | `keywords.yaml` 제외어에 태양광, 재생에너지, 송전망, 전력망 추가 | **이번 PR 아님.** S5 시작 때 설계 세션이 main에 넣음 |
+
+- 문턱값 잠정 확정(리뷰 댓글 3장: drop_below 0.30 유지, rescue_above 0.50)은 그대로 진행
+- 반영이 끝나면 PR 설명 맨 위를 "리뷰 반영 완료"로 바꾸고 verify 전부 + `uv run --extra video --extra embed pytest -q` 결과를 댓글로. 그다음 설계 세션이 반영 확인 리뷰 후 병합
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+https://claude.ai/code/session_017BC9S4jjUvhFgYARcN2rTE
+
