@@ -1,0 +1,43 @@
+{
+ "input": {
+  "full_name": "boykopovar/AnyPS5",
+  "max_depth": 2,
+  "reason": "이번 주 트렌딩(2026-W41)",
+  "trending": {
+   "week": "2026-W41",
+   "rank": 2,
+   "stars_total": 11262,
+   "stars_this_week": 6075,
+   "forks": 855,
+   "language": "C++",
+   "description": "Tool for automatic PS5 executables porting to Linux and Windows"
+  },
+  "oneliner": "PS5 실행 파일을 Linux·Windows로 자동 이식하는 도구",
+  "keywords": [
+   "AI 에이전트",
+   "코딩 에이전트",
+   "MCP · 도구 호출",
+   "오픈웨이트 · 로컬 LLM",
+   "RAG · 검색",
+   "멀티모달",
+   "추론 · 판단 모델",
+   "평가 · 벤치마크",
+   "AI 보안",
+   "프런티어 모델 출시",
+   "AI 산업 · 시장",
+   "개발 실무 · 경험",
+   "AI 일반"
+  ],
+  "week_items": [],
+  "hype": {
+   "flags": [],
+   "force_check": false,
+   "commits_7d": 100,
+   "contributors": 89,
+   "note": "7일 별 +6075, 커밋 100"
+  },
+  "tool_calls": 6
+ },
+ "expect": {},
+ "note": "2026-W41 트렌딩, 이번 주 트렌딩(2026-W41)"
+}

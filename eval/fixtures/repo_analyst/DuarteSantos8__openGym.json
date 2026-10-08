@@ -1,0 +1,43 @@
+{
+ "input": {
+  "full_name": "DuarteSantos8/openGym",
+  "max_depth": 2,
+  "reason": "이번 주 트렌딩(2026-W41)",
+  "trending": {
+   "week": "2026-W41",
+   "rank": 9,
+   "stars_total": 7222,
+   "stars_this_week": 4906,
+   "forks": 941,
+   "language": "JavaScript",
+   "description": "Self-hosted gym & body-weight tracker — plan routines, log workouts (supersets, warm-ups, cardio), see which muscles are trained, fatigued or detrained, import from FitNotes/Strong/Hevy, passkey login. Your data, your server."
+  },
+  "oneliner": "",
+  "keywords": [
+   "AI 에이전트",
+   "코딩 에이전트",
+   "MCP · 도구 호출",
+   "오픈웨이트 · 로컬 LLM",
+   "RAG · 검색",
+   "멀티모달",
+   "추론 · 판단 모델",
+   "평가 · 벤치마크",
+   "AI 보안",
+   "프런티어 모델 출시",
+   "AI 산업 · 시장",
+   "개발 실무 · 경험",
+   "AI 일반"
+  ],
+  "week_items": [],
+  "hype": {
+   "flags": [],
+   "force_check": false,
+   "commits_7d": 100,
+   "contributors": 67,
+   "note": "7일 별 +4906, 커밋 100"
+  },
+  "tool_calls": 6
+ },
+ "expect": {},
+ "note": "2026-W41 트렌딩, 이번 주 트렌딩(2026-W41)"
+}

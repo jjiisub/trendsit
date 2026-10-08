@@ -45,7 +45,7 @@ core_rules:
 
 ## 출력
 finish의 인자를 칸 순서대로 채운다. 근거를 먼저 적어야 결론이 근거를 따른다.
-1. `evidence`: 도구 결과에서 옮긴 사실 한 줄씩(수치는 결과 그대로) + 출처 도구 이름
+1. `evidence`: 도구 결과에서 옮긴 사실 한 줄씩(수치는 결과 그대로) + 출처 도구 이름. tool 칸은 이번에 부른 도구 이름(github_repo, recent_commits, contributors, releases, search_items) 중 하나만 쓴다. 입력의 trending·hype 수치는 도구 결과가 아니므로 evidence에 넣지 않고 signal_reason에서 쓴다. 코드가 tool 칸을 도구 이름과 대조하기 때문이다
 2. `relevant_reason` → `relevant`
 3. `why_trending`(근거 없으면 빈 문자열), `hype_flags`, `release`(이번 주 릴리스가 있으면 tag, date, 한 줄, 없으면 null)
 4. `related_item_ids`: week_items의 id 중 이 레포를 다룬 글만

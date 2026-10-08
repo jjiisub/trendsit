@@ -82,3 +82,51 @@ judge 판정: **잠정**(사람 라벨 없음. `eval/labels/text_analyst.csv`를
 | 시각 | 모델 | 프롬프트 | 결과 | 비용 | 메모(바꾼 것) |
 |---|---|---|---|---|---|
 | 2026-10-08T12:28:02+09:00 | generate | `38c5c467fa69` | 코드 6/6, Q1 6/6, Q2 6/6, Q3 6/6, 통과 | $0.0043 |  |
+
+## repo_analyst
+
+문턱값(generate 기준, 코드 채점 통과분의 질문별 통과율): Q1 80%, Q2 80%, Q3 80% 이상 + 코드 채점 전부 통과
+
+- Q1: 관련성: relevant 판단이 관심 키워드와 README·설명(evidence)에 맞나?
+- Q2: 뜨는 이유: why_trending의 모든 내용이 evidence(도구 결과)로 뒷받침되나? 근거가 없으면 빈 문자열이어야 통과
+- Q3: 과열: signal과 hype_flags가 수치(이번 주 별, 7일 커밋, 기여자)와 맞나? 별 수만으로 중요하다고 단정하지 않았나?
+
+judge 판정: **잠정**(사람 라벨 없음. `eval/labels/repo_analyst.csv`를 채우면 일치율을 잰다)
+
+### 모델별 최신 결과 (전체 실행만, 점수는 보고용)
+
+| 모델 | 코드 통과 | enforce 후 코드 통과 | Q1 통과 | Q2 통과 | Q3 통과 | 근거 평균 | 신호 판단 평균 | 표현 평균 | 문턱값 | 비용 | 프롬프트 |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| generate (`qwen/qwen3.8-27b`) | 10/10 | 10/10 | 10/10 | 10/10 | 10/10 | 4.9 | 5.0 | 5.0 | 통과 | $0.0350 | `407996307552` |
+
+- generate 전체 지표: 평균 도구 호출 3.4, 관련 낮음 얕게 끝냄 4/5
+- generate 모델 일치율(코드 소유 칸, 통과 판정은 enforce 후 값): signal 10/10, hype_flags 10/10, attention 10/10
+
+### 가장 나쁜 사례 3개 (generate, 2026-10-08T18:29:28+09:00)
+
+1. **DuarteSantos8__openGym**
+   - 입력: `{"full_name": "DuarteSantos8/openGym", "max_depth": 2, "reason": "이번 주 트렌딩(2026-W41)", "trending": {"week": "2026-W41", "rank": 9, "stars_total": 7222, "stars_this_week": 4906, "forks": 941, "language": "JavaScript", "description": "Self-hosted gym & body-weight tracker — plan routines, log workouts (supersets, warm-ups, cardio), see which muscles are trained, fatigued or detrained, import from FitNotes/Strong/Hevy, passkey login. Your data, your server."}, "oneliner": "", "keywords": ["AI 에이전트", "코딩 에이전트", "MCP · 도구 호출", "오픈웨이트 · 로컬 LLM", "RAG · 검색", "멀티모달", "추론 · 판단 모델", "평가 · 벤치마크", "AI 보안", "프런티어 모델 출시", "AI 산업 · 시장", "개발 실무 · 경험", "AI 일반"], "week_items": [], "hype": {"flags": [], "force_check": false, "commits_7d": 100, "contributors": 67, "note": "7일 별 +4906, 커밋 100"}, "tool_calls": 6}`
+   - 출력: `{"log": "DuarteSantos8/openGym: 관련 낮음, 도구 1회", "attention": false, "evidence": [{"fact": "README: A self-hosted gym and body-weight tracker you actually own", "tool": "github_repo"}, {"fact": "topics: bodyweight, fitness, gym, health, workout-tracker, self-hosted (mcp 토픽 포함)", "tool": "github_repo"}], "relevant_reason": "자율주행 피트니스·운동 기록 앱, 관심 키워드(AI 에이전트, 로컬 LLM, RAG 등)와 무관", "relevant": false, "why_trending": "", "hype_flags": [], "release": null, "related_item_ids": [], "signal_reason": "관련 없음, 트렌딩 수치만(7일 +4906, 커밋 100, 기여자 67)", "signal": "trending"}`
+   - Q1 pass: source_fields.trending.description과 evidence에서 피트니스 추적 앱임이 확인되며 AI 관련 관심 키워드와 무관하므로 relevant=false 판정이 일치함 (단, evidence[2]의 '자율주행' 오기는 relevant_reason에 섞여 있으나 본질적 판단은 일치)
+   - Q2 pass: why_trending이 비어 있어(없음) 근거 없는 서술이 없으므로 기준에 부합함
+   - Q3 pass: hype_flags가 없고, 7일 별 +4906 커밋 100 기여자 67 수치에 맞춰 signal을 trending으로 적절히 판정함
+2. **HunxByts__GhostTrack**
+   - 입력: `{"full_name": "HunxByts/GhostTrack", "max_depth": 2, "reason": "이번 주 트렌딩(2026-W41)", "trending": {"week": "2026-W41", "rank": 11, "stars_total": 17443, "stars_this_week": 1534, "forks": 2358, "language": "Python", "description": "Useful tool to track location or mobile number"}, "oneliner": "", "keywords": ["AI 에이전트", "코딩 에이전트", "MCP · 도구 호출", "오픈웨이트 · 로컬 LLM", "RAG · 검색", "멀티모달", "추론 · 판단 모델", "평가 · 벤치마크", "AI 보안", "프런티어 모델 출시", "AI 산업 · 시장", "개발 실무 · 경험", "AI 일반"], "week_items": [], "hype": {"flags": ["no_commits"], "force_check": true, "commits_7d": 0, "contributors": 2, "note": "7일 별 +1534, 커밋 0"}, "tool_calls": 6}`
+   - 출력: `{"log": "HunxByts/GhostTrack: OSINT 추적 도구, 관련 낮음, 커밋 0", "attention": true, "evidence": [{"fact": "README: Useful tool to track location or mobile number, osint/information gathering (IP, phone, username tracker)", "tool": "github_repo"}, {"fact": "topics: osint, hacking-tool, pentesting, ip-geolocation, phone-number, termux-tool", "tool": "github_repo"}, {"fact": "pushed_at 2024-01-11, license 없음", "tool": "github_repo"}], "relevant_reason": "OSINT/위치·전화번호 추적 도구로, 관심 키워드(AI 에이전트, 로컬 LLM, RAG, AI 보안 등)와 무관", "relevant": false, "why_trending": "", "hype_flags": ["no_commits"], "release": null, "related_item_ids": [], "signal_reason": "7일 별 +1534인데 커밋 0, 기여자 2, 마지막 push 2024-01-11로 개발 중단 상태", "signal": "check"}`
+   - Q1 pass: 출력의 relevant(false) 판단은 evidence의 OSINT/추적 도구 내용과 source_fields의 AI 관련 키워드 목록 불일치에 부합함
+   - Q2 pass: 근거가 없어 why_trending이 비어 있으므로 규칙에 따라 통과
+   - Q3 pass: hype_flags(no_commits)와 signal(check)이 source_fields의 7일 별 +1534, 커밋 0, 기여자 2 수치 및 hype 결과와 정확히 일치함
+3. **NVIDIA__OpenShell**
+   - 입력: `{"full_name": "NVIDIA/OpenShell", "max_depth": 2, "reason": "이번 주 트렌딩(2026-W41)", "trending": {"week": "2026-W41", "rank": 5, "stars_total": 15340, "stars_this_week": 3690, "forks": 1729, "language": "Rust", "description": "OpenShell is the safe, private runtime for autonomous AI agents."}, "oneliner": "자율 AI 에이전트용 안전하고 격리된 런타임", "keywords": ["AI 에이전트", "코딩 에이전트", "MCP · 도구 호출", "오픈웨이트 · 로컬 LLM", "RAG · 검색", "멀티모달", "추론 · 판단 모델", "평가 · 벤치마크", "AI 보안", "프런티어 모델 출시", "AI 산업 · 시장", "개발 실무 · 경험", "AI 일반"], "week_items": [], "hype": {"flags": [], "force_check": false, "commits_7d": 86, "contributors": 100, "note": "7일 별 +3690, 커밋 86"}, "tool_calls": 6}`
+   - 출력: `{"log": "NVIDIA/OpenShell: v0.1.2 릴리스, 커밋 86, 관련", "attention": false, "evidence": [{"fact": "README: OpenShell is the safe, private runtime for fleets of autonomous AI agents; kernel-level enforcement, formally verified policy changes", "tool": "github_repo"}, {"fact": "v0.1.2 2026-09-28 릴리스 (docs: clarify sandbox-local loopback access 등)", "tool": "releases"}, {"fact": "최근 7일 커밋 86, 작성자 24, 마지막 커밋 2026-10-08", "tool": "recent_commits"}, {"fact": "기여자 100+, 상위 drew 344, johntmyers 199", "tool": "contributors"}, {"fact": "이번 주 글에 OpenShell 언급 없음", "tool": "search_items"}], "relevant_reason": "자율 AI 에이전트 격리 런타임, AI 에이전트·AI 보안 키워드 직접 해당", "relevant": true, "why_trending": "v0.1.2 릴리스(2026-09-28), 7일 커밋 86·작성자 24로 개발 지속", "hype_flags": [], "release": {"tag": "v0.1.2", "date": "2026-09-28", "line": "샌드박스 loopback 접근 문서 명확화, WebSocket 터널 opt-in"}, "related_item_ids": [], "signal_reason": "트렌딩 5위, 7일 별 +3690, 커밋 86·기여자 100+로 개발 지속, v0.1.2 릴리스(9/28)", "signal": "trending"}`
+   - Q1 pass: 출력의 relevant(true) 및 관련 이유가 키워드(AI 에이전트, AI 보안) 및 README(autonomous AI agents, safe runtime)와 정확히 일치함
+   - Q2 pass: why_trending의 릴리스 날짜 및 7일 커밋 86, 작성자 24 수치가 evidence 2번, 3번 항목에 그대로 뒷받침됨
+   - Q3 pass: signal(trending)과 hype_flags(없음)가 7일 별 3690, 커밋 86, 기여자 100+ 등 활발한 개발 수치와 잘 부합함
+
+### 반복 기록
+
+| 시각 | 모델 | 프롬프트 | 결과 | 비용 | 메모(바꾼 것) |
+|---|---|---|---|---|---|
+| 2026-10-08T16:47:18+09:00 | generate | `2d9acff170b6` | 코드 4/10, Q1 4/4, Q2 4/4, Q3 4/4, 미달 | $0.0261 | 맥: 2026-W41 트렌딩 10개(키워드 통과 5, 걸러짐·경계 5), 실제 GitHub API |
+| 2026-10-08T16:53:34+09:00 | generate | `407996307552` | 코드 10/10, Q1 10/10, Q2 10/10, Q3 10/10, 미달 | $0.0348 | 반복 1(md 문구): evidence tool 칸은 도구 이름만, 입력 trending·hype는 signal_reason에 |
+| 2026-10-08T18:29:28+09:00 | generate | `407996307552` | 코드 10/10, Q1 10/10, Q2 10/10, Q3 10/10, 통과 | $0.0350 | 반복 1 재실행(md 문구: evidence tool 칸은 도구 이름만). 앞 실행(…-165334)은 GitHub 403으로 무효 |

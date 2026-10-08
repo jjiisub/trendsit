@@ -1,0 +1,46 @@
+{
+ "input": {
+  "full_name": "pablostanley/yoinks",
+  "max_depth": 2,
+  "reason": "이번 주 트렌딩(2026-W41)",
+  "trending": {
+   "week": "2026-W41",
+   "rank": 8,
+   "stars_total": 5169,
+   "stars_this_week": 2732,
+   "forks": 449,
+   "language": "TypeScript",
+   "description": "yoink any video from your terminal. no shady ads."
+  },
+  "oneliner": "",
+  "keywords": [
+   "AI 에이전트",
+   "코딩 에이전트",
+   "MCP · 도구 호출",
+   "오픈웨이트 · 로컬 LLM",
+   "RAG · 검색",
+   "멀티모달",
+   "추론 · 판단 모델",
+   "평가 · 벤치마크",
+   "AI 보안",
+   "프런티어 모델 출시",
+   "AI 산업 · 시장",
+   "개발 실무 · 경험",
+   "AI 일반"
+  ],
+  "week_items": [],
+  "hype": {
+   "flags": [
+    "no_commits",
+    "single_contributor"
+   ],
+   "force_check": true,
+   "commits_7d": 0,
+   "contributors": 1,
+   "note": "7일 별 +2732, 커밋 0"
+  },
+  "tool_calls": 6
+ },
+ "expect": {},
+ "note": "2026-W41 트렌딩, 이번 주 트렌딩(2026-W41)"
+}

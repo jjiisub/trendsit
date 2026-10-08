@@ -1,0 +1,43 @@
+{
+ "input": {
+  "full_name": "mvschwarz/openrig",
+  "max_depth": 2,
+  "reason": "이번 주 트렌딩(2026-W41)",
+  "trending": {
+   "week": "2026-W41",
+   "rank": 1,
+   "stars_total": 5860,
+   "stars_this_week": 2912,
+   "forks": 433,
+   "language": "TypeScript",
+   "description": "Build your own network of agents from Claude Code, Codex and Pi: persistent teams with roles, shared context and owned work."
+  },
+  "oneliner": "Claude Code, Codex 에이전트를 팀으로 구성해 실행하는 오픈소스 CLI",
+  "keywords": [
+   "AI 에이전트",
+   "코딩 에이전트",
+   "MCP · 도구 호출",
+   "오픈웨이트 · 로컬 LLM",
+   "RAG · 검색",
+   "멀티모달",
+   "추론 · 판단 모델",
+   "평가 · 벤치마크",
+   "AI 보안",
+   "프런티어 모델 출시",
+   "AI 산업 · 시장",
+   "개발 실무 · 경험",
+   "AI 일반"
+  ],
+  "week_items": [],
+  "hype": {
+   "flags": [],
+   "force_check": false,
+   "commits_7d": 100,
+   "contributors": 50,
+   "note": "7일 별 +2912, 커밋 100"
+  },
+  "tool_calls": 6
+ },
+ "expect": {},
+ "note": "2026-W41 트렌딩, 이번 주 트렌딩(2026-W41)"
+}
