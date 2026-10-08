@@ -72,6 +72,7 @@ Relevance = Literal["high", "mid", "low"]
 
 
 class ItemCardV1(RoleOutput):
+    ENFORCED_FIELDS = ("attention",)  # 설계 결정 Q1. 긴 인용 자르기(Q6)는 fix(owned=True), 나머지 인용·수치·키워드·링크 정리는 품질
     quotes: list[Quote] = Field(max_length=8, description="본문에서 그대로 옮긴 핵심 문장. 가장 먼저 채움")
     numbers: list[NumberFact] = Field(description="quote에 있는 수치만. 없으면 빈 목록")
     claims: list[Claim] = Field(description="핵심 주장. 각 주장은 quote 번호로 뒷받침")
@@ -208,6 +209,7 @@ class PlanInput(RoleInput):
 
 
 class CollectionPlan(RoleOutput):
+    ENFORCED_FIELDS = ("attention",)  # 설계 결정 Q1. 없는 id·중복, 깊이, 예산 꼬리 자르기는 품질 정리
     text_queue: list[TextQueueItem] = Field(description="원본을 추적할 글, 우선순위 순서")
     video_queue: list[VideoQueueItem] = Field(description="영상 처리 지시, 우선순위 순서")
     repo_queue: list[RepoQueueItem] = Field(description="깊게 볼 레포, 우선순위 순서")
@@ -308,6 +310,7 @@ class Origin(Strict):
 
 
 class ItemCardV2(RoleOutput):
+    ENFORCED_FIELDS = ("attention",)  # 설계 결정 Q1. 근거 없는 판정, 연 적 없는 페이지 인용, trail 밖 origin은 품질 정리
     trail: list[TrailStep] = Field(description="거쳐 간 페이지(순서대로)")
     quotes: list[OriginQuote] = Field(max_length=8, description="원본에서 옮긴 문장. 결론보다 먼저")
     verified: list[Verified] = Field(description="checks마다 confirmed / differs / not_found")

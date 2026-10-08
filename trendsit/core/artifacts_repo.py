@@ -81,6 +81,7 @@ Signal = Literal["trending", "rising", "release", "check"]
 
 
 class RepoCard(RoleOutput):
+    ENFORCED_FIELDS = ("signal", "hype_flags", "attention")  # 설계 결정 Q1. 입력 밖 글 id 삭제는 품질 정리
     evidence: list[Evidence] = Field(description="도구 결과에서 확인한 사실. 가장 먼저 채움")
     relevant_reason: str = Field(description="관심 키워드와의 관련성 판단 이유 한 줄")
     relevant: bool
