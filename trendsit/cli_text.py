@@ -8,6 +8,7 @@ from __future__ import annotations
 import argparse
 import json
 from datetime import date
+from pathlib import Path
 from typing import Any
 
 from .core import config
@@ -138,6 +139,53 @@ def cmd_summarize(args: argparse.Namespace) -> int:
     return 0 if status == "ok" else 1
 
 
+# ---------- repo-analyze (3c) ----------
+REPO_TRACES = ROOT / "reports" / "S3_traces" / "repo"
+
+
+def _queue_from_file(path: str) -> list[Any]:
+    from .deep.repo_agent import QueueItem
+
+    data = json.loads(Path(path).read_text(encoding="utf-8"))
+    rows = data.get("repo_queue", data) if isinstance(data, dict) else data
+    return [QueueItem(r["full_name"], int(r.get("max_depth", 2)), r.get("reason", "")) for r in rows]
+
+
+def cmd_repo_analyze(args: argparse.Namespace) -> int:
+    from .core.context import open_ctx
+    from .deep.repo_agent import build_input, rule_queue, run_repo_analysis, write_traces
+
+    ctx = open_ctx("repo-analyze", spec=args.spec or "S3", model=args.model, no_cache=args.no_cache,
+                   note=f"repo-analyze {args.week}")
+    status = "failed"
+    try:
+        queue = _queue_from_file(args.queue) if args.queue else rule_queue(ctx.db, args.week, args.top)
+        kw = config.load("keywords.yaml")
+        if args.fixtures:  # 관문 B 픽스처: 입력만 만든다(한 줄 설명이 없으면 repo_oneliner 실행)
+            out = Path(args.fixtures)
+            out.mkdir(parents=True, exist_ok=True)
+            for q in queue:
+                inp = build_input(ctx, q, args.week, kw)
+                (out / f"{q.full_name.replace('/', '__')}.json").write_text(json.dumps(
+                    {"input": inp.model_dump(), "expect": {}, "note": f"{args.week} 트렌딩, {q.reason}"},
+                    ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+            print(f"픽스처 {len(queue)}개: {out}")
+            status = "ok"
+            return 0
+        res = run_repo_analysis(ctx, queue, args.week, kw)
+        ctx.tracer.step(kind="code", role="repo-analyze", text=res.summary(),
+                        detail={k: v for k, v in res.__dict__.items() if k != "traces"},
+                        attention=bool(res.stopped or res.fallback))
+        print(res.summary())
+        if args.traces:
+            paths = write_traces(res.traces, REPO_TRACES, f"uv run python -m trendsit repo-analyze --week {args.week}")
+            print(f"검증 산출물 {len(paths)}개: {REPO_TRACES.relative_to(ROOT)}")
+        status = "stopped" if res.stopped else "ok"
+    finally:
+        ctx.tracer.finish(status)
+    return 0 if status == "ok" else 1
+
+
 def register(sub: Any) -> None:
     r = sub.add_parser("rematch", help="바뀐 keywords.yaml로 저장된 항목의 키워드 판정을 다시 계산(네트워크 없음)")
     r.add_argument("--since")
@@ -163,6 +211,17 @@ def register(sub: Any) -> None:
     sm.add_argument("--no-cache", action="store_true")
     sm.add_argument("--spec")
     sm.set_defaults(fn=cmd_summarize)
+
+    ra = sub.add_parser("repo-analyze", help="레포 분석가(repo_analyst): 규칙 기반 큐 또는 --queue 파일")
+    ra.add_argument("--week", required=True, help="ISO 주차(예: 2026-W41)")
+    ra.add_argument("--top", type=int, default=10)
+    ra.add_argument("--queue", help="큐 JSON(편집장 계획의 repo_queue 또는 [{full_name, max_depth, reason}])")
+    ra.add_argument("--fixtures", help="실행하지 않고 관문 B 픽스처(입력)만 이 폴더에")
+    ra.add_argument("--traces", action="store_true", help="reports/S3_traces/repo/ 검증 산출물")
+    ra.add_argument("--model")
+    ra.add_argument("--no-cache", action="store_true")
+    ra.add_argument("--spec")
+    ra.set_defaults(fn=cmd_repo_analyze)
 
     ff = sub.add_parser("filter-fixtures", help="eval/fixtures/filter 20건 점수(장치별 비교)")
     ff.add_argument("--embedder", choices=["real", "mock"], default="real")

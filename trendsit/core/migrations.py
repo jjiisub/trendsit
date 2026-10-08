@@ -101,6 +101,17 @@ register(11, """
     );
     """)
 
+# 12: S3 3c 레포 분석가 카드(주차별)와 레포 한 줄(repo_oneliner 결과, 입력 해시가 같으면 재사용)
+register(12, """
+    CREATE TABLE IF NOT EXISTS repo_cards (
+        week TEXT NOT NULL, full_name TEXT NOT NULL, card_json TEXT NOT NULL, model TEXT, run_id TEXT,
+        created_at TEXT, fallback INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(week, full_name)
+    );
+    CREATE TABLE IF NOT EXISTS repo_oneliners (
+        full_name TEXT PRIMARY KEY, input_hash TEXT NOT NULL, output_json TEXT NOT NULL, model TEXT, created_at TEXT
+    );
+    """)
+
 # ---------- S4 (20~29) ----------
 
 

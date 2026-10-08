@@ -74,3 +74,54 @@ graders.ROLE_STYLE_FIELDS["item_card"] = ("summary", "claims", "log", "relevance
 graders.AGGREGATES["item_card"] = aggregate_item_card
 # S2S3_TASK 7장: 코드 채점 전부(항목별) + 인용 일치율 95%(전체) + judge 질문별 80%
 graders.THRESHOLDS["item_card"] = {"questions": {"Q1": 0.8, "Q2": 0.8, "Q3": 0.8}, "code_pass_all": True}
+
+
+# ---------- repo_analyst (S3 3c) ----------
+REPO_TOOLS = {"github_repo", "recent_commits", "contributors", "releases", "search_items"}
+DEEP_TOOLS = {"recent_commits", "contributors", "releases"}
+LOW_REL_SHALLOW = 0.8  # 관련 낮은 레포 중 커밋 도구 없이 finish한 비율 하한
+AVG_TOOL_CALLS = 4.0  # 평균 도구 호출 상한
+
+
+def _tool_names(rec: dict[str, Any]) -> list[str]:
+    return [t["text"].split(":")[0] for t in rec.get("tool_calls") or [] if not t["text"].startswith("finish")]
+
+
+def code_repo_analyst(inp: dict[str, Any], out: dict[str, Any], expect: dict[str, Any]) -> list[dict[str, Any]]:
+    ids = {x["id"] for x in inp.get("week_items") or []}
+    hype = inp.get("hype") or {}
+    bad_tools = [e["tool"] for e in out["evidence"] if e["tool"] not in REPO_TOOLS]
+    checks = [
+        check("evidence 출처가 도구 이름", not bad_tools, ", ".join(bad_tools)),
+        check("related_item_ids가 입력 안", all(i in ids for i in out["related_item_ids"]),
+              ", ".join(i for i in out["related_item_ids"] if i not in ids)),
+        check("과열 규칙(force_check)이면 check", not hype.get("force_check") or out["signal"] == "check",
+              f"signal {out['signal']}"),
+        check("코드 과열 플래그 유지", all(f in out["hype_flags"] for f in hype.get("flags", [])),
+              f"입력 {hype.get('flags')}, 출력 {out['hype_flags']}"),
+        check("근거 없는 why_trending이면 attention", bool(out["evidence"]) or not out["why_trending"] or out["attention"],
+              "evidence 없이 why_trending"),
+    ]
+    if "relevant" in expect:
+        checks.append(check("relevant", out["relevant"] == expect["relevant"], f"기대 {expect['relevant']}"))
+    return checks
+
+
+def aggregate_repo_analyst(results: list[dict[str, Any]]) -> tuple[dict[str, Any], list[str]]:
+    calls = [len(_tool_names(r)) for r in results if r.get("output")]
+    low = [r for r in results if r.get("output") and not r["output"]["relevant"]]
+    shallow = [r for r in low if not DEEP_TOOLS & set(_tool_names(r))]
+    avg = round(sum(calls) / len(calls), 2) if calls else None
+    rate = round(len(shallow) / len(low), 3) if low else None
+    reasons = []
+    if avg is None or avg > AVG_TOOL_CALLS:
+        reasons.append(f"평균 도구 호출 {avg} > {AVG_TOOL_CALLS}")
+    if rate is not None and rate < LOW_REL_SHALLOW:
+        reasons.append(f"관련 낮은 레포 중 커밋 도구 없이 끝낸 비율 {len(shallow)}/{len(low)} < {LOW_REL_SHALLOW:.0%}")
+    return {"평균 도구 호출": avg, "관련 낮음 얕게 끝냄": f"{len(shallow)}/{len(low)}"}, reasons
+
+
+graders.ROLE_CHECKS["repo_analyst"] = code_repo_analyst
+graders.ROLE_STYLE_FIELDS["repo_analyst"] = ("relevant_reason", "why_trending", "signal_reason", "log")
+graders.AGGREGATES["repo_analyst"] = aggregate_repo_analyst
+graders.THRESHOLDS["repo_analyst"] = {"questions": {"Q1": 0.8, "Q2": 0.8, "Q3": 0.8}, "code_pass_all": True}

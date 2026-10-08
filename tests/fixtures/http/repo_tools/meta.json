@@ -1,0 +1,4 @@
+{
+ "note": "레포 정보와 README(recorded: true)는 S1 녹화(window, 2026-10-07)에서 복사. 커밋·기여자·릴리스(synthetic: true)는 클라우드 세션에서 GitHub API가 이 저장소 밖으로 막혀 녹화하지 못해 GitHub API 응답 형식대로 만든 합성 응답. 맥에서 scripts/record_http_fixtures.py 방식으로 실제 녹화로 바꿀 수 있음(맥 확인 목록)",
+ "today": "2026-10-08"
+}

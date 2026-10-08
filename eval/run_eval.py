@@ -55,6 +55,7 @@ def _evaluate(ctx: Any, role_name: str, model: str | None, limit: int | None, no
         before = ctx.budget.session_cost
         out, error, inp = None, None, None
         final = None
+        mark = ctx.db.conn.execute("SELECT COALESCE(MAX(id), 0) FROM steps").fetchone()[0]
         try:
             inp = role.input_cls.model_validate(fx["input"])
             final = run(role, inp, ctx)
@@ -71,6 +72,10 @@ def _evaluate(ctx: Any, role_name: str, model: str | None, limit: int | None, no
             print(f"[eval] 중단: {stopped}", file=sys.stderr)
             break
         rec["output"], rec["error"] = out, error
+        if role.spec.tools:  # 도구 에이전트: 이 픽스처의 도구 호출 경로(도구 효율 채점, 검증 산출물)
+            rec["tool_calls"] = [{"text": r["text"], "error": r["error"], "detail": r["detail"]} for r in ctx.db.conn.execute(
+                "SELECT text, error, detail FROM steps WHERE run_id=? AND kind='tool' AND id>? ORDER BY id",
+                (ctx.tracer.run_id, mark))]
         rec["code"] = graders.code_grade(role_name, fx["input"], out, error, fx["expect"])
         if final is not None and final.enforced:  # enforce 후 출력(저장되는 것)도 함께 기록
             rec["enforced"] = final.enforced
