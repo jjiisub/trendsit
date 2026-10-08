@@ -1,0 +1,11 @@
+{
+ "input": {
+  "source": "anthropic",
+  "channel": "text",
+  "title": "Expanding the Cyber Verification Program",
+  "keyword_status": "pass",
+  "keyword_reason": null,
+  "text": "Expanding the Cyber Verification Program\nExpanding the Cyber Verification Program\nExpanding the Cyber Verification Program\nWe’re launching a new, expanded version of our Cyber Verification Program (CVP), which makes advanced cyber capabilities and reduced blocking classifiers available to qualifying security professionals. The program now consists of three access tiers, which allow security teams to apply for the level of access that best suits their work. Each tier includes access to our most capable models, including Claude Opus 5.5, Claude Sonnet 5.5, Claude Mythos 5.1, and new models moving forward. Interested customers can apply here.\nCybersecurity is inherently dual use: the same capabilities that enable a security team to find and fix a vulnerability can also help a malicious actor exploit it. For this reason, our generally available models, such as Claude Opus 5.5, Claude Fable 5.1, and Claude Sonnet 5.5, have conservative cyber safeguards that block most cyber work. This is intended to limit the harmful activities malicious actors can carry out using our mo"
+ },
+ "note": "S1 녹화 응답(tests/fixtures/http/window, bf_*)으로 만든 개발 DB에서 뽑음. keyword_status는 새 키워드로 rematch한 판정"
+}

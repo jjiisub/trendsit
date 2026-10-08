@@ -214,12 +214,44 @@ class KeywordsConfig(Strict):
         return self
 
 
+# ---------- filter.yaml (S2 임베딩 관련성 필터) ----------
+class Interest(Strict):
+    keyword_id: str = Field(pattern=r"^[a-z0-9-]+$")
+    text: str = Field(min_length=10)  # 관심사 설명 1~2문장. 쿼리로 임베딩
+
+
+class FilterConfig(Strict):
+    model: str = Field(min_length=1)  # 임베딩 모델(sentence-transformers 이름)
+    instruction: str = Field(min_length=1)  # 쿼리 쪽 지시문(Qwen3-Embedding 모델 카드 방식)
+    doc_chars: int = Field(default=1000, gt=0)  # 글 입력 = 제목 + 요약 + 본문 앞 doc_chars자
+    drop_below: float = Field(ge=-1, le=1)  # 키워드 통과 + 점수 < drop_below → drop
+    rescue_above: float = Field(ge=-1, le=1)  # 키워드 걸러짐(no_keyword) + 점수 ≥ rescue_above → keep
+    thresholds_status: Literal["provisional", "confirmed"] = "provisional"  # 라벨로 확정 전에는 잠정
+    thresholds_basis: str = ""  # 문턱값 근거 한 줄(리포트와 같이)
+    interests: list[Interest] = Field(min_length=1)
+    # URL 중복 연결의 기준 항목: 원본에 가까운 쪽. 소스 종류(sources.yaml kind) 순위, source_kind로 소스별 덮어쓰기
+    origin_rank: list[str] = ["primary", "blog", "news", "curation"]
+    source_kind: dict[str, str] = {}
+    similar_pairs: int = Field(default=30, ge=0)  # 리포트에 남길 유사 쌍 수(S5 묶기 재료)
+    batch_size: int = Field(default=16, gt=0)
+
+    @model_validator(mode="after")
+    def _check(self) -> FilterConfig:
+        if self.rescue_above < self.drop_below:
+            raise ValueError("rescue_above는 drop_below 이상이어야 함(걸러진 글을 통과 글보다 쉽게 살리지 않게)")
+        bad = sorted({k for k in self.source_kind.values() if k not in self.origin_rank})
+        if bad:
+            raise ValueError(f"source_kind에 origin_rank 밖 종류: {', '.join(bad)}")
+        return self
+
+
 FILES: dict[str, type[BaseModel]] = {
     "models.yaml": ModelsConfig,
     "budget.yaml": BudgetConfig,
     "sources.yaml": SourcesConfig,
     "keywords.yaml": KeywordsConfig,
     "link_kinds.yaml": LinkKindsConfig,
+    "filter.yaml": FilterConfig,  # S2
 }
 
 
@@ -272,7 +304,7 @@ def load(name: str, config_dir: Path | None = None) -> Any:
 
 
 def check_all(config_dir: Path | None = None) -> list[ConfigError]:
-    """네 파일 전부 검증하고 오류를 모두 모은다."""
+    """FILES의 설정 파일 전부 검증하고 오류를 모두 모은다."""
     errors: list[ConfigError] = []
     for name, cls in FILES.items():
         path = (config_dir or ROOT / "config") / name
@@ -282,7 +314,17 @@ def check_all(config_dir: Path | None = None) -> list[ConfigError]:
             errors.append(e)
         except ValidationError as e:
             errors.extend(_errors(name, e))
+    if not errors:
+        errors += _cross_check(config_dir)
     return errors
+
+
+def _cross_check(config_dir: Path | None) -> list[ConfigError]:
+    """파일 사이 참조: filter.yaml 관심사의 keyword_id는 keywords.yaml에 있어야 한다."""
+    kw = {k.id for k in load("keywords.yaml", config_dir).keywords}
+    flt = load("filter.yaml", config_dir)
+    return [ConfigError("filter.yaml", f"interests[{i}].keyword_id", f"keywords.yaml에 없는 키워드 '{x.keyword_id}'")
+            for i, x in enumerate(flt.interests) if x.keyword_id not in kw]
 
 
 def get_secret(name: str) -> str | None:

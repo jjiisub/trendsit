@@ -1,0 +1,11 @@
+{
+ "input": {
+  "source": "geeknews",
+  "channel": "text",
+  "title": "CogSend - 여러 소셜 플랫폼에 글을 예약 발행하는 셀프 호스팅 도구",
+  "keyword_status": "pass",
+  "keyword_reason": null,
+  "text": "CogSend - 여러 소셜 플랫폼에 글을 예약 발행하는 셀프 호스팅 도구\nMastodon, Bluesky, LinkedIn, Threads, X에 글을 한 번 작성하고 플랫폼별로 수정해 즉시 게시하거나 예약 발행하는 오픈소스 도구 별도 서버 대\nSelf-hosted social scheduler for Mastodon, Bluesky, LinkedIn, Threads and X.\nWrite a draft, customize it per platform, then publish it now or schedule it.\nInstall · Documentation · API · Contributing\ncogsend-trailer.mp4\nSupported by Zernio, which lets you connect X, Threads, LinkedIn and Bluesky without your own developer apps.\nHosted schedulers usually charge per channel and keep your posts and tokens on their servers. CogSend runs on your own Cloudflare account instead: your data stays in your own D1 database and R2 bucket, posts go out through your own API credentials, and there is no subscription to keep paying.\n- Thread editor: one card per post, images with alt text, and a tab per platform for tailored versions\n- Auto-split: paste a long draft and it becomes a thread that fits every platform you picked\n- Publish or schedule: see results per account, then cancel, reschedule or retry from Posts\n- Automatic retries: temporary failures retry on their own, up to five attempts\n- Insigh"
+ },
+ "note": "S1 녹화 응답(tests/fixtures/http/window, bf_*)으로 만든 개발 DB에서 뽑음. keyword_status는 새 키워드로 rematch한 판정"
+}

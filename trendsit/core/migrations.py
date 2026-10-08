@@ -77,6 +77,20 @@ register(2, """
     """)
 
 # ---------- S2~S3 (10~19) ----------
+# 10: S2 2a 임베딩 관련성 필터와 URL 중복 연결. S1 items.filter_status(키워드 판정)는 건드리지 않고 따로 저장
+register(10, """
+    CREATE TABLE IF NOT EXISTS item_embeddings (
+        item_id INTEGER NOT NULL, model TEXT NOT NULL, dim INTEGER NOT NULL, vec BLOB NOT NULL,
+        text_hash TEXT, created_at TEXT, PRIMARY KEY(item_id, model)
+    );
+    CREATE TABLE IF NOT EXISTS item_relevance (
+        item_id INTEGER PRIMARY KEY, model TEXT NOT NULL, score REAL NOT NULL, keyword_id TEXT,
+        decision TEXT NOT NULL CHECK(decision IN ('keep','drop')), reason TEXT, run_id TEXT
+    );
+    CREATE TABLE IF NOT EXISTS item_same_as (
+        item_id INTEGER PRIMARY KEY, canonical_id INTEGER NOT NULL, reason TEXT
+    );
+    """)
 
 # ---------- S4 (20~29) ----------
 

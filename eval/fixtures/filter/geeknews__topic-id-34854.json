@@ -1,0 +1,11 @@
+{
+ "input": {
+  "source": "geeknews",
+  "channel": "text",
+  "title": "OpenRig - Claude Code와 Codex를 팀으로 운영하는 멀티 에이전트 오케스트레이터",
+  "keyword_status": "pass",
+  "keyword_reason": null,
+  "text": "OpenRig - Claude Code와 Codex를 팀으로 운영하는 멀티 에이전트 오케스트레이터\nClaude Code, Codex, Pi 등의 코딩 에이전트를 역할과 공유 문맥을 갖춘 지속적인 팀으로 구성하는 오픈소스 도구 개별 터미널 세션에 일일이 지시\nA harness wraps a model. A rig wraps your harnesses. Define your agent team in YAML, boot it with one command. Claude Code and Codex in the same rig, managed as one system.\nOpenRig is open-source software for building and running your own network of agents. It turns AI coding agents from a pile of terminal sessions into a persistent, organized team. Talk to a lead agent about the outcome you want; it can coordinate specialists across teams and bring you results and decisions that need your attention. Start with a repository and one useful change, then keep the team's work and context at the same addresses.\nIt's the open-source system behind my AI civilization experiments.\nGuide: Getting started · Stuck? Help · Questions: Q&A · Updates and demos: @_feralmachine on X\nStart here: the guided first-use path: install, talk to the kernel operator, then choose a team for your first useful change.\nNot setting this up today? Get the next walkthrough and occasional OpenRig updates → https://openr"
+ },
+ "note": "S1 녹화 응답(tests/fixtures/http/window, bf_*)으로 만든 개발 DB에서 뽑음. keyword_status는 새 키워드로 rematch한 판정"
+}

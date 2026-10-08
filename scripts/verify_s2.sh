@@ -54,6 +54,27 @@ M6_HIT=$(grep -rn "메인(점수순)\|RSS + list_pages" trendsit/ 2>/dev/null)
 [ "$STAGE" = 0 ] && exit $FAILED
 
 # ---------- 2a, 2b (S2S3_TASK 6장) ----------
-for id in A3 A4 A5 A6 A7 A8 A13 A14; do fail "$id" "미구현(2a·2b 단계에서 추가)"; done
+if uv run --quiet python -m trendsit check-config >"$TMP/a3" 2>&1; then
+  pt A3 "filter.yaml, 바뀐 keywords.yaml(13개)이 check-config 통과 + 없는 키워드 id, 범위 밖 문턱값이 경로를 짚어 실패" \
+    tests/test_s2a.py -k "filter_yaml or handoff_draft"
+else
+  fail A3 "$(head -2 "$TMP/a3" | tr '\n' ' ')"
+fi
+pt A5 "rematch: 키워드를 바꾸면 판정·item_keywords·트렌딩 판정이 바뀌고, 다시 돌려도 같음" tests/test_s2a.py -k "rematch"
+pt A6 "필터(모의 임베더): 네 갈래 판정, 제외어는 되살리지 않음, 두 번째 실행 임베딩 계산 0" \
+  tests/test_s2a.py -k "four_way or run_filter or blob or distribution or seed_lookup"
+pt A7 "같은 정규화 URL(원문 링크 포함)이 same_as로 연결, 기준 항목은 공식 > 개인 블로그 > 언론 > 큐레이션" tests/test_s2a.py -k "same_url"
+A13=$(uv run --quiet python - <<'PY'
+import re
+from trendsit.core.migrations import MIGRATIONS
+src = open("trendsit/core/migrations.py", encoding="utf-8").read()
+block = src.split("# ---------- S2~S3 (10~19) ----------")[1].split("# ---------- S4 (20~29) ----------")[0]
+mine = [int(n) for n in re.findall(r"register\((\d+),", block)]
+bad = [n for n in mine if not 10 <= n <= 19]
+print(("OK " if mine and not bad else "BAD ") + f"이 묶음 번호 {mine}, 대역 밖 {bad}, 등록 전체 {sorted(MIGRATIONS)}")
+PY
+)
+[[ "$A13" == OK* ]] && pass A13 "마이그레이션 대역: ${A13#OK }" || fail A13 "${A13#BAD }"
+for id in A4 A8 A14; do fail "$id" "미구현(2b 단계에서 추가)"; done
 
 exit $FAILED

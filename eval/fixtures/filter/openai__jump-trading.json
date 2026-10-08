@@ -1,0 +1,11 @@
+{
+ "input": {
+  "source": "openai",
+  "channel": "text",
+  "title": "How Jump Trading is scaling quant research with ChatGPT",
+  "keyword_status": "pass",
+  "keyword_reason": null,
+  "text": "How Jump Trading is scaling quant research with ChatGPT\nJump Trading uses OpenAI to expand quantitative research. See how longer-running AI workflows combine multiple data sources with human review.\nHow Jump Trading is scaling quant research with ChatGPT\nJump Trading uses GPT‑6 Astra to take on longer, more ambiguous research problems.\nAs a quantitative trading firm, Jump Trading creates predictive models that use market data, news and events, and a range of alternative data sources to make the best possible predictions about asset prices. Because markets are complex, noisy, and changing over time, it is rarely possible to anticipate exactly what will happen. But according to Lucas Baker, Head of LLM R&D at Jump, predicting even slightly better than a coin flip at scale is enough to result in a successful strategy.\nBaker leads agentic research and development, and he’s focused on building the agents, harnesses, and infrastructure that let quantitative researchers explore their ideas in greater breadth and depth. Adding GPT‑6 Astra has dramatically expanded the scale and complexity of workflows that can be handed off to agents, from day-to-day coding to advanced quantitative studie"
+ },
+ "note": "S1 녹화 응답(tests/fixtures/http/window, bf_*)으로 만든 개발 DB에서 뽑음. keyword_status는 새 키워드로 rematch한 판정"
+}

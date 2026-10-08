@@ -1,0 +1,11 @@
+{
+ "input": {
+  "source": "geeknews",
+  "channel": "text",
+  "title": "전 아마존 부사장에게 묻는 사내 정치의 어두운 면 [영상]",
+  "keyword_status": "filtered",
+  "keyword_reason": "excluded:정치",
+  "text": "전 아마존 부사장에게 묻는 사내 정치의 어두운 면 [영상]\n전 Amazon VP Ethan Evans는 성과만 내고 인정받기를 기다리기보다, 자신의 기여를 알리고 원하는 역할과 승진 조건을 직접 협의해야 한다고 조언"
+ },
+ "note": "S1 녹화 응답(tests/fixtures/http/window, bf_*)으로 만든 개발 DB에서 뽑음. keyword_status는 새 키워드로 rematch한 판정"
+}

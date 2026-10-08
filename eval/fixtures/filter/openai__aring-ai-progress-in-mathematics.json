@@ -1,0 +1,11 @@
+{
+ "input": {
+  "source": "openai",
+  "channel": "text",
+  "title": "Sharing AI progress in mathematics",
+  "keyword_status": "pass",
+  "keyword_reason": null,
+  "text": "Sharing AI progress in mathematics\nOpenAI publishes new results on open problems in mathematics from an internal frontier model and shares Lean proof formalizations and research details on GitHub.\nWe’re releasing a broad range of new mathematical results produced by an internal frontier model.\nAs we look to improve how we share results with the math community, we’ve been consulting with the independent Advisory Group on Mathematics and Artificial Intelligence at the Institute for Advanced Study(opens in a new window) to develop best practices, and we have drawn on their advice and public recommendations(opens in a new window) to inform how we release these results.\nFor this release, we’re publishing the results in a GitHub repository, with protocols for paper revisions and citations. We’re continuing to explore other community-hosted alternatives for this release which meet the committee’s guidelines. For future releases, we are committed to further improving the quality of the papers via the citations, mathematical exposition, and presentation of the results for better understanding.\nAs part of our GitHub repository, we are sharing formalizations of many of the proofs in Lean,"
+ },
+ "note": "S1 녹화 응답(tests/fixtures/http/window, bf_*)으로 만든 개발 DB에서 뽑음. keyword_status는 새 키워드로 rematch한 판정"
+}
