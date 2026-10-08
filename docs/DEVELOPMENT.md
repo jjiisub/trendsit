@@ -19,6 +19,7 @@ GITHUB_TOKEN=...             # 선택. 픽스처 README 수집에만
 | `bash scripts/verify_s0.sh` | S0 관문 A. 항목별 PASS/FAIL, smoke(무료) 모델 실제 호출 포함 |
 | `bash scripts/verify_s1.sh` | S1 관문 A(S0 회귀 + 1a S0 보완 P1~P6, 리뷰 반영 R1~R6 + 1b 수집) |
 | `bash scripts/verify_s2.sh [--stage 0]` | S2 관문 A. `--stage 0`은 0단계(S1 리뷰 M1, M2, M4, M6)만 |
+| `bash scripts/verify_s4.sh` | S4 관문 A(S0·S1 회귀 + A2~A14). 맥이면 `video` 묶음을 넣고 맥 전용 테스트까지 |
 | `uv run python -m trendsit check-config [--root DIR]` | 설정 파일 + 역할 md(`roles/*.md`, `eval/judge.md`) 검증. 틀리면 파일, 경로, 이유 |
 | `uv run python -m trendsit role <이름> --input <json> [--model 별칭] [--no-cache]` | 역할 1회 실행. 출력 JSON, stderr에 run_id, step_id, 비용 |
 | `uv run python -m trendsit role --replay <step_id> [--model 별칭] [--no-cache]` | 기록된 요청으로 다시 실행. `--model`로 다른 모델 비교 |
@@ -31,6 +32,12 @@ GITHUB_TOKEN=...             # 선택. 픽스처 README 수집에만
 | `uv run python -m trendsit items [--week 2026-W40] [--source ID] [--status pass\|filtered] [--limit N]` | 수집 항목 목록(날짜, 소스, 필터 상태, 본문 상태, 키워드, 제목) |
 | `uv run python -m trendsit report collection [--since DATE] [--until DATE]` | `reports/S1_collection.md`: 소스별 표, 하루 신규 건수, 백필 확인, GitHub, 유튜브, 사람 확인용 샘플, 링크 분포, 문턱값 |
 | `uv run python scripts/record_http_fixtures.py <이름> --since D --until D [--source ID] [--max-items N] [--today D] [--extend]` | 수집 테스트용 응답 녹화(`tests/fixtures/http/<이름>/`, 피드와 HTML은 줄여서 gzip). `--extend`는 이전 녹화를 쓰고 새 URL만 받음 |
+| `uv run --extra video python -m trendsit video run --video-id ID --mode whisper+slides [--start S --end E] [--reason 이유] [--frames full] [--res N]` | 영상 하나: 받기 → 로컬 전사와 프레임 → 슬라이드 판독 → 대조 → 요약 → VideoDigest 저장. 실행 기록은 영상마다 run 1개(S4, 맥) |
+| `uv run --extra video python -m trendsit video run --queue q.json` (`-`면 표준 입력) | 영상 처리 지시 배열(CONTRACTS 1장). `--from-json data/media/<id>/media_result.json`이면 전사 없이 판독 이후만 |
+| `uv run python -m trendsit video purge [--older-than 7]` | 작업 폴더(`data/media/<id>`: 영상, 프레임) 중 오래 쓰지 않은 것 삭제 + 보관 기한 지난 segments 텍스트 삭제. DB의 판독·요약은 남음 |
+| `uv run python -m trendsit video report [--since D --until D] [--out FILE]` | 영상 처리 기록 표(markdown) |
+| `uv run --extra video python scripts/save_video_fixture.py <id> <mode>` | 실제 영상의 1차 처리 결과를 테스트 픽스처로(`tests/fixtures/video/`, 썸네일 5장) |
+| `uv run python scripts/s4_eval_fixtures.py <큐 JSON>` | 실행한 영상의 요약 입력을 `eval/fixtures/video_summary/`로(파생 A7 픽스처 2개 포함) |
 
 - `--input`은 JSON 파일 경로나 JSON 문자열. 픽스처 파일(`{"input", "expect"}`)이면 `input` 칸을 쓴다
 - `--no-cache`는 캐시 읽기만 끈다. 새 응답은 캐시에 저장된다
@@ -118,3 +125,18 @@ data/        trendsit.db(실행 기록), cache/, budget_state.json, prices.json 
 - `README.md`: 현재 상태 설명서. 스펙이 끝날 때마다 기능, 빠른 시작, 성과 수치, 로드맵을 갱신
 - 위키: 과정 기록(기획, 설계·ADR, 개발일지, 트러블슈팅, 회고). 설계 세션이 관리
 - `docs/`: 오래 남길 설계 문서와 스펙. ADR은 `docs/adr/`
+
+## 영상 분석가 (S4)
+`video run`에 영상 처리 지시(`video_id`, `mode`, 구간, 이유)를 주면 단계를 고정 순서로 돈다. mode는 편집장 계획이 정하고 영상 분석가는 올리지 않는다(CONTRACTS 1장).
+
+- 맥 전용: 전사는 mlx-whisper(`large-v3-turbo`, GPU), 받기는 yt-dlp. 선택 묶음 `video`(`uv sync --extra video`). 시스템 의존성 ffmpeg/ffprobe와 yt-dlp용 JS 런타임(deno, node, bun 중 하나, 없으면 영상 포맷 403)
+- `uv run`은 실행 전에 환경을 잠금 파일에 맞추며 선택 묶음을 지운다. 영상 명령과 관문 A는 `uv run --extra video ...`로(`verify_s4.sh`는 맥이면 자동)
+- 설정 `config/video.yaml`(S4 소유, `check-config`가 검사): mode별 설정(captions = 수동 자막만, whisper = 전사만, whisper+slides = 전사 + 프레임 auto, 1024px, 상한 20장), 60분 상한, 1080p, 보관 일수
+- 1차 처리(`collect/video/`, 맥 youtube-analyze 스킬 방식을 옮김): 받기(작업 폴더에 원자적 커밋, 1회 재시도, 재생목록·채널 URL 거부) → 전사(GPU)와 프레임 후보(CPU) 동시 → 전사 정규화(시간 역순·겹침·구간 밖·빈 segment 정리)와 품질 판정(ok / suspect_hallucination / empty) → 화면 지시 표현과 발화 공백으로 프레임 추가 → 남은 예산 채움 → 프레임마다 그 시각 발화(spoken_text). 결과 `MediaResult`는 계약 검사(`collect/video/contract.py`)를 통과해야 다음 단계로
+- 수동 자막(captions): 업로더 자막 트랙만(`video.yaml`의 `caption_langs` 순서). 자동 자막은 읽지도 받지도 않는다. 수동 자막이 없으면 건너뛰고 기록(whisper로 올리지 않음)
+- 판독(`video_slide`, 프레임당 1회): 우선순위 transcript-cue → scene-change → first-frame → uniform. 이미지 입력은 공통 코어(`core/images.py`): 메시지·캐시 키·실행 기록에는 경로와 바이트 해시만, 전송 직전에만 data URI. enforce: 수치 값은 ocr_text 안 글자 그대로, slide가 아니면 수치 비움
+- 대조(`video/align.py`): 판독 수치를 값으로 정규화(쉼표, K/M/B, %, x/배, 영어 수사)해 그 프레임 발화와 앞뒤 30초 segments에서 찾음. 없으면 `slide_only_facts`(근거 id `vd:{item_id}@{초}`), check 판독은 사람 확인 목록. 전사 품질이 ok가 아니면 발화에 있는 수치도 없는 것으로 본다
+- 요약(`video_summary`, LLM 1회): 전사(`[초] 문장` 줄)와 판독 문서로 표기 쌍, 핵심 포인트(근거 id), 타임라인, 요약. 전사 품질이 ok가 아니면 전사는 빈 문서. 전사도 판독도 없으면 LLM을 부르지 않고 "내용 없음" + attention. enforce: 표기 쌍 양쪽이 자료에 있음, 근거·초가 처리 구간 안, 전사를 쓸 수 없으면 판독 근거만
+- 대체 동작: 판독이 전부 실패하면 전사 결과만(status partial), 받기·전사 실패는 영상 건너뜀 + `fetch_log` 실패
+- 저장(마이그레이션 20): `video_runs`(처리마다 1행), `video_segments`(8주 뒤 텍스트 삭제), `video_frames`(판독 텍스트), `video_digests`(VideoDigest). 영상·프레임 이미지는 `data/media/<id>`에만, `video purge`로 7일 뒤 정리
+- 테스트: 판독 이후 단계는 실제 영상 1차 처리 픽스처(`tests/fixtures/video/`)와 모의 LLM으로 어디서나. 맥 전용 테스트(합성 영상으로 ffmpeg 실제 실행)는 `mac_video` 표시 하나로만 건너뜀
