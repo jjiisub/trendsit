@@ -1,6 +1,6 @@
 # S3 리포트: 깊게 보기 (3c 레포 분석가 → 3a 편집장 계획 → 3b 글 분석가)
 
-> 진행 체크리스트(COMMON 8장). 상태: 클라우드 구현 끝 + 클라우드 관문 B(픽스처 범위) 끝 + **맥 확인(2026-10-08)**: 실제 GitHub(토큰), 실제 한 주(2026-W41, 2026-10-04 계획)로 관문 B 세 역할 통과(judge 잠정). 라벨은 MVP 동안 사람이 달지 않고 PR 리뷰 세션 Opus 5.5가 2차 채점(설계 결정 D1-3). 파일만 만들어 둠(빈칸, `labeler` 칸). `--agreement`·영상 mode 동의율은 **리뷰 채점 대기**.
+> 진행 체크리스트(COMMON 8장). 상태: 클라우드 구현 끝 + 클라우드 관문 B(픽스처 범위) 끝 + 맥 확인(2026-10-08) + **리뷰 반영(2026-10-09)**: PR #6 리뷰 R1·R3·R4, 설계 결정 N1·N2 반영, 2차 채점 라벨 기록(labeler opus-5.5), 0원 재채점. 채점 수치는 모두 **잠정**, judge 일치율은 "모델 대 모델 일치율"(설계 결정 D1-3).
 > 맥 실행 환경: M1 Max, 파이썬 3.12.14, `GITHUB_TOKEN`(fine-grained, 공개 저장소 읽기 전용, `~/.config/trendsit/.env`). 토큰 값이 저장소·data·로그에 없음을 값 대조로 확인
 > **클라우드 관문 B의 범위**: editor_plan 2건, text_analyst 6건의 픽스처를 녹화 응답으로 만든 개발 DB(글 15건 1차 요약, 영상 1편, 트렌딩 11행)에서 뽑아 돌렸다. 스펙 수(영상 10편 계획, 글 10건)에 못 미치고 실제 한 주가 아니다. repo_analyst는 GitHub API가 이 저장소 밖으로 막혀 돌리지 않았다. 실제 한 주 픽스처, 검증 산출물(`S3_traces/`, `S3_plan.md`), 사람 라벨은 맥 몫. judge 판정은 모두 **잠정**
 > 실행 환경(두 번째 클라우드 세션): 키 있음, openrouter.ai·export.arxiv.org·일반 원문 사이트 열림. github.com(레포 페이지), 이 저장소 밖 GitHub API, news.hada.io는 막힘
@@ -16,7 +16,8 @@
 - [x] 관문 B editor_plan(픽스처 2건), text_analyst(픽스처 6건): 두 번째 클라우드 세션, 잠정 통과
 - [x] 관문 B repo_analyst(맥, 반복 1), editor_plan·text_analyst 실제 한 주 픽스처(맥), 검증 산출물(`S3_traces/`, `S3_plan.md`), 라벨 파일(맥)
 - [x] 설계 결정 Q3(실제 녹화), Q4(픽스처), Q5(라벨 경로) 반영(맥)
-- [ ] 라벨 일치율·영상 mode 동의율(리뷰 채점 대기, 반영 단계에서 잠정)
+- [x] 모델 대 모델 일치율·영상 mode 동의율(잠정, labeler opus-5.5)
+- [x] 리뷰 반영: R1(도구 성공 기준 enforce), R3(부분 확인 내림), R4, N1(평가 무효 기준), N2(부분 확인 지표), 0원 재채점
 
 ## 1. 한 줄 요약
 편집장이 세 채널 후보와 예산으로 계획을 세우면(모델 실패 시 규칙 기반 계획), 코드가 예산·깊이·id를 검증해 자르고, 레포 분석가가 GitHub 도구로 관련성·뜨는 이유·과열을, 글 분석가가 원문 링크를 따라 원본을 찾아 수치를 대조한다. 도구 사용 범위와 횟수, 문서 깊이, 근거 없는 판정은 코드가 막는다.
@@ -41,7 +42,21 @@ PASS A14 README(빠른 시작, 성과 행), DEVELOPMENT 명령표, S3 리포트,
 - A1까지 전부 PASS(첫 클라우드 세션 때는 키가 없어 A1만 FAIL)
 
 ## 3. 관문 B
-**맥(2026-10-08)**: 응답 캐시가 없어 클라우드 `dev-` 픽스처도 새로 생성·채점. judge는 모두 **잠정**(리뷰 채점 대기)
+**맥(2026-10-08)**: 응답 캐시가 없어 클라우드 `dev-` 픽스처도 새로 생성·채점. judge·2차 채점은 모두 **잠정**
+
+**리뷰 반영 뒤 최종(2026-10-09, 0원 재채점 `…-20261009-0018xx.json`, labeler opus-5.5)**
+
+| 역할 | 코드(통과 판정) | judge | 2차 채점 | 모델 대 모델 일치율 | 관문 기준 판정(잠정) |
+|---|---|---|---|---|---|
+| repo_analyst(10) | 10/10, GitHub 도구 오류율 0(N1 유효) | 10/10 ×3 | Q1 9/10, Q2 9/10, Q3 10/10 | 90%, 90%, 100% | **통과** |
+| editor_plan(3) | 3/3 | Q1 3/3, Q2 3/3 | Q1 1/3, Q2 3/3 | 33.3%, 100% | **Q1 미달**(표본 3, reason이 입력과 다름: 리뷰 R11) |
+| editor_plan mode(17) | - | - | 동의 15/17 | - | **88.2% ≥ 80% 통과**(비동의: -TeOEuplMrQ whisper+slides가 맞음, xRZHLI5SPWo 큐에 넣어야 함) |
+| text_analyst(16) | 16/16, 근거 없는 판정 0 | 16/16 ×3 | Q1 15/16, Q2 12/16, Q3 15/16 | 93.8%, 75.0%, 93.8% | **Q2 미달**(부분 확인을 confirmed로: R3로 5개 check가 내려감, 보고용 N2) |
+- 불일치는 모두 "judge pass, 2차 채점 fail" 한 방향. judge는 인용 밖 서술, 메타데이터에 없는 reason, 부분 확인을 거르지 못한다(리뷰 R3·R10·R11)
+- 0원 재채점에서 R3가 내린 check: it201 5(1300개)·6(1%·99%), it933 11(8.9%)·12(2.62배), it997 12(51.3%). 리뷰가 꼽은 목록과 같다. 근거 없는 판정 문턱값(0~1건)에는 넣지 않음(N2, S5부터 포함)
+- R1을 무효 실행(…-165334)에 적용하면 N1 기준으로 "도구 오류로 무효"(GitHub 도구 성공 0 항목 10개). 테스트 `test_n1_invalid_run_by_github_tool_errors`. 정상 실행(…-182928)은 오류 0이라 판정 불변
+
+**맥 첫 실행(2026-10-08) 기록**
 
 | 역할 | 통과 기준 | 맥 결과 |
 |---|---|---|
@@ -132,18 +147,25 @@ PASS A14 README(빠른 시작, 성과 행), DEVELOPMENT 명령표, S3 리포트,
 | Q4 | repo_analyst 10(2026-W41), editor_plan 1(실제 2026-10-04, 영상 17편), text_analyst 10(계획 큐 5 + 수동 5: 933, 201, 972, 959, 240). `dev-` 픽스처 그대로 | `51f5a95` 외 |
 | Q5 | `cli_text.PLAN_LABELS = eval/labels/editor_plan_mode.csv`, judge 라벨은 `editor_plan.csv`. `docs/DEVELOPMENT.md`, 맥 확인 목록 명령, `test_mode_labels_and_judge_labels_are_separate_files` | `6665044` |
 | Q7 | S3 상한 2.00 그대로, 주석만. 합계 $0.561 | `90c4f74` |
+| 라벨(리뷰 부록 C~F) | repo_analyst 10, editor_plan 3, editor_plan_mode 17, text_analyst 16에 2차 채점(labeler opus-5.5). 집계가 리뷰 3장 표와 같음 | `9f8b116` |
+| R1 | `core/agent.py`가 실행마다 `ctx.resources["tool_results"]`(공통 코어, 별도) → `RepoCard.tool_rules`(enforce), `graders_text.tool_check_repo_analyst`(원래 출력 검사), 테스트 `test_r1_all_github_tools_fail_403`(403 녹화) | `285e1ee`(별도), `d4c77b3` |
+| R3 | `artifacts_text.figures`(%·배·소수·네 자리 이상, 모델·버전 이름·한국어 큰 단위·작은 개수 제외), `ItemCardV2.demote_partial`(enforce 끝, 규칙 `PARTIAL_RULE`). regrade에서는 저장된 enforce 후 출력에 이어 적용(가져온 페이지 없이) | `d4c77b3` |
+| R4 | `code_repo_analyst`: "근거 없는 why_trending이면 attention" → "evidence 없이 why_trending을 쓰지 않음"(원래 출력). 해당 0건 | `d4c77b3` |
+| N1 | `aggregate_repo_analyst` 무효 기준(위 6장). 리포트 지표 "GitHub 도구 오류율", "GitHub 도구 성공 0 항목" | `d4c77b3` |
+| N2 | `aggregate_text_analyst` 지표 "부분 확인 내림(보고용, N2)" 5, 근거 없는 판정 집계에서 제외. S5 handoff에 "S5부터 같은 문턱값"(6장 S5로 넘김) | `d4c77b3` |
+| 0원 재채점 | `eval --regrade --no-judge`: repo_analyst·text_analyst(+item_card). 사용액 변화 없음 | `3ad5be0` |
 
 ## 사람 확인 부채 (S3, 고도화 단계에서 처리)
 MVP 동안 사람 라벨을 하지 않는다(설계 결정 D1-3). 아래 라벨은 PR 리뷰 세션 Opus 5.5가 2차 채점하고(`labeler` 칸에 기록), 그 값으로 낸 수치는 **잠정**이다. 고도화 단계에서 사람이 확인한다.
 
 | 라벨 파일 | 규모 | 무엇을 정하는가 | 사람이 볼 것 |
 |---|---|---|---|
-| `eval/labels/repo_analyst.csv` | 10행 × Q1~Q3 | judge 일치율 | relevant 판정(tilelang처럼 경계인 레포), 과열 check 판단 |
-| `eval/labels/editor_plan.csv` | 3행 × Q1~Q2(계획 단위) | judge 일치율 | 실제 2026-10-04 계획의 우선순위 |
-| `eval/labels/editor_plan_mode.csv` | 17행(큐 5 + 큐에 없음 12), `agree` | 영상 mode 동의율(관문 B 기준 80%) | 큐에 없음(skip)으로 둔 12편이 맞는지 |
-| `eval/labels/text_analyst.csv` | 16행 × Q1~Q3 | judge 일치율 | 원본이 1차 자료인지(it982 언론 원본), differs·not_found 판정 |
+| `eval/labels/repo_analyst.csv`(채움) | 10행 × Q1~Q3 | 모델 대 모델 일치율 90/90/100% | **경계**: tile-ai/tilelang(GPU/NPU 커널 DSL을 AI 인프라로 볼지, 2차 Q1 fail), openGym relevant_reason 오역, 과열 check 판단 |
+| `eval/labels/editor_plan.csv`(채움) | 3행 × Q1~Q2(계획 단위) | 모델 대 모델 일치율 33.3/100% | reason과 입력의 일치(982, dev-10-06), 표본 3 |
+| `eval/labels/editor_plan_mode.csv`(채움) | 17행(큐 5 + 큐에 없음 12), `agree` | 영상 mode 동의율 88.2% | **경계 3행**: 9tPnHRSUNFA(새 모델 소개), sINXtw4wmyM(31.4분), S-bRN-avZ4Q(발표라 slides 가능). 그 밖에 AzmloQSjvp0(관련 높음, 예산) |
+| `eval/labels/text_analyst.csv`(채움) | 16행 × Q1~Q3 | 모델 대 모델 일치율 93.8/75.0/93.8% | 원본이 1차 자료인지(it982 언론 원본), 같은 글로 확인하는 순환(dev-it6), 부분 확인 판정 |
 
-- 함께 볼 지적: 도구가 전부 실패한 실행이 judge 10/10을 받은 사례(6장). judge만으로는 근거 확보 여부를 못 거른다
+- 함께 볼 지적: 도구가 전부 실패한 실행이 judge 10/10을 받은 사례(6장, 이제 R1·N1이 코드로 막음). **judge 너그러움**: 불일치는 모두 judge pass·2차 fail(리뷰 R10). judge만으로는 근거 확보·인용 밖 서술·부분 확인을 못 거른다
 
 ## 4. 공통 코어 수정
 | 커밋 | 파일 | 내용 |
@@ -167,11 +189,12 @@ MVP 동안 사람 라벨을 하지 않는다(설계 결정 D1-3). 아래 라벨�
 | 13 | 3a | plans |
 
 ## 6. 남은 문제, 다음 스펙 제안
-- **(지적, 리뷰 때 결정) 도구가 전부 실패해도 관문 B가 통과한 사례**: repo_analyst 무효 실행(`reports/eval/repo_analyst_generate_20261008-165334.json`). GitHub 비인증 한도 소진으로 GitHub 도구 41회 중 33회가 HTTP 403(성공은 search_items 8회뿐)이었는데 **코드 10/10, judge Q1~Q3 각 10/10**으로 통과 판정이 났다. 모델은 "막혔을 때" 지시대로 10개 모두 attention=true, why_trending 빈칸, evidence에 "github_repo, releases, … 모두 HTTP 403으로 실패"를 적었고 relevant·signal은 입력(트렌딩 수치, 설명)만으로 정했다. judge는 "403이라 why_trending을 비운 처리가 규칙에 부합"으로 pass. 지금 채점은 "실패를 정직하게 적었는가"만 보고 "근거를 실제로 얻었는가"는 보지 않는다. 코드 규칙 후보(지금은 넣지 않음): 이 항목의 GitHub 도구 호출이 전부 오류면 attention 고정 + 카드 내용(relevant, signal) 무효 표시, 평가에서는 도구 오류율이 높은 실행을 무효로. 리뷰 세션 결정 대기
+- **(지적 → 리뷰 R1·N1로 반영) 도구가 전부 실패해도 관문 B가 통과한 사례**: repo_analyst 무효 실행(`reports/eval/repo_analyst_generate_20261008-165334.json`). GitHub 비인증 한도 소진으로 GitHub 도구 41회 중 33회가 HTTP 403(성공은 search_items 8회뿐)이었는데 **코드 10/10, judge Q1~Q3 각 10/10**으로 통과 판정이 났다. 모델은 "막혔을 때" 지시대로 10개 모두 attention=true, why_trending 빈칸, evidence에 "github_repo, releases, … 모두 HTTP 403으로 실패"를 적었고 relevant·signal은 입력(트렌딩 수치, 설명)만으로 정했다. judge는 "403이라 why_trending을 비운 처리가 규칙에 부합"으로 pass. 지금 채점은 "실패를 정직하게 적었는가"만 보고 "근거를 실제로 얻었는가"는 보지 않는다. 코드 규칙 후보(지금은 넣지 않음): 이 항목의 GitHub 도구 호출이 전부 오류면 attention 고정 + 카드 내용(relevant, signal) 무효 표시, 평가에서는 도구 오류율이 높은 실행을 무효로. 리뷰 세션 결정 대기
 - 평가 실행 경로와 운영 경로의 자원 초기화가 달랐던 문제(`b09261f`로 고침)는 클라우드에서 github.com이 막혀 드러나지 않았다. 도구 결과를 근거로 등록하는 다른 경로(arxiv 등)도 평가·운영이 같은 초기화를 쓰는지 리뷰 때 함께 볼 것
 - 인용 대조의 따옴표 모양: 모델이 ’를 '로 옮기는 일이 반복되면(text_analyst 반복 1로 이번에는 0건) enforce의 공백 정리에 따옴표·대시 정규화를 더할지 설계 세션 판단. 채점·enforce 규칙 변경이라 손대지 않음
-- it982 원본이 공식 발표가 아니라 언론(thenewstack.io)인데 judge Q1 pass. 라벨 비교 때 확인할 것
-- 라벨 일치율·영상 mode 동의율: 리뷰 세션 2차 채점 뒤 반영 단계에서 잠정으로(아래 "사람 확인 부채")
+- it982 원본이 공식 발표가 아니라 언론(thenewstack.io)인데 judge Q1 pass. 2차 채점 Q1 fail(리뷰 R12, S5)
+- **반영(리뷰)**: R1 → `RepoCard.tool_rules`(evidence는 성공한 도구에서 온 것만, GitHub 도구 성공 0이면 attention·why_trending 비움·숫자 규칙 signal) + 원래 출력 검사 "evidence 출처가 성공한 도구"(`graders_text.tool_check_repo_analyst`). N1 → `aggregate_repo_analyst`(`GITHUB_ERROR_RATE_MAX = 0.2`, 성공 0 항목)
+- **S5로 넘김(PR #6 리뷰)**: R6(코드 소유 칸 선언 방식 통일), R8(`reports/eval/` JSON 정리), R11(editor_plan reason이 입력과 다름, mode: 데이터 발표를 whisper로, 시드 keep 영상을 큐 밖으로, 영상 84분 > md 80%), R12(`skills/origin_trace.md`: 확인 대상 글 자신은 근거 아님, 언론이면 공식 발표를 한 번 더), N2(부분 확인 내림을 S5부터 근거 없는 판정 문턱값에)
 - 다음 스펙(S5) 제안: 유사 쌍 상위 30(맥 실행 뒤 `reports/S2_filter/README.md`)으로 묶기 기준, ItemCard 중 묶기에 쓸 칸(entities, keywords, claims), 원본 깊이 분포로 기본 깊이 결정
 - 슬라이드 예산만 넘는 영상을 빼지 않고 whisper로 낮출지(S4 결과 보고)
 
