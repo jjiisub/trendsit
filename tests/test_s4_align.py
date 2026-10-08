@@ -69,3 +69,22 @@ def test_check_numbers_go_to_separate_list_and_duplicates_once():
 def test_unparsed_values_are_not_facts():
     res = align([(frame(5), reading(("high", "GPT", "", "모델 이름")))], [], item_id=7)
     assert res.slide_only == [] and res.unparsed
+
+
+@pytest.mark.parametrize("value,unit,what,why", [
+    ("2026", "", "Retrieval Harness", "연도"), ("4.6", "", "Opus 4.6", "이름에 붙은 버전"),
+    ("4.5", "", "Haku 4.5 (think)", "이름에 붙은 버전"), ("18", "", "contact (슬라이드 번호)", "슬라이드 번호"),
+    ("10", "", "BrowseComp-Plus query workload (slide number)", "슬라이드 번호"),
+])
+def test_non_facts_are_excluded(value, unit, what, why):
+    res = align([(frame(5), reading(("high", value, unit, what)))], [], item_id=7)
+    assert res.slide_only == [] and res.excluded[0]["why"] == why
+
+
+@pytest.mark.parametrize("value,unit,what", [
+    ("1M", "docs per day", "Low Cost Regime require 1M docs per day"), ("16", "page(s)", "Paste 16 page(s) in 0.03s"),
+    ("2,000", "", "PRs per month"), ("73.3%", "%", "DR-DCI on BrowseComp-Plus"), ("4.6", "", "average rating"),
+])
+def test_real_facts_are_kept(value, unit, what):
+    res = align([(frame(5), reading(("high", value, unit, what)))], [], item_id=7)
+    assert len(res.slide_only) == 1 and res.excluded == []

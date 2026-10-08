@@ -63,8 +63,13 @@ def cmd_run(args: argparse.Namespace) -> int:
     for item in items:
         ctx.tracer = Tracer(ctx.db, "video", ctx.spec, f"video {item.video_id} {item.mode}")
         status = "failed"
+        reuse = MEDIA_ROOT / item.video_id / "media_result.json"
+        this_media = media
+        if this_media is None and args.reuse_media and reuse.exists():
+            saved = MediaResult.model_validate_json(reuse.read_text(encoding="utf-8"))
+            this_media = saved if saved.mode == item.mode else None  # mode가 다르면 처음부터
         try:
-            out = analyze(item, ctx, cfg, MEDIA_ROOT, overrides=overrides, media=media)
+            out = analyze(item, ctx, cfg, MEDIA_ROOT, overrides=overrides, media=this_media)
             status = {"ok": "ok", "partial": "ok", "skipped": "ok"}.get(out.status, "failed")
             results.append({"video_id": item.video_id, "status": out.status, "note": out.note,
                             "log": out.digest.log if out.digest else None, "run_id": ctx.tracer.run_id})
@@ -122,6 +127,8 @@ def register(sub: Any) -> None:
     r.add_argument("--res", type=int, help="프레임 가로 픽셀(수치 많은 발표는 1024)")
     r.add_argument("--lang", help="전사 언어 강제(기본: 다지점 자동 감지)")
     r.add_argument("--from-json", help="저장한 1차 처리 결과(MediaResult)로 판독 이후만")
+    r.add_argument("--reuse-media", action="store_true",
+                   help="영상마다 data/media/<id>/media_result.json이 있고 mode가 같으면 전사 없이 판독 이후만")
     r.add_argument("--model", help="역할 모델 별칭 덮어쓰기")
     r.add_argument("--no-cache", action="store_true")
     r.add_argument("--spec")

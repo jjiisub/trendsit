@@ -6,7 +6,7 @@ output: VideoSummary
 tools: []
 max_steps: 1
 max_depth: null
-max_tokens: 1800
+max_tokens: 3500
 temperature: 0.2
 includes: [skills/style_ko.md]
 task: "위 전사와 슬라이드 판독으로 이 영상의 표기 쌍, 핵심 포인트, 타임라인, 요약을 만든다."
@@ -37,8 +37,8 @@ core_rules:
 
 ## 출력
 칸 순서대로 채운다. 근거가 되는 쌍과 포인트를 먼저 적어야 요약이 근거를 따른다.
-1. `name_pairs`: spoken(전사 표기 그대로) → screen(판독 표기 그대로) → sec. 두 표기가 같으면 넣지 않는다. 없으면 빈 목록
-2. `key_points`: 3~6개. text(명사형 한 문장) → evidence(`vd:` id 1~3개). 근거가 없으면 빈 목록
+1. `name_pairs`: spoken(전사 표기 그대로) → screen(판독 표기 그대로) → sec. screen은 슬라이드 판독 문서에 글자 그대로 있는 표기만 쓴다. 판독에 없는 표기를 알고 있는 지식으로 채우지 않고, 두 표기가 같으면 넣지 않는다. 판독 문서가 없으면(whisper, captions) 빈 목록
+2. `key_points`: 3~6개, 6개를 넘기지 않는다(브리핑 화면에 다 들어가지 않음). text는 명사로 끝나는 한 문장("~감소", "~도입", "~필요성"), "~했다", "~이다"처럼 문장으로 끝내지 않는다 → evidence(`vd:` id 1~3개). 근거가 없으면 빈 목록
 3. `timeline`: 주제가 바뀌는 시각 4~10개. sec → label(명사형 짧게) → slide(그 시각에 판독한 슬라이드가 근거면 true)
 4. `chapters`: 업로더 챕터가 있으면 그 시각과 제목 그대로, 없으면 빈 목록
 5. `summary`: 2~4문장, "~다". 근거가 없으면 "내용 없음"

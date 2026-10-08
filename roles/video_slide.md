@@ -6,7 +6,7 @@ output: SlideReading
 tools: []
 max_steps: 1
 max_depth: null
-max_tokens: 900
+max_tokens: 1600
 temperature: 0.1
 includes: [skills/style_ko.md]
 task: "위 프레임 이미지의 화면 글자, 수치, 표를 그대로 옮긴다."

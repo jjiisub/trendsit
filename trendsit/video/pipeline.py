@@ -80,6 +80,19 @@ def slide_documents(readings: list[tuple[Frame, SlideReading | None]], item_id: 
     return docs
 
 
+def summary_input(media: MediaResult, readings: list[tuple[Frame, SlideReading | None]], aligned: AlignResult,
+                  info: dict[str, Any]) -> VideoSummaryInput:
+    """요약 입력 조립(평가 픽스처도 이 함수로 같은 입력을 다시 만든다)."""
+    item_id, usable = info["item_id"], media.transcript_quality == "ok"
+    span_hi = round(media.span.end)
+    return VideoSummaryInput(
+        item_id=item_id, transcript=transcript_document(media, item_id, usable),
+        transcript_quality=media.transcript_quality, slides=slide_documents(readings, item_id),
+        slide_only_facts=aligned.slide_only, title=info["title"] or media.title, duration_sec=media.duration_sec,
+        span_start=round(media.span.start), span_end=span_hi,
+        chapters=[c for c in info["chapters"] if c["sec"] <= span_hi], mode=media.mode)
+
+
 def read_slides(media: MediaResult, ctx: Ctx) -> tuple[list[tuple[Frame, SlideReading | None]], dict[str, int]]:
     """프레임마다 판독 1회. 우선순위 transcript-cue → scene-change → first-frame → uniform(V6)."""
     role = load_role("video_slide", ctx.models)
@@ -186,16 +199,11 @@ def _analyze(item: VideoQueueItem, ctx: Ctx, cfg: VideoConfig, media_root: Path,
     aligned = align(done, media.segments if usable else [], item_id, cfg.align_window_sec)
     _step(ctx, f"대조: 슬라이드 전용 수치 {len(aligned.slide_only)}개, 발화와 일치 {len(aligned.matched)}개, "
                f"확인 필요 {len(aligned.checks)}개", attention=bool(aligned.checks),
-          detail={"unparsed": aligned.unparsed})
+          detail={"unparsed": aligned.unparsed, "excluded": aligned.excluded})
 
     # ---------- 요약 ----------
     span_lo, span_hi = round(media.span.start), round(media.span.end)
-    sinp = VideoSummaryInput(
-        item_id=item_id, transcript=transcript_document(media, item_id, usable),
-        transcript_quality=media.transcript_quality, slides=slide_documents(readings, item_id),
-        slide_only_facts=aligned.slide_only, title=info["title"] or media.title, duration_sec=media.duration_sec,
-        span_start=span_lo, span_end=span_hi, chapters=[c for c in info["chapters"] if c["sec"] <= span_hi],
-        mode=media.mode)
+    sinp = summary_input(media, readings, aligned, info)
     model = None
     if not usable and not sinp.slides:
         summary = VideoSummary(name_pairs=[], key_points=[], timeline=[], chapters=sinp.chapters,
@@ -211,7 +219,8 @@ def _analyze(item: VideoQueueItem, ctx: Ctx, cfg: VideoConfig, media_root: Path,
             _step(ctx, "요약 실패, 대체 출력", attention=True, error=str(e), role="video_summary")
 
     # ---------- 저장 ----------
-    span_note = (f"구간 {span_lo}~{span_hi}초" if span_lo > 0 or span_hi < media.duration_sec else "")
+    # 길이는 올림 정수라 끝이 1초 안쪽이면 전체 처리로 본다
+    span_note = (f"구간 {span_lo}~{span_hi}초" if span_lo > 0 or span_hi < media.duration_sec - 1 else "")
     log = " / ".join(x for x in [
         item.reason, span_note, f"전사 {media.transcript_quality}",
         f"판독 {stats['read']}/{len(media.frames)}장" if media.mode == "whisper+slides" else "",

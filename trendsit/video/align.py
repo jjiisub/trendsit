@@ -27,6 +27,22 @@ SMALL |= {"twenty": 20, "thirty": 30, "forty": 40, "fifty": 50, "sixty": 60, "se
 SCALES = {"thousand": 1e3, "million": 1e6, "billion": 1e9, "trillion": 1e12}
 NUM_WORDS = set(SMALL) | set(SCALES) | {"hundred"}
 TOL = 1e-6
+# 수치가 아닌 판독(md가 금지해도 모델이 넣는 것): 단위 없는 연도, 이름에 붙은 버전(Opus 4.6), 슬라이드·쪽 번호
+_YEAR = re.compile(r"^(19|20)\d{2}$")
+_BARE = re.compile(r"^\d+(\.\d+)?$")
+PAGE_WORDS = ("slide number", "slide no", "page number", "슬라이드 번호", "쪽 번호", "페이지 번호")
+
+
+def not_a_fact(value: str, unit: str, what: str) -> str | None:
+    """대조 전에 걸러 낼 이유. 판독은 그대로 두고 slide_only_facts에만 넣지 않는다(excluded로 기록)."""
+    v, w = value.strip(), what.strip()
+    if unit.strip() == "" and _YEAR.match(v):
+        return "연도"
+    if unit.strip() == "" and _BARE.match(v) and re.search(rf"[A-Za-z][\w.]*[\s-]{re.escape(v)}(?![\d.])", w):
+        return "이름에 붙은 버전"
+    if any(k in w.lower() for k in PAGE_WORDS):
+        return "슬라이드 번호"
+    return None
 
 
 def _digits_values(text: str) -> list[float]:
@@ -103,6 +119,7 @@ class AlignResult:
     checks: list[CheckNumber] = field(default_factory=list)
     matched: list[dict[str, Any]] = field(default_factory=list)  # 발화에서 찾은 수치(리포트용)
     unparsed: list[dict[str, Any]] = field(default_factory=list)  # 수로 읽히지 않는 값
+    excluded: list[dict[str, Any]] = field(default_factory=list)  # 수치가 아닌 판독(연도, 버전, 슬라이드 번호)
 
 
 def spoken_window(frame: Frame, segments: list[Segment], window: float) -> str:
@@ -121,6 +138,10 @@ def align(readings: list[tuple[Frame, SlideReading]], segments: list[Segment], i
         for n in reading.numbers:
             if n.confidence == "check":
                 res.checks.append(CheckNumber(sec=sec, value=n.value, unit=n.unit, what=n.what, frame=frame.path))
+                continue
+            why = not_a_fact(n.value, n.unit, n.what)
+            if why:
+                res.excluded.append({"sec": sec, "value": n.value, "unit": n.unit, "what": n.what, "why": why})
                 continue
             v = reading_value(n.value, n.unit)
             if v is None:
