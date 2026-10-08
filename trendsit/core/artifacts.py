@@ -33,6 +33,10 @@ class RoleInput(BaseModel):
         """이 입력의 문서 깊이 상한(예: 편집장 계획의 항목별 max_depth)."""
         return default
 
+    def depth_seed(self) -> list[tuple[str, list[str]]]:
+        """이미 읽은 시작 문서(깊이 1)와 그 문서의 링크. 예: 글 분석가의 원래 글(본문은 1차 요약 때 읽음)."""
+        return []
+
 
 class Document(BaseModel):
     """문서형 자료. user 메시지에서 <document id source title url> 태그로 들어간다. id는 근거 id(rp:, it:, vd:)."""

@@ -61,3 +61,17 @@ def test_tool_call_cap_rejects_and_counts_down(tmp_path, models):
     last_tool = [m for m in t.bodies[2]["messages"] if m["role"] == "tool"][-1]["content"]
     assert last_tool.endswith("[남은 도구 호출 0회]")
     assert out.doc_id == "r1"
+
+
+class Seeded(LookupInput):
+    def depth_seed(self):
+        return [("r1", ["a2"])]
+
+
+def test_depth_seed_marks_start_document_as_read(tmp_path, models):
+    role = load_role("lookup_agent", models)
+    t = FakeTransport([call("read_doc", id="a2", parent="r1"), finish("a2")])
+    ctx = make_ctx(tmp_path, t)
+    run_agent(role, Seeded(question="q"), ctx)
+    steps = tool_steps(ctx)
+    assert not steps[0]["error"] and json.loads(steps[0]["detail"])["depth"] == 2  # r1을 읽지 않고도 이어짐

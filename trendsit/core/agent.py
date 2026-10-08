@@ -192,6 +192,9 @@ def run_agent(role: Role, inp: RoleInput, ctx: Ctx) -> RoleOutput:
     tools = [TOOLS[n].schema() for n in names] + [finish_schema]
     messages = initial_messages(role, inp)
     state = AgentState(depth=DepthTracker(inp.depth_limit(role.spec.max_depth)), ctx=ctx, inp=inp)
+    for doc, links in inp.depth_seed():  # 이미 읽은 시작 문서: 깊이 1, 그 링크는 깊이 2로 이어짐
+        state.depth.roots.add(doc)
+        state.depth.visited(doc, 1, links)
 
     def finish_with(out: RoleOutput, how: str) -> RoleOutput:
         out = apply_enforce(out, inp, ctx)  # 코드 규칙은 스키마 검증 뒤, 저장 전(대체 출력에도)
