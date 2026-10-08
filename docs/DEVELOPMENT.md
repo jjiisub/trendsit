@@ -34,6 +34,12 @@ GITHUB_TOKEN=...             # 선택. 픽스처 README 수집에만
 | `uv run python -m trendsit filter [--since D] [--until D] [--embedder real\|mock] [--report] [--labels]` | 임베딩 관련성 필터(글·영상 전부, 키워드 판정과 무관) → `item_relevance` keep/drop + 같은 URL 연결(`item_same_as`). `--report`는 `reports/S2_filter/`, `--labels`는 `eval/labels/relevance.csv` 40건. real은 `uv sync --extra embed` 필요 |
 | `uv run python -m trendsit filter-fixtures [--embedder real\|mock] [--record]` | 재현 픽스처 `eval/fixtures/filter/` 20건 점수(DB 없음). `--record`는 장치별 점수를 `reports/S2_filter/fixture_scores.json`에, 다른 장치 기록과 차이 0.001 초과면 종료 코드 1 |
 | `uv run python -m trendsit summarize [--since D] [--until D] [--limit N] [--model 별칭] [--redo] --spec S2` | 글 1차 요약(`item_card`): 필터 keep이고 같은 URL 묶음의 기준 항목인 글만. `item_cards` version 1에 저장, 이미 있으면 건너뜀 |
+| `bash scripts/verify_s3.sh` | S3 관문 A(S0·S1 회귀 + M3 + 3c, 3a, 3b) |
+| `uv run python -m trendsit repo-analyze --week W [--top N] [--queue file] [--traces] [--fixtures DIR] --spec S3` | 레포 분석가(`repo_analyst`). 큐는 `--queue`(계획의 repo_queue 또는 목록) 없으면 규칙 기반(키워드에 걸린 트렌딩 이번 주 별 순 + 추적 레포 릴리스). `repo_cards`에 저장, 한 줄 설명은 `repo_oneliner` 결과를 붙임 |
+| `uv run python -m trendsit plan [run] --day D [--report] [--labels] [--fixture file] [--no-hype] --spec S3` | 편집장 계획(`editor_plan`). 모델 실패면 규칙 기반 대체 계획. `plans`에 저장, `--report`는 `reports/S3_plan.md`, `--labels`는 `eval/labels/editor_plan.csv` |
+| `uv run python -m trendsit plan show --day D [--video-queue]` | 그날 최신 계획. `--video-queue`는 CONTRACTS 1장 JSON 배열(S4 `video run --queue` 입력) |
+| `uv run python -m trendsit plan agreement --day D` | `editor_plan.csv`의 영상 mode 동의율 |
+| `uv run python -m trendsit deep text (--day D \| --item ID [--max-depth N]) [--traces] [--fixtures DIR] --spec S3` | 글 분석가(`text_analyst`). `--day`는 그날 계획의 text_queue. `item_cards` version 2에 저장(v1은 그대로), `--traces`는 `reports/S3_traces/text/` |
 | `uv run python scripts/record_http_fixtures.py <이름> --since D --until D [--source ID] [--max-items N] [--today D] [--extend]` | 수집 테스트용 응답 녹화(`tests/fixtures/http/<이름>/`, 피드와 HTML은 줄여서 gzip). `--extend`는 이전 녹화를 쓰고 새 URL만 받음 |
 
 - `--input`은 JSON 파일 경로나 JSON 문자열. 픽스처 파일(`{"input", "expect"}`)이면 `input` 칸을 쓴다
@@ -83,6 +89,15 @@ GITHUB_TOKEN=...             # 선택. 픽스처 README 수집에만
 - 채점(`eval/graders_text.py`, `eval/rubrics/item_card.md`): 코드 = 수치가 그 인용 안, 참조 번호, 목록 안 키워드, 문체(요약·주장·로그만. 인용은 원문 문체), 인젝션 사례에서 지시 미이행 + 전체 인용 본문 일치율 95%(원래 출력 기준). judge = Q1 충실성, Q2 핵심, Q3 원본 판정
 - 스펙별 채점 모듈은 `eval/graders.py` 끝의 `_load` 줄로 불러 `ROLE_CHECKS`, `ROLE_STYLE_FIELDS`, `THRESHOLDS`, `AGGREGATES`에 등록한다
 
+## 깊게 보기 (S3)
+- 도구 에이전트의 입력별 상한(코드): `RoleInput.tool_names`(레포 분석가 max_depth 1이면 `github_repo`, `search_items`만), `depth_limit`(글 분석가는 계획의 max_depth, 전체 4), `depth_seed`(원래 글을 깊이 1로, 그 링크를 깊이 2로). 역할 md의 `max_tool_calls`(6)를 넘는 도구 호출은 실행하지 않고 거부, 결과마다 남은 횟수 표시
+- 도구는 `ctx.resources`(fetcher, GitHub 헤더, 가져온 페이지)를 쓴다. 도구 설명(docstring)은 언제 쓰나 / 언제 쓰지 않나 / 인자 예
+- 레포 분석가(`deep/repo_agent.py`): 과열 규칙은 입력 조립 때 코드가 계산(7일 별 `HYPE_STARS_WEEK`=1000 이상 + 7일 커밋 0 → check 고정, 기여자 1명, awesome 목록)하고 enforce가 고정
+- 편집장 계획(`deep/plan.py`, `config/deep.yaml`): `validate_plan`(enforce)이 없는 id·중복 제거, 깊이 자르기, 예산 합계를 넘는 꼬리를 우선순위 뒤에서 잘라 log에 기록, 예산 80%를 넘으면 attention
+- 글 분석가(`deep/text_agent.py`, `skills/origin_trace.md`): 확인할 것 = v1의 수치·주장(번호). enforce는 이번 실행에서 실제로 연 페이지(`fetch_page`, `arxiv` 초록, `github_repo` README)에 없는 인용을 지우고, 근거 없는 confirmed/differs를 not_found로, trail 밖 origin을 지움. `arxiv`, `github_repo`는 깊이를 세지 않는다(검색·API)
+- safe_fetch 연결 주소 고정(S1 리뷰 M3): 검사에서 통과한 IP로만 연결(httpcore 네트워크 백엔드). Host 헤더와 TLS SNI·인증서 확인은 원래 이름. 환경 변수 프록시가 있으면 프록시가 이름을 풀어 적용하지 않음
+- 오프라인 픽스처: `tests/fixtures/http/repo_tools`(레포 정보·README는 S1 녹화, 커밋·기여자·릴리스는 합성. `meta.json`에 표시), 3b는 S1 window 녹화의 GeekNews 원문 페이지
+
 ## DB 마이그레이션 (S1 리뷰 M1)
 - `trendsit/core/migrations.py`에 번호 → SQL로 등록(`register(번호, sql)`). 적용 기록은 `schema_migrations(version, applied_at)`. 등록된 번호 중 기록에 없는 것을 오름차순으로, 번호마다 한 트랜잭션(문장을 하나씩 실행 → 기록 → COMMIT, 실패하면 ROLLBACK하고 기록하지 않음 → 다음 실행 때 다시 시도). 빈 번호 허용
 - 번호 대역(COMMON 9장): 1~9 S0~S1, 10~19 S2~S3, 20~29 S4. 다른 대역끼리 서로 의존하지 않는다
@@ -106,6 +121,8 @@ trendsit/
   tools/     registry(도구 등록) lookup(테스트용 가짜 도구)
   collect/   fetch(safe_fetch) text(글, 백필) youtube github links keywords report run, sites/(geeknews, aitimes, simonw, anthropic)
   filter/    rematch(키워드 재판정) embed(임베더, 점수, 판정) dedupe(같은 URL) report(검증 산출물, 라벨)
+  deep/      plan(편집장 계획, validate_plan) repo_agent(레포 분석가) text_agent(글 분석가)
+  tools/     github(github_repo, recent_commits, contributors, releases) items(search_items) web(fetch_page, read_more) arxiv
   summarize.py  글 1차 요약 입력 조립, 대상, 저장
   cli_text.py   S2~S3 명령(register)
 eval/        fixtures/<역할>/ rubrics/ judge.md(채점자 역할) labels/(사람 라벨 CSV) graders.py run_eval.py

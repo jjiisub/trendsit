@@ -58,7 +58,7 @@ def cmd_filter(args: argparse.Namespace) -> int:
                     note=f"filter {args.embedder} {_period(args)}".strip())
     status = "failed"
     try:
-        embedder = make_embedder(args.embedder, cfg)
+        embedder = make_embedder(args.embedder, cfg, args.device)
         res = run_filter(db, cfg, embedder, tracer.run_id, _date(args.since), _date(args.until))
         dropped = res.decisions.get("low_similarity", 0)
         tracer.step(kind="code", role="filter", text=res.summary(),
@@ -93,7 +93,7 @@ def cmd_filter_fixtures(args: argparse.Namespace) -> int:
     from .filter.embed import best_interest, make_embedder
 
     cfg = config.load("filter.yaml")
-    embedder = make_embedder(args.embedder, cfg)
+    embedder = make_embedder(args.embedder, cfg, args.device)
     interests = list(zip([x.keyword_id for x in cfg.interests],
                          embedder.embed_queries([x.text for x in cfg.interests]), strict=True))
     fx = load_filter_fixtures()
@@ -310,6 +310,7 @@ def register(sub: Any) -> None:
     f.add_argument("--since")
     f.add_argument("--until")
     f.add_argument("--embedder", choices=["real", "mock"], default="real", help="mock: 단어 해시(개발, 테스트용)")
+    f.add_argument("--device", choices=["cpu", "mps", "cuda"], help="기본: mps → cuda → cpu 자동")
     f.add_argument("--report", action="store_true", help="reports/S2_filter/ 검증 산출물 생성")
     f.add_argument("--labels", action="store_true", help="eval/labels/relevance.csv 40건 생성(채운 expected 보존)")
     f.add_argument("--spec")
@@ -364,4 +365,5 @@ def register(sub: Any) -> None:
     ff = sub.add_parser("filter-fixtures", help="eval/fixtures/filter 20건 점수(장치별 비교)")
     ff.add_argument("--embedder", choices=["real", "mock"], default="real")
     ff.add_argument("--record", action="store_true")
+    ff.add_argument("--device", choices=["cpu", "mps", "cuda"])
     ff.set_defaults(fn=cmd_filter_fixtures)

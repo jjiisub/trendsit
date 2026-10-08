@@ -46,9 +46,9 @@ flowchart LR
 |---|---|---|---|
 | 레포 한 줄 설명 (`repo_oneliner`) | README 앞부분 → 레포가 하는 일 한 문장 | LLM 1회 | **S0 완료** |
 | 글 1차 요약 (`item_card`) | 원글 본문 → 인용 근거가 달린 요약, 핵심 주장, 수치, 원본 확인 필요 여부 | LLM 1회 | S2 구현(맥 확인 대기) |
-| 편집장 · 계획 | 그날 후보 전체 → 항목별 깊게 볼지, 최대 깊이 | 판단 + 코드 분기 | S3 |
-| 글 분석가 | 글 + 링크 → 원본, 추적 경로, 원본과의 차이 | 도구 에이전트 | S3 |
-| 레포 분석가 | 트렌딩 수치 + README → 하는 일, 신호, 과열 신호 | 도구 에이전트 | S3 |
+| 편집장 · 계획 (`editor_plan`) | 그날 후보 전체 → 항목별 깊게 볼지, 최대 깊이 | 판단 + 코드 분기 | S3 구현(맥 확인 대기) |
+| 글 분석가 (`text_analyst`) | 글 + 링크 → 원본, 추적 경로, 원본과의 차이 | 도구 에이전트 | S3 구현(맥 확인 대기) |
+| 레포 분석가 (`repo_analyst`) | 트렌딩 수치 + README → 하는 일, 신호, 과열 신호 | 도구 에이전트 | S3 구현(맥 확인 대기) |
 | 영상 분석가 | 전사 + 슬라이드 프레임 → 슬라이드 전용 수치, 타임라인 | 판단 + 코드 분기 | S4 |
 | 편집장 · 선별 / 작성자 / 검수자 | 토픽 후보 → 순위 → 토픽 페이지 → 판정 | LLM 1회 | S5 |
 
@@ -66,6 +66,9 @@ uv run python -m trendsit rematch --since 2026-09-28 --until 2026-10-04   # 바�
 uv sync --extra embed                          # 임베딩 필터용(sentence-transformers, Qwen3-Embedding)
 uv run python -m trendsit filter --since 2026-09-28 --until 2026-10-04 --report   # 관련성 keep/drop + 같은 URL 연결
 uv run python -m trendsit summarize --since 2026-09-28 --until 2026-10-04 --spec S2   # 글 1차 요약 카드
+uv run python -m trendsit repo-analyze --week 2026-W41 --traces   # 레포 분석가(규칙 기반 큐 또는 --queue)
+uv run python -m trendsit plan --day 2026-10-04 --report          # 편집장 계획(plan show --day D --video-queue로 S4 입력)
+uv run python -m trendsit deep text --day 2026-10-04 --traces     # 글 분석가: 계획의 원본 추적 큐
 uv run python -m trendsit cost --spec S0       # 사용액과 남은 예산
 ```
 그 밖의 명령: 수집 항목 보기 `items [--week 2026-W40] [--status pass]`, 기록된 호출 다시 실행 `role --replay <step_id> [--model 별칭]`, 평가 `eval <역할> [--model 별칭]`, 실행 기록 보기 `trace <run_id>`. 전체 명령표와 동작 방식은 [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
@@ -83,6 +86,7 @@ uv run python -m trendsit cost --spec S0       # 사용액과 남은 예산
 | S0 | `lookup_agent` 도구 루프 5건(smoke) | 5/5. 깊이 상한 밖 문서는 코드가 거부 | $0 |
 | S1 | 수집 9/28~10/4(한 주) | 글 308건(AI타임스 188, GeekNews 83, Simon Willison 18, OpenAI 15, Anthropic 2, DeepMind 2), 영상 17편, 릴리스 18건, 트렌딩 11개(페이지 전부). 6곳 모두 기간을 덮음, 중복 0. 본문 추출 성공 GeekNews 98%(원문 기준, 의도적 건너뜀 제외), 나머지 93~100%. GeekNews는 날짜별 목록 날짜당 1페이지(점수 상위 약 20건, 자기 글 제외 하루 11.9건). 키워드 통과 184건 | LLM 없음 $0 |
 | S2 | 임베딩 필터, `item_card` (클라우드 구현) | 관문 A(모의 임베더·모의 LLM) 통과. 실제 임베딩 점수, 문턱값, 관문 B는 맥 확인 뒤 기록 | 클라우드 $0 |
+| S3 | 편집장 계획, 글 분석가, 레포 분석가 (클라우드 구현) | 관문 A(녹화 HTTP·모의 LLM으로 에이전트 루프, 깊이·도구 상한, 계획 검증, 계약) 통과. 관문 B는 맥 확인 뒤 기록 | 클라우드 $0 |
 | S1 | `repo_oneliner` 새 프롬프트 형식 + 예/아니오 채점(generate) | 3회 개선 후 코드 채점 8/10 → README 기호 정리(설계 결정) 뒤 코드 9/10, judge Q1·Q2·Q3 9/9(잠정, 사람 라벨 전). 남은 실패는 README가 한 줄뿐인 레포의 attention | S1 $0.056 (상한 $0.06) |
 
 - 같은 입력 재실행은 캐시로 0원. 채점 기준은 S1부터 예/아니오 질문 + 사람 라벨 일치율로 바뀐다
@@ -113,7 +117,7 @@ uv run python -m trendsit cost --spec S0       # 사용액과 남은 예산
 config/      설정: 모델 별칭(models), 예산(budget), 소스(sources), 키워드(keywords)
 roles/       역할 정의 = 프롬프트 폴더. 앞부분 실행 설정 + 본문 지시
 skills/      여러 역할이 같이 쓰는 지침(문체 등)
-trendsit/    파이썬 패키지: cli, core(LLM 호출, 캐시, 예산, run_role/run_agent, 실행 기록), tools, collect(수집), filter(재판정, 임베딩 필터, 중복 연결)
+trendsit/    파이썬 패키지: cli, core(LLM 호출, 캐시, 예산, run_role/run_agent, 실행 기록), tools, collect(수집), filter(재판정, 임베딩 필터, 중복 연결), deep(편집장 계획, 글 분석가, 레포 분석가)
 eval/        평가: 픽스처, 채점표, 채점기, 채점자 역할
 tests/       단위 테스트(LLM은 모의)
 scripts/     관문 A 확인 스크립트(verify_s<n>.sh) 등

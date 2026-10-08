@@ -105,10 +105,10 @@ class SentenceEmbedder:
         return self._encode(texts, None)
 
 
-def make_embedder(kind: str, cfg: FilterConfig) -> Embedder:
+def make_embedder(kind: str, cfg: FilterConfig, device: str | None = None) -> Embedder:
     if kind == "mock":
         return HashEmbedder()
-    return SentenceEmbedder(cfg.model, cfg.instruction, batch_size=cfg.batch_size)
+    return SentenceEmbedder(cfg.model, cfg.instruction, device=device, batch_size=cfg.batch_size)
 
 
 def library_versions() -> dict[str, str]:
