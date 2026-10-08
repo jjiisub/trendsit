@@ -9,7 +9,7 @@
 - Q1: 근거: 각 결정의 reason이 그 후보의 입력 메타데이터(길이, 자막, 설명, relevance, 별 수 등)와 맞나? 메타데이터에 없는 사실을 지어내지 않았나?
 - Q2: 우선순위: 큐 순서와 고른 항목이 관심 키워드와의 관련성에 맞나? 관련 높은 후보를 빼고 관련 낮은 후보를 넣지 않았나?
 
-judge 판정: **잠정**(사람 라벨 없음. `eval/labels/editor_plan.csv`를 채우면 일치율을 잰다)
+judge 판정: 라벨(opus-5.5, 잠정)과 일치율 확인됨(아래)
 
 ### 모델별 최신 결과 (전체 실행만, 점수는 보고용)
 
@@ -19,6 +19,14 @@ judge 판정: **잠정**(사람 라벨 없음. `eval/labels/editor_plan.csv`를 
 
 - generate 모델 일치율(코드 소유 칸, 보고용): attention 2/3
 - generate 통과 판정(코드 소유 칸 attention만 enforce 후): 3/3. 원래 출력 3/3은 모델 품질로 기록
+
+### judge·라벨 일치율 (labeler opus-5.5, 잠정, 라벨 3건, reports/eval/editor_plan_generate_20261008-195540.json)
+
+| 질문 | 일치 | 비교 수 | 일치율 |
+|---|---|---|---|
+| Q1 | 1 | 3 | 0.333 |
+| Q2 | 3 | 3 | 1.0 |
+| 전체 | 4 | 6 | 0.667 |
 
 ### 가장 나쁜 사례 3개 (generate, 2026-10-08T19:55:40+09:00)
 
@@ -55,7 +63,7 @@ judge 판정: **잠정**(사람 라벨 없음. `eval/labels/editor_plan.csv`를 
 - Q2: 대조: 각 verified 판정(confirmed / differs / not_found)이 그 check와 가리킨 quote의 내용에 맞나?
 - Q3: 차이: differences의 각 항목이 quotes와 checks로 뒷받침되나? 없는 차이를 만들거나 있는 차이를 놓치지 않았나?
 
-judge 판정: **잠정**(사람 라벨 없음. `eval/labels/text_analyst.csv`를 채우면 일치율을 잰다)
+judge 판정: 라벨(opus-5.5, 잠정)과 일치율 확인됨(아래)
 
 ### 모델별 최신 결과 (전체 실행만, 점수는 보고용)
 
@@ -63,11 +71,20 @@ judge 판정: **잠정**(사람 라벨 없음. `eval/labels/text_analyst.csv`를
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | generate (`qwen/qwen3.8-27b`) | 16/16 | 16/16 | 16/16 | 16/16 | 16/16 | 5.0 | 5.0 | 5.0 | 통과 | $0.1511 | `0f361ba1a70d` |
 
-- generate 전체 지표: 근거 없는 판정(enforce 전) 0, 원본 확보 14/16, 깊이 분포 2:13, 3:1
+- generate 전체 지표: 근거 없는 판정(enforce 전) 0, 부분 확인 내림(보고용, N2) 5, 원본 확보 14/16, 깊이 분포 2:13, 3:1
 - generate 모델 일치율(코드 소유 칸, 보고용): attention 16/16
 - generate 통과 판정(코드 소유 칸 attention만 enforce 후): 16/16. 원래 출력 16/16은 모델 품질로 기록
 
-### 가장 나쁜 사례 3개 (generate, 2026-10-08T19:55:42+09:00)
+### judge·라벨 일치율 (labeler opus-5.5, 잠정, 라벨 16건, reports/eval/text_analyst_generate_20261008-195542.json)
+
+| 질문 | 일치 | 비교 수 | 일치율 |
+|---|---|---|---|
+| Q1 | 15 | 16 | 0.938 |
+| Q2 | 12 | 16 | 0.75 |
+| Q3 | 15 | 16 | 0.938 |
+| 전체 | 42 | 48 | 0.875 |
+
+### 가장 나쁜 사례 3개 (generate, 2026-10-09T00:18:26+09:00)
 
 1. **dev-it20**
    - 입력: `{"item_id": 20, "title": "화면 안 보고 게임한다…GPT-6 아스트라, 'WoW' 40분 만에 클리어", "source_name": "AI타임스", "url": "https://www.aitimes.com/news/articleView.html?idxno=215945", "max_depth": 2, "card_v1": {"log": "언론 보도, 수치 2개, 원본 확인 필요", "attention": false, "quotes": [{"n": 1, "text": "GPT-6 아스트라는 2일(현지시간) '월드 오브 워크래프트(WoW)'를 게임 화면 한 번 보지 않고 플레이해 오크 시작 지역의 모든 퀘스트를 40분 만에 완료했다."}, {"n": 2, "text": "한 번도 죽지 않은 것은 물론, 별도의 게임 공략이나 사전 지식 대신 서버의 네트워크 패킷과 SQL 데이터를 분석해 게임 세계를 파악했다."}, {"n": 3, "text": "에이전트-wow는 일반적인 게임 봇처럼 화면을 컴퓨터 비전으로 분석하거나 키보드와 마우스를 직접 조작하지 않는다."}, {"n": 4, "text": "이번 실행에서는 서버가 보내는 28종의 메시지를 구독해 메모리에 저장하는 모듈 하나를 만들었고, 파이썬 프로그램이 이를 가져와 체력과 주변 생물, 퀘스트 진행 상황, 전리품 등을 해석했다."}, {"n": 5, "text": "퀘스트 정보는 오픈소스 WoW 서버 엔진인 ‘아제로스코어(AzerothCore)’의 SQL 파일에서 가져왔다."}, {"n": 6, "text": "전문가들이 이번 실험을 AI의 장기적 의도 파악 및 추론 능력을 검증한 주요 이정표로 보는 이유다."}], "numbers": [{"quote_n": 1, "value": "40분", "unit": "", "what": "오크 시작 지역 퀘스트 완료 소요 시간"}, {"quote_n": 4, "value": "28종", "unit": "", "what": "서버에서 구독한 메시지 종류 수"}], "claims": [{"quote_ns": [1, 2], "text": "GPT-6 아스트라가 시각 정보 없이 네트워크 패킷과 SQL 데이터 분석만으로 WoW 오크 시작 지역 퀘스트를 40분 만에 완료했다."}, {"quote_ns": [3, 4], "text": "에이전트-wow는 화면 분석이나 직접 조작 대신 서버 프로토콜을 통해 상호작용하며, 28종의 메시지를 구독해 상태를 해석하는 모듈을 구축했다."}, {"quote_ns": [5], "text": "퀘스트 요구사항과 동선 계획은 오픈소스 서버 엔진 아제로스코어의 SQL 데이터를 분석하여 수립했다."}, {"quote_ns": [6], "text": "이번 실험은 AI의 장기적 의도 파악 및 추론 능력을 검증하는 이정표로 평가받는다."}], "summary": "오픈AI의 GPT-6 아스트라가 게임 화면을 보지 않고 네트워크 패킷과 SQL 데이터 분석만으로 '월드 오브 워크래프트' 오크 시작 지역 퀘스트를 40분 만에 완료했다. 에이전트-wow 프로젝트는 컴퓨터 비전 대신 서버 프로토콜을 통해 환경을 구조화했으며, 아제로스코어 데이터를 활용해 퀘스트 동선을 최적화했다.", "entities": ["GPT-6 아스트라", "월드 오브 워크래프트", "에이전트-wow", "아제로스코어", "오픈AI"], "keywords": ["agent", "reasoning", "ai-general"], "is_curation": false, "origin_candidates": [1], "relevance_reason": "AI 에이전트의 장기적 추론 및 자율적 환경 조작 능력에 대한 구체적 실험 결과", "relevance": "high", "needs_original_reason": "핵심 수치(40분, 28종)와 실험 상세 내용이 에드워즈의 원본 블로그(링크 1)에 기반함", "needs_original": true}, "links": [{"n": 1, "url": "https://agent-wow.sh/gpt-6-astra-plays-world-of-warcraft-for-the-first-time-with-agent-wow/", "kind": "other", "anchor": "에드워즈에 따르면", "candidate": true}], "checks": [{"n": 1, "kind": "number", "text": "오크 시작 지역 퀘스트 완료 소요 시간: 40분", "quote": "GPT-6 아스트라는 2일(현지시간) '월드 오브 워크래프트(WoW)'를 게임 화면 한 번 보지 않고 플레이해 오크 시작 지역의 모든 퀘스트를 40분 만에 완료했다."}, {"n": 2, "kind": "number", "text": "서버에서 구독한 메시지 종류 수: 28종", "quote": "이번 실행에서는 서버가 보내는 28종의 메시지를 구독해 메모리에 저장하는 모듈 하나를 만들었고, 파이썬 프로그램이 이를 가져와 체력과 주변 생물, 퀘스트 진행 상황, 전리품 등을 해석했다."}, {"n": 3, "kind": "claim", "text": "GPT-6 아스트라가 시각 정보 없이 네트워크 패킷과 SQL 데이터 분석만으로 WoW 오크 시작 지역 퀘스트를 40분 만에 완료했다.", "quote": "GPT-6 아스트라는 2일(현지시간) '월드 오브 워크래프트(WoW)'를 게임 화면 한 번 보지 않고 플레이해 오크 시작 지역의 모든 퀘스트를 40분 만에 완료했다. / 한 번도 죽지 않은 것은 물론, 별도의 게임 공략이나 사전 지식 대신 서버의 네트워크 패킷과 SQL 데이터를 분석해 게임 세계를 파악했다."}, {"n": 4, "kind": "claim", "text": "에이전트-wow는 화면 분석이나 직접 조작 대신 서버 프로토콜을 통해 상호작용하며, 28종의 메시지를 구독해 상태를 해석하는 모듈을 구축했다.", "quote": "에이전트-wow는 일반적인 게임 봇처럼 화면을 컴퓨터 비전으로 분석하거나 키보드와 마우스를 직접 조작하지 않는다. / 이번 실행에서는 서버가 보내는 28종의 메시지를 구독해 메모리에 저장하는 모듈 하나를 만들었고, 파이썬 프로그램이 이를 가져와 체력과 주변 생물, 퀘스트 진행 상황, 전리품 등을 해석했다."}, {"n": 5, "kind": "claim", "text": "퀘스트 요구사항과 동선 계획은 오픈소스 서버 엔진 아제로스코어의 SQL 데이터를 분석하여 수립했다.", "quote": "퀘스트 정보는 오픈소스 WoW 서버 엔진인 ‘아제로스코어(AzerothCore)’의 SQL 파일에서 가져왔다."}, {"n": 6, "kind": "claim", "text": "이번 실험은 AI의 장기적 의도 파악 및 추론 능력을 검증하는 이정표로 평가받는다.", "quote": "전문가들이 이번 실험을 AI의 장기적 의도 파악 및 추론 능력을 검증한 주요 이정표로 보는 이유다."}], "tool_calls": null}`
@@ -97,6 +114,7 @@ judge 판정: **잠정**(사람 라벨 없음. `eval/labels/text_analyst.csv`를
 | 2026-10-08T18:55:14+09:00 | generate | `38c5c467fa69` | 코드 16/16, Q1 16/16, Q2 15/16, Q3 15/16, 미달 | $0.0110 | 평가 버그 수정(b09261f) 뒤 재실행, 개선 횟수 아님 |
 | 2026-10-08T19:12:28+09:00 | generate | `0f361ba1a70d` | 코드 16/16, Q1 16/16, Q2 16/16, Q3 16/16, 통과 | $0.1511 | 반복 1(md 문구): 따옴표·대시 모양까지 그대로 |
 | 2026-10-08T19:55:42+09:00 | generate | `0f361ba1a70d` | 코드 16/16, Q1 16/16, Q2 16/16, Q3 16/16, 통과 | $0.1511 | 병합 뒤 기록 형식(code=원래 출력, code_basis=통과 판정)으로 재채점, 생성 재실행 없음: text_analyst_generate_20261008-191228 |
+| 2026-10-09T00:18:26+09:00 | generate | `0f361ba1a70d` | 코드 16/16, Q1 16/16, Q2 16/16, Q3 16/16, 통과 | $0.1511 | PR #6 리뷰 R1~R4·N1·N2 반영 뒤 0원 재채점(생성·judge 재실행 없음): text_analyst_generate_20261008-195542 |
 
 ## repo_analyst
 
@@ -106,7 +124,7 @@ judge 판정: **잠정**(사람 라벨 없음. `eval/labels/text_analyst.csv`를
 - Q2: 뜨는 이유: why_trending의 모든 내용이 evidence(도구 결과)로 뒷받침되나? 근거가 없으면 빈 문자열이어야 통과
 - Q3: 과열: signal과 hype_flags가 수치(이번 주 별, 7일 커밋, 기여자)와 맞나? 별 수만으로 중요하다고 단정하지 않았나?
 
-judge 판정: **잠정**(사람 라벨 없음. `eval/labels/repo_analyst.csv`를 채우면 일치율을 잰다)
+judge 판정: 라벨(opus-5.5, 잠정)과 일치율 확인됨(아래)
 
 ### 모델별 최신 결과 (전체 실행만, 점수는 보고용)
 
@@ -114,11 +132,20 @@ judge 판정: **잠정**(사람 라벨 없음. `eval/labels/repo_analyst.csv`를
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | generate (`qwen/qwen3.8-27b`) | 10/10 | 10/10 | 10/10 | 10/10 | 10/10 | 4.9 | 5.0 | 5.0 | 통과 | $0.0350 | `407996307552` |
 
-- generate 전체 지표: 평균 도구 호출 3.4, 관련 낮음 얕게 끝냄 4/5
+- generate 전체 지표: 평균 도구 호출 3.4, 관련 낮음 얕게 끝냄 4/5, GitHub 도구 오류율 0.0, GitHub 도구 성공 0 항목 0
 - generate 모델 일치율(코드 소유 칸, 보고용): signal 10/10, hype_flags 10/10, attention 10/10
 - generate 통과 판정(코드 소유 칸 signal, hype_flags, attention만 enforce 후): 10/10. 원래 출력 10/10은 모델 품질로 기록
 
-### 가장 나쁜 사례 3개 (generate, 2026-10-08T19:55:38+09:00)
+### judge·라벨 일치율 (labeler opus-5.5, 잠정, 라벨 10건, reports/eval/repo_analyst_generate_20261008-195538.json)
+
+| 질문 | 일치 | 비교 수 | 일치율 |
+|---|---|---|---|
+| Q1 | 9 | 10 | 0.9 |
+| Q2 | 9 | 10 | 0.9 |
+| Q3 | 10 | 10 | 1.0 |
+| 전체 | 28 | 30 | 0.933 |
+
+### 가장 나쁜 사례 3개 (generate, 2026-10-09T00:18:24+09:00)
 
 1. **DuarteSantos8__openGym**
    - 입력: `{"full_name": "DuarteSantos8/openGym", "max_depth": 2, "reason": "이번 주 트렌딩(2026-W41)", "trending": {"week": "2026-W41", "rank": 9, "stars_total": 7222, "stars_this_week": 4906, "forks": 941, "language": "JavaScript", "description": "Self-hosted gym & body-weight tracker — plan routines, log workouts (supersets, warm-ups, cardio), see which muscles are trained, fatigued or detrained, import from FitNotes/Strong/Hevy, passkey login. Your data, your server."}, "oneliner": "", "keywords": ["AI 에이전트", "코딩 에이전트", "MCP · 도구 호출", "오픈웨이트 · 로컬 LLM", "RAG · 검색", "멀티모달", "추론 · 판단 모델", "평가 · 벤치마크", "AI 보안", "프런티어 모델 출시", "AI 산업 · 시장", "개발 실무 · 경험", "AI 일반"], "week_items": [], "hype": {"flags": [], "force_check": false, "commits_7d": 100, "contributors": 67, "note": "7일 별 +4906, 커밋 100"}, "tool_calls": 6}`
@@ -147,3 +174,4 @@ judge 판정: **잠정**(사람 라벨 없음. `eval/labels/repo_analyst.csv`를
 | 2026-10-08T16:53:34+09:00 | generate | `407996307552` | 코드 10/10, Q1 10/10, Q2 10/10, Q3 10/10, 미달 | $0.0348 | 반복 1(md 문구): evidence tool 칸은 도구 이름만, 입력 trending·hype는 signal_reason에 |
 | 2026-10-08T18:29:28+09:00 | generate | `407996307552` | 코드 10/10, Q1 10/10, Q2 10/10, Q3 10/10, 통과 | $0.0350 | 반복 1 재실행(md 문구: evidence tool 칸은 도구 이름만). 앞 실행(…-165334)은 GitHub 403으로 무효 |
 | 2026-10-08T19:55:38+09:00 | generate | `407996307552` | 코드 10/10, Q1 10/10, Q2 10/10, Q3 10/10, 통과 | $0.0350 | 병합 뒤 기록 형식(code=원래 출력, code_basis=통과 판정)으로 재채점, 생성 재실행 없음: repo_analyst_generate_20261008-182928 |
+| 2026-10-09T00:18:24+09:00 | generate | `407996307552` | 코드 10/10, Q1 10/10, Q2 10/10, Q3 10/10, 통과 | $0.0350 | PR #6 리뷰 R1~R4·N1·N2 반영 뒤 0원 재채점(생성·judge 재실행 없음): repo_analyst_generate_20261008-195538 |
