@@ -109,7 +109,7 @@ def _replay(ctx: Any, step_id: int, model: str | None) -> Any:
         text, out = "재생: 스키마 검증 실패", None
     ctx.last_step_id = record_llm(ctx, role, res, text=text, output=out, error=res.parse_error,
                                   attention=bool(out and out.attention),
-                                  detail={"replay_of": step_id, "alias": alias},
+                                  detail={"replay_of": step_id, "alias": alias, "enforce": "미적용(재생에는 입력이 없음)"},
                                   prompt_hash=step["prompt_hash"])
     if out is not None:
         return out.model_dump()
@@ -142,7 +142,8 @@ def cmd_eval(args: argparse.Namespace) -> int:
     report = run_eval(args.role, model=args.model, limit=args.limit, spec=args.spec, no_cache=args.no_cache,
                       note=args.note)
     s = report["summary"]
-    print(f"{report['role']} / {report['model_alias']} ({report['model_id']}): 코드 통과 {s['code_pass']}/{s['n']}")
+    print(f"{report['role']} / {report['model_alias']} ({report['model_id']}): 코드 통과 {s['code_pass']}/{s['n']} "
+          f"(enforce 후 {s['code_pass_enforced']}/{s['n']})")
     for q, v in s.get("questions", {}).items():
         print(f"  {q}: 통과 {v['pass']}/{v['n']}")
     for c, v in s["criteria"].items():
@@ -261,6 +262,18 @@ def cmd_report(args: argparse.Namespace) -> int:
     return 0
 
 
+def _register(sub: Any, module: str) -> None:
+    import importlib
+
+    try:
+        mod = importlib.import_module(f"{__package__}.{module}")
+    except ModuleNotFoundError as e:
+        if e.name == f"{__package__}.{module}":
+            return
+        raise
+    mod.register(sub)
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="trendsit")
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -319,6 +332,10 @@ def main(argv: list[str] | None = None) -> int:
     rp.add_argument("--since")
     rp.add_argument("--until")
     rp.set_defaults(fn=cmd_report)
+
+    # 스펙별 명령(COMMON 9장): 각 파일의 register(sub). 여기에는 등록 한 줄씩만. 없는 모듈은 건너뜀
+    _register(sub, "cli_text")  # S2~S3
+    _register(sub, "cli_video")  # S4
 
     args = p.parse_args(argv)
     try:

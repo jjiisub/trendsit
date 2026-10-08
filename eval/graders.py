@@ -176,7 +176,10 @@ def summarize(role: str, results: list[dict[str, Any]]) -> dict[str, Any]:
     th = THRESHOLDS.get(role, {"code_pass_all": True})
     n = len(results)
     code_pass = sum(1 for r in results if r["code"]["passed"])
-    summary: dict[str, Any] = {"n": n, "code_pass": code_pass, "questions": {}, "criteria": {}}
+    # 보고용: enforce 후 출력 기준 코드 통과(바뀐 것이 없으면 원래 출력 판정). 통과 판정은 code_pass(원래 출력)
+    code_pass_enforced = sum(1 for r in results if r.get("code_enforced", r["code"])["passed"])
+    summary: dict[str, Any] = {"n": n, "code_pass": code_pass, "code_pass_enforced": code_pass_enforced,
+                               "questions": {}, "criteria": {}}
     has_rubric = rubric_path(role).exists()
     questions = rubric_questions(role) if has_rubric else {}
     judged = [r for r in results if r.get("llm")]
