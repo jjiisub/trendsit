@@ -2,11 +2,23 @@
 
 from __future__ import annotations
 
-from typing import Any, Literal, Self
+from typing import TYPE_CHECKING, Any, Literal, Self
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, model_validator
 
 from .textclean import clean_markdown
+
+if TYPE_CHECKING:
+    from .context import Ctx
+
+
+def _plain(v: Any) -> Any:
+    """기록용으로 pydantic 값을 JSON으로 바꿀 수 있는 값으로."""
+    if isinstance(v, BaseModel):
+        return v.model_dump()
+    if isinstance(v, list):
+        return [_plain(x) for x in v]
+    return v
 
 
 class RoleInput(BaseModel):
@@ -31,10 +43,52 @@ class RoleOutput(BaseModel):
     log: str = Field(description="한 줄 기록. 명사형, 화면 문구 규칙")
     attention: bool = Field(default=False, description="사람이 확인해야 하면 true")
 
+    # enforce가 바꾼 칸 기록과 enforce 전 원래 출력(평가가 모델 품질을 원래 출력으로 재도록)
+    _enforced: list[dict[str, Any]] = PrivateAttr(default_factory=list)
+    _raw: dict[str, Any] | None = PrivateAttr(default=None)
+
     @classmethod
     def fallback(cls, reason: str, inp: Any) -> Self:
         """상한 도달, 실패 시 대체 출력. 역할마다 정의."""
         raise NotImplementedError(f"{cls.__name__}에 대체 출력이 없음")
+
+    def enforce(self, inp: Any, ctx: Ctx | None) -> Self:
+        """코드 규칙(반드시 지켜져야 하는 것). 스키마 검증 뒤, 저장 전에 run_role/run_agent가 부른다(S1 리뷰 M2).
+
+        기본은 그대로 반환. 역할이 덮어쓸 때는 칸을 직접 바꾸지 않고 fix()로 바꿔 기록이 남게 한다.
+        """
+        return self
+
+    def fix(self, field: str, value: Any, rule: str) -> Self:
+        """칸 하나를 바꾼 사본. 값이 같으면 그대로. 바꾼 내용은 enforced에 {field, before, after, rule}로 쌓인다."""
+        before = getattr(self, field)
+        if before == value:
+            return self
+        new = self.model_copy(update={field: value})
+        change = {"field": field, "before": _plain(before), "after": _plain(value), "rule": rule}
+        new._enforced = [*self._enforced, change]
+        new._raw = self._raw
+        return new
+
+    @property
+    def enforced(self) -> list[dict[str, Any]]:
+        return list(self._enforced)
+
+    def raw_dump(self) -> dict[str, Any]:
+        """enforce 전 원래 출력. enforce가 바꾼 것이 없으면 지금 출력과 같다."""
+        return dict(self._raw) if self._raw is not None else self.model_dump()
+
+
+def apply_enforce(out: RoleOutput, inp: Any, ctx: Ctx | None) -> RoleOutput:
+    """원래 출력을 보관한 뒤 역할의 enforce를 적용한다."""
+    raw = out.model_dump()
+    fixed = out.enforce(inp, ctx)
+    if fixed.enforced:
+        fixed._raw = raw
+    return fixed
+
+
+README_THIN_CHARS = 200  # 정리한 README 본문이 이보다 짧으면 사람 확인(attention). S1 리뷰 M2
 
 
 # ---------- repo_oneliner ----------
@@ -62,6 +116,12 @@ class RepoOneliner(RoleOutput):
     def fallback(cls, reason: str, inp: RepoOnelinerInput) -> Self:
         text = (inp.description or inp.full_name)[:60]
         return cls(basis="", oneliner=text, log=f"{inp.full_name}: 설명 문구로 대체 ({reason})", attention=True)
+
+    def enforce(self, inp: RepoOnelinerInput, ctx: Ctx | None) -> Self:
+        """정리한 README 본문이 README_THIN_CHARS자 미만이면 근거가 얇으므로 attention 고정(S1 리뷰 M2)."""
+        if len(inp.readme_head.text.strip()) < README_THIN_CHARS:
+            return self.fix("attention", True, f"README 본문 {README_THIN_CHARS}자 미만")
+        return self
 
 
 # ---------- lookup_agent (테스트용) ----------
@@ -111,3 +171,28 @@ INPUTS: dict[str, type[RoleInput]] = {
 OUTPUTS: dict[str, type[RoleOutput]] = {
     c.__name__: c for c in (RepoOneliner, LookupAnswer, JudgeResult)
 }
+
+
+# ---------- 스펙별 스키마 모듈 합치기(COMMON 9장) ----------
+# 스펙마다 자기 파일에 입력·출력 스키마를 두고 INPUTS, OUTPUTS 튜플을 내놓는다. 여기에는 합치는 줄만.
+# 아직 없는 모듈은 건너뛴다(병행 브랜치가 먼저 병합되는 경우). 같은 이름이 다른 클래스로 들어오면 오류.
+# 스키마 모듈은 무거운 선택 의존성(numpy, torch 등)을 import하지 않는다. 안 그러면 그 묶음이 없는 환경에서 모든 명령이 멈춘다.
+def _merge(module: str) -> None:
+    import importlib
+
+    try:
+        mod = importlib.import_module(f"{__package__}.{module}")
+    except ModuleNotFoundError as e:
+        if e.name == f"{__package__}.{module}":
+            return
+        raise
+    for table, classes in ((INPUTS, getattr(mod, "INPUTS", ())), (OUTPUTS, getattr(mod, "OUTPUTS", ()))):
+        for c in classes:
+            if table.get(c.__name__, c) is not c:
+                raise ValueError(f"스키마 이름 '{c.__name__}'이 {module}과 다른 모듈에서 겹침")
+            table[c.__name__] = c
+
+
+_merge("artifacts_text")  # S2~S3
+_merge("artifacts_repo")  # S2~S3
+_merge("artifacts_video")  # S4

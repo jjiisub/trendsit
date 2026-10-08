@@ -54,9 +54,11 @@ def _evaluate(ctx: Any, role_name: str, model: str | None, limit: int | None, no
         rec: dict[str, Any] = {"id": fid, "input": fx["input"], "expect": fx["expect"], "note": fx.get("note")}
         before = ctx.budget.session_cost
         out, error, inp = None, None, None
+        final = None
         try:
             inp = role.input_cls.model_validate(fx["input"])
-            out = run(role, inp, ctx).model_dump()
+            final = run(role, inp, ctx)
+            out = final.raw_dump()  # 통과 판정은 enforce 전 원래 출력(모델 품질을 숨기지 않게, S1 리뷰 M2)
             rec["step_id"] = ctx.last_step_id
         except (RoleFailed, ValidationError) as e:  # 출력 검증 실패, 픽스처 입력 형식 오류는 그 항목의 실패
             error = f"{type(e).__name__}: {e}"
@@ -70,6 +72,11 @@ def _evaluate(ctx: Any, role_name: str, model: str | None, limit: int | None, no
             break
         rec["output"], rec["error"] = out, error
         rec["code"] = graders.code_grade(role_name, fx["input"], out, error, fx["expect"])
+        if final is not None and final.enforced:  # enforce 후 출력(저장되는 것)도 함께 기록
+            rec["enforced"] = final.enforced
+            rec["enforced_output"] = final.model_dump()
+            rec["code_enforced"] = graders.code_grade(role_name, fx["input"], rec["enforced_output"], None,
+                                                      fx["expect"])
         if with_llm and rec["code"]["passed"]:
             try:
                 rec["llm"] = graders.llm_grade(role_name, inp, out, ctx)  # type: ignore[arg-type]
@@ -174,13 +181,14 @@ def write_quality(spec: str) -> Path:
         if questions:
             lines += ["judge 판정: " + ("사람 라벨과 일치율 확인됨(아래)" if agree and agree["n_rows"] else
                                          "**잠정**(사람 라벨 없음. `eval/labels/" + role + ".csv`를 채우면 일치율을 잰다)"), ""]
-        head = (["모델", "코드 통과"] + [f"{q} 통과" for q in questions] + [f"{c} 평균" for c in criteria]
+        head = (["모델", "코드 통과", "enforce 후 코드 통과"] + [f"{q} 통과" for q in questions] + [f"{c} 평균" for c in criteria]
                 + ["문턱값", "비용", "프롬프트"])
         lines += ["### 모델별 최신 결과 (전체 실행만, 점수는 보고용)", "",
                   "| " + " | ".join(head) + " |", "|" + "---|" * len(head)]
         for alias, r in latest.items():
             s = r["summary"]
-            row = [f"{alias} (`{r['model_id']}`)", f"{s['code_pass']}/{s['n']}"]
+            row = [f"{alias} (`{r['model_id']}`)", f"{s['code_pass']}/{s['n']}",
+                   f"{s['code_pass_enforced']}/{s['n']}" if "code_pass_enforced" in s else "-"]
             row += [f"{s.get('questions', {}).get(q, {}).get('pass', '-')}/{s.get('questions', {}).get(q, {}).get('n', '-')}"
                     for q in questions]
             row += [str(s.get("criteria", {}).get(c, {}).get("avg", "-")) for c in criteria]
@@ -248,6 +256,8 @@ def write_quality(spec: str) -> Path:
                       f"   - 출력: `{_cell(json.dumps(x['output'], ensure_ascii=False) if x['output'] else x['error'])}`"]
             if x["code"]["failed"]:
                 lines.append(f"   - 코드 채점 실패: {_cell('; '.join(x['code']['failed']))}")
+            for c in x.get("enforced") or []:
+                lines.append(f"   - enforce: {c['field']} {_cell(c['before'])} → {_cell(c['after'])} ({_cell(c['rule'])})")
             for q, v in ((x.get("llm") or {}).get("verdicts") or {}).items():
                 lines.append(f"   - {q} {v['verdict']}: {_cell(v['critique'])}")
         lines.append("")

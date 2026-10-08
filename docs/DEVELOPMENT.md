@@ -18,6 +18,7 @@ GITHUB_TOKEN=...             # 선택. 픽스처 README 수집에만
 | `uv run ruff check . && uv run pytest` | 정적 검사 + 단위 테스트(네트워크 없음) |
 | `bash scripts/verify_s0.sh` | S0 관문 A. 항목별 PASS/FAIL, smoke(무료) 모델 실제 호출 포함 |
 | `bash scripts/verify_s1.sh` | S1 관문 A(S0 회귀 + 1a S0 보완 P1~P6, 리뷰 반영 R1~R6 + 1b 수집) |
+| `bash scripts/verify_s2.sh [--stage 0]` | S2 관문 A. `--stage 0`은 0단계(S1 리뷰 M1, M2, M4, M6)만 |
 | `uv run python -m trendsit check-config [--root DIR]` | 설정 파일 + 역할 md(`roles/*.md`, `eval/judge.md`) 검증. 틀리면 파일, 경로, 이유 |
 | `uv run python -m trendsit role <이름> --input <json> [--model 별칭] [--no-cache]` | 역할 1회 실행. 출력 JSON, stderr에 run_id, step_id, 비용 |
 | `uv run python -m trendsit role --replay <step_id> [--model 별칭] [--no-cache]` | 기록된 요청으로 다시 실행. `--model`로 다른 모델 비교 |
@@ -43,6 +44,7 @@ GITHUB_TOKEN=...             # 선택. 픽스처 README 수집에만
 - 메시지: system = 본문 + includes + data 규칙(정적) / user = `<data>` 자료 → task → "핵심 규칙:" core_rules. 프롬프트 해시 = system + task + core_rules(입력과 무관)
 - 자료 렌더(`core/render.py`): `Document` 칸은 `<document id="rp:owner/name" source="GitHub README">본문</document>`, 짧은 칸은 `이름: 값` 줄. 자료 안의 `<`는 모두 `&lt;`로 바꿔 태그 밖으로 못 나가게 한다
 - 출력 스키마 칸 순서: 인용·이유 칸 먼저, 결론 칸 나중, `log`, `attention` 맨 끝(모델에 넘기는 스키마에서 코드가 정렬)
+- 코드 규칙은 출력 클래스의 `enforce(inp, ctx)`에(S1 리뷰 M2). `run_role`/`run_agent`가 스키마 검증 뒤, 저장 전에 부른다. 칸은 `self.fix(칸, 값, 규칙)`으로 바꿔 step detail의 `enforced`에 `{field, before, after, rule}`가 남게 한다. `eval`은 원래 출력(통과 판정)과 enforce 후 출력(보고용)을 둘 다 기록. `role --replay`는 입력이 없어 enforce 전 출력을 낸다(원래 step에는 enforce 후가 저장됨)
 - 채점자(`eval/judge.md`)는 역할 무관. 역할별 질문(`Q<n>`)과 보고용 점수표는 `eval/rubrics/<역할>.md`에 두고 includes로 붙인다
 
 ## 수집 (S1)
@@ -65,8 +67,20 @@ GITHUB_TOKEN=...             # 선택. 픽스처 README 수집에만
 - 레포 키워드: 설명(제목 자리), 토픽, README(이름은 넣지 않음). 같은 주에 다시 돌리면 그 주 트렌딩 목록을 바꾼다
 - 키워드: 제목, 요약, 본문 앞 2,000자. 영어 별칭은 단어 경계, 한국어는 부분 문자열. 점수 = 제목 키워드 × 3 + 본문 키워드 × 1. 제외어가 있고 제목에 포함 키워드가 없으면 filtered. 걸러진 항목도 이유와 함께 저장
 - 실행 기록: `runs`(kind='collect') 1행, 소스마다 `steps`(kind='code', 실패면 attention)와 `fetch_log`
-- 칠판 테이블(`PRAGMA user_version` 1): sources, fetch_log, items, item_texts(본문, 8주 뒤 지움), item_keywords, links, videos, repos, repo_trending
+- 칠판 테이블(마이그레이션 1번): sources, fetch_log, items, item_texts(본문, 8주 뒤 지움), item_keywords, links, videos, repos, repo_trending
 - 테스트는 `tests/fixtures/http/`의 녹화 응답만 쓴다(녹화에 없는 URL은 연결 실패로 처리해 네트워크가 새지 않게)
+
+## DB 마이그레이션 (S1 리뷰 M1)
+- `trendsit/core/migrations.py`에 번호 → SQL로 등록(`register(번호, sql)`). 적용 기록은 `schema_migrations(version, applied_at)`. 등록된 번호 중 기록에 없는 것을 오름차순으로, 번호마다 한 트랜잭션(문장을 하나씩 실행 → 기록 → COMMIT, 실패하면 ROLLBACK하고 기록하지 않음 → 다음 실행 때 다시 시도). 빈 번호 허용
+- 번호 대역(COMMON 9장): 1~9 S0~S1, 10~19 S2~S3, 20~29 S4. 다른 대역끼리 서로 의존하지 않는다
+- 번호 키 방식 이전 DB(`PRAGMA user_version` N)는 처음 열 때 1..N을 적용된 것으로 기록한다(다시 실행하지 않음). `user_version`은 적용된 최대 번호로 맞춰 두지만 판단에는 쓰지 않는다
+
+## 병행 개발 자리 (COMMON 9장)
+- 스키마: 스펙별 파일(`core/artifacts_text.py`, `artifacts_repo.py`, `artifacts_video.py`)이 `INPUTS`, `OUTPUTS` 튜플을 내놓고 `core/artifacts.py` 끝의 `_merge` 줄이 합친다
+- 명령: 스펙별 파일(`trendsit/cli_text.py`, `cli_video.py`)의 `register(sub)`를 `cli.py`의 `_register` 줄이 부른다
+- 둘 다 모듈이 아직 없으면 건너뛴다. 모듈 안의 import 오류(의존성 없음 등)는 숨기지 않는다. 그래서 스키마·명령 모듈 첫머리에서는 선택 의존성(numpy, torch 등)을 import하지 않고 쓰는 함수 안에서 import한다
+- 스키마 이름이 두 모듈에서 겹치면 `ValueError`
+- 의존성: `pyproject.toml`의 `[project.optional-dependencies]`에 묶음별 한 줄(S2~S3 `embed`, S4 `video`)
 
 ## 구조 상세
 ```
@@ -75,7 +89,7 @@ roles/       역할 정의 md: 앞부분 실행 설정(모델, 입출력 스키�
 skills/      여러 역할이 같이 쓰는 지침 md(style_ko)
 trendsit/
   cli.py
-  core/      config llm cache budget render(자료 렌더) role(run_role, 역할 md 검사) agent(run_agent) trace db artifacts(스키마) context
+  core/      config llm cache budget render(자료 렌더) role(run_role, 역할 md 검사) agent(run_agent) trace db migrations artifacts(스키마) context
   tools/     registry(도구 등록) lookup(테스트용 가짜 도구)
   collect/   fetch(safe_fetch) text(글, 백필) youtube github links keywords report run, sites/(geeknews, aitimes, simonw, anthropic)
 eval/        fixtures/<역할>/ rubrics/ judge.md(채점자 역할) labels/(사람 라벨 CSV) graders.py run_eval.py

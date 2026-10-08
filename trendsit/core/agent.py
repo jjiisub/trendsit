@@ -9,11 +9,11 @@ from typing import TYPE_CHECKING, Any
 from pydantic import BaseModel, ValidationError
 
 from ..tools import TOOLS, ToolOutput, ToolRejected
-from .artifacts import RoleInput, RoleOutput
+from .artifacts import RoleInput, RoleOutput, apply_enforce
 from .budget import BudgetExceeded
 from .llm import LLMError, parse_json_output, strict_json_schema
 from .render import render_data
-from .role import Role, initial_messages, record_llm
+from .role import Role, enforce_detail, initial_messages, record_llm
 
 if TYPE_CHECKING:
     from .context import Ctx
@@ -90,6 +90,50 @@ def normalize_nulls(model: type[BaseModel], args: dict[str, Any]) -> list[str]:
     return sorted(changed)
 
 
+ERROR_KO = {  # pydantic 오류 종류 → 모델에게 줄 짧은 설명
+    "missing": "필수 칸 없음",
+    "extra_forbidden": "없는 칸(스키마에 없는 이름)",
+    "literal_error": "허용 값 아님",
+    "enum": "허용 값 아님",
+    "string_type": "문자열이어야 함",
+    "int_type": "정수여야 함",
+    "int_parsing": "정수여야 함",
+    "bool_type": "true/false여야 함",
+    "bool_parsing": "true/false여야 함",
+    "list_type": "배열이어야 함",
+    "dict_type": "객체여야 함",
+    "model_type": "객체여야 함",
+    "model_attributes_type": "객체여야 함",
+    "greater_than_equal": "값이 너무 작음",
+    "less_than_equal": "값이 너무 큼",
+    "string_too_long": "문자열이 너무 김",
+    "too_long": "항목이 너무 많음",
+}
+
+
+def _loc(loc: tuple[Any, ...]) -> str:
+    """('origin', 'items', 0, 'kind') → origin.items[0].kind"""
+    out = ""
+    for part in loc:
+        out += f"[{part}]" if isinstance(part, int) else (f".{part}" if out else str(part))
+    return out or "(최상위)"
+
+
+def validation_paths(e: ValidationError, limit: int = 5) -> str:
+    """도구 인자 검증 오류를 칸 경로와 함께 한 줄씩(S1 리뷰 M4). 작은 모델이 중첩 인자를 고칠 수 있게."""
+    parts = []
+    for err in e.errors()[:limit]:
+        reason = ERROR_KO.get(err["type"], err["msg"])
+        ctx = err.get("ctx") or {}
+        if "expected" in ctx:
+            reason += f" (허용: {ctx['expected']})"
+        elif err["type"] not in ("missing", "extra_forbidden") and "input" in err:
+            reason += f" (받은 값: {json.dumps(err['input'], ensure_ascii=False, default=str)[:60]})"
+        parts.append(f"{_loc(err['loc'])}: {reason}")
+    more = len(e.errors()) - limit
+    return "; ".join(parts) + (f" 외 {more}건" if more > 0 else "")
+
+
 def execute_tool(name: str, raw_args: str, allowed: set[str], state: AgentState) -> tuple[str, dict[str, Any]]:
     """도구 하나 실행. 결과 문자열(모델에게 줄 것)과 기록용 정보를 돌려준다. 거부와 도구 실패도 결과로 돌려준다."""
     info: dict[str, Any] = {"name": name, "args": None, "error": None, "depth": None, "truncated": False,
@@ -103,8 +147,10 @@ def execute_tool(name: str, raw_args: str, allowed: set[str], state: AgentState)
             if isinstance(args_dict, dict):
                 info["normalized"] = normalize_nulls(tool.args, args_dict)
             args = tool.args.model_validate(args_dict)
-        except (json.JSONDecodeError, ValidationError) as e:
-            raise ToolRejected(f"인자 형식 오류: {str(e)[:300]}") from e
+        except json.JSONDecodeError as e:
+            raise ToolRejected(f"인자 형식 오류: JSON이 아님({e.msg}, {e.pos}번째 글자)") from e
+        except ValidationError as e:
+            raise ToolRejected(f"인자 형식 오류: {validation_paths(e)}") from e
         info["args"] = args.model_dump()
         depth = None
         if tool.depth_target:
@@ -143,8 +189,10 @@ def run_agent(role: Role, inp: RoleInput, ctx: Ctx) -> RoleOutput:
     state = AgentState(depth=DepthTracker(role.spec.max_depth))
 
     def finish_with(out: RoleOutput, how: str) -> RoleOutput:
+        out = apply_enforce(out, inp, ctx)  # 코드 규칙은 스키마 검증 뒤, 저장 전(대체 출력에도)
         ctx.last_step_id = ctx.tracer.step(kind="code", role=role.name, text=out.log, attention=out.attention,
-                                           output=out.model_dump(), detail={"end": how, "steps": step + 1})
+                                           output=out.model_dump(),
+                                           detail=enforce_detail(out, {"end": how, "steps": step + 1}))
         return out
 
     step = 0
@@ -178,7 +226,7 @@ def run_agent(role: Role, inp: RoleInput, ctx: Ctx) -> RoleOutput:
                     final = role.output_cls.model_validate_json(tc["arguments"])
                     content = "제출 완료"
                 except ValidationError as e:
-                    content = f"오류: 최종 답이 스키마에 맞지 않음: {str(e)[:300]}"
+                    content = f"오류: 최종 답이 스키마에 맞지 않음: {validation_paths(e)}"
                 ctx.tracer.step(kind="tool", role=role.name, text=f"{FINISH}: 최종 답 제출",
                                 error=None if final else content)
                 messages.append(_tool_message(tc["id"], content))

@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING, Any
 import yaml
 from pydantic import BaseModel, Field, ValidationError
 
-from .artifacts import INPUTS, OUTPUTS, RoleInput, RoleOutput
+from .artifacts import INPUTS, OUTPUTS, RoleInput, RoleOutput, apply_enforce
 from .budget import BudgetExceeded
 from .config import ROOT, ConfigError, ModelsConfig, Strict, loc_to_path
 from .llm import LLMError
@@ -194,6 +194,11 @@ def record_llm(ctx: Ctx, role: Role, res: Any, *, text: str, attention: bool = F
     )
 
 
+def enforce_detail(out: RoleOutput, detail: dict[str, Any]) -> dict[str, Any]:
+    """step detail에 enforce가 바꾼 칸 목록을 붙인다(바꾼 것이 있을 때만)."""
+    return {**detail, "enforced": out.enforced} if out.enforced else detail
+
+
 def run_role(role: Role, inp: RoleInput, ctx: Ctx) -> RoleOutput:
     """1회 호출 → 스키마 검증 → 실패하면 오류를 알려 주고 재시도(최대 2회) → 그래도 실패하면 RoleFailed."""
     alias = ctx.model or role.spec.model
@@ -209,9 +214,9 @@ def run_role(role: Role, inp: RoleInput, ctx: Ctx) -> RoleOutput:
                             error=str(e), detail={"attempt": attempt + 1})
             raise
         if res.parsed is not None:
-            out: RoleOutput = res.parsed
+            out: RoleOutput = apply_enforce(res.parsed, inp, ctx)  # 코드 규칙은 스키마 검증 뒤, 저장 전
             ctx.last_step_id = record_llm(ctx, role, res, text=out.log, attention=out.attention, output=out,
-                                          detail={"attempt": attempt + 1})
+                                          detail=enforce_detail(out, {"attempt": attempt + 1}))
             return out
         last_error = res.parse_error or "알 수 없는 검증 오류"
         ctx.last_step_id = record_llm(ctx, role, res, text=f"스키마 검증 실패 ({attempt + 1}회)",

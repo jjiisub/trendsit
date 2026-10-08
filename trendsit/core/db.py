@@ -53,63 +53,6 @@ CREATE TABLE IF NOT EXISTS llm_calls (
 );
 """
 
-# 칠판(S1~). 마이그레이션은 PRAGMA user_version으로 순서대로 한 번씩
-MIGRATIONS = [
-    """
-    CREATE TABLE IF NOT EXISTS sources (
-        id TEXT PRIMARY KEY, channel TEXT NOT NULL, kind TEXT, name TEXT, feed TEXT,
-        enabled INTEGER NOT NULL DEFAULT 1, config_json TEXT
-    );
-    CREATE TABLE IF NOT EXISTS fetch_log (
-        id INTEGER PRIMARY KEY, run_id TEXT, source_id TEXT, day TEXT,
-        status TEXT NOT NULL CHECK(status IN ('ok','failed','partial')),
-        n_new INTEGER NOT NULL DEFAULT 0, n_backfilled INTEGER NOT NULL DEFAULT 0, error TEXT,
-        n_seen INTEGER NOT NULL DEFAULT 0, detail TEXT, t TEXT
-    );
-    CREATE TABLE IF NOT EXISTS items (
-        id INTEGER PRIMARY KEY, source_id TEXT NOT NULL,
-        channel TEXT NOT NULL CHECK(channel IN ('text','video','github')), kind TEXT,
-        external_id TEXT NOT NULL, url TEXT, title TEXT, published_at TEXT,
-        published_estimated INTEGER NOT NULL DEFAULT 0, day TEXT, week TEXT, summary_feed TEXT,
-        body_status TEXT, filter_status TEXT CHECK(filter_status IN ('pass','filtered')),
-        filter_reason TEXT, score INTEGER, run_id TEXT, created_at TEXT,
-        via TEXT,
-        UNIQUE(source_id, external_id)
-    );
-    CREATE INDEX IF NOT EXISTS items_day ON items(day);
-    CREATE INDEX IF NOT EXISTS items_week ON items(week);
-    CREATE TABLE IF NOT EXISTS item_texts (
-        item_id INTEGER PRIMARY KEY REFERENCES items(id), text TEXT, origin_summary TEXT, expires_at TEXT
-    );
-    CREATE TABLE IF NOT EXISTS item_keywords (
-        item_id INTEGER NOT NULL, keyword_id TEXT NOT NULL, where_matched TEXT,
-        PRIMARY KEY(item_id, keyword_id)
-    );
-    CREATE TABLE IF NOT EXISTS links (
-        id INTEGER PRIMARY KEY, item_id INTEGER NOT NULL, url TEXT NOT NULL, anchor TEXT, kind TEXT,
-        role TEXT NOT NULL CHECK(role IN ('body','origin_candidate')), UNIQUE(item_id, url)
-    );
-    CREATE TABLE IF NOT EXISTS videos (
-        item_id INTEGER PRIMARY KEY, video_id TEXT, duration_sec INTEGER, manual_sub_langs TEXT,
-        has_auto_sub INTEGER, chapters_json TEXT, meta_status TEXT
-    );
-    CREATE TABLE IF NOT EXISTS repos (
-        full_name TEXT PRIMARY KEY, description TEXT, language TEXT, topics_json TEXT, readme_head TEXT,
-        first_seen TEXT
-    );
-    CREATE TABLE IF NOT EXISTS repo_trending (
-        week TEXT NOT NULL, full_name TEXT NOT NULL, rank INTEGER, stars_total INTEGER,
-        stars_this_week INTEGER, forks INTEGER, run_id TEXT,
-        score INTEGER, filter_status TEXT, filter_reason TEXT, keywords TEXT,
-        PRIMARY KEY(week, full_name)
-    );
-    """,
-    # 2: 소스별 부가 정보(GeekNews 점수, 댓글 수, topic id 등). 받은 시점의 값
-    """
-    ALTER TABLE items ADD COLUMN meta_json TEXT;
-    """,
-]
-
 STEP_COLUMNS = (
     "run_id", "seq", "t", "role", "kind", "text", "attention", "detail", "prompt_hash", "model",
     "provider", "tokens_in", "tokens_out", "cost_usd", "cost_estimated", "latency_ms", "cache_hit",
@@ -130,7 +73,7 @@ def _json(v: Any) -> str | None:
 
 
 class DB:
-    def __init__(self, path: Path):
+    def __init__(self, path: Path, migrations: dict[int, str] | None = None):
         path.parent.mkdir(parents=True, exist_ok=True)
         self.path = path
         self.conn = sqlite3.connect(path)
@@ -142,15 +85,13 @@ class DB:
         for name, kind in ADDED_STEP_COLUMNS:
             if name not in have:
                 self.conn.execute(f"ALTER TABLE steps ADD COLUMN {name} {kind}")
-        self.migrate()
+        self.migrate(migrations)
 
-    def migrate(self) -> int:
-        version = self.conn.execute("PRAGMA user_version").fetchone()[0]
-        for i, script in enumerate(MIGRATIONS[version:], start=version + 1):
-            with self.conn:
-                self.conn.executescript(script)
-                self.conn.execute(f"PRAGMA user_version = {i}")
-        return self.conn.execute("PRAGMA user_version").fetchone()[0]
+    def migrate(self, migrations: dict[int, str] | None = None) -> list[int]:
+        """등록된 마이그레이션 중 아직 적용하지 않은 것을 적용한다(core/migrations.py). 적용한 번호를 돌려준다."""
+        from .migrations import apply_all
+
+        return apply_all(self.conn, migrations)
 
     def close(self) -> None:
         self.conn.close()
