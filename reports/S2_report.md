@@ -1,9 +1,11 @@
 # S2 리포트: 0단계(S1 리뷰 반영) + 2a 필터 + 2b 글 1차 요약
 
-> 상태: 클라우드 구현 끝, 맥 확인 대기(`reports/S2S3_mac_todo.md`). 관문 B 수치는 맥 확인 뒤 채운다
+> 상태: 클라우드 구현 끝 + **클라우드 관문 B(픽스처 범위만, 2026-10-08 두 번째 클라우드 세션)** 끝, 맥 확인 대기(`reports/S2S3_mac_todo.md`).
+> **클라우드 관문 B의 범위**: 저장소에 있는 픽스처(item_card 17건, 임베딩 재현 20건, repo_oneliner 10건)와 녹화 응답으로 만든 개발 DB(25건)만으로 돌렸다. 실제 한 주 데이터(맥의 `data/trendsit.db`)로 하는 `rematch`·`filter`·`summarize`, 시드 13건, 문턱값 확정, 사람 라벨 일치율은 맥 몫으로 남는다. judge 판정은 라벨이 없어 모두 **잠정**
 
 > 진행 체크리스트(COMMON 8장). 맥락이 끊기면 여기서 이어 간다. S3(3c, 3a, 3b)는 `reports/S3_report.md`.
-> 실행 환경: 클라우드 Claude Code 세션(리눅스, 파이썬 3.13). `OPENROUTER_API_KEY` 없음, 네트워크는 `api.github.com`과 패키지 저장소만 열림(openrouter.ai, huggingface.co, export.arxiv.org, 수집 소스 도메인은 정책상 막힘). LLM과 실제 임베딩 모델이 필요한 것은 `reports/S2S3_mac_todo.md`로.
+> 실행 환경(두 번째 클라우드 세션, 2026-10-08): `OPENROUTER_API_KEY` 있음, openrouter.ai·huggingface.co·export.arxiv.org 열림. github.com과 다른 저장소의 GitHub API, news.hada.io는 여전히 막힘. 임베딩은 CPU(`Qwen/Qwen3-Embedding-0.6B@cpu`)
+> 실행 환경(첫 클라우드 세션): 리눅스, 파이썬 3.13. `OPENROUTER_API_KEY` 없음, 네트워크는 `api.github.com`과 패키지 저장소만 열림(openrouter.ai, huggingface.co, export.arxiv.org, 수집 소스 도메인은 정책상 막힘). LLM과 실제 임베딩 모델이 필요한 것은 `reports/S2S3_mac_todo.md`로.
 
 ## 진행 체크리스트
 - [x] 0단계 M1 마이그레이션 번호 키 등록(`core/migrations.py`, `schema_migrations`)
@@ -12,13 +14,15 @@
 - [x] 0단계 M6 낡은 문구 2곳
 - [x] 0단계 병행 개발 자리(`[project.optional-dependencies]`, `artifacts.py` `_merge`, `cli.py` `_register`)
 - [x] 0단계 `scripts/verify_s2.sh --stage 0`
-- [ ] 0단계 repo_oneliner 관문 B 재실행(키 필요, 맥) → `--agreement`는 저장된 결과로 확인함(아래)
+- [x] 0단계 repo_oneliner 관문 B 재실행(두 번째 클라우드 세션) + `--agreement`
 - [x] 2a 키워드 안 적용(13개), 녹화 테스트는 테스트 전용 키워드로 분리
 - [x] 2a `rematch`
 - [x] 2a 임베딩 필터(실제·모의 임베더, 네 갈래 판정, 임베딩 재사용), URL 중복 연결, 검증 산출물·라벨 생성기, 재현 픽스처 20건
-- [ ] 2a 실제 모델 점수 분포, 문턱값 확정, 시드 13건, 검증 산출물(맥)
+- [x] 2a 실제 임베딩 모델 테스트, 재현 픽스처 CPU 점수 기록(두 번째 클라우드 세션)
+- [ ] 2a 실제 한 주 점수 분포, 문턱값 확정, 시드 13건, 검증 산출물, MPS 점수(맥)
 - [x] 2b `item_card` 스키마·enforce·역할 md·채점기·채점표, `summarize`, 픽스처 17건(녹화 글 16 + 인젝션 1)
-- [ ] 2b 픽스처 3건 추가(20건), 관문 B, 한 주 실행(맥)
+- [x] 2b 관문 B 픽스처 17건(두 번째 클라우드 세션, 반복 3회): 코드 16/17로 미달 1건, judge 잠정 통과
+- [ ] 2b 픽스처 3건 추가(20건), 라벨 20건, 한 주 실행(맥)
 
 ## 0단계 (S1 리뷰 반영, `s2-0-base` PR)
 
@@ -40,6 +44,18 @@ PASS M6 낡은 문구 두 개(geeknews.py 설명, report.py 계획 표기) 없�
 - A1 FAIL은 코드가 아니라 환경 때문이다. `verify_s0.sh`의 A4~A6은 smoke(무료) 모델을 실제로 부르는데 이 세션에 키가 없고 openrouter.ai도 막혀 있다. verify_s0의 나머지 7개(A1~A3, A7~A10)와 verify_s1의 나머지 23개는 PASS. 키가 있는 곳(맥)에서 `bash scripts/verify_s2.sh --stage 0`을 한 번 돌려 A1을 확인해야 한다
 
 ### 3. 관문 B (repo_oneliner)
+**두 번째 클라우드 세션 재실행(2026-10-08)**: `eval repo_oneliner --spec S2`(`reports/eval/repo_oneliner_generate_20261008-104252.json`, 프롬프트 `a1a38c7f4dfe`, $0.0155)
+
+| 기준 | 결과 |
+|---|---|
+| 코드 채점(원래 출력, 통과 판정 기준) | 9/10 미달(Images360 attention false) |
+| 코드 채점(enforce 후, 보고용) | 10/10 |
+| judge Q1·Q2·Q3 | 각 9/9 |
+
+- 예상(질문 파일 Q1)과 같다. 판정 기준 결정은 Q1에 남아 있다
+- `eval repo_oneliner --agreement --spec S2`: 라벨이 가리키는 결과(`…-071621.json`) 기준이라 아래 표와 같다(Q1 1.0, Q2 0.889, Q3 1.0, 전체 0.963)
+
+첫 클라우드 세션(키 없음) 때 기록:
 - 재실행(`eval repo_oneliner`)은 키가 없어 못 했다. 맥의 응답 캐시가 있으면 0원
 - 대신 저장된 마지막 전체 실행(`reports/eval/repo_oneliner_generate_20261008-071621.json`, 프롬프트 `a1a38c7f4dfe`)에 새 enforce를 적용해 코드 채점을 다시 계산했다(LLM 호출 없음)
 
@@ -116,8 +132,12 @@ PASS M6 낡은 문구 두 개(geeknews.py 설명, report.py 계획 표기) 없�
 ### 3. 관문 B (맥 확인 후)
 | 기준 | 결과 |
 |---|---|
-| `relevance_seed.csv` 13건 85% 이상 | 맥 확인 후 |
+| `relevance_seed.csv` 13건 85% 이상 | 맥 확인 후(실제 한 주 DB 필요) |
 | 라벨 40건 keep 정밀도·재현율 | 맥 확인 후 |
+| (보조) 실제 임베딩 모델 테스트 | 통과(두 번째 클라우드 세션, `uv run --extra embed pytest -k real_embedder`, 모델 받기 포함 223초) |
+| (보조) 재현 픽스처 20건 CPU 점수 | `reports/S2_filter/fixture_scores.json`에 기록(0.312~0.577, 200초). MPS 비교는 맥 |
+- 두 번째 클라우드 세션(실제 임베더 CPU, 녹화 응답으로 다시 만든 개발 DB 25건): `rematch` 18건 바뀜(filtered→pass 1). `filter` 17건 새 임베딩 188.7초, keep 16 / drop 1(excluded:정치). 개발 DB 점수는 문턱값 근거가 아니다(표본이 작고 실제 한 주가 아님)
+- 주의: `uv run`만 쓰면 embed 묶음이 지워진다. 실제 임베더는 `uv run --extra embed ...`로 실행
 - 클라우드 확인(모의 임베더, 녹화 응답으로 만든 개발 DB 29건): `rematch` 1회차 22건 바뀜(filtered→pass 1), 2회차 0건. `filter` 21건(글 17, 영상 4) 1회차 새 임베딩 21, 2회차 0. 모의 임베더 점수는 단어 해시라 문턱값 근거로 쓰지 않는다
 
 ### 4. 결정한 것
@@ -148,10 +168,32 @@ PASS M6 낡은 문구 두 개(geeknews.py 설명, report.py 계획 표기) 없�
 ### 3. 관문 B (맥 확인 후)
 | 기준 | 결과 |
 |---|---|
-| 코드 채점 전부 + 인용 본문 일치 95% 이상(원래 출력) | 맥 확인 후 |
-| judge Q1 충실성 / Q2 핵심 / Q3 원본 판정 각 80% | 맥 확인 후(잠정) |
-| 라벨 20건 일치율 80% | 맥 확인 후 |
-| 한 주 전체(건수, 비용, relevance 분포, needs_original 비율) | 맥 확인 후 |
+두 번째 클라우드 세션, **픽스처 17건 범위만**(`reports/eval/item_card_generate_20261008-120344.json`, 프롬프트 `2691c9a33fbc`, max_tokens 2000)
+
+| 기준 | 결과 |
+|---|---|
+| 코드 채점 전부(원래 출력) | **미달 16/17**(openai__jump-trading: 249자 인용으로 스키마 3회 실패) |
+| 인용 본문 일치 95% 이상 | 83/83 (100%) |
+| judge Q1 충실성 / Q2 핵심 / Q3 원본 판정 각 80% | 16/16, 16/16, 16/16 (잠정, 라벨 없음) |
+| 라벨 20건 일치율 80% | 맥 확인 후(`eval/labels/item_card.csv` 17행 만들어 둠, 빈칸) |
+| 한 주 전체(건수, 비용, relevance 분포, needs_original 비율) | 맥 확인 후. 개발 DB 15건 참고값: relevance high 8 / mid 4 / low 3, 원본 확인 필요 6건, 대체 출력 1건(같은 jump-trading), $0.0213 |
+
+**반복 기록(COMMON 3장, 최대 3회)**
+
+| 회차 | 프롬프트 | 바꾼 것(한 가지) | 결과 | 원인 분류 |
+|---|---|---|---|---|
+| 0 | `4a88561d8bd4` | - | 코드 0/17 | 채점기 오탐 14건(아래) + JSON 잘림 2 + 인용 200자 초과 1 |
+| 0' | `4a88561d8bd4` | 채점기 오탐 수정(사용자 결정, `9f890d9`) | 코드 14/17, Q1 14/14, Q2 14/14, Q3 13/14 | 잘림 2(finish_reason=length), 200자 초과 1 |
+| 1 | `2691c9a33fbc` | md: quotes 핵심 3~6개, 각 200자 이하, 길면 잘린다는 이유 | 코드 14/17(ironclad 잘림 해소, 34752 평가형 마무리 "핵심이다" 1건 새로) | 지시를 어김 / 상한 |
+| 2 | `2691c9a33fbc`* | 코드 규칙: max_tokens 1400→2000(한국어 3,038자 출력이 1,400토큰) | **코드 16/17**, Q1~Q3 각 16/16 | 남은 1건은 모델 한계(아래) |
+| 3 | `e66573de84fa` | md 예시: 긴 문장을 중간에서 자르는 예 | 코드 16/17, Q3 15/16 | 효과 없음 → 되돌림 |
+| 최종 | `2691c9a33fbc` | 반복 2로 되돌려 캐시로 재기록($0) | 코드 16/17, Q1~Q3 각 16/16 | |
+
+\* 프롬프트 해시는 md 본문만 보므로 frontmatter의 max_tokens 변경은 해시가 같다. 회차는 `reports/S2_quality.md` 메모 칸으로 구분
+
+**남은 실패 1건(멈춘 이유)**: openai__jump-trading의 영어 문장 하나(249자)를 모델이 통째로 옮기고, 재시도 2회 모두 "200자 안으로 줄일 것" 피드백을 받고도 같은 출력(694토큰)을 냈다. 재시도 요청에 오류 문장이 들어가는 것은 확인했다. md 문구(반복 1)와 예시(반복 3)로 고치지 못해 모델 한계로 분류했다. 코드 쪽 대안(예: 스키마 상한을 넘는 인용을 코드가 200자 안 연속 구간으로 자르기)은 판정 기준을 건드려 질문 파일 Q6으로 넘겼다. 실제 운영에서는 이 글이 대체 출력(attention)으로 저장된다
+
+**가장 나쁜 사례**: `reports/S2_quality.md` item_card 장(입력, 출력, 채점 비평)
 
 ### 4. 결정한 것
 - 본문 6,000자: 문단 경계(빈 줄 또는 줄바꿈)에서 자름. 첫 문단이 길면 마지막 문장 끝에서
@@ -165,30 +207,34 @@ PASS M6 낡은 문구 두 개(geeknews.py 설명, report.py 계획 표기) 없�
 - `summarize`는 이미 v1이 있는 글을 건너뜀(`--redo`로 다시)
 
 ### 5. 스펙과 다르게 한 것
+- (두 번째 클라우드 세션) 채점기 `eval/graders.py`의 해요체 검사 오탐 수정: 정규식 `(요|…)$`이 log·claims의 "원본 확인 필요", "…이 중요" 같은 명사형 끝말을 해요체로 잡았다(첫 실행 14건, 실제 해요체 0건). "필요·중요·주요·개요·수요·강요·소요"로 끝나는 문장만 예외로 두고 "필요해요" 같은 실제 해요체는 그대로 잡는 테스트를 더했다. 통과를 위한 채점기 변경 금지 규칙에 걸릴 수 있어 사용자에게 묻고 고쳤다(별도 커밋 `9f890d9`). 같은 끝말 문제가 repo_oneliner의 "명사형 끝" 검사(`SENTENCE_END`)에도 있으나 이번 실패와 무관해 그대로 두었다
+- (두 번째 클라우드 세션) `roles/item_card.md` max_tokens 1400 → 2000(반복 2)
 - 픽스처 17건(스펙 20건). 녹화 응답에 있는 실제 글이 16건뿐(DeepMind 0건). 큐레이션 7건(GeekNews 4, Simon Willison 3), 수치가 많은 글 3건(본문의 수치 표현을 정규식으로 셈: GeekNews 테스트 글 14, OpenAI Ironclad 7, AI타임스 원프레딕트 3). 남은 3건은 맥에서 실제 한 주로 추가(추가는 허용, 기존 픽스처는 고치지 않음)
 
 ### 6. 남은 문제
-- 관문 B, 라벨, 한 주 실행 → 맥
+- 코드 채점 16/17(jump-trading 1건, 질문 Q6)
+- 픽스처 3건 추가, 라벨 20건, 한 주 실행 → 맥
 
 ## S2 관문 A 전체
-`bash scripts/verify_s2.sh` (2026-10-08, 클라우드)
+`bash scripts/verify_s2.sh` (2026-10-08, 두 번째 클라우드 세션, 키 있음)
 ```
-FAIL A1 회귀: verify_s0.sh FAIL [A4 키 없음(OPENROUTER_API_KEY);A5 키 없음;A6 키 없음;] verify_s1.sh FAIL [A1 ]
-PASS A2 ruff 0, pytest 253 passed, 1 skipped in 13.63s
-PASS M1 마이그레이션 번호 키: user_version 2 기존 DB 재적용 없음, 10·20 등록 순서 무관, 늦게 추가된 10번 적용, 실패는 기록 없이 재시도 (8 passed in 0.12s)
-PASS M2 enforce 훅: 칸을 바꾸면 step detail enforced 기록, eval이 원래·enforce 후를 모두 기록(판정은 원래 출력), repo_oneliner README 200자 규칙 (6 passed in 0.19s)
+PASS A1 verify_s0.sh 10개, verify_s1.sh 24개 전부 PASS
+PASS A2 ruff 0, pytest 258 passed, 1 skipped in 12.95s
+PASS M1 마이그레이션 번호 키: user_version 2 기존 DB 재적용 없음, 10·20 등록 순서 무관, 늦게 추가된 10번 적용, 실패는 기록 없이 재시도 (8 passed in 0.13s)
+PASS M2 enforce 훅: 칸을 바꾸면 step detail enforced 기록, eval이 원래·enforce 후를 모두 기록(판정은 원래 출력), repo_oneliner README 200자 규칙 (6 passed in 0.17s)
 PASS M4 도구 거부 메시지: 중첩 인자 오류에 칸 경로(origin.kind, pages[1]) (2 passed, 4 deselected in 0.10s)
 PASS M6 낡은 문구 두 개(geeknews.py 설명, report.py 계획 표기) 없음
-PASS A3 filter.yaml, 바뀐 keywords.yaml(13개)이 check-config 통과 + 없는 키워드 id, 범위 밖 문턱값이 경로를 짚어 실패 (2 passed, 13 deselected in 0.38s)
+PASS A3 filter.yaml, 바뀐 keywords.yaml(13개)이 check-config 통과 + 없는 키워드 id, 범위 밖 문턱값이 경로를 짚어 실패 (2 passed, 13 deselected in 0.35s)
 PASS A5 rematch: 키워드를 바꾸면 판정·item_keywords·트렌딩 판정이 바뀌고, 다시 돌려도 같음 (2 passed, 13 deselected in 0.10s)
 PASS A6 필터(모의 임베더): 네 갈래 판정, 제외어는 되살리지 않음, 두 번째 실행 임베딩 계산 0 (9 passed, 6 deselected in 0.11s)
-PASS A7 같은 정규화 URL(원문 링크 포함)이 same_as로 연결, 기준 항목은 공식 > 개인 블로그 > 언론 > 큐레이션 (1 passed, 14 deselected in 0.09s)
+PASS A7 같은 정규화 URL(원문 링크 포함)이 same_as로 연결, 기준 항목은 공식 > 개인 블로그 > 언론 > 큐레이션 (1 passed, 14 deselected in 0.08s)
 PASS A13 마이그레이션 대역: 이 묶음 번호 [10, 11, 12, 13], 대역 밖 [], 등록 전체 [1, 2, 10, 11, 12, 13]
 PASS A4 S2 새 역할 md(item_card)와 채점표가 역할 md 검사 통과, 예시 3개(보통/빈칸/함정). S3 역할은 verify_s3.sh (1 passed, 28 deselected in 0.12s)
-PASS A8 item_card enforce: 본문에 없는 quote, quote에 없는 수치, 목록 밖 키워드·링크 정리 + detail 기록, 코드 채점(인젝션, 인용 일치율) (13 passed in 0.28s)
+PASS A8 item_card enforce: 본문에 없는 quote, quote에 없는 수치, 목록 밖 키워드·링크 정리 + detail 기록, 코드 채점(인젝션, 인용 일치율) (13 passed in 0.26s)
 PASS A14 README(기능, 빠른 시작, 성과 행), DEVELOPMENT 명령표, S2 리포트, 맥 확인 목록
 ```
-- A1 FAIL은 0단계와 같은 이유(키 없음, verify_s0 A4~A6). 나머지 전부 PASS
+- A1까지 전부 PASS. pytest의 건너뜀 1개는 embed 묶음 없이 돈 실제 임베더 테스트(허용된 한 종류)이고, `uv run --extra embed`로 따로 돌려 통과
+- 첫 클라우드 세션 때는 A1만 FAIL(키 없음)
 
 ## S2 공통 코어 수정
 | 커밋 | 파일 | 내용 |
@@ -199,12 +245,15 @@ PASS A14 README(기능, 빠른 시작, 성과 행), DEVELOPMENT 명령표, S2 �
 ## 사용액 (S2)
 | 구분 | 사용액 |
 |---|---|
-| 클라우드 | $0(LLM 호출 없음, 키 없음) |
-| 맥 | 맥 확인 후 |
+| 클라우드(첫 세션) | $0(LLM 호출 없음, 키 없음) |
+| 클라우드(두 번째 세션) | **$0.3707** / 클라우드 몫 0.80 (qwen3.8-27b $0.2322, gemini-3.8-flash $0.1385. `cost --spec S2`) |
+| 맥 | 맥 확인 후. 스펙 상한 1.00에서 클라우드 사용액을 빼고 확인 |
+
+- 두 번째 세션 내역: repo_oneliner 재평가 $0.0155, item_card 평가 6회(첫 실행, 채점기 수정 뒤, 반복 1~3, 최종) $0.334, 개발 DB summarize $0.0213. verify_s0 A4~A6 smoke는 무료 모델
 
 ## 7-1. README, 위키 메모 (S2)
 - README: 역할 표의 글 1차 요약 상태, 빠른 시작(rematch, filter, summarize), 성과 표 S2 행(맥 확인 뒤 수치). DEVELOPMENT: 명령 4개, 필터와 1차 요약 동작
-- 위키 메모: 녹화 픽스처가 실제 키워드 설정에 기대고 있어 키워드를 넓히자 녹화에 없는 URL(README 요청)이 생겨 테스트가 깨짐 → 테스트 전용 키워드 파일로 분리. 원문 인용 칸까지 문체 검사를 하면 원문 "~요"가 걸려 거짓 실패 → 역할별 문체 검사 칸
+- 위키 메모: 녹화 픽스처가 실제 키워드 설정에 기대고 있어 키워드를 넓히자 녹화에 없는 URL(README 요청)이 생겨 테스트가 깨짐 → 테스트 전용 키워드 파일로 분리. 원문 인용 칸까지 문체 검사를 하면 원문 "~요"가 걸려 거짓 실패 → 역할별 문체 검사 칸. 문장 끝 "요" 정규식은 "필요·중요" 같은 명사도 잡음 → 명사 끝말 예외. 한국어 JSON 출력은 글자당 토큰이 많아 max_tokens를 영어 기준으로 잡으면 잘림(finish_reason=length). `uv run`은 선택 묶음을 지우므로 `--extra embed`를 붙여야 함
 
 ## 8. 서브에이전트 리뷰 (2a, 2b)
 S2·S3를 함께 리뷰받았다. 지적과 처리는 `reports/S3_report.md` 8장. S2 몫: 같은 URL 기준 항목이 drop이면 keep 경유 항목을 대표로(`summarize.targets`), 스키마 모듈 import 순서(자기 등록), 리포트 출력 갱신

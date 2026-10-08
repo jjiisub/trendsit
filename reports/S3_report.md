@@ -1,7 +1,9 @@
 # S3 리포트: 깊게 보기 (3c 레포 분석가 → 3a 편집장 계획 → 3b 글 분석가)
 
-> 진행 체크리스트(COMMON 8장). 상태: 클라우드 구현 끝, 맥 확인 대기(`reports/S2S3_mac_todo.md`). 관문 B 수치는 맥 확인 뒤 채운다.
-> 실행 환경: 클라우드(리눅스, 파이썬 3.13), `OPENROUTER_API_KEY` 없음. GitHub API는 이 저장소만, github.com·export.arxiv.org·원문 사이트는 막힘.
+> 진행 체크리스트(COMMON 8장). 상태: 클라우드 구현 끝 + **클라우드 관문 B(픽스처 범위만, 2026-10-08 두 번째 클라우드 세션)** 끝, 맥 확인 대기(`reports/S2S3_mac_todo.md`).
+> **클라우드 관문 B의 범위**: editor_plan 2건, text_analyst 6건의 픽스처를 녹화 응답으로 만든 개발 DB(글 15건 1차 요약, 영상 1편, 트렌딩 11행)에서 뽑아 돌렸다. 스펙 수(영상 10편 계획, 글 10건)에 못 미치고 실제 한 주가 아니다. repo_analyst는 GitHub API가 이 저장소 밖으로 막혀 돌리지 않았다. 실제 한 주 픽스처, 검증 산출물(`S3_traces/`, `S3_plan.md`), 사람 라벨은 맥 몫. judge 판정은 모두 **잠정**
+> 실행 환경(두 번째 클라우드 세션): 키 있음, openrouter.ai·export.arxiv.org·일반 원문 사이트 열림. github.com(레포 페이지), 이 저장소 밖 GitHub API, news.hada.io는 막힘
+> 실행 환경(첫 클라우드 세션): 클라우드(리눅스, 파이썬 3.13), `OPENROUTER_API_KEY` 없음. GitHub API는 이 저장소만, github.com·export.arxiv.org·원문 사이트는 막힘.
 
 ## 진행 체크리스트
 - [x] M3 safe_fetch 연결 주소 고정(DNS 재바인딩)
@@ -10,34 +12,42 @@
 - [x] 3a `editor_plan`: 스키마(CONTRACTS 1장), validate_plan, 대체 계획, `plan run/show/agreement`, 산출물·라벨 생성기, 채점
 - [x] 3b `text_analyst`: 스키마·enforce, fetch_page·read_more·arxiv, 원본 추적 지침, `deep text`, 채점
 - [x] `scripts/verify_s3.sh`
-- [ ] 관문 B 3개 역할, 검증 산출물(`S3_traces/`, `S3_plan.md`), 라벨(맥)
+- [x] 관문 B editor_plan(픽스처 2건), text_analyst(픽스처 6건): 두 번째 클라우드 세션, 잠정 통과
+- [ ] 관문 B repo_analyst(GitHub API 필요), 실제 한 주 픽스처, 검증 산출물(`S3_traces/`, `S3_plan.md`), 라벨(맥)
 
 ## 1. 한 줄 요약
 편집장이 세 채널 후보와 예산으로 계획을 세우면(모델 실패 시 규칙 기반 계획), 코드가 예산·깊이·id를 검증해 자르고, 레포 분석가가 GitHub 도구로 관련성·뜨는 이유·과열을, 글 분석가가 원문 링크를 따라 원본을 찾아 수치를 대조한다. 도구 사용 범위와 횟수, 문서 깊이, 근거 없는 판정은 코드가 막는다.
 
 ## 2. 관문 A
-`bash scripts/verify_s3.sh` (2026-10-08, 클라우드)
+`bash scripts/verify_s3.sh` (2026-10-08, 두 번째 클라우드 세션, 키 있음)
 ```
-FAIL A1 회귀: verify_s0.sh FAIL [A4 키 없음(OPENROUTER_API_KEY);A5 키 없음;A6 키 없음;] verify_s1.sh FAIL [A1 ]
-PASS A2 ruff 0, pytest 253 passed, 1 skipped in 14.09s
-PASS A3 deep.yaml이 check-config 통과 + 잘못된 값(깊이 순서, 범위)이 경로를 짚어 실패 (1 passed in 0.19s)
-PASS A4 S3 역할 md 3개(repo_analyst, editor_plan, text_analyst)와 채점표, 원본 추적 지침이 역할 md 검사 통과, 예시 3개 (1 passed, 28 deselected in 0.12s)
+PASS A1 verify_s0.sh 10개, verify_s1.sh 24개 전부 PASS
+PASS A2 ruff 0, pytest 258 passed, 1 skipped in 13.33s
+PASS A3 deep.yaml이 check-config 통과 + 잘못된 값(깊이 순서, 범위)이 경로를 짚어 실패 (1 passed in 0.16s)
+PASS A4 S3 역할 md 3개(repo_analyst, editor_plan, text_analyst)와 채점표, 원본 추적 지침이 역할 md 검사 통과, 예시 3개 (1 passed, 28 deselected in 0.11s)
 PASS M3 safe_fetch 연결 주소 고정: 검사한 IP로만 연결(Host는 원래 이름), 리다이렉트마다 다시 고정, 검사 안 한 이름은 거부 (5 passed in 0.21s)
-PASS A9 에이전트 오프라인: 녹화 픽스처로 3c(GitHub 응답), 3b(GeekNews 원문 페이지) 루프가 끝까지(모의 LLM) (4 passed, 20 deselected in 0.61s)
-PASS A10 깊이·도구 상한: max_depth별 허용 도구(3c), 깊이 상한 밖·parent 없는 읽기 거부(3b), 도구 호출 6회 상한 (7 passed, 21 deselected in 0.74s)
-PASS A11 계획 검증: 예산 초과 꼬리 자르기, max_depth 자르기, 없는 id 제거, 대체 계획 (7 passed, 7 deselected in 0.32s)
+PASS A9 에이전트 오프라인: 녹화 픽스처로 3c(GitHub 응답), 3b(GeekNews 원문 페이지) 루프가 끝까지(모의 LLM) (4 passed, 20 deselected in 0.49s)
+PASS A10 깊이·도구 상한: max_depth별 허용 도구(3c), 깊이 상한 밖·parent 없는 읽기 거부(3b), 도구 호출 6회 상한 (7 passed, 21 deselected in 0.62s)
+PASS A11 계획 검증: 예산 초과 꼬리 자르기, max_depth 자르기, 없는 id 제거, 대체 계획 (7 passed, 7 deselected in 0.27s)
 PASS A12 계약: video_queue.json이 VideoQueueItem으로 읽히고 plan show --video-queue 출력이 같은 모양 (2 passed, 12 deselected in 0.28s)
 PASS A13 마이그레이션 대역: 이 묶음 번호 [10, 11, 12, 13], 대역 밖 [], 등록 전체 [1, 2, 10, 11, 12, 13]
 PASS A14 README(빠른 시작, 성과 행), DEVELOPMENT 명령표, S3 리포트, 맥 확인 목록
 ```
-- A1 FAIL은 키가 없어 verify_s0 A4~A6(smoke 모델 실제 호출)이 FAIL인 것뿐. 맥에서 확인
+- A1까지 전부 PASS(첫 클라우드 세션 때는 키가 없어 A1만 FAIL)
 
-## 3. 관문 B (맥 확인 후)
+## 3. 관문 B (클라우드는 픽스처 범위만, 나머지 맥)
 | 역할 | 통과 기준 | 결과 |
 |---|---|---|
-| repo_analyst | judge Q1~Q3 각 80% + 관련 낮은 레포 80% 이상 커밋 도구 없이 finish + 평균 도구 호출 4회 이하 | 맥 확인 후 |
-| editor_plan | 코드 채점 전부 + judge Q1~Q2 80% + 영상 mode 동의율 80% | 맥 확인 후 |
-| text_analyst | enforce 전 근거 없는 confirmed/differs 0~1건 + judge Q1~Q3 각 80% | 맥 확인 후 |
+| repo_analyst | judge Q1~Q3 각 80% + 관련 낮은 레포 80% 이상 커밋 도구 없이 finish + 평균 도구 호출 4회 이하 | **실행 안 함**: 도구(커밋·기여자·릴리스·README)가 GitHub API를 부르는데 이 클라우드는 이 저장소 밖이 403. 녹화는 2개 레포뿐이고 커밋 등은 합성. 맥 확인 후 |
+| editor_plan | 코드 채점 전부 + judge Q1~Q2 80% + 영상 mode 동의율 80% | 픽스처 2건(개발 DB 2026-10-04, 10-06): 코드 2/2, Q1 2/2, Q2 2/2 **잠정 통과**($0.0083, 재기록 $0, `reports/eval/editor_plan_generate_20261008-122719.json`). 영상 1편뿐이라 mode 동의율은 맥 |
+| text_analyst | enforce 전 근거 없는 confirmed/differs 0~1건 + judge Q1~Q3 각 80% | 픽스처 6건: 근거 없는 판정 0건, 코드 6/6, Q1~Q3 각 6/6 **잠정 통과**($0.0499 + 재기록 $0.0043, `reports/eval/text_analyst_generate_20261008-122802.json`). 원본 확보 6/6, 깊이 2에서 6건 |
+
+**두 번째 클라우드 세션 픽스처(새로 추가, 기존 없음)**
+- 개발 DB: S1 녹화 응답 5묶음(window, bf_aitimes, bf_geeknews, bf_simonw, bf_youtube)을 테스트와 같은 재생 방식으로 `data/`에 수집 → `rematch` → `filter --embedder real` → `summarize`(15건, $0.0213). 실제 한 주가 아니다
+- `eval/fixtures/editor_plan/dev-2026-10-04.json`(영상 1, 글 3, 레포 0), `dev-2026-10-06.json`(영상 1, 글 5, 레포 11). `plan run --fixture … --no-hype`(과열 검사는 GitHub API라 끔). 10-07도 만들었으나 10-06과 날짜 말고 같아 지움
+- `eval/fixtures/text_analyst/dev-it{5,6,20,21,22,23}.json`: 개발 DB에서 needs_original=true인 6건 전부, `deep text --item N --fixtures`. 원본 후보 접속: it5·it21은 github.com이 403이라 공식 사이트·문서로 대신 확인(not_found 처리), it20은 원본 블로그 열림, it6은 블로그 + arxiv 초록
+- 반복 개선 없음(두 역할 모두 첫 실행에서 문턱값 통과). 라벨 `eval/labels/text_analyst.csv` 6행 만들어 둠(빈칸)
+- `eval editor_plan --label`은 judge 라벨을 `eval/labels/editor_plan.csv`에 쓰는데, 같은 경로를 `plan --labels`(영상 mode 동의 라벨, 스펙 지정)도 쓴다. 서로 덮어써서 judge 라벨은 만들지 않았다(질문 파일 Q5)
 
 ## 3c 레포 분석가
 
@@ -97,15 +107,17 @@ PASS A14 README(빠른 시작, 성과 행), DEVELOPMENT 명령표, S3 리포트,
 | 13 | 3a | plans |
 
 ## 6. 남은 문제, 다음 스펙 제안
-- 관문 B 3개 역할, 라벨, 산출물 → 맥
+- repo_analyst 관문 B 전체, editor_plan·text_analyst의 실제 한 주 픽스처(영상 10편, 글 10건), 라벨, 산출물 → 맥
+- editor_plan 라벨 경로 겹침(질문 Q5)
 - 다음 스펙(S5) 제안: 유사 쌍 상위 30(맥 실행 뒤 `reports/S2_filter/README.md`)으로 묶기 기준, ItemCard 중 묶기에 쓸 칸(entities, keywords, claims), 원본 깊이 분포로 기본 깊이 결정
 - 슬라이드 예산만 넘는 영상을 빼지 않고 whisper로 낮출지(S4 결과 보고)
 
 ## 7. 사용액
 | 구분 | S3 사용액 |
 |---|---|
-| 클라우드 | $0(LLM 호출 없음, 키 없음) |
-| 맥 | 맥 확인 후 |
+| 클라우드(첫 세션) | $0(LLM 호출 없음, 키 없음) |
+| 클라우드(두 번째 세션) | **$0.0625** / 클라우드 몫 1.60 (`cost --spec S3`. editor_plan $0.0083, text_analyst $0.0499 + 픽스처 이름 변경 뒤 재기록 $0.0043(원문 페이지를 새로 받아 캐시 일부만 맞음, 결과 같음)) |
+| 맥 | 맥 확인 후. 스펙 상한 2.00에서 클라우드 사용액을 빼고 확인 |
 
 ## 7-1. README, 위키 메모
 - README: 역할 표 상태, 빠른 시작(repo-analyze, plan, deep text), 성과 표 S3 행. DEVELOPMENT: 명령 5개, 깊게 보기 동작
