@@ -228,3 +228,17 @@ def test_label_metrics_with_labeler(tmp_path):
     m = label_metrics(path, rows)
     assert (m["n"], m["precision"], m["recall"]) == (3, 0.5, 0.5)
     assert m["labelers"] == ["opus-5.5"] and m["provisional"] is True
+
+
+def test_n5_device_reproduction_rule():
+    """설계 결정 N5: 판정 구간이 바뀐 픽스처 0건 + 최대 차이 0.01 이하. 저장된 클라우드 CPU·맥 MPS 점수는 통과."""
+    import json
+    from pathlib import Path
+
+    from trendsit.cli_text import DEVICE_DIFF_MAX, device_flips
+
+    cfg = config.load("filter.yaml")
+    rec = json.loads((Path(__file__).parents[1] / "reports" / "S2_filter" / "fixture_scores.json").read_text())
+    cpu, mps = rec["Qwen/Qwen3-Embedding-0.6B@cpu"], rec["Qwen/Qwen3-Embedding-0.6B@mps"]
+    assert max(abs(cpu[k] - mps[k]) for k in cpu) <= DEVICE_DIFF_MAX and device_flips(cpu, mps, cfg) == []
+    assert device_flips({"a": 0.299}, {"a": 0.301}, cfg) == ["a"]  # drop_below 0.30을 사이에 두면 판정이 갈림
