@@ -45,7 +45,7 @@ core_rules:
 ## 출력
 finish의 인자를 칸 순서대로 채운다. 인용을 먼저 적어야 판정이 인용을 따른다.
 1. `trail`: 연 페이지 순서대로 {url, depth, reason}. 원래 글은 넣지 않아도 된다
-2. `quotes`: 원본에서 옮긴 문장 {n, url(그 문장이 있던 페이지), text(그대로)}. 최대 8개
+2. `quotes`: 원본에서 옮긴 문장 {n, url(그 문장이 있던 페이지), text(그대로)}. 최대 8개. 따옴표·아포스트로피(’ “ ”)와 대시(– —) 모양까지 페이지 글자 그대로 옮긴다. 코드가 페이지 본문과 글자 단위로 대조해 한 글자만 달라도 인용과 그 판정을 지우기 때문이다
 3. `verified`: checks마다 {check_n, quote_n 또는 null, status}
 4. `differences`: differs마다 한 줄(예: "요약 '10배', 원본 '최대 10배'")
 5. `origin`: 찾은 1차 자료 {url, kind, title, date}. trail에 있는 URL만. 못 찾았으면 null
