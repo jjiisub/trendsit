@@ -32,18 +32,18 @@
 맥에서 `bash scripts/verify_s4.sh`(video 묶음 포함, 맥 전용 테스트까지 실행):
 ```
 PASS A1 verify_s0.sh 10개, verify_s1.sh 24개 전부 PASS
-PASS A2 ruff 0, pytest 286 passed in 66.11s (0:01:06) (건너뜀 0건은 맥 전용 표시뿐)
-PASS A3 check-config 통과(OK 설정 6개, 역할 5개) + 잘못된 mode·상한이 경로를 짚어 실패 (6 passed, 35 deselected in 0.85s)
-PASS A4 video_slide, video_summary 역할 md 검사 통과, 예시 3개 (4 passed, 23 deselected in 1.09s)
-PASS A5 픽스처 MediaResult 계약 통과 + 깨뜨린 사본(시간 역순, 상한 초과, 작업 폴더 밖 경로 등) 실패 (2 passed, 39 deselected in 0.71s)
-PASS A6 큐 계약 JSON → mode별 설정, captions에 수동 자막 없으면 건너뜀(올리지 않음) (12 passed, 45 deselected in 3.33s)
-PASS A7 suspect_hallucination·empty에서 전사를 근거로 쓰지 않음, 둘 다 없으면 내용 없음 + attention (7 passed, 21 deselected in 4.16s)
-PASS A8 대조: 다른 표기의 같은 수치는 대조됨, 30초 밖은 slide_only, check는 따로 (47 passed in 0.55s)
-PASS A9 enforce: 판독 수치(ocr_text 안), 표기 쌍, 근거·타임라인 초 범위(모의 LLM) (3 passed, 9 deselected in 0.43s)
-PASS A10 이미지 입력: 메시지 모양, 캐시 키가 이미지 바이트에 따름, 기록·캐시에 원본 없음, 예상 비용 (5 passed, 7 deselected in 0.70s)
-PASS A11 보관: purge는 7일 지난 작업 폴더만, DB 텍스트 유지, 8주 지난 segments 텍스트 삭제 (2 passed, 55 deselected in 1.75s)
-PASS A12 마이그레이션 대역: S4 번호 모두 20~29, video_ 표만, 묶음 A 번호와 순서 무관 (2 passed, 14 deselected in 11.34s)
-PASS A13 자동 자막 경로 없음(자동 자막만 있는 메타데이터에서 captions는 건너뜀) (2 passed, 39 deselected in 7.62s)
+PASS A2 ruff 0, pytest 296 passed in 52.74s (건너뜀 0건은 맥 전용 표시뿐)
+PASS A3 check-config 통과(OK 설정 6개, 역할 5개) + 잘못된 mode·상한이 경로를 짚어 실패 (6 passed, 35 deselected in 1.21s)
+PASS A4 video_slide, video_summary 역할 md 검사 통과, 예시 3개 (4 passed, 23 deselected in 1.82s)
+PASS A5 픽스처 MediaResult 계약 통과 + 깨뜨린 사본(시간 역순, 상한 초과, 작업 폴더 밖 경로 등) 실패 (2 passed, 39 deselected in 1.15s)
+PASS A6 큐 계약 JSON → mode별 설정, captions에 수동 자막 없으면 건너뜀(올리지 않음) (12 passed, 45 deselected in 1.61s)
+PASS A7 suspect_hallucination·empty에서 전사를 근거로 쓰지 않음, 둘 다 없으면 내용 없음 + attention (7 passed, 27 deselected in 2.04s)
+PASS A8 대조: 다른 표기의 같은 수치는 대조됨, 30초 밖은 slide_only, check는 따로 (47 passed in 0.53s)
+PASS A9 enforce: 판독 수치(ocr_text 안), 표기 쌍, 근거·타임라인 초 범위(모의 LLM) (3 passed, 15 deselected in 0.44s)
+PASS A10 이미지 입력: 메시지 모양, 캐시 키가 이미지 바이트에 따름, 기록·캐시에 원본 없음, 예상 비용 (5 passed, 13 deselected in 0.65s)
+PASS A11 보관: purge는 7일 지난 작업 폴더만, DB 텍스트 유지, 8주 지난 segments 텍스트 삭제 (2 passed, 55 deselected in 1.08s)
+PASS A12 마이그레이션 대역: S4 번호 모두 20~29, video_ 표만, 묶음 A 번호와 순서 무관 (2 passed, 14 deselected in 1.30s)
+PASS A13 자동 자막 경로 없음(자동 자막만 있는 메타데이터에서 captions는 건너뜀) (2 passed, 39 deselected in 0.83s)
 PASS A14 README(기능, 빠른 시작, 시스템 의존성), DEVELOPMENT.md 명령표, 리포트
 ```
 
