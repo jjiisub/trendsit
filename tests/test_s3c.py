@@ -4,8 +4,8 @@ GitHub 응답은 tests/fixtures/http/repo_tools(레포 정보·README는 S1 녹�
 """
 
 import json
-from pathlib import Path
 from datetime import date
+from pathlib import Path
 
 import pytest
 
@@ -207,7 +207,14 @@ def real_state():
 
 
 def test_recorded_github_responses_normal_path():
-    from trendsit.tools.github import CommitsArgs, RepoArgs, contributors, github_repo, recent_commits, releases
+    from trendsit.tools.github import (
+        CommitsArgs,
+        RepoArgs,
+        contributors,
+        github_repo,
+        recent_commits,
+        releases,
+    )
 
     st = real_state()
     info = github_repo(RepoArgs(name=REAL["active"]), st).content
