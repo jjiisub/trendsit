@@ -14,6 +14,7 @@ dependencies = [
 
 # 스펙별 선택 묶음(COMMON 9장): S2~S3 = embed, S4 = video. 각 묶음이 한 줄씩 추가하고 병합 때 uv lock 재생성
 [project.optional-dependencies]
+video = ["yt-dlp>=2026.8.19", "mlx-whisper>=0.4.3; sys_platform == 'darwin'"]  # S4 영상 분석가(받기, 로컬 전사). ffmpeg와 JS 런타임은 시스템 의존성
 
 [dependency-groups]
 dev = ["pytest>=8", "ruff>=0.8"]
