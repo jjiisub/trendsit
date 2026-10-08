@@ -1,0 +1,588 @@
+{
+ "video_id": "kcflfXb6dBM",
+ "mode": "whisper+slides",
+ "title": "[한영자막] 프롬프트에서 프로덕션까지: AI 코드 워크플로우의 미래는 어떻게 바뀔까요?",
+ "duration_sec": 423,
+ "span": {
+  "start": 0.0,
+  "end": 422.674
+ },
+ "language": "en",
+ "transcript_source": "whisper",
+ "transcript_quality": "ok",
+ "quality_signals": {
+  "segments": 73,
+  "chars": 4669,
+  "repeat_ratio": 0.0,
+  "unique_tokens": 390,
+  "window_uniform_ratio": 0.0,
+  "silence_ratio": 0.0889,
+  "no_speech_ratio": 0.0,
+  "mean_avg_logprob": -0.2149,
+  "mean_compression_ratio": 1.4745,
+  "language_votes": [
+   {
+    "at": 84.5,
+    "lang": "en",
+    "prob": 0.9998
+   },
+   {
+    "at": 211.3,
+    "lang": "en",
+    "prob": 0.9999
+   },
+   {
+    "at": 338.1,
+    "lang": "en",
+    "prob": 0.9998
+   }
+  ]
+ },
+ "segments": [
+  {
+   "start": 0.0,
+   "end": 4.32,
+   "text": "Today, moving from prompt to production seems so simple with AI."
+  },
+  {
+   "start": 4.5,
+   "end": 9.18,
+   "text": "I just tell it my project idea and agent-encoding IDEs can get right to work,"
+  },
+  {
+   "start": 9.18,
+   "end": 13.82,
+   "text": "building every part of the workflow from that first line of code all the way to"
+  },
+  {
+   "start": 13.82,
+   "end": 14.9,
+   "text": "actually deploying it."
+  },
+  {
+   "start": 15.72,
+   "end": 19.62,
+   "text": "Let's explore what it actually takes and why writing code is increasingly"
+  },
+  {
+   "start": 19.62,
+   "end": 24.66,
+   "text": "becoming the easiest part of that journey from idea to outcome."
+  },
+  {
+   "start": 25.24,
+   "end": 29.42,
+   "text": "The same way you don't start pouring concrete before designing a building,"
+  },
+  {
+   "start": 29.42,
+   "end": 33.1,
+   "text": "complex engineering work starts with a detailed plan."
+  },
+  {
+   "start": 33.44,
+   "end": 41.68,
+   "text": "Effective AI workflows must understand intent, assess impact, and reason about"
+  },
+  {
+   "start": 41.68,
+   "end": 45.62,
+   "text": "which steps are needed to complete the work successfully."
+  },
+  {
+   "start": 45.8,
+   "end": 50.72,
+   "text": "As a consequence, the quality of the solution is often determined long before"
+  },
+  {
+   "start": 50.72,
+   "end": 52.76,
+   "text": "that first line of code is even written."
+  },
+  {
+   "start": 53.0,
+   "end": 59.08,
+   "text": "Let's say I have a website and I prompt my AI to"
+  },
+  {
+   "start": 59.42,
+   "end": 63.8,
+   "text": "Coding Assistant to help customers find information faster."
+  },
+  {
+   "start": 64.7,
+   "end": 68.18,
+   "text": "In my code, an AI agent could do any of the following."
+  },
+  {
+   "start": 68.54,
+   "end": 76.82,
+   "text": "It could build a search bar, author an FAQ section, display personalized"
+  },
+  {
+   "start": 76.82,
+   "end": 81.74,
+   "text": "recommendations, or even create an AI chatbot."
+  },
+  {
+   "start": 81.74,
+   "end": 90.86,
+   "text": "AI coding tools are incredibly capable and could implement any of these with high speed and quality."
+  },
+  {
+   "start": 90.86,
+   "end": 96.98,
+   "text": "But you, the prompter, need to set the stage of what is important for success and why."
+  },
+  {
+   "start": 96.98,
+   "end": 106.74,
+   "text": "Maybe we don't have the customer data to be able to personalize or the budget to enable an AI assistant or licensing for a particular tech stack."
+  },
+  {
+   "start": 106.74,
+   "end": 115.22,
+   "text": "Planning is now more important than ever as AI helps execute your vision to deliver the best outcomes."
+  },
+  {
+   "start": 115.22,
+   "end": 120.8,
+   "text": "In fact, much of modern software development is less about writing code."
+  },
+  {
+   "start": 120.8,
+   "end": 130.76,
+   "text": "And more about navigating dependencies, workflows, architecture decisions, and trade-offs across these increasingly complex systems."
+  },
+  {
+   "start": 130.76,
+   "end": 137.54,
+   "text": "As AI makes implementation cheaper, choosing the right approach becomes even more important."
+  },
+  {
+   "start": 137.54,
+   "end": 143.0,
+   "text": "Once we've designed the right solution, it's time to have the AI execute."
+  },
+  {
+   "start": 143.0,
+   "end": 145.16,
+   "text": "And that's where things get interesting."
+  },
+  {
+   "start": 145.16,
+   "end": 152.96,
+   "text": "When you think of a code change, it's easy to see it as going from prompt to code."
+  },
+  {
+   "start": 156.54,
+   "end": 160.64,
+   "text": "You or an AI write the code, commit it, and are done."
+  },
+  {
+   "start": 160.64,
+   "end": 168.14,
+   "text": "But implementing changes is actually a much larger workflow where the code change is often just a small part of it."
+  },
+  {
+   "start": 168.14,
+   "end": 180.88,
+   "text": "You may need to update code, tests, configs, infrastructure, documentation, monitoring, pipelines, dependencies, security, compliance, the list goes on."
+  },
+  {
+   "start": 180.88,
+   "end": 190.52,
+   "text": "And a lot of times these updates need to be coordinated across a variety of different repositories, services, or delivery pipelines."
+  },
+  {
+   "start": 190.52,
+   "end": 195.52,
+   "text": "An agentic coding system isn't valuable due to its ability to write a simple function."
+  },
+  {
+   "start": 195.52,
+   "end": 209.52,
+   "text": "It's valuable because of its ability to tie together execution, validation, dependencies, and testing all into one workflow that it coordinates across all of these domains for you."
+  },
+  {
+   "start": 209.52,
+   "end": 213.52,
+   "text": "And being agents, these aren't just one-shot actions."
+  },
+  {
+   "start": 213.52,
+   "end": 226.52,
+   "text": "Coding assistants build, run tests, find any failures, fix those failures, run security scans, validate dependencies, and continually evaluate and rebuild."
+  },
+  {
+   "start": 226.52,
+   "end": 236.52,
+   "text": "Agentic code systems create this self-correcting workflow where execution and validation happen together, driving toward efficient outcomes."
+  },
+  {
+   "start": 236.52,
+   "end": 243.52,
+   "text": "For a while now, the main challenge hasn't been just generating code, but rather coordinating all of the changes around it."
+  },
+  {
+   "start": 243.52,
+   "end": 247.52,
+   "text": "But after the agent is successful, there's still one lingering question."
+  },
+  {
+   "start": 247.52,
+   "end": 249.52,
+   "text": "How do we know it worked?"
+  },
+  {
+   "start": 249.52,
+   "end": 253.52,
+   "text": "For years, software development was limited by execution."
+  },
+  {
+   "start": 253.52,
+   "end": 257.52,
+   "text": "Writing code, migrating systems, and testing all took time."
+  },
+  {
+   "start": 257.52,
+   "end": 258.52,
+   "text": "But AI changes that."
+  },
+  {
+   "start": 258.52,
+   "end": 267.52,
+   "text": "Today, an agent can update hundreds of files, touch multiple repos, modify tests, pipelines, and configs in a matter of minutes."
+  },
+  {
+   "start": 267.52,
+   "end": 269.52,
+   "text": "That's output."
+  },
+  {
+   "start": 273.52,
+   "end": 279.52,
+   "text": "The challenge is AI can scale execution dramatically faster than humans can scale verification."
+  },
+  {
+   "start": 279.52,
+   "end": 283.52,
+   "text": "If an agent updates five files, that's no sweat."
+  },
+  {
+   "start": 283.52,
+   "end": 284.52,
+   "text": "I can review that myself."
+  },
+  {
+   "start": 284.52,
+   "end": 292.52,
+   "text": "If it updates 500 files across multiple repos, tests, and deployment pipelines, I can't realistically review every change."
+  },
+  {
+   "start": 292.52,
+   "end": 300.52,
+   "text": "As execution takes less time, the bottleneck becomes our confidence that the solution's outcomes are successful."
+  },
+  {
+   "start": 300.52,
+   "end": 305.52,
+   "text": "As developers, we need concrete answers to these simple questions."
+  },
+  {
+   "start": 305.52,
+   "end": 308.52,
+   "text": "What changed?"
+  },
+  {
+   "start": 308.52,
+   "end": 311.52,
+   "text": "Why did it change?"
+  },
+  {
+   "start": 311.52,
+   "end": 313.52,
+   "text": "What could break?"
+  },
+  {
+   "start": 313.52,
+   "end": 317.52,
+   "text": "How does this impact downstream systems?"
+  },
+  {
+   "start": 317.52,
+   "end": 320.52,
+   "text": "And did we actually achieve the objective?"
+  },
+  {
+   "start": 320.52,
+   "end": 324.52,
+   "text": "I don't care if AI changed 1,000 lines of code."
+  },
+  {
+   "start": 324.52,
+   "end": 330.52,
+   "text": "I care that the right thousand lines changed and that they moved us closer to the outcome we needed."
+  },
+  {
+   "start": 330.52,
+   "end": 334.52,
+   "text": "When used right, AI doesn't just have to produce code."
+  },
+  {
+   "start": 334.52,
+   "end": 337.52,
+   "text": "It should generate evidence."
+  },
+  {
+   "start": 337.52,
+   "end": 346.52,
+   "text": "It should generate evidence through testing, validation, impact analysis, and explanations."
+  },
+  {
+   "start": 346.52,
+   "end": 352.52,
+   "text": "And that in turn produces developer confidence in the outcomes."
+  },
+  {
+   "start": 352.52,
+   "end": 361.52,
+   "text": "Trust isn't generated by seeing more output or someone simply telling you the answer."
+  },
+  {
+   "start": 361.52,
+   "end": 369.52,
+   "text": "Trust comes from knowing the solution works, understanding its impact and risks, and having confidence the objective was achieved."
+  },
+  {
+   "start": 369.52,
+   "end": 375.52,
+   "text": "Great AI workflows accelerate not just execution, but confidence at scale."
+  },
+  {
+   "start": 375.52,
+   "end": 378.52,
+   "text": "AI coding tools have come a long way in just a few years."
+  },
+  {
+   "start": 378.52,
+   "end": 388.52,
+   "text": "Initially focused on just ability to generate working code, we can now use agentic code systems within entire software development workflows, streamlining the hardest part."
+  },
+  {
+   "start": 388.52,
+   "end": 389.52,
+   "text": "Coordination."
+  },
+  {
+   "start": 389.52,
+   "end": 396.52,
+   "text": "As AI is making this execution cheaper, it is shifting the prioritized skills of modern developers."
+  },
+  {
+   "start": 396.52,
+   "end": 402.52,
+   "text": "From planning to architecture to governance, engineering judgment and thinking have become even more valuable."
+  },
+  {
+   "start": 402.52,
+   "end": 406.52,
+   "text": "We are now far past prompt code."
+  },
+  {
+   "start": 406.52,
+   "end": 411.52,
+   "text": "The future is prompt to production."
+  },
+  {
+   "start": 411.52,
+   "end": 421.52,
+   "text": "The strongest AI workflows will connect planning, execution, validation, and verification into a continuous path from idea to outcome."
+  },
+  {
+   "start": 421.52,
+   "end": 422.674,
+   "text": "Profession control development MATTLEY"
+  }
+ ],
+ "frames": [
+  {
+   "t": 0.0,
+   "path": "frames/1791428885-68710/frame_0001.jpg",
+   "reason": "first-frame",
+   "segment_index": 0,
+   "spoken_text": "Today, moving from prompt to production seems so simple with AI."
+  },
+  {
+   "t": 4.3,
+   "path": "frames/1791428885-68710/frame_0017.jpg",
+   "reason": "uniform",
+   "segment_index": 0,
+   "spoken_text": "Today, moving from prompt to production seems so simple with AI."
+  },
+  {
+   "t": 33.333,
+   "path": "frames/1791428885-68710/frame_0002.jpg",
+   "reason": "scene-change",
+   "segment_index": 8,
+   "spoken_text": "Effective AI workflows must understand intent, assess impact, and reason about"
+  },
+  {
+   "t": 68.433,
+   "path": "frames/1791428885-68710/frame_0003.jpg",
+   "reason": "scene-change",
+   "segment_index": 15,
+   "spoken_text": "It could build a search bar, author an FAQ section, display personalized"
+  },
+  {
+   "t": 107.433,
+   "path": "frames/1791428885-68710/frame_0004.jpg",
+   "reason": "scene-change",
+   "segment_index": 20,
+   "spoken_text": "Planning is now more important than ever as AI helps execute your vision to deliver the best outcomes."
+  },
+  {
+   "t": 134.0,
+   "path": "frames/1791428885-68710/frame_0005.jpg",
+   "reason": "scene-change",
+   "segment_index": 23,
+   "spoken_text": "As AI makes implementation cheaper, choosing the right approach becomes even more important."
+  },
+  {
+   "t": 145.2,
+   "path": "frames/1791428885-68710/frame_0018.jpg",
+   "reason": "uniform",
+   "segment_index": 26,
+   "spoken_text": "When you think of a code change, it's easy to see it as going from prompt to code."
+  },
+  {
+   "t": 153.467,
+   "path": "frames/1791428885-68710/cue_0015.jpg",
+   "reason": "transcript-cue",
+   "segment_index": 26,
+   "spoken_text": "When you think of a code change, it's easy to see it as going from prompt to code."
+  },
+  {
+   "t": 171.3,
+   "path": "frames/1791428885-68710/frame_0006.jpg",
+   "reason": "scene-change",
+   "segment_index": 29,
+   "spoken_text": "You may need to update code, tests, configs, infrastructure, documentation, monitoring, pipelines, dependencies, security, compliance, the list goes on."
+  },
+  {
+   "t": 202.4,
+   "path": "frames/1791428885-68710/frame_0007.jpg",
+   "reason": "scene-change",
+   "segment_index": 32,
+   "spoken_text": "It's valuable because of its ability to tie together execution, validation, dependencies, and testing all into one workflow that it coordinates across all of these domains for you."
+  },
+  {
+   "t": 223.233,
+   "path": "frames/1791428885-68710/frame_0008.jpg",
+   "reason": "scene-change",
+   "segment_index": 34,
+   "spoken_text": "Coding assistants build, run tests, find any failures, fix those failures, run security scans, validate dependencies, and continually evaluate and rebuild."
+  },
+  {
+   "t": 259.1,
+   "path": "frames/1791428885-68710/frame_0009.jpg",
+   "reason": "scene-change",
+   "segment_index": 42,
+   "spoken_text": "Today, an agent can update hundreds of files, touch multiple repos, modify tests, pipelines, and configs in a matter of minutes."
+  },
+  {
+   "t": 270.033,
+   "path": "frames/1791428885-68710/cue_0016.jpg",
+   "reason": "transcript-cue",
+   "segment_index": 43,
+   "spoken_text": "That's output."
+  },
+  {
+   "t": 282.0,
+   "path": "frames/1791428885-68710/frame_0019.jpg",
+   "reason": "uniform",
+   "segment_index": 45,
+   "spoken_text": "If an agent updates five files, that's no sweat."
+  },
+  {
+   "t": 290.3,
+   "path": "frames/1791428885-68710/frame_0010.jpg",
+   "reason": "scene-change",
+   "segment_index": 47,
+   "spoken_text": "If it updates 500 files across multiple repos, tests, and deployment pipelines, I can't realistically review every change."
+  },
+  {
+   "t": 315.3,
+   "path": "frames/1791428885-68710/frame_0011.jpg",
+   "reason": "scene-change",
+   "segment_index": 53,
+   "spoken_text": "How does this impact downstream systems?"
+  },
+  {
+   "t": 351.5,
+   "path": "frames/1791428885-68710/frame_0012.jpg",
+   "reason": "scene-change",
+   "segment_index": 60,
+   "spoken_text": "And that in turn produces developer confidence in the outcomes."
+  },
+  {
+   "t": 384.3,
+   "path": "frames/1791428885-68710/frame_0013.jpg",
+   "reason": "scene-change",
+   "segment_index": 65,
+   "spoken_text": "Initially focused on just ability to generate working code, we can now use agentic code systems within entire software development workflows, streamlining the hardest part."
+  },
+  {
+   "t": 411.133,
+   "path": "frames/1791428885-68710/frame_0020.jpg",
+   "reason": "uniform",
+   "segment_index": 70,
+   "spoken_text": "The future is prompt to production."
+  },
+  {
+   "t": 416.5,
+   "path": "frames/1791428885-68710/frame_0014.jpg",
+   "reason": "scene-change",
+   "segment_index": 71,
+   "spoken_text": "The strongest AI workflows will connect planning, execution, validation, and verification into a continuous path from idea to outcome."
+  }
+ ],
+ "frames_meta": {
+  "tier": "auto",
+  "engine": "keyframe",
+  "candidates": 164,
+  "deduped": 144,
+  "distinct_ratio": 0.878,
+  "selected": 20,
+  "cue_selected": 2,
+  "cap": 20,
+  "resolution": 768,
+  "fallback": false
+ },
+ "frames_error": null,
+ "warnings": [
+  "구간 밖 segment 4건 제외",
+  "앞 segment와 겹친 segment 1건 시작 시각 보정"
+ ],
+ "work_dir": "tests/fixtures/video/kcflfXb6dBM",
+ "env": {
+  "device": "Device(gpu, 0)",
+  "whisper_model": "large-v3-turbo",
+  "versions": {
+   "python": "3.12.14",
+   "platform": "Darwin-arm64",
+   "mlx-whisper": "0.4.3",
+   "mlx": "0.32.3",
+   "yt-dlp": "2026.8.19",
+   "ffmpeg": "8.1.2"
+  },
+  "timings_sec": {
+   "download": 0.23,
+   "frames_pass1": 33.91,
+   "transcribe": 114.27,
+   "frames_post": 6.92,
+   "total": 121.69
+  }
+ },
+ "truncated_segments": false
+}

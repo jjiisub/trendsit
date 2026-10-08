@@ -1,0 +1,12 @@
+# 영상 분석가 설정 (S4 소유, COMMON 9장). mode는 편집장 계획이 정하고 영상 분석가는 올리지 않는다(CONTRACTS 1장)
+whisper_model: large-v3-turbo       # mlx-whisper. 첫 실행 때 약 1.6GB 받음
+max_span_sec: 3600                  # 60분 넘는 영상: start/end 구간, 없으면 앞 60분 (V4)
+download_max_height: 1080           # 디스크가 부족하면 720
+caption_langs: [ko, en]             # captions mode에서 쓸 업로더 수동 자막 언어(앞이 우선). 자동 자막은 쓰지 않음
+retention_days: 7                   # data/media/<video_id> 작업 폴더(영상, 프레임) 보관 일수 (V9)
+segment_ttl_weeks: 8                # video_segments 텍스트 보관(item_texts와 같은 원칙)
+align_window_sec: 30                # 판독 수치를 찾을 발화 범위(프레임 시각 앞뒤, V8)
+modes:
+  captions: {transcript: manual, frames: "off"}
+  whisper: {transcript: whisper, frames: "off"}
+  whisper+slides: {transcript: whisper, frames: auto, frames_res: 768, frames_cap: 20}   # 수치 많은 발표는 --res 1024, 장면 전환이 많은 슬라이드 발표는 --frames full
