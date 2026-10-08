@@ -11,12 +11,12 @@ from ..core import config
 from ..core.db import DB
 from .links import normalize_url
 
-# handoff(S1) 묶음의 백필 후보. 실제로 열어 확인한 결과와 나란히 보여 준다
+# handoff(S1) 묶음의 백필 후보(GeekNews는 설계 결정 Q1·Q5로 정한 실제 방식). 실제로 열어 확인한 결과와 나란히 보여 준다
 HANDOFF_CANDIDATES = {
     "openai": "rss_only",
     "anthropic": "list_pages https://www.anthropic.com/news",
     "deepmind": "rss_only",
-    "geeknews": "RSS + list_pages https://news.hada.io/?page={page}",
+    "geeknews": "day_archive https://news.hada.io/past?day={date} (날짜당 1페이지)",
     "simonw": "day_archive https://simonwillison.net/{yyyy}/{Mon}/{d}/",
     "aitimes": "list_pages https://www.aitimes.com/news/articleList.html?page={page}&view_type=sm",
     "techbridge": "channel_listing (yt-dlp)",
