@@ -5,6 +5,8 @@ from __future__ import annotations
 import re
 from typing import Any
 
+from trendsit.core.artifacts_video import MAX_EVIDENCE, same_spelling
+
 from . import graders
 from .graders import EVAL_ENDINGS, check
 
@@ -36,7 +38,7 @@ def code_video_summary(inp: dict[str, Any], out: dict[str, Any], expect: dict[st
     bad_ev = [e for e in evidence if not in_span(e)]
     checks = [
         check("근거 id 형식과 구간", not bad_ev, ", ".join(bad_ev[:5])),
-        check("포인트마다 근거 1~3개", all(1 <= len(kp["evidence"]) <= 3 for kp in points),
+        check(f"포인트마다 근거 1~{MAX_EVIDENCE}개", all(1 <= len(kp["evidence"]) <= MAX_EVIDENCE for kp in points),
               str([len(kp["evidence"]) for kp in points])),
         check("타임라인 초가 구간 안", all(lo <= t["sec"] <= hi for t in out["timeline"]),
               str([t["sec"] for t in out["timeline"] if not lo <= t["sec"] <= hi])),
@@ -48,9 +50,10 @@ def code_video_summary(inp: dict[str, Any], out: dict[str, Any], expect: dict[st
         check("포인트·라벨 평가형 마무리 없음",
               not [x for x in [kp["text"] for kp in points] + [t["label"] for t in out["timeline"]]
                    if any(e in x for e in EVAL_ENDINGS)], ""),
-        check("표기 쌍 양쪽 표기가 자료에 있음",
+        check("표기 쌍 양쪽 표기가 자료에 있고 서로 다름",
               all(_norm(p["spoken"]) in transcript and any(_norm(p["screen"]) in s for s in screens)
-                  for p in out["name_pairs"]), str(out["name_pairs"])[:120]),
+                  and not same_spelling(p["spoken"], p["screen"]) for p in out["name_pairs"]),
+              str(out["name_pairs"])[:120]),
     ]
     if not usable:
         transcript_only = [e for e in evidence if e not in slide_ids]
@@ -71,4 +74,7 @@ graders.ROLE_CHECKS["video_summary"] = code_video_summary
 # 문체(해요체, 평가형 마무리)는 요약 칸만. chapters와 name_pairs는 업로더·화면 표기를 그대로 옮긴 칸이고,
 # 포인트·라벨은 위의 명사형·평가형 검사가 본다(공통 해요체 정규식은 '개요', '필요'처럼 요로 끝나는 명사도 잡음)
 graders.ROLE_STYLE_FIELDS["video_summary"] = ("summary",)
+# 표기 쌍은 코드 소유 칸(S4 설계 결정 D2-1): 규칙(spoken은 전사에, screen은 판독에, 둘이 다름)이 문자열로 확정되므로
+# 통과 판정은 enforce 후 값으로. 원래 출력 점수는 모델 품질로 따로 기록
+graders.ENFORCED_FIELDS["video_summary"] = ("name_pairs",)
 graders.THRESHOLDS["video_summary"] = {"questions": {"Q1": 0.8, "Q2": 0.8, "Q3": 0.8}, "code_pass_all": True}

@@ -211,6 +211,18 @@ class TimelineEntry(_Strict):
 
 
 NO_CONTENT = "내용 없음"
+MAX_EVIDENCE = 3  # 포인트 하나의 근거 id 상한(md 1~3개). 넘으면 앞 3개만(S4 설계 결정 D2-2)
+# 표기 쌍 spoken과 screen이 띄어쓰기만 다르면("Frontier Code" / "FrontierCode") 같은 표기로 보고 뺀다(리뷰 R2).
+# 대소문자만 다른 것("openclaw" / "OpenClaw")은 전사가 다르게 적은 것이라 남긴다
+NAME_PAIR_SPACING_ONLY_SAME = True
+
+
+def same_spelling(spoken: str, screen: str) -> bool:
+    """표기 쌍의 두 표기가 같은 표기인지(같으면 별칭 후보가 아니다)."""
+    a, b = " ".join(spoken.split()), " ".join(screen.split())
+    if NAME_PAIR_SPACING_ONLY_SAME:
+        a, b = a.replace(" ", ""), b.replace(" ", "")
+    return a == b
 _VD = re.compile(r"^vd:(\d+)@(\d+)$")
 
 
@@ -249,12 +261,17 @@ class VideoSummary(RoleOutput):
         pairs = [p for p in out.name_pairs if p.spoken.strip() and p.screen.strip()
                  and _norm(p.spoken) in transcript and any(_norm(p.screen) in s for s in screens)]
         out = out.fix("name_pairs", pairs, "표기 쌍은 전사와 판독에 실제로 있는 것만")
+        out = out.fix("name_pairs", [p for p in out.name_pairs if not same_spelling(p.spoken, p.screen)],
+                      "표기 쌍의 두 표기가 같으면 뺌")
         points = []
         for kp in out.key_points:
             ev = [e for e in kp.evidence if valid(e)]
             if ev:
                 points.append(kp if ev == kp.evidence else kp.model_copy(update={"evidence": ev}))
         out = out.fix("key_points", points, "근거 id가 구간 밖이거나 쓸 수 없는 전사만 근거인 포인트 정리")
+        capped = [kp if len(kp.evidence) <= MAX_EVIDENCE else kp.model_copy(update={"evidence": kp.evidence[:MAX_EVIDENCE]})
+                  for kp in out.key_points]
+        out = out.fix("key_points", capped, f"포인트 근거 {MAX_EVIDENCE}개 초과 → 앞 {MAX_EVIDENCE}개만")
         out = out.fix("timeline", [t for t in out.timeline if lo <= t.sec <= hi], "타임라인 초는 처리 구간 안")
         out = out.fix("chapters", [c for c in out.chapters if 0 <= c.sec <= inp.duration_sec], "챕터 초는 영상 길이 안")
         if not usable and not inp.slides:

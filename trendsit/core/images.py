@@ -15,7 +15,9 @@ from typing import Any
 from pydantic import BaseModel, ConfigDict
 
 SCHEME = "image:sha256="
-# 예상 비용 계산용 장당 입력 토큰. 768px 프레임 실측 약 300(qwen3.8-27b, DeepInfra, 2026-10-08). 상한 쪽으로 넉넉하게
+# 예상 비용 계산용 장당 입력 토큰. 실측(qwen3.8-27b, DeepInfra, 2026-10-08, 같은 프레임·같은 문구):
+# 기본 해상도 1024px 약 540(요청 626토큰), 768px 약 300(386토큰). 관문 B 판독 1장 평균 입력 약 3,030토큰
+# (시스템 프롬프트 포함). 상한 쪽으로 넉넉하게
 IMAGE_TOKENS_EST = 1500
 MIME = {".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png", ".webp": "image/webp"}
 

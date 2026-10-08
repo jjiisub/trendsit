@@ -181,3 +181,28 @@ def test_check_numbers_survive_enforce():
                                                 {"confidence": "high", "value": "999", "unit": "ms", "what": "p99"}]))
     out = r.enforce(slide_input(THUMBS[0]), None)
     assert [n.value for n in out.numbers] == ["1?8"] and out.attention
+
+
+def test_summary_evidence_capped_at_three():
+    """D2-2: 근거가 3개를 넘으면 앞 3개만 남기고 enforced에 기록."""
+    from trendsit.core.artifacts_video import MAX_EVIDENCE
+
+    s = summary(key_points=[{"text": "근거 많은 포인트", "evidence": [f"vd:905@{i}" for i in (95, 97, 100, 120, 200)]}])
+    out = s.enforce(summary_input(), None)
+    assert out.key_points[0].evidence == ["vd:905@95", "vd:905@97", "vd:905@100"] and MAX_EVIDENCE == 3
+    assert any("3개 초과" in c["rule"] for c in out.enforced)
+
+
+@pytest.mark.parametrize("spoken,screen,kept", [
+    ("Llama 3.1", "Llama 3.1", False),            # 같은 표기
+    ("Review  time", "Review time", False),       # 공백 개수만 다름
+    ("Review time", "Reviewtime", False),         # 띄어쓰기만 다름(NAME_PAIR_SPACING_ONLY_SAME)
+    ("review time", "Review time", True),         # 대소문자만 다름: 남김
+    ("lama three point one", "Llama 3.1", True),
+])
+def test_name_pair_same_spelling_dropped(spoken, screen, kept):
+    """리뷰 R2: spoken과 screen이 같은 표기면 별칭 후보가 아니므로 뺀다."""
+    inp = summary_input(transcript=f"[95] {spoken} is here\n[240] {spoken} again")
+    inp.slides.append(Document(id="vd:905@300", source="슬라이드 판독", text=f"{screen} reviewer"))
+    out = summary(name_pairs=[{"spoken": spoken, "screen": screen, "sec": 241}]).enforce(inp, None)
+    assert bool(out.name_pairs) is kept
