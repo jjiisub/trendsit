@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Literal, Self
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Self
 
 from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, model_validator
 
@@ -60,6 +60,10 @@ class RoleOutput(BaseModel):
     log: str = Field(description="한 줄 기록. 명사형, 화면 문구 규칙")
     attention: bool = Field(default=False, description="사람이 확인해야 하면 true")
 
+    # 코드 소유 칸(설계 결정 Q1): enforce가 값을 정하는 칸. 평가 코드 채점은 이 칸만 enforce 후 값으로 본다.
+    # 나머지 enforce(모델이 틀린 것을 지우는 정리)는 원래 출력으로 채점해 모델 품질을 숨기지 않는다
+    ENFORCED_FIELDS: ClassVar[tuple[str, ...]] = ()
+
     # enforce가 바꾼 칸 기록과 enforce 전 원래 출력(평가가 모델 품질을 원래 출력으로 재도록)
     _enforced: list[dict[str, Any]] = PrivateAttr(default_factory=list)
     _raw: dict[str, Any] | None = PrivateAttr(default=None)
@@ -76,13 +80,19 @@ class RoleOutput(BaseModel):
         """
         return self
 
-    def fix(self, field: str, value: Any, rule: str) -> Self:
-        """칸 하나를 바꾼 사본. 값이 같으면 그대로. 바꾼 내용은 enforced에 {field, before, after, rule}로 쌓인다."""
+    def fix(self, field: str, value: Any, rule: str, owned: bool | None = None) -> Self:
+        """칸 하나를 바꾼 사본. 값이 같으면 그대로. 바꾼 내용은 enforced에 {field, before, after, rule, owned}로 쌓인다.
+
+        owned: 코드 소유 규칙인지. 기본은 field가 ENFORCED_FIELDS에 있는지. 칸 일부만 코드 소유인 규칙(예: 긴 인용
+        자르기)은 True로 넘기고, 같은 칸의 품질 정리보다 먼저 부른다(채점 보기는 코드 소유 변경의 after를 차례로 덮는다).
+        """
         before = getattr(self, field)
         if before == value:
             return self
+        if owned is None:
+            owned = field in self.ENFORCED_FIELDS
         new = self.model_copy(update={field: value})
-        change = {"field": field, "before": _plain(before), "after": _plain(value), "rule": rule}
+        change = {"field": field, "before": _plain(before), "after": _plain(value), "rule": rule, "owned": owned}
         new._enforced = [*self._enforced, change]
         new._raw = self._raw
         return new
@@ -94,6 +104,18 @@ class RoleOutput(BaseModel):
     def raw_dump(self) -> dict[str, Any]:
         """enforce 전 원래 출력. enforce가 바꾼 것이 없으면 지금 출력과 같다."""
         return dict(self._raw) if self._raw is not None else self.model_dump()
+
+    @classmethod
+    def graded_output(cls, raw: dict[str, Any], enforced: list[dict[str, Any]]) -> dict[str, Any]:
+        """코드 채점 대상(설계 결정 Q1): 원래 출력에 코드 소유 변경만 덮은 것. owned가 없는 옛 기록은 ENFORCED_FIELDS로 가린다."""
+        out = dict(raw)
+        for c in enforced:
+            if c.get("owned", c["field"] in cls.ENFORCED_FIELDS):
+                out[c["field"]] = c["after"]
+        return out
+
+    def graded_dump(self) -> dict[str, Any]:
+        return self.graded_output(self.raw_dump(), self._enforced)
 
 
 def apply_enforce(out: RoleOutput, inp: Any, ctx: Ctx | None) -> RoleOutput:
@@ -126,6 +148,7 @@ class RepoOnelinerInput(RoleInput):
 
 
 class RepoOneliner(RoleOutput):
+    ENFORCED_FIELDS = ("attention",)
     basis: str = Field(max_length=120, description="README 본문이나 description에서 근거가 된 구절을 그대로 옮김. 근거가 없으면 빈 문자열")
     oneliner: str = Field(max_length=60, description="무엇을 하는 레포인지 한 문장. 명사형 60자 이내. 근거가 없으면 빈 문자열")
 

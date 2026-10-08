@@ -180,13 +180,26 @@ def llm_grade(role: str, inp: RoleInput, out: dict[str, Any], ctx: Ctx) -> dict[
             "judge_prompt_hash": judge.prompt_hash, "judge_step_id": judge_ctx.last_step_id}
 
 
-def summarize(role: str, results: list[dict[str, Any]]) -> dict[str, Any]:
+def model_agreement(results: list[dict[str, Any]], owned_fields: tuple[str, ...] = ()) -> dict[str, str]:
+    """코드 소유 칸별 모델 일치율(설계 결정 Q1): 원래 출력이 코드가 정한 값과 같았던 건수/출력 수."""
+    outs = [r for r in results if r.get("output")]
+    changed: dict[str, int] = dict.fromkeys(owned_fields, 0)
+    for r in outs:
+        fields = {c["field"] for c in r.get("enforced") or [] if c.get("owned", c["field"] in owned_fields)}
+        for f in fields:
+            changed[f] = changed.get(f, 0) + 1
+    return {f: f"{len(outs) - k}/{len(outs)}" for f, k in changed.items()}
+
+
+def summarize(role: str, results: list[dict[str, Any]], owned_fields: tuple[str, ...] = ()) -> dict[str, Any]:
     th = THRESHOLDS.get(role, {"code_pass_all": True})
     n = len(results)
+    # 통과 판정: 원래 출력에 코드 소유 칸만 enforce 후 값으로 덮어 채점(설계 결정 Q1, run_eval이 code에 넣음)
     code_pass = sum(1 for r in results if r["code"]["passed"])
-    # 보고용: enforce 후 출력 기준 코드 통과(바뀐 것이 없으면 원래 출력 판정). 통과 판정은 code_pass(원래 출력)
+    # 보고용: enforce 전부 적용한 출력(저장되는 것) 기준 코드 통과
     code_pass_enforced = sum(1 for r in results if r.get("code_enforced", r["code"])["passed"])
     summary: dict[str, Any] = {"n": n, "code_pass": code_pass, "code_pass_enforced": code_pass_enforced,
+                               "model_agreement": model_agreement(results, owned_fields),
                                "questions": {}, "criteria": {}}
     has_rubric = rubric_path(role).exists()
     questions = rubric_questions(role) if has_rubric else {}

@@ -118,7 +118,7 @@ def _replay(ctx: Any, step_id: int, model: str | None) -> Any:
 
 # ---------- eval ----------
 def cmd_eval(args: argparse.Namespace) -> int:
-    from eval.run_eval import agreement, make_labels, run_eval
+    from eval.run_eval import agreement, make_labels, regrade, run_eval
 
     if args.label:
         path = make_labels(args.role, config.current_spec(args.spec))
@@ -139,8 +139,11 @@ def cmd_eval(args: argparse.Namespace) -> int:
             print(f"80% 미만: {', '.join(low)} → 사람 비평을 채점 프롬프트 예시로 넣고 다시 잴 것(COMMON 2장)")
         return 0
 
-    report = run_eval(args.role, model=args.model, limit=args.limit, spec=args.spec, no_cache=args.no_cache,
-                      note=args.note)
+    if args.regrade:
+        report = regrade(Path(args.regrade).resolve(), note=args.note)
+    else:
+        report = run_eval(args.role, model=args.model, limit=args.limit, spec=args.spec, no_cache=args.no_cache,
+                          note=args.note)
     s = report["summary"]
     print(f"{report['role']} / {report['model_alias']} ({report['model_id']}): 코드 통과 {s['code_pass']}/{s['n']} "
           f"(enforce 후 {s['code_pass_enforced']}/{s['n']})")
@@ -300,6 +303,7 @@ def main(argv: list[str] | None = None) -> int:
     e.add_argument("--note", help="반복 기록에 남길 메모(이번 수정의 이유 등)")
     e.add_argument("--label", action="store_true", help="최근 eval 결과로 사람 라벨 CSV(eval/labels/<역할>.csv) 생성")
     e.add_argument("--agreement", action="store_true", help="사람 라벨과 judge 판정의 질문별 일치율")
+    e.add_argument("--regrade", metavar="REPORT_JSON", help="저장된 eval 결과를 생성 재실행 없이 지금 규칙으로 다시 채점")
     e.set_defaults(fn=cmd_eval)
 
     k = sub.add_parser("cost", help="스펙별, 모델별 사용액과 남은 예산")

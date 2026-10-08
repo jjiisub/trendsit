@@ -60,7 +60,7 @@ def _evaluate(ctx: Any, role_name: str, model: str | None, limit: int | None, no
         try:
             inp = role.input_cls.model_validate(fx["input"])
             final = run(role, inp, ctx)
-            out = final.raw_dump()  # 통과 판정은 enforce 전 원래 출력(모델 품질을 숨기지 않게, S1 리뷰 M2)
+            out = final.raw_dump()  # 원래 출력(모델 품질). 통과 판정은 여기에 코드 소유 칸만 덮은 것(설계 결정 Q1)
             rec["step_id"] = ctx.last_step_id
         except (RoleFailed, ValidationError) as e:  # 출력 검증 실패, 픽스처 입력 형식 오류는 그 항목의 실패
             error = f"{type(e).__name__}: {e}"
@@ -77,15 +77,19 @@ def _evaluate(ctx: Any, role_name: str, model: str | None, limit: int | None, no
             rec["tool_calls"] = [{"text": r["text"], "error": r["error"], "detail": r["detail"]} for r in ctx.db.conn.execute(
                 "SELECT text, error, detail FROM steps WHERE run_id=? AND kind='tool' AND id>? ORDER BY id",
                 (ctx.tracer.run_id, mark))]
-        rec["code"] = graders.code_grade(role_name, fx["input"], out, error, fx["expect"])
+        graded = out
         if final is not None and final.enforced:  # enforce 후 출력(저장되는 것)도 함께 기록
             rec["enforced"] = final.enforced
             rec["enforced_output"] = final.model_dump()
             rec["code_enforced"] = graders.code_grade(role_name, fx["input"], rec["enforced_output"], None,
                                                       fx["expect"])
+            graded = final.graded_dump()
+            if graded != out:
+                rec["graded_output"] = graded
+        rec["code"] = graders.code_grade(role_name, fx["input"], graded, error, fx["expect"])
         if with_llm and rec["code"]["passed"]:
             try:
-                rec["llm"] = graders.llm_grade(role_name, inp, out, ctx)  # type: ignore[arg-type]
+                rec["llm"] = graders.llm_grade(role_name, inp, graded, ctx)  # type: ignore[arg-type]
             except (BudgetExceeded, LLMError, PriceUnknown, RoleFailed) as e:
                 stopped = f"채점 {type(e).__name__}: {e}"
                 print(f"[eval] 채점 중단: {stopped}", file=sys.stderr)
@@ -97,7 +101,7 @@ def _evaluate(ctx: Any, role_name: str, model: str | None, limit: int | None, no
         print(f"[eval] {fid}: 코드 {mark} {json.dumps(out, ensure_ascii=False)[:120] if out else error}",
               file=sys.stderr)
 
-    summary = graders.summarize(role_name, results)
+    summary = graders.summarize(role_name, results, role.output_cls.ENFORCED_FIELDS)
     if stopped:
         summary["passed"] = False
         summary["fail_reasons"].append(f"중단: {stopped}")
@@ -113,6 +117,54 @@ def _evaluate(ctx: Any, role_name: str, model: str | None, limit: int | None, no
     path = out_dir / f"{role_name}_{alias}_{now:%Y%m%d-%H%M%S}.json"
     path.write_text(json.dumps(report, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     report["path"] = str(path.relative_to(ROOT))
+    return report
+
+
+def regrade(path: Path, note: str | None = None) -> dict[str, Any]:
+    """저장된 eval 결과를 생성 재실행 없이 지금 채점 규칙으로 다시 채점한다(설계 결정 Q1).
+
+    새로 코드 채점을 통과했는데 LLM 채점이 없는 항목만 judge를 부른다. 결과는 새 리포트 파일로.
+    """
+    old = json.loads(path.read_text(encoding="utf-8"))
+    role_name = old["role"]
+    ctx = open_ctx("eval", spec=old["spec"], note=f"regrade {role_name}")
+    status = "failed"
+    try:
+        role = load_role(role_name, ctx.models)
+        with_llm = graders.rubric_path(role_name).exists()
+        results, stopped = [], None
+        for rec in old["results"]:
+            rec = dict(rec)
+            out = rec.get("output")
+            graded = role.output_cls.graded_output(out, rec.get("enforced") or []) if out else None
+            rec.pop("graded_output", None)
+            if graded is not None and graded != out:
+                rec["graded_output"] = graded
+            rec["code"] = graders.code_grade(role_name, rec["input"], graded, rec.get("error"), rec["expect"])
+            if with_llm and rec["code"]["passed"] and not rec.get("llm") and not stopped:
+                try:
+                    inp = role.input_cls.model_validate(rec["input"])
+                    rec["llm"] = graders.llm_grade(role_name, inp, graded, ctx)  # type: ignore[arg-type]
+                except (BudgetExceeded, LLMError, PriceUnknown, RoleFailed) as e:
+                    stopped = f"채점 {type(e).__name__}: {e}"
+            results.append(rec)
+        summary = graders.summarize(role_name, results, role.output_cls.ENFORCED_FIELDS)
+        if stopped:
+            summary["passed"] = False
+            summary["fail_reasons"].append(f"중단: {stopped}")
+        now = datetime.now(KST)
+        src = str(path.relative_to(ROOT)) if path.is_absolute() and path.is_relative_to(ROOT) else str(path)
+        report = {**old, "at": now.isoformat(timespec="seconds"), "run_id": ctx.tracer.run_id,
+                  "note": note or f"재채점(설계 결정 Q1) {src}", "regraded_from": src, "stopped": stopped,
+                  "cost_usd": round(old["cost_usd"] + ctx.budget.session_cost, 6), "summary": summary,
+                  "results": results}
+        out_path = REPORTS / "eval" / f"{role_name}_{old['model_alias']}_{now:%Y%m%d-%H%M%S}.json"
+        out_path.write_text(json.dumps(report, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+        report["path"] = str(out_path.relative_to(ROOT))
+        status = "stopped" if stopped else "ok"
+    finally:
+        ctx.tracer.finish(status)
+    write_quality(old["spec"])
     return report
 
 
@@ -204,6 +256,9 @@ def write_quality(spec: str) -> Path:
         for alias, r in latest.items():
             if r["summary"].get("aggregate"):
                 lines.append(f"- {alias} 전체 지표: " + ", ".join(f"{k} {v}" for k, v in r["summary"]["aggregate"].items()))
+            if r["summary"].get("model_agreement"):
+                lines.append(f"- {alias} 모델 일치율(코드 소유 칸, 통과 판정은 enforce 후 값): "
+                             + ", ".join(f"{k} {v}" for k, v in r["summary"]["model_agreement"].items()))
             if r["summary"]["fail_reasons"]:
                 lines.append(f"- {alias} 미달 이유: {'; '.join(r['summary']['fail_reasons'])}")
         if "judge" in latest and questions:

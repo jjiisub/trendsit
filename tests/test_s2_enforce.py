@@ -41,7 +41,7 @@ def test_repo_oneliner_thin_readme_forces_attention():
     fixed = apply_enforce(oneliner(attention=False), inp, None)
     assert fixed.attention is True
     assert fixed.enforced == [{"field": "attention", "before": False, "after": True,
-                               "rule": f"README 본문 {README_THIN_CHARS}자 미만"}]
+                               "rule": f"README 본문 {README_THIN_CHARS}자 미만", "owned": True}]
     assert fixed.raw_dump()["attention"] is False  # 원래 출력 보존
     # 이미 true면 바꾼 것이 없음
     assert apply_enforce(oneliner(attention=True), inp, None).enforced == []
@@ -74,12 +74,62 @@ def test_eval_records_raw_and_enforced(tmp_path, monkeypatch):
     monkeypatch.setattr(run_eval, "ROOT", tmp_path)
     raw = oneliner(attention=False).model_dump()
     ctx = make_ctx(tmp_path, FakeTransport([response(json.dumps(raw, ensure_ascii=False))]))
+    monkeypatch.setattr(run_eval.graders, "llm_grade", lambda *a: {"verdicts": {}, "scores": {}, "missing": []})
     report = run_eval._evaluate(ctx, "repo_oneliner", None, None, "test")
     rec = report["results"][0]
     assert rec["output"]["attention"] is False and rec["enforced_output"]["attention"] is True
-    assert rec["code"]["passed"] is False  # 통과 판정은 원래 출력
+    # 설계 결정 Q1: attention은 코드 소유 칸이라 통과 판정은 enforce 후 값, 모델 일치율은 따로
+    assert rec["graded_output"]["attention"] is True and rec["code"]["passed"] is True
     assert rec["code_enforced"]["passed"] is True
-    assert report["summary"]["code_pass"] == 0 and report["summary"]["code_pass_enforced"] == 1
+    assert report["summary"]["code_pass"] == 1 and report["summary"]["code_pass_enforced"] == 1
+    assert report["summary"]["model_agreement"] == {"attention": "0/1"}
+
+
+def test_graded_output_overrides_owned_fields_only():
+    """코드 소유 변경만 덮고 품질 정리는 원래 출력 그대로(설계 결정 Q1). owned 없는 옛 기록은 ENFORCED_FIELDS로."""
+    raw = {"oneliner": "x", "basis": "", "log": "l", "attention": False}
+    enforced = [{"field": "attention", "before": False, "after": True, "rule": "r"},
+                {"field": "basis", "before": "", "after": "b", "rule": "q", "owned": False},
+                {"field": "oneliner", "before": "x", "after": "y", "rule": "o", "owned": True}]
+    graded = RepoOneliner.graded_output(raw, enforced)
+    assert graded == {"oneliner": "y", "basis": "", "log": "l", "attention": True}
+    assert raw["attention"] is False  # 원래 출력은 건드리지 않음
+
+
+def test_regrade_saved_report(tmp_path, monkeypatch):
+    """저장된 결과를 다시 채점: 새로 통과한 항목만 judge를 부르고 새 리포트를 쓴다."""
+    from eval import graders, run_eval
+
+    monkeypatch.setattr(run_eval, "FIXTURES", tmp_path / "fixtures")
+    monkeypatch.setattr(run_eval, "REPORTS", tmp_path / "reports")
+    monkeypatch.setattr(run_eval, "ROOT", tmp_path)
+    (tmp_path / "fixtures" / "repo_oneliner").mkdir(parents=True)
+    (tmp_path / "fixtures" / "repo_oneliner" / "Images360.json").write_text("{}", encoding="utf-8")
+    (tmp_path / "reports" / "eval").mkdir(parents=True)
+    expect = {"max_len": 60, "attention": True}
+    raw = oneliner(attention=False).model_dump()
+    old = {"role": "repo_oneliner", "model_alias": "generate", "model_id": "m", "prompt_hash": "h", "spec": "S2",
+           "run_id": 1, "at": "2026-10-08T10:00:00+09:00", "note": None, "stopped": None, "limit": None,
+           "cost_usd": 0.01, "summary": {}, "results": [{
+               "id": "Images360", "input": THIN, "expect": expect, "output": raw, "error": None,
+               "code": {"passed": False}, "enforced": [{"field": "attention", "before": False, "after": True,
+                                                         "rule": "README 본문 200자 미만"}]}]}
+    src = tmp_path / "old.json"
+    src.write_text(json.dumps(old, ensure_ascii=False), encoding="utf-8")
+    calls = []
+
+    def fake_llm(role, inp, out, ctx):
+        calls.append(out["attention"])
+        return {"verdicts": {q: {"verdict": "pass", "critique": "c"} for q in ("Q1", "Q2", "Q3")},
+                "scores": {}, "missing": []}
+
+    monkeypatch.setattr(graders, "llm_grade", fake_llm)
+    monkeypatch.setattr(run_eval, "open_ctx", lambda *a, **k: make_ctx(tmp_path, FakeTransport([])))
+    rep = run_eval.regrade(src)
+    assert calls == [True]  # judge는 채점 보기(enforce 후 attention)를 본다
+    assert rep["summary"]["code_pass"] == 1 and rep["summary"]["passed"] is True
+    assert rep["summary"]["model_agreement"] == {"attention": "0/1"}
+    assert rep["regraded_from"] and rep["prompt_hash"] == "h"
 
 
 # ---------- M4 ----------
