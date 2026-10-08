@@ -246,7 +246,7 @@ def test_recorded_fixtures_have_no_secrets_and_keep_synthetic():
 
 def test_github_token_not_persisted_or_sent_to_llm(ctx):
     """토큰은 GitHub 요청 헤더에만. 실행 기록 DB(steps, llm_calls, fetch_log 등)와 LLM 요청 본문에 남지 않는다."""
-    fake = "github_pat_FAKE0123456789abcdefTOKENVALUE"
+    fake = "github_pat_" + "FAKE" * 8  # 이어 붙여 만든다(verify_s0 A9 키 문자열 검사에 걸리지 않게)
     c = ctx([ONELINER, call("github_repo", name="ollama/ollama"), call("releases", name="ollama/ollama"),
              call("finish", **card())])
     c.resources["github_headers"] = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {fake}"}

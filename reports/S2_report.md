@@ -262,6 +262,8 @@ PASS M6 낡은 문구 두 개(geeknews.py 설명, report.py 계획 표기) 없�
 | Q7 | `config/budget.yaml` S2 1.50, S3 주석. 실행 전 `cost` 기록, 합계 S2 $1.057 / 1.50 | `90c4f74` |
 
 ## S2 관문 A 전체
+**맥(2026-10-08, 결정 반영 뒤 마지막 커밋)**: `verify_s2.sh`·`verify_s3.sh` 전부 PASS(A1 포함, FAIL 0), pytest 273 passed + 1 skipped(embed 없이), `uv run --extra embed pytest -q` 274 passed. 중간에 verify_s0 A9(키 문자열 검사)가 테스트의 가짜 토큰 문자열을 잡아 테스트에서 이어 붙여 만들도록 고침(검사 규칙은 그대로)
+
 `bash scripts/verify_s2.sh` (2026-10-08, 두 번째 클라우드 세션, 키 있음)
 ```
 PASS A1 verify_s0.sh 10개, verify_s1.sh 24개 전부 PASS
