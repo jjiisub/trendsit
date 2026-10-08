@@ -24,7 +24,7 @@ from ..core.artifacts_text import (
     VideoCandidate,
     VideoQueueItem,
 )
-from ..core.config import MAX_DEPTH_ALL, DeepConfig
+from ..core.config import MAX_DEPTH_ALL, DeepConfig, labeler_info
 from ..core.db import DB, now_kst
 
 REPO_CANDIDATES = 20  # 계획 입력에 넣는 레포 후보 수 상한
@@ -266,7 +266,8 @@ def make_mode_labels(inp: PlanInput, plan: dict[str, Any], path: Path) -> int:
         with path.open(encoding="utf-8") as f:
             old = {(r["video_id"], r["mode"]): r for r in csv.DictReader(f)}
     vq = {v["video_id"]: v for v in plan["video_queue"]}
-    cols = ["video_id", "title", "duration_min", "manual_sub_langs", "has_auto_sub", "mode", "reason", "agree", "note"]
+    cols = ["video_id", "title", "duration_min", "manual_sub_langs", "has_auto_sub", "mode", "reason", "agree", "note",
+            "labeler"]
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8", newline="") as f:
         w = csv.DictWriter(f, fieldnames=cols)
@@ -276,7 +277,8 @@ def make_mode_labels(inp: PlanInput, plan: dict[str, Any], path: Path) -> int:
             prev = old.get((v.video_id, q["mode"]), {})
             w.writerow({"video_id": v.video_id, "title": v.title, "duration_min": v.duration_min,
                         "manual_sub_langs": " ".join(v.manual_sub_langs), "has_auto_sub": v.has_auto_sub,
-                        "mode": q["mode"], "reason": q["reason"], "agree": prev.get("agree", ""), "note": prev.get("note", "")})
+                        "mode": q["mode"], "reason": q["reason"], "agree": prev.get("agree", ""), "note": prev.get("note", ""),
+                        "labeler": prev.get("labeler", "")})
     return len(inp.new_videos)
 
 
@@ -286,4 +288,4 @@ def mode_agreement(path: Path) -> dict[str, Any] | None:
     with path.open(encoding="utf-8") as f:
         rows = [r for r in csv.DictReader(f) if (r.get("agree") or "").strip()]
     yes = sum(1 for r in rows if r["agree"].strip().lower() in ("y", "yes", "o", "1", "동의", "pass", "true"))
-    return {"n": len(rows), "agree": yes, "rate": round(yes / len(rows), 3) if rows else None}
+    return {"n": len(rows), "agree": yes, "rate": round(yes / len(rows), 3) if rows else None, **labeler_info(rows)}

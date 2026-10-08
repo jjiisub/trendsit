@@ -143,10 +143,11 @@ def test_distribution_and_labels(tmp_path):
     assert sum(p + q for _, p, q in dist) == 60
     path = tmp_path / "relevance.csv"
     assert make_relevance_labels(rows, path) == 40
-    text = path.read_text(encoding="utf-8").replace(",keep,\n", ",keep,keep\n", 1)  # 사용자가 하나 채움
+    assert path.read_text(encoding="utf-8").splitlines()[0].endswith(",expected,labeler")
+    text = path.read_text(encoding="utf-8").replace(",keep,,\n", ",keep,keep,opus-5.5\n", 1)  # 라벨러가 하나 채움
     path.write_text(text, encoding="utf-8")
     make_relevance_labels(rows, path)
-    assert ",keep,keep" in path.read_text(encoding="utf-8")  # 채운 라벨 보존
+    assert ",keep,keep,opus-5.5" in path.read_text(encoding="utf-8")  # 채운 라벨과 labeler 보존
 
 
 def test_seed_lookup_by_source_and_title_prefix(tmp_path):

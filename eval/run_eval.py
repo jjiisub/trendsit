@@ -12,7 +12,7 @@ from typing import Any
 from pydantic import ValidationError
 
 from trendsit.core.budget import BudgetExceeded, PriceUnknown
-from trendsit.core.config import ROOT
+from trendsit.core.config import HUMAN_LABELERS, ROOT  # labeler가 사람이 아니면(예: opus-5.5) 잠정 라벨
 from trendsit.core.context import open_ctx
 from trendsit.core.db import KST
 from trendsit.core.llm import LLMError
@@ -379,7 +379,6 @@ def _brief(v: Any) -> Any:
 
 # ---------- judge 맞추기: 사람 라벨 ----------
 LABELS = ROOT / "eval" / "labels"
-HUMAN_LABELERS = {"human", "사람", "user", "사용자"}  # labeler 칸이 이것이 아니면(예: opus-5.5) 잠정 라벨
 TRUE_WORDS = {"pass", "p", "y", "yes", "1", "o", "예", "통과", "true"}
 FALSE_WORDS = {"fail", "f", "n", "no", "0", "x", "아니오", "실패", "false"}
 

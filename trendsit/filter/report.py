@@ -12,7 +12,7 @@ import platform
 from pathlib import Path
 from typing import Any
 
-from ..core.config import FilterConfig
+from ..core.config import FilterConfig, labeler_info
 from ..core.db import DB
 from .embed import FilterResult, library_versions, similar_pairs
 
@@ -131,14 +131,14 @@ def write_report(db: DB, cfg: FilterConfig, res: FilterResult, out_dir: Path, se
 
 
 def make_relevance_labels(rows: list[dict[str, Any]], path: Path, n_each: int = 20) -> int:
-    """라벨 40건: 키워드 통과 20, 걸러짐 20. 각 무리 안에서 점수 순으로 고르게(등간격 뽑기). expected는 사용자가 채운다.
+    """라벨 40건: 키워드 통과 20, 걸러짐 20. 각 무리 안에서 점수 순으로 고르게(등간격 뽑기). expected는 라벨러가 채운다.
 
-    이미 채운 행(같은 id)은 expected를 보존한다.
+    이미 채운 행(같은 id)은 expected와 labeler(누가 달았나, 사람이 아니면 잠정)를 보존한다.
     """
-    old: dict[str, str] = {}
+    old: dict[str, dict[str, str]] = {}
     if path.exists():
         with path.open(encoding="utf-8") as f:
-            old = {r["id"]: r.get("expected", "") for r in csv.DictReader(f)}
+            old = {r["id"]: r for r in csv.DictReader(f)}
     picked = []
     for passed in (True, False):
         group = sorted((r for r in rows if r["channel"] == "text" and (r["keyword_status"] == "pass") == passed
@@ -150,11 +150,14 @@ def make_relevance_labels(rows: list[dict[str, Any]], path: Path, n_each: int = 
             picked += [group[round(i * step)] for i in range(n_each)]
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8", newline="") as f:
-        w = csv.DictWriter(f, fieldnames=["id", "source", "title", "keyword_status", "score", "decision", "expected"])
+        w = csv.DictWriter(f, fieldnames=["id", "source", "title", "keyword_status", "score", "decision", "expected",
+                                          "labeler"])
         w.writeheader()
         for r in picked:
+            prev = old.get(str(r["id"]), {})
             w.writerow({"id": r["id"], "source": r["source"], "title": r["title"], "keyword_status": r["keyword_status"],
-                        "score": r["score"], "decision": r["decision"], "expected": old.get(str(r["id"]), "")})
+                        "score": r["score"], "decision": r["decision"], "expected": prev.get("expected", ""),
+                        "labeler": prev.get("labeler", "")})
     return len(picked)
 
 
@@ -164,12 +167,14 @@ def label_metrics(path: Path, rows: list[dict[str, Any]]) -> dict[str, Any] | No
         return None
     by_id = {r["id"]: r for r in rows}
     tp = fp = fn = tn = 0
+    used: list[dict[str, str]] = []
     with path.open(encoding="utf-8") as f:
         for lab in csv.DictReader(f):
             exp = (lab.get("expected") or "").strip().lower()
             r = by_id.get(int(lab["id"]))
             if exp not in ("keep", "drop") or r is None:
                 continue
+            used.append(lab)
             got = r["decision"]
             tp += got == "keep" and exp == "keep"
             fp += got == "keep" and exp == "drop"
@@ -179,4 +184,5 @@ def label_metrics(path: Path, rows: list[dict[str, Any]]) -> dict[str, Any] | No
     if not n:
         return None
     return {"n": n, "precision": round(tp / (tp + fp), 3) if tp + fp else None,
-            "recall": round(tp / (tp + fn), 3) if tp + fn else None, "tp": tp, "fp": fp, "fn": fn, "tn": tn}
+            "recall": round(tp / (tp + fn), 3) if tp + fn else None, "tp": tp, "fp": fp, "fn": fn, "tn": tn,
+            **labeler_info(used)}

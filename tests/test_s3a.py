@@ -172,7 +172,7 @@ def test_mode_labels_and_agreement(tmp_path):
         w = csv.DictWriter(f, fieldnames=list(rows[0]))
         w.writeheader()
         w.writerows(rows)
-    assert mode_agreement(path) == {"n": 2, "agree": 1, "rate": 0.5}
+    assert mode_agreement(path) == {"n": 2, "agree": 1, "rate": 0.5, "labelers": [], "provisional": False}
     make_mode_labels(plan_input(), p, path)  # 다시 만들어도 채운 칸 보존
     assert mode_agreement(path)["n"] == 2
 
@@ -204,3 +204,23 @@ def test_mode_labels_and_judge_labels_are_separate_files():
     from trendsit.cli_text import PLAN_LABELS
 
     assert PLAN_LABELS.name == "editor_plan_mode.csv" and PLAN_LABELS != LABELS / "editor_plan.csv"
+
+
+def test_mode_labels_keep_labeler_and_mark_provisional(tmp_path):
+    """labeler 칸: 다시 만들어도 보존, 사람이 아니면(리뷰 세션 2차 채점) 동의율은 잠정."""
+    import csv
+
+    path = tmp_path / "editor_plan_mode.csv"
+    p = plan_input()
+    make_mode_labels(p, plan(video_queue=[v(1)]).model_dump(), path)
+    rows = list(csv.DictReader(path.open(encoding="utf-8")))
+    assert rows[0]["labeler"] == ""
+    rows[0]["agree"], rows[0]["labeler"] = "y", "opus-5.5"
+    with path.open("w", encoding="utf-8", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=list(rows[0]))
+        w.writeheader()
+        w.writerows(rows)
+    make_mode_labels(p, plan(video_queue=[v(1)]).model_dump(), path)
+    assert next(csv.DictReader(path.open(encoding="utf-8")))["labeler"] == "opus-5.5"
+    a = mode_agreement(path)
+    assert a["labelers"] == ["opus-5.5"] and a["provisional"] is True

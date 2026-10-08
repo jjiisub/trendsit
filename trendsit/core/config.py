@@ -369,6 +369,16 @@ def get_secret(name: str) -> str | None:
     return None
 
 
+# 라벨 파일 labeler 칸: 이 값이 아니면(예: opus-5.5, 리뷰 세션 2차 채점) 그 라벨로 낸 일치율·문턱값은 잠정
+HUMAN_LABELERS = {"human", "사람", "user", "사용자"}
+
+
+def labeler_info(rows: list[dict[str, str]]) -> dict[str, Any]:
+    """채운 라벨 행들의 labeler 목록과 잠정 여부."""
+    names = sorted({(r.get("labeler") or "").strip() for r in rows} - {""})
+    return {"labelers": names, "provisional": any(n.lower() not in HUMAN_LABELERS for n in names)}
+
+
 SECRET_NAMES = ("OPENROUTER_API_KEY", "GITHUB_TOKEN")
 
 
