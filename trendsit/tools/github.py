@@ -82,6 +82,10 @@ def github_repo(args: RepoArgs, state: Any) -> ToolOutput:
         raise ToolRejected(f"없는 레포: {args.name}")
     _, readme = api_get(state, f"/repos/{args.name}/readme", raw=True)
     lic = (data.get("license") or {}).get("spdx_id")
+    if readme:  # 글 분석가가 README 문장을 인용할 수 있게(enforce 대조 대상)
+        res = getattr(getattr(state, "ctx", None), "resources", None)
+        if res is not None and "fetched_pages" in res:
+            res["fetched_pages"][f"https://github.com/{args.name}".lower()] = clean_markdown(readme)
     return ToolOutput(content={
         "full_name": data.get("full_name"), "description": data.get("description"), "topics": data.get("topics") or [],
         "stars": data.get("stargazers_count"), "forks": data.get("forks_count"), "language": data.get("language"),

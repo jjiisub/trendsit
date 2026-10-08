@@ -199,6 +199,8 @@ def _merge(module: str) -> None:
         if e.name == f"{__package__}.{module}":
             return
         raise
+    if not hasattr(mod, "INPUTS") and not hasattr(mod, "OUTPUTS"):  # 순환 import로 반쯤 읽힌 모듈
+        raise ImportError(f"{module}에 INPUTS/OUTPUTS 없음(순환 import 확인: 도구 모듈이 스키마 모듈을 먼저 import하는지)")
     for table, classes in ((INPUTS, getattr(mod, "INPUTS", ())), (OUTPUTS, getattr(mod, "OUTPUTS", ()))):
         for c in classes:
             if table.get(c.__name__, c) is not c:

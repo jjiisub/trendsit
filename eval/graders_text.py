@@ -150,3 +150,43 @@ def code_editor_plan(inp: dict[str, Any], out: dict[str, Any], expect: dict[str,
 graders.ROLE_CHECKS["editor_plan"] = code_editor_plan
 graders.ROLE_STYLE_FIELDS["editor_plan"] = ("log",)
 graders.THRESHOLDS["editor_plan"] = {"questions": {"Q1": 0.8, "Q2": 0.8}, "code_pass_all": True}
+
+
+# ---------- text_analyst (S3 3b) ----------
+MISJUDGED_MAX = 1  # enforce 전 confirmed/differs 오판정(근거 인용 없음) 허용 건수(S2S3_TASK 7장: 0~1건)
+
+
+def code_text_analyst(inp: dict[str, Any], out: dict[str, Any], expect: dict[str, Any]) -> list[dict[str, Any]]:
+    checks_n = {c["n"] for c in inp.get("checks") or []}
+    quotes = {q["n"] for q in out["quotes"]}
+    got = [v["check_n"] for v in out["verified"]]
+    no_q = [v["check_n"] for v in out["verified"] if v["status"] != "not_found" and v["quote_n"] not in quotes]
+    trail = {t["url"] for t in out["trail"]}
+    return [
+        check("verified가 checks를 빠짐없이", sorted(got) == sorted(checks_n), f"기대 {sorted(checks_n)}, 출력 {sorted(got)}"),
+        check("confirmed/differs에 인용 번호", not no_q, f"check {no_q}"),
+        check("origin이 trail 안", out["origin"] is None or out["origin"]["url"] in trail, str(out["origin"])[:80]),
+        check("differs가 있으면 differences", not any(v["status"] == "differs" for v in out["verified"])
+              or bool(out["differences"]), "differences 비어 있음"),
+    ]
+
+
+def aggregate_text_analyst(results: list[dict[str, Any]]) -> tuple[dict[str, Any], list[str]]:
+    """enforce가 confirmed/differs를 not_found로 바꾼 건수(근거 없는 판정) + 원본 확보율, 깊이 분포(지표)."""
+    mis = sum(1 for r in results for e in r.get("enforced") or [] if e["field"] == "verified"
+              for b, a in zip(e["before"], e["after"], strict=False) if b["status"] != a["status"])
+    outs = [r["output"] for r in results if r.get("output")]
+    found = [o for o in outs if o.get("origin")]
+    depths: dict[int, int] = {}
+    for o in found:
+        d = next((t["depth"] for t in o["trail"] if t["url"] == o["origin"]["url"]), 0)
+        depths[d] = depths.get(d, 0) + 1
+    reasons = [] if mis <= MISJUDGED_MAX else [f"근거 없는 confirmed/differs {mis}건 > {MISJUDGED_MAX}"]
+    return {"근거 없는 판정(enforce 전)": mis, "원본 확보": f"{len(found)}/{len(outs)}",
+            "깊이 분포": ", ".join(f"{k}:{v}" for k, v in sorted(depths.items())) or "-"}, reasons
+
+
+graders.ROLE_CHECKS["text_analyst"] = code_text_analyst
+graders.ROLE_STYLE_FIELDS["text_analyst"] = ("differences", "summary", "claims", "log")
+graders.AGGREGATES["text_analyst"] = aggregate_text_analyst
+graders.THRESHOLDS["text_analyst"] = {"questions": {"Q1": 0.8, "Q2": 0.8, "Q3": 0.8}, "code_pass_all": True}

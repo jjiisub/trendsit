@@ -222,5 +222,120 @@ class CollectionPlan(RoleOutput):
         return validate_plan(self, inp)
 
 
-INPUTS = (ItemCardInput, PlanInput)
-OUTPUTS = (ItemCardV1, CollectionPlan)
+# ---------- 글 분석가 (text_analyst, S3 3b) ----------
+def norm_url(url: str) -> str:
+    """깊이 추적과 대조의 문서 id(추적 파라미터, 조각, 끝 슬래시 정리)."""
+    from ..collect.links import normalize_url
+
+    return normalize_url(url)
+
+
+class CheckItem(Strict):
+    n: int = Field(description="확인할 것 번호(verified의 check_n)")
+    kind: Literal["number", "claim"]
+    text: str = Field(description="요약 글의 수치·주장")
+    quote: str = Field(description="요약 글에서 그 수치·주장이 나온 문장")
+
+
+class ArticleLink(Strict):
+    n: int
+    url: str
+    kind: str | None = None
+    anchor: str | None = None
+    candidate: bool = Field(description="1차 요약이 원본 후보로 고른 링크")
+
+
+class TextAnalystInput(RoleInput):
+    item_id: int
+    title: str
+    source_name: str
+    url: str = Field(description="원래 글 URL(이미 읽음, 깊이 1)")
+    max_depth: int = Field(ge=1, le=4, description="편집장 계획의 항목별 깊이 상한")
+    card_v1: ItemCardV1
+    links: list[ArticleLink] = Field(description="원래 글의 링크(종류 표시). 원본 후보는 candidate=true")
+    checks: list[CheckItem] = Field(description="원본과 대조할 수치·주장(코드가 v1에서 뽑음)")
+
+    def depth_limit(self, default: int | None) -> int | None:
+        from .config import MAX_DEPTH_ALL
+
+        return min(self.max_depth, default or MAX_DEPTH_ALL, MAX_DEPTH_ALL)
+
+    def depth_seed(self) -> list[tuple[str, list[str]]]:
+        return [(norm_url(self.url), [norm_url(x.url) for x in self.links])]
+
+
+class TrailStep(Strict):
+    url: str
+    depth: int = Field(ge=1)
+    reason: str = Field(description="왜 이 페이지로 갔는지 한 줄(예: 'GeekNews → 공식 블로그: 수치 출처')")
+
+
+class OriginQuote(Strict):
+    n: int = Field(ge=1, description="근거 id og:{item_id}#q{n}")
+    url: str = Field(description="이 문장을 가져온 페이지 URL(fetch_page·arxiv·github_repo로 연 것)")
+    text: str = Field(max_length=300, description="원본 문장을 한 글자도 바꾸지 않고 그대로")
+
+
+class Verified(Strict):
+    check_n: int
+    quote_n: int | None = Field(description="대조에 쓴 원본 quote 번호. 못 찾았으면 null")
+    status: Literal["confirmed", "differs", "not_found"]
+
+
+class Origin(Strict):
+    url: str
+    kind: Literal["paper", "official_doc", "official_blog", "press", "repo", "news", "curation", "other"]
+    title: str
+    date: str | None = None
+
+
+class ItemCardV2(RoleOutput):
+    trail: list[TrailStep] = Field(description="거쳐 간 페이지(순서대로)")
+    quotes: list[OriginQuote] = Field(max_length=8, description="원본에서 옮긴 문장. 결론보다 먼저")
+    verified: list[Verified] = Field(description="checks마다 confirmed / differs / not_found")
+    differences: list[str] = Field(description="요약 글과 원본이 다른 점(예: 요약 '10배', 원본 '최대 10배')")
+    origin: Origin | None = Field(description="찾은 1차 자료. 못 찾았으면 null")
+    numbers: list[NumberFact] = Field(description="원본 quote에 있는 수치만")
+    claims: list[Claim]
+    summary: str = Field(max_length=400, description="원본 기준 2~3문장. 원본을 못 찾았으면 v1 요약 그대로")
+
+    @classmethod
+    def fallback(cls, reason: str, inp: TextAnalystInput) -> Self:
+        """v1 유지 + "원본 찾지 못함"(attention 아님)."""
+        v1 = inp.card_v1
+        return cls(trail=[], quotes=[], verified=[Verified(check_n=c.n, quote_n=None, status="not_found")
+                                                  for c in inp.checks],
+                   differences=[], origin=None, numbers=[], claims=[], summary=v1.summary,
+                   log=f"원본 찾지 못함({reason})", attention=False)
+
+    def enforce(self, inp: TextAnalystInput, ctx: Ctx | None) -> Self:
+        """이번 실행에서 실제로 가져온 페이지 본문에 있는 인용만 근거로 인정(S2S3_TASK 5.5)."""
+        pages: dict[str, str] = (ctx.resources.get("fetched_pages") if ctx is not None else None) or {}
+        bodies = {norm_url(u): squash(t) for u, t in pages.items()}
+        out = self
+        kept = [q for q in self.quotes
+                if squash(q.text) and squash(q.text) in bodies.get(norm_url(q.url), "")]
+        if len(kept) != len(self.quotes):
+            out = out.fix("quotes", kept, "가져온 페이지에 없는 인용 삭제")
+        ok = {q.n for q in kept}
+        ver = [v if v.status == "not_found" or (v.quote_n is not None and v.quote_n in ok)
+               else v.model_copy(update={"status": "not_found", "quote_n": None}) for v in self.verified]
+        if ver != self.verified:
+            out = out.fix("verified", ver, "confirmed/differs인데 근거 인용이 없거나 가져온 페이지에 없음 → not_found")
+        nums = [x for x in self.numbers if x.quote_n in ok]
+        if nums != self.numbers:
+            out = out.fix("numbers", nums, "없는 인용을 가리키는 수치 삭제")
+        claims = [c.model_copy(update={"quote_ns": [n for n in c.quote_ns if n in ok]}) for c in self.claims
+                  if any(n in ok for n in c.quote_ns)]
+        if claims != self.claims:
+            out = out.fix("claims", claims, "없는 인용을 가리키는 주장 정리")
+        trail = {norm_url(t.url) for t in self.trail}
+        if self.origin is not None and norm_url(self.origin.url) not in trail:
+            out = out.fix("origin", None, "origin.url이 trail에 없음")
+        if any(v.status == "differs" for v in out.verified) and not out.attention:
+            out = out.fix("attention", True, "원본과 다른 점(differs)이 있어 사람 확인")
+        return out
+
+
+INPUTS = (ItemCardInput, PlanInput, TextAnalystInput)
+OUTPUTS = (ItemCardV1, CollectionPlan, ItemCardV2)

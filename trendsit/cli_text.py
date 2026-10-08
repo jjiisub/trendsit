@@ -248,6 +248,57 @@ def cmd_plan(args: argparse.Namespace) -> int:
     return 0
 
 
+# ---------- deep text (3b) ----------
+TEXT_TRACES = ROOT / "reports" / "S3_traces" / "text"
+
+
+def cmd_deep(args: argparse.Namespace) -> int:
+    from .core.context import open_ctx
+    from .deep.plan import latest_plan
+    from .deep.text_agent import queue_from_plan, run_text_analysis, write_traces
+
+    if not args.day and args.item is None:
+        print("--day(계획의 text_queue) 또는 --item이 필요함", file=sys.stderr)
+        return 2
+    ctx = open_ctx("deep-text", spec=args.spec or "S3", model=args.model, no_cache=args.no_cache,
+                   note=f"deep text {args.day or args.item}")
+    status = "failed"
+    try:
+        if args.item is not None:
+            queue = [(args.item, args.max_depth or config.load("deep.yaml").default_text_depth)]
+        else:
+            plan = latest_plan(ctx.db, args.day)
+            if plan is None:
+                print(f"{args.day} 계획 없음(plan run --day 먼저)", file=sys.stderr)
+                return 1
+            queue = queue_from_plan(plan)
+        if args.fixtures:  # 관문 B 픽스처: 입력만 만든다
+            from .deep.text_agent import build_input
+
+            out = Path(args.fixtures)
+            out.mkdir(parents=True, exist_ok=True)
+            for item_id, depth in queue:
+                inp = build_input(ctx.db, item_id, depth)
+                (out / f"it{item_id}.json").write_text(json.dumps(
+                    {"input": inp.model_dump(), "expect": {}, "note": f"{args.day or ''} 계획 text_queue, {inp.title[:40]}"},
+                    ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+            print(f"픽스처 {len(queue)}개: {out}")
+            status = "ok"
+            return 0
+        res = run_text_analysis(ctx, queue)
+        ctx.tracer.step(kind="code", role="deep-text", text=res.summary(),
+                        detail={k: v for k, v in res.__dict__.items() if k != "traces"}, attention=bool(res.stopped))
+        print(res.summary())
+        if args.traces:
+            cmd = f"uv run python -m trendsit deep text {'--day ' + args.day if args.day else '--item ' + str(args.item)}"
+            paths = write_traces(res.traces, TEXT_TRACES, cmd)
+            print(f"검증 산출물 {len(paths)}개: {TEXT_TRACES.relative_to(ROOT)}")
+        status = "stopped" if res.stopped else "ok"
+    finally:
+        ctx.tracer.finish(status)
+    return 0 if status == "ok" else 1
+
+
 def register(sub: Any) -> None:
     r = sub.add_parser("rematch", help="바뀐 keywords.yaml로 저장된 항목의 키워드 판정을 다시 계산(네트워크 없음)")
     r.add_argument("--since")
@@ -297,6 +348,18 @@ def register(sub: Any) -> None:
     pl.add_argument("--no-cache", action="store_true")
     pl.add_argument("--spec")
     pl.set_defaults(fn=cmd_plan)
+
+    dp = sub.add_parser("deep", help="깊게 보기: text(글 분석가, 원본 추적)")
+    dp.add_argument("what", choices=["text"])
+    dp.add_argument("--day", help="이날 계획(plan)의 text_queue")
+    dp.add_argument("--item", type=int, help="한 항목만(items.id)")
+    dp.add_argument("--max-depth", type=int, help="--item일 때 깊이(기본 deep.yaml default_text_depth)")
+    dp.add_argument("--traces", action="store_true", help="reports/S3_traces/text/ 검증 산출물")
+    dp.add_argument("--fixtures", help="실행하지 않고 관문 B 픽스처(입력)만 이 폴더에")
+    dp.add_argument("--model")
+    dp.add_argument("--no-cache", action="store_true")
+    dp.add_argument("--spec")
+    dp.set_defaults(fn=cmd_deep)
 
     ff = sub.add_parser("filter-fixtures", help="eval/fixtures/filter 20건 점수(장치별 비교)")
     ff.add_argument("--embedder", choices=["real", "mock"], default="real")

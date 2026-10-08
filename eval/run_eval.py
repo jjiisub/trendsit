@@ -55,6 +55,7 @@ def _evaluate(ctx: Any, role_name: str, model: str | None, limit: int | None, no
         before = ctx.budget.session_cost
         out, error, inp = None, None, None
         final = None
+        ctx.resources.pop("fetched_pages", None)  # 도구 에이전트: 이전 픽스처에서 연 페이지를 인용 근거로 쓰지 않게
         mark = ctx.db.conn.execute("SELECT COALESCE(MAX(id), 0) FROM steps").fetchone()[0]
         try:
             inp = role.input_cls.model_validate(fx["input"])
