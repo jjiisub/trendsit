@@ -24,6 +24,15 @@ def _plain(v: Any) -> Any:
 class RoleInput(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
+    # 도구 에이전트의 입력별 상한(코드가 지킴). 기본은 역할 md 설정 그대로
+    def tool_names(self, names: list[str]) -> list[str]:
+        """이 입력에서 허용할 도구(예: 레포 분석가 max_depth 1이면 일부만)."""
+        return names
+
+    def depth_limit(self, default: int | None) -> int | None:
+        """이 입력의 문서 깊이 상한(예: 편집장 계획의 항목별 max_depth)."""
+        return default
+
 
 class Document(BaseModel):
     """문서형 자료. user 메시지에서 <document id source title url> 태그로 들어간다. id는 근거 id(rp:, it:, vd:)."""
