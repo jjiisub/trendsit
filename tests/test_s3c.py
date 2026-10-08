@@ -255,3 +255,11 @@ def test_github_token_not_persisted_or_sent_to_llm(ctx):
     dump = "\n".join(c.db.conn.iterdump())
     assert fake not in dump and "Authorization" not in dump
     assert fake not in json.dumps(c.llm.transport.bodies, ensure_ascii=False)
+
+
+def test_agent_records_tool_results_per_run(ctx):
+    """run_agent가 이번 실행의 도구 결과(이름, 성공 여부)를 ctx.resources에 남긴다(R1 enforce 근거)."""
+    c = ctx([ONELINER, call("github_repo", name="ollama/ollama"), call("contributors", name="nobody/missing"),
+             call("finish", **card(release=None, signal="trending"))])
+    run_repo_analysis(c, [QueueItem("ollama/ollama", 2, "트렌딩")], WEEK, config.load("keywords.yaml"))
+    assert c.resources["tool_results"] == [{"name": "github_repo", "ok": True}, {"name": "contributors", "ok": False}]
