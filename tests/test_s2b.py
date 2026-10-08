@@ -243,3 +243,29 @@ def test_targets_use_keep_member_when_canonical_dropped(db):
     db.conn.execute("UPDATE item_same_as SET canonical_id = 2 WHERE item_id = 4")
     db.conn.commit()
     assert targets(db, None, None) == [1, 3, 4]
+
+
+def test_r2_numbers_in_summary_must_be_quoted():
+    """PR #6 리뷰 R2: 요약·주장의 숫자는 인용(또는 제목)에. 영어 수 단어 one~ten 허용. 어기면 attention + 원래 출력 코드 채점 실패."""
+    ok = card(summary="새 모델을 공개했다. 가격은 70% 낮아졌다.", claims=[{"quote_ns": [2], "text": "지연 300ms 아래"}])
+    assert ok.numbers_outside_quotes("새 모델") == []
+    words = card(quotes=[{"n": 1, "text": "OpenAI가 새 모델을 공개했다."}], numbers=[],
+                 claims=[{"quote_ns": [1], "text": "모델 공개"}], summary="모델 3개 공개.")
+    assert words.numbers_outside_quotes("three models") == []  # 제목의 three = 3
+    bad = card(summary="영상 길이는 15초다.", claims=[{"quote_ns": [1], "text": "15초 영상"}])
+    assert bad.numbers_outside_quotes("새 모델") == ["15", "15"]
+    out = apply_enforce(bad, inp(), None)
+    assert out.attention is True and out.enforced[-1]["rule"] == "요약·주장의 숫자가 인용(제목)에 없음"
+    failed = graders.code_grade("item_card", inp().model_dump(), bad.model_dump(), None, {})["failed"]
+    assert "요약·주장의 숫자가 인용 안: 15" in failed
+
+
+def test_r2_regrade_on_saved_item_card_flags_only_kakapo():
+    """저장된 맥 평가 21건에 다시 적용하면 kakapo-party만 걸린다(오탐 0)."""
+    from pathlib import Path
+
+    rep = Path(__file__).parents[1] / "reports" / "eval" / "item_card_generate_20261008-195536.json"
+    results = json.loads(rep.read_text())["results"]
+    hit = [x["id"] for x in results
+           if ItemCardV1.model_validate(x["output"]).numbers_outside_quotes(x["input"]["title"])]
+    assert hit == ["simonw__kakapo-party"]

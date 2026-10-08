@@ -239,3 +239,38 @@ def test_eval_registers_github_readme_as_fetched_page(tmp_path, monkeypatch):
     assert not any(e["field"] in ("quotes", "verified") for e in rec.get("enforced") or [])
     assert rec["output"]["verified"][0]["status"] == "confirmed"
     assert "stale" not in c.resources["fetched_pages"]
+
+
+def test_r3_partial_confirmation_demoted():
+    """PR #6 리뷰 R3: confirmed인데 check 수치가 인용에 없으면 not_found. 모델·버전 이름, 한국어 큰 단위, 작은 개수는 대조 안 함."""
+    from trendsit.core.artifacts_text import PARTIAL_RULE, figures
+
+    assert figures("GPT-6 아스트라, 2억8000만개, 6개 작업, 8.9% 증가, 2.62배, 1,300개, 2026년") == ["8.9", "2.62", "1300"]
+    inp = TextAnalystInput.model_validate({"item_id": 6, "title": "t", "source_name": "GeekNews", "url": TOPIC,
+                                           "max_depth": 2, "card_v1": V1, "links": [], "checks": [
+                                               {"n": 1, "kind": "number", "text": "결함 233건", "quote": "q"},
+                                               {"n": 2, "kind": "claim", "text": "속도 2.62배 향상", "quote": "q"}]})
+    out = ItemCardV2.model_validate(v2(verified=[{"check_n": 1, "quote_n": 1, "status": "confirmed"},
+                                                 {"check_n": 2, "quote_n": 1, "status": "confirmed"}]))
+    got = out.demote_partial(inp)
+    assert [v.status for v in got.verified] == ["confirmed", "not_found"]  # 233은 인용에 있음, 2.62는 없음
+    assert got.enforced[-1]["rule"] == PARTIAL_RULE
+
+
+def test_r3_n2_regrade_saved_text_analyst():
+    """저장된 맥 평가에 R3을 이어 적용: it201·it933·it997이 내려가고, N2대로 별도 지표(근거 없는 판정 문턱값 밖)."""
+    from pathlib import Path
+
+    from eval.graders_text import aggregate_text_analyst, reenforce_text_analyst
+
+    rep = Path(__file__).parents[1] / "reports" / "eval" / "text_analyst_generate_20261008-195542.json"
+    results = json.loads(rep.read_text())["results"]
+    changed = []
+    for x in results:
+        enforced, out = reenforce_text_analyst(x)
+        if any(e["rule"] == "부분 확인: check 수치가 인용에 없음 → not_found" for e in enforced):
+            changed.append(x["id"])
+        x["enforced"], x["enforced_output"] = enforced, out
+    assert changed == ["it201", "it933", "it997"]
+    metrics, reasons = aggregate_text_analyst(results)
+    assert metrics["부분 확인 내림(보고용, N2)"] == 5 and metrics["근거 없는 판정(enforce 전)"] == 0 and reasons == []

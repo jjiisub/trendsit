@@ -15,6 +15,7 @@ if TYPE_CHECKING:
 DEPTH_TOOLS = {1: ("github_repo", "search_items"),
                2: ("github_repo", "search_items", "recent_commits", "contributors", "releases")}
 DEPTH_TOOLS[3] = DEPTH_TOOLS[2]
+GITHUB_TOOLS = ("github_repo", "recent_commits", "contributors", "releases")  # 실제 수치를 주는 도구(search_items 제외)
 
 
 class Strict(BaseModel):
@@ -103,6 +104,9 @@ class RepoCard(RoleOutput):
 
     def enforce(self, inp: RepoAnalystInput, ctx: Ctx | None) -> Self:
         out = self
+        results = ctx.resources.get("tool_results") if ctx is not None else None
+        if results is not None:
+            out = out.tool_rules(inp, results)
         allowed = {x.id for x in inp.week_items}
         rel = [i for i in self.related_item_ids if i in allowed]
         if rel != self.related_item_ids:
@@ -116,6 +120,22 @@ class RepoCard(RoleOutput):
             out = out.fix("attention", True, "check 신호는 사람 확인")
         if not out.evidence and out.why_trending.strip() and not out.attention:
             out = out.fix("attention", True, "근거(evidence) 없이 why_trending을 씀")
+        return out
+
+
+    def tool_rules(self, inp: RepoAnalystInput, results: list[dict]) -> Self:
+        """PR #6 리뷰 R1. (a) evidence는 이 항목에서 성공한 도구에서 온 것만(품질 정리).
+        (b) GitHub 도구 성공 0이면 attention 고정, why_trending 비움, signal은 대체 출력과 같은 숫자 규칙(코드 소유)."""
+        ok = {r["name"] for r in results if r["ok"]}
+        out = self
+        ev = [e for e in out.evidence if e.tool in ok]
+        if ev != out.evidence:
+            out = out.fix("evidence", ev, "성공하지 않은 도구를 출처로 쓴 근거 삭제")
+        if not ok & set(GITHUB_TOOLS):
+            rule = "GitHub 도구 성공 0"
+            out = out.fix("attention", True, f"{rule}: 사람 확인")
+            out = out.fix("why_trending", "", f"{rule}: 뜨는 이유 비움", owned=True)
+            out = out.fix("signal", "check" if inp.hype.force_check else "trending", f"{rule}: 숫자 규칙(대체 출력과 같음)")
         return out
 
 

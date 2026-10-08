@@ -263,3 +263,45 @@ def test_agent_records_tool_results_per_run(ctx):
              call("finish", **card(release=None, signal="trending"))])
     run_repo_analysis(c, [QueueItem("ollama/ollama", 2, "트렌딩")], WEEK, config.load("keywords.yaml"))
     assert c.resources["tool_results"] == [{"name": "github_repo", "ok": True}, {"name": "contributors", "ok": False}]
+
+
+# ---------- PR #6 리뷰 R1, R4, 설계 결정 N1 ----------
+def test_r1_all_github_tools_fail_403(ctx):
+    """GitHub API 403(비인증 한도) 녹화: 실패한 도구를 출처로 쓴 evidence 삭제, attention·why_trending·signal 코드 규칙."""
+    c = ctx([ONELINER, call("github_repo", name="ollama/ollama"), call("releases", name="ollama/ollama"),
+             call("search_items", query="ollama"),
+             call("finish", **card(evidence=[{"fact": "github_repo, releases 모두 HTTP 403으로 실패", "tool": "github_repo"},
+                                             {"fact": "이번 주 글 it:1에서 언급", "tool": "search_items"}],
+                                   why_trending="이번 주 릴리스", signal="release", attention=False))])
+    deny = {u: 403 for u in FixtureTransport("repo_tools").index if "ollama/ollama" in u}
+    c.resources["fetcher"] = fetcher_for(FixtureTransport("repo_tools", override=deny))
+    run_repo_analysis(c, [QueueItem("ollama/ollama", 2, "트렌딩")], WEEK, config.load("keywords.yaml"))
+    assert [r["ok"] for r in c.resources["tool_results"]] == [False, False, True]
+    saved = json.loads(c.db.conn.execute("SELECT card_json FROM repo_cards").fetchone()[0])
+    assert [e["tool"] for e in saved["evidence"]] == ["search_items"]
+    assert saved["attention"] is True and saved["why_trending"] == "" and saved["signal"] == "trending"
+
+
+def test_r1_tool_check_and_r4_raw_why_trending():
+    from eval import graders
+
+    out = card(evidence=[{"fact": "403", "tool": "github_repo"}]) | {"why_trending": "릴리스"}
+    calls = [{"text": "github_repo: name=x", "error": "HTTP 403", "detail": None}, {"text": "finish: 최종 답 제출", "error": None}]
+    got = graders.code_grade("repo_analyst", _inp(), out, None, {}, calls)
+    assert "evidence 출처가 성공한 도구: github_repo" in got["failed"]
+    no_ev = card(evidence=[], why_trending="근거 없는 이유", attention=True)  # attention이 true여도(코드 소유) 품질 실패
+    assert any(f.startswith("evidence 없이 why_trending을 쓰지 않음") for f in
+               graders.code_grade("repo_analyst", _inp(), no_ev, None, {}, [])["failed"])
+
+
+def test_n1_invalid_run_by_github_tool_errors():
+    """설계 결정 N1: 무효 실행(…-165334)은 '도구 오류로 무효', 정상 실행(…-182928)은 판정 불변."""
+    from eval.graders_text import aggregate_repo_analyst
+
+    rep = Path(__file__).parents[1] / "reports" / "eval"
+    bad = json.loads((rep / "repo_analyst_generate_20261008-165334.json").read_text())["results"]
+    good = json.loads((rep / "repo_analyst_generate_20261008-182928.json").read_text())["results"]
+    metrics, reasons = aggregate_repo_analyst(bad)
+    assert any(r.startswith("도구 오류로 무효") for r in reasons) and metrics["GitHub 도구 성공 0 항목"] == 10
+    metrics, reasons = aggregate_repo_analyst(good)
+    assert reasons == [] and metrics["GitHub 도구 오류율"] == 0.0

@@ -6,6 +6,7 @@ COMMON 9장: 스펙별 파일. core/artifacts.py는 끝의 _merge 줄로 INPUTS,
 
 from __future__ import annotations
 
+import re
 from typing import TYPE_CHECKING, Literal, Self
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -23,6 +24,37 @@ class Strict(BaseModel):
 def squash(text: str) -> str:
     """공백 정리(줄바꿈, 연속 공백을 한 칸으로). 인용 대조의 기준."""
     return " ".join((text or "").split())
+
+
+_NUM = re.compile(r"\d+(?:[.,]\d+)*")
+_NUM_WORDS = {"1": "one", "2": "two", "3": "three", "4": "four", "5": "five", "6": "six", "7": "seven", "8": "eight",
+              "9": "nine", "10": "ten"}
+
+
+def number_in(n: str, text: str, words: bool = False) -> bool:
+    """숫자 n(쉼표 없음)이 text에 독립된 수로 있는지. words면 영어 수 단어 one~ten도 같은 것으로."""
+    if re.search(rf"(?<![\d.]){re.escape(n)}(?![\d])", (text or "").replace(",", "")):
+        return True
+    w = _NUM_WORDS.get(n) if words else None
+    return bool(w and re.search(rf"\b{w}\b", text or "", re.I))
+
+
+def numbers(text: str) -> list[str]:
+    """글 속 숫자 전부(쉼표 없앰). item_card 요약·주장 대조(PR #6 리뷰 R2)."""
+    return [m.group().replace(",", "") for m in _NUM.finditer(text or "")]
+
+
+def figures(text: str) -> list[str]:
+    """대조할 수치만: %·배·x가 붙은 수, 소수, 네 자리 이상 정수(연도 제외).
+    모델·버전 이름(GPT-6, v1.1), 한국어 큰 단위(2억8000만), 작은 개수(6개)는 표기가 달라 대조하지 않는다(리뷰 R3)."""
+    out = []
+    for m in _NUM.finditer(text or ""):
+        n, before, after = m.group().replace(",", ""), text[m.start() - 1:m.start()], text[m.end():m.end() + 1]
+        if before.isalpha() or before in ("-", "_") or after in ("만", "억", "천", "조"):
+            continue
+        if after in ("%", "배", "x", "×") or "." in n or (len(n) >= 4 and not re.fullmatch(r"(19|20)\d\d", n)):
+            out.append(n)
+    return out
 
 
 # ---------- 글 1차 요약 (item_card, S2 2b) ----------
@@ -110,7 +142,10 @@ Relevance = Literal["high", "mid", "low"]
 
 
 class ItemCardV1(RoleOutput):
-    ENFORCED_FIELDS = ("attention",)  # 설계 결정 Q1. 긴 인용 자르기(Q6)는 fix(owned=True), 나머지 인용·수치·키워드·링크 정리는 품질
+    # 설계 결정 Q1. 칸 단위 코드 소유는 attention뿐. 긴 인용 자르기(Q6)도 코드 소유지만 quotes 칸 전체를 코드 소유로 둘 수
+    # 없어(본문에 없는 인용 삭제는 품질 정리) fix(owned=True)로만 표시한다. 통과 판정 보기(graders.basis_output)는 quotes를
+    # 원래 출력으로 보는데, 채점기에 인용 길이 검사가 없어 결과는 결정과 같다(PR #6 리뷰 R5)
+    ENFORCED_FIELDS = ("attention",)
     quotes: list[Quote] = Field(max_length=8, description="본문에서 그대로 옮긴 핵심 문장. 가장 먼저 채움")
     numbers: list[NumberFact] = Field(description="quote에 있는 수치만. 없으면 빈 목록")
     claims: list[Claim] = Field(description="핵심 주장. 각 주장은 quote 번호로 뒷받침")
@@ -160,7 +195,15 @@ class ItemCardV1(RoleOutput):
             out = out.fix("origin_candidates", origins, "없는 링크 번호 삭제")
         if len(kept) != len(self.quotes) or len(nums) != len(before_nums):
             out = out.fix("attention", True, "인용·수치 정리가 있어 사람 확인")
+        if out.numbers_outside_quotes(inp.title):
+            out = out.fix("attention", True, "요약·주장의 숫자가 인용(제목)에 없음")
         return out
+
+    def numbers_outside_quotes(self, title: str = "") -> list[str]:
+        """summary·claims의 숫자 중 quotes와 제목에 없는 것(영어 수 단어 one~ten 허용). PR #6 리뷰 R2."""
+        src = " ".join([title, *(q.text for q in self.quotes)])
+        return [n for t in [self.summary, *(c.text for c in self.claims)] for n in numbers(t)
+                if not number_in(n, src, words=True)]
 
     def clip_quotes(self, body: str) -> Self:
         """본문에 있는 QUOTE_CHARS자 초과 인용을 자르고, 잘려 나간 수치를 지운다(설계 결정 Q6, 코드 소유. attention 없음)."""
@@ -372,6 +415,9 @@ class Origin(Strict):
     date: str | None = None
 
 
+PARTIAL_RULE = "부분 확인: check 수치가 인용에 없음 → not_found"
+
+
 class ItemCardV2(RoleOutput):
     ENFORCED_FIELDS = ("attention",)  # 설계 결정 Q1. 근거 없는 판정, 연 적 없는 페이지 인용, trail 밖 origin은 품질 정리
     trail: list[TrailStep] = Field(description="거쳐 간 페이지(순서대로)")
@@ -422,9 +468,19 @@ class ItemCardV2(RoleOutput):
             out = out.fix("claims", claims, "없는 인용을 가리키는 주장 정리")
         if self.origin is not None and page_key(self.origin.url) not in bodies:
             out = out.fix("origin", None, "origin.url을 이번 실행에서 열지 않음")
+        out = out.demote_partial(inp)
         if any(v.status == "differs" for v in out.verified) and not out.attention:
             out = out.fix("attention", True, "원본과 다른 점(differs)이 있어 사람 확인")
         return out
+
+    def demote_partial(self, inp: TextAnalystInput) -> Self:
+        """confirmed/differs인데 check 문장의 수치가 인용에 없으면 부분 확인으로 보고 not_found(PR #6 리뷰 R3).
+        가져온 페이지 없이 출력과 입력만 보므로 eval --regrade가 저장된 출력에 다시 적용할 수 있다."""
+        checks = {c.n: c.text for c in inp.checks}
+        quoted = " ".join(q.text for q in self.quotes)
+        ver = [v if v.status == "not_found" or all(number_in(n, quoted) for n in figures(checks.get(v.check_n, "")))
+               else v.model_copy(update={"status": "not_found", "quote_n": None}) for v in self.verified]
+        return self.fix("verified", ver, PARTIAL_RULE) if ver != self.verified else self
 
 
 INPUTS = (ItemCardInput, PlanInput, TextAnalystInput)
