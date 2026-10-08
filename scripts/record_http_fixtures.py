@@ -134,8 +134,14 @@ def main() -> None:
     tmp = Path(tempfile.mkdtemp())
     fetcher = Fetcher(None, use_cache=False, transport=rec)
     today = date.fromisoformat(args.today) if args.today else datetime.now(timezone(timedelta(hours=9))).date()
+    # 녹화는 테스트 전용 키워드로(테스트가 같은 키워드로 재생해야 녹화에 없는 URL이 생기지 않음)
+    import yaml
+
+    from trendsit.core.config import ROOT, KeywordsConfig
+    test_kw = KeywordsConfig.model_validate(
+        yaml.safe_load((ROOT / "tests" / "fixtures" / "keywords_test.yaml").read_text(encoding="utf-8")))
     res = collect(since, until, only=args.source, data_dir=tmp, fetcher=fetcher, ytdlp=ytdlp,
-                  max_items=args.max_items, today=today)
+                  max_items=args.max_items, today=today, keywords=test_kw)
     if out.exists():
         shutil.rmtree(out)
     out.mkdir(parents=True)

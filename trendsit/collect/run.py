@@ -41,10 +41,11 @@ def sync_sources(db: DB, src: config.SourcesConfig) -> None:
 def collect(since: date, until: date, *, only: str | None = None, no_body: bool = False,
             data_dir: Path | None = None, config_dir: Path | None = None, use_http_cache: bool = True,
             fetcher: Fetcher | None = None, ytdlp: YtDlp = run_ytdlp, max_items: int | None = None,
-            spec: str | None = None, today: date | None = None) -> CollectResult:
+            spec: str | None = None, today: date | None = None,
+            keywords: config.KeywordsConfig | None = None) -> CollectResult:
     data_dir = data_dir or config.ROOT / "data"
     sources = config.load("sources.yaml", config_dir)
-    keywords = config.load("keywords.yaml", config_dir)
+    keywords = keywords or config.load("keywords.yaml", config_dir)  # 테스트는 녹화 당시 키워드를 직접 넘긴다
     kinds = config.load("link_kinds.yaml", config_dir)
     ids = [s.id for s in sources.text] + [s.id for s in sources.video] + ["github_trending", "github_releases"]
     if only and only not in ids:  # 실행 기록을 만들기 전에 거른다
