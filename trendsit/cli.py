@@ -129,6 +129,8 @@ def cmd_eval(args: argparse.Namespace) -> int:
         if a is None or not a["n_rows"]:
             print(f"채운 라벨 없음: eval/labels/{args.role}.csv")
             return 1
+        if a.get("labelers"):
+            print(f"labeler: {', '.join(a['labelers'])}" + (", 잠정(사람 라벨 아님)" if a.get("provisional") else ""))
         print(f"| 질문 | 일치 | 비교 수 | 일치율 |  (라벨 {a['n_rows']}건, {a['report']})")
         print("|---|---|---|---|")
         for q, v in a["questions"].items():

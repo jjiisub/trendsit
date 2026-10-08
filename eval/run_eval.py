@@ -190,7 +190,9 @@ def write_quality(spec: str) -> Path:
             lines += ["문턱값: 코드 채점 전부 통과", ""]
         agree = agreement(role, spec) if questions else None
         if questions:
-            lines += ["judge 판정: " + ("사람 라벨과 일치율 확인됨(아래)" if agree and agree["n_rows"] else
+            who = (f"라벨({', '.join(agree['labelers'])}{', 잠정' if agree['provisional'] else ''})"
+                   if agree and agree.get("labelers") else "사람 라벨")
+            lines += ["judge 판정: " + (f"{who}과 일치율 확인됨(아래)" if agree and agree["n_rows"] else
                                          "**잠정**(사람 라벨 없음. `eval/labels/" + role + ".csv`를 채우면 일치율을 잰다)"), ""]
         head = (["모델", "코드 통과", "enforce 후 코드 통과"] + [f"{q} 통과" for q in questions] + [f"{c} 평균" for c in criteria]
                 + ["문턱값", "비용", "프롬프트"])
@@ -238,7 +240,9 @@ def write_quality(spec: str) -> Path:
             lines.append("")
 
         if agree and agree["n_rows"]:
-            lines += [f"### judge·사람 일치율 (라벨 {agree['n_rows']}건, {agree['report']})", "",
+            who = (f"labeler {', '.join(agree['labelers'])}{', 잠정' if agree['provisional'] else ''}"
+                   if agree.get("labelers") else "사람")
+            lines += [f"### judge·라벨 일치율 ({who}, 라벨 {agree['n_rows']}건, {agree['report']})", "",
                       "| 질문 | 일치 | 비교 수 | 일치율 |", "|---|---|---|---|"]
             for q, v in agree["questions"].items():
                 lines.append(f"| {q} | {v['agree']} | {v['n']} | {v['rate']} |")
@@ -304,6 +308,7 @@ def _brief(v: Any) -> Any:
 
 # ---------- judge 맞추기: 사람 라벨 ----------
 LABELS = ROOT / "eval" / "labels"
+HUMAN_LABELERS = {"human", "사람", "user", "사용자"}  # labeler 칸이 이것이 아니면(예: opus-5.5) 잠정 라벨
 TRUE_WORDS = {"pass", "p", "y", "yes", "1", "o", "예", "통과", "true"}
 FALSE_WORDS = {"fail", "f", "n", "no", "0", "x", "아니오", "실패", "false"}
 
@@ -325,7 +330,8 @@ def make_labels(role: str, spec: str) -> Path:
     if rep is None:
         raise SystemExit(f"{role}: 전체 eval 결과가 없음. 먼저 eval {role}을 돌릴 것")
     questions = list(graders.rubric_questions(role))
-    cols = ["id", "input_summary", "output"] + [c for q in questions for c in (f"{q}_pass", f"{q}_critique")] + ["eval_report"]
+    cols = (["id", "input_summary", "output"] + [c for q in questions for c in (f"{q}_pass", f"{q}_critique")]
+            + ["labeler", "eval_report"])
     path = LABELS / f"{role}.csv"
     old: dict[str, dict[str, str]] = {}
     if path.exists():
@@ -345,6 +351,7 @@ def make_labels(role: str, spec: str) -> Path:
             for q in questions:
                 row[f"{q}_pass"] = prev.get(f"{q}_pass", "") if same else ""
                 row[f"{q}_critique"] = prev.get(f"{q}_critique", "") if same else ""
+            row["labeler"] = prev.get("labeler", "") if same else ""  # 누가 라벨을 달았나(사람이 아니면 잠정)
             w.writerow(row)
     return path
 
@@ -370,6 +377,7 @@ def agreement(role: str, spec: str | None = None, path: Path | None = None) -> d
     stats = {q: {"agree": 0, "n": 0} for q in questions}
     labeled_rows = 0
     judged_enforced: list[str] = []  # judge는 enforce 후 출력, 라벨은 원래 출력인 행
+    labelers: set[str] = set()
     for row in rows:
         rp = row.get("eval_report")
         if rp not in reports:
@@ -387,10 +395,13 @@ def agreement(role: str, spec: str | None = None, path: Path | None = None) -> d
             stats[q]["n"] += 1
             stats[q]["agree"] += int(human == (verdicts[q]["verdict"] == "pass"))
         labeled_rows += int(any_label)
+        if any_label and (row.get("labeler") or "").strip():
+            labelers.add(row["labeler"].strip())
     for v in stats.values():
         v["rate"] = round(v["agree"] / v["n"], 3) if v["n"] else None
     total_n = sum(v["n"] for v in stats.values())
     total_a = sum(v["agree"] for v in stats.values())
     return {"questions": stats, "n_rows": labeled_rows, "report": ", ".join(k for k in reports if k),
-            "judged_enforced": judged_enforced,
+            "judged_enforced": judged_enforced, "labelers": sorted(labelers),
+            "provisional": any(lb.lower() not in HUMAN_LABELERS for lb in labelers),
             "total": {"agree": total_a, "n": total_n, "rate": round(total_a / total_n, 3) if total_n else None}}
