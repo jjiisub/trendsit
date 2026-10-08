@@ -110,6 +110,11 @@ ROLE_CHECKS = {"repo_oneliner": code_repo_oneliner, "lookup_agent": code_lookup_
 ROLE_STYLE_FIELDS: dict[str, tuple[str, ...]] = {}
 # 픽스처 전체를 모아 보는 기준(예: 인용 일치율 95%). role → results → (지표, 미달 이유 목록)
 AGGREGATES: dict[str, Any] = {}
+# 도구 호출 기록(run_eval의 rec["tool_calls"])을 보는 코드 검사. role → (입력, 출력, 도구 호출) → 검사 목록
+TOOL_CHECKS: dict[str, Any] = {}
+# eval --regrade가 저장된 기록에 enforce를 다시 적용(규칙이 늘었을 때 0원 재계산). role → rec → (enforced, 출력)
+# enforce를 원래 출력에서 다시 돌릴 수 없는 역할(가져온 페이지가 필요한 글 분석가)은 새 규칙만 이어 적용한다
+REENFORCE: dict[str, Any] = {}
 # 코드 소유 칸(S4 설계 결정 D2-1, S2~S3 결정 Q1): 규칙이 문자열로 확정 판정되어 enforce가 고친 값이 곧 정답인 칸.
 # 통과 판정은 이 칸만 enforce 후 값으로 바꾼 출력으로 한다. 원래 출력 점수는 모델 품질로 따로 기록. role → 칸 목록
 ENFORCED_FIELDS: dict[str, tuple[str, ...]] = {}
@@ -126,13 +131,15 @@ def basis_output(role: str, raw: dict[str, Any], enforced: dict[str, Any] | None
 
 
 def code_grade(role: str, inp: dict[str, Any], out: dict[str, Any] | None, error: str | None,
-               expect: dict[str, Any]) -> dict[str, Any]:
+               expect: dict[str, Any], tool_calls: list[dict[str, Any]] | None = None) -> dict[str, Any]:
     if out is None:
         checks = [check("스키마", False, error or "출력 없음")]
     else:
         fields = ROLE_STYLE_FIELDS.get(role)
         styled = {k: out[k] for k in fields if k in out} if fields else out
         checks = [check("스키마", True)] + ROLE_CHECKS[role](inp, out, expect) + style_checks(styled)
+        if role in TOOL_CHECKS:  # 도구 에이전트: 이 항목의 도구 호출 기록이 필요한 검사
+            checks += TOOL_CHECKS[role](inp, out, tool_calls or [])
     return {"passed": all(c["passed"] for c in checks), "checks": checks,
             "failed": [f"{c['name']}: {c['detail']}" for c in checks if not c["passed"]]}
 

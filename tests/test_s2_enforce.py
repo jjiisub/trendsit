@@ -138,6 +138,8 @@ def test_regrade_saved_report(tmp_path, monkeypatch):
     assert rep["summary"]["code_pass"] == 0 and rep["summary"]["code_pass_basis"] == 1 and rep["summary"]["passed"] is True
     assert rep["summary"]["model_agreement"] == {"attention": "0/1"}
     assert rep["regraded_from"] and rep["prompt_hash"] == "h"
+    rep2 = run_eval.regrade(src, judge=False)  # --no-judge: judge를 부르지 않음(0원)
+    assert calls == [True] and not rep2["results"][0].get("llm")
 
 
 # ---------- M4 ----------

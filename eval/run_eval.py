@@ -79,16 +79,17 @@ def _evaluate(ctx: Any, role_name: str, model: str | None, limit: int | None, no
             rec["tool_calls"] = [{"text": r["text"], "error": r["error"], "detail": r["detail"]} for r in ctx.db.conn.execute(
                 "SELECT text, error, detail FROM steps WHERE run_id=? AND kind='tool' AND id>? ORDER BY id",
                 (ctx.tracer.run_id, mark))]
-        rec["code"] = graders.code_grade(role_name, fx["input"], out, error, fx["expect"])
+        tcalls = rec.get("tool_calls")
+        rec["code"] = graders.code_grade(role_name, fx["input"], out, error, fx["expect"], tcalls)
         if final is not None and final.enforced:  # enforce 후 출력(저장되는 것)도 함께 기록
             rec["enforced"] = final.enforced
             rec["enforced_output"] = final.model_dump()
             rec["code_enforced"] = graders.code_grade(role_name, fx["input"], rec["enforced_output"], None,
-                                                      fx["expect"])
+                                                      fx["expect"], tcalls)
         if out is not None and role_name in graders.ENFORCED_FIELDS:  # 통과 판정 기준(코드 소유 칸만 enforce 후)
             basis = graders.basis_output(role_name, out, rec.get("enforced_output"))
             rec["code_basis"] = rec["code"] if basis == out else graders.code_grade(
-                role_name, fx["input"], basis, None, fx["expect"])
+                role_name, fx["input"], basis, None, fx["expect"], tcalls)
         # judge: 원래 출력이 코드 채점을 통과하면 원래 출력을. 코드 소유 칸을 선언한 역할은 원래 출력이 실패해도
         # enforce 후 출력이 통과하면 그 출력을 채점(기록에 표시, S4 설계 결정 D2-4)
         target = None
@@ -129,10 +130,11 @@ def _evaluate(ctx: Any, role_name: str, model: str | None, limit: int | None, no
     return report
 
 
-def regrade(path: Path, note: str | None = None) -> dict[str, Any]:
+def regrade(path: Path, note: str | None = None, judge: bool = True) -> dict[str, Any]:
     """저장된 eval 결과를 생성 재실행 없이 지금 채점 규칙으로 다시 채점한다(설계 결정 Q1).
 
-    새로 코드 채점을 통과했는데 LLM 채점이 없는 항목만 judge를 부른다. 결과는 새 리포트 파일로.
+    새로 judge 대상이 됐는데 LLM 채점이 없는 항목만 judge를 부른다(judge=False면 부르지 않음, 0원 보장).
+    결과는 새 리포트 파일로.
     """
     old = json.loads(path.read_text(encoding="utf-8"))
     role_name = old["role"]
@@ -146,21 +148,29 @@ def regrade(path: Path, note: str | None = None) -> dict[str, Any]:
             rec = dict(rec)
             out = rec.get("output")
             rec.pop("graded_output", None)
+            tcalls = rec.get("tool_calls")
+            if out is not None and role_name in graders.REENFORCE:  # 늘어난 enforce 규칙을 저장된 출력에(0원)
+                enforced, enforced_out = graders.REENFORCE[role_name](rec)
+                if enforced:
+                    rec["enforced"], rec["enforced_output"] = enforced, enforced_out
+                else:
+                    for k in ("enforced", "enforced_output", "code_enforced"):
+                        rec.pop(k, None)
             # run_eval과 같은 기록: code = 원래 출력, code_basis = 코드 소유 칸만 enforce 후(통과 판정)
-            rec["code"] = graders.code_grade(role_name, rec["input"], out, rec.get("error"), rec["expect"])
+            rec["code"] = graders.code_grade(role_name, rec["input"], out, rec.get("error"), rec["expect"], tcalls)
             if rec.get("enforced_output") is not None:
                 rec["code_enforced"] = graders.code_grade(role_name, rec["input"], rec["enforced_output"], None,
-                                                          rec["expect"])
+                                                          rec["expect"], tcalls)
             if out is not None and role_name in graders.ENFORCED_FIELDS:
                 basis = graders.basis_output(role_name, out, rec.get("enforced_output"))
                 rec["code_basis"] = rec["code"] if basis == out else graders.code_grade(
-                    role_name, rec["input"], basis, None, rec["expect"])
+                    role_name, rec["input"], basis, None, rec["expect"], tcalls)
             target = None  # judge 대상(S4 설계 결정 D2-4). 이미 채점된 항목은 다시 부르지 않음
             if rec["code"]["passed"]:
                 target, rec["judged_output"] = out, "raw"
             elif role_name in graders.ENFORCED_FIELDS and rec.get("code_enforced", {}).get("passed"):
                 target, rec["judged_output"] = rec["enforced_output"], "enforced"
-            if with_llm and target is not None and not rec.get("llm") and not stopped:
+            if judge and with_llm and target is not None and not rec.get("llm") and not stopped:
                 try:
                     inp = role.input_cls.model_validate(rec["input"])
                     rec["llm"] = graders.llm_grade(role_name, inp, target, ctx)  # type: ignore[arg-type]

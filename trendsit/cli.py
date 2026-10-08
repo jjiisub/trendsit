@@ -144,7 +144,7 @@ def cmd_eval(args: argparse.Namespace) -> int:
         return 0
 
     if args.regrade:
-        report = regrade(Path(args.regrade).resolve(), note=args.note)
+        report = regrade(Path(args.regrade).resolve(), note=args.note, judge=not args.no_judge)
     else:
         report = run_eval(args.role, model=args.model, limit=args.limit, spec=args.spec, no_cache=args.no_cache,
                           note=args.note)
@@ -310,6 +310,7 @@ def main(argv: list[str] | None = None) -> int:
     e.add_argument("--label", action="store_true", help="최근 eval 결과로 사람 라벨 CSV(eval/labels/<역할>.csv) 생성")
     e.add_argument("--agreement", action="store_true", help="사람 라벨과 judge 판정의 질문별 일치율")
     e.add_argument("--regrade", metavar="REPORT_JSON", help="저장된 eval 결과를 생성 재실행 없이 지금 규칙으로 다시 채점")
+    e.add_argument("--no-judge", action="store_true", help="--regrade에서 judge를 부르지 않음(0원)")
     e.set_defaults(fn=cmd_eval)
 
     k = sub.add_parser("cost", help="스펙별, 모델별 사용액과 남은 예산")
