@@ -149,7 +149,12 @@ def _queue_from_file(path: str) -> list[Any]:
 
     data = json.loads(Path(path).read_text(encoding="utf-8"))
     rows = data.get("repo_queue", data) if isinstance(data, dict) else data
-    return [QueueItem(r["full_name"], int(r.get("max_depth", 2)), r.get("reason", "")) for r in rows]
+    from .tools.github import valid_name
+
+    bad = [r["full_name"] for r in rows if not valid_name(r["full_name"])]
+    if bad:
+        raise config.ConfigError(Path(path).name, "full_name", f"레포 이름 형식 오류: {', '.join(bad)[:80]}")
+    return [QueueItem(r["full_name"], min(max(int(r.get("max_depth", 2)), 1), 3), r.get("reason", "")) for r in rows]
 
 
 def cmd_repo_analyze(args: argparse.Namespace) -> int:

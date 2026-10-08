@@ -34,9 +34,34 @@ def resources(state: Any) -> dict[str, Any]:
     return res
 
 
-def remember(state: Any, url: str, text: str) -> None:
-    """가져온 문서 본문(enforce가 인용 대조에 씀)."""
-    resources(state)["fetched_pages"][norm_url(url)] = text
+def remember(state: Any, url: str, text: str, depth: int | None = None) -> None:
+    """가져온 문서 본문(enforce가 인용 대조에 씀)과 코드가 센 깊이."""
+    from ..core.artifacts_text import page_key
+
+    res = resources(state)
+    res["fetched_pages"][page_key(url)] = text
+    if depth is not None:
+        res.setdefault("page_depth", {})[page_key(url)] = depth
+
+
+_REF = re.compile(r'<ref target="([^"]+)">(.*?)</ref>', re.S)
+
+
+def page_links(xml: str, base: str) -> list[dict[str, str]]:
+    """본문 링크 전부(같은 사이트 포함: 공식 블로그 → 같은 도메인 논문·문서). http/https만, 자기 자신·조각 제외."""
+    from urllib.parse import urljoin, urlsplit
+
+    out, seen = [], {norm_url(base)}
+    for href, anchor in _REF.findall(xml):
+        url = urljoin(base, href.strip())
+        if urlsplit(url).scheme not in ("http", "https"):
+            continue
+        key = norm_url(url)
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append({"url": url, "anchor": re.sub(r"<[^>]+>", "", anchor).strip()})
+    return out
 
 
 class FetchArgs(BaseModel):
@@ -60,14 +85,12 @@ def extract(html: str, url: str) -> tuple[str, str | None, str | None, list[str]
     """(본문, 제목, 날짜, 소제목, 링크[url, anchor]). trafilatura로 본문, XML에서 링크와 소제목."""
     import trafilatura
 
-    from ..collect.links import extract_links
-
     xml = trafilatura.extract(html, url=url, output_format="xml", include_links=True, include_comments=False,
                               favor_recall=True) or ""
     text = trafilatura.extract(html, url=url, include_comments=False, favor_recall=True) or ""
     meta = trafilatura.extract_metadata(html)
     heads = [re.sub(r"<[^>]+>", "", h).strip() for h in _HEAD.findall(xml)]
-    links = extract_links(xml, url, xml_refs=True)
+    links = page_links(xml, url)
     return text, (meta.title if meta else None), (meta.date if meta else None), [h for h in heads if h][:20], links
 
 
@@ -89,9 +112,10 @@ def fetch_page(args: FetchArgs, state: Any) -> ToolOutput:
         text, title, when, heads, links = extract(r.text, r.final_url)
     if not text:
         raise ToolRejected("본문을 추출하지 못함(JS 페이지일 수 있음)")
-    remember(state, args.url, text)
+    depth = state.depth.resolve(args.url, args.parent) if hasattr(state, "depth") else None  # 이미 통과한 검사, 값만
+    remember(state, args.url, text, depth)
     if norm_url(r.final_url) != args.url:
-        remember(state, r.final_url, text)
+        remember(state, r.final_url, text, depth)
     kinds = res["link_kinds"]
     shown = [{"url": x["url"], "kind": classify(x["url"], kinds), "anchor": (x.get("anchor") or "")[:60]}
              for x in links[:MAX_LINKS]]

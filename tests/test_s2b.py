@@ -178,3 +178,10 @@ def test_item_card_fixtures_are_valid_inputs():
         assert x.body.text and len(x.body.text) <= BODY_LIMIT + 200  # 인젝션 사본은 한 문장 더 김
     assert sum(1 for _, f in fx if f["expect"].get("injection_phrase")) == 1
     assert sum(1 for _, f in fx if f["input"]["source_kind"] == "curation") >= 3
+
+
+def test_targets_use_keep_member_when_canonical_dropped(db):
+    # 기준 항목 2가 drop이고 경유 항목 4가 keep이면 4를 대표로(묶음 전체가 빠지지 않게)
+    db.conn.execute("UPDATE item_same_as SET canonical_id = 2 WHERE item_id = 4")
+    db.conn.commit()
+    assert targets(db, None, None) == [1, 3, 4]

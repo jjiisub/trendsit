@@ -169,3 +169,26 @@ def test_traces_written(ctx, tmp_path):
     text = p.read_text(encoding="utf-8")
     assert p.name == "ollama__ollama.md" and "| 1 | github_repo | name=ollama/ollama | ok |" in text
     assert "이번 주 별 300" in text and '"oneliner": "로컬 LLM 실행 도구"' in text
+
+
+def test_commits_404_does_not_count_as_zero(tmp_path):
+    from trendsit.core.artifacts_repo import TrendingStats
+
+    url = "https://api.github.com/repos/gone/repo/commits?since=2026-10-01T00:00:00Z&per_page=100"
+    extra = {url: (404, "application/json", '{"message": "Not Found"}'),
+             "https://api.github.com/repos/gone/repo/contributors?per_page=100&anon=1":
+                 (404, "application/json", '{"message": "Not Found"}')}
+    c = make_ctx(tmp_path, FakeTransport([]))
+    c.resources.update(fetcher=fetcher_for(FixtureTransport("repo_tools", extra=extra)), today=date(2026, 10, 8),
+                       github_headers={})
+    h = hype_check(c, "gone/repo", TrendingStats(week=WEEK, stars_this_week=HYPE_STARS_WEEK + 1), None)
+    assert h.flags == [] and not h.force_check and "404" in h.note
+    assert hype_check(c, "../user", None, None).note.startswith("레포 이름 형식 오류")
+
+
+def test_tool_call_limit_from_deep_yaml(ctx):
+    c = ctx([ONELINER])
+    inp = build_input(c, QueueItem("ollama/ollama", 2, "r"), WEEK, config.load("keywords.yaml"), tool_calls=2)
+    assert inp.tool_call_limit(6) == 2
+    inp = build_input(c, QueueItem("ollama/ollama", 2, "r"), WEEK, config.load("keywords.yaml"))
+    assert inp.tool_calls == config.load("deep.yaml").repo_tool_calls_per_item

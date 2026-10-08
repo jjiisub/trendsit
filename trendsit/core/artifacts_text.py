@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING, Literal, Self
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from .artifacts import Document, RoleInput, RoleOutput
+from .artifacts import Document, RoleInput, RoleOutput, register_schemas
 
 if TYPE_CHECKING:
     from .context import Ctx
@@ -163,8 +163,10 @@ class VideoCandidate(Strict):
 
 class RepoCandidate(Strict):
     full_name: str
+    rank: int | None = None
     stars_this_week: int | None = None
     stars_total: int | None = None
+    forks: int | None = None
     language: str | None = None
     description: str | None = None
     tracked_release: str | None = Field(default=None, description="추적 레포 릴리스 제목(있으면)")
@@ -230,6 +232,17 @@ def norm_url(url: str) -> str:
     return normalize_url(url)
 
 
+def page_key(url: str) -> str:
+    """가져온 문서 대조 열쇠: 정규화 URL + github.com은 소문자, arxiv는 https·버전 없는 abs 주소."""
+    import re
+
+    u = norm_url(url).replace("http://", "https://", 1)
+    if u.startswith("https://github.com/"):
+        return u.lower()
+    m = re.match(r"https://(?:export\.)?arxiv\.org/(?:abs|pdf)/(\d{4}\.\d{4,5})(v\d+)?", u)
+    return f"https://arxiv.org/abs/{m.group(1)}" if m else u
+
+
 class CheckItem(Strict):
     n: int = Field(description="확인할 것 번호(verified의 check_n)")
     kind: Literal["number", "claim"]
@@ -254,6 +267,11 @@ class TextAnalystInput(RoleInput):
     card_v1: ItemCardV1
     links: list[ArticleLink] = Field(description="원래 글의 링크(종류 표시). 원본 후보는 candidate=true")
     checks: list[CheckItem] = Field(description="원본과 대조할 수치·주장(코드가 v1에서 뽑음)")
+
+    tool_calls: int | None = Field(default=None, ge=1, description="항목당 도구 호출 상한(deep.yaml text_tool_calls_per_item)")
+
+    def tool_call_limit(self, default: int | None) -> int | None:
+        return self.tool_calls or default
 
     def depth_limit(self, default: int | None) -> int | None:
         from .config import MAX_DEPTH_ALL
@@ -310,11 +328,18 @@ class ItemCardV2(RoleOutput):
 
     def enforce(self, inp: TextAnalystInput, ctx: Ctx | None) -> Self:
         """이번 실행에서 실제로 가져온 페이지 본문에 있는 인용만 근거로 인정(S2S3_TASK 5.5)."""
-        pages: dict[str, str] = (ctx.resources.get("fetched_pages") if ctx is not None else None) or {}
-        bodies = {norm_url(u): squash(t) for u, t in pages.items()}
+        res = ctx.resources if ctx is not None else {}
+        pages: dict[str, str] = res.get("fetched_pages") or {}
+        depths: dict[str, int] = res.get("page_depth") or {}
+        bodies = {page_key(u): squash(t) for u, t in pages.items()}
         out = self
+        # trail은 실제로 연 문서만, 깊이는 코드가 센 값으로(모델이 쓴 값을 믿지 않음)
+        trail = [t.model_copy(update={"depth": depths.get(page_key(t.url), t.depth)}) for t in self.trail
+                 if page_key(t.url) in bodies]
+        if trail != self.trail:
+            out = out.fix("trail", trail, "연 적 없는 문서 삭제, 깊이는 코드가 센 값")
         kept = [q for q in self.quotes
-                if squash(q.text) and squash(q.text) in bodies.get(norm_url(q.url), "")]
+                if squash(q.text) and squash(q.text) in bodies.get(page_key(q.url), "")]
         if len(kept) != len(self.quotes):
             out = out.fix("quotes", kept, "가져온 페이지에 없는 인용 삭제")
         ok = {q.n for q in kept}
@@ -329,9 +354,8 @@ class ItemCardV2(RoleOutput):
                   if any(n in ok for n in c.quote_ns)]
         if claims != self.claims:
             out = out.fix("claims", claims, "없는 인용을 가리키는 주장 정리")
-        trail = {norm_url(t.url) for t in self.trail}
-        if self.origin is not None and norm_url(self.origin.url) not in trail:
-            out = out.fix("origin", None, "origin.url이 trail에 없음")
+        if self.origin is not None and page_key(self.origin.url) not in bodies:
+            out = out.fix("origin", None, "origin.url을 이번 실행에서 열지 않음")
         if any(v.status == "differs" for v in out.verified) and not out.attention:
             out = out.fix("attention", True, "원본과 다른 점(differs)이 있어 사람 확인")
         return out
@@ -339,3 +363,4 @@ class ItemCardV2(RoleOutput):
 
 INPUTS = (ItemCardInput, PlanInput, TextAnalystInput)
 OUTPUTS = (ItemCardV1, CollectionPlan, ItemCardV2)
+register_schemas("artifacts_text", INPUTS, OUTPUTS)

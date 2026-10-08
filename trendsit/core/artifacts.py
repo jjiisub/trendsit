@@ -33,6 +33,10 @@ class RoleInput(BaseModel):
         """이 입력의 문서 깊이 상한(예: 편집장 계획의 항목별 max_depth)."""
         return default
 
+    def tool_call_limit(self, default: int | None) -> int | None:
+        """이 입력의 도구 호출 상한(예: deep.yaml의 항목당 상한). 역할 md 값보다 늘리지는 않는다."""
+        return default
+
     def depth_seed(self) -> list[tuple[str, list[str]]]:
         """이미 읽은 시작 문서(깊이 1)와 그 문서의 링크. 예: 글 분석가의 원래 글(본문은 1차 요약 때 읽음)."""
         return []
@@ -190,22 +194,30 @@ OUTPUTS: dict[str, type[RoleOutput]] = {
 # 스펙마다 자기 파일에 입력·출력 스키마를 두고 INPUTS, OUTPUTS 튜플을 내놓는다. 여기에는 합치는 줄만.
 # 아직 없는 모듈은 건너뛴다(병행 브랜치가 먼저 병합되는 경우). 같은 이름이 다른 클래스로 들어오면 오류.
 # 스키마 모듈은 무거운 선택 의존성(numpy, torch 등)을 import하지 않는다. 안 그러면 그 묶음이 없는 환경에서 모든 명령이 멈춘다.
-def _merge(module: str) -> None:
-    import importlib
-
-    try:
-        mod = importlib.import_module(f"{__package__}.{module}")
-    except ModuleNotFoundError as e:
-        if e.name == f"{__package__}.{module}":
-            return
-        raise
-    if not hasattr(mod, "INPUTS") and not hasattr(mod, "OUTPUTS"):  # 순환 import로 반쯤 읽힌 모듈
-        raise ImportError(f"{module}에 INPUTS/OUTPUTS 없음(순환 import 확인: 도구 모듈이 스키마 모듈을 먼저 import하는지)")
-    for table, classes in ((INPUTS, getattr(mod, "INPUTS", ())), (OUTPUTS, getattr(mod, "OUTPUTS", ()))):
+def register_schemas(module: str, inputs: tuple[type[RoleInput], ...], outputs: tuple[type[RoleOutput], ...]) -> None:
+    """스펙별 모듈이 끝에서 부른다. 같은 이름이 다른 클래스로 들어오면 오류."""
+    for table, classes in ((INPUTS, inputs), (OUTPUTS, outputs)):
         for c in classes:
             if table.get(c.__name__, c) is not c:
                 raise ValueError(f"스키마 이름 '{c.__name__}'이 {module}과 다른 모듈에서 겹침")
             table[c.__name__] = c
+
+
+def _merge(module: str) -> None:
+    """모듈을 읽어 등록되게 한다. 그 모듈이 지금 읽히는 중(순환)이면 끝에서 스스로 register_schemas를 부른다."""
+    import importlib
+    import sys
+
+    name = f"{__package__}.{module}"
+    if name in sys.modules and not hasattr(sys.modules[name], "INPUTS"):
+        return  # 읽히는 중: 모듈 끝의 register_schemas가 등록
+    try:
+        mod = importlib.import_module(name)
+    except ModuleNotFoundError as e:
+        if e.name == name:
+            return
+        raise
+    register_schemas(module, tuple(getattr(mod, "INPUTS", ())), tuple(getattr(mod, "OUTPUTS", ())))
 
 
 _merge("artifacts_text")  # S2~S3

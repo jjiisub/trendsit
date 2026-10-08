@@ -53,9 +53,13 @@ def build_input(db: DB, item_id: int, keywords: config.KeywordsConfig) -> ItemCa
 
 
 def targets(db: DB, since: date | None, until: date | None, *, redo: bool = False, limit: int | None = None) -> list[int]:
-    """임베딩 필터 keep이고 같은 URL 묶음의 기준 항목인 글(경유 항목은 제외). 이미 v1이 있으면 건너뜀(redo면 포함)."""
+    """임베딩 필터 keep이고 같은 URL 묶음의 대표인 글(기준 항목, 기준이 drop이면 keep 경유 항목 하나). 이미 v1이 있으면 건너뜀."""
+    # 같은 URL 묶음은 keep인 멤버 하나만: 기준 항목이 keep이면 그것, 아니면 keep 경유 항목 중 id가 가장 작은 것
     sql = ("SELECT i.id FROM items i JOIN item_relevance r ON r.item_id = i.id AND r.decision = 'keep' "
-           "WHERE i.channel = 'text' AND i.id NOT IN (SELECT item_id FROM item_same_as)")
+           "WHERE i.channel = 'text' AND (i.id NOT IN (SELECT item_id FROM item_same_as) OR i.id = ("
+           " SELECT MIN(s2.item_id) FROM item_same_as s2 JOIN item_relevance r2 ON r2.item_id = s2.item_id "
+           " AND r2.decision = 'keep' WHERE s2.canonical_id = (SELECT canonical_id FROM item_same_as WHERE item_id = i.id)"
+           " AND NOT EXISTS (SELECT 1 FROM item_relevance r3 WHERE r3.item_id = s2.canonical_id AND r3.decision = 'keep')))")
     args: list[Any] = []
     if since:
         sql += " AND i.day >= ?"

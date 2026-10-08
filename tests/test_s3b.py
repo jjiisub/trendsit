@@ -116,7 +116,7 @@ def test_confirmed_without_fetched_quote_becomes_not_found(make):
     assert card["origin"] is None and card["numbers"] == [] and card["claims"] == []
     detail = json.loads([s for s in c.db.steps_of(c.tracer.run_id) if s["kind"] == "code"][-1]["detail"])
     rules = {e["rule"] for e in detail["enforced"]}
-    assert "가져온 페이지에 없는 인용 삭제" in rules and "origin.url이 trail에 없음" in rules
+    assert "가져온 페이지에 없는 인용 삭제" in rules and "origin.url을 이번 실행에서 열지 않음" in rules
 
 
 def test_differs_sets_attention():
@@ -171,3 +171,37 @@ def test_text_analyst_graders():
     assert m["근거 없는 판정(enforce 전)"] == 1 and not reasons and m["깊이 분포"] == "2:2"
     _, reasons = aggregate_text_analyst([rec, rec])
     assert reasons
+
+
+def test_trail_and_depth_come_from_actual_fetches(make):
+    # 모델이 깊이를 1로, 열지 않은 페이지를 trail에 적음 → 코드가 연 페이지만 남기고 깊이 2로
+    fake = v2(trail=[{"url": ORIGIN, "depth": 1, "reason": "원문"},
+                     {"url": "https://never-opened.example/x", "depth": 2, "reason": "지어냄"}])
+    c = make([call("fetch_page", url=ORIGIN, parent=TOPIC), call("finish", **fake)])
+    res = run_text_analysis(c, [(6, 2)])
+    card = load_card(c.db, 6, 2)
+    assert card["trail"] == [{"url": ORIGIN, "depth": 2, "reason": "원문"}] and res.depths == {2: 1}
+
+
+def test_page_keys_for_github_and_arxiv():
+    from trendsit.core.artifacts_text import page_key
+
+    assert page_key("https://github.com/NousResearch/hermes-agent/") == page_key("https://github.com/nousresearch/hermes-agent")
+    assert page_key("http://arxiv.org/abs/2501.01234v2") == "https://arxiv.org/abs/2501.01234"
+
+
+def test_same_host_links_are_followable():
+    from trendsit.tools.web import page_links
+
+    xml = ('<doc><ref target="/research/paper-x">논문</ref><ref target="https://other.example/a">외부</ref>'
+           '<ref target="#top">위로</ref><ref target="mailto:a@b">메일</ref></doc>')
+    links = page_links(xml, "https://www.anthropic.com/news/post")
+    assert [x["url"] for x in links] == ["https://www.anthropic.com/research/paper-x", "https://other.example/a"]
+
+
+def test_github_name_rejects_path_traversal():
+    from trendsit.tools.github import RepoArgs
+
+    for bad in ("../user", "a/..", "./x"):
+        with pytest.raises(ValueError):
+            RepoArgs(name=bad)

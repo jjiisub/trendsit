@@ -174,19 +174,19 @@ PASS M6 낡은 문구 두 개(geeknews.py 설명, report.py 계획 표기) 없�
 `bash scripts/verify_s2.sh` (2026-10-08, 클라우드)
 ```
 FAIL A1 회귀: verify_s0.sh FAIL [A4 키 없음(OPENROUTER_API_KEY);A5 키 없음;A6 키 없음;] verify_s1.sh FAIL [A1 ]
-PASS A2 ruff 0, pytest 240 passed, 1 skipped in 11.35s
-PASS M1 마이그레이션 번호 키: user_version 2 기존 DB 재적용 없음, 10·20 등록 순서 무관, 늦게 추가된 10번 적용, 실패는 기록 없이 재시도 (8 passed in 0.13s)
-PASS M2 enforce 훅: 칸을 바꾸면 step detail enforced 기록, eval이 원래·enforce 후를 모두 기록(판정은 원래 출력), repo_oneliner README 200자 규칙 (6 passed in 0.16s)
+PASS A2 ruff 0, pytest 253 passed, 1 skipped in 13.63s
+PASS M1 마이그레이션 번호 키: user_version 2 기존 DB 재적용 없음, 10·20 등록 순서 무관, 늦게 추가된 10번 적용, 실패는 기록 없이 재시도 (8 passed in 0.12s)
+PASS M2 enforce 훅: 칸을 바꾸면 step detail enforced 기록, eval이 원래·enforce 후를 모두 기록(판정은 원래 출력), repo_oneliner README 200자 규칙 (6 passed in 0.19s)
 PASS M4 도구 거부 메시지: 중첩 인자 오류에 칸 경로(origin.kind, pages[1]) (2 passed, 4 deselected in 0.10s)
 PASS M6 낡은 문구 두 개(geeknews.py 설명, report.py 계획 표기) 없음
-PASS A3 filter.yaml, 바뀐 keywords.yaml(13개)이 check-config 통과 + 없는 키워드 id, 범위 밖 문턱값이 경로를 짚어 실패 (2 passed, 13 deselected in 0.34s)
-PASS A5 rematch: 키워드를 바꾸면 판정·item_keywords·트렌딩 판정이 바뀌고, 다시 돌려도 같음 (2 passed, 13 deselected in 0.09s)
-PASS A6 필터(모의 임베더): 네 갈래 판정, 제외어는 되살리지 않음, 두 번째 실행 임베딩 계산 0 (9 passed, 6 deselected in 0.10s)
-PASS A7 같은 정규화 URL(원문 링크 포함)이 same_as로 연결, 기준 항목은 공식 > 개인 블로그 > 언론 > 큐레이션 (1 passed, 14 deselected in 0.08s)
+PASS A3 filter.yaml, 바뀐 keywords.yaml(13개)이 check-config 통과 + 없는 키워드 id, 범위 밖 문턱값이 경로를 짚어 실패 (2 passed, 13 deselected in 0.38s)
+PASS A5 rematch: 키워드를 바꾸면 판정·item_keywords·트렌딩 판정이 바뀌고, 다시 돌려도 같음 (2 passed, 13 deselected in 0.10s)
+PASS A6 필터(모의 임베더): 네 갈래 판정, 제외어는 되살리지 않음, 두 번째 실행 임베딩 계산 0 (9 passed, 6 deselected in 0.11s)
+PASS A7 같은 정규화 URL(원문 링크 포함)이 same_as로 연결, 기준 항목은 공식 > 개인 블로그 > 언론 > 큐레이션 (1 passed, 14 deselected in 0.09s)
 PASS A13 마이그레이션 대역: 이 묶음 번호 [10, 11, 12, 13], 대역 밖 [], 등록 전체 [1, 2, 10, 11, 12, 13]
 PASS A4 S2 새 역할 md(item_card)와 채점표가 역할 md 검사 통과, 예시 3개(보통/빈칸/함정). S3 역할은 verify_s3.sh (1 passed, 28 deselected in 0.12s)
-PASS A8 item_card enforce: 본문에 없는 quote, quote에 없는 수치, 목록 밖 키워드·링크 정리 + detail 기록, 코드 채점(인젝션, 인용 일치율) (12 passed in 0.23s)
-FAIL A14 없음: reports/S2_report.md(2a) reports/S2_report.md(2b) reports/S2S3_mac_todo.md
+PASS A8 item_card enforce: 본문에 없는 quote, quote에 없는 수치, 목록 밖 키워드·링크 정리 + detail 기록, 코드 채점(인젝션, 인용 일치율) (13 passed in 0.28s)
+PASS A14 README(기능, 빠른 시작, 성과 행), DEVELOPMENT 명령표, S2 리포트, 맥 확인 목록
 ```
 - A1 FAIL은 0단계와 같은 이유(키 없음, verify_s0 A4~A6). 나머지 전부 PASS
 

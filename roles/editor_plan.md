@@ -63,9 +63,9 @@ core_rules:
 출력: `{"text_queue": [], "video_queue": [], "repo_queue": [{"reason": "관련 낮음, 설명만 확인", "full_name": "e/f", "max_depth": 1}], "log": "영상·글 후보 없음, 레포 1개 얕게", "attention": false}`
 </example>
 <example>
-함정: 긴 영상과 슬라이드 예산
-입력 요약: budget video_minutes 90, slide_videos 2, plan_share 0.8 / 영상 D(140분 컨퍼런스 키노트, 챕터 12개 중 5번째가 "Agents"), E(50분 발표, 자동 자막만), F(40분 발표, 자동 자막만)
-출력: `{"text_queue": [], "video_queue": [{"reason": "140분 키노트, Agents 챕터 구간 60분만, 슬라이드 수치", "video_id": "DDDDDDDDDDD", "mode": "whisper+slides", "start_sec": 1800, "end_sec": 3600}, {"reason": "발표, 자동 자막만, 로컬 전사", "video_id": "EEEEEEEEEEE", "mode": "whisper", "start_sec": null, "end_sec": null}], "repo_queue": [], "log": "영상 3편 중 2편(구간 지정 1), 예산 80% 안", "attention": true}`
-D를 끝까지 처리하면 90분 예산을 혼자 넘는다. 구간 30분 + E 50분 = 80분으로 72분(80%)을 조금 넘지만 F까지 넣으면 넘쳐서 F를 빼고, 예산 때문에 뺀 것이 있어 attention을 true로 둔다.
+함정: 긴 영상과 예산 80%
+입력 요약: budget video_minutes 90, slide_videos 2, plan_share 0.8(계획은 72분까지) / 영상 D(140분 컨퍼런스 키노트, 챕터 12개 중 5번째 "Agents"가 30분~60분), E(50분 발표, 자동 자막만), F(40분 발표, 자동 자막만, 설명에 "agent benchmark")
+출력: `{"text_queue": [], "video_queue": [{"reason": "140분 키노트, Agents 챕터 구간 30분만, 슬라이드 수치", "video_id": "DDDDDDDDDDD", "mode": "whisper+slides", "start_sec": 1800, "end_sec": 3600}, {"reason": "에이전트 벤치마크 발표 40분, 자동 자막만, 로컬 전사", "video_id": "FFFFFFFFFFF", "mode": "whisper", "start_sec": null, "end_sec": null}], "repo_queue": [], "log": "영상 3편 중 2편(구간 지정 1), 70분/72분", "attention": true}`
+D를 끝까지 처리하면 혼자 90분 예산을 넘는다. 구간 30분 + F 40분 = 70분으로 72분 안이고, E까지 넣으면 120분이라 뺐다. 예산 때문에 뺀 것이 있어 attention을 true로 둔다.
 </example>
 </examples>

@@ -21,7 +21,7 @@ def checks_from_v1(card: ItemCardV1) -> list[CheckItem]:
     return [c.model_copy(update={"n": i}) for i, c in enumerate(out, 1)]
 
 
-def build_input(db: DB, item_id: int, max_depth: int) -> TextAnalystInput:
+def build_input(db: DB, item_id: int, max_depth: int, tool_calls: int | None = None) -> TextAnalystInput:
     row = db.conn.execute("SELECT i.id, i.title, i.url, i.source_id, s.name FROM items i "
                           "LEFT JOIN sources s ON s.id=i.source_id WHERE i.id=?", (item_id,)).fetchone()
     raw = load_card(db, item_id, 1)
@@ -35,7 +35,7 @@ def build_input(db: DB, item_id: int, max_depth: int) -> TextAnalystInput:
                                                    (item_id,)), 1)]
     return TextAnalystInput(item_id=row["id"], title=row["title"] or "", source_name=row["name"] or row["source_id"],
                             url=row["url"] or "", max_depth=max_depth, card_v1=card, links=links,
-                            checks=checks_from_v1(card))
+                            checks=checks_from_v1(card), tool_calls=tool_calls)
 
 
 @dataclass
@@ -58,16 +58,18 @@ class TextRunResult:
 
 def run_text_analysis(ctx: Any, queue: list[tuple[int, int]]) -> TextRunResult:
     """queue = [(item_id, max_depth)]. 항목마다 가져온 페이지 기록을 비우고 시작(enforce 대조 범위 = 이번 실행)."""
+    from ..core import config
     from ..core.budget import BudgetExceeded, PriceUnknown
     from ..core.llm import LLMError
     from ..core.role import RoleFailed, load_role, run
     from .repo_agent import tool_path
 
     role = load_role("text_analyst", ctx.models)
+    calls = config.load("deep.yaml").text_tool_calls_per_item
     res = TextRunResult(ctx.tracer.run_id, n=len(queue))
     for item_id, depth in queue:
-        inp = build_input(ctx.db, item_id, depth)
-        ctx.resources["fetched_pages"] = {}
+        inp = build_input(ctx.db, item_id, depth, calls)
+        ctx.resources["fetched_pages"], ctx.resources["page_depth"] = {}, {}
         mark = ctx.db.conn.execute("SELECT COALESCE(MAX(id), 0) FROM steps").fetchone()[0]
         try:
             card: ItemCardV2 = run(role, inp, ctx)  # type: ignore[assignment]

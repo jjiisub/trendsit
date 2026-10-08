@@ -89,7 +89,8 @@ def repo_candidates(ctx: Any, day: date, *, hype: bool = True) -> list[RepoCandi
             r = ctx.db.conn.execute("SELECT readme_head FROM repos WHERE full_name=?", (q.full_name,)).fetchone()
             h = hype_check(ctx, q.full_name, st, r["readme_head"] if r else None)
         out.append(RepoCandidate(
-            full_name=q.full_name, stars_this_week=st.stars_this_week if st else None,
+            full_name=q.full_name, rank=st.rank if st else None, forks=st.forks if st else None,
+            stars_this_week=st.stars_this_week if st else None,
             stars_total=st.stars_total if st else None, language=st.language if st else None,
             description=st.description if st else None,
             tracked_release=q.reason.removeprefix("추적 레포 릴리스: ") if q.reason.startswith("추적") else None,

@@ -19,16 +19,16 @@
 `bash scripts/verify_s3.sh` (2026-10-08, 클라우드)
 ```
 FAIL A1 회귀: verify_s0.sh FAIL [A4 키 없음(OPENROUTER_API_KEY);A5 키 없음;A6 키 없음;] verify_s1.sh FAIL [A1 ]
-PASS A2 ruff 0, pytest 240 passed, 1 skipped in 11.11s
-PASS A3 deep.yaml이 check-config 통과 + 잘못된 값(깊이 순서, 범위)이 경로를 짚어 실패 (1 passed in 0.16s)
-PASS A4 S3 역할 md 3개(repo_analyst, editor_plan, text_analyst)와 채점표, 원본 추적 지침이 역할 md 검사 통과, 예시 3개 (1 passed, 28 deselected in 0.11s)
-PASS M3 safe_fetch 연결 주소 고정: 검사한 IP로만 연결(Host는 원래 이름), 리다이렉트마다 다시 고정, 검사 안 한 이름은 거부 (5 passed in 0.22s)
-PASS A9 에이전트 오프라인: 녹화 픽스처로 3c(GitHub 응답), 3b(GeekNews 원문 페이지) 루프가 끝까지(모의 LLM) (4 passed, 14 deselected in 0.59s)
-PASS A10 깊이·도구 상한: max_depth별 허용 도구(3c), 깊이 상한 밖·parent 없는 읽기 거부(3b), 도구 호출 6회 상한 (7 passed, 15 deselected in 0.71s)
-PASS A11 계획 검증: 예산 초과 꼬리 자르기, max_depth 자르기, 없는 id 제거, 대체 계획 (7 passed, 7 deselected in 0.28s)
-PASS A12 계약: video_queue.json이 VideoQueueItem으로 읽히고 plan show --video-queue 출력이 같은 모양 (2 passed, 12 deselected in 0.27s)
+PASS A2 ruff 0, pytest 253 passed, 1 skipped in 14.09s
+PASS A3 deep.yaml이 check-config 통과 + 잘못된 값(깊이 순서, 범위)이 경로를 짚어 실패 (1 passed in 0.19s)
+PASS A4 S3 역할 md 3개(repo_analyst, editor_plan, text_analyst)와 채점표, 원본 추적 지침이 역할 md 검사 통과, 예시 3개 (1 passed, 28 deselected in 0.12s)
+PASS M3 safe_fetch 연결 주소 고정: 검사한 IP로만 연결(Host는 원래 이름), 리다이렉트마다 다시 고정, 검사 안 한 이름은 거부 (5 passed in 0.21s)
+PASS A9 에이전트 오프라인: 녹화 픽스처로 3c(GitHub 응답), 3b(GeekNews 원문 페이지) 루프가 끝까지(모의 LLM) (4 passed, 20 deselected in 0.61s)
+PASS A10 깊이·도구 상한: max_depth별 허용 도구(3c), 깊이 상한 밖·parent 없는 읽기 거부(3b), 도구 호출 6회 상한 (7 passed, 21 deselected in 0.74s)
+PASS A11 계획 검증: 예산 초과 꼬리 자르기, max_depth 자르기, 없는 id 제거, 대체 계획 (7 passed, 7 deselected in 0.32s)
+PASS A12 계약: video_queue.json이 VideoQueueItem으로 읽히고 plan show --video-queue 출력이 같은 모양 (2 passed, 12 deselected in 0.28s)
 PASS A13 마이그레이션 대역: 이 묶음 번호 [10, 11, 12, 13], 대역 밖 [], 등록 전체 [1, 2, 10, 11, 12, 13]
-FAIL A14 없음: reports/S3_report.md(## 3c) reports/S3_report.md(## 3a) reports/S3_report.md(## 3b) reports/S2S3_mac_todo.md
+PASS A14 README(빠른 시작, 성과 행), DEVELOPMENT 명령표, S3 리포트, 맥 확인 목록
 ```
 - A1 FAIL은 키가 없어 verify_s0 A4~A6(smoke 모델 실제 호출)이 FAIL인 것뿐. 맥에서 확인
 
@@ -85,6 +85,7 @@ FAIL A14 없음: reports/S3_report.md(## 3c) reports/S3_report.md(## 3a) reports
 | `42e68d0` | `core/artifacts.py`, `agent.py` | 시작 문서 지정(`RoleInput.depth_seed`) |
 | `c72908a`(3c 커밋 안) | `eval/run_eval.py` | 도구 에이전트의 픽스처별 도구 호출 경로 기록 |
 | `23cfb17`(3b 커밋 안) | `core/artifacts.py`, `eval/run_eval.py` | 반쯤 읽힌 스키마 모듈을 오류로, 픽스처마다 연 페이지 기록 비움 |
+| 리뷰 반영 커밋 | `core/artifacts.py`, `agent.py` | 스펙별 스키마 자기 등록(`register_schemas`), 입력별 도구 호출 상한(`tool_call_limit`) |
 - `c72908a`, `23cfb17`은 기능 커밋 안에 섞였다(COMMON 9장은 별도 커밋). 다음부터 분리
 
 ## 5. 마이그레이션
@@ -111,4 +112,23 @@ FAIL A14 없음: reports/S3_report.md(## 3c) reports/S3_report.md(## 3a) reports
 - 위키 메모: 도구 모듈이 스키마 모듈을 먼저 import하면 스펙별 스키마 합치기가 반쯤 읽힌 모듈을 받아 역할이 "없는 출력 클래스"가 됨 → 합치기에서 오류로 잡게 함. 프록시 환경에서 전송 계층을 바꾸면 httpx가 환경 변수 프록시를 쓰지 않음 → 프록시가 있으면 주소 고정을 끔
 
 ## 8. 서브에이전트 리뷰
-(리뷰 후 기록)
+새 컨텍스트 서브에이전트에게 스펙(S2S3_TASK, S1_REVIEW, CONTRACTS, COMMON 9~11장)과 `s2-0-base...s2-s3` diff, 리포트만 주고 대조 리뷰를 받았다(S2·S3 함께).
+| 지적 | 처리 |
+|---|---|
+| (높음) 스키마 모듈(`artifacts_text` 등)을 먼저 import하는 진입점에서 순환 import로 ImportError | 스펙별 모듈이 끝에서 `register_schemas`로 스스로 등록, `_merge`는 읽히는 중인 모듈을 건너뜀. 6개 모듈 단독 import 회귀 테스트 |
+| (중간) 대문자 레포 README, arxiv(http·버전) 인용이 대조 열쇠가 달라 지워짐 | `page_key`(github.com 소문자, arxiv는 https·버전 없는 abs)로 넣고 찾음 + 테스트 |
+| (중간) trail·origin·깊이를 모델이 쓴 값으로 믿음 | trail은 이번 실행에서 연 문서만, 깊이는 코드가 센 값(`page_depth`)으로 덮어씀, origin은 연 문서만 + 테스트 |
+| (중간) fetch_page가 같은 사이트 링크를 따라갈 수 없음(공식 블로그 → 같은 도메인 논문) | 도구 쪽 링크 추출을 같은 호스트 포함으로(`page_links`) + 테스트 |
+| (중간) 같은 URL 기준 항목이 drop이면 묶음 전체가 요약에서 빠짐 | 기준이 drop이면 keep 경유 항목 하나(id 최소)를 대표로 + 테스트 |
+| (중간) editor_plan 함정 예시가 80% 규칙·구간과 어긋남 | 72분 안(구간 30분 + 40분)으로, reason과 구간 일치 |
+| (중간) deep.yaml의 항목당 도구 호출 수가 안 쓰임 | `RoleInput.tool_call_limit`(공통 코어, 좁히기만) + 두 입력의 `tool_calls`를 deep.yaml에서 + 테스트 |
+| (낮음) GitHub 이름 `../user`로 다른 API 경로 | `valid_name`(., .. 거부)을 도구 인자, `--queue` 파일, 과열 규칙에 + 테스트 |
+| (낮음) 커밋 API 404를 커밋 0으로 셈, 지난 주차도 오늘 기준 | 404면 규칙 미적용 + note, 지난 주차는 그 주 일요일까지 7일 + 테스트 |
+| (낮음) 계획의 레포 후보에 rank, forks 없음 | 칸 추가 |
+| (낮음) 허용 밖·인자 오류 호출도 도구 호출 상한에 셈 | 의도대로 둠(헤매는 호출도 비용). 아래 "스펙과 다르게"에 적음 |
+| (낮음) 리포트의 관문 A 출력이 오래됨 | 다시 붙임 |
+| (낮음) 프록시 환경에서 주소 고정이 조용히 꺼짐 | 운영(맥)은 직접 연결이라 그대로 두고 아래에 적음. 맥 확인 목록에 실제 HTTPS 수집 확인 |
+
+### 리뷰 뒤 스펙과 다르게 한 것(추가)
+- 도구 호출 상한은 거부된 호출(허용 밖 도구, 인자 오류)도 센다
+- safe_fetch 주소 고정은 환경 변수 프록시가 있으면 꺼진다(프록시가 이름을 풀므로). 판별에 httpx 내부 함수(`httpx._utils.get_environment_proxies`)를 쓴다

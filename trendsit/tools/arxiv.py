@@ -35,7 +35,9 @@ def arxiv(args: ArxivArgs, state: Any) -> ToolOutput:
     feed = feedparser.parse(r.text)
     out = []
     for e in feed.entries[:3]:
-        abs_url = e.get("id", "")
+        from ..core.artifacts_text import page_key
+
+        abs_url = page_key(e.get("id", ""))  # https, 버전 없는 abs 주소(인용 대조 열쇠와 같게)
         abstract = " ".join((e.get("summary") or "").split())
         remember(state, abs_url, f"{e.get('title', '')}\n{abstract}")
         out.append({"title": " ".join((e.get("title") or "").split()), "authors": [a.get("name") for a in e.get("authors", [])][:8],

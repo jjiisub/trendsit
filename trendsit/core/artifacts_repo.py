@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Literal, Self
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from .artifacts import RoleInput, RoleOutput
+from .artifacts import RoleInput, RoleOutput, register_schemas
 
 if TYPE_CHECKING:
     from .context import Ctx
@@ -55,6 +55,11 @@ class RepoAnalystInput(RoleInput):
     keywords: list[str] = Field(description="관심 키워드 이름")
     week_items: list[ItemTitle] = Field(description="이번 주 ItemCard 제목(최대 30)")
     hype: HypeCheck
+
+    tool_calls: int | None = Field(default=None, ge=1, description="항목당 도구 호출 상한(deep.yaml repo_tool_calls_per_item)")
+
+    def tool_call_limit(self, default: int | None) -> int | None:
+        return self.tool_calls or default
 
     def tool_names(self, names: list[str]) -> list[str]:
         allowed = DEPTH_TOOLS[min(self.max_depth, 3)]
@@ -115,3 +120,4 @@ class RepoCard(RoleOutput):
 
 INPUTS = (RepoAnalystInput,)
 OUTPUTS = (RepoCard,)
+register_schemas("artifacts_repo", INPUTS, OUTPUTS)

@@ -145,7 +145,7 @@ class Fetcher:
         self.sleep = sleep
         self.clock = clock
         self.pins: dict[str, list[str]] = {}  # 호스트 이름 → 검사에서 통과한 주소(연결은 이 주소로만)
-        self.backend: PinnedBackend | None = None
+        self.backend: PinnedBackend | None = None  # None이면 주소 고정이 꺼진 것(가짜 전송 또는 프록시 환경)
         # 실제 네트워크: 연결 주소 고정. 테스트의 가짜 전송은 연결이 없으므로 그대로.
         # 환경 변수 프록시가 있으면 httpx가 프록시로 보내고 프록시가 이름을 푼다(전송을 바꾸면 프록시를 못 씀)
         if transport is None and (network_backend is not None or not _env_proxied()):

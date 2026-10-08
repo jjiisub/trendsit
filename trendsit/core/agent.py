@@ -184,7 +184,9 @@ def run_agent(role: Role, inp: RoleInput, ctx: Ctx) -> RoleOutput:
     alias = ctx.model or role.spec.model
     names = [n for n in inp.tool_names(list(role.spec.tools)) if n in role.spec.tools]  # 입력별로 좁히기만
     allowed = set(names)
-    cap = role.spec.max_tool_calls
+    cap = inp.tool_call_limit(role.spec.max_tool_calls)
+    if role.spec.max_tool_calls is not None and (cap is None or cap > role.spec.max_tool_calls):
+        cap = role.spec.max_tool_calls  # 입력은 좁히기만
     finish_schema = {"type": "function", "function": {
         "name": FINISH,
         "description": "최종 답 제출. 답이 정해졌거나 더 볼 것이 없을 때 마지막에 한 번 호출한다.",

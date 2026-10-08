@@ -9,7 +9,7 @@ import hashlib
 import json
 import re
 from dataclasses import dataclass, field
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
@@ -63,10 +63,12 @@ def trending_stats(db: DB, week: str, full_name: str) -> TrendingStats | None:
 
 def hype_check(ctx: Any, full_name: str, stats: TrendingStats | None, readme: str | None) -> HypeCheck:
     """코드 과열 규칙. 급증일 때만 커밋을 세고(API 1회), 기여자 수는 항상 센다(API 1회)."""
-    from ..tools.github import api_get, today
+    from ..tools.github import api_get, today, valid_name
 
     state = SimpleNamespace(ctx=ctx)
     flags, notes = [], []
+    if not valid_name(full_name):
+        return HypeCheck(flags=[], force_check=False, note=f"레포 이름 형식 오류: {full_name[:60]}")
     commits = contributors = None
     if AWESOME.search(full_name.split("/")[-1]) or AWESOME.search((readme or "")[:300]):
         flags.append("awesome_list")
@@ -74,18 +76,27 @@ def hype_check(ctx: Any, full_name: str, stats: TrendingStats | None, readme: st
     force = False
     try:
         if stars >= HYPE_STARS_WEEK:
-            since = (datetime.combine(today(state), datetime.min.time(), UTC) - timedelta(days=7)).strftime(
-                "%Y-%m-%dT%H:%M:%SZ")
-            _, data = api_get(state, f"/repos/{full_name}/commits?since={since}&per_page=100")
-            commits = len(data or [])
-            if commits <= HYPE_COMMITS_7D:
-                flags.append("no_commits")
-                force = True
-            notes.append(f"7일 별 +{stars}, 커밋 {commits}")
-        _, data = api_get(state, f"/repos/{full_name}/contributors?per_page=100&anon=1")
-        contributors = len(data or [])
-        if contributors <= SINGLE_CONTRIBUTOR:
-            flags.append("single_contributor")
+            end = today(state)
+            if stats is not None:  # 지난 주차를 분석할 때는 그 주 일요일까지의 7일
+                week_end = date.fromisocalendar(int(stats.week[:4]), int(stats.week[6:]), 7)
+                end = min(end, week_end + timedelta(days=1))
+            since = (datetime.combine(end, datetime.min.time(), UTC) - timedelta(days=7)).strftime("%Y-%m-%dT%H:%M:%SZ")
+            until = datetime.combine(end, datetime.min.time(), UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
+            q = f"since={since}&per_page=100" if end == today(state) else f"since={since}&until={until}&per_page=100"
+            status, data = api_get(state, f"/repos/{full_name}/commits?{q}")
+            if status == 404:  # 이름이 바뀌었거나 지워진 레포: 커밋 0으로 세지 않음
+                notes.append("커밋 API 404, 과열 규칙 미적용")
+            else:
+                commits = len(data or [])
+                if commits <= HYPE_COMMITS_7D:
+                    flags.append("no_commits")
+                    force = True
+                notes.append(f"7일 별 +{stars}, 커밋 {commits}")
+        status, data = api_get(state, f"/repos/{full_name}/contributors?per_page=100&anon=1")
+        if status != 404:
+            contributors = len(data or [])
+            if contributors <= SINGLE_CONTRIBUTOR:
+                flags.append("single_contributor")
     except Exception as e:  # noqa: BLE001 - API 실패는 규칙 미적용으로 두고 이유를 남긴다
         notes.append(f"과열 규칙 API 실패: {str(e)[:80]}")
     return HypeCheck(flags=flags, force_check=force, commits_7d=commits, contributors=contributors,
@@ -129,14 +140,15 @@ def oneliner_for(ctx: Any, full_name: str) -> str:
 
 
 def build_input(ctx: Any, q: QueueItem, week: str, keywords: config.KeywordsConfig,
-                items: list[ItemTitle] | None = None) -> RepoAnalystInput:
+                items: list[ItemTitle] | None = None, tool_calls: int | None = None) -> RepoAnalystInput:
     stats = trending_stats(ctx.db, week, q.full_name)
     r = ctx.db.conn.execute("SELECT readme_head FROM repos WHERE full_name=?", (q.full_name,)).fetchone()
     return RepoAnalystInput(
         full_name=q.full_name, max_depth=q.max_depth, reason=q.reason, trending=stats,
         oneliner=oneliner_for(ctx, q.full_name), keywords=[k.canonical for k in keywords.keywords],
         week_items=items if items is not None else week_items(ctx.db, week),
-        hype=hype_check(ctx, q.full_name, stats, r["readme_head"] if r else None))
+        hype=hype_check(ctx, q.full_name, stats, r["readme_head"] if r else None),
+        tool_calls=tool_calls or config.load("deep.yaml").repo_tool_calls_per_item)
 
 
 @dataclass
