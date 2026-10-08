@@ -125,3 +125,28 @@ graders.ROLE_CHECKS["repo_analyst"] = code_repo_analyst
 graders.ROLE_STYLE_FIELDS["repo_analyst"] = ("relevant_reason", "why_trending", "signal_reason", "log")
 graders.AGGREGATES["repo_analyst"] = aggregate_repo_analyst
 graders.THRESHOLDS["repo_analyst"] = {"questions": {"Q1": 0.8, "Q2": 0.8, "Q3": 0.8}, "code_pass_all": True}
+
+
+# ---------- editor_plan (S3 3a) ----------
+def code_editor_plan(inp: dict[str, Any], out: dict[str, Any], expect: dict[str, Any]) -> list[dict[str, Any]]:
+    from trendsit.core.artifacts_text import CollectionPlan, PlanInput
+    from trendsit.deep.plan import usage
+
+    pi, plan = PlanInput.model_validate(inp), CollectionPlan.model_validate(out)
+    over = [f"{k} {u:g}/{t:g}" for k, (u, t) in usage(plan, pi).items() if u > t]
+    no_reason = [str(getattr(x, "item_id", None) or getattr(x, "video_id", None) or getattr(x, "full_name", ""))
+                 for x in [*plan.text_queue, *plan.video_queue, *plan.repo_queue] if not x.reason.strip()]
+    unknown = ([f"글 {t.item_id}" for t in plan.text_queue if t.item_id not in {c.item_id for c in pi.text_candidates}]
+               + [f"영상 {v.video_id}" for v in plan.video_queue if v.video_id not in {c.video_id for c in pi.new_videos}]
+               + [f"레포 {r.full_name}" for r in plan.repo_queue
+                  if r.full_name not in {c.full_name for c in pi.repo_candidates}])
+    deep = [f"글 {t.item_id} 깊이 {t.max_depth}" for t in plan.text_queue if t.max_depth > pi.budget.max_text_depth]
+    return [check("예산 초과 0", not over, ", ".join(over)),
+            check("모든 결정에 reason", not no_reason, ", ".join(no_reason)),
+            check("id가 입력 후보 안", not unknown, ", ".join(unknown)[:120]),
+            check("글 깊이가 max_text_depth 이하", not deep, ", ".join(deep))]
+
+
+graders.ROLE_CHECKS["editor_plan"] = code_editor_plan
+graders.ROLE_STYLE_FIELDS["editor_plan"] = ("log",)
+graders.THRESHOLDS["editor_plan"] = {"questions": {"Q1": 0.8, "Q2": 0.8}, "code_pass_all": True}

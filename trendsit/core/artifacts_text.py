@@ -123,5 +123,104 @@ class ItemCardV1(RoleOutput):
         return out
 
 
-INPUTS = (ItemCardInput,)
-OUTPUTS = (ItemCardV1,)
+# ---------- 편집장 계획 (editor_plan, S3 3a) ----------
+VideoMode = Literal["skip", "captions", "whisper", "whisper+slides"]
+
+
+class VideoQueueItem(Strict):
+    """영상 처리 지시(CONTRACTS 1장). S4 core/artifacts_video.py와 같은 모양(같은 JSON 픽스처로 테스트)."""
+
+    reason: str = Field(description="왜 이 깊이인지 한 줄. 결정보다 먼저")
+    video_id: str = Field(pattern=r"^[A-Za-z0-9_-]{11}$")
+    mode: VideoMode
+    start_sec: int | None = Field(default=None, ge=0, description="60분 넘는 영상의 처리 구간 시작. null이면 처음부터")
+    end_sec: int | None = Field(default=None, ge=0, description="null이면 최대 60분")
+
+
+class TextQueueItem(Strict):
+    reason: str = Field(description="왜 원본을 추적하는지, 왜 이 깊이인지 한 줄")
+    item_id: int
+    max_depth: int = Field(ge=1, le=4)
+
+
+class RepoQueueItem(Strict):
+    reason: str
+    full_name: str
+    max_depth: int = Field(ge=1, le=3)
+
+
+class VideoCandidate(Strict):
+    video_id: str
+    item_id: int
+    title: str
+    duration_min: float | None = None
+    manual_sub_langs: list[str] = []
+    has_auto_sub: bool | None = None
+    description_head: str = ""
+    published: str | None = None
+    chapters: int = 0
+
+
+class RepoCandidate(Strict):
+    full_name: str
+    stars_this_week: int | None = None
+    stars_total: int | None = None
+    language: str | None = None
+    description: str | None = None
+    tracked_release: str | None = Field(default=None, description="추적 레포 릴리스 제목(있으면)")
+    hype_flags: list[str] = []
+    force_check: bool = False
+
+
+class TextCandidate(Strict):
+    item_id: int
+    title: str
+    source: str
+    relevance: Relevance
+    needs_original_reason: str
+    origin_link_kinds: list[str] = Field(description="원본 후보 링크 종류(논문, 공식 블로그, 레포 등)")
+
+
+class PlanBudget(Strict):
+    video_minutes: int
+    slide_videos: int
+    vlm_frames: int
+    frames_per_slide_video: int
+    text_items: int
+    text_tool_calls_per_item: int
+    repo_items: int
+    default_text_depth: int
+    max_text_depth: int
+    plan_share: float
+    video_max_minutes: int
+
+
+class PlanInput(RoleInput):
+    day: str
+    new_videos: list[VideoCandidate]
+    repo_candidates: list[RepoCandidate]
+    text_candidates: list[TextCandidate]
+    keywords: list[str]
+    budget: PlanBudget
+    recent_topics: list[str] = []
+
+
+class CollectionPlan(RoleOutput):
+    text_queue: list[TextQueueItem] = Field(description="원본을 추적할 글, 우선순위 순서")
+    video_queue: list[VideoQueueItem] = Field(description="영상 처리 지시, 우선순위 순서")
+    repo_queue: list[RepoQueueItem] = Field(description="깊게 볼 레포, 우선순위 순서")
+
+    @classmethod
+    def fallback(cls, reason: str, inp: PlanInput) -> Self:
+        from ..deep.plan import fallback_plan
+
+        return fallback_plan(inp, reason)
+
+    def enforce(self, inp: PlanInput, ctx: Ctx | None) -> Self:
+        from ..deep.plan import validate_plan
+
+        return validate_plan(self, inp)
+
+
+INPUTS = (ItemCardInput, PlanInput)
+OUTPUTS = (ItemCardV1, CollectionPlan)

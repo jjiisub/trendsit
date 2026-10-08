@@ -112,6 +112,15 @@ register(12, """
     );
     """)
 
+# 13: S3 3a 편집장 계획(날짜별, 모델 계획 또는 규칙 기반 대체 계획)
+register(13, """
+    CREATE TABLE IF NOT EXISTS plans (
+        id INTEGER PRIMARY KEY, day TEXT NOT NULL, run_id TEXT,
+        source TEXT NOT NULL CHECK(source IN ('model','fallback')), plan_json TEXT NOT NULL, created_at TEXT
+    );
+    CREATE INDEX IF NOT EXISTS plans_day ON plans(day, id);
+    """)
+
 # ---------- S4 (20~29) ----------
 
 

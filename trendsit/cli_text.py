@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from datetime import date
 from pathlib import Path
 from typing import Any
@@ -186,6 +187,67 @@ def cmd_repo_analyze(args: argparse.Namespace) -> int:
     return 0 if status == "ok" else 1
 
 
+# ---------- plan (3a) ----------
+PLAN_REPORT = ROOT / "reports" / "S3_plan.md"
+PLAN_LABELS = ROOT / "eval" / "labels" / "editor_plan.csv"
+
+
+def cmd_plan(args: argparse.Namespace) -> int:
+    from .core.artifacts_text import CollectionPlan, PlanInput
+    from .core.budget import BudgetExceeded, PriceUnknown
+    from .core.context import open_ctx
+    from .core.llm import LLMError
+    from .core.role import RoleFailed, load_role, run
+    from .deep import plan as P
+
+    day = date.fromisoformat(args.day)
+    if args.action == "show":
+        db = _db()
+        got = P.latest_plan(db, args.day)
+        if got is None:
+            print(f"{args.day} 계획 없음", file=sys.stderr)
+            return 1
+        print(json.dumps(P.video_queue_json(got) if args.video_queue else got, ensure_ascii=False, indent=2))
+        return 0
+    if args.action == "agreement":
+        a = P.mode_agreement(PLAN_LABELS)
+        print(a if a else f"채운 라벨 없음: {PLAN_LABELS.relative_to(ROOT)}")
+        return 0 if a else 1
+    ctx = open_ctx("plan", spec=args.spec or "S3", model=args.model, no_cache=args.no_cache, note=f"plan {args.day}")
+    status = "failed"
+    try:
+        cfg = config.load("deep.yaml")
+        inp: PlanInput = P.build_plan_input(ctx, day, cfg, config.load("keywords.yaml"), hype=not args.no_hype)
+        if args.fixture:
+            Path(args.fixture).parent.mkdir(parents=True, exist_ok=True)
+            Path(args.fixture).write_text(json.dumps({"input": inp.model_dump(), "expect": {},
+                                                      "note": f"{args.day} 계획 입력(영상 {len(inp.new_videos)}, 글 "
+                                                              f"{len(inp.text_candidates)}, 레포 {len(inp.repo_candidates)})"},
+                                                     ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+            print(f"픽스처: {args.fixture}")
+            status = "ok"
+            return 0
+        source = "model"
+        try:
+            out: CollectionPlan = run(load_role("editor_plan", ctx.models), inp, ctx)  # type: ignore[assignment]
+        except (RoleFailed, BudgetExceeded, LLMError, PriceUnknown) as e:
+            out, source = P.fallback_plan(inp, f"{type(e).__name__}: {str(e)[:60]}"), "fallback"
+            ctx.tracer.step(kind="code", role="editor_plan", text=out.log, attention=True, error=str(e),
+                            output=out.model_dump(), detail={"enforced": out.enforced})
+        pid = P.save_plan(ctx.db, args.day, out, source, ctx.tracer.run_id)
+        print(f"계획 {pid} ({source}): 글 {len(out.text_queue)}, 영상 {len(out.video_queue)}, 레포 {len(out.repo_queue)} / {out.log}")
+        if args.report:
+            P.write_plan_report(inp, out, source, PLAN_REPORT, f"uv run python -m trendsit plan run --day {args.day} --report")
+            print(f"검증 산출물: {PLAN_REPORT.relative_to(ROOT)}")
+        if args.labels:
+            n = P.make_mode_labels(inp, out.model_dump(), PLAN_LABELS)
+            print(f"라벨 파일: {PLAN_LABELS.relative_to(ROOT)} {n}행(agree에 y/n)")
+        status = "ok"
+    finally:
+        ctx.tracer.finish(status)
+    return 0
+
+
 def register(sub: Any) -> None:
     r = sub.add_parser("rematch", help="바뀐 keywords.yaml로 저장된 항목의 키워드 판정을 다시 계산(네트워크 없음)")
     r.add_argument("--since")
@@ -222,6 +284,19 @@ def register(sub: Any) -> None:
     ra.add_argument("--no-cache", action="store_true")
     ra.add_argument("--spec")
     ra.set_defaults(fn=cmd_repo_analyze)
+
+    pl = sub.add_parser("plan", help="편집장 계획(editor_plan): run(실행) / show(보기) / agreement(영상 mode 동의율)")
+    pl.add_argument("action", nargs="?", choices=["run", "show", "agreement"], default="run")
+    pl.add_argument("--day", required=True, help="YYYY-MM-DD(이날 포함 최근 lookback_days의 후보)")
+    pl.add_argument("--video-queue", action="store_true", help="show: CONTRACTS 1장 형식 JSON 배열(S4 입력)")
+    pl.add_argument("--report", action="store_true", help="reports/S3_plan.md")
+    pl.add_argument("--labels", action="store_true", help="eval/labels/editor_plan.csv(영상 mode 동의)")
+    pl.add_argument("--fixture", help="실행하지 않고 관문 B 픽스처(입력)만 이 파일에")
+    pl.add_argument("--no-hype", action="store_true", help="레포 과열 규칙 API를 부르지 않음")
+    pl.add_argument("--model")
+    pl.add_argument("--no-cache", action="store_true")
+    pl.add_argument("--spec")
+    pl.set_defaults(fn=cmd_plan)
 
     ff = sub.add_parser("filter-fixtures", help="eval/fixtures/filter 20건 점수(장치별 비교)")
     ff.add_argument("--embedder", choices=["real", "mock"], default="real")

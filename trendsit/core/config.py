@@ -245,6 +245,32 @@ class FilterConfig(Strict):
         return self
 
 
+# ---------- deep.yaml (S3 밤 깊게 보기 예산과 상한) ----------
+MAX_DEPTH_ALL = 4  # 전체 깊이 상한(코드 상수). deep.yaml의 max_text_depth는 이 아래로만
+
+
+class DeepConfig(Strict):
+    video_minutes: int = Field(ge=0)  # 밤 하나에 처리할 영상 분(skip 제외, 60분 넘는 영상은 처리 구간만)
+    slide_videos: int = Field(ge=0)  # whisper+slides 영상 수
+    vlm_frames: int = Field(ge=0)  # 슬라이드 판독 프레임 총수
+    frames_per_slide_video: int = Field(default=20, ge=1)  # 영상당 프레임 상한(S4 --frames-cap)
+    text_items: int = Field(ge=0)  # 글 분석가 항목 수
+    text_tool_calls_per_item: int = Field(ge=1)
+    repo_items: int = Field(ge=0)
+    repo_tool_calls_per_item: int = Field(ge=1)
+    default_text_depth: int = Field(ge=1)
+    max_text_depth: int = Field(ge=1, le=MAX_DEPTH_ALL)
+    plan_share: float = Field(default=0.8, gt=0, le=1)  # 계획은 예산의 이 비율까지(나머지는 재시도 몫)
+    video_max_minutes: int = Field(default=60, ge=1)  # 영상 하나 처리 구간 상한(CONTRACTS 1장)
+    lookback_days: int = Field(default=7, ge=1)  # 계획 입력: day 포함 최근 며칠의 영상·글
+
+    @model_validator(mode="after")
+    def _depths(self) -> DeepConfig:
+        if self.default_text_depth > self.max_text_depth:
+            raise ValueError("default_text_depth가 max_text_depth보다 큼")
+        return self
+
+
 FILES: dict[str, type[BaseModel]] = {
     "models.yaml": ModelsConfig,
     "budget.yaml": BudgetConfig,
@@ -252,6 +278,7 @@ FILES: dict[str, type[BaseModel]] = {
     "keywords.yaml": KeywordsConfig,
     "link_kinds.yaml": LinkKindsConfig,
     "filter.yaml": FilterConfig,  # S2
+    "deep.yaml": DeepConfig,  # S3
 }
 
 
