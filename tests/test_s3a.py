@@ -161,7 +161,7 @@ def test_build_plan_input_from_db(tmp_path):
 
 
 def test_mode_labels_and_agreement(tmp_path):
-    path = tmp_path / "editor_plan.csv"
+    path = tmp_path / "editor_plan_mode.csv"
     p = plan(video_queue=[v(1), v(2, "captions")]).model_dump()
     assert make_mode_labels(plan_input(), p, path) == 4
     import csv
@@ -196,3 +196,11 @@ def test_apply_enforce_on_fallback_is_idempotent():
     fb = fallback_plan(plan_input(), "x")
     again = apply_enforce(fb, plan_input(), None)
     assert again.enforced == fb.enforced and again.model_dump() == fb.model_dump()  # 두 번째 검증은 바꾸는 것 없음
+
+
+def test_mode_labels_and_judge_labels_are_separate_files():
+    """설계 결정 Q5: 영상 mode 동의 라벨과 judge 라벨이 서로 덮어쓰지 않는다."""
+    from eval.run_eval import LABELS
+    from trendsit.cli_text import PLAN_LABELS
+
+    assert PLAN_LABELS.name == "editor_plan_mode.csv" and PLAN_LABELS != LABELS / "editor_plan.csv"

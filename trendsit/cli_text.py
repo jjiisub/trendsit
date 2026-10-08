@@ -194,7 +194,7 @@ def cmd_repo_analyze(args: argparse.Namespace) -> int:
 
 # ---------- plan (3a) ----------
 PLAN_REPORT = ROOT / "reports" / "S3_plan.md"
-PLAN_LABELS = ROOT / "eval" / "labels" / "editor_plan.csv"
+PLAN_LABELS = ROOT / "eval" / "labels" / "editor_plan_mode.csv"  # 영상 mode 동의(설계 결정 Q5). judge 라벨은 editor_plan.csv
 
 
 def cmd_plan(args: argparse.Namespace) -> int:
@@ -347,7 +347,7 @@ def register(sub: Any) -> None:
     pl.add_argument("--day", required=True, help="YYYY-MM-DD(이날 포함 최근 lookback_days의 후보)")
     pl.add_argument("--video-queue", action="store_true", help="show: CONTRACTS 1장 형식 JSON 배열(S4 입력)")
     pl.add_argument("--report", action="store_true", help="reports/S3_plan.md")
-    pl.add_argument("--labels", action="store_true", help="eval/labels/editor_plan.csv(영상 mode 동의)")
+    pl.add_argument("--labels", action="store_true", help="eval/labels/editor_plan_mode.csv(영상 mode 동의)")
     pl.add_argument("--fixture", help="실행하지 않고 관문 B 픽스처(입력)만 이 파일에")
     pl.add_argument("--no-hype", action="store_true", help="레포 과열 규칙 API를 부르지 않음")
     pl.add_argument("--model")

@@ -36,9 +36,9 @@ GITHUB_TOKEN=...             # 선택. 픽스처 README 수집에만
 | `uv run python -m trendsit summarize [--since D] [--until D] [--limit N] [--model 별칭] [--redo] --spec S2` | 글 1차 요약(`item_card`): 필터 keep이고 같은 URL 묶음의 기준 항목인 글만. `item_cards` version 1에 저장, 이미 있으면 건너뜀 |
 | `bash scripts/verify_s3.sh` | S3 관문 A(S0·S1 회귀 + M3 + 3c, 3a, 3b) |
 | `uv run python -m trendsit repo-analyze --week W [--top N] [--queue file] [--traces] [--fixtures DIR] --spec S3` | 레포 분석가(`repo_analyst`). 큐는 `--queue`(계획의 repo_queue 또는 목록) 없으면 규칙 기반(키워드에 걸린 트렌딩 이번 주 별 순 + 추적 레포 릴리스). `repo_cards`에 저장, 한 줄 설명은 `repo_oneliner` 결과를 붙임 |
-| `uv run python -m trendsit plan [run] --day D [--report] [--labels] [--fixture file] [--no-hype] --spec S3` | 편집장 계획(`editor_plan`). 모델 실패면 규칙 기반 대체 계획. `plans`에 저장, `--report`는 `reports/S3_plan.md`, `--labels`는 `eval/labels/editor_plan.csv` |
+| `uv run python -m trendsit plan [run] --day D [--report] [--labels] [--fixture file] [--no-hype] --spec S3` | 편집장 계획(`editor_plan`). 모델 실패면 규칙 기반 대체 계획. `plans`에 저장, `--report`는 `reports/S3_plan.md`, `--labels`는 영상 mode 동의 라벨 `eval/labels/editor_plan_mode.csv`(judge 라벨 `eval editor_plan --label`은 `editor_plan.csv`, 설계 결정 Q5) |
 | `uv run python -m trendsit plan show --day D [--video-queue]` | 그날 최신 계획. `--video-queue`는 CONTRACTS 1장 JSON 배열(S4 `video run --queue` 입력) |
-| `uv run python -m trendsit plan agreement --day D` | `editor_plan.csv`의 영상 mode 동의율 |
+| `uv run python -m trendsit plan agreement --day D` | `editor_plan_mode.csv`의 영상 mode 동의율 |
 | `uv run python -m trendsit deep text (--day D \| --item ID [--max-depth N]) [--traces] [--fixtures DIR] --spec S3` | 글 분석가(`text_analyst`). `--day`는 그날 계획의 text_queue. `item_cards` version 2에 저장(v1은 그대로), `--traces`는 `reports/S3_traces/text/` |
 | `uv run python scripts/record_http_fixtures.py <이름> --since D --until D [--source ID] [--max-items N] [--today D] [--extend]` | 수집 테스트용 응답 녹화(`tests/fixtures/http/<이름>/`, 피드와 HTML은 줄여서 gzip). `--extend`는 이전 녹화를 쓰고 새 URL만 받음 |
 
