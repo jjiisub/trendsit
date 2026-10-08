@@ -14,6 +14,7 @@ from pydantic import BaseModel, Field, ValidationError
 from .artifacts import INPUTS, OUTPUTS, RoleInput, RoleOutput, apply_enforce
 from .budget import BudgetExceeded
 from .config import ROOT, ConfigError, ModelsConfig, Strict, loc_to_path
+from .images import ImageFile, image_part
 from .llm import LLMError
 from .render import render_data
 
@@ -176,8 +177,16 @@ def check_roles(models: ModelsConfig, root: Path = ROOT) -> list[ConfigError]:
 
 def initial_messages(role: Role, inp: RoleInput) -> list[dict[str, Any]]:
     """system = 역할 md(정적). user = <data> 자료 → 과제 → 핵심 규칙 (자료는 위, 핵심 지시는 처음과 끝)."""
+    imgs = [v for name in type(inp).model_fields if isinstance(v := getattr(inp, name), ImageFile)]
+    if not imgs:
+        return [{"role": "system", "content": role.system_prompt},
+                {"role": "user", "content": f"{render_data(inp)}\n\n{role.instructions()}"}]
+    # 이미지 칸: 자료(<data>, 이미지 칸 제외) → 이미지 → 과제·핵심 규칙. 메시지에는 경로와 해시만(images.py)
+    data = {name: v for name in type(inp).model_fields if not isinstance(v := getattr(inp, name), ImageFile)}
     return [{"role": "system", "content": role.system_prompt},
-            {"role": "user", "content": f"{render_data(inp)}\n\n{role.instructions()}"}]
+            {"role": "user", "content": [{"type": "text", "text": render_data(data)},
+                                         *(image_part(i) for i in imgs),
+                                         {"type": "text", "text": role.instructions()}]}]
 
 
 def record_llm(ctx: Ctx, role: Role, res: Any, *, text: str, attention: bool = False,
