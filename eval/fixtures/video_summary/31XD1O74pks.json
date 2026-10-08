@@ -1,0 +1,518 @@
+{
+ "input": {
+  "item_id": 2,
+  "transcript": {
+   "id": "vd:2@0",
+   "source": "전사(whisper)",
+   "text": "[0] All right, guys.\n[2] Very nice to meet you all.\n[4] My name is Laurent.\n[4] I'm the co-founder and president of Cast.ai,\n[7] who is the inventor of Kimshi, which I'm\n[9] going to show you in a few seconds.\n[12] The talk is going to be about proprietary models for each case,\n[16] but use OpenSource for the rest.\n[17] And you're going to see some great result we have with that\n[20] with the coding agent called Kimshi.\n[23] I have the pleasure to be here with Zilvinas.\n[26] Hey, guys.\n[26] I'm Zilvinas.\n[27] I am leading engineering for a Kimshi coding platform.\n[30] So you have Zilvinas who run the entire engineering team\n[33] for Kimshi.\n[33] I'm so excited to be here with you.\n[36] All right, let's go.\n[36] So you may have seen this in the news, two pieces of information\n[43] that came up in the last few weeks.\n[44] The first one is there's a company in India\n[47] that spent $500 million on Anthropic alone in one month,\n[52] which is, again, a good example of tokens that are completely\n[55] out of control.\n[56] The other example is a famous tweet from Uber,\n[59] the CTO of Uber, who say that in the last four months,\n[62] he actually used the entire budget of Anthropic for the entire year.\n[68] And this is how much the token maxing or the token cost is a thing\n[74] for the enterprises.\n[76] And you're going to see how we fix this.\n[78] Companies responded to this by limiting the use of token.\n[82] You may have heard this many, many times with our friends, developers.\n[87] And as a developer, when you limit the amount of token,\n[91] it feels like this.\n[93] It's like, hey, you can use your laptop.\n[96] You have an hour battery.\n[98] And you can only charge once a day.\n[102] That's how it feels to limit the amount of token for a developer.\n[107] We at Kim Chi think this is wrong.\n[111] Our job as manager is to do the opposite,\n[116] is to ensure that we want to make the tokens unlimited and inexpensive.\n[125] Our job is not to prevent the developer to use coding agent.\n[129] Our job is to make sure they can use it as much as they want,\n[132] for as long as they want, in a completely unlimited fashion.\n[136] This is why we started Kim Chi.\n[140] At Kim Chi, we have 300 developers.\n[143] Oh, sorry.\n[144] 300 employees.\n[146] Two-thirds of those are developers that Zivinas run that.\n[150] And we've been using this coding agent for the last three months.\n[154] I'm going to show you what we built, how we built it, and the result of it.\n[160] And then Zivinas will show you a few more things\n[164] that make the coding agent really, really cool.\n[168] It's coming now.\n[171] We built an entire token optimization based on this idea.\n[176] What you see on screen is the true cost of LLM model for the same task.\n[183] It was made by the famous white paper in a university.\n[187] And here's what they say.\n[189] On one side, you see the cost per token.\n[193] On the other side, you see the cost per task for the same task,\n[198] with the same quality.\n[200] That is the important thing.\n[201] Otherwise, you cannot compare Apple with Apple.\n[203] And here's what is written here.\n[204] First, they are all different.\n[207] But also, look at Gemini 3 Flash, our friends at Google.\n[212] Well, it seems to be a relatively inexpensive model at $3.5 per million\n[218] token.\n[219] It's a blended average at the time this study was made.\n[222] But actually, the task to complete with Gemini 3 was $305.\n[228] Sorry, $705.\n[231] And look at the others, Minimax 2.7 is one of my favorites.\n[235] The cost per token is $1.5.\n[237] And the cost for the task is $148.\n[243] It means the models are not the same.\n[246] They don't cost the same.\n[247] But they're also not the same per task.\n[251] And that's why we built our coding agent.\n[255] Would it be nice that you have an automated fashion,\n[258] automated engine, automated harness that will select the right model\n[263] for the task at the right time based on the outcome of the task?\n[269] That is what we did with Kim C. Coding.\n[272] That is what Zilminas did with his team.\n[276] And here is the result.\n[278] We've been using it for three months.\n[280] 2.5 times is the amount of savings we have over Claude\n[285] for the period.\n[286] This is a graph of what would have been our Claude bill by day.\n[293] The purple one on top is what would have been Claude costs\n[298] over time.\n[300] The blue line is what we paid.\n[304] Same outcome.\n[307] But look at this.\n[308] The number of tokens increased by 1.5 times.\n[314] OK, we all experienced that.\n[316] The cost to Claude decreased by 1.5 times.\n[322] This is our job as managers.\n[324] We provide to our team a coding agent that is essentially\n[328] unlimited because of that coding agent is growing 3x less,\n[333] 2.5 times less, than the gross of token for the task.\n[340] There's another result.\n[342] The multimodal I showed you before.\n[345] I'm going to show you the evolution of the selection\n[348] of the model over time by the harness.\n[353] And here it looks like.\n[355] You see there is a lot of orange early June.\n[358] And there's a lot of yellow late June.\n[362] There's a complete shift, meaning the harness is selecting\n[365] a very different model.\n[366] It happens the 12th of June.\n[371] And this is what happened the 12th of June.\n[375] The 3rd of June, Kimi 2.6 is winning by far the most popular\n[380] of the harness.\n[382] 21st of June, the one winning is Minimax 3.\n[387] Us as human, probably we can find and understand and test\n[392] and be comfortable with a new model coming in.\n[394] Do you think we look at this as human?\n[398] Absolutely not.\n[399] But an autonomous harness, an automated coding agent that\n[404] is obsessed with token costs is going to do just that.\n[411] That is what I mean when I say our responsibility is to think\n[417] about providing our developers with the right cost per token\n[421] for the same outcome.\n[424] It is our responsibility to do it.\n[427] Zivinas is going to tell you a little bit more of how it works.\n[430] Because whatever you're going to see, it's open source.\n[435] Go, Zivinas.\n[438] OK, so one more thing to mention.\n[440] So Laura mentioned that token maxing is no longer an option\n[444] for everyone.\n[445] And as a manager at the company, as most of you guys probably\n[449] heard, having unlimited amount of tokens to spend\n[453] is no longer looking to be like a case.\n[455] And we had to build this hardness for ourselves.\n[459] So meaning like we ended up spending too much on Cloud Code\n[462] like half a year ago.\n[463] So we saw this Cloud Build skyrocketing\n[465] and started working on our own harness.\n[467] Behind the scenes, it's using like PyMonos as SDK.\n[470] But the goal of that is to take the open source experience,\n[474] still contribute back to open source\n[476] by providing our own harnesses open source,\n[479] building constructs like Ferment, which\n[481] fits into the kimchi theme, which is meant for long running\n[484] tasks where, on average, we estimate the human envelope\n[487] for these tasks is typically happening only like every two hours,\n[491] every three hours, and et cetera.\n[493] So the goal is you use kimchi harness,\n[495] you run a Ferment process.\n[498] It asks you a bunch of questions, and autonomously\n[500] runs a coding task for like more than two hours.\n[503] The goal of that is that because it breaks it into milestones,\n[507] it knows how to implement it.\n[508] And at the end of the cycle, you would get scoring for your output,\n[512] so you would actually know what's happening.\n[514] And going back to previously discussed,\n[516] like the amount of models used with kimchi harness,\n[520] the scoring is there to prove you that whatever model we\n[523] will pick for you, you will always\n[524] have like good enough scoring for the output on the task\n[527] you are implementing.\n[529] The way whole kimchi platform works,\n[531] the goal is like we are not just providing you the coding harness.\n[535] We want to provide you the full software development\n[538] lifecycle solution.\n[540] So you do a change, it runs a build for you,\n[543] it checks if something broke.\n[544] If something broke, it will go back, do a change again,\n[547] rebuild again, and that's how this fermentation process looks.\n[551] If everything is complete, there is no extra remediation\n[554] needs to be done, the changes will be deployed\n[557] to the staging environment.\n[559] MARIUSZ GASIEWSKI- You see,\n[560] what I like with the ways you just explain it\n[563] is the harnesses like the model,\n[565] Ferment is constantly checking the quality of the code\n[570] and going back, meaning there is a higher order model that\n[575] is checking the quality and thinking that quality is not\n[577] good enough, please do it again.\n[580] This is what I was saying earlier by it looks at the outcome\n[585] and it's optimizing the token based on the quality\n[588] of the outcome.\n[590] That is what is super cool with Ferment.\n[592] MARIUSZ GASIEWSKI- Yep.\n[592] And Artifact is only considered complete once the output\n[596] of the scoring, at least B as a score.\n[599] And even for that, if you don't like the score,\n[602] you can ask the agent to go back, fix it up,\n[604] and it will try to achieve A as a scoring.\n[609] The intention of stopping at the staging\n[611] is currently by design.\n[613] We still believe there is some little human\n[615] that needs to be in the loop before going\n[617] to the production, at least at this point.\n[619] We all know that the ultimate future is to avoid that.\n[622] You go to production.\n[623] You look at the metrics.\n[624] You look at the observability data, the solo metrics\n[628] you have in your environment.\n[629] If you're running on Kubernetes, you\n[631] want to check if the pods are not crashing,\n[632] if application health checks are passing.\n[634] So all of these things need to be done before it\n[637] shipped to production automatically.\n[639] So this is one of the things that are coming.\n[641] So the current limitation, we have stopped staging,\n[644] but we'll go to production and further on that.\n[649] What we believe is that reading code is not enough anymore.\n[652] So probably most of you noticed across this year,\n[656] the more VIBE engineering or the agentic engineering we do\n[659] in our coding environments, the more code changes we get\n[663] in our change sets.\n[664] And it kind of becomes unbearable to read,\n[667] especially as you keep bringing a little bit of a less technical\n[670] personnel into your pipelines.\n[672] So imagine a product manager doing the coding,\n[674] or my dear colleague Laura starting to do some coding,\n[677] and suddenly he comes up with a PR, which is like 2,000 lines\n[681] long.\n[682] And you need to actually review not just the differences,\n[685] but the actual intent which he wanted to achieve,\n[688] and the specifications which he provided to the coding agent.\n[692] So yeah, moving on.\n[696] One thing we built more on top of that\n[698] is the thing we called kimchi teleport.\n[700] So kimchi teleport allows you to close your laptop.\n[702] It spins up sandbox in the remote environment.\n[705] It's a secure sandbox, but you don't need to care about anything.\n[708] We can do that both on our SaaS platform.\n[710] We can ship it to your on-premise deployments\n[713] if you're like a financial technology company,\n[715] and things like that.\n[716] So we will manage agent sessions for you.\n[719] We will make sure they are running.\n[720] We are accessible both from your laptop, from mobile devices,\n[723] if we are running in the background.\n[725] So it goes back and ties to the story\n[727] that I mentioned that the human in the loop is only\n[730] appearing like every two or three hours.\n[732] So teleport emphasizes that.\n[734] You run your process.\n[736] You teleport it to the remote environment.\n[738] The arm spins up in the background.\n[739] We don't need to care about it.\n[741] We will make sure it's the right size,\n[743] it's the right security requirements, and everything else.\n[745] And it will keep on running until the task is done,\n[748] or until the human in the loop needs to be involved,\n[751] get notifications for some clarification of specs,\n[754] and things like that.\n[756] GABRIEL GARCIA- Guys, I really like this idea.\n[758] Look at this.\n[759] This is the screenshot of Teleport.\n[762] I am puzzled that sometimes innovations are always\n[766] the simplest one.\n[768] This was born out of the idea that one of us\n[771] was in the plane coding.\n[774] And then Wi-Fi breaks.\n[777] And what do you do when Wi-Fi breaks?\n[778] It breaks the coding because it lives inside your thing.\n[783] I think it was not the Wi-Fi.\n[785] It was the battery that broke.\n[787] Not the Wi-Fi.\n[788] So you lost.\n[789] So that's it.\n[790] The guy was stopped there.\n[793] What Teleport does is it takes all your environment,\n[796] it synchronizes with a container that\n[799] lives inside one of the hyperscaler.\n[801] In our case, it's Google.\n[804] And locally on your laptop, it feels exactly the same.\n[807] It just doesn't run inside your laptop.\n[810] It feels like it.\n[813] It runs somewhere else in your environment,\n[816] in a container, in a Kubernetes cluster,\n[819] inside the place at Google that will continue running,\n[823] even if you close your laptop.\n[825] How simple that is.\n[827] And yet, our favorite tool is this one.\n[831] I think the last one I looked at, it's 62% of our engineers\n[836] are only using Teleport when they are coding now for that problem.\n[840] They go home, it continues.\n[842] They're in transit.\n[843] It continues.\n[845] They are on holiday.\n[845] They don't look at it anymore.\n[847] It continues.\n[850] That's so cool, huh?\n[851] Yeah.\n[852] So there is more to that.\n[854] So we built another tool called Kimchi Studio.\n[857] If the Teleport is something typically individual uses,\n[860] Studio is kind of like a Teleport for teams and enterprises.\n[864] The goal behind the Studio is that you have a kind of like board on your environment.\n[868] It, again, runs in the Teleport sandboxes in the secure environment.\n[872] The thing here is like you're supposed to share your tasks and work in progress and plans,\n[877] which are made by the Kimchi Kodak harness with open source or proprietary models with your teams.\n[882] So, for example, imagine you as an engineer, you are like working on a task.\n[886] You started implementing, asking for a plan.\n[889] The plan can be easily reviewed by your colleagues, like by your peer engineer,\n[893] by your product manager or someone else who cares what's happening.\n[896] And this is how you kind of work with your whole team on collaborating on this agentic engineering\n[901] journey instead of like saying, oh, I'm going to type this prompt.\n[904] I'm going to try to execute it to the production only later on to learn that the specification\n[909] and the requirements were incorrect.\n[911] The output is not what was actually wanted by the task and things like that.\n[916] And this is yet another thing we built for ourselves.\n[919] We found it so cool.\n[921] We decided to make it a product.\n[925] How do you work with your colleague if what you have is a terminal, a CLI?\n[932] How do you share that with the others?\n[935] Well, first, he has to leave somewhere else.\n[937] So Teleport is the base of what we call Studio.\n[942] And Studio is a very nice way to visualize all the sessions that are running,\n[947] including those that are asking for a review.\n[950] And then someone in the teams can say, I take it.\n[954] And I answer the question that is for review.\n[958] Then you answer it.\n[959] It goes back to in progress until the next one goes into review.\n[964] And you can have many, many of those in a pizza team, a team of five to ten guys.\n[971] Think about it.\n[973] Yet a very simple innovation that is so essential in how our engineers are coding.\n[980] They can now share in a very simple way.\n[984] It's a browser.\n[985] It's graphical.\n[986] They can share and they can take over the task according to the Kanban style of what is\n[994] in review, what is in progress.\n[996] They can start new ones with backlog.\n[998] And you know what?\n[999] If they close the laptop, it continues.\n[1002] It's so cool.\n[1004] This is really cool.\n[1005] Thank you.\n[1006] We forgot to show you.\n[1010] Oh, this is the one that we took over, right?\n[1013] That's the one.\n[1014] Guys, you can see this at our booth if you want to see more of it.\n[1020] We are in UG4.\n[1021] It's exactly this way across a few streets.\n[1024] But have a look at it.\n[1025] It's really good.\n[1026] It is open source, most of it at least.\n[1029] The harness is entirely open source.\n[1031] Studio and Teleport, you need a Google account.\n[1034] It's a little bit more complicated, but it's a five-minute install.\n[1039] And then you get your Teleport set up as many sessions as you want inside your Google account.\n[1045] And then you can share it with your colleagues with Kim Shi Studio.\n[1051] So come see us.\n[1052] We'll be delighted to speak to you.\n[1055] Thank you, guys.\n[1056] Thank you, guys.\n[1057] Thank you.",
+   "title": null,
+   "url": null
+  },
+  "transcript_quality": "ok",
+  "slides": [
+   {
+    "id": "vd:2@63",
+    "source": "슬라이드 판독",
+    "text": "THE PROBLEM\nAXIOS / INDUATODAY · MAY 2026\n$500M\nClaude bill — one enterprise, one month\nOne enterprise client received a bill of $500M for a single month of Claude usage after failing to set usage limits on employee licences.\nAgentic loops alone can consume 1,000x more tokens than a chat query.\nFORTUNE · MAY 2026\n4 months\nto burn an entire year's AI coding budget\nUber's COO couldn't connect a dollar to a shipped feature. \"That link is not there yet.\" The company burned 2026's full AI coding budget before summer.",
+    "title": "THE PROBLEM",
+    "url": null
+   },
+   {
+    "id": "vd:2@138",
+    "source": "슬라이드 판독",
+    "text": "THE RIGHT RESPONSE\nOur job as managers:\nmake tokens unlimited\nand inexpensive.\nNot a developer problem. Not a budget problem.\nToken Optimization\nRoute dynamically. Spend less. Ship more.",
+    "title": "Our job as managers: make tokens unlimited and inexpensive.",
+    "url": null
+   },
+   {
+    "id": "vd:2@197",
+    "source": "슬라이드 판독",
+    "text": "Token optimization?\nListed price rank ($ per MTok)\nActual cost rank (total $)\nOpus 4.7 $30.0\nGPT-5.4 $17.5\nGemini 3.1 Pro $14.0\nHaiku 4.5 $6.00\nGPT-5.4 Mini $5.25\nKimi K2.6 $4.95\nGemini 3 Flash $3.50\nMiniMax M2.7 $1.50\nOpus 4.7 $708\nGemini 3 Flash $705\nGemini 3.1 Pro $677\nGPT-5.4 $509\nKimi K2.6 $422\nHaiku 4.5 $421\nGPT-5.4 Mini $325\nMiniMax M2.7 $148",
+    "title": "Token optimization?",
+    "url": null
+   },
+   {
+    "id": "vd:2@280",
+    "source": "슬라이드 판독",
+    "text": "The result:\n2.5×",
+    "title": "The result:",
+    "url": null
+   },
+   {
+    "id": "vd:2@306",
+    "source": "슬라이드 판독",
+    "text": "THE MATH\nDaily Claude Code Cost ($K)\nBroad internal Kimchi\nadoption began\nmid-May\nWith Kimchi *\nIf We Didn't Have Kimchi\n4.0 4.2 4.2 4.3 4.6 4.2 4.1 4.1 4.0 3.8 3.4 3.4 3.4 3.3 3.3 3.4 3.4 3.3 3.3 3.4 3.1 2.9 2.8 2.7 2.6\n4.4 4.5 4.5 4.6 4.8 4.8 4.8 5.0 5.3 5.4 5.5 5.6 5.8 5.8 6.0 6.1 6.1 6.1 6.1 6.3 6.5 6.5 6.4 6.4 6.5\nOpus 4.7 release\ndrove another\nClaude Code\nCost increase\nResult: 60%\nsavings in 2\nweeks: and\ngrowing\n* Includes Kimchi / GPU capacity costs\n5/10/26 5/13/26 5/16/26 5/19/26 5/22/26 5/25/26 5/28/26 5/31/26 6/3/26 6/6/26\n7",
+    "title": "Daily Claude Code Cost ($K)",
+    "url": null
+   },
+   {
+    "id": "vd:2@375",
+    "source": "슬라이드 판독",
+    "text": "3 June\nTotal 1871.7M\nkimi-k2.6 1141.8M\nminimax-m2.7 369.1M\nkimi-k2.5 272.5M\nclaude-sonnet-4-6 17.0M\nclaude-opus-4-6 25.2M\nnemotron-3-super-fp4 31.4M\ngpt-5 3.0M\nclaude-haiku-4-5-20251001 1.8M\nclaude-sonnet-4-5 1.8M\nminimax-m2.5 2.2M\ngpt-5-mini 1.2M\ngpt-4.1-mini 3.2M\no3 1,784\ngpt-4.1 281.8K\nclaude-haiku-4-6 690.1K\n3 June\nTotal 1871.7M\nkimi-k2.6 1141.8M\nminimax-m2.7 369.1M\nkimi-k2.5 272.5M",
+    "title": "3 June",
+    "url": null
+   },
+   {
+    "id": "vd:2@488",
+    "source": "슬라이드 판독",
+    "text": "04 · THE BUILD · FERMENT\nIntroducing /ferment\n/ferment\nHands-off execution for\ncomplex work.\nAgent breaks work into milestones\nExecutes autonomously, milestone by\nmilestone\nFrontier model evaluates & scores each step\nMultiple passes until output is correct\n/ferment create \"to-do list\" app\nphase: plan · kimi-k2.5\nMilestone 1 · Project scaffold (Vite + React + TS)\nMilestone 2 · Data model + local persistence\nMilestone 3 · UI: list, add, complete, delete\nMilestone 4 · Tests + deploy preview\nMilestone 5 · Open PR · dispatch to merge...\nphase: build · sonnet-2.7 (2 parallel)\npackage.json · vite.config.ts scaffolded · 0.8s\nsrc/store/todo.ts · 42 lines · 0.9s\nsrc/components/TodoList.tsx · 88 lines · 1.2s\nsrc/components/AddTodo.tsx · 31 lines · 0.7s\nsrc/App.tsx wired · 14 lines\nphase: test\nvitest ",
+    "title": "Introducing /ferment",
+    "url": null
+   },
+   {
+    "id": "vd:2@588",
+    "source": "슬라이드 판독",
+    "text": "04 - THE SUITE - REMEDIATION\nIt deploys. It breaks. It fixes itself.\nChange → Build → Break → Ferment → Complete\nKimchi diagnoses the failure at the end of the cycle, repairs it, and redeploys to staging, the full remediation loop.",
+    "title": "It deploys. It breaks. It fixes itself.",
+    "url": null
+   },
+   {
+    "id": "vd:2@650",
+    "source": "슬라이드 판독",
+    "text": "05 · THE SHIFT\nReading code is not enough anymore\nLines\nwhat we used to read\nDiffs\nthen we read changes\nIntent & specs\nwhat Kimchi makes you review\nThe spec precise enough to execute isn't prose. It's a contract.",
+    "title": "Reading code is not enough anymore",
+    "url": null
+   },
+   {
+    "id": "vd:2@738",
+    "source": "슬라이드 판독",
+    "text": "There's more.\nKimchi Teleport\nOffload your agent session to the cloud —\nclose your laptop, keep working.",
+    "title": "There's more.",
+    "url": null
+   },
+   {
+    "id": "vd:2@757",
+    "source": "슬라이드 판독",
+    "text": "There's more.\nKimchi Teleport\nOffload your agent session to the cloud —\nclose your laptop, keep working.\nCome see us — Booth U-G4",
+    "title": "There's more.",
+    "url": null
+   },
+   {
+    "id": "vd:2@1022",
+    "source": "슬라이드 판독",
+    "text": "Kimchi\nCome see us\nBooth U-G4",
+    "title": "Kimchi",
+    "url": null
+   }
+  ],
+  "slide_only_facts": [
+   {
+    "fact": "more tokens than a chat query",
+    "value": "1,000x",
+    "unit": "x",
+    "sec": 63,
+    "evidence": "vd:2@63",
+    "confidence": "high"
+   },
+   {
+    "fact": "Opus (model version)",
+    "value": "4.7",
+    "unit": "",
+    "sec": 197,
+    "evidence": "vd:2@197",
+    "confidence": "high"
+   },
+   {
+    "fact": "Opus 4.7 listed price per MTok",
+    "value": "$30.0",
+    "unit": "$",
+    "sec": 197,
+    "evidence": "vd:2@197",
+    "confidence": "high"
+   },
+   {
+    "fact": "GPT-5.4 listed price per MTok",
+    "value": "$17.5",
+    "unit": "$",
+    "sec": 197,
+    "evidence": "vd:2@197",
+    "confidence": "high"
+   },
+   {
+    "fact": "Gemini 3.1 Pro listed price per MTok",
+    "value": "$14.0",
+    "unit": "$",
+    "sec": 197,
+    "evidence": "vd:2@197",
+    "confidence": "high"
+   },
+   {
+    "fact": "Haiku 4.5 listed price per MTok",
+    "value": "$6.00",
+    "unit": "$",
+    "sec": 197,
+    "evidence": "vd:2@197",
+    "confidence": "high"
+   },
+   {
+    "fact": "GPT-5.4 Mini listed price per MTok",
+    "value": "$5.25",
+    "unit": "$",
+    "sec": 197,
+    "evidence": "vd:2@197",
+    "confidence": "high"
+   },
+   {
+    "fact": "Kimi K2.6 listed price per MTok",
+    "value": "$4.95",
+    "unit": "$",
+    "sec": 197,
+    "evidence": "vd:2@197",
+    "confidence": "high"
+   },
+   {
+    "fact": "MiniMax M2.7 listed price per MTok",
+    "value": "$1.50",
+    "unit": "$",
+    "sec": 197,
+    "evidence": "vd:2@197",
+    "confidence": "high"
+   },
+   {
+    "fact": "Opus 4.7 actual total cost",
+    "value": "$708",
+    "unit": "$",
+    "sec": 197,
+    "evidence": "vd:2@197",
+    "confidence": "high"
+   },
+   {
+    "fact": "Gemini 3 Flash actual total cost",
+    "value": "$705",
+    "unit": "$",
+    "sec": 197,
+    "evidence": "vd:2@197",
+    "confidence": "high"
+   },
+   {
+    "fact": "Gemini 3.1 Pro actual total cost",
+    "value": "$677",
+    "unit": "$",
+    "sec": 197,
+    "evidence": "vd:2@197",
+    "confidence": "high"
+   },
+   {
+    "fact": "GPT-5.4 actual total cost",
+    "value": "$509",
+    "unit": "$",
+    "sec": 197,
+    "evidence": "vd:2@197",
+    "confidence": "high"
+   },
+   {
+    "fact": "Kimi K2.6 actual total cost",
+    "value": "$422",
+    "unit": "$",
+    "sec": 197,
+    "evidence": "vd:2@197",
+    "confidence": "high"
+   },
+   {
+    "fact": "Haiku 4.5 actual total cost",
+    "value": "$421",
+    "unit": "$",
+    "sec": 197,
+    "evidence": "vd:2@197",
+    "confidence": "high"
+   },
+   {
+    "fact": "GPT-5.4 Mini actual total cost",
+    "value": "$325",
+    "unit": "$",
+    "sec": 197,
+    "evidence": "vd:2@197",
+    "confidence": "high"
+   },
+   {
+    "fact": "MiniMax M2.7 actual total cost",
+    "value": "$148",
+    "unit": "$",
+    "sec": 197,
+    "evidence": "vd:2@197",
+    "confidence": "high"
+   },
+   {
+    "fact": "savings in 2 weeks",
+    "value": "60%",
+    "unit": "%",
+    "sec": 306,
+    "evidence": "vd:2@306",
+    "confidence": "high"
+   },
+   {
+    "fact": "Total",
+    "value": "1871.7M",
+    "unit": "M",
+    "sec": 375,
+    "evidence": "vd:2@375",
+    "confidence": "high"
+   },
+   {
+    "fact": "kimi-k2.6",
+    "value": "1141.8M",
+    "unit": "M",
+    "sec": 375,
+    "evidence": "vd:2@375",
+    "confidence": "high"
+   },
+   {
+    "fact": "minimax-m2.7",
+    "value": "369.1M",
+    "unit": "M",
+    "sec": 375,
+    "evidence": "vd:2@375",
+    "confidence": "high"
+   },
+   {
+    "fact": "kimi-k2.5",
+    "value": "272.5M",
+    "unit": "M",
+    "sec": 375,
+    "evidence": "vd:2@375",
+    "confidence": "high"
+   },
+   {
+    "fact": "claude-sonnet-4-6",
+    "value": "17.0M",
+    "unit": "M",
+    "sec": 375,
+    "evidence": "vd:2@375",
+    "confidence": "high"
+   },
+   {
+    "fact": "claude-opus-4-6",
+    "value": "25.2M",
+    "unit": "M",
+    "sec": 375,
+    "evidence": "vd:2@375",
+    "confidence": "high"
+   },
+   {
+    "fact": "nemotron-3-super-fp4",
+    "value": "31.4M",
+    "unit": "M",
+    "sec": 375,
+    "evidence": "vd:2@375",
+    "confidence": "high"
+   },
+   {
+    "fact": "gpt-5",
+    "value": "3.0M",
+    "unit": "M",
+    "sec": 375,
+    "evidence": "vd:2@375",
+    "confidence": "high"
+   },
+   {
+    "fact": "claude-haiku-4-5-20251001",
+    "value": "1.8M",
+    "unit": "M",
+    "sec": 375,
+    "evidence": "vd:2@375",
+    "confidence": "high"
+   },
+   {
+    "fact": "claude-sonnet-4-5",
+    "value": "1.8M",
+    "unit": "M",
+    "sec": 375,
+    "evidence": "vd:2@375",
+    "confidence": "high"
+   },
+   {
+    "fact": "minimax-m2.5",
+    "value": "2.2M",
+    "unit": "M",
+    "sec": 375,
+    "evidence": "vd:2@375",
+    "confidence": "high"
+   },
+   {
+    "fact": "gpt-5-mini",
+    "value": "1.2M",
+    "unit": "M",
+    "sec": 375,
+    "evidence": "vd:2@375",
+    "confidence": "high"
+   },
+   {
+    "fact": "gpt-4.1-mini",
+    "value": "3.2M",
+    "unit": "M",
+    "sec": 375,
+    "evidence": "vd:2@375",
+    "confidence": "high"
+   },
+   {
+    "fact": "o3",
+    "value": "1,784",
+    "unit": "",
+    "sec": 375,
+    "evidence": "vd:2@375",
+    "confidence": "high"
+   },
+   {
+    "fact": "gpt-4.1",
+    "value": "281.8K",
+    "unit": "K",
+    "sec": 375,
+    "evidence": "vd:2@375",
+    "confidence": "high"
+   },
+   {
+    "fact": "claude-haiku-4-6",
+    "value": "690.1K",
+    "unit": "K",
+    "sec": 375,
+    "evidence": "vd:2@375",
+    "confidence": "high"
+   },
+   {
+    "fact": "src/store/todo.ts",
+    "value": "42",
+    "unit": "lines",
+    "sec": 488,
+    "evidence": "vd:2@488",
+    "confidence": "low"
+   },
+   {
+    "fact": "src/components/TodoList.tsx",
+    "value": "88",
+    "unit": "lines",
+    "sec": 488,
+    "evidence": "vd:2@488",
+    "confidence": "low"
+   },
+   {
+    "fact": "src/components/AddTodo.tsx",
+    "value": "31",
+    "unit": "lines",
+    "sec": 488,
+    "evidence": "vd:2@488",
+    "confidence": "low"
+   },
+   {
+    "fact": "src/App.tsx wired",
+    "value": "14",
+    "unit": "lines",
+    "sec": 488,
+    "evidence": "vd:2@488",
+    "confidence": "low"
+   },
+   {
+    "fact": "vitest",
+    "value": "8/8",
+    "unit": "pass",
+    "sec": 488,
+    "evidence": "vd:2@488",
+    "confidence": "low"
+   },
+   {
+    "fact": "vitest",
+    "value": "480ms",
+    "unit": "ms",
+    "sec": 488,
+    "evidence": "vd:2@488",
+    "confidence": "low"
+   },
+   {
+    "fact": "multi-model (kimi-k2)",
+    "value": "72%",
+    "unit": "%",
+    "sec": 488,
+    "evidence": "vd:2@488",
+    "confidence": "low"
+   },
+   {
+    "fact": "multi-model (kimi-k2)",
+    "value": "+13M",
+    "unit": "",
+    "sec": 488,
+    "evidence": "vd:2@488",
+    "confidence": "low"
+   },
+   {
+    "fact": "multi-model (kimi-k2)",
+    "value": "7/8",
+    "unit": "",
+    "sec": 488,
+    "evidence": "vd:2@488",
+    "confidence": "low"
+   }
+  ],
+  "title": "[한영자막] 토큰 제한을 멈추세요: 하네스가 최적의 모델을 직접 고르게 해보세요",
+  "duration_sec": 1059,
+  "span_start": 0,
+  "span_end": 1059,
+  "chapters": [
+   {
+    "sec": 0,
+    "title": "Kimchi 소개"
+   },
+   {
+    "sec": 39,
+    "title": "통제 불능이 된 토큰 비용 문제"
+   },
+   {
+    "sec": 78,
+    "title": "토큰 사용 제한이 잘못된 대응인 이유"
+   },
+   {
+    "sec": 133,
+    "title": "토큰을 무제한으로 저렴하게 공급하는 법"
+   },
+   {
+    "sec": 172,
+    "title": "토큰당 비용 vs 작업당 비용"
+   },
+   {
+    "sec": 257,
+    "title": "모델을 스스로 선택하는 하네스"
+   },
+   {
+    "sec": 276,
+    "title": "실제 성과: 3개월 만에 비용 2.5배 절감"
+   },
+   {
+    "sec": 341,
+    "title": "하네스의 모델 스위칭 동작 방식"
+   },
+   {
+    "sec": 430,
+    "title": "Kimchi 하네스의 작동 원리"
+   },
+   {
+    "sec": 482,
+    "title": "Ferment: 수 시간 단위의 자율 코딩 루프"
+   },
+   {
+    "sec": 532,
+    "title": "빌드, 자체 검증, 스테이징 자동 배포"
+   },
+   {
+    "sec": 650,
+    "title": "단순 코드 diff 확인이 부족해진 이유"
+   },
+   {
+    "sec": 695,
+    "title": "Kimchi Teleport: 노트북을 닫아도 계속되는 원격 환경"
+   },
+   {
+    "sec": 829,
+    "title": "엔지니어의 62%가 이 방식을 선택한 이유"
+   },
+   {
+    "sec": 850,
+    "title": "팀 협업을 위한 Kimchi Studio와 칸반 대시보드"
+   },
+   {
+    "sec": 1011,
+    "title": "마무리"
+   }
+  ],
+  "mode": "whisper+slides"
+ },
+ "expect": {},
+ "note": "관문 B 실제 실행: 하네스 모델 선택 발표 (whisper+slides)"
+}

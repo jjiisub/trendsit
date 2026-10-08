@@ -1,0 +1,564 @@
+{
+ "whisper": {
+  "key_points": [
+   {
+    "text": "배포 빈도(DORA)는 전반적으로 증가했으나, 체감 속도 향상률은 약 4.5%로 제한적",
+    "evidence": [
+     "vd:15@104",
+     "vd:15@210"
+    ]
+   },
+   {
+    "text": "변경 실패율(Change Failure Rate) 변동성 증가, 일부 기업은 벤치마크 대비 결함 50% 증가",
+    "evidence": [
+     "vd:15@275",
+     "vd:15@305"
+    ]
+   },
+   {
+    "text": "코드 유지보수성 인식은 4% 상승했으나, 변경 확신도(Change Confidence)는 6% 하락",
+    "evidence": [
+     "vd:15@349",
+     "vd:15@386"
+    ]
+   },
+   {
+    "text": "PR 평균 크기가 44줄에서 72줄로 증가하며 점진적 배포(Incremental Delivery) 인식 10% 하락",
+    "evidence": [
+     "vd:15@409",
+     "vd:15@487"
+    ]
+   },
+   {
+    "text": "주니어 엔지니어의 AI 사용 빈도와 토큰 소모량이 높으나, 시니어와 시간 절감 효과는 유사",
+    "evidence": [
+     "vd:15@516",
+     "vd:15@585"
+    ]
+   },
+   {
+    "text": "AI 도입 후 속도 향상 중앙값 7.7%로 기대 이하, 병목은 코드 생성이 아닌 전체 가치 흐름",
+    "evidence": [
+     "vd:15@884",
+     "vd:15@917"
+    ]
+   }
+  ],
+  "summary": "DX의 부CTO Justin Riach가 400개 기업 데이터를 바탕으로 AI가 개발 생산성에 미치는 영향을 분석한 발표다. 배포 빈도는 증가했으나 체감 속도 향상은 제한적이며, 코드 유지보수성 인식은 올랐지만 변경 확신도는 오히려 하락했다. PR 크기가 커지며 점진적 배포가 약화되었고, AI로 인한 속도 향상 중앙값은 7.7%로 기대에 미치지 못했다. 발표자는 코드 생성이 아닌 전체 가치 흐름의 병목을 해결해야 한다고 강조하며 Morgan Stanley, Zapier, Spotify의 사례를 제시했다.",
+  "timeline": [
+   {
+    "sec": 0,
+    "label": "DX 연구 소개 및 데이터 출처",
+    "slide": false
+   },
+   {
+    "sec": 74,
+    "label": "배포 빈도 및 속도 지표 분석",
+    "slide": false
+   },
+   {
+    "sec": 200,
+    "label": "체감 속도와 실제 생산성 괴리",
+    "slide": false
+   },
+   {
+    "sec": 265,
+    "label": "변경 실패율 및 품질 변동성",
+    "slide": false
+   },
+   {
+    "sec": 349,
+    "label": "유지보수성 상승과 확신도 하락",
+    "slide": false
+   },
+   {
+    "sec": 409,
+    "label": "PR 크기 증가와 점진적 배포 영향",
+    "slide": false
+   },
+   {
+    "sec": 509,
+    "label": "주니어/시니어 및 기업 규모별 차이",
+    "slide": false
+   },
+   {
+    "sec": 624,
+    "label": "AI 성과 측정 프레임워크",
+    "slide": false
+   },
+   {
+    "sec": 884,
+    "label": "코드 생성 병목 논증 및 실전 사례",
+    "slide": false
+   }
+  ],
+  "name_pairs": [],
+  "slide_only_facts": []
+ },
+ "whisper+slides": {
+  "key_points": [
+   {
+    "text": "배포 빈도(DORA) 지속 증가, Q3 2025 78에서 Q2 2026 114로 상승",
+    "evidence": [
+     "vd:15@105",
+     "vd:15@108"
+    ]
+   },
+   {
+    "text": "체감 배포 속도 약 4.5% 증가로 정체, 실제 생산성 향상과 괴리",
+    "evidence": [
+     "vd:15@210",
+     "vd:15@254"
+    ]
+   },
+   {
+    "text": "변경 실패율(Change Failure Rate) 변동성 확대, 일부 기업 벤치마크 대비 50% 이상 결함 증가",
+    "evidence": [
+     "vd:15@299",
+     "vd:15@305"
+    ]
+   },
+   {
+    "text": "PR 크기 급증(평균 44줄→72줄), 코드 유지보수성 체감 4% 상승 대비 배포 확신도 6% 하락",
+    "evidence": [
+     "vd:15@428",
+     "vd:15@360",
+     "vd:15@386"
+    ]
+   },
+   {
+    "text": "AI 도입 후 PR 처리량 중위수 7.76%, 평균 13.1% 증가로 기대 대비 낮은 생산성 향상",
+    "evidence": [
+     "vd:15@905",
+     "vd:15@917"
+    ]
+   },
+   {
+    "text": "Zapier, Spotify 등 에이전트 도입으로 병목 해결 및 운영 효율화 사례",
+    "evidence": [
+     "vd:15@1014",
+     "vd:15@1075"
+    ]
+   }
+  ],
+  "summary": "DX의 400개 이상 기업 데이터를 기반으로 AI가 개발 생산성에 미치는 영향을 분석한 발표다. 배포 빈도는 증가했으나 체감 속도와 실제 생산성 향상은 정체되어 있으며, PR 크기 증가로 인한 품질 변동성과 배포 확신도 하락이 확인된다. AI 도입 후 PR 처리량 중위수 7.76% 증가로 기대 대비 낮은 생산성 향상이 나타나며, 병목 해결을 위한 에이전트 활용 사례가 제시된다.",
+  "timeline": [
+   {
+    "sec": 0,
+    "label": "DX 플랫폼 및 연구 소개",
+    "slide": true
+   },
+   {
+    "sec": 74,
+    "label": "트렌드 1: 개발 속도 및 배포 빈도",
+    "slide": true
+   },
+   {
+    "sec": 200,
+    "label": "체감 속도와 실제 생산성 괴리",
+    "slide": true
+   },
+   {
+    "sec": 265,
+    "label": "트렌드 2: 품질 및 변경 실패율 변동성",
+    "slide": true
+   },
+   {
+    "sec": 409,
+    "label": "PR 크기 증가 및 점진적 배포 영향",
+    "slide": true
+   },
+   {
+    "sec": 509,
+    "label": "트렌드 3: 주니어/시니어 엔지니어별 AI 활용",
+    "slide": true
+   },
+   {
+    "sec": 624,
+    "label": "트렌드 4: AI 성과 측정 프레임워크",
+    "slide": true
+   },
+   {
+    "sec": 884,
+    "label": "트렌드 5: 코드 생성 외 병목 해결",
+    "slide": true
+   },
+   {
+    "sec": 974,
+    "label": "실전 사례: Morgan Stanley, Zapier, Spotify",
+    "slide": true
+   }
+  ],
+  "name_pairs": [
+   {
+    "spoken": "METR study",
+    "screen": "METR",
+    "sec": 234
+   },
+   {
+    "spoken": "Zapier",
+    "screen": "Zapier",
+    "sec": 1014
+   },
+   {
+    "spoken": "Spotify",
+    "screen": "Spotify",
+    "sec": 1075
+   }
+  ],
+  "slide_only_facts": [
+   {
+    "fact": "Q3 2025 deployment frequency",
+    "value": "78",
+    "unit": "",
+    "sec": 105,
+    "evidence": "vd:15@105",
+    "confidence": "high"
+   },
+   {
+    "fact": "Q4 2025 deployment frequency",
+    "value": "80",
+    "unit": "",
+    "sec": 105,
+    "evidence": "vd:15@105",
+    "confidence": "high"
+   },
+   {
+    "fact": "Q1 2026 deployment frequency",
+    "value": "105",
+    "unit": "",
+    "sec": 105,
+    "evidence": "vd:15@105",
+    "confidence": "high"
+   },
+   {
+    "fact": "Q2 2026 deployment frequency",
+    "value": "114",
+    "unit": "",
+    "sec": 105,
+    "evidence": "vd:15@105",
+    "confidence": "high"
+   },
+   {
+    "fact": "companies (data from)",
+    "value": "61",
+    "unit": "",
+    "sec": 299,
+    "evidence": "vd:15@299",
+    "confidence": "high"
+   },
+   {
+    "fact": "Median PR size Q4 2025",
+    "value": "48",
+    "unit": "lines of code",
+    "sec": 428,
+    "evidence": "vd:15@428",
+    "confidence": "high"
+   },
+   {
+    "fact": "Median PR size Q1 2026",
+    "value": "58",
+    "unit": "lines of code",
+    "sec": 428,
+    "evidence": "vd:15@428",
+    "confidence": "high"
+   },
+   {
+    "fact": "Sample from",
+    "value": "400+",
+    "unit": "companies",
+    "sec": 535,
+    "evidence": "vd:15@535",
+    "confidence": "high"
+   },
+   {
+    "fact": "Incomplete",
+    "value": "336",
+    "unit": "",
+    "sec": 833,
+    "evidence": "vd:15@833",
+    "confidence": "high"
+   },
+   {
+    "fact": "time",
+    "value": "2",
+    "unit": "hours ago",
+    "sec": 833,
+    "evidence": "vd:15@833",
+    "confidence": "high"
+   },
+   {
+    "fact": "code coverage",
+    "value": "> 80%",
+    "unit": "%",
+    "sec": 833,
+    "evidence": "vd:15@833",
+    "confidence": "high"
+   },
+   {
+    "fact": "companies (random sample)",
+    "value": "400+",
+    "unit": "",
+    "sec": 905,
+    "evidence": "vd:15@905",
+    "confidence": "high"
+   },
+   {
+    "fact": "Median weighted PR throughput increase",
+    "value": "7.76%",
+    "unit": "%",
+    "sec": 905,
+    "evidence": "vd:15@905",
+    "confidence": "high"
+   },
+   {
+    "fact": "Average weighted PR throughput increase",
+    "value": "13.1%",
+    "unit": "%",
+    "sec": 905,
+    "evidence": "vd:15@905",
+    "confidence": "high"
+   },
+   {
+    "fact": "Molding Max. per color",
+    "value": "2500",
+    "unit": "",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Molding max.",
+    "value": "12,500",
+    "unit": "pcs",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Molding PT",
+    "value": "6 s",
+    "unit": "s",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Molding CT",
+    "value": "8 s",
+    "unit": "s",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Molding A",
+    "value": "60%",
+    "unit": "%",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Painting Max. per color",
+    "value": "2500",
+    "unit": "",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Painting (count)",
+    "value": "3",
+    "unit": "",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Painting PT",
+    "value": "24 s",
+    "unit": "s",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Painting CT",
+    "value": "8 s",
+    "unit": "s",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Painting CTeff",
+    "value": "30 min",
+    "unit": "min",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Logo Printing Max.",
+    "value": "333",
+    "unit": "",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Logo Printing PT",
+    "value": "80 s",
+    "unit": "s",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Logo Printing BPEL",
+    "value": "7.5 h",
+    "unit": "h",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Logo Printing CTeff",
+    "value": "9 s",
+    "unit": "s",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Assembly PT",
+    "value": "35 s",
+    "unit": "s",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Assembly A",
+    "value": "100%",
+    "unit": "%",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Assembly Max.",
+    "value": "2500",
+    "unit": "",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Assembly (count)",
+    "value": "3",
+    "unit": "",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "WT (first)",
+    "value": "135,000",
+    "unit": "",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "WT",
+    "value": "3,600",
+    "unit": "",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "WT",
+    "value": "1,800",
+    "unit": "",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "WT (last)",
+    "value": "27,000",
+    "unit": "",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "WT (interval)",
+    "value": "6",
+    "unit": "",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "WT (interval)",
+    "value": "24",
+    "unit": "",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "WT (interval)",
+    "value": "80",
+    "unit": "",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "WT (interval)",
+    "value": "35",
+    "unit": "",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "WT",
+    "value": "144,000",
+    "unit": "sec",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "PT",
+    "value": "151",
+    "unit": "sec",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "PLT",
+    "value": "144,151",
+    "unit": "sec",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "of all incidents at Spotify",
+    "value": "90%",
+    "unit": "%",
+    "sec": 1075,
+    "evidence": "vd:15@1075",
+    "confidence": "high"
+   }
+  ]
+ }
+}

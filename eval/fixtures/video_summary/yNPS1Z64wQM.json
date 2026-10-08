@@ -1,0 +1,390 @@
+{
+ "input": {
+  "item_id": 43,
+  "transcript": {
+   "id": "vd:43@0",
+   "source": "전사(whisper)",
+   "text": "[0] JOEL BERGUM, CEO of Hornet Dev.\n[3] I'm here today to talk about the unreasonable effectiveness of BM25 for Argentic Search.\n[11] So how many of you have heard about BM25 before?\n[14] Is it new or is it?\n[15] Well, quite a few, so that's great.\n[17] I'm also watching the World Cup.\n[20] Norway is playing there against Ivory Coast's second half.\n[24] Norway is leading, so that's good.\n[26] So yeah, and at Hornet we are building retrieval infrastructure\n[31] for agents.\n[32] And I've been working on search and retrieval problems\n[36] for a long time.\n[37] As you can tell, I'm gray-haired.\n[40] Been working in this space for more than 20 years.\n[45] And in the talk today, I'll talk about why\n[47] this kind of 30-year-old lexical scoring function\n[51] is making a strong comeback.\n[55] First, I will talk a little bit about what\n[57] I mean by Argentic Search or Argentic Attribute\n[59] and kind of define that for all of you.\n[64] My definition is that Argentic Search is essentially\n[67] searched inside agent loop.\n[70] So you have an agent that is trying to accomplish a task,\n[73] write the coding, or do some deep research, or whatever task.\n[78] And inside that, you have some kind of information need\n[81] for the agent in order to get that task done successfully.\n[85] And you essentially need three things to kind of build a good\n[90] Argentic Search system.\n[92] And that is you need a capable model, a model that is able to\n[96] use tools and is able to formulate queries.\n[100] You also need a harness around the model and how you kind of\n[104] expose the retrieval and the search functions to the model.\n[108] There's different ways to do that.\n[110] It could be through tool calling, or it could be through code\n[113] mode.\n[114] Ido here demonstrated what I call code mode for exposing\n[119] retrieval infrastructure.\n[121] So that's the harness part.\n[122] And then you also need a retrieval engine to be able to do\n[128] searches efficiently, potentially over a billion scaled document\n[133] sets.\n[133] And to define BM25, BM25 actually stands for best match 25.\n[141] So there were some researchers doing plenty of different\n[143] experiments.\n[144] And experiment number 25 turned out to be the best one.\n[148] So that's the background of the name.\n[151] It's essentially a scoring function.\n[153] So you can imagine you have a query, and you have a document,\n[156] and you calculate some kind of score by interaction between the\n[160] query terms and the document terms.\n[162] And you come up with a score, and you hope that this score is a good\n[166] proxy for the relevancy of the document with regards to the query.\n[170] So one way to calculate BM25 would be to take all the documents and\n[175] score each of them, and then figure out what are the top K documents.\n[180] And then there's like 30 or 40 years of interest in how you accelerate\n[185] that type of retrieval, top K, lots of different algorithms.\n[189] We also invest a lot in that.\n[190] I'll show something in this direction.\n[193] But BM25 is the scoring function.\n[195] And there is a way to kind of accelerate top K retrieval.\n[200] BM25 hasn't changed.\n[203] It's the same scoring function.\n[205] But the change here is really that we got a more powerful user.\n[209] Edo talked about general knowledge.\n[212] The LLMs today have a lot of general knowledge.\n[214] They know about entities.\n[216] They know about companies.\n[217] They know about dates.\n[218] They know a lot.\n[220] And by using that kind of implicit knowledge that is built into the\n[224] parametric model, they essentially become very good at search.\n[230] And that's the really change here now that is kind of making BM25\n[235] more relevant.\n[237] And BM25 used to be a kind of a baseline function.\n[241] Any information retrieval research would include a BM25 baseline.\n[245] And then you would put something fancy, advanced, neural, fancy stuff.\n[250] And then you would compare it with BM25.\n[253] And I also think it's interesting in how we evaluate search before.\n[256] Because you will simply look at 10 blue links.\n[259] And you scan it.\n[260] And you compute some metrics.\n[262] A lot of that is now going away because the agent is not really\n[267] it's kind of powerful in the way that it can type out a lot more\n[272] queries than a human can do.\n[273] So it's less relevant to think about evaluating these systems just\n[277] by a single shot query.\n[281] And this is one of my favorite benchmarks out there.\n[286] I like to talk about benchmarks.\n[287] So BrowseCom Plus is a deep research benchmark published\n[293] in a paper last year.\n[295] And it has almost exactly 830 questions.\n[302] These are riddle-like.\n[303] Think about it like a pub quiz.\n[305] Do you have pub quizzes in the US?\n[307] Yeah, OK, great.\n[308] So like kind of a riddle type of questions, quite long.\n[312] And the agent, the harness of this kind of protocol\n[316] of this benchmark is that you have a model.\n[319] And it gets a very simple tool called search.\n[323] And it accepts a query string.\n[324] And you return some snippets back to the model.\n[328] And the corpus is about 100,000 documents.\n[332] So that's kind of tiny.\n[333] And these are web documents.\n[336] And the end-to-end accuracy, all of these questions\n[339] have a golden reference answer.\n[341] And you can kind of check if the model and the entire loop\n[344] produces that exact answer.\n[350] But why do we need retrieval?\n[354] I like to compare context windows with floppy disks,\n[358] because I'm old in the 80s.\n[359] We installed these kind of games on our computers\n[362] using floppy disks.\n[363] So one kind of you guys are so young,\n[366] so you don't probably have this kind of nostalgia.\n[368] But one floppy disk could fit about 1.4 megabytes of data.\n[374] And the current models, before they start degrading in quality,\n[379] that's, in my opinion, around 350,000 tokens.\n[383] So that's one floppy disk of data.\n[386] So you need retrieval in order to fetch the information\n[391] that you actually need to put into the context window.\n[395] And BrowseCom Plus really demonstrate how retrieval quality\n[402] affects the end-to-end accuracy of the task.\n[405] The end-to-end accuracy here is essentially,\n[407] is the model equipped with this search tool\n[411] able to answer the question, the riddle-like question?\n[415] And if you artificially just stuff the evidence documents that\n[421] is needed to answer this question into the context window\n[425] of the model, the accuracy is really high.\n[429] So reasoning is not the bottleneck.\n[431] The model, given the evidence up front,\n[435] answers the question with a very high accuracy rate, even GPT-4.\n[441] But if you expose the model with the harness with the retrieval tool,\n[445] that accuracy falls, because it now depends on the harness,\n[449] it depends on the model's ability to formulate queries,\n[453] and the retrieval quality of the retriever.\n[457] So for me, this is also quite important,\n[460] because even if we get perfect models,\n[463] like models that are kind of AGI,\n[465] you don't have to append, make no mistakes,\n[468] you still will be limited to a context window that\n[471] is approximately a floppy disk, right?\n[472] So you have to decide what goes into that context window.\n[476] And I think retrieval is still very relevant,\n[478] as the previous slide showed.\n[482] And in this Browse Comp Plus dataset,\n[485] one of these riddle-like questions\n[487] become a search trajectory, because the model\n[490] executes the query, gets some response back, reads it,\n[494] reformulates the query, and continues until it has kind of filled up\n[498] the context window, or found the answer, whatever comes first.\n[505] And we spent some time to investigate these trajectories,\n[512] to see how GPT-5 is formulating queries.\n[517] And we found a lot of interesting aspects with that.\n[521] We described it in a recent blog post, as well.\n[523] You can find it on Hornet.deb.\n[526] And we like to compare it with AOL query logs.\n[530] So AOL was like a service back in the day,\n[534] had some search interface.\n[536] And they accidentally published a very large sample of what\n[542] people were searching for on the web.\n[545] And they were quite short.\n[547] And I have seen more recent query logs, as well.\n[550] And the user human pattern are still searching with just a few terms.\n[556] GPT-5, on the other hand, it's a much more powerful user.\n[559] It has the general knowledge.\n[560] And it can, bam, write out very long queries.\n[563] It can use a lot of syntax operators that are useful.\n[569] It has learned from web search, or site operator, phrases, et cetera.\n[573] And this is a new type of workload.\n[579] And on BM25.\n[582] BM25 has essentially two hyperparameters that controls various\n[587] aspects of the scoring function.\n[589] And I talked about having a baseline.\n[592] And BM25 is usually a baseline.\n[594] And BrowseCompPlus, as well, has a baseline with BM25.\n[598] But it turns out that that baseline is terrible.\n[602] So when you look at fancier techniques, embedding models,\n[606] what have you, it stands out as a much better retrieval paradigm\n[612] than BM25, if you look at the original paper.\n[615] But more recent research shows that the parameters that\n[619] were used in the BrowseCompPlus research paper\n[622] was not really adequate to handle these kind of long documents.\n[625] So I like this, which BM25 do you mean?\n[629] Because it has a quite dramatic impact on that specific benchmarks\n[633] on the overall accuracy.\n[638] And why is BM25 now more powerful with the new user?\n[644] So I mentioned the general knowledge of the user\n[646] and that he can type faster and be more specific\n[649] as a more powerful user.\n[651] And exact matching is still relevant, right?\n[654] Because the model knows names, entities, zip codes, SKUs,\n[659] what have you.\n[660] That is not so easy to represent with an embedding model,\n[664] which kind of encodes all the tokens into a fixed vocabulary.\n[669] It's also relatively cheap, especially if you take into consideration\n[674] the cost of doing embedding inference.\n[676] Some of these embedding models have like 8 billion parameters\n[679] and you encode text and you have to stand up infrastructure for this\n[682] and what have you.\n[684] So it's quite simple.\n[685] And also the tooling in the overall ecosystem is quite good.\n[691] So it's readily available.\n[694] And it's also very easy for the model to inspect the results\n[697] and understand why a certain query formulation returned\n[700] the result it did right.\n[702] Because you're matching literal terms and phrases and things\n[705] like that, which can help it kind of reformulate the queries.\n[711] So these are the three key things.\n[715] And now into more hot topics on what is all you need.\n[720] And this is a very recent research that came out from Waterloo,\n[724] from Jimmy Lin's group up there.\n[725] They are doing a great job at the information retrieval research\n[729] and also on agentic search.\n[731] They have a recent paper that I love.\n[734] It's called Scaling Direct Corpus Interaction\n[737] Via Dynamic Workspace Expansion.\n[740] So I'll spend some time on expanding this.\n[743] So imagine you want to stand up web search infrastructure\n[746] for agents.\n[747] A lot of companies are doing that at the moment.\n[750] We are also working with some of these companies\n[753] to help them build infrastructure for powering\n[755] that kind of use case.\n[757] And there you have potentially billions of documents.\n[761] So that doesn't fit into the context window.\n[763] So you obviously need retrieval.\n[765] And BM25 is a good baseline.\n[767] So you can retrieve information over that.\n[771] And the results of this is you can imagine this as a search engine\n[779] result page, SERP, for agents.\n[783] Because you can place these documents that are retrieved from\n[787] the retriever into a workspace.\n[789] And if you organize this workspace as a file system,\n[793] you can play into the same things that you have around skills.\n[797] You can have progressive disclosure.\n[799] Because you can have the document, like the title of the document,\n[803] and a small snippet of the document, and expose that to the model.\n[807] And the model can then also decide, oh, I need to read more of the document.\n[811] And when it's doing that, it can use all the primitive tools that it's really good at using.\n[816] You all use coding agents.\n[818] You all see in grep, and rip grep, and sed, and orc, and whatever it's doing to kind of manage context.\n[824] So here you get the benefits of both worlds.\n[826] And also you get to combine sandbox infrastructure, retrieval infrastructure, and VFS, and just bash,\n[832] and whatever.\n[833] So it's also quite exciting, right?\n[835] Because it combines all of these new type of paradigms that is happening at the moment.\n[839] So I'm really excited about this type of direction.\n[842] And it's also kind of a hack to optimize for what the models are good at at the moment,\n[848] because all the frontier LLM companies are optimizing their model for coding,\n[852] for bash, for tool use.\n[855] So if you put your kind of end-to-end task on the trajectory of that,\n[859] you kind of, whatever, there's a new model,\n[861] you know there's going to be better at this as well, right?\n[865] So it might be that when we get AGI, they can just use the browser, we'll see.\n[870] But currently this is a very powerful way to build retrieval infrastructure,\n[875] and a whole editing search experience.\n[881] And when it comes to evaluation, right, I talked about this earlier as well,\n[885] in traditional information retrieval we were used to having just one query,\n[890] one rank list, compute and DGD, and compare it.\n[895] That is no longer very relevant when the new user is an agent,\n[898] because that agent can reformulate queries, and do more queries,\n[902] and do expansion, and do all kinds of different stuff.\n[905] So a lot of the classical information retrieval evaluation\n[909] is now kind of dead.\n[911] Instead, look at, like, see if the model can perform the task it's set to.\n[917] And for example, for question answering,\n[919] does it get the answer right?\n[920] And we, at Hornet, we are betting on BM25 as one of the primitives.\n[928] And we have set out on the vision to kind of have the best, most efficient way\n[934] to evaluate BM25, because I think it's such a strong fundamental primitive.\n[941] And this illustration compares some anonymized engines, comparing with Hornet,\n[947] on the same type of hardware, with web documents, 100 million web documents,\n[954] on a single node.\n[956] And as you can see, Hornet has a much more efficient implementation than the other engines,\n[961] and can do more throughput for the same type of box, which, for a lot of companies that\n[967] are building infrastructure at the moment for web search, et cetera, means a lot in savings.\n[972] What is the y-axis?\n[974] The y-axis is QPS.\n[977] Sorry.\n[978] The y-axis is, oh, sorry.\n[982] The y-axis is latency.\n[984] I'm sorry.\n[985] So, four claims to take away from this talk.\n[992] There's a new user.\n[994] It's more powerful.\n[997] It's able to type faster.\n[999] It's able to read faster.\n[1001] It's able to reformulate queries.\n[1003] And it has a lot of general knowledge, which makes simple tools like grep and BM25 more powerful.\n[1009] That's number one.\n[1012] Number two, which BM25 do you mean?\n[1016] There are differences in implementation, in performance, in parameters.\n[1020] So think about that.\n[1022] And also, why is it effective for agentic search?\n[1025] It's simply because it's explainable for the model.\n[1028] So the model can see and also use it in combination with grep, right?\n[1032] Because you have literal matches, and grep is almost about literal matches as well.\n[1037] And the combination of these two is a very strong agentic search or agentic retrieval paradigm.\n[1047] There's a lot of references.\n[1048] I think I will publish a talk.\n[1051] Or the talk will be published, and also the slides.\n[1055] And if you hated it, you can tweet at me.\n[1064] I was told that there's not a room for questions.\n[1066] But happy to chat about retrieval.\n[1069] You will find me around the conference.\n[1071] Probably the best way to reach me is through my X account.\n[1076] And that's it.",
+   "title": null,
+   "url": null
+  },
+  "transcript_quality": "ok",
+  "slides": [
+   {
+    "id": "vd:43@55",
+    "source": "슬라이드 판독",
+    "text": "03 / what I mean by agentic search\nAgentic search is search inside an agent loop.\nTask loop examples\ncoding\nquestion answering\ndeep search/research\n01 / model\ncapable model (LLM)\nChooses when to search and formulates queries\n- plan ->\n02 / harness\nharness\nRuns the loop and define the tool contract: e.g search (query), manages budgets (context, calls, cost)\n- call ->\n03 / retrieval engine\nretrieval engine\nImplements retrieval. Ranks candidates cheaply, exposes results, and handles repeated searches.",
+    "title": "Agentic search is search inside an agent loop.",
+    "url": null
+   },
+   {
+    "id": "vd:43@138",
+    "source": "슬라이드 판독",
+    "text": "04 / what BM25 is\nBM25 is a scoring function\nhistory\nBest Match 25\nOkapi/TREC-era lexical ranking from the 1990s.\nscoring\nscore(query, document)\nTerm rarity, term frequency, and document length normalization become one number.\nserving\ntop-k retrieval\nThe inverted index and algorithms like WAND skip most documents and return only the best candidates.\nposting lists — upper bounds — skip candidates — top-k heap",
+    "title": "BM25 is a scoring function",
+    "url": null
+   },
+   {
+    "id": "vd:43@280",
+    "source": "슬라이드 판독",
+    "text": "06 / benchmark agentic search\nBrowseComp-Plus\nputs search inside the\nloop.\ntask\nriddle-like,\nmulti-hop\nquestion\nThe agent has to find\nevidence before it can\nanswer.\nGPT-5 agent\nthink\ntool call\nsearch(query)\nretriever\nBM25 top-5\nsnippets\nagent\nread +\nreformulate\njudge\nfinal answer\nScore task success,\nnot just one ranked\nlist.\nrepeat until enough evidence\nquestions\n830\nfixed answer set\nweb pages\n100,195\nfixed corpus\nSource: BrowseComp-Plus, arXiv:2508.06600.",
+    "title": "BrowseComp-Plus puts search inside the loop.",
+    "url": null
+   },
+   {
+    "id": "vd:43@397",
+    "source": "슬라이드 판독",
+    "text": "08 / retrieval quality\nRetrieval quality changes answer accuracy.\nretriever A\n55.9%\nsame agent loop, baseline retrieved evidence\nretriever B\n70.1%\nsame agent loop, stronger retrieved evidence\noracle evidence\n93%\nwhen the right evidence is present, the task is mostly solvable\nsame benchmark\nOracle evidence reaches 93%. Retrieval quality is core to answer quality.\nSources: BrowseComp-Plus ACL 2026 paper; Hornet trajectory analysis",
+    "title": "Retrieval quality changes answer accuracy.",
+    "url": null
+   },
+   {
+    "id": "vd:43@497",
+    "source": "슬라이드 판독",
+    "text": "09 / trajectory\nOne question becomes\na query session.\nsearch 1\nsite:newsroom 2017\nacquisition founder\nbroad clue query\nsearch 7\n\"appointment\" 2019 founder\nnarrow after reading\nsearch 24\n\"person name\" \"role\"\n\"date\"\nverify answer\npoint\nThe agent keeps rewriting the query as it learns.",
+    "title": "One question becomes a query session.",
+    "url": null
+   },
+   {
+    "id": "vd:43@576",
+    "source": "슬라이드 판독",
+    "text": "10 / BrowseComp-Plus query workload\nGPT-5 issues power-user queries.\nhuman search log\n2 terms\nhome\ndepot\nAOL median\nagent search trajectory\n10 terms median\nsitesnooker.org\n2021\nUK\nChampionship\nfinal\nZhao\nXintong\nBrecel\n\"frame\"\n\"scores\"\nsite filter + year + entities + phrase match\nAOL human median\n2 terms\nGPT-5 median\n18 terms\nGPT-5 first query mean\n19 terms",
+    "title": "GPT-5 issues power-user queries.",
+    "url": null
+   },
+   {
+    "id": "vd:43@592",
+    "source": "슬라이드 판독",
+    "text": "11 / which BM25?\nWhich BM25 Do You Mean?\nanswer accuracy\n64.0%\n82.0%\nDefault BM25\nk=1=0.9, b=0.4\nTuned BM25\nk=1=25, b=1\nsame 100-query subset\n+18 points\nPi-Serini found that tuning BM25 for long BrowseComp-Plus documents lifted answer accuracy from 64.0% to 82.0%.\nSurfaced evidence recall: 84.6% to 95.7%\nSource: Pi-Serini / arXiv:2605.10848, Table 3, gpt-5.4, 300s timeout.",
+    "title": "Which BM25 Do You Mean?",
+    "url": null
+   },
+   {
+    "id": "vd:43@613",
+    "source": "슬라이드 판독",
+    "text": "Which BM25 Do You Mean?\n11 / which BM25?\nanswer accuracy\n64.0%\n82.0%\nDefault BM25\nk=0.9, b=0.4\nTuned BM25\nk=25, b=1\nsame 100-query subset\n+18 points\nPi-Serini found that tuning BM25 for long BrowseComp-Plus documents lifted answer accuracy from 64.0% to 82.0%.\nSurfaced evidence recall: 84.6% to 95.7%\nSource: Pi-Serini / arXiv:2605.10848, Table 3, gpt-5.4, 300s timeout.",
+    "title": "Which BM25 Do You Mean?",
+    "url": null
+   },
+   {
+    "id": "vd:43@635",
+    "source": "슬라이드 판독",
+    "text": "11 / which BM25?\nWhich BM25 Do You Mean?\nanswer accuracy\n64.0%\n82.0%\nDefault BM25\nk=1, b=0.4\nTuned BM25\nk=1, b=1\nsame 100-query subset\n+18 points\nPi-Serini found that tuning BM25 for long BrowseComp-Plus documents lifted answer accuracy from 64.0% to 82.0%.\nSurfaced evidence recall: 84.6% to 95.7%\nSource: Pi-Serini / arXiv:2605.10848, Table 3, gpt-5.4, 300s timeout.",
+    "title": "Which BM25 Do You Mean?",
+    "url": null
+   },
+   {
+    "id": "vd:43@697",
+    "source": "슬라이드 판독",
+    "text": "12 / why it works\nBM25 is more powerful with the new user\nexact\nEXACT\nnames / dates / IDs / phrases\ncheap\nCHEAP\nSimple and cost efficient - no embedding inferencing\ninspectable\nEXPLAIN\nmatched terms become the next move",
+    "title": "BM25 is more powerful with the new user",
+    "url": null
+   },
+   {
+    "id": "vd:43@747",
+    "source": "슬라이드 판독",
+    "text": "13 / SERP for agents - progressive disclosure\nBM25 + grep Is All You Need\nfull corpus\nbillions of docs\ntoo large for context or broad shell scans\nBM25\nimports\ncandidates\nruntime\ncandidates\nexposed in vfs\nProgressive disclosure, navigatable\nagent\nloop\ninspect,\nnarrow,\nverify\nsimple bash tools\nrg + read\nrg / grep\nread lines\ncat / sed\ncount / verify\n61%\nDCI read + grep\nvs. Qwen3 retrieval agent at 45%\n73.3%\nDR-DCI + reset\ndynamic workspace expansion on BrowseComp-Plus\nJun 2026, DR-DCI: Scaling Direct Corpus Interaction via Dynamic Workspace Expansion arXiv:2606.14885.",
+    "title": "BM25 + grep Is All You Need",
+    "url": null
+   },
+   {
+    "id": "vd:43@825",
+    "source": "슬라이드 판독",
+    "text": "13 / SERP for agents - progressive disclosure\nBM25 + grep Is All You Need\nfull corpus\nbillions of docs\ntoo large for context or broad shell scans\nBM25\nimports\ncandidates\nruntime\ncandidates\nexposed in vfs\nProgressive disclosure, navigatable\nagent\nloop\ninspect,\nnarrow,\nverify\nsimple bash tools\nrg + read\nrg / grep\nread lines\ncat / sed\ncount / verify\n61%\nDCI read + grep\nvs. Qwen3 retrieval agent at 45%\n73.3%\nDR-DCI + reset\ndynamic workspace expansion on BrowseComp-Plus\nJun 2026. DR-DCI: Scaling Direct Corpus Interaction via Dynamic Workspace Expansion arXiv:2606.14885.",
+    "title": "BM25 + grep Is All You Need",
+    "url": null
+   },
+   {
+    "id": "vd:43@878",
+    "source": "슬라이드 판독",
+    "text": "13 | SERP for agents - progressive disclosure\nBM25 + grep Is All You Need\nfull corpus\nbillions of docs\ntoo large for context or broad shell scans\nBM25\nimports candidates\nruntime\ncandidates exposed in vfs\nProgressive disclosure, navigatable\nagent loop\ninspect, discover, verify\nsimple bash tools\nrg + read\nrg / grep\nread lines\ncat / sed\ncount / verify\n61%\nDCI read + grep vs. Qwen3 retrieval agent at 45%\n73.3%\nDR-DCI + reset dynamic workspace expansion on BrowseComp-Plus\nJun 2026. DR-DCI: Scaling Direct Corpus Interaction via Dynamic Workspace Expansion arXiv:2606.14885.",
+    "title": "BM25 + grep Is All You Need",
+    "url": null
+   },
+   {
+    "id": "vd:43@897",
+    "source": "슬라이드 판독",
+    "text": "14 / evals\nEvaluate the agent +\nretriever as a system.\nstatic IR\none query\n01 02 03 ... 10\nranked list / nDCG@10\nagentic search\ntrajectory\nsuccess recall calls latency cost",
+    "title": "Evaluate the agent + retriever as a system.",
+    "url": null
+   },
+   {
+    "id": "vd:43@933",
+    "source": "슬라이드 판독",
+    "text": "15 / Hornet performance\nWe bet on BM25. 100M web documents. top-100\nengine\nhornet\nengine A\nengine B\nengine C\nOBS",
+    "title": "We bet on BM25. 100M web documents. top-100",
+    "url": null
+   },
+   {
+    "id": "vd:43@1055",
+    "source": "슬라이드 판독",
+    "text": "18 / contact\nFollow-up\nCome talk\nretrieval\nwith me.\nx.com/jobergum\nbergum@hornet.dev  Hornet.dev\nAgentic Retrieval\nHORNET\nEdit profile\nJo Kristian Bergum\n@jobergum\nCEO Hornet.dev - The retrieval engine built for agents.\nTrondheim, Norge  hornet.dev  Joined July 2009\n1,509 Following  20.1K Followers",
+    "title": "Come talk retrieval with me.",
+    "url": null
+   }
+  ],
+  "slide_only_facts": [
+   {
+    "fact": "Okapi/TREC-era lexical ranking from the",
+    "value": "1990s",
+    "unit": "",
+    "sec": 138,
+    "evidence": "vd:43@138",
+    "confidence": "high"
+   },
+   {
+    "fact": "web pages fixed corpus",
+    "value": "100,195",
+    "unit": "",
+    "sec": 280,
+    "evidence": "vd:43@280",
+    "confidence": "high"
+   },
+   {
+    "fact": "retriever A",
+    "value": "55.9%",
+    "unit": "%",
+    "sec": 397,
+    "evidence": "vd:43@397",
+    "confidence": "high"
+   },
+   {
+    "fact": "retriever B",
+    "value": "70.1%",
+    "unit": "%",
+    "sec": 397,
+    "evidence": "vd:43@397",
+    "confidence": "high"
+   },
+   {
+    "fact": "oracle evidence",
+    "value": "93%",
+    "unit": "%",
+    "sec": 397,
+    "evidence": "vd:43@397",
+    "confidence": "high"
+   },
+   {
+    "fact": "Oracle evidence reaches",
+    "value": "93%",
+    "unit": "%",
+    "sec": 397,
+    "evidence": "vd:43@397",
+    "confidence": "high"
+   },
+   {
+    "fact": "BrowseComp-Plus query workload",
+    "value": "10",
+    "unit": "",
+    "sec": 576,
+    "evidence": "vd:43@576",
+    "confidence": "high"
+   },
+   {
+    "fact": "agent search trajectory",
+    "value": "10 terms median",
+    "unit": "terms",
+    "sec": 576,
+    "evidence": "vd:43@576",
+    "confidence": "high"
+   },
+   {
+    "fact": "GPT-5 median",
+    "value": "18 terms",
+    "unit": "terms",
+    "sec": 576,
+    "evidence": "vd:43@576",
+    "confidence": "high"
+   },
+   {
+    "fact": "GPT-5 first query mean",
+    "value": "19 terms",
+    "unit": "terms",
+    "sec": 576,
+    "evidence": "vd:43@576",
+    "confidence": "high"
+   },
+   {
+    "fact": "answer accuracy (Default BM25)",
+    "value": "64.0%",
+    "unit": "%",
+    "sec": 592,
+    "evidence": "vd:43@592",
+    "confidence": "high"
+   },
+   {
+    "fact": "answer accuracy (Tuned BM25)",
+    "value": "82.0%",
+    "unit": "%",
+    "sec": 592,
+    "evidence": "vd:43@592",
+    "confidence": "high"
+   },
+   {
+    "fact": "same 100-query subset",
+    "value": "+18",
+    "unit": "points",
+    "sec": 592,
+    "evidence": "vd:43@592",
+    "confidence": "high"
+   },
+   {
+    "fact": "Surfaced evidence recall",
+    "value": "84.6%",
+    "unit": "%",
+    "sec": 592,
+    "evidence": "vd:43@592",
+    "confidence": "high"
+   },
+   {
+    "fact": "Surfaced evidence recall",
+    "value": "95.7%",
+    "unit": "%",
+    "sec": 592,
+    "evidence": "vd:43@592",
+    "confidence": "high"
+   },
+   {
+    "fact": "answer accuracy from",
+    "value": "64.0%",
+    "unit": "%",
+    "sec": 635,
+    "evidence": "vd:43@635",
+    "confidence": "high"
+   },
+   {
+    "fact": "answer accuracy to",
+    "value": "82.0%",
+    "unit": "%",
+    "sec": 635,
+    "evidence": "vd:43@635",
+    "confidence": "high"
+   },
+   {
+    "fact": "DCI read + grep",
+    "value": "61%",
+    "unit": "%",
+    "sec": 747,
+    "evidence": "vd:43@747",
+    "confidence": "high"
+   },
+   {
+    "fact": "Qwen3 retrieval agent",
+    "value": "45%",
+    "unit": "%",
+    "sec": 747,
+    "evidence": "vd:43@747",
+    "confidence": "high"
+   },
+   {
+    "fact": "DR-DCI + reset dynamic workspace expansion on BrowseComp-Plus",
+    "value": "73.3%",
+    "unit": "%",
+    "sec": 747,
+    "evidence": "vd:43@747",
+    "confidence": "high"
+   },
+   {
+    "fact": "/ evals",
+    "value": "14",
+    "unit": "",
+    "sec": 897,
+    "evidence": "vd:43@897",
+    "confidence": "high"
+   },
+   {
+    "fact": "static IR query count",
+    "value": "10",
+    "unit": "",
+    "sec": 897,
+    "evidence": "vd:43@897",
+    "confidence": "high"
+   },
+   {
+    "fact": "nDCG@10",
+    "value": "10",
+    "unit": "",
+    "sec": 897,
+    "evidence": "vd:43@897",
+    "confidence": "high"
+   },
+   {
+    "fact": "ranking",
+    "value": "top-100",
+    "unit": "",
+    "sec": 933,
+    "evidence": "vd:43@933",
+    "confidence": "high"
+   },
+   {
+    "fact": "Following",
+    "value": "1,509",
+    "unit": "",
+    "sec": 1055,
+    "evidence": "vd:43@1055",
+    "confidence": "high"
+   },
+   {
+    "fact": "Followers",
+    "value": "20.1K",
+    "unit": "K",
+    "sec": 1055,
+    "evidence": "vd:43@1055",
+    "confidence": "high"
+   }
+  ],
+  "title": "[한영자막] 에이전트 검색에서 30년 된 BM25가 놀랍도록 강력한 이유입니다",
+  "duration_sec": 1080,
+  "span_start": 0,
+  "span_end": 1080,
+  "chapters": [
+   {
+    "sec": 0,
+    "title": "30년 된 검색 스코어링 함수의 귀환"
+   },
+   {
+    "sec": 126,
+    "title": "Best Match 25, 이름의 유래"
+   },
+   {
+    "sec": 204,
+    "title": "함수는 그대로, 사용자가 바뀌었다"
+   },
+   {
+    "sec": 284,
+    "title": "830개 수수께끼 질문 벤치마크 (BrowseComp+)"
+   },
+   {
+    "sec": 348,
+    "title": "컨텍스트 윈도우는 플로피 디스크와 같습니다"
+   },
+   {
+    "sec": 412,
+    "title": "추론 능력은 병목이 아닙니다"
+   },
+   {
+    "sec": 504,
+    "title": "에이전트 모델이 쿼리를 작성하는 방식"
+   },
+   {
+    "sec": 571,
+    "title": "당신이 말하는 BM25는 어떤 BM25인가요?"
+   },
+   {
+    "sec": 713,
+    "title": "검색된 문서를 파일 시스템 워크스페이스로 활용하기"
+   },
+   {
+    "sec": 869,
+    "title": "고전적 정보 검색 평가의 종말"
+   },
+   {
+    "sec": 979,
+    "title": "발표를 요약하는 4가지 핵심 메시지"
+   }
+  ],
+  "mode": "whisper+slides"
+ },
+ "expect": {},
+ "note": "관문 B 실제 실행: BM25 검색 발표, 벤치마크 수치 (whisper+slides)"
+}

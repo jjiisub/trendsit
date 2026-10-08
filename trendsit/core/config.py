@@ -9,6 +9,8 @@ from typing import Annotated, Any, Literal
 import yaml
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator, model_validator
 
+from .config_video import VideoConfig
+
 ROOT = Path(__file__).resolve().parents[2]
 REQUIRED_ALIASES = ("generate", "judge", "compare", "smoke")
 SECRET_FILE = Path.home() / ".config" / "trendsit" / ".env"
@@ -220,6 +222,7 @@ FILES: dict[str, type[BaseModel]] = {
     "sources.yaml": SourcesConfig,
     "keywords.yaml": KeywordsConfig,
     "link_kinds.yaml": LinkKindsConfig,
+    "video.yaml": VideoConfig,  # S4
 }
 
 

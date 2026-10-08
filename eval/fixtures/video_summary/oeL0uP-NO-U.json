@@ -1,0 +1,199 @@
+{
+ "input": {
+  "item_id": 6,
+  "transcript": {
+   "id": "vd:6@0",
+   "source": "전사(whisper)",
+   "text": "[0] This is a talk today about the unglamorous but load-bearing work of owning a large, complex code base.\n[10] And why AI and agentic coding tools today make that job more difficult and more important than ever before.\n[17] Just to start, the software that runs the world is not pretty.\n[22] It's not new. It's not clean.\n[25] It's how everything actually works.\n[27] 72% of software industry employment is in companies with more than 500 people.\n[33] These are the large enterprises of the world.\n[36] These are the companies managing thousands of repositories and decades of code base history.\n[41] Few of your peers work at startups, at the hot companies you may hear about on social media,\n[46] and even fewer of them are actually like ex-solopreneurs making a living off of their social feeds.\n[52] Most of us work in large, long-lived code bases.\n[56] Those code bases are how your bank account will reject a transaction in real time if you hit your limit.\n[62] They're how your insurance carrier calculates the reimbursement rate for a policy holder with dual coverage.\n[67] It's how a chip in a warehouse scanner will actually allow Amazon to tell you when your socks arrive.\n[72] It's how your Uber estimates an arrival time.\n[75] It's how an airplane uses radar to adjust trajectories.\n[78] It's how your paycheck gets issued.\n[80] It's how your office air conditioner ticks on and on and on and on and on.\n[84] These are the things that keep the world moving.\n[88] We are all completely, utterly dependent on massive, decades-old, super complex code bases that have been built over many, many years by thousands of engineers.\n[104] And coding agents are writing more, better code today, faster than we have ever seen before.\n[110] A tidal wave of code is coming for you.\n[114] It's coming for your code base and for all of your engineers on your team who are trying to just keep their heads above water.\n[120] Every one of us has felt this pain, this flood of AI-generated code that we now have to review and make sure is healthy for our code base.\n[128] And we're exhausted by it.\n[130] And look, there are now code review agents.\n[132] I'm sure there's a lot of them around this room right now.\n[134] There are tools designed to help you measure your code base's health and so on.\n[138] And look, the major coding agents will start to pull this stuff in.\n[142] The models will get better.\n[143] Over time, we'll keep putting sandbags down to keep this flood held back, right?\n[148] We're going to keep finding these local maxima to help ourselves sort of avoid this problem.\n[154] But meanwhile, what's happening is that these code bases, these massive ones that keep the world running, are beginning to decay.\n[163] Millions of lines of code, tens of thousands of repositories, way too much to fit into a context window, or even just to clone and grep in real time.\n[172] That's just not possible.\n[174] And this is causing big problems.\n[176] We're publishing new features, new patches at record speed.\n[180] There are different coding standards being applied in different places by different agents across the code base.\n[185] There's duplicated code proliferating.\n[188] You already have a library that does this, but your agent doesn't know that.\n[192] There's cross-service dependencies that are becoming more brittle.\n[195] There are slight deviations in standards that are creating more insidious hidden issues across the code base.\n[202] And maybe more important than anything else here, there are new vulnerabilities being uncovered by agents every single day.\n[208] They require constant, constant oversight and upkeep of all of these massive legacy code bases that nobody wants to think about or deal with.\n[217] The job of owning a code base is harder today than it has ever been before.\n[223] And at the end of the day, the problem here is actually the volume of code.\n[231] The call is coming from inside the house, right?\n[234] The very tools that are speeding all of us up and letting us write more code faster than ever are also the tools that are creating the conditions that will cause these massive code bases that run our world to begin to fail.\n[246] Every day I talk to technology executives at these large companies and they are feeling this so viscerally.\n[255] The same pain that I imagine many of you are feeling too, right?\n[258] I want to give my devs the best tools possible.\n[262] But just today I overheard a dev say, I don't know what this code does.\n[265] AI wrote it for me.\n[266] This is a tech leader and executive at a top 10 car manufacturer.\n[270] When you're writing vehicle autopilot code and you have thousands of engineers in your org that you have to manage and you want to enable, this is terrifying.\n[281] All right, here we go.\n[286] So what I deeply believe is that these code base owners deserve better.\n[295] Today's agentic dev tools are not meeting the moment for this.\n[299] The infrastructure to see and understand a 50,000 repo code base is not being built or sold by open AI, by Anthropic, by Cursor, by the rest of them.\n[309] This is a hard and unique problem.\n[312] Their agents are so unbelievably good at solving the small scale problems that most developers deal with every day, that their demand is growing faster than ever before.\n[324] And this bigger problem of these code bases beginning to fall apart is going unnoticed.\n[330] So this session, this is a call, first of all, off to celebrate the people, the owners of these code bases, people around the world who are actually keeping them alive and keeping them running.\n[340] Most of our software engineer peers around the globe.\n[343] So thank you all so much for what you're doing.\n[345] But this session is also a call to dev tools companies out there, to the agent harness builders, to people who are building the infrastructure for these agents, to help build the infrastructure, the ability to go see and understand these massive scale repositories and give that to their agents.\n[365] This is a great quote that I heard from a tech leader at one of the top 10 US banks, tens of trillions of dollars in assets in custody or administration.\n[383] Sure, cloud code can make this change, but I have 90,000 repositories to make it in.\n[390] This is actually a specific quote about a specific supply chain vulnerability, an NPM thing.\n[396] Won't get into it.\n[397] But if you're a bank and you're seeing agents uncover and create these new vulnerabilities at an unprecedented pace, and you're being told to go use cloud code to solve this, that's a problem.\n[409] Good luck doing that in 90,000 repositories mapping out how these code bases all come together, what's actually living in production across your company, across your product offerings.\n[422] Because at the end of the day, what's really funny about all this is that if we know anything about LLMs, it's that they just love to search.\n[430] It's like a new hire getting up to speed on the code base.\n[433] It's how agents build models of the world.\n[436] The repo architecture that you're plugging into your agents.md files, like let's be real, that's barely moving the needle here.\n[443] This agent is going to grep, grep, grep, grep, grep, grep, grep, grep, grep its way to code base understanding.\n[449] That's simply how it works.\n[451] But understanding is a context problem.\n[453] You can't grep what you literally cannot see.\n[456] This is tools and infrastructure that's needed.\n[459] And the infrastructure to go see and search and really deeply understand a 500 or 5,000 or 50,000 or half a million repo code base is not being built by the agent builders today.\n[474] And so that's where what we're solving, what we're working on as a company.\n[479] This is what Sourcegraph is built around, right?\n[482] Give this a second.\n[484] If you'll let me sort of take a moment and predict the future of our industry.\n[490] These massive code bases are not going away.\n[494] In fact, there will be more code.\n[496] There will be much, much, much more code out there in the future.\n[501] And we believe very deeply that building tools to give agents the ability to actually see and understand and evolve those large code bases is essential for the future.\n[513] And where this comes from at the end of the day is having a graph, that code graph in mind.\n[519] The foundational graph of your code base, including search and then the actual compiler accurate output, if you go and do that analysis.\n[529] That is essential to give your agents the ability to go and understand how to make changes effectively.\n[536] Visibility is infrastructure.\n[538] And we actually built a lot on top of this, right?\n[542] We're not stopping here.\n[543] Actually, just today we launched our new agentic batch changes product into beta.\n[548] This is a frontier agent.\n[550] And its job is to let the owner of a massive code base actually execute code changes across hundreds or thousands of repositories at once.\n[559] Starting with a single prompt.\n[561] This is a product that will iteratively roll out changes across that code base.\n[565] Self heal, respond to CI status, PR comments.\n[568] Use coding agents where it makes sense, where judgment is needed.\n[571] Use deterministic scripts where it's not.\n[573] And provide tracking and auditability to be sure that you've covered 100% of the places where that patch is needed, where that change is needed.\n[581] Because like I keep saying here, at the end of the day, this is an infrastructure problem.\n[587] When you're putting code out there into the world, you need to make sure that it's actually going to keep your code base healthy.\n[592] That it's actually going to be able to adapt to the places where your code base is beginning to fall apart.\n[597] Here's a great quote from an early access user.\n[602] Actually, Mercari, a global shopping tool out of Japan.\n[606] Incredible company.\n[607] Massive code base.\n[608] Hundreds and hundreds of independent micro services running in production.\n[612] This user was using this product to go actually patch a GitHub code injection issue where you have to set environment variables correctly.\n[620] He ran this on two repos where he knew this issue existed and then said, yeah, go explore the rest of our code base and found 80 other potential vulnerabilities across their code base in other places.\n[630] This is like config files.\n[632] This is basically just going and doing that scan.\n[634] Patching them all in one go with a sort of deterministic script that can go make sure it's making that change consistently, effectively across 100 of the places where that risk exists, that is what confidence is all about in the agentic coding era.\n[649] If you want to ask them to stopом in there.\n[651] Yeah.",
+   "title": null,
+   "url": null
+  },
+  "transcript_quality": "ok",
+  "slides": [
+   {
+    "id": "vd:6@0",
+    "source": "슬라이드 판독",
+    "text": "Sourcegraph\nThe Enterprise\nAgentic Gap:\nThe wall dev tools run into at millions of lines of code\nDan Adler, CEO\nSourcegraph",
+    "title": "The Enterprise Agentic Gap:",
+    "url": null
+   },
+   {
+    "id": "vd:6@33",
+    "source": "슬라이드 판독",
+    "text": "We are all completely, utterly\ndependent on massive and complex\ncodebases built over decades",
+    "title": null,
+    "url": null
+   },
+   {
+    "id": "vd:6@72",
+    "source": "슬라이드 판독",
+    "text": "We are all completely, utterly dependent on massive and complex codebases built over decades\nSOURCEGRAPH\nJUNE 30, 2026",
+    "title": null,
+    "url": null
+   },
+   {
+    "id": "vd:6@125",
+    "source": "슬라이드 판독",
+    "text": "But these\ncodebases are\ndecaying —\nquietly, and at\nrecord speed\nJUNE 30, 2026",
+    "title": null,
+    "url": null
+   },
+   {
+    "id": "vd:6@147",
+    "source": "슬라이드 판독",
+    "text": "But these\ncodebases are\ndecaying –\nquietly, and at\nrecord speed\nSOURCEGRAPH",
+    "title": null,
+    "url": null
+   },
+   {
+    "id": "vd:6@163",
+    "source": "슬라이드 판독",
+    "text": "But these\ncodebases are\ndecaying —\nquietly, and at\nrecord speed",
+    "title": null,
+    "url": null
+   },
+   {
+    "id": "vd:6@205",
+    "source": "슬라이드 판독",
+    "text": "But these\ncodebases are\ndecaying –\nquietly, and at\nrecord speed",
+    "title": null,
+    "url": null
+   },
+   {
+    "id": "vd:6@272",
+    "source": "슬라이드 판독",
+    "text": "I want to give my team the best tools.\nBut then I overheard a dev say, 'I don't know what this code does — AI wrote it.'\n— Technology leader · Top 10 car manufacturer",
+    "title": null,
+    "url": null
+   },
+   {
+    "id": "vd:6@297",
+    "source": "슬라이드 판독",
+    "text": "Today's agent dev tools\nare not meeting the moment\nToday's agents are extraordinary at small-scale problems.\nSo good that the larger problem building around them goes unnoticed.\nWhy build the infrastructure to deeply understand a 50,000-repo\ncodebase when you're growing faster than any company in history?",
+    "title": "Today's agent dev tools are not meeting the moment",
+    "url": null
+   },
+   {
+    "id": "vd:6@392",
+    "source": "슬라이드 판독",
+    "text": "Sure, Claude Code can make this change. But I have 90,000 repositories to make it in.\n— Technology leader · Top 10 US bank",
+    "title": null,
+    "url": null
+   },
+   {
+    "id": "vd:6@433",
+    "source": "슬라이드 판독",
+    "text": "You can't grep what\nyou can't see\nUnderstanding the codebases that run our world is\nan infrastructure problem, not a harness problem.\nJUNE 30, 2026",
+    "title": "You can't grep what you can't see",
+    "url": null
+   },
+   {
+    "id": "vd:6@467",
+    "source": "슬라이드 판독",
+    "text": "You can't grep what\nyou can't see\nUnderstanding the codebases that run our world is\nan infrastructure problem, not a harness problem.\nSOURCE: GRAPH\nTHE CODEBASE\nJUNE 30, 2026",
+    "title": "You can't grep what you can't see",
+    "url": null
+   },
+   {
+    "id": "vd:6@488",
+    "source": "슬라이드 판독",
+    "text": "Sourcegraph\nControl your codebase\nCode understanding and control for humans and agents",
+    "title": "Control your codebase",
+    "url": null
+   },
+   {
+    "id": "vd:6@538",
+    "source": "슬라이드 판독",
+    "text": "CODE UNDERSTANDING\nagent effectiveness\ndev productivity code reuse\ndocumentation onboarding\nCODE OVERSIGHT\ntracking codebase change\nsecurity incident response\nCODEBASE EVOLUTION\nmodernization automation\nrefactoring at scale\nThe code graph foundation\nUniversal code search + precise code intelligence\n10+ years of investment",
+    "title": "The code graph foundation",
+    "url": null
+   },
+   {
+    "id": "vd:6@605",
+    "source": "슬라이드 판독",
+    "text": "I looked at a GitHub injection issue where you have to set environment variables correctly. I was able to fix it with one prompt on both the Help Center frontend and backend, then extended this to all repos in Mercari - I found around 80 potential repos affected\n— Patrick Klitzke · Team Lead at Mercari",
+    "title": null,
+    "url": null
+   }
+  ],
+  "slide_only_facts": [
+   {
+    "fact": "of investment",
+    "value": "10+",
+    "unit": "years",
+    "sec": 538,
+    "evidence": "vd:6@538",
+    "confidence": "high"
+   }
+  ],
+  "title": "[한영자막] AI 코딩 에이전트가 거대한 코드베이스를 망가뜨리고 있습니다 — Sourcegraph Dan Adler",
+  "duration_sec": 651,
+  "span_start": 0,
+  "span_end": 651,
+  "chapters": [
+   {
+    "sec": 0,
+    "title": "거대한 코드베이스를 관리하는 일"
+   },
+   {
+    "sec": 17,
+    "title": "세상을 움직이는 오래된 코드"
+   },
+   {
+    "sec": 104,
+    "title": "AI가 쏟아내는 코드"
+   },
+   {
+    "sec": 155,
+    "title": "코드베이스가 망가지는 이유"
+   },
+   {
+    "sec": 217,
+    "title": "더 어려워진 코드 관리"
+   },
+   {
+    "sec": 250,
+    "title": "AI가 쓴 코드를 모른다는 개발자"
+   },
+   {
+    "sec": 290,
+    "title": "코드베이스 책임자에게 필요한 도구"
+   },
+   {
+    "sec": 347,
+    "title": "개발 도구 기업에 보내는 요청"
+   },
+   {
+    "sec": 373,
+    "title": "저장소 9만 개의 현실"
+   },
+   {
+    "sec": 422,
+    "title": "에이전트는 검색으로 이해한다"
+   },
+   {
+    "sec": 451,
+    "title": "보이지 않는 코드는 찾을 수 없다"
+   },
+   {
+    "sec": 484,
+    "title": "앞으로 코드는 더 늘어난다"
+   },
+   {
+    "sec": 515,
+    "title": "코드 그래프라는 기반"
+   },
+   {
+    "sec": 543,
+    "title": "Agentic Batch Changes"
+   },
+   {
+    "sec": 600,
+    "title": "Mercari의 취약점 수정 사례"
+   }
+  ],
+  "mode": "whisper+slides"
+ },
+ "expect": {},
+ "note": "관문 B 실제 실행: Sourcegraph 컨퍼런스 발표 (whisper+slides)"
+}

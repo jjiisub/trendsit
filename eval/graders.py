@@ -104,6 +104,21 @@ def code_lookup_agent(inp: dict[str, Any], out: dict[str, Any], expect: dict[str
 
 
 ROLE_CHECKS = {"repo_oneliner": code_repo_oneliner, "lookup_agent": code_lookup_agent}
+# 문체 검사를 할 칸(없으면 출력 전체). 본문을 그대로 옮긴 인용 칸은 원문 문체라 검사하지 않는다
+ROLE_STYLE_FIELDS: dict[str, tuple[str, ...]] = {}
+# 픽스처 전체를 모아 보는 기준(예: 인용 일치율 95%). role → results → (지표, 미달 이유 목록)
+AGGREGATES: dict[str, Any] = {}
+# 코드 소유 칸(S4 설계 결정 D2-1, S2~S3 결정 Q1): 규칙이 문자열로 확정 판정되어 enforce가 고친 값이 곧 정답인 칸.
+# 통과 판정은 이 칸만 enforce 후 값으로 바꾼 출력으로 한다. 원래 출력 점수는 모델 품질로 따로 기록. role → 칸 목록
+ENFORCED_FIELDS: dict[str, tuple[str, ...]] = {}
+
+
+def basis_output(role: str, raw: dict[str, Any], enforced: dict[str, Any] | None) -> dict[str, Any]:
+    """통과 판정용 출력: 원래 출력에서 코드 소유 칸만 enforce 후 값으로."""
+    fields = ENFORCED_FIELDS.get(role, ())
+    if not fields or enforced is None:
+        return raw
+    return {**raw, **{k: enforced[k] for k in fields if k in enforced}}
 
 
 def code_grade(role: str, inp: dict[str, Any], out: dict[str, Any] | None, error: str | None,
@@ -111,7 +126,9 @@ def code_grade(role: str, inp: dict[str, Any], out: dict[str, Any] | None, error
     if out is None:
         checks = [check("스키마", False, error or "출력 없음")]
     else:
-        checks = [check("스키마", True)] + ROLE_CHECKS[role](inp, out, expect) + style_checks(out)
+        fields = ROLE_STYLE_FIELDS.get(role)
+        styled = {k: out[k] for k in fields if k in out} if fields else out
+        checks = [check("스키마", True)] + ROLE_CHECKS[role](inp, out, expect) + style_checks(styled)
     return {"passed": all(c["passed"] for c in checks), "checks": checks,
             "failed": [f"{c['name']}: {c['detail']}" for c in checks if not c["passed"]]}
 
@@ -178,8 +195,10 @@ def summarize(role: str, results: list[dict[str, Any]]) -> dict[str, Any]:
     code_pass = sum(1 for r in results if r["code"]["passed"])
     # 보고용: enforce 후 출력 기준 코드 통과(바뀐 것이 없으면 원래 출력 판정). 통과 판정은 code_pass(원래 출력)
     code_pass_enforced = sum(1 for r in results if r.get("code_enforced", r["code"])["passed"])
+    # 통과 판정: 코드 소유 칸(ENFORCED_FIELDS)만 enforce 후 값으로 채점한 결과. 칸 선언이 없으면 원래 출력 판정과 같다
+    code_pass_basis = sum(1 for r in results if r.get("code_basis", r["code"])["passed"])
     summary: dict[str, Any] = {"n": n, "code_pass": code_pass, "code_pass_enforced": code_pass_enforced,
-                               "questions": {}, "criteria": {}}
+                               "code_pass_basis": code_pass_basis, "questions": {}, "criteria": {}}
     has_rubric = rubric_path(role).exists()
     questions = rubric_questions(role) if has_rubric else {}
     judged = [r for r in results if r.get("llm")]
@@ -191,10 +210,14 @@ def summarize(role: str, results: list[dict[str, Any]]) -> dict[str, Any]:
         vals = [r["llm"]["scores"][c]["score"] for r in judged if c in r["llm"]["scores"]]
         summary["criteria"][c] = {"avg": round(sum(vals) / len(vals), 2) if vals else None, "n": len(vals)}
     reasons = []
-    if th.get("code_pass_all") and code_pass < n:
-        reasons.append(f"코드 채점 통과 {code_pass}/{n}")
+    if th.get("code_pass_all") and code_pass_basis < n:
+        owned = ENFORCED_FIELDS.get(role)
+        reasons.append(f"코드 채점 통과 {code_pass_basis}/{n}" + (f"(코드 소유 칸 {', '.join(owned)}은 enforce 후)" if owned else ""))
     if questions:
-        missing_llm = sum(1 for r in results if r["code"]["passed"] and not r.get("llm"))
+        # judge 대상: 원래 출력이 통과한 것. 코드 소유 칸을 선언한 역할은 enforce 후 출력이 통과한 것도(그 출력을 채점)
+        owned = role in ENFORCED_FIELDS
+        missing_llm = sum(1 for r in results if (r["code"]["passed"] or (owned and r.get("code_enforced", r["code"])["passed"]))
+                          and not r.get("llm"))
         if missing_llm:
             reasons.append(f"LLM 채점 누락 {missing_llm}건")
         missing = sum(1 for r in judged if r["llm"].get("missing"))
@@ -207,3 +230,18 @@ def summarize(role: str, results: list[dict[str, Any]]) -> dict[str, Any]:
     summary["passed"] = not reasons
     summary["fail_reasons"] = reasons
     return summary
+
+
+# ---------- 스펙별 채점 모듈(COMMON 9장): ROLE_CHECKS, ROLE_STYLE_FIELDS, THRESHOLDS, AGGREGATES에 등록 ----------
+def _load(module: str) -> None:
+    import importlib
+
+    try:
+        importlib.import_module(f"eval.{module}")
+    except ModuleNotFoundError as e:
+        if e.name != f"eval.{module}":
+            raise
+
+
+_load("graders_text")  # S2~S3
+_load("graders_video")  # S4

@@ -15,7 +15,7 @@
 ## 2. 핵심 기능
 | 기능 | 내용 | 상태 |
 |---|---|---|
-| 멀티모달 수집 ★ | 글 6곳 + 유튜브 발표 영상(음성 전사 + 슬라이드 판독) + GitHub 주간 트렌딩 | 수집·백필 **S1 완료**, 영상 분석 S4 |
+| 멀티모달 수집 ★ | 글 6곳 + 유튜브 발표 영상(음성 전사 + 슬라이드 판독) + GitHub 주간 트렌딩 | 수집·백필 **S1 완료**, 영상 분석가 **S4 완료**(로컬 전사, 슬라이드 전용 수치, 시각 링크 타임라인) |
 | 원본 추적 ★ | 큐레이션 글이 가리키는 1차 자료(논문, 공식 글, 레포)까지 링크를 따라가 대조 | S3 |
 | 소스 간 교차 연계 ★ | 같은 주제의 글, 영상, 레포를 한 토픽으로 묶어 연결 서술 | S5 |
 | 근거 검수 | 작성자 ⇄ 검수자 루프. 근거와 맞지 않는 문장은 반려하거나 '확인 필요'로 표시 | S5 |
@@ -49,7 +49,7 @@ flowchart LR
 | 편집장 · 계획 | 그날 후보 전체 → 항목별 깊게 볼지, 최대 깊이 | 판단 + 코드 분기 | S3 |
 | 글 분석가 | 글 + 링크 → 원본, 추적 경로, 원본과의 차이 | 도구 에이전트 | S3 |
 | 레포 분석가 | 트렌딩 수치 + README → 하는 일, 신호, 과열 신호 | 도구 에이전트 | S3 |
-| 영상 분석가 | 전사 + 슬라이드 프레임 → 슬라이드 전용 수치, 타임라인 | 판단 + 코드 분기 | S4 |
+| 영상 분석가 (`video_slide`, `video_summary`) | 영상 처리 지시 → 로컬 전사 + 슬라이드 판독 → 슬라이드 전용 수치, 표기 쌍, 타임라인, 요약 | 판단 + 코드 분기 | **S4 완료** |
 | 편집장 · 선별 / 작성자 / 검수자 | 토픽 후보 → 순위 → 토픽 페이지 → 판정 | LLM 1회 | S5 |
 
 모델 별칭은 `config/models.yaml`: 생성 `generate`(qwen3.8-27b, 오픈웨이트), 채점 `judge`(gemini-3.8-flash, 다른 계열), 배관 확인 `smoke`(무료 모델). 9주차 이후 로컬(Ollama)로 옮길 때 설정만 바꾼다.
@@ -64,6 +64,13 @@ uv run python -m trendsit collect --since 2026-09-28 --until 2026-10-04   # 기�
 uv run python -m trendsit report collection --since 2026-09-28 --until 2026-10-04
 uv run python -m trendsit cost --spec S0       # 사용액과 남은 예산
 ```
+영상 분석가(맥, Apple Silicon): `uv sync --extra video` 뒤
+```bash
+TRENDSIT_SPEC=S4 uv run --extra video python -m trendsit video run --video-id xRZHLI5SPWo --mode whisper+slides
+TRENDSIT_SPEC=S4 uv run --extra video python -m trendsit video run --queue q.json   # 영상 처리 지시 배열
+uv run python -m trendsit video purge --older-than 7                                # 영상·프레임 정리(DB 텍스트는 남음)
+```
+시스템 의존성(영상): ffmpeg·ffprobe(`brew install ffmpeg`), yt-dlp용 JS 런타임 deno·node·bun 중 하나(없으면 유튜브 영상 포맷이 403). 전사는 로컬 mlx-whisper(`large-v3-turbo`, 첫 실행 때 약 1.6GB 받음). 외부 전사 API와 유튜브 자동 자막은 쓰지 않는다. `uv run`은 선택 묶음을 지우므로 영상 명령은 `--extra video`를 붙인다.
 그 밖의 명령: 수집 항목 보기 `items [--week 2026-W40] [--status pass]`, 기록된 호출 다시 실행 `role --replay <step_id> [--model 별칭]`, 평가 `eval <역할> [--model 별칭]`, 실행 기록 보기 `trace <run_id>`. 전체 명령표와 동작 방식은 [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
 
 ## 5. 사용 예시 / 결과물
@@ -79,9 +86,10 @@ uv run python -m trendsit cost --spec S0       # 사용액과 남은 예산
 | S0 | `lookup_agent` 도구 루프 5건(smoke) | 5/5. 깊이 상한 밖 문서는 코드가 거부 | $0 |
 | S1 | 수집 9/28~10/4(한 주) | 글 308건(AI타임스 188, GeekNews 83, Simon Willison 18, OpenAI 15, Anthropic 2, DeepMind 2), 영상 17편, 릴리스 18건, 트렌딩 11개(페이지 전부). 6곳 모두 기간을 덮음, 중복 0. 본문 추출 성공 GeekNews 98%(원문 기준, 의도적 건너뜀 제외), 나머지 93~100%. GeekNews는 날짜별 목록 날짜당 1페이지(점수 상위 약 20건, 자기 글 제외 하루 11.9건). 키워드 통과 184건 | LLM 없음 $0 |
 | S1 | `repo_oneliner` 새 프롬프트 형식 + 예/아니오 채점(generate) | 3회 개선 후 코드 채점 8/10 → README 기호 정리(설계 결정) 뒤 코드 9/10, judge Q1·Q2·Q3 9/9(잠정, 사람 라벨 전). 남은 실패는 README가 한 줄뿐인 레포의 attention | S1 $0.056 (상한 $0.06) |
+| S4 | 영상 분석가, Tech Bridge 10편(슬라이드 발표 7, 대담 3, 맥) | 1차 처리 10/10 성공·계약 검사 전부 통과, 로컬 전사 10~31분 영상당 1~2.5분(M1 Max GPU). 슬라이드 판독 139/140장, 슬라이드 전용 수치 124개. 잠정(labeler opus-5.5): 판독 수치 정확도 98.2%, 포착률 87.9%, 요약 Q1 67%·Q2 42%·Q3 75%(미달, S5에서 개선). 같은 전사에 슬라이드를 더하면 잘못 들은 수치가 화면 값으로 바로잡힘(예: 'Sweebench Pro 88%' → SWE-Bench Pro 80.3%) | S4 $0.52 (상한 $0.80) |
 
 - 같은 입력 재실행은 캐시로 0원. 채점 기준은 S1부터 예/아니오 질문 + 사람 라벨 일치율로 바뀐다
-- 상세: [reports/S0_quality.md](reports/S0_quality.md), [reports/S0_report.md](reports/S0_report.md), [reports/S1_collection.md](reports/S1_collection.md), [reports/S1_report.md](reports/S1_report.md)
+- 상세: [reports/S0_quality.md](reports/S0_quality.md), [reports/S0_report.md](reports/S0_report.md), [reports/S1_collection.md](reports/S1_collection.md), [reports/S1_report.md](reports/S1_report.md), [reports/S4_report.md](reports/S4_report.md), [reports/S4_video/](reports/S4_video/README.md)
 
 ## 7. 기술적 도전
 | 문제 | 시도 | 해결 | 결과 |
@@ -109,6 +117,7 @@ config/      설정: 모델 별칭(models), 예산(budget), 소스(sources), 키
 roles/       역할 정의 = 프롬프트 폴더. 앞부분 실행 설정 + 본문 지시
 skills/      여러 역할이 같이 쓰는 지침(문체 등)
 trendsit/    파이썬 패키지: cli, core(LLM 호출, 캐시, 예산, run_role/run_agent, 실행 기록), tools
+             collect/video(영상 받기, 로컬 전사, 프레임), video(대조, 영상 분석가 파이프라인)  # S4
 eval/        평가: 픽스처, 채점표, 채점기, 채점자 역할
 tests/       단위 테스트(LLM은 모의)
 scripts/     관문 A 확인 스크립트(verify_s<n>.sh) 등
@@ -123,7 +132,7 @@ data/        실행 기록 DB, 캐시(git 제외), 예시 사이트 데이터(�
 - [x] S1 수집: 글 6곳(RSS + 백필), 유튜브, GitHub 트렌딩, SSRF 방어
 - [ ] S2 글 1차 요약 + 임베딩 필터
 - [ ] S3 깊게 보기: 편집장 계획, 글 분석가(원본 추적), 레포 분석가
-- [ ] S4 영상 분석가(전사 + 슬라이드 판독)
+- [x] S4 영상 분석가(로컬 전사 + 슬라이드 판독, 맥)
 - [ ] S5 주간 브리핑: 묶기, 선별, 작성 ⇄ 검수
 - [ ] S6 공개와 자동화: 사이트 연결, 매일·매주 자동 실행
 - [ ] 9주차 이후: 로컬 모델 전환, 자연어 추적 관리, 쌓인 브리핑 Q&A

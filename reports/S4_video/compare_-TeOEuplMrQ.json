@@ -1,0 +1,246 @@
+{
+ "whisper": {
+  "key_points": [
+   {
+    "text": "자율 에이전트 사용 개발자의 코드 작성량 741% 증가, 소프트웨어 배포량 30% 증가",
+    "evidence": [
+     "vd:13@93",
+     "vd:13@106"
+    ]
+   },
+   {
+    "text": "리뷰어당 400~450줄 초과 시 결함 발견율 급감(Cisco 연구)",
+    "evidence": [
+     "vd:13@221",
+     "vd:13@229"
+    ]
+   },
+   {
+    "text": "테스트 통과 PR의 실제 머지 적합률 약 50%(METR 연구)",
+    "evidence": [
+     "vd:13@429",
+     "vd:13@439"
+    ]
+   },
+   {
+    "text": "Fable 5 모델의 Frontier Code 최난이도 점수 29%(Sweebench Pro 88% 대비)",
+    "evidence": [
+     "vd:13@500",
+     "vd:13@511"
+    ]
+   },
+   {
+    "text": "Bun의 Zig→Rust 포팅 코드 내 unsafe 블록 13,044개(동급 인간 코드 대비 약 74개)",
+    "evidence": [
+     "vd:13@990",
+     "vd:13@996"
+    ]
+   },
+   {
+    "text": "프롬프트 인젝션 공격에 대한 자율 리뷰 에이전트 취약성(88% 성공률)",
+    "evidence": [
+     "vd:13@1256",
+     "vd:13@1266"
+    ]
+   }
+  ],
+  "summary": "AI 에이전트 도입으로 코드 생산량은 급증했으나 인간 리뷰 속도는 정체되어 새로운 병목이 발생했다. 연구에 따르면 테스트를 통과한 코드도 실제 머지 적합률은 50% 수준에 그치며, 완전한 무인 리뷰 시 메모리 안전성 결함이나 프롬프트 인젝션 취약점이 드러났다. 코드 리뷰는 사라지지 않고 인간이 코드를 직접 읽는 것에서 검증 시스템을 설계하는 역할로 이동하고 있다.",
+  "timeline": [
+   {
+    "sec": 0,
+    "label": "발표자 소개 및 코드 리뷰 병목 문제 제기",
+    "slide": false
+   },
+   {
+    "sec": 84,
+    "label": "AI 에이전트 도입 후 코드 생산량과 배포량 격차 데이터",
+    "slide": false
+   },
+   {
+    "sec": 189,
+    "label": "인간 리뷰 한계(Cisco 연구) 및 번아웃 문제",
+    "slide": false
+   },
+   {
+    "sec": 279,
+    "label": "인간 리뷰 완전 배제 시도(OpenAI 사례) 및 루프 설계",
+    "slide": false
+   },
+   {
+    "sec": 389,
+    "label": "테스트 통과와 실제 머지 적합성 간 괴리(METR, FrontierCode)",
+    "slide": false
+   },
+   {
+    "sec": 653,
+    "label": "GitHub Copilot, Cursor 등 자동 리뷰 도구 현황",
+    "slide": false
+   },
+   {
+    "sec": 887,
+    "label": "인간 배제 실험의 한계(C 컴파일러, Bun 포팅)",
+    "slide": false
+   },
+   {
+    "sec": 1112,
+    "label": "무인 리뷰 실패 사례 및 인간 검증의 잔존 지점",
+    "slide": false
+   },
+   {
+    "sec": 1227,
+    "label": "리뷰 시스템 자체의 취약점(프롬프트 인젝션) 및 프로덕션 모니터링",
+    "slide": false
+   },
+   {
+    "sec": 1351,
+    "label": "코드 리뷰의 재설계 및 실무적 제안(검증 하네스 구축)",
+    "slide": false
+   }
+  ],
+  "name_pairs": [],
+  "slide_only_facts": []
+ },
+ "whisper+slides": {
+  "key_points": [
+   {
+    "text": "자율 에이전트 사용 개발자의 코드 작성량 741% 증가, 소프트웨어 배포량 30% 증가",
+    "evidence": [
+     "vd:13@93",
+     "vd:13@106"
+    ]
+   },
+   {
+    "text": "리뷰어당 400~450줄 초과 시 결함 탐지율 급감(Cisco 연구)",
+    "evidence": [
+     "vd:13@221",
+     "vd:13@229",
+     "vd:13@210"
+    ]
+   },
+   {
+    "text": "테스트 통과 PR의 실제 머지 가능 비율 약 50%(METR 연구)",
+    "evidence": [
+     "vd:13@429",
+     "vd:13@413"
+    ]
+   },
+   {
+    "text": "Fable 5의 SWE-Bench Pro 80.3%와 FrontierCode 29.3% 점수 격차",
+    "evidence": [
+     "vd:13@500",
+     "vd:13@527"
+    ]
+   },
+   {
+    "text": "Bun의 Zig→Rust 포팅 코드에 13,044개 unsafe 블록 포함(동급 수작업 코드 73개)",
+    "evidence": [
+     "vd:13@996",
+     "vd:13@991"
+    ]
+   },
+   {
+    "text": "인간 리뷰어의 역할이 코드 직접 검토에서 검증 시스템 설계로 상향 이동",
+    "evidence": [
+     "vd:13@1215",
+     "vd:13@1183"
+    ]
+   }
+  ],
+  "summary": "AI 에이전트의 코드 생성 속도 증가로 인한 인간 코드 리뷰 병목 문제를 다룬 발표다. 코드 작성량은 741% 증가한 반면 실제 배포된 소프트웨어는 30%만 늘었으며, 이는 리뷰 단계의 한계 때문이다. Cisco 연구에 따르면 리뷰어가 400~450줄을 초과하면 결함 탐지율이 급감하고, METR 연구에서는 테스트를 통과한 PR의 실제 머지 가능 비율이 약 50%에 그쳤다. FrontierCode 벤치마크에서 Fable 5는 SWE-Bench Pro 80.3%와 FrontierCode 29.3%로 큰 격차를 보였고, Bun의 Zig→Rust 포팅 코드에는 13,044개의 unsafe 블록이 포함되었다. 인간 리뷰어의 역할은 코드 직접 검토에서 검증 시스템 설계로 상향 이동하고 있으며, 개발팀은 검증 하네스 구축에 집중해야 한다.",
+  "timeline": [
+   {
+    "sec": 0,
+    "label": "개요 및 발표자 소개",
+    "slide": false
+   },
+   {
+    "sec": 84,
+    "label": "코드 생성량과 배포량 격차",
+    "slide": false
+   },
+   {
+    "sec": 144,
+    "label": "코드 생성 병목 해소 사례",
+    "slide": false
+   },
+   {
+    "sec": 189,
+    "label": "리뷰 한계 및 Cisco 연구",
+    "slide": true
+   },
+   {
+    "sec": 279,
+    "label": "인간 리뷰 배제 시도 및 OpenAI 사례",
+    "slide": true
+   },
+   {
+    "sec": 389,
+    "label": "테스트 통과와 머지 가능성의 차이",
+    "slide": true
+   },
+   {
+    "sec": 468,
+    "label": "FrontierCode 벤치마크 결과",
+    "slide": true
+   },
+   {
+    "sec": 653,
+    "label": "GitHub Copilot 및 Cursor 자동 리뷰 현황",
+    "slide": true
+   },
+   {
+    "sec": 887,
+    "label": "인간 배제 실험 및 한계",
+    "slide": true
+   },
+   {
+    "sec": 1182,
+    "label": "인간 검증의 잔존 지점 및 프로덕션 모니터링",
+    "slide": true
+   },
+   {
+    "sec": 1351,
+    "label": "코드 리뷰 재설계 및 실무 권고",
+    "slide": false
+   }
+  ],
+  "name_pairs": [
+   {
+    "spoken": "Sweebench",
+    "screen": "SWE-Bench Pro",
+    "sec": 527
+   },
+   {
+    "spoken": "Frontier Code",
+    "screen": "FrontierCode",
+    "sec": 527
+   }
+  ],
+  "slide_only_facts": [
+   {
+    "fact": "Fable 5 on SWE-Bench Pro",
+    "value": "80.3%",
+    "unit": "%",
+    "sec": 527,
+    "evidence": "vd:13@527",
+    "confidence": "high"
+   },
+   {
+    "fact": "Fable 5 on FrontierCode",
+    "value": "29.3%",
+    "unit": "%",
+    "sec": 527,
+    "evidence": "vd:13@527",
+    "confidence": "high"
+   },
+   {
+    "fact": "in a comparable hand-written project",
+    "value": "73",
+    "unit": "",
+    "sec": 991,
+    "evidence": "vd:13@991",
+    "confidence": "high"
+   }
+  ]
+ }
+}
