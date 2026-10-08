@@ -79,19 +79,26 @@ def _evaluate(ctx: Any, role_name: str, model: str | None, limit: int | None, no
             rec["tool_calls"] = [{"text": r["text"], "error": r["error"], "detail": r["detail"]} for r in ctx.db.conn.execute(
                 "SELECT text, error, detail FROM steps WHERE run_id=? AND kind='tool' AND id>? ORDER BY id",
                 (ctx.tracer.run_id, mark))]
-        graded = out
+        rec["code"] = graders.code_grade(role_name, fx["input"], out, error, fx["expect"])
         if final is not None and final.enforced:  # enforce 후 출력(저장되는 것)도 함께 기록
             rec["enforced"] = final.enforced
             rec["enforced_output"] = final.model_dump()
             rec["code_enforced"] = graders.code_grade(role_name, fx["input"], rec["enforced_output"], None,
                                                       fx["expect"])
-            graded = final.graded_dump()
-            if graded != out:
-                rec["graded_output"] = graded
-        rec["code"] = graders.code_grade(role_name, fx["input"], graded, error, fx["expect"])
-        if with_llm and rec["code"]["passed"]:
+        if out is not None and role_name in graders.ENFORCED_FIELDS:  # 통과 판정 기준(코드 소유 칸만 enforce 후)
+            basis = graders.basis_output(role_name, out, rec.get("enforced_output"))
+            rec["code_basis"] = rec["code"] if basis == out else graders.code_grade(
+                role_name, fx["input"], basis, None, fx["expect"])
+        # judge: 원래 출력이 코드 채점을 통과하면 원래 출력을. 코드 소유 칸을 선언한 역할은 원래 출력이 실패해도
+        # enforce 후 출력이 통과하면 그 출력을 채점(기록에 표시, S4 설계 결정 D2-4)
+        target = None
+        if rec["code"]["passed"]:
+            target, rec["judged_output"] = out, "raw"
+        elif role_name in graders.ENFORCED_FIELDS and rec.get("code_enforced", {}).get("passed"):
+            target, rec["judged_output"] = rec["enforced_output"], "enforced"
+        if with_llm and target is not None:
             try:
-                rec["llm"] = graders.llm_grade(role_name, inp, graded, ctx)  # type: ignore[arg-type]
+                rec["llm"] = graders.llm_grade(role_name, inp, target, ctx)  # type: ignore[arg-type]
             except (BudgetExceeded, LLMError, PriceUnknown, RoleFailed) as e:
                 stopped = f"채점 {type(e).__name__}: {e}"
                 print(f"[eval] 채점 중단: {stopped}", file=sys.stderr)
@@ -103,7 +110,7 @@ def _evaluate(ctx: Any, role_name: str, model: str | None, limit: int | None, no
         print(f"[eval] {fid}: 코드 {mark} {json.dumps(out, ensure_ascii=False)[:120] if out else error}",
               file=sys.stderr)
 
-    summary = graders.summarize(role_name, results, role.output_cls.ENFORCED_FIELDS)
+    summary = graders.summarize(role_name, results)
     if stopped:
         summary["passed"] = False
         summary["fail_reasons"].append(f"중단: {stopped}")
@@ -138,19 +145,29 @@ def regrade(path: Path, note: str | None = None) -> dict[str, Any]:
         for rec in old["results"]:
             rec = dict(rec)
             out = rec.get("output")
-            graded = role.output_cls.graded_output(out, rec.get("enforced") or []) if out else None
             rec.pop("graded_output", None)
-            if graded is not None and graded != out:
-                rec["graded_output"] = graded
-            rec["code"] = graders.code_grade(role_name, rec["input"], graded, rec.get("error"), rec["expect"])
-            if with_llm and rec["code"]["passed"] and not rec.get("llm") and not stopped:
+            # run_eval과 같은 기록: code = 원래 출력, code_basis = 코드 소유 칸만 enforce 후(통과 판정)
+            rec["code"] = graders.code_grade(role_name, rec["input"], out, rec.get("error"), rec["expect"])
+            if rec.get("enforced_output") is not None:
+                rec["code_enforced"] = graders.code_grade(role_name, rec["input"], rec["enforced_output"], None,
+                                                          rec["expect"])
+            if out is not None and role_name in graders.ENFORCED_FIELDS:
+                basis = graders.basis_output(role_name, out, rec.get("enforced_output"))
+                rec["code_basis"] = rec["code"] if basis == out else graders.code_grade(
+                    role_name, rec["input"], basis, None, rec["expect"])
+            target = None  # judge 대상(S4 설계 결정 D2-4). 이미 채점된 항목은 다시 부르지 않음
+            if rec["code"]["passed"]:
+                target, rec["judged_output"] = out, "raw"
+            elif role_name in graders.ENFORCED_FIELDS and rec.get("code_enforced", {}).get("passed"):
+                target, rec["judged_output"] = rec["enforced_output"], "enforced"
+            if with_llm and target is not None and not rec.get("llm") and not stopped:
                 try:
                     inp = role.input_cls.model_validate(rec["input"])
-                    rec["llm"] = graders.llm_grade(role_name, inp, graded, ctx)  # type: ignore[arg-type]
+                    rec["llm"] = graders.llm_grade(role_name, inp, target, ctx)  # type: ignore[arg-type]
                 except (BudgetExceeded, LLMError, PriceUnknown, RoleFailed) as e:
                     stopped = f"채점 {type(e).__name__}: {e}"
             results.append(rec)
-        summary = graders.summarize(role_name, results, role.output_cls.ENFORCED_FIELDS)
+        summary = graders.summarize(role_name, results)
         if stopped:
             summary["passed"] = False
             summary["fail_reasons"].append(f"중단: {stopped}")
@@ -239,7 +256,9 @@ def write_quality(spec: str) -> Path:
             lines += ["문턱값: 코드 채점 전부 통과", ""]
         agree = agreement(role, spec) if questions else None
         if questions:
-            lines += ["judge 판정: " + ("사람 라벨과 일치율 확인됨(아래)" if agree and agree["n_rows"] else
+            who = (f"라벨({', '.join(agree['labelers'])}{', 잠정' if agree['provisional'] else ''})"
+                   if agree and agree.get("labelers") else "사람 라벨")
+            lines += ["judge 판정: " + (f"{who}과 일치율 확인됨(아래)" if agree and agree["n_rows"] else
                                          "**잠정**(사람 라벨 없음. `eval/labels/" + role + ".csv`를 채우면 일치율을 잰다)"), ""]
         head = (["모델", "코드 통과", "enforce 후 코드 통과"] + [f"{q} 통과" for q in questions] + [f"{c} 평균" for c in criteria]
                 + ["문턱값", "비용", "프롬프트"])
@@ -259,8 +278,16 @@ def write_quality(spec: str) -> Path:
             if r["summary"].get("aggregate"):
                 lines.append(f"- {alias} 전체 지표: " + ", ".join(f"{k} {v}" for k, v in r["summary"]["aggregate"].items()))
             if r["summary"].get("model_agreement"):
-                lines.append(f"- {alias} 모델 일치율(코드 소유 칸, 통과 판정은 enforce 후 값): "
+                lines.append(f"- {alias} 모델 일치율(코드 소유 칸, 보고용): "
                              + ", ".join(f"{k} {v}" for k, v in r["summary"]["model_agreement"].items()))
+            s_ = r["summary"]
+            if role in graders.ENFORCED_FIELDS and "code_pass_basis" in s_:
+                lines.append(f"- {alias} 통과 판정(코드 소유 칸 {', '.join(graders.ENFORCED_FIELDS[role])}만 enforce 후): "
+                             f"{s_['code_pass_basis']}/{s_['n']}. 원래 출력 {s_['code_pass']}/{s_['n']}은 모델 품질로 기록")
+            enforced_judged = [x["id"] for x in r["results"] if x.get("judged_output") == "enforced"]
+            if enforced_judged:
+                lines.append(f"- {alias} enforce 후 출력으로 judge 채점: {', '.join(enforced_judged)}")
+        for alias, r in latest.items():
             if r["summary"]["fail_reasons"]:
                 lines.append(f"- {alias} 미달 이유: {'; '.join(r['summary']['fail_reasons'])}")
         if "judge" in latest and questions:
@@ -284,7 +311,9 @@ def write_quality(spec: str) -> Path:
             lines.append("")
 
         if agree and agree["n_rows"]:
-            lines += [f"### judge·사람 일치율 (라벨 {agree['n_rows']}건, {agree['report']})", "",
+            who = (f"labeler {', '.join(agree['labelers'])}{', 잠정' if agree['provisional'] else ''}"
+                   if agree.get("labelers") else "사람")
+            lines += [f"### judge·라벨 일치율 ({who}, 라벨 {agree['n_rows']}건, {agree['report']})", "",
                       "| 질문 | 일치 | 비교 수 | 일치율 |", "|---|---|---|---|"]
             for q, v in agree["questions"].items():
                 lines.append(f"| {q} | {v['agree']} | {v['n']} | {v['rate']} |")
@@ -350,6 +379,7 @@ def _brief(v: Any) -> Any:
 
 # ---------- judge 맞추기: 사람 라벨 ----------
 LABELS = ROOT / "eval" / "labels"
+HUMAN_LABELERS = {"human", "사람", "user", "사용자"}  # labeler 칸이 이것이 아니면(예: opus-5.5) 잠정 라벨
 TRUE_WORDS = {"pass", "p", "y", "yes", "1", "o", "예", "통과", "true"}
 FALSE_WORDS = {"fail", "f", "n", "no", "0", "x", "아니오", "실패", "false"}
 
@@ -371,7 +401,8 @@ def make_labels(role: str, spec: str) -> Path:
     if rep is None:
         raise SystemExit(f"{role}: 전체 eval 결과가 없음. 먼저 eval {role}을 돌릴 것")
     questions = list(graders.rubric_questions(role))
-    cols = ["id", "input_summary", "output"] + [c for q in questions for c in (f"{q}_pass", f"{q}_critique")] + ["eval_report"]
+    cols = (["id", "input_summary", "output"] + [c for q in questions for c in (f"{q}_pass", f"{q}_critique")]
+            + ["labeler", "eval_report"])
     path = LABELS / f"{role}.csv"
     old: dict[str, dict[str, str]] = {}
     if path.exists():
@@ -391,6 +422,7 @@ def make_labels(role: str, spec: str) -> Path:
             for q in questions:
                 row[f"{q}_pass"] = prev.get(f"{q}_pass", "") if same else ""
                 row[f"{q}_critique"] = prev.get(f"{q}_critique", "") if same else ""
+            row["labeler"] = prev.get("labeler", "") if same else ""  # 누가 라벨을 달았나(사람이 아니면 잠정)
             w.writerow(row)
     return path
 
@@ -415,12 +447,16 @@ def agreement(role: str, spec: str | None = None, path: Path | None = None) -> d
     reports: dict[str, dict[str, Any]] = {}
     stats = {q: {"agree": 0, "n": 0} for q in questions}
     labeled_rows = 0
+    judged_enforced: list[str] = []  # judge는 enforce 후 출력, 라벨은 원래 출력인 행
+    labelers: set[str] = set()
     for row in rows:
         rp = row.get("eval_report")
         if rp not in reports:
             reports[rp] = json.loads((ROOT / rp).read_text(encoding="utf-8")) if rp and (ROOT / rp).exists() else {}
         x = next((x for x in reports[rp].get("results", []) if x["id"] == row["id"]), None)
         verdicts = ((x or {}).get("llm") or {}).get("verdicts") or {}
+        if (x or {}).get("judged_output") == "enforced":
+            judged_enforced.append(row["id"])
         any_label = False
         for q in questions:
             human = _label_value(row.get(f"{q}_pass", ""))
@@ -430,9 +466,13 @@ def agreement(role: str, spec: str | None = None, path: Path | None = None) -> d
             stats[q]["n"] += 1
             stats[q]["agree"] += int(human == (verdicts[q]["verdict"] == "pass"))
         labeled_rows += int(any_label)
+        if any_label and (row.get("labeler") or "").strip():
+            labelers.add(row["labeler"].strip())
     for v in stats.values():
         v["rate"] = round(v["agree"] / v["n"], 3) if v["n"] else None
     total_n = sum(v["n"] for v in stats.values())
     total_a = sum(v["agree"] for v in stats.values())
     return {"questions": stats, "n_rows": labeled_rows, "report": ", ".join(k for k in reports if k),
+            "judged_enforced": judged_enforced, "labelers": sorted(labelers),
+            "provisional": any(lb.lower() not in HUMAN_LABELERS for lb in labelers),
             "total": {"agree": total_a, "n": total_n, "rate": round(total_a / total_n, 3) if total_n else None}}

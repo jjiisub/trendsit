@@ -4,7 +4,8 @@ from __future__ import annotations
 
 from typing import Any
 
-from trendsit.core.artifacts_text import clipped_quotes, squash
+from trendsit.core.artifacts_repo import RepoCard
+from trendsit.core.artifacts_text import CollectionPlan, ItemCardV1, ItemCardV2, clipped_quotes, squash
 
 from . import graders
 from .graders import check
@@ -192,3 +193,9 @@ graders.ROLE_CHECKS["text_analyst"] = code_text_analyst
 graders.ROLE_STYLE_FIELDS["text_analyst"] = ("differences", "summary", "claims", "log")
 graders.AGGREGATES["text_analyst"] = aggregate_text_analyst
 graders.THRESHOLDS["text_analyst"] = {"questions": {"Q1": 0.8, "Q2": 0.8, "Q3": 0.8}, "code_pass_all": True}
+
+
+# 코드 소유 칸(설계 결정 Q1): 출력 클래스의 ENFORCED_FIELDS를 채점기에 등록. 통과 판정은 이 칸만 enforce 후 값
+for _role, _cls in (("item_card", ItemCardV1), ("repo_analyst", RepoCard), ("editor_plan", CollectionPlan),
+                    ("text_analyst", ItemCardV2)):
+    graders.ENFORCED_FIELDS[_role] = _cls.ENFORCED_FIELDS

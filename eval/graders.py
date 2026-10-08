@@ -9,7 +9,7 @@ from typing import Any
 
 from pydantic import BaseModel
 
-from trendsit.core.artifacts import Document, JudgeInput, JudgeResult, RoleInput
+from trendsit.core.artifacts import Document, JudgeInput, JudgeResult, RepoOneliner, RoleInput
 from trendsit.core.config import ROOT
 from trendsit.core.context import Ctx
 from trendsit.core.role import load_role, run_role
@@ -110,6 +110,19 @@ ROLE_CHECKS = {"repo_oneliner": code_repo_oneliner, "lookup_agent": code_lookup_
 ROLE_STYLE_FIELDS: dict[str, tuple[str, ...]] = {}
 # 픽스처 전체를 모아 보는 기준(예: 인용 일치율 95%). role → results → (지표, 미달 이유 목록)
 AGGREGATES: dict[str, Any] = {}
+# 코드 소유 칸(S4 설계 결정 D2-1, S2~S3 결정 Q1): 규칙이 문자열로 확정 판정되어 enforce가 고친 값이 곧 정답인 칸.
+# 통과 판정은 이 칸만 enforce 후 값으로 바꾼 출력으로 한다. 원래 출력 점수는 모델 품질로 따로 기록. role → 칸 목록
+ENFORCED_FIELDS: dict[str, tuple[str, ...]] = {}
+# S2~S3 역할은 칸 목록을 출력 클래스의 ENFORCED_FIELDS(ClassVar)에 선언하고 여기에 등록한다(한 곳에서만 정함)
+ENFORCED_FIELDS["repo_oneliner"] = RepoOneliner.ENFORCED_FIELDS
+
+
+def basis_output(role: str, raw: dict[str, Any], enforced: dict[str, Any] | None) -> dict[str, Any]:
+    """통과 판정용 출력: 원래 출력에서 코드 소유 칸만 enforce 후 값으로."""
+    fields = ENFORCED_FIELDS.get(role, ())
+    if not fields or enforced is None:
+        return raw
+    return {**raw, **{k: enforced[k] for k in fields if k in enforced}}
 
 
 def code_grade(role: str, inp: dict[str, Any], out: dict[str, Any] | None, error: str | None,
@@ -181,7 +194,10 @@ def llm_grade(role: str, inp: RoleInput, out: dict[str, Any], ctx: Ctx) -> dict[
 
 
 def model_agreement(results: list[dict[str, Any]], owned_fields: tuple[str, ...] = ()) -> dict[str, str]:
-    """코드 소유 칸별 모델 일치율(설계 결정 Q1): 원래 출력이 코드가 정한 값과 같았던 건수/출력 수."""
+    """코드 소유 칸별 모델 일치율(설계 결정 Q1, 보고용): 원래 출력이 코드가 정한 값과 같았던 건수/출력 수.
+
+    칸 일부만 코드 소유인 규칙(fix(owned=True), 예: 긴 인용 자르기)도 그 칸 이름으로 센다.
+    """
     outs = [r for r in results if r.get("output")]
     changed: dict[str, int] = dict.fromkeys(owned_fields, 0)
     for r in outs:
@@ -191,15 +207,17 @@ def model_agreement(results: list[dict[str, Any]], owned_fields: tuple[str, ...]
     return {f: f"{len(outs) - k}/{len(outs)}" for f, k in changed.items()}
 
 
-def summarize(role: str, results: list[dict[str, Any]], owned_fields: tuple[str, ...] = ()) -> dict[str, Any]:
+def summarize(role: str, results: list[dict[str, Any]]) -> dict[str, Any]:
     th = THRESHOLDS.get(role, {"code_pass_all": True})
     n = len(results)
-    # 통과 판정: 원래 출력에 코드 소유 칸만 enforce 후 값으로 덮어 채점(설계 결정 Q1, run_eval이 code에 넣음)
-    code_pass = sum(1 for r in results if r["code"]["passed"])
+    code_pass = sum(1 for r in results if r["code"]["passed"])  # 원래 출력(모델 품질)
     # 보고용: enforce 전부 적용한 출력(저장되는 것) 기준 코드 통과
     code_pass_enforced = sum(1 for r in results if r.get("code_enforced", r["code"])["passed"])
+    # 통과 판정: 코드 소유 칸(ENFORCED_FIELDS)만 enforce 후 값으로 채점한 결과. 칸 선언이 없으면 원래 출력 판정과 같다
+    code_pass_basis = sum(1 for r in results if r.get("code_basis", r["code"])["passed"])
     summary: dict[str, Any] = {"n": n, "code_pass": code_pass, "code_pass_enforced": code_pass_enforced,
-                               "model_agreement": model_agreement(results, owned_fields),
+                               "code_pass_basis": code_pass_basis,
+                               "model_agreement": model_agreement(results, ENFORCED_FIELDS.get(role, ())),
                                "questions": {}, "criteria": {}}
     has_rubric = rubric_path(role).exists()
     questions = rubric_questions(role) if has_rubric else {}
@@ -212,10 +230,14 @@ def summarize(role: str, results: list[dict[str, Any]], owned_fields: tuple[str,
         vals = [r["llm"]["scores"][c]["score"] for r in judged if c in r["llm"]["scores"]]
         summary["criteria"][c] = {"avg": round(sum(vals) / len(vals), 2) if vals else None, "n": len(vals)}
     reasons = []
-    if th.get("code_pass_all") and code_pass < n:
-        reasons.append(f"코드 채점 통과 {code_pass}/{n}")
+    if th.get("code_pass_all") and code_pass_basis < n:
+        owned = ENFORCED_FIELDS.get(role)
+        reasons.append(f"코드 채점 통과 {code_pass_basis}/{n}" + (f"(코드 소유 칸 {', '.join(owned)}은 enforce 후)" if owned else ""))
     if questions:
-        missing_llm = sum(1 for r in results if r["code"]["passed"] and not r.get("llm"))
+        # judge 대상: 원래 출력이 통과한 것. 코드 소유 칸을 선언한 역할은 enforce 후 출력이 통과한 것도(그 출력을 채점)
+        owned = role in ENFORCED_FIELDS
+        missing_llm = sum(1 for r in results if (r["code"]["passed"] or (owned and r.get("code_enforced", r["code"])["passed"]))
+                          and not r.get("llm"))
         if missing_llm:
             reasons.append(f"LLM 채점 누락 {missing_llm}건")
         missing = sum(1 for r in judged if r["llm"].get("missing"))

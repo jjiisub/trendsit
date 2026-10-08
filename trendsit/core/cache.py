@@ -7,6 +7,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+from .images import without_paths
+
 # 캐시 키에 들어가는 요청 칸. usage 같은 회계용 칸은 응답 내용에 영향이 없어 뺀다
 KEY_FIELDS = ("model", "provider", "messages", "response_format", "tools", "tool_choice",
               "max_tokens", "temperature", "reasoning")
@@ -14,6 +16,7 @@ KEY_FIELDS = ("model", "provider", "messages", "response_format", "tools", "tool
 
 def cache_key(body: dict[str, Any]) -> str:
     material = {k: body.get(k) for k in KEY_FIELDS}
+    material["messages"] = without_paths(material["messages"])  # 이미지는 경로가 아니라 바이트 해시로
     raw = json.dumps(material, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()
 

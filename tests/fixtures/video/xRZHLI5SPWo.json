@@ -1,0 +1,1238 @@
+{
+ "video_id": "xRZHLI5SPWo",
+ "mode": "whisper+slides",
+ "title": "[한영자막] 400개 기업 데이터로 본 소프트웨어 개발 AI의 현주소입니다",
+ "duration_sec": 1123,
+ "span": {
+  "start": 0.0,
+  "end": 1122.174
+ },
+ "language": "en",
+ "transcript_source": "whisper",
+ "transcript_quality": "ok",
+ "quality_signals": {
+  "segments": 203,
+  "chars": 17130,
+  "repeat_ratio": 0.0049,
+  "unique_tokens": 874,
+  "window_uniform_ratio": 0.0148,
+  "silence_ratio": 0.0135,
+  "no_speech_ratio": 0.0,
+  "mean_avg_logprob": -0.1061,
+  "mean_compression_ratio": 1.7125,
+  "language_votes": [
+   {
+    "at": 224.4,
+    "lang": "en",
+    "prob": 0.9999
+   },
+   {
+    "at": 561.1,
+    "lang": "en",
+    "prob": 0.9998
+   },
+   {
+    "at": 897.7,
+    "lang": "en",
+    "prob": 0.9998
+   }
+  ]
+ },
+ "segments": [
+  {
+   "start": 0.0,
+   "end": 4.56,
+   "text": "I'm Justin Riach. I'm the deputy CTO at DX. I get to do a lot of our research"
+  },
+  {
+   "start": 4.56,
+   "end": 9.48,
+   "text": "around developer experience and its relation to developer productivity and"
+  },
+  {
+   "start": 9.48,
+   "end": 14.76,
+   "text": "certainly over the last year a lot of that research has focused on AI's impact"
+  },
+  {
+   "start": 14.76,
+   "end": 19.74,
+   "text": "on the developer experience and basic aspects of productivity within an"
+  },
+  {
+   "start": 19.74,
+   "end": 24.96,
+   "text": "organization. So we produce these quarterly reports, our state of AI and AI"
+  },
+  {
+   "start": 24.96,
+   "end": 29.12,
+   "text": "impact reports, which looks at really a lot of raw data that we're able to get"
+  },
+  {
+   "start": 29.12,
+   "end": 33.92,
+   "text": "from our platform. Our platform is a research-backed platform built from the"
+  },
+  {
+   "start": 33.92,
+   "end": 37.52,
+   "text": "same folks who worked on Dora metrics and the space framework and the Devex"
+  },
+  {
+   "start": 37.52,
+   "end": 41.42,
+   "text": "framework and really at the end of the day it's a data gathering platform that"
+  },
+  {
+   "start": 41.42,
+   "end": 44.9,
+   "text": "can look at a lot of different trends across an organization with you know how"
+  },
+  {
+   "start": 44.9,
+   "end": 49.08,
+   "text": "are we focusing on developer experience, are we seeing outcomes and improvements"
+  },
+  {
+   "start": 49.08,
+   "end": 53.5,
+   "text": "with developer experience, and certainly are we seeing outcomes with the way that"
+  },
+  {
+   "start": 53.5,
+   "end": 57.62,
+   "text": "we're using AI in our workflows. This session is going to be a little bit"
+  },
+  {
+   "start": 57.62,
+   "end": 62.12,
+   "text": "different than the 345 session I think that's up in the leadership room later"
+  },
+  {
+   "start": 62.12,
+   "end": 66.26,
+   "text": "today which just looks at the raw data from our newest report. It's a little bit"
+  },
+  {
+   "start": 66.26,
+   "end": 70.1,
+   "text": "of a preview. This is looking at more like organizational trends and how our"
+  },
+  {
+   "start": 70.1,
+   "end": 74.64,
+   "text": "workflows changing and things like that based on the data that we're seeing. So"
+  },
+  {
+   "start": 74.64,
+   "end": 77.22,
+   "text": "first things first let's kind of look at what we're seeing in terms of the"
+  },
+  {
+   "start": 77.22,
+   "end": 81.22,
+   "text": "velocity impact. Now if anybody's familiar with looking at various"
+  },
+  {
+   "start": 81.22,
+   "end": 85.04,
+   "text": "velocity metrics like PR throughput and deployment frequency like hopefully you"
+  },
+  {
+   "start": 85.04,
+   "end": 88.82,
+   "text": "understand the caveat that these metrics are not perfect. They are proxy metrics"
+  },
+  {
+   "start": 88.82,
+   "end": 92.84,
+   "text": "for understanding the way that work flows through an organization. They're not"
+  },
+  {
+   "start": 92.84,
+   "end": 95.96,
+   "text": "fully representative of the value generation. We're going to look at some"
+  },
+  {
+   "start": 95.96,
+   "end": 100.22,
+   "text": "metrics that are closer to that as well but let's just try to understand what"
+  },
+  {
+   "start": 100.22,
+   "end": 103.7,
+   "text": "this technology is doing in terms of just the raw velocity metrics in the"
+  },
+  {
+   "start": 103.7,
+   "end": 107.78,
+   "text": "organization. So here's our Dora metric for deployment frequency. Who's"
+  },
+  {
+   "start": 107.78,
+   "end": 113.9,
+   "text": "familiar with Dora metrics? All right most of you great. So this is one of the you know"
+  },
+  {
+   "start": 113.9,
+   "end": 118.24,
+   "text": "four key metrics that tries to understand directionally you know the speed of"
+  },
+  {
+   "start": 118.24,
+   "end": 122.84,
+   "text": "shipping work within an environment and we're seeing it steadily increase. It's"
+  },
+  {
+   "start": 122.84,
+   "end": 128.0,
+   "text": "tapering off a little bit. I think there's reasons for that. Some of the surge"
+  },
+  {
+   "start": 128.0,
+   "end": 133.52,
+   "text": "that we saw early on was due to people shipping you know PRs more frequently and"
+  },
+  {
+   "start": 133.52,
+   "end": 139.7,
+   "text": "things like that. So we're seeing increases in this. This is one small part of"
+  },
+  {
+   "start": 139.7,
+   "end": 144.86,
+   "text": "the SDLC PDLC right. This is like the creation of the PR to actually trying to"
+  },
+  {
+   "start": 144.86,
+   "end": 148.52,
+   "text": "deploy this into production. It doesn't tell us about revert rates. It doesn't"
+  },
+  {
+   "start": 148.52,
+   "end": 152.66,
+   "text": "tell us about defect ratios. It doesn't tell us about change failure rate. It just"
+  },
+  {
+   "start": 152.66,
+   "end": 156.74,
+   "text": "tells us about how much stuff are we now kind of pushing out into production. But"
+  },
+  {
+   "start": 156.74,
+   "end": 162.02,
+   "text": "you know the data is showing us that this number is steadily increasing. Okay the"
+  },
+  {
+   "start": 162.02,
+   "end": 167.96,
+   "text": "trends vary a little bit across regions. We are seeing North America just sort of"
+  },
+  {
+   "start": 167.96,
+   "end": 172.64,
+   "text": "like trending up. We've seen Europe actually pull back a little bit just in"
+  },
+  {
+   "start": 172.64,
+   "end": 176.24,
+   "text": "the last quarter. I think you know there's there's a number of reasons for"
+  },
+  {
+   "start": 176.24,
+   "end": 179.72,
+   "text": "that. I mean obviously the way work is done in these regions are differently. The"
+  },
+  {
+   "start": 179.72,
+   "end": 182.84,
+   "text": "way that we can spend money on this technology and think about token spend is"
+  },
+  {
+   "start": 182.84,
+   "end": 187.76,
+   "text": "different. The regulation is different. But if we just look at the through line in"
+  },
+  {
+   "start": 187.76,
+   "end": 193.22,
+   "text": "general you know we still see improvements in in this one metric of"
+  },
+  {
+   "start": 193.22,
+   "end": 197.9,
+   "text": "deploy frequency even across various regions. We do just see some variance in"
+  },
+  {
+   "start": 197.9,
+   "end": 203.84,
+   "text": "those regions. Here's one that's kind of interesting though. The perceived rate of"
+  },
+  {
+   "start": 203.84,
+   "end": 209.78,
+   "text": "delivery. How much faster do engineers feel in terms of what they're delivering?"
+  },
+  {
+   "start": 209.78,
+   "end": 214.64,
+   "text": "It's gone up a little bit. This number shows an increase of about four and a half"
+  },
+  {
+   "start": 214.64,
+   "end": 220.64,
+   "text": "ish percent. But given that that's a full year and given all the investment and"
+  },
+  {
+   "start": 220.64,
+   "end": 224.34,
+   "text": "cost and new spend on AI. It's interesting that this perceived rate has"
+  },
+  {
+   "start": 224.34,
+   "end": 228.44,
+   "text": "not stayed. It has not kind of crept up a little bit more. Especially when you look"
+  },
+  {
+   "start": 228.44,
+   "end": 233.54,
+   "text": "at some studies like obviously infamous flawed METR study. If you're familiar"
+  },
+  {
+   "start": 233.54,
+   "end": 237.62,
+   "text": "with that study back in February they actually released a follow-up to that"
+  },
+  {
+   "start": 237.62,
+   "end": 240.44,
+   "text": "study saying that some of the signals they gathered were sort of imperfect"
+  },
+  {
+   "start": 240.44,
+   "end": 243.52,
+   "text": "and they needed to rethink some of that. But what was interesting was that in"
+  },
+  {
+   "start": 243.52,
+   "end": 247.88,
+   "text": "these 16 engineers that were part of that study, small study, flawed study, the"
+  },
+  {
+   "start": 247.88,
+   "end": 252.62,
+   "text": "productivity went down by about 19 percent but the perception went up by about 20"
+  },
+  {
+   "start": 252.62,
+   "end": 256.58,
+   "text": "percent. So there was like a 40 percent spread in perception of productivity"
+  },
+  {
+   "start": 256.58,
+   "end": 259.88,
+   "text": "versus actual productivity. But here when we look at this on more of an"
+  },
+  {
+   "start": 259.88,
+   "end": 266.28,
+   "text": "aggregate things interestingly stay sort of flat. All right what about impact on"
+  },
+  {
+   "start": 266.28,
+   "end": 270.38,
+   "text": "quality and and delivery right? So those are just kind of our speed our velocity"
+  },
+  {
+   "start": 270.38,
+   "end": 275.2,
+   "text": "metrics but what is this actually doing to our software quality? The first metric"
+  },
+  {
+   "start": 275.2,
+   "end": 280.78,
+   "text": "we'll look at here is the DORA change failure rate metric and let me prepare you."
+  },
+  {
+   "start": 280.78,
+   "end": 284.8,
+   "text": "Most of you are sitting down. It's very volatile the impact that we've seen on"
+  },
+  {
+   "start": 284.8,
+   "end": 289.84,
+   "text": "quality over this period of time. Each line on this graph represents a single"
+  },
+  {
+   "start": 289.84,
+   "end": 294.34,
+   "text": "company that was part of this particular part of the study and that line shows"
+  },
+  {
+   "start": 294.34,
+   "end": 297.62,
+   "text": "whether you've moved up in terms of your change failure rate or move down in"
+  },
+  {
+   "start": 297.62,
+   "end": 301.48,
+   "text": "terms of your change failure rate. You want to go down. You want to be on the"
+  },
+  {
+   "start": 301.48,
+   "end": 304.96,
+   "text": "bottom side of this graph. But what's interesting is if you look at some of"
+  },
+  {
+   "start": 304.96,
+   "end": 308.16,
+   "text": "these top lines you see people increasing as much as 2 percent which"
+  },
+  {
+   "start": 308.16,
+   "end": 310.98,
+   "text": "doesn't sound like much until you realize that the industry benchmark is"
+  },
+  {
+   "start": 310.98,
+   "end": 315.58,
+   "text": "about 4 percent. So that means shipping potentially 50 percent more defects than"
+  },
+  {
+   "start": 315.58,
+   "end": 318.94,
+   "text": "we were shipping before. So you really just want to understand what side of this"
+  },
+  {
+   "start": 318.94,
+   "end": 323.32,
+   "text": "graph you're on. You want to start measuring this stuff right? This pattern"
+  },
+  {
+   "start": 323.32,
+   "end": 328.96,
+   "text": "exists without AI by the way. This has a lot to do. It's not purely causal with AI. A lot of"
+  },
+  {
+   "start": 328.96,
+   "end": 332.14,
+   "text": "this has to do with like your release pipeline, your automated testing, everything"
+  },
+  {
+   "start": 332.14,
+   "end": 335.68,
+   "text": "that's surrounding the way that you're releasing the code. The pattern remains"
+  },
+  {
+   "start": 335.68,
+   "end": 340.42,
+   "text": "the same. The amplitude has changed as a result of AI. We always see this type of"
+  },
+  {
+   "start": 340.42,
+   "end": 344.78,
+   "text": "shift in volatility but not usually to these extremes. And that's the AI effect"
+  },
+  {
+   "start": 344.78,
+   "end": 349.26,
+   "text": "that we're seeing right there. Here's a really interesting one. These are two"
+  },
+  {
+   "start": 349.26,
+   "end": 355.66,
+   "text": "qualitative quality metrics that normally are sort of in sync with one another. Code"
+  },
+  {
+   "start": 355.66,
+   "end": 359.56,
+   "text": "maintainability, how maintainable the developers perceive the code to be in"
+  },
+  {
+   "start": 359.56,
+   "end": 363.58,
+   "text": "terms of making changes to it, that number has gone up almost 4 percent"
+  },
+  {
+   "start": 363.58,
+   "end": 367.72,
+   "text": "according to our data. By the way we're looking at about 200,000 engineers in this"
+  },
+  {
+   "start": 367.72,
+   "end": 373.44,
+   "text": "study to gather this data. The change confidence though, which"
+  },
+  {
+   "start": 373.44,
+   "end": 377.78,
+   "text": "traditionally we've seen closely associated with code maintainability. Hey"
+  },
+  {
+   "start": 377.78,
+   "end": 382.22,
+   "text": "this code is maintainable, it's modular, it's easy to modify, I feel good about the"
+  },
+  {
+   "start": 382.22,
+   "end": 386.02,
+   "text": "changes that I'm pushing into production. Nope, our change confidence number has"
+  },
+  {
+   "start": 386.02,
+   "end": 390.14,
+   "text": "gone down 6 percent. This is really an interesting tension because it means like"
+  },
+  {
+   "start": 390.14,
+   "end": 393.86,
+   "text": "okay agents and assistants are making it easier for me to understand and modify the"
+  },
+  {
+   "start": 393.86,
+   "end": 399.04,
+   "text": "code that's in front of me, but I trust the outputs less. I'm more afraid now of"
+  },
+  {
+   "start": 399.04,
+   "end": 403.58,
+   "text": "breaking things than I was a year ago. So it's an interesting psychological effect"
+  },
+  {
+   "start": 403.58,
+   "end": 408.4,
+   "text": "that we see here. And a lot of this is because PR size is measurably increasing. This is"
+  },
+  {
+   "start": 408.4,
+   "end": 412.28,
+   "text": "going to be one of the most important metrics that we look at this year. Hasn't quite doubled,"
+  },
+  {
+   "start": 412.28,
+   "end": 416.92,
+   "text": "but look at that trajectory, right? This is over the same period of study about a year,"
+  },
+  {
+   "start": 416.92,
+   "end": 426.22,
+   "text": "and we've seen PRs go from around 44 lines on average per PR up to 72. Now there's a number"
+  },
+  {
+   "start": 426.22,
+   "end": 430.9,
+   "text": "of reasons for this. It's not just, you know, the likelihood that the way that these models work"
+  },
+  {
+   "start": 430.9,
+   "end": 435.28,
+   "text": "is that they're being trained to output relatively mediocre code. I've been writing code"
+  },
+  {
+   "start": 435.28,
+   "end": 439.36,
+   "text": "professionally since the late 90s. I remember when it was a great mark of a developer to be able to"
+  },
+  {
+   "start": 439.36,
+   "end": 443.48,
+   "text": "implement the same use case with as little code as possible. Now it's like, well, no, let's get the"
+  },
+  {
+   "start": 443.48,
+   "end": 446.98,
+   "text": "thing out. And, you know, the code that's being generated is going to be essentially mediocre"
+  },
+  {
+   "start": 446.98,
+   "end": 451.7,
+   "text": "because it's law of averages. But on top of that too, think about if you've got a build pipeline that"
+  },
+  {
+   "start": 451.7,
+   "end": 457.42,
+   "text": "takes 45 minutes or an hour to complete, and now I've got AI generating functions for me instantly."
+  },
+  {
+   "start": 457.68,
+   "end": 463.4,
+   "text": "Am I going to push four different PRs with four different functions and wait 45 minutes or an hour or"
+  },
+  {
+   "start": 463.4,
+   "end": 467.52,
+   "text": "whatever that is for build? Or I'm just going to cram all that code into a single PR, right?"
+  },
+  {
+   "start": 467.52,
+   "end": 472.5,
+   "text": "So there's multiple reasons for this, but it really bears mentioning that like every extra line of code"
+  },
+  {
+   "start": 472.5,
+   "end": 476.92,
+   "text": "is a potential bug, a potential vulnerability. It's more to review. It makes the code less portable."
+  },
+  {
+   "start": 477.14,
+   "end": 482.0,
+   "text": "So we need to pay attention to this metric as well. Because we're also seeing this associated with"
+  },
+  {
+   "start": 482.0,
+   "end": 487.28,
+   "text": "perception of incremental delivery. I get to work on small incremental changes, and this is actually"
+  },
+  {
+   "start": 487.28,
+   "end": 492.36,
+   "text": "one of the lowest qualitative developer experience drivers that we've seen impacted over the last year."
+  },
+  {
+   "start": 492.36,
+   "end": 498.72,
+   "text": "This number and this sentiment has gone down 10%. And incremental delivery is awful, is as we've learned,"
+  },
+  {
+   "start": 499.08,
+   "end": 504.94,
+   "text": "also very important for the way that we try to deliver in a way that's easy to roll back,"
+  },
+  {
+   "start": 505.38,
+   "end": 508.3,
+   "text": "and where we can understand and review the changes that are being pushed through."
+  },
+  {
+   "start": 509.7,
+   "end": 516.28,
+   "text": "Okay. What about demographic differences? What is different about AI impacts across like, you know,"
+  },
+  {
+   "start": 516.36,
+   "end": 520.02,
+   "text": "junior devs and stuff like that? Junior engineers are using AI the most."
+  },
+  {
+   "start": 520.02,
+   "end": 525.84,
+   "text": "This really should surprise nobody. Anytime we have sort of a new leap, again, writing code"
+  },
+  {
+   "start": 525.84,
+   "end": 531.7,
+   "text": "professionally since the late 90s, I'm a bit of an OG. I'm on this journey too. But there's less to"
+  },
+  {
+   "start": 531.7,
+   "end": 537.68,
+   "text": "unlearn when you're coming into the industry, right? In many, many cases, you've already been working with"
+  },
+  {
+   "start": 537.68,
+   "end": 542.84,
+   "text": "this kind of stuff, like right out of school. And so you're more likely to implement it when you"
+  },
+  {
+   "start": 542.84,
+   "end": 549.12,
+   "text": "actually start working. Now, we've seen some other trends there too. We have interesting ways of"
+  },
+  {
+   "start": 549.12,
+   "end": 554.48,
+   "text": "looking per use case at efficiency, which I'll get into in the second talk later today. And one of those"
+  },
+  {
+   "start": 554.48,
+   "end": 559.92,
+   "text": "is looking at agent experience. Like literally, we're asking agents about their experience working"
+  },
+  {
+   "start": 559.92,
+   "end": 565.26,
+   "text": "with humans. We're trying to figure out what use cases are they working on and how many tokens did"
+  },
+  {
+   "start": 565.26,
+   "end": 570.76,
+   "text": "they spend. And definitely, we also see a trend where the more junior developers for the same use case"
+  },
+  {
+   "start": 570.76,
+   "end": 574.94,
+   "text": "will spend more tokens than a more senior developer on the same use case. And that's just a learning"
+  },
+  {
+   "start": 574.94,
+   "end": 579.22,
+   "text": "curve, right? Again, that should surprise nobody. But in terms of who's using it the most, we do see"
+  },
+  {
+   "start": 579.22,
+   "end": 585.16,
+   "text": "juniors using it the most. However, despite that additional use, we see staff plus some more senior"
+  },
+  {
+   "start": 585.16,
+   "end": 590.94,
+   "text": "engineers saving about the same amount of time, right? And burning less tokens. I want to make sure"
+  },
+  {
+   "start": 590.94,
+   "end": 595.66,
+   "text": "that that's kind of clear too. So in terms of like raw time savings and the aggregate output of this,"
+  },
+  {
+   "start": 595.66,
+   "end": 600.26,
+   "text": "it's pretty flat between junior engineers who are using the tech more and staff engineers who have"
+  },
+  {
+   "start": 600.26,
+   "end": 604.38,
+   "text": "an easier time spotting hallucinations, understanding the architecture around the"
+  },
+  {
+   "start": 604.38,
+   "end": 609.94,
+   "text": "changes they're making and things like that. Smaller companies lead in time savings. Sure,"
+  },
+  {
+   "start": 610.34,
+   "end": 614.56,
+   "text": "you know, the release pipelines are going to be less complicated. You know, there's less overall"
+  },
+  {
+   "start": 614.56,
+   "end": 620.92,
+   "text": "complexity in the organization that's going to lead to more time savings for a company that already has"
+  },
+  {
+   "start": 620.92,
+   "end": 628.36,
+   "text": "less friction and has a little bit more agility to it than a larger company. What about measurement?"
+  },
+  {
+   "start": 628.62,
+   "end": 633.62,
+   "text": "How should we even be thinking about measuring this stuff? I mean, it bears mentioning that measuring"
+  },
+  {
+   "start": 633.62,
+   "end": 638.92,
+   "text": "developer productivity and measuring developer experience was a challenge before AI. And we never"
+  },
+  {
+   "start": 638.92,
+   "end": 644.84,
+   "text": "completed that conversation before kind of throwing accelerant on this, right? So this is still a"
+  },
+  {
+   "start": 644.84,
+   "end": 649.16,
+   "text": "difficult thing. And I'd argue even more difficult to do now, because it's confounded by several"
+  },
+  {
+   "start": 649.16,
+   "end": 655.1,
+   "text": "different aspects of AI. But we're all going to have to answer this question this year, right? Spent"
+  },
+  {
+   "start": 655.1,
+   "end": 661.48,
+   "text": "10 million or way more if you come to my talk later today on tokens. Where's our 10x productivity?"
+  },
+  {
+   "start": 662.66,
+   "end": 667.9,
+   "text": "When we're thinking about this stuff, it's important to bear in mind that we don't throw away what we're"
+  },
+  {
+   "start": 667.9,
+   "end": 672.04,
+   "text": "measuring, right? Our foundational developer experience and developer productivity metrics are"
+  },
+  {
+   "start": 672.04,
+   "end": 678.64,
+   "text": "still what matter the most, right? We want to understand how AI is impacting these trusted metrics that"
+  },
+  {
+   "start": 678.64,
+   "end": 684.52,
+   "text": "we've already been looking at. Like we want to maybe look at cohorts of users. We maybe want to take"
+  },
+  {
+   "start": 684.52,
+   "end": 690.1,
+   "text": "data from the API telemetry and things that come out of the tools and use that to understand who's using"
+  },
+  {
+   "start": 690.1,
+   "end": 694.78,
+   "text": "what and where. But we would only want to use those cohorts and look at them comparatively across our"
+  },
+  {
+   "start": 694.78,
+   "end": 699.26,
+   "text": "foundational metrics. What is this actually doing to quality? What is this actually doing to speed?"
+  },
+  {
+   "start": 699.58,
+   "end": 704.98,
+   "text": "What is this doing to impact to the organization and value generation? And so this is where our AI"
+  },
+  {
+   "start": 704.98,
+   "end": 709.36,
+   "text": "measurement framework comes from. I won't spend too much time on this. We have a big white paper"
+  },
+  {
+   "start": 709.36,
+   "end": 714.8,
+   "text": "available. My colleague Anton, who's standing in the back of the room in the white shirt, will be able"
+  },
+  {
+   "start": 714.8,
+   "end": 719.36,
+   "text": "to hand out some hard copies of reports that we have after the talk that go into the way that we derive"
+  },
+  {
+   "start": 719.36,
+   "end": 724.96,
+   "text": "this methodology and how to use it and think about it. It focuses on three key dimensions of measurement,"
+  },
+  {
+   "start": 725.08,
+   "end": 729.28,
+   "text": "so looking at utilization, our daily active users, weekly active users, that sort of thing."
+  },
+  {
+   "start": 729.28,
+   "end": 735.68,
+   "text": "It looks at impact. So which metric should we be looking for moving the needle based on utilization?"
+  },
+  {
+   "start": 736.22,
+   "end": 742.08,
+   "text": "As our utilization goes up, what do we hope to see in terms of impact to the business? And then cost."
+  },
+  {
+   "start": 742.6,
+   "end": 746.7,
+   "text": "It's a fair joke that we're 15 years after the last major hype cycle and we're still trying to figure"
+  },
+  {
+   "start": 746.7,
+   "end": 750.42,
+   "text": "out cloud costs, but this stuff is getting pretty expensive. We're going to have to measure it."
+  },
+  {
+   "start": 750.98,
+   "end": 754.96,
+   "text": "So you can think about this as a bit of a maturity curve as well. Most people start with utilization on"
+  },
+  {
+   "start": 754.96,
+   "end": 758.96,
+   "text": "the left, just figuring out what's happening in the organization with the tech, who's using it,"
+  },
+  {
+   "start": 759.28,
+   "end": 764.2,
+   "text": "using how often and for what use cases, and then how do we then cross-reference those to the impact"
+  },
+  {
+   "start": 764.2,
+   "end": 768.66,
+   "text": "metrics, the value generation, what we really want to understand to know whether these investments"
+  },
+  {
+   "start": 768.66,
+   "end": 773.78,
+   "text": "are actually working, which is what we really want to figure out. This is just an example of how we"
+  },
+  {
+   "start": 773.78,
+   "end": 778.7,
+   "text": "might correlate such a thing. So you could look at two separate cohorts of users and you could compare"
+  },
+  {
+   "start": 778.7,
+   "end": 786.12,
+   "text": "them across metrics like PR cycle time or PR size or pushback in review. So lots of the way to think"
+  },
+  {
+   "start": 786.12,
+   "end": 791.66,
+   "text": "about this again is to right now separate cohorts and then look at how that plays out across these"
+  },
+  {
+   "start": 791.66,
+   "end": 797.3,
+   "text": "foundational productivity metrics that we've learned to trust. We also need to be able to understand our"
+  },
+  {
+   "start": 797.3,
+   "end": 803.48,
+   "text": "platform's readiness. I like to say that in 2024 we gave everybody a coding assistant. In 2025 we started"
+  },
+  {
+   "start": 803.48,
+   "end": 807.28,
+   "text": "building agents. Now we're realizing that our infrastructure wasn't ready for any of this."
+  },
+  {
+   "start": 807.7,
+   "end": 811.88,
+   "text": "A lot of the vendors that are here are selling solutions that help you with this problem."
+  },
+  {
+   "start": 811.88,
+   "end": 816.24,
+   "text": "I think if you can measure your platform's AI readiness you're going to have a much better"
+  },
+  {
+   "start": 816.24,
+   "end": 821.4,
+   "text": "handle on how efficient you're going to be spending tokens and providing context to these agents. So"
+  },
+  {
+   "start": 821.4,
+   "end": 825.12,
+   "text": "these are things like clear and accurate well-structured documentation, data structures with"
+  },
+  {
+   "start": 825.12,
+   "end": 831.52,
+   "text": "straightforward relations, manageable modular code, reliable local CI, and non-flaky test suites. If by"
+  },
+  {
+   "start": 831.52,
+   "end": 836.08,
+   "text": "the way any of this sounds familiar to you it's because we used to just call this good developer"
+  },
+  {
+   "start": 836.08,
+   "end": 841.22,
+   "text": "experience. But it turns out that what's good for humans is also good for agents. So we may finally"
+  },
+  {
+   "start": 841.22,
+   "end": 845.5,
+   "text": "paradoxically be making those investments that we should have been making over the last couple of"
+  },
+  {
+   "start": 845.5,
+   "end": 850.92,
+   "text": "decades. We also want to understand the effectiveness of the way that we work with AI. And this is one"
+  },
+  {
+   "start": 850.92,
+   "end": 855.2,
+   "text": "way of doing that. What you're actually seeing here is feedback, qualitative feedback coming back from"
+  },
+  {
+   "start": 855.2,
+   "end": 861.44,
+   "text": "agents telling us where they ran into issues with steering with the human, the context that was"
+  },
+  {
+   "start": 861.44,
+   "end": 866.06,
+   "text": "provided for them, the feedback cycles that they had to go through. So we're actually getting that data"
+  },
+  {
+   "start": 866.06,
+   "end": 870.88,
+   "text": "from the agents to try to figure out how effective our teams are at working with AI. And we can break"
+  },
+  {
+   "start": 870.88,
+   "end": 876.62,
+   "text": "this down into use cases which is very important too. We want to understand which use cases are"
+  },
+  {
+   "start": 876.62,
+   "end": 881.38,
+   "text": "giving us the most efficient token spend and again moving the needle for value creation and"
+  },
+  {
+   "start": 881.38,
+   "end": 887.32,
+   "text": "productivity within the business. Finally, the fifth trend, integrating across the SDLC and PDLC."
+  },
+  {
+   "start": 887.32,
+   "end": 891.34,
+   "text": "Why would we want to do this? Because code generation was never the bottleneck in the first place."
+  },
+  {
+   "start": 891.34,
+   "end": 897.08,
+   "text": "Right? Even if engineers are getting like 100% accurate instant code coming from the models, which they are"
+  },
+  {
+   "start": 897.08,
+   "end": 903.34,
+   "text": "not, you would still only be attacking anywhere from maybe 14 to 16% of the overall value stream. So we need"
+  },
+  {
+   "start": 903.34,
+   "end": 909.08,
+   "text": "to think beyond that. Especially because right now the productivity gains that we are actually seeing are"
+  },
+  {
+   "start": 909.08,
+   "end": 916.82,
+   "text": "more modest than expected. Despite additional PR throughput increases, our median increase in the study that we did from"
+  },
+  {
+   "start": 916.82,
+   "end": 925.82,
+   "text": "November to 2024 to February this year only found about a median 7.7% increase in this velocity metric, a 13% average, but even our top"
+  },
+  {
+   "start": 925.82,
+   "end": 940.82,
+   "text": "performers were in the 70% range. Nobody hit 2x, nobody hit 5x, nobody hit 10x. And that's because our time savings that come out of AI are still being outweighed by other non AI factors within our organization."
+  },
+  {
+   "start": 940.82,
+   "end": 955.8,
+   "text": "Right? We might be saving a lot of time with AI and that's great, but if we're still eclipsing those time savings because of meeting heavy days and context switching and other sources of interruption, the cumulative effects of the dev environment and friction in the way that we create software around the code, then we're not going to be able to"
+  },
+  {
+   "start": 955.8,
+   "end": 985.78,
+   "text": "to be able to do that. We're not attacking the bottleneck. And as Ellie Goldratt from the theory of constraints and the goal and inspiration for the Phoenix project would tell us that an hour saved on something that isn't the bottleneck is worthless. And so we need to find the bottleneck and fix the bottleneck. And that's what a lot of organizations are doing. Morgan Stanley has been really public about their creation of the DevGen AI agent, which is an agent for interpreting legacy code like mainframe natural and COBOL and hate to admit Perl. I've written a lot of Perl in my career, but it's legacy now. The agent actually"
+  },
+  {
+   "start": 985.78,
+   "end": 1015.76,
+   "text": "creates PRDs to hand to engineers to get rid of that reverse engineering step. And it's saving Morgan Stanley about 300,000 hours a year right now. Zapier is one of my favorite stories in AI right now. They have a whole agent ecosystem that they're using to deal with a lot of administrative tasks and overhead, like daily standups and things like that. They've reduced their standups by using agent summaries and things like that in this ecosystem that they've built to two times a week as opposed to five times a week. They're successfully onboarding engineers with"
+  },
+  {
+   "start": 1015.76,
+   "end": 1045.76,
+   "text": "within about a two week period, which is really fast. Our industry benchmark for that is over a month usually. But my favorite part about this story is that they're seeing about a 15% additional value creation per engineer. So they are hiring more than they have in the history of their entire company because they realize the truth here that they're getting more capacity per single engineer, they're getting a better return on investment per single engineer, and hiring more engineers will improve their competitive edge. This is the right attitude."
+  },
+  {
+   "start": 1045.76,
+   "end": 1072.76,
+   "text": "Increased innovative capacity story. This is not a headcount replacement story. Fair. They're automating about 3,000 of their code reviews a week triggered off of a pull request. And they look at superficial stuff. They still need humans in the loop. But the initial superficial review that comes from the agent is all part of the system of record. It stays in the PR comments. And so the next engineer to actually perform the review will have an idea of what the agents already looked at. So it can save some time."
+  },
+  {
+   "start": 1072.76,
+   "end": 1098.76,
+   "text": "Finally, Spotify, if anybody remembers the Spotify model from DevOps, they were sort of the North Star for DevOps, they built an agent for SREs that will gather remediation steps from runbooks and information and context about the incident, and put all that together into SRE communication channels, so that when an incident occurs, the SRE has immediate context and doesn't have to go through multiple minutes of discovery to figure out how to solve the issue."
+  },
+  {
+   "start": 1098.76,
+   "end": 1103.76,
+   "text": "So if you want to dive deeper into this data, our Q2 report is coming out in just a few weeks."
+  },
+  {
+   "start": 1103.76,
+   "end": 1113.76,
+   "text": "But the Q1 report still has a lot of tidbits from this session in it. And if you subscribe to our newsletter or you come back to the website, by mid-ish end of July, we'll have our Q2 report."
+  },
+  {
+   "start": 1113.76,
+   "end": 1119.76,
+   "text": "And if you want to see a preview of that report, that's the talk that I'm giving later this afternoon. Thanks, everybody, for your time. I appreciate it."
+  },
+  {
+   "start": 1119.76,
+   "end": 1120.76,
+   "text": "I appreciate it."
+  },
+  {
+   "start": 1120.76,
+   "end": 1121.18,
+   "text": "I appreciate it."
+  }
+ ],
+ "frames": [
+  {
+   "t": 0.0,
+   "path": "frames/1791429022-68853/frame_0001.jpg",
+   "reason": "first-frame",
+   "segment_index": 0,
+   "spoken_text": "I'm Justin Riach. I'm the deputy CTO at DX. I get to do a lot of our research"
+  },
+  {
+   "t": 39.033,
+   "path": "frames/1791429022-68853/cue_0015.jpg",
+   "reason": "transcript-cue",
+   "segment_index": 8,
+   "spoken_text": "framework and really at the end of the day it's a data gathering platform that"
+  },
+  {
+   "t": 50.6,
+   "path": "frames/1791429022-68853/frame_0002.jpg",
+   "reason": "scene-change",
+   "segment_index": 11,
+   "spoken_text": "with developer experience, and certainly are we seeing outcomes with the way that"
+  },
+  {
+   "t": 94.367,
+   "path": "frames/1791429022-68853/cue_0016.jpg",
+   "reason": "transcript-cue",
+   "segment_index": 22,
+   "spoken_text": "fully representative of the value generation. We're going to look at some"
+  },
+  {
+   "t": 105.1,
+   "path": "frames/1791429022-68853/frame_0003.jpg",
+   "reason": "scene-change",
+   "segment_index": 25,
+   "spoken_text": "organization. So here's our Dora metric for deployment frequency. Who's"
+  },
+  {
+   "t": 181.233,
+   "path": "frames/1791429022-68853/cue_0017.jpg",
+   "reason": "transcript-cue",
+   "segment_index": 41,
+   "spoken_text": "way that we can spend money on this technology and think about token spend is"
+  },
+  {
+   "t": 254.133,
+   "path": "frames/1791429022-68853/cue_0018.jpg",
+   "reason": "transcript-cue",
+   "segment_index": 57,
+   "spoken_text": "percent. So there was like a 40 percent spread in perception of productivity"
+  },
+  {
+   "t": 279.233,
+   "path": "frames/1791429022-68853/frame_0004.jpg",
+   "reason": "scene-change",
+   "segment_index": 62,
+   "spoken_text": "we'll look at here is the DORA change failure rate metric and let me prepare you."
+  },
+  {
+   "t": 299.133,
+   "path": "frames/1791429022-68853/cue_0019.jpg",
+   "reason": "transcript-cue",
+   "segment_index": 67,
+   "spoken_text": "terms of your change failure rate. You want to go down. You want to be on the"
+  },
+  {
+   "t": 428.0,
+   "path": "frames/1791429022-68853/frame_0005.jpg",
+   "reason": "scene-change",
+   "segment_index": 96,
+   "spoken_text": "of reasons for this. It's not just, you know, the likelihood that the way that these models work"
+  },
+  {
+   "t": 535.2,
+   "path": "frames/1791429022-68853/frame_0006.jpg",
+   "reason": "scene-change",
+   "segment_index": 117,
+   "spoken_text": "unlearn when you're coming into the industry, right? In many, many cases, you've already been working with"
+  },
+  {
+   "t": 650.4,
+   "path": "frames/1791429022-68853/frame_0007.jpg",
+   "reason": "scene-change",
+   "segment_index": 139,
+   "spoken_text": "different aspects of AI. But we're all going to have to answer this question this year, right? Spent"
+  },
+  {
+   "t": 765.6,
+   "path": "frames/1791429022-68853/frame_0008.jpg",
+   "reason": "scene-change",
+   "segment_index": 161,
+   "spoken_text": "metrics, the value generation, what we really want to understand to know whether these investments"
+  },
+  {
+   "t": 832.9,
+   "path": "frames/1791429022-68853/frame_0009.jpg",
+   "reason": "scene-change",
+   "segment_index": 174,
+   "spoken_text": "the way any of this sounds familiar to you it's because we used to just call this good developer"
+  },
+  {
+   "t": 905.4,
+   "path": "frames/1791429022-68853/frame_0010.jpg",
+   "reason": "scene-change",
+   "segment_index": 188,
+   "spoken_text": "to think beyond that. Especially because right now the productivity gains that we are actually seeing are"
+  },
+  {
+   "t": 965.5,
+   "path": "frames/1791429022-68853/frame_0011.jpg",
+   "reason": "scene-change",
+   "segment_index": 193,
+   "spoken_text": "to be able to do that. We're not attacking the bottleneck. And as Ellie Goldratt from the theory of constraints and the goal and inspiration for the Phoenix project would tell us that an hour saved on something that isn't the bottleneck is worthless. And so we need to find the bottleneck and fix the bottleneck. And that's what a lot of organizations are doing. Morgan Stanley has been really public about their creation of the DevGen AI agent, which is an agent for interpreting legacy code like mainframe natural and COBOL and hate to admit Perl. I've written a lot of Perl in my career, but it's legacy now. The agent actually"
+  },
+  {
+   "t": 1013.8,
+   "path": "frames/1791429022-68853/frame_0012.jpg",
+   "reason": "scene-change",
+   "segment_index": 194,
+   "spoken_text": "creates PRDs to hand to engineers to get rid of that reverse engineering step. And it's saving Morgan Stanley about 300,000 hours a year right now. Zapier is one of my favorite stories in AI right now. They have a whole agent ecosystem that they're using to deal with a lot of administrative tasks and overhead, like daily standups and things like that. They've reduced their standups by using agent summaries and things like that in this ecosystem that they've built to two times a week as opposed to five times a week. They're successfully onboarding engineers with"
+  },
+  {
+   "t": 1047.267,
+   "path": "frames/1791429022-68853/cue_0020.jpg",
+   "reason": "transcript-cue",
+   "segment_index": 196,
+   "spoken_text": "Increased innovative capacity story. This is not a headcount replacement story. Fair. They're automating about 3,000 of their code reviews a week triggered off of a pull request. And they look at superficial stuff. They still need humans in the loop. But the initial superficial review that comes from the agent is all part of the system of record. It stays in the PR comments. And so the next engineer to actually perform the review will have an idea of what the agents already looked at. So it can save some time."
+  },
+  {
+   "t": 1074.6,
+   "path": "frames/1791429022-68853/frame_0013.jpg",
+   "reason": "scene-change",
+   "segment_index": 197,
+   "spoken_text": "Finally, Spotify, if anybody remembers the Spotify model from DevOps, they were sort of the North Star for DevOps, they built an agent for SREs that will gather remediation steps from runbooks and information and context about the incident, and put all that together into SRE communication channels, so that when an incident occurs, the SRE has immediate context and doesn't have to go through multiple minutes of discovery to figure out how to solve the issue."
+  },
+  {
+   "t": 1120.233,
+   "path": "frames/1791429022-68853/frame_0014.jpg",
+   "reason": "scene-change",
+   "segment_index": 201,
+   "spoken_text": "I appreciate it."
+  }
+ ],
+ "frames_meta": {
+  "tier": "auto",
+  "engine": "keyframe",
+  "candidates": 453,
+  "deduped": 112,
+  "distinct_ratio": 0.2472,
+  "selected": 20,
+  "cue_selected": 6,
+  "cap": 20,
+  "resolution": 768,
+  "fallback": false
+ },
+ "frames_error": null,
+ "warnings": [
+  "글자 없는 segment 3건 제외",
+  "앞 segment와 겹친 segment 5건 시작 시각 보정"
+ ],
+ "work_dir": "tests/fixtures/video/xRZHLI5SPWo",
+ "env": {
+  "device": "Device(gpu, 0)",
+  "whisper_model": "large-v3-turbo",
+  "versions": {
+   "python": "3.12.14",
+   "platform": "Darwin-arm64",
+   "mlx-whisper": "0.4.3",
+   "mlx": "0.32.3",
+   "yt-dlp": "2026.8.19",
+   "ffmpeg": "8.1.2"
+  },
+  "timings_sec": {
+   "download": 0.16,
+   "frames_pass1": 30.56,
+   "transcribe": 140.61,
+   "frames_post": 4.65,
+   "total": 145.6
+  }
+ },
+ "truncated_segments": false
+}

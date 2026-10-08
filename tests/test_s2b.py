@@ -96,8 +96,11 @@ def test_enforce_clips_long_quote_as_owned_without_attention():
     assert ("numbers", "자른 인용 밖으로 나간 수치 삭제", True) in rules  # 잘려 나간 4,096
     assert ("numbers", "인용에 없는 수치 삭제", False) in rules  # 지어낸 99%는 품질 정리
     assert out.attention is True  # 99% 품질 정리 때문(자르기만으로는 켜지 않음)
-    graded = ItemCardV1.graded_output(out.raw_dump(), out.enforced)
-    assert graded["quotes"][0]["text"] == q and [x["value"] for x in graded["numbers"]] == ["14 days", "99%"]
+    # 통과 판정 보기: 칸 단위 코드 소유는 attention뿐. 인용은 원래 출력(본문 연속 문장이라 코드 채점 통과), 지어낸 99%는 실패
+    basis = graders.basis_output("item_card", out.raw_dump(), out.model_dump())
+    assert basis["quotes"][0]["text"] == LONG and basis["attention"] is True
+    failed = graders.code_grade("item_card", item.model_dump(), basis, None, {})["failed"]
+    assert len(failed) == 1 and "99%" in failed[0]
 
 
 def test_clip_alone_keeps_attention_off():

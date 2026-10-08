@@ -16,6 +16,7 @@ from typing import Any
 import httpx
 from pydantic import BaseModel, ValidationError
 
+from . import images
 from .budget import Budget
 from .cache import Cache, cache_key
 from .config import ModelsConfig, get_secret
@@ -231,6 +232,8 @@ class LLMClient:
         base_url = self.models.base_url(alias)
         if self.budget is not None:
             estimate = self.budget.estimate(spec, base_url, body)
+            if n_images := images.count(body):  # 자리표시 문자열 대신 장당 추정 토큰으로
+                estimate += n_images * images.IMAGE_TOKENS_EST * self.budget.prices.price(spec, base_url)[0]
             self.budget.check(estimate, f"{alias}({spec.id}) max_tokens={body.get('max_tokens')}")
         api_key = self.secret(spec.api_key_env)
         if not api_key and self.is_openrouter(alias):
@@ -238,7 +241,7 @@ class LLMClient:
 
         started = time.monotonic()
         self.network_calls += 1
-        response = self.transport(body, base_url, api_key or "ollama")
+        response = self.transport(images.materialize(body), base_url, api_key or "ollama")
         latency = int((time.monotonic() - started) * 1000)
         if response.get("error") or not response.get("choices"):
             # 실패 응답에도 청구액이 있으면 예산에 더한다(키 usage로도 나중에 맞춰짐)

@@ -1,0 +1,1958 @@
+{
+ "video_id": "5wDzydCqkV8",
+ "mode": "whisper",
+ "title": "[한영자막] 앤트로픽 CEO 다리오 아모데이 인터뷰",
+ "duration_sec": 1427,
+ "span": {
+  "start": 0.0,
+  "end": 1426.921
+ },
+ "language": "en",
+ "transcript_source": "whisper",
+ "transcript_quality": "ok",
+ "quality_signals": {
+  "segments": 378,
+  "chars": 17923,
+  "repeat_ratio": 0.0159,
+  "unique_tokens": 810,
+  "window_uniform_ratio": 0.0,
+  "silence_ratio": 0.0135,
+  "no_speech_ratio": 0.0,
+  "mean_avg_logprob": -0.1389,
+  "mean_compression_ratio": 1.6511,
+  "language_votes": [
+   {
+    "at": 285.4,
+    "lang": "en",
+    "prob": 0.9999
+   },
+   {
+    "at": 713.5,
+    "lang": "en",
+    "prob": 0.9998
+   },
+   {
+    "at": 1141.5,
+    "lang": "en",
+    "prob": 0.9998
+   }
+  ]
+ },
+ "segments": [
+  {
+   "start": 0.48,
+   "end": 3.4,
+   "text": "Dario Amadei, you're the CEO of Anthropic."
+  },
+  {
+   "start": 3.4,
+   "end": 4.6,
+   "text": "Thank you for doing this today."
+  },
+  {
+   "start": 4.6,
+   "end": 5.88,
+   "text": "Thank you for having me."
+  },
+  {
+   "start": 5.88,
+   "end": 10.2,
+   "text": "Okay, so we're here to talk about the concern that AI really could kill us all in the not"
+  },
+  {
+   "start": 10.2,
+   "end": 12.32,
+   "text": "so distant future."
+  },
+  {
+   "start": 12.32,
+   "end": 14.94,
+   "text": "What's the risk of this actually happening?"
+  },
+  {
+   "start": 14.94,
+   "end": 21.32,
+   "text": "So just to back up a little bit, we believed since we started Anthropic, I've believed"
+  },
+  {
+   "start": 21.32,
+   "end": 26.6,
+   "text": "since the 12 years that I've been working in this field, that this is a powerful technology."
+  },
+  {
+   "start": 26.6,
+   "end": 31.42,
+   "text": "And therefore, it's a technology with serious risks and serious benefits."
+  },
+  {
+   "start": 31.42,
+   "end": 37.6,
+   "text": "I've always believed that the benefits outweigh the risks, and even more to the point that"
+  },
+  {
+   "start": 37.6,
+   "end": 44.06,
+   "text": "we can reduce the risks to be very low if we build the technology in the right way."
+  },
+  {
+   "start": 44.06,
+   "end": 50.48,
+   "text": "Looking at some of the benefits, I really believe that this technology could cure diseases that"
+  },
+  {
+   "start": 50.48,
+   "end": 54.28,
+   "text": "have plagued humanity for millennia."
+  },
+  {
+   "start": 54.28,
+   "end": 60.04,
+   "text": "Just last week, we did some work on, you know, doing better protein binding, which is one"
+  },
+  {
+   "start": 60.04,
+   "end": 63.36,
+   "text": "of the early steps in drug development, using our models."
+  },
+  {
+   "start": 63.36,
+   "end": 65.34,
+   "text": "We're starting to work on them."
+  },
+  {
+   "start": 65.34,
+   "end": 71.86,
+   "text": "We'll have things to say in the coming months to make basic scientific discoveries in biology."
+  },
+  {
+   "start": 71.86,
+   "end": 77.16,
+   "text": "But when something's very powerful, right, what we're building is essentially intelligence."
+  },
+  {
+   "start": 77.16,
+   "end": 83.24,
+   "text": "When something's very powerful, then, of course, it can be used well, and it can also be used"
+  },
+  {
+   "start": 83.24,
+   "end": 84.88,
+   "text": "for ill."
+  },
+  {
+   "start": 84.88,
+   "end": 91.94,
+   "text": "And so I am worried about what we've seen with the OpenAI Hugging Face Incident, with models,"
+  },
+  {
+   "start": 91.94,
+   "end": 94.84,
+   "text": "you know, taking actions they weren't authorized to take."
+  },
+  {
+   "start": 94.84,
+   "end": 96.56,
+   "text": "And I'm worried about that escalating."
+  },
+  {
+   "start": 96.56,
+   "end": 99.32,
+   "text": "I'm worried about misuse of AI models."
+  },
+  {
+   "start": 99.32,
+   "end": 107.44,
+   "text": "Just two days ago, we put out a report about misuse of models to build biological weapons."
+  },
+  {
+   "start": 107.44,
+   "end": 113.96,
+   "text": "And our view, the whole way we've built Anthropic, is so that these bad outcomes don't happen."
+  },
+  {
+   "start": 113.96,
+   "end": 119.02,
+   "text": "Instead of talking about the probabilities, let's talk about what we can do."
+  },
+  {
+   "start": 119.02,
+   "end": 121.88,
+   "text": "It's not like we're just rolling the dice, right?"
+  },
+  {
+   "start": 121.88,
+   "end": 127.0,
+   "text": "If we build in the right way, I think the probability of something bad happening is very low."
+  },
+  {
+   "start": 127.0,
+   "end": 130.64,
+   "text": "If we build in the wrong way, the probability of something bad happening is very high."
+  },
+  {
+   "start": 130.64,
+   "end": 136.52,
+   "text": "AMNA NAWAZ, The conversation right now is that we are on the precipice of something really"
+  },
+  {
+   "start": 136.52,
+   "end": 137.56,
+   "text": "scary."
+  },
+  {
+   "start": 137.56,
+   "end": 139.02,
+   "text": "Is this a five-alarm fire?"
+  },
+  {
+   "start": 139.02,
+   "end": 141.58,
+   "text": "DAVID BROOKS, I don't know."
+  },
+  {
+   "start": 141.58,
+   "end": 143.84,
+   "text": "Depends what you mean by five-alarm fire."
+  },
+  {
+   "start": 143.84,
+   "end": 144.84,
+   "text": "What I would say is this."
+  },
+  {
+   "start": 144.84,
+   "end": 145.84,
+   "text": "AMNA NAWAZ, How would you describe it?"
+  },
+  {
+   "start": 145.84,
+   "end": 148.78,
+   "text": "DAVID BROOKS, What I would describe is, so, something"
+  },
+  {
+   "start": 148.78,
+   "end": 154.74,
+   "text": "I have been saying since we started Anthropic, almost since before we started Anthropic,"
+  },
+  {
+   "start": 154.74,
+   "end": 157.64,
+   "text": "is that this technology is on an exponential, right?"
+  },
+  {
+   "start": 157.64,
+   "end": 162.04,
+   "text": "It's like you have one, then two, then four, then eight, then 16, then 32."
+  },
+  {
+   "start": 162.04,
+   "end": 167.24,
+   "text": "But even as I was saying that to myself, I don't think I fully just appreciated what it"
+  },
+  {
+   "start": 167.24,
+   "end": 171.1,
+   "text": "would actually be like when the progress was as fast as it was."
+  },
+  {
+   "start": 171.1,
+   "end": 173.96,
+   "text": "So we're an exponential curve looks a little like this."
+  },
+  {
+   "start": 173.96,
+   "end": 174.96,
+   "text": "AMNA NAWAZ, Where are we on the curve?"
+  },
+  {
+   "start": 174.96,
+   "end": 177.96,
+   "text": "DAVID BROOKS, We're kind of on the bend where it's starting to get steeper."
+  },
+  {
+   "start": 177.96,
+   "end": 180.92,
+   "text": "AMNA NAWAZ, So is that a five-alarm fire to you?"
+  },
+  {
+   "start": 180.92,
+   "end": 184.92,
+   "text": "DAVID BROOKS, What it means, it doesn't mean we need to panic today."
+  },
+  {
+   "start": 184.92,
+   "end": 188.96,
+   "text": "It doesn't mean we need to shut it all down."
+  },
+  {
+   "start": 188.96,
+   "end": 189.96,
+   "text": "What I would say..."
+  },
+  {
+   "start": 189.96,
+   "end": 190.96,
+   "text": "AMNA NAWAZ, Why not?"
+  },
+  {
+   "start": 190.96,
+   "end": 192.56,
+   "text": "DAVID BROOKS, It's a warning sign."
+  },
+  {
+   "start": 192.56,
+   "end": 195.64,
+   "text": "It's a warning sign that we need to slow down."
+  },
+  {
+   "start": 195.64,
+   "end": 197.92,
+   "text": "We need to make this technology carefully."
+  },
+  {
+   "start": 197.92,
+   "end": 205.88,
+   "text": "And we need to make sure that the... our safeguards, our ability to understand it, our ability to"
+  },
+  {
+   "start": 205.88,
+   "end": 211.88,
+   "text": "control it, keeps up with the pace at which the technology is happening."
+  },
+  {
+   "start": 211.88,
+   "end": 216.88,
+   "text": "So far, we have been trying to do that by building the safeguards fast."
+  },
+  {
+   "start": 216.88,
+   "end": 223.26,
+   "text": "But I think we have reached the point where, at least to some extent, we need to moderate"
+  },
+  {
+   "start": 223.26,
+   "end": 226.34,
+   "text": "a little bit the pace at which the technology is being built."
+  },
+  {
+   "start": 226.34,
+   "end": 229.84,
+   "text": "AMNA NAWAZ, Does that then mean that Anthropic is going to stop releasing more advanced models?"
+  },
+  {
+   "start": 229.84,
+   "end": 231.84,
+   "text": "DAVID BROOKS, It doesn't mean that."
+  },
+  {
+   "start": 231.84,
+   "end": 240.12,
+   "text": "What it means is that we need to make sure that every generation of models that we release"
+  },
+  {
+   "start": 240.12,
+   "end": 242.94,
+   "text": "is properly tested."
+  },
+  {
+   "start": 242.94,
+   "end": 244.22,
+   "text": "The thing I've proposed..."
+  },
+  {
+   "start": 244.22,
+   "end": 250.3,
+   "text": "So, you know, in this essay that I put out a few hours ago, I proposed a three-step plan."
+  },
+  {
+   "start": 250.3,
+   "end": 251.3,
+   "text": "AMNA NAWAZ, Right."
+  },
+  {
+   "start": 251.3,
+   "end": 257.62,
+   "text": "DAVID BROOKS, And the first step is that we put in place embedded evaluators, embedded"
+  },
+  {
+   "start": 257.62,
+   "end": 264.98,
+   "text": "external evaluators from a third-party nonprofit or perhaps someday government organization that"
+  },
+  {
+   "start": 264.98,
+   "end": 271.46,
+   "text": "can observe the process of us training and running our models."
+  },
+  {
+   "start": 271.46,
+   "end": 281.3,
+   "text": "That actually is, I think, ultimately more important than how or when we release models,"
+  },
+  {
+   "start": 281.3,
+   "end": 285.1,
+   "text": "because it's the predicate for more carefully releasing models."
+  },
+  {
+   "start": 285.1,
+   "end": 292.54,
+   "text": "I want this to be done across the industry so that whenever anyone builds an AI model,"
+  },
+  {
+   "start": 292.54,
+   "end": 299.08,
+   "text": "there's a third-party evaluator who understands the best safety practices, who can verify whether"
+  },
+  {
+   "start": 299.08,
+   "end": 303.48,
+   "text": "that company is following the safety practices that they're committed to."
+  },
+  {
+   "start": 303.48,
+   "end": 304.48,
+   "text": "It's like a food inspector."
+  },
+  {
+   "start": 304.48,
+   "end": 305.48,
+   "text": "You know..."
+  },
+  {
+   "start": 305.48,
+   "end": 310.66,
+   "text": "AMNA NAWAZ, But can the food inspector keep up when the technology is changing so fast?"
+  },
+  {
+   "start": 310.66,
+   "end": 317.2,
+   "text": "DAVID BROOKS, Well, one of the things they will be able to do is tell us the rate at which"
+  },
+  {
+   "start": 317.2,
+   "end": 318.52,
+   "text": "they can keep up."
+  },
+  {
+   "start": 318.52,
+   "end": 325.22,
+   "text": "That may be one of the factors that may determine, that may set the speed limit on the technology."
+  },
+  {
+   "start": 325.22,
+   "end": 328.96,
+   "text": "We have to understand it, and the external evaluators have to understand it."
+  },
+  {
+   "start": 328.96,
+   "end": 331.88,
+   "text": "AMNA NAWAZ, So, Elon Musk has said he agrees with you."
+  },
+  {
+   "start": 331.88,
+   "end": 334.14,
+   "text": "Sam Altman says he agrees with you."
+  },
+  {
+   "start": 334.14,
+   "end": 336.9,
+   "text": "What's the action plan for you guys to come together?"
+  },
+  {
+   "start": 336.9,
+   "end": 339.44,
+   "text": "Is there a group chat that's going to come into fruition here?"
+  },
+  {
+   "start": 339.44,
+   "end": 340.74,
+   "text": "DAVID BROOKS, So, first of all, I'm..."
+  },
+  {
+   "start": 340.74,
+   "end": 341.74,
+   "text": "AMNA NAWAZ, So, first of all, I'm..."
+  },
+  {
+   "start": 341.74,
+   "end": 342.74,
+   "text": "AMNA NAWAZ, So, first of all, I'm..."
+  },
+  {
+   "start": 342.74,
+   "end": 343.74,
+   "text": "AMNA NAWAZ, So, first of all, I'm..."
+  },
+  {
+   "start": 343.74,
+   "end": 347.44,
+   "text": "AMNA NAWAZ, So, first of all, I'm going to be able to understand that other industry leaders,"
+  },
+  {
+   "start": 347.44,
+   "end": 350.44,
+   "text": "including our competitors, have..."
+  },
+  {
+   "start": 350.44,
+   "end": 352.44,
+   "text": "have offered their agreement with this plan."
+  },
+  {
+   "start": 352.44,
+   "end": 358.32,
+   "text": "AMNA NAWAZ, I think the next step is for multiple industry players to also agree to have"
+  },
+  {
+   "start": 358.32,
+   "end": 360.44,
+   "text": "third-party evaluators."
+  },
+  {
+   "start": 360.44,
+   "end": 367.16,
+   "text": "AMNA NAWAZ, Then, I think the next step after that is, in some form, the companies need to"
+  },
+  {
+   "start": 367.16,
+   "end": 374.66,
+   "text": "work together to set standards about safety standards for release, perhaps something about"
+  },
+  {
+   "start": 374.66,
+   "end": 376.16,
+   "text": "the pace of release."
+  },
+  {
+   "start": 376.16,
+   "end": 380.96,
+   "text": "But in order to do that, there needs to be involvement of the government, because what"
+  },
+  {
+   "start": 380.96,
+   "end": 386.56,
+   "text": "we're talking about is the rate of release of products because of whether they're safe."
+  },
+  {
+   "start": 386.56,
+   "end": 389.76,
+   "text": "We need to have that conversation with the government in the room."
+  },
+  {
+   "start": 389.76,
+   "end": 394.7,
+   "text": "AMNA NAWAZ, Do you think the government fundamentally understands what's possible here?"
+  },
+  {
+   "start": 394.7,
+   "end": 400.84,
+   "text": "Because former Anthropik employee Jacob Coxon said about both Anthropik and OpenAI, neither"
+  },
+  {
+   "start": 400.84,
+   "end": 403.74,
+   "text": "company is acting responsibly."
+  },
+  {
+   "start": 403.74,
+   "end": 407.04,
+   "text": "You guys are gambling with our lives."
+  },
+  {
+   "start": 407.04,
+   "end": 408.04,
+   "text": "What's your response to that?"
+  },
+  {
+   "start": 408.04,
+   "end": 412.84,
+   "text": "MARK COXON, Well, first of all, I mean, one thing that Jacob said, it wasn't quoted as"
+  },
+  {
+   "start": 412.84,
+   "end": 421.96,
+   "text": "much, but he also said that he thought Anthropik was the most responsible of the major players,"
+  },
+  {
+   "start": 421.96,
+   "end": 427.3,
+   "text": "and that we were trying very hard to get it right."
+  },
+  {
+   "start": 427.3,
+   "end": 433.64,
+   "text": "He was calling out honestly the same thing that I'm calling out, which is the difficulty"
+  },
+  {
+   "start": 433.64,
+   "end": 440.1,
+   "text": "of the situation, right, the structural difficulty of the situation that we're all in, and that"
+  },
+  {
+   "start": 440.1,
+   "end": 446.64,
+   "text": "the plan that I've put out is designed to help us address, designed to help us work together."
+  },
+  {
+   "start": 446.64,
+   "end": 452.22,
+   "text": "Now, to your question about the government, you know, we are talking to the government"
+  },
+  {
+   "start": 452.22,
+   "end": 453.22,
+   "text": "every day."
+  },
+  {
+   "start": 453.22,
+   "end": 456.4,
+   "text": "We are talking to government officials every day in the Commerce Department, in the Treasury"
+  },
+  {
+   "start": 456.4,
+   "end": 466.46,
+   "text": "Department, in the intelligence community, to tell them as much as we can what we know."
+  },
+  {
+   "start": 466.46,
+   "end": 472.92,
+   "text": "And I'm optimistic that if we keep working together with them, we can update them on the latest."
+  },
+  {
+   "start": 472.92,
+   "end": 475.08,
+   "text": "I think they really want to do the right thing here."
+  },
+  {
+   "start": 475.08,
+   "end": 477.64,
+   "text": "I think they're looking for how they can help."
+  },
+  {
+   "start": 477.64,
+   "end": 483.86,
+   "text": "And so I'm optimistic that the companies working together with the government can get to a plan"
+  },
+  {
+   "start": 483.86,
+   "end": 484.86,
+   "text": "here that makes sense."
+  },
+  {
+   "start": 484.86,
+   "end": 485.86,
+   "text": "AMNA NAWAZ, All right."
+  },
+  {
+   "start": 485.86,
+   "end": 487.24,
+   "text": "So there is some proposed legislation out there, right?"
+  },
+  {
+   "start": 487.24,
+   "end": 493.48,
+   "text": "You have the ban artificial superintelligence act from Senator Sanders and Representative Kassar"
+  },
+  {
+   "start": 493.48,
+   "end": 499.54,
+   "text": "that would punish corporations and individuals working on advanced AI, just like those unlawfully"
+  },
+  {
+   "start": 499.54,
+   "end": 502.2,
+   "text": "developing nuclear weapons."
+  },
+  {
+   "start": 502.2,
+   "end": 507.62,
+   "text": "One of the parts of this proposed legislation says entities will be subject to the corporate"
+  },
+  {
+   "start": 507.62,
+   "end": 512.62,
+   "text": "death penalty and persons shall be subject to not more than 20 years in prison."
+  },
+  {
+   "start": 512.62,
+   "end": 513.62,
+   "text": "Do you agree with that?"
+  },
+  {
+   "start": 513.62,
+   "end": 520.22,
+   "text": "So, you know, what I would say there's there's a very wide range of legislation being offered."
+  },
+  {
+   "start": 520.22,
+   "end": 522.18,
+   "text": "Like the range is incredible."
+  },
+  {
+   "start": 522.18,
+   "end": 528.16,
+   "text": "If we go back only one year to 2025."
+  },
+  {
+   "start": 528.16,
+   "end": 531.4,
+   "text": "And you know, there was a bill called SB 53 in California."
+  },
+  {
+   "start": 531.4,
+   "end": 536.82,
+   "text": "There were similar bills in other states, which basically just said, you have to disclose"
+  },
+  {
+   "start": 536.82,
+   "end": 539.5,
+   "text": "what your safety testing plans are."
+  },
+  {
+   "start": 539.5,
+   "end": 540.5,
+   "text": "AMNA NAWAZ, Right."
+  },
+  {
+   "start": 540.5,
+   "end": 542.16,
+   "text": "The entire industry was against it."
+  },
+  {
+   "start": 542.16,
+   "end": 544.28,
+   "text": "Anthropic was the or didn't say anything on it."
+  },
+  {
+   "start": 544.28,
+   "end": 548.32,
+   "text": "Anthropic was the only company enthusiastically in support."
+  },
+  {
+   "start": 548.32,
+   "end": 552.0,
+   "text": "And then there's there's all the way to, you know, let's let's let's let's"
+  },
+  {
+   "start": 552.0,
+   "end": 553.16,
+   "text": "AMNA NAWAZ, There's an AI kill switch bill."
+  },
+  {
+   "start": 553.16,
+   "end": 555.7,
+   "text": "AMNA NAWAZ, Yeah, let's let's ban all of it."
+  },
+  {
+   "start": 555.7,
+   "end": 557.66,
+   "text": "So the AI kill switch could be a good idea."
+  },
+  {
+   "start": 557.66,
+   "end": 558.66,
+   "text": "AMNA NAWAZ, Why?"
+  },
+  {
+   "start": 558.66,
+   "end": 562.94,
+   "text": "AMNA NAWAZ, I don't think banning it, completely banning it is the right approach."
+  },
+  {
+   "start": 562.94,
+   "end": 568.5,
+   "text": "One, the idea that we would never get the incredible benefits, would never get the medical"
+  },
+  {
+   "start": 568.5,
+   "end": 571.26,
+   "text": "measures, that doesn't sit right with me."
+  },
+  {
+   "start": 571.26,
+   "end": 576.82,
+   "text": "Second, this technology will be built in other countries, including authoritarian countries."
+  },
+  {
+   "start": 576.82,
+   "end": 580.74,
+   "text": "AMNA NAWAZ, China, China, among others."
+  },
+  {
+   "start": 580.74,
+   "end": 586.66,
+   "text": "And I am worried about how they will use it, how they will use it against free societies,"
+  },
+  {
+   "start": 586.66,
+   "end": 589.88,
+   "text": "how they will use it to repress their own people."
+  },
+  {
+   "start": 589.88,
+   "end": 593.42,
+   "text": "Now, in one place, I do talk about working together with them."
+  },
+  {
+   "start": 593.42,
+   "end": 596.86,
+   "text": "And I believe we need to do that to some extent."
+  },
+  {
+   "start": 596.86,
+   "end": 603.52,
+   "text": "But I just don't see how it's a stable solution to never build the technology."
+  },
+  {
+   "start": 603.52,
+   "end": 606.12,
+   "text": "What we need to do is not stop."
+  },
+  {
+   "start": 606.12,
+   "end": 608.02,
+   "text": "We need to slow down."
+  },
+  {
+   "start": 608.02,
+   "end": 614.48,
+   "text": "And that is in line, honestly, with what anthropic that's been anthropic's philosophy since the"
+  },
+  {
+   "start": 614.48,
+   "end": 615.48,
+   "text": "beginning."
+  },
+  {
+   "start": 615.48,
+   "end": 616.48,
+   "text": "Right."
+  },
+  {
+   "start": 616.48,
+   "end": 617.7,
+   "text": "We've always tried to balance."
+  },
+  {
+   "start": 617.7,
+   "end": 621.48,
+   "text": "We've said it's important that we be builders of this technology."
+  },
+  {
+   "start": 621.48,
+   "end": 623.24,
+   "text": "But we need to create a race to the top."
+  },
+  {
+   "start": 623.24,
+   "end": 625.24,
+   "text": "We need to raise the bar."
+  },
+  {
+   "start": 625.24,
+   "end": 631.38,
+   "text": "So, you know, we need to be on the frontier, but we need to do it in the right way."
+  },
+  {
+   "start": 631.38,
+   "end": 638.9,
+   "text": "We've said, you know, we're excited to use the models for, you know, national defense applications."
+  },
+  {
+   "start": 638.9,
+   "end": 641.0,
+   "text": "But not every national defense application."
+  },
+  {
+   "start": 641.0,
+   "end": 647.86,
+   "text": "We've always tried to find the middle ground, the thing that works for everyone, the sensible"
+  },
+  {
+   "start": 647.86,
+   "end": 648.86,
+   "text": "solution."
+  },
+  {
+   "start": 648.86,
+   "end": 650.68,
+   "text": "That's what we're trying to do here as well."
+  },
+  {
+   "start": 650.68,
+   "end": 652.7,
+   "text": "It may not be the perfect solution, but we're trying."
+  },
+  {
+   "start": 652.7,
+   "end": 655.86,
+   "text": "AMNA NAWAZ- Would you support Congressman Ted Leo's AI kill switch bill?"
+  },
+  {
+   "start": 655.86,
+   "end": 660.24,
+   "text": "I've not looked at that bill super closely."
+  },
+  {
+   "start": 660.24,
+   "end": 666.98,
+   "text": "But what I would say is that the idea that we need some way to, it's not a panacea, it's"
+  },
+  {
+   "start": 666.98,
+   "end": 675.18,
+   "text": "not the only thing, but the idea that we need some way to make sure that we can deactivate"
+  },
+  {
+   "start": 675.18,
+   "end": 679.64,
+   "text": "or limit or shut down AI models, that's not the only thing."
+  },
+  {
+   "start": 679.64,
+   "end": 683.26,
+   "text": "If an AI model is powerful enough, it can circumvent attempts to shut it down."
+  },
+  {
+   "start": 683.26,
+   "end": 685.14,
+   "text": "And we've seen that in simulations as well."
+  },
+  {
+   "start": 685.14,
+   "end": 686.96,
+   "text": "AMNA NAWAZ- So it may not work at all?"
+  },
+  {
+   "start": 686.96,
+   "end": 690.02,
+   "text": "We think of this in terms of defense and depth."
+  },
+  {
+   "start": 690.02,
+   "end": 693.98,
+   "text": "There's a notion in the security community called the Swiss cheese model."
+  },
+  {
+   "start": 693.98,
+   "end": 696.62,
+   "text": "So just imagine a slice of Swiss cheese."
+  },
+  {
+   "start": 696.62,
+   "end": 700.48,
+   "text": "And it's like it blocks some things, but there are holes in the Swiss cheese."
+  },
+  {
+   "start": 700.48,
+   "end": 705.52,
+   "text": "But if I take five slices of Swiss cheese and I put them together, the holes in different"
+  },
+  {
+   "start": 705.52,
+   "end": 707.44,
+   "text": "layers are in different places."
+  },
+  {
+   "start": 707.44,
+   "end": 712.92,
+   "text": "And so it's very hard to get through the entire stack of Swiss cheese."
+  },
+  {
+   "start": 712.92,
+   "end": 719.44,
+   "text": "So I think of it as there's no one thing that will protect us from the risks of AI."
+  },
+  {
+   "start": 719.44,
+   "end": 724.02,
+   "text": "We have to be careful all the way up and down the stack."
+  },
+  {
+   "start": 724.02,
+   "end": 727.62,
+   "text": "And then no one defense is perfect."
+  },
+  {
+   "start": 727.62,
+   "end": 732.5,
+   "text": "But if we're being careful everywhere, which is what taking extra time will allow us to"
+  },
+  {
+   "start": 732.5,
+   "end": 735.18,
+   "text": "do, then I think things can go well."
+  },
+  {
+   "start": 735.18,
+   "end": 741.0,
+   "text": "AMNA NAWAZ- You think things can go well, even though it feels like we're in this inflection"
+  },
+  {
+   "start": 741.0,
+   "end": 742.34,
+   "text": "point of a moment."
+  },
+  {
+   "start": 742.34,
+   "end": 748.34,
+   "text": "You say in your essay, pacing should only happen, slowing down should only happen within the margin"
+  },
+  {
+   "start": 748.34,
+   "end": 754.34,
+   "text": "of the lead that U.S. companies have over authoritarian regimes, chiefly the Chinese Communist Party."
+  },
+  {
+   "start": 754.34,
+   "end": 756.32,
+   "text": "We are in this race with China."
+  },
+  {
+   "start": 756.32,
+   "end": 759.86,
+   "text": "Do you actually think slowing down is a good idea when China will not?"
+  },
+  {
+   "start": 759.86,
+   "end": 761.38,
+   "text": "AMNA NAWAZ- This is the toughest dilemma."
+  },
+  {
+   "start": 761.38,
+   "end": 764.44,
+   "text": "This is the toughest aspect of our situation."
+  },
+  {
+   "start": 764.44,
+   "end": 768.76,
+   "text": "If we weren't in that situation, we could take much more time."
+  },
+  {
+   "start": 768.76,
+   "end": 772.1,
+   "text": "So this is the thing that most puts us in a bind."
+  },
+  {
+   "start": 772.1,
+   "end": 774.76,
+   "text": "It's not about commercial competition."
+  },
+  {
+   "start": 774.76,
+   "end": 778.86,
+   "text": "The geopolitical situation is the hardest to deal with."
+  },
+  {
+   "start": 778.86,
+   "end": 782.86,
+   "text": "But I will talk about two strategies that we have."
+  },
+  {
+   "start": 782.86,
+   "end": 789.48,
+   "text": "One, and I talk about it in my proposal, is we can slow down within the margin, within the"
+  },
+  {
+   "start": 789.48,
+   "end": 795.52,
+   "text": "envelope that we have, particularly if we don't sell chips to authoritarian countries,"
+  },
+  {
+   "start": 795.52,
+   "end": 801.56,
+   "text": "and if we do more to help our own security, so that our technology is not stolen."
+  },
+  {
+   "start": 801.56,
+   "end": 806.1,
+   "text": "I believe that will buy us at least a little time."
+  },
+  {
+   "start": 806.1,
+   "end": 807.1,
+   "text": "So we can slow down."
+  },
+  {
+   "start": 807.1,
+   "end": 809.74,
+   "text": "AMNA NAWAZ- Does it make enough of a difference to stop the ending of humanity?"
+  },
+  {
+   "start": 809.74,
+   "end": 814.74,
+   "text": "AMNA NAWAZ- What I would say is, with that first strategy, we will take as much time"
+  },
+  {
+   "start": 814.74,
+   "end": 816.28,
+   "text": "as we can get."
+  },
+  {
+   "start": 816.28,
+   "end": 822.08,
+   "text": "And then I think we should pursue a second strategy as well, which is that we should go directly"
+  },
+  {
+   "start": 822.08,
+   "end": 830.4,
+   "text": "to even to authoritarian countries, even to the Chinese, and say, look, there are potentially"
+  },
+  {
+   "start": 830.4,
+   "end": 832.82,
+   "text": "threats here that are concerning to all of us."
+  },
+  {
+   "start": 832.82,
+   "end": 835.32,
+   "text": "It's not just out of control AI."
+  },
+  {
+   "start": 835.32,
+   "end": 842.22,
+   "text": "Two days ago, we put out a report that people were trying to use AI potentially for bioterrorism,"
+  },
+  {
+   "start": 842.22,
+   "end": 846.7,
+   "text": "for enhancing the infectiousness of viruses."
+  },
+  {
+   "start": 846.7,
+   "end": 847.7,
+   "text": "That's scary."
+  },
+  {
+   "start": 847.7,
+   "end": 849.02,
+   "text": "And you know what?"
+  },
+  {
+   "start": 849.02,
+   "end": 850.94,
+   "text": "Even the Chinese don't want that."
+  },
+  {
+   "start": 850.94,
+   "end": 851.94,
+   "text": "They don't."
+  },
+  {
+   "start": 851.94,
+   "end": 852.94,
+   "text": "They don't."
+  },
+  {
+   "start": 852.94,
+   "end": 853.94,
+   "text": "They don't."
+  },
+  {
+   "start": 853.94,
+   "end": 856.32,
+   "text": "It's not in any government's interest to have bioterrorism."
+  },
+  {
+   "start": 856.32,
+   "end": 864.68,
+   "text": "And so we should talk with the Chinese and see if we can work together to put limits,"
+  },
+  {
+   "start": 864.68,
+   "end": 868.28,
+   "text": "to put a speed limit on the rate of this technology."
+  },
+  {
+   "start": 868.28,
+   "end": 875.06,
+   "text": "It's a little bit like, you know, for all our differences with, you know, other systems"
+  },
+  {
+   "start": 875.06,
+   "end": 876.06,
+   "text": "of government."
+  },
+  {
+   "start": 876.06,
+   "end": 877.06,
+   "text": "And I have many."
+  },
+  {
+   "start": 877.06,
+   "end": 881.08,
+   "text": "I generally have a hawkish position on China."
+  },
+  {
+   "start": 881.08,
+   "end": 885.7,
+   "text": "But for all our differences, think about when it was the U.S. and the Soviet Union, right?"
+  },
+  {
+   "start": 885.7,
+   "end": 890.5,
+   "text": "And we each had 10,000 nuclear missiles pointed at each other."
+  },
+  {
+   "start": 890.5,
+   "end": 896.48,
+   "text": "Even for all our differences, we recognized that that was too many, that we needed to engage"
+  },
+  {
+   "start": 896.48,
+   "end": 902.06,
+   "text": "in talks that could lower the scale of the potential destruction."
+  },
+  {
+   "start": 902.06,
+   "end": 908.8,
+   "text": "AMNA NAWAZI, Is that the way we should be thinking about AI, is using the Cold War as"
+  },
+  {
+   "start": 908.8,
+   "end": 909.8,
+   "text": "a model?"
+  },
+  {
+   "start": 909.8,
+   "end": 913.24,
+   "text": "MARK SHIELDS, So I didn't say we should use the Cold War as a model."
+  },
+  {
+   "start": 913.24,
+   "end": 914.24,
+   "text": "I said we should..."
+  },
+  {
+   "start": 914.24,
+   "end": 915.24,
+   "text": "AMNA NAWAZI, Well, those negotiations that happened..."
+  },
+  {
+   "start": 915.24,
+   "end": 920.6,
+   "text": "MARK SHIELDS, Yes, yes, disarmament negotiations, like arms limitation."
+  },
+  {
+   "start": 920.6,
+   "end": 927.26,
+   "text": "I do think that is an appropriate lens through which to think about this at the geopolitical"
+  },
+  {
+   "start": 927.26,
+   "end": 928.26,
+   "text": "level."
+  },
+  {
+   "start": 928.26,
+   "end": 931.32,
+   "text": "And look at what AI models can do in terms of cyber."
+  },
+  {
+   "start": 931.32,
+   "end": 936.14,
+   "text": "Like, they absolutely have geopolitical and national security significance."
+  },
+  {
+   "start": 936.14,
+   "end": 937.38,
+   "text": "Of course they do."
+  },
+  {
+   "start": 937.38,
+   "end": 939.72,
+   "text": "That's why we're having this whole conversation."
+  },
+  {
+   "start": 939.72,
+   "end": 943.4,
+   "text": "And so I think we should approach China."
+  },
+  {
+   "start": 943.4,
+   "end": 945.34,
+   "text": "Again, all this is above my pay grade."
+  },
+  {
+   "start": 945.34,
+   "end": 947.86,
+   "text": "This is something the U.S. government has to do with the Chinese government, right?"
+  },
+  {
+   "start": 947.86,
+   "end": 949.08,
+   "text": "AMNA NAWAZI, But you're advising the president."
+  },
+  {
+   "start": 949.08,
+   "end": 955.34,
+   "text": "MARK SHIELDS, I mean, if anyone asks me what I think they should do, I'm happy to say."
+  },
+  {
+   "start": 955.34,
+   "end": 959.4,
+   "text": "I have some thoughts in that essay."
+  },
+  {
+   "start": 959.4,
+   "end": 962.16,
+   "text": "And if anyone asks me, I can say more."
+  },
+  {
+   "start": 962.16,
+   "end": 964.66,
+   "text": "At the end of the day, this is a government-to-government thing."
+  },
+  {
+   "start": 964.66,
+   "end": 966.82,
+   "text": "But yes, I'll tell you what I think."
+  },
+  {
+   "start": 966.82,
+   "end": 975.3,
+   "text": "I think that we should work together to get as much restraint as we can on this technology."
+  },
+  {
+   "start": 975.3,
+   "end": 980.82,
+   "text": "I think our hope should be high, but our expectations should be low."
+  },
+  {
+   "start": 980.82,
+   "end": 984.3,
+   "text": "And we should see how much it's possible to get."
+  },
+  {
+   "start": 984.3,
+   "end": 992.7,
+   "text": "And I think what we should especially focus on in these negotiations is a way to verify."
+  },
+  {
+   "start": 992.7,
+   "end": 998.8,
+   "text": "So this is very important in, again, nuclear weapons negotiations, biological weapons negotiations."
+  },
+  {
+   "start": 998.8,
+   "end": 1005.06,
+   "text": "You need to be able to verify that the other side is not defecting on the agreement."
+  },
+  {
+   "start": 1005.06,
+   "end": 1009.02,
+   "text": "And so I think finding ways to verify will be the most important thing here."
+  },
+  {
+   "start": 1009.02,
+   "end": 1012.72,
+   "text": "AMNA NAWAZI, President Trump will meet with President Xi Jinping very soon."
+  },
+  {
+   "start": 1012.72,
+   "end": 1018.08,
+   "text": "What's the one simple, most important solution that they should come to an agreement on in"
+  },
+  {
+   "start": 1018.08,
+   "end": 1019.08,
+   "text": "AI?"
+  },
+  {
+   "start": 1019.08,
+   "end": 1023.3,
+   "text": "So maybe I'll say two things, like a small-a thing that's small enough we might be able"
+  },
+  {
+   "start": 1023.3,
+   "end": 1027.2,
+   "text": "to do it, and a thing that's big enough that I think is going to take a very long time."
+  },
+  {
+   "start": 1027.2,
+   "end": 1034.06,
+   "text": "The small thing is if we could-US and China could agree that we won't use AI to develop"
+  },
+  {
+   "start": 1034.06,
+   "end": 1041.32,
+   "text": "biological weapons or release AI models that bioterrorists could use to develop biological"
+  },
+  {
+   "start": 1041.32,
+   "end": 1042.32,
+   "text": "weapons."
+  },
+  {
+   "start": 1042.32,
+   "end": 1045.72,
+   "text": "We're already both signatories to the Biological Weapons Convention."
+  },
+  {
+   "start": 1045.72,
+   "end": 1051.0,
+   "text": "If we could just extend that convention to that idea, that would be really valuable."
+  },
+  {
+   "start": 1051.0,
+   "end": 1058.0,
+   "text": "And then I think the more long-term thing would be working together to put a speed limit on"
+  },
+  {
+   "start": 1058.0,
+   "end": 1060.76,
+   "text": "the rate of AI progress."
+  },
+  {
+   "start": 1060.76,
+   "end": 1065.84,
+   "text": "I think that's going to be very difficult, because the incentives to pull ahead and the"
+  },
+  {
+   "start": 1065.84,
+   "end": 1070.38,
+   "text": "military advantage that you get from that are so large."
+  },
+  {
+   "start": 1070.38,
+   "end": 1075.84,
+   "text": "And honestly, I don't know if it's possible, but we should try."
+  },
+  {
+   "start": 1075.84,
+   "end": 1078.28,
+   "text": "We should see if it is possible."
+  },
+  {
+   "start": 1078.28,
+   "end": 1080.66,
+   "text": "Again, all of this is above my pay grade."
+  },
+  {
+   "start": 1080.66,
+   "end": 1085.36,
+   "text": "What I'm trying to say is that these are some things that our government could try to say."
+  },
+  {
+   "start": 1085.36,
+   "end": 1088.16,
+   "text": "These are some considerations that they could include."
+  },
+  {
+   "start": 1088.16,
+   "end": 1095.2,
+   "text": "AMNA NAWAZ, As we zoom out here on this problem, it seems like the fate of humanity is at risk."
+  },
+  {
+   "start": 1095.2,
+   "end": 1099.44,
+   "text": "How much personal responsibility do you feel about where we are going?"
+  },
+  {
+   "start": 1099.44,
+   "end": 1107.84,
+   "text": "So, look, my view here is, it has always been very strange that this technology is being built"
+  },
+  {
+   "start": 1107.84,
+   "end": 1110.0,
+   "text": "by a private company."
+  },
+  {
+   "start": 1110.0,
+   "end": 1111.52,
+   "text": "People ask me that question all the time."
+  },
+  {
+   "start": 1111.52,
+   "end": 1113.58,
+   "text": "Why isn't this being built by government?"
+  },
+  {
+   "start": 1113.58,
+   "end": 1116.2,
+   "text": "And the strangest thing about it is, I agree with them."
+  },
+  {
+   "start": 1116.2,
+   "end": 1117.2,
+   "text": "I'm uncomfortable."
+  },
+  {
+   "start": 1117.2,
+   "end": 1119.94,
+   "text": "AMNA NAWAZ, Would you be willing to give up the technology to the government?"
+  },
+  {
+   "start": 1119.94,
+   "end": 1123.26,
+   "text": "AMNA NAWAZ, To the right combination of governments."
+  },
+  {
+   "start": 1123.26,
+   "end": 1124.26,
+   "text": "So the worry I have-"
+  },
+  {
+   "start": 1124.26,
+   "end": 1126.34,
+   "text": "AMNA NAWAZ, You're willing to hand over this company?"
+  },
+  {
+   "start": 1126.34,
+   "end": 1132.06,
+   "text": "AMNA NAWAZ, I am concerned that one single government could abuse this technology just"
+  },
+  {
+   "start": 1132.06,
+   "end": 1134.5,
+   "text": "as easily as a single company could."
+  },
+  {
+   "start": 1134.5,
+   "end": 1141.9,
+   "text": "But I think a combination of democratically elected governments, I don't know about handing"
+  },
+  {
+   "start": 1141.9,
+   "end": 1146.6,
+   "text": "over, but some kind of oversight, some kind of joint governance."
+  },
+  {
+   "start": 1146.6,
+   "end": 1151.72,
+   "text": "AMNA NAWAZ, So just to ask this final question, do you feel personal responsibility here?"
+  },
+  {
+   "start": 1151.72,
+   "end": 1152.92,
+   "text": "AMNA NAWAZ, Of course."
+  },
+  {
+   "start": 1152.92,
+   "end": 1159.64,
+   "text": "I feel that this is a technology with great benefits and great risks."
+  },
+  {
+   "start": 1159.64,
+   "end": 1164.9,
+   "text": "I feel the benefits or the need for benefits every day."
+  },
+  {
+   "start": 1164.9,
+   "end": 1173.58,
+   "text": "One thing I said in my essay, my father died of a disease, hepatitis C, that was something"
+  },
+  {
+   "start": 1173.58,
+   "end": 1175.46,
+   "text": "like 40 percent curable when he died of it."
+  },
+  {
+   "start": 1175.46,
+   "end": 1177.38,
+   "text": "He wasn't one of the ones who was cured."
+  },
+  {
+   "start": 1177.38,
+   "end": 1182.46,
+   "text": "And a few years after, a medicine that was invented that made it 95 percent curable."
+  },
+  {
+   "start": 1182.46,
+   "end": 1187.34,
+   "text": "I myself survived an early stage cancer that if I had been living in 1950, I probably would"
+  },
+  {
+   "start": 1187.34,
+   "end": 1188.54,
+   "text": "have died."
+  },
+  {
+   "start": 1188.54,
+   "end": 1193.04,
+   "text": "So I feel the weight of bringing the benefits of this technology."
+  },
+  {
+   "start": 1193.04,
+   "end": 1194.96,
+   "text": "I also feel the risks."
+  },
+  {
+   "start": 1194.96,
+   "end": 1200.26,
+   "text": "I wake up every day and, you know, I read one of these threat reports like someone tried"
+  },
+  {
+   "start": 1200.26,
+   "end": 1203.44,
+   "text": "to, you know, use our model to build biological weapons."
+  },
+  {
+   "start": 1203.44,
+   "end": 1205.66,
+   "text": "Of course I don't want to be responsible for that."
+  },
+  {
+   "start": 1205.66,
+   "end": 1208.76,
+   "text": "And that's why we have very strong safeguards."
+  },
+  {
+   "start": 1208.76,
+   "end": 1214.12,
+   "text": "Almost every day I'm made fun of on social media because our model's biology safeguards"
+  },
+  {
+   "start": 1214.12,
+   "end": 1216.1,
+   "text": "are too strong."
+  },
+  {
+   "start": 1216.1,
+   "end": 1218.18,
+   "text": "And, you know, biology students complain."
+  },
+  {
+   "start": 1218.18,
+   "end": 1221.1,
+   "text": "You know, they make jokes that we can't use the model."
+  },
+  {
+   "start": 1221.1,
+   "end": 1226.1,
+   "text": "And the but the reason for that is that we have strong safeguards."
+  },
+  {
+   "start": 1226.1,
+   "end": 1231.24,
+   "text": "And I would rather they make fun of me than to wake up one day and discover that someone"
+  },
+  {
+   "start": 1231.24,
+   "end": 1234.1,
+   "text": "used our model, Claude, to kill a bunch of people."
+  },
+  {
+   "start": 1234.1,
+   "end": 1235.1,
+   "text": "I don't want that."
+  },
+  {
+   "start": 1235.1,
+   "end": 1238.6,
+   "text": "So I feel both sides of it."
+  },
+  {
+   "start": 1238.6,
+   "end": 1241.06,
+   "text": "I feel both sides of the responsibility."
+  },
+  {
+   "start": 1241.06,
+   "end": 1246.96,
+   "text": "But again, I would repeat the same point, which is that it shouldn't be my responsibility"
+  },
+  {
+   "start": 1246.96,
+   "end": 1252.56,
+   "text": "alone or Anthropics responsibility alone or all of the AI companies responsibility alone"
+  },
+  {
+   "start": 1252.56,
+   "end": 1255.26,
+   "text": "or even one government's responsibility alone."
+  },
+  {
+   "start": 1255.26,
+   "end": 1257.1,
+   "text": "This is bigger than all of us."
+  },
+  {
+   "start": 1257.1,
+   "end": 1263.74,
+   "text": "And we need to work out some way for everyone to have a say in this, for everyone to feel"
+  },
+  {
+   "start": 1263.74,
+   "end": 1265.68,
+   "text": "like they're an active part of this."
+  },
+  {
+   "start": 1265.68,
+   "end": 1267.74,
+   "text": "I don't want people to feel powerless."
+  },
+  {
+   "start": 1267.74,
+   "end": 1271.86,
+   "text": "I don't want them to feel like a few companies are just going and doing whatever they want."
+  },
+  {
+   "start": 1271.86,
+   "end": 1272.86,
+   "text": "That's how they feel."
+  },
+  {
+   "start": 1272.86,
+   "end": 1273.86,
+   "text": "I know."
+  },
+  {
+   "start": 1273.86,
+   "end": 1274.86,
+   "text": "I know that's how they feel."
+  },
+  {
+   "start": 1274.86,
+   "end": 1276.76,
+   "text": "I've never wanted that."
+  },
+  {
+   "start": 1276.76,
+   "end": 1277.9,
+   "text": "I've never wanted that."
+  },
+  {
+   "start": 1277.9,
+   "end": 1279.96,
+   "text": "We need to make that not true."
+  },
+  {
+   "start": 1279.96,
+   "end": 1282.32,
+   "text": "We need to find a way to make that not true."
+  },
+  {
+   "start": 1282.32,
+   "end": 1286.2,
+   "text": "And there's lots of things we are trying to do already to make that the case."
+  },
+  {
+   "start": 1286.2,
+   "end": 1287.3,
+   "text": "But we need to do even more."
+  },
+  {
+   "start": 1287.3,
+   "end": 1292.46,
+   "text": "And this proposal that shows some restraint that works with governments doesn't address everything,"
+  },
+  {
+   "start": 1292.46,
+   "end": 1295.04,
+   "text": "but it's one step in this direction."
+  },
+  {
+   "start": 1295.04,
+   "end": 1301.78,
+   "text": "If you're sitting at home and you're using Claude or Trapped GPT and you're, I don't know,"
+  },
+  {
+   "start": 1301.78,
+   "end": 1304.62,
+   "text": "my aunt, what's your message?"
+  },
+  {
+   "start": 1304.62,
+   "end": 1306.74,
+   "text": "Look, my message is, you know."
+  },
+  {
+   "start": 1306.74,
+   "end": 1308.02,
+   "text": "There's a lot of fear right now."
+  },
+  {
+   "start": 1308.02,
+   "end": 1310.0,
+   "text": "So a few things."
+  },
+  {
+   "start": 1310.0,
+   "end": 1316.06,
+   "text": "One, like, first of all, as always, this is a great technology and it has lots of positive"
+  },
+  {
+   "start": 1316.06,
+   "end": 1317.06,
+   "text": "uses."
+  },
+  {
+   "start": 1317.06,
+   "end": 1319.0,
+   "text": "So let's just start with that."
+  },
+  {
+   "start": 1319.0,
+   "end": 1323.96,
+   "text": "You know, we have hundreds of millions of people, you know, using our technology every"
+  },
+  {
+   "start": 1323.96,
+   "end": 1325.62,
+   "text": "week to do wonderful things."
+  },
+  {
+   "start": 1325.62,
+   "end": 1331.52,
+   "text": "Every week I get an email from someone who says this, you know, I was talking to Claude"
+  },
+  {
+   "start": 1331.52,
+   "end": 1334.96,
+   "text": "and Claude diagnosed this disease that my doctors had missed."
+  },
+  {
+   "start": 1334.96,
+   "end": 1336.82,
+   "text": "I get emails like this every week."
+  },
+  {
+   "start": 1336.82,
+   "end": 1338.58,
+   "text": "So let's not forget that."
+  },
+  {
+   "start": 1338.58,
+   "end": 1342.44,
+   "text": "But in terms of the dangers of the technology, I won't lie to you."
+  },
+  {
+   "start": 1342.44,
+   "end": 1344.2,
+   "text": "There are real dangers."
+  },
+  {
+   "start": 1344.2,
+   "end": 1351.74,
+   "text": "And I think for too long the industry lied to people about the fact that this technology"
+  },
+  {
+   "start": 1351.74,
+   "end": 1352.74,
+   "text": "had risk."
+  },
+  {
+   "start": 1352.74,
+   "end": 1355.66,
+   "text": "The idea was that they would present it as positive as possible."
+  },
+  {
+   "start": 1355.66,
+   "end": 1356.76,
+   "text": "We've never done that."
+  },
+  {
+   "start": 1356.76,
+   "end": 1359.34,
+   "text": "But too much of the industry did that."
+  },
+  {
+   "start": 1359.34,
+   "end": 1363.34,
+   "text": "And so it starts with telling the truth."
+  },
+  {
+   "start": 1363.34,
+   "end": 1366.32,
+   "text": "And the truth is there are risks."
+  },
+  {
+   "start": 1366.32,
+   "end": 1367.52,
+   "text": "Risks are real."
+  },
+  {
+   "start": 1367.52,
+   "end": 1374.28,
+   "text": "But also you have a say in how these risks are addressed."
+  },
+  {
+   "start": 1374.28,
+   "end": 1379.66,
+   "text": "We're doing the best we can to work with government to create the proper oversight of this technology,"
+  },
+  {
+   "start": 1379.66,
+   "end": 1387.9,
+   "text": "to give voters and elected officials a say in how this technology is deployed."
+  },
+  {
+   "start": 1387.9,
+   "end": 1392.7,
+   "text": "And we want to work with those folks as much as we can."
+  },
+  {
+   "start": 1392.7,
+   "end": 1399.7,
+   "text": "I want everyone to feel like they're appreciating the incredible benefits of the technology,"
+  },
+  {
+   "start": 1399.7,
+   "end": 1406.48,
+   "text": "but also they have a say in their voice and in their vote in determining how this technology"
+  },
+  {
+   "start": 1406.48,
+   "end": 1407.88,
+   "text": "is deployed."
+  },
+  {
+   "start": 1407.88,
+   "end": 1410.6,
+   "text": "This isn't a decision for a few people alone."
+  },
+  {
+   "start": 1410.6,
+   "end": 1412.82,
+   "text": "This is a decision for everyone."
+  },
+  {
+   "start": 1412.82,
+   "end": 1414.7,
+   "text": "But it is an important decision."
+  },
+  {
+   "start": 1414.7,
+   "end": 1418.46,
+   "text": "I won't lie that the stakes aren't high."
+  },
+  {
+   "start": 1418.46,
+   "end": 1423.92,
+   "text": "This is one of the seminal technological events in human history, and we all have to have a"
+  },
+  {
+   "start": 1423.92,
+   "end": 1424.92,
+   "text": "part in it."
+  }
+ ],
+ "frames": [],
+ "frames_meta": null,
+ "frames_error": null,
+ "warnings": [
+  "앞 segment와 겹친 segment 9건 시작 시각 보정"
+ ],
+ "work_dir": "tests/fixtures/video/5wDzydCqkV8",
+ "env": {
+  "device": "Device(gpu, 0)",
+  "whisper_model": "large-v3-turbo",
+  "versions": {
+   "python": "3.12.14",
+   "platform": "Darwin-arm64",
+   "mlx-whisper": "0.4.3",
+   "mlx": "0.32.3",
+   "yt-dlp": "2026.8.19",
+   "ffmpeg": "8.1.2"
+  },
+  "timings_sec": {
+   "download": 12.86,
+   "transcribe": 204.26,
+   "total": 217.32
+  }
+ },
+ "truncated_segments": false
+}

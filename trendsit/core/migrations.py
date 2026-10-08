@@ -122,6 +122,29 @@ register(13, """
     """)
 
 # ---------- S4 (20~29) ----------
+# 20: 영상 분석가. 영상마다 처리 기록 1행(다시 처리하면 새 행), 전사 segments(8주 뒤 텍스트 삭제), 프레임 판독(텍스트만),
+# VideoDigest. 영상 파일과 프레임 이미지는 DB에 두지 않는다(data/media, 7일 뒤 정리). S1 videos는 읽기만
+register(20, """
+    CREATE TABLE IF NOT EXISTS video_runs (
+        id INTEGER PRIMARY KEY, item_id INTEGER, video_id TEXT NOT NULL,
+        mode TEXT NOT NULL CHECK(mode IN ('skip','captions','whisper','whisper+slides')),
+        start_sec INTEGER, end_sec INTEGER, reason TEXT, transcript_source TEXT, transcript_quality TEXT,
+        status TEXT NOT NULL CHECK(status IN ('ok','partial','skipped','failed')), note TEXT,
+        run_id TEXT, created_at TEXT
+    );
+    CREATE INDEX IF NOT EXISTS video_runs_video ON video_runs(video_id);
+    CREATE TABLE IF NOT EXISTS video_segments (
+        video_id TEXT NOT NULL, idx INTEGER NOT NULL, start REAL NOT NULL, "end" REAL NOT NULL, text TEXT,
+        expires_at TEXT, PRIMARY KEY(video_id, idx)
+    );
+    CREATE TABLE IF NOT EXISTS video_frames (
+        video_id TEXT NOT NULL, t REAL NOT NULL, reason TEXT, spoken_text TEXT, reading_json TEXT,
+        PRIMARY KEY(video_id, t)
+    );
+    CREATE TABLE IF NOT EXISTS video_digests (
+        video_id TEXT PRIMARY KEY, item_id INTEGER, digest_json TEXT NOT NULL, model TEXT, run_id TEXT, created_at TEXT
+    );
+    """)
 
 
 # ---------- 적용 ----------
