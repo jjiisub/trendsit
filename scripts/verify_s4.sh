@@ -49,7 +49,7 @@ done
 if [ -z "$A4_MISS" ]; then pt A4 "video_slide, video_summary 역할 md 검사 통과, 예시 3개" tests/test_s1a.py -k "lint"; else fail A4 "$A4_MISS"; fi
 
 pt A5 "픽스처 MediaResult 계약 통과 + 깨뜨린 사본(시간 역순, 상한 초과, 작업 폴더 밖 경로 등) 실패" tests/test_s4_media.py -k "fixtures_exist or contract_rejects"
-pt A6 "큐 계약 JSON → mode별 설정, captions에 수동 자막 없으면 건너뜀(올리지 않음)" tests/test_s4_media.py -k "queue or captions" tests/test_s4_pipeline.py -k "captions"
+pt A6 "큐 계약 JSON → mode별 설정, captions에 수동 자막 없으면 건너뜀(올리지 않음)" tests/test_s4_media.py tests/test_s4_pipeline.py -k "queue or captions"
 pt A7 "suspect_hallucination·empty에서 전사를 근거로 쓰지 않음, 둘 다 없으면 내용 없음 + attention" tests/test_s4_pipeline.py tests/test_s4_roles.py -k "bad_transcript or no_sources or no_content"
 pt A8 "대조: 다른 표기의 같은 수치는 대조됨, 30초 밖은 slide_only, check는 따로" tests/test_s4_align.py
 pt A9 "enforce: 판독 수치(ocr_text 안), 표기 쌍, 근거·타임라인 초 범위(모의 LLM)" tests/test_s4_roles.py -k "slide_numbers or non_slide or summary_enforce"

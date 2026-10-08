@@ -88,3 +88,26 @@ def test_non_facts_are_excluded(value, unit, what, why):
 def test_real_facts_are_kept(value, unit, what):
     res = align([(frame(5), reading(("high", value, unit, what)))], [], item_id=7)
     assert len(res.slide_only) == 1 and res.excluded == []
+
+
+@pytest.mark.parametrize("text,expected", [
+    ("between five and ten percent", [5, 10]), ("two three", [2, 3]), ("twenty twenty six", [20, 26]),
+    ("point three five", [0.35]), ("one thousand two hundred", [1200]), ("5천만 원", [5e7]), ("2만큼", [2]),
+    ("5m walk", [5]),
+])
+def test_number_values_exact(text, expected):
+    assert number_values(text) == pytest.approx(expected)
+
+
+@pytest.mark.parametrize("value,unit,expected", [("5", "m", 5), ("7", "km", 7), ("5m", "", 5), ("2", "Million", 2e6)])
+def test_units_are_not_magnitudes(value, unit, expected):
+    assert reading_value(value, unit) == pytest.approx(expected)
+
+
+def test_unusable_transcript_ignores_frame_spoken_text():
+    """전사 품질 미달이면 프레임 spoken_text(같은 환각 전사)로도 대조하지 않는다."""
+    f = frame(100, "we hit 41 percent of teams", 0)
+    r = reading(("high", "41%", "%", "of teams"))
+    assert align([(f, r)], [], item_id=1).matched
+    res = align([(f, r)], [], item_id=1, spoken_usable=False)
+    assert res.matched == [] and [x.value for x in res.slide_only] == ["41%"]

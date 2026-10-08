@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Any
 
 from ..collect.video import contract
-from ..collect.video.process import Deps, MediaFailed, MediaSkipped, Overrides, media_process
+from ..collect.video.process import Deps, MediaFailed, MediaSkipped, Overrides, media_process, resolve_span
 from ..core.artifacts import Document
 from ..core.artifacts_video import (
     FRAME_PRIORITY,
@@ -29,7 +29,7 @@ from ..core.artifacts_video import (
     VideoSummary,
     VideoSummaryInput,
 )
-from ..core.budget import BudgetExceeded
+from ..core.budget import BudgetExceeded, PriceUnknown
 from ..core.config_video import VideoConfig
 from ..core.context import Ctx
 from ..core.db import KST
@@ -134,9 +134,14 @@ def analyze(item: VideoQueueItem, ctx: Ctx, cfg: VideoConfig, media_root: Path, 
         _step(ctx, f"건너뜀(mode skip): {item.reason}")
         store.save_run(db, item_id=item_id, status="skipped", note=item.reason, **base)
         return VideoOutcome(item.video_id, "skipped", item.reason)
+    if media is not None and media.mode != item.mode:  # 저장한 결과로 mode를 올리거나 바꾸지 않는다(CONTRACTS 1장)
+        note = f"저장한 1차 처리 결과의 mode({media.mode})가 처리 지시({item.mode})와 다름"
+        _step(ctx, note, attention=True)
+        store.save_run(db, item_id=item_id, status="failed", note=note, **base)
+        return VideoOutcome(item.video_id, "failed", note)
     try:
         return _analyze(item, ctx, cfg, media_root, info, base, deps, overrides, media)
-    except BudgetExceeded as e:
+    except (BudgetExceeded, PriceUnknown) as e:
         _step(ctx, "예산 상한으로 중단", attention=True, error=str(e))
         store.save_run(db, item_id=item_id, status="failed", note=f"예산 상한: {e}", **base)
         raise
@@ -196,7 +201,7 @@ def _analyze(item: VideoQueueItem, ctx: Ctx, cfg: VideoConfig, media_root: Path,
 
     # ---------- 대조 (전사를 쓸 수 없으면 발화에 있는 수치도 없는 것으로) ----------
     done = [(f, r) for f, r in readings if r is not None]
-    aligned = align(done, media.segments if usable else [], item_id, cfg.align_window_sec)
+    aligned = align(done, media.segments, item_id, cfg.align_window_sec, spoken_usable=usable)
     _step(ctx, f"대조: 슬라이드 전용 수치 {len(aligned.slide_only)}개, 발화와 일치 {len(aligned.matched)}개, "
                f"확인 필요 {len(aligned.checks)}개", attention=bool(aligned.checks),
           detail={"unparsed": aligned.unparsed, "excluded": aligned.excluded})
@@ -220,7 +225,10 @@ def _analyze(item: VideoQueueItem, ctx: Ctx, cfg: VideoConfig, media_root: Path,
 
     # ---------- 저장 ----------
     # 길이는 올림 정수라 끝이 1초 안쪽이면 전체 처리로 본다
-    span_note = (f"구간 {span_lo}~{span_hi}초" if span_lo > 0 or span_hi < media.duration_sec - 1 else "")
+    span_note = ""
+    if span_lo > 0 or span_hi < media.duration_sec - 1:  # 구간을 정한 이유(V4). 60분 상한이면 그 문구
+        why = resolve_span(item.start_sec, item.end_sec, media.duration_sec, cfg.max_span_sec)[2]
+        span_note = why or f"구간 {span_lo}~{span_hi}초"
     log = " / ".join(x for x in [
         item.reason, span_note, f"전사 {media.transcript_quality}",
         f"판독 {stats['read']}/{len(media.frames)}장" if media.mode == "whisper+slides" else "",
@@ -238,7 +246,8 @@ def _analyze(item: VideoQueueItem, ctx: Ctx, cfg: VideoConfig, media_root: Path,
         frames_read=stats["read"], log=log, attention=attention)
     status = "partial" if slides_failed else "ok"
     store.save_segments(db, item.video_id, media.segments, cfg.segment_ttl_weeks)
-    store.save_frames(db, item.video_id, readings)
+    if dup := store.save_frames(db, item.video_id, readings):
+        _step(ctx, f"같은 시각 프레임 {dup}장은 판독 하나만 저장", attention=True)
     store.save_digest(db, digest, model=model, run_id=run_id)
     store.save_run(db, item_id=item_id, status=status, note="; ".join(notes) or None,
                    transcript_source=media.transcript_source, transcript_quality=media.transcript_quality, **base)

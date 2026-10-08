@@ -40,6 +40,10 @@ def check(result: MediaResult | dict[str, Any], *, check_files: bool = False) ->
         if i and s.start < r.segments[i - 1].end - EPS:
             out.append(f"segment {i}: 앞 segment와 겹침({r.segments[i - 1].end} > {s.start})")
 
+    # mode ↔ 전사 출처(mode가 몰래 바뀌지 않았는지: captions = 수동 자막, 나머지 = whisper)
+    if (r.mode == "captions") != (r.transcript_source == "manual"):
+        out.append(f"mode {r.mode}인데 전사 출처가 {r.transcript_source}")
+
     # frames
     if r.mode != "whisper+slides" and r.frames:
         out.append(f"프레임: mode {r.mode}인데 프레임 {len(r.frames)}장")

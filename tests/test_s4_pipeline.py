@@ -210,3 +210,60 @@ def test_video_migration_applies_in_either_order(tmp_path):
         return sorted(r[0] for r in db.conn.execute("SELECT name FROM sqlite_master WHERE type='table'"))
 
     assert tables(a) == tables(b) and "video_digests" in tables(a)
+
+
+def test_saved_media_with_other_mode_is_refused(tmp_path):
+    """저장한 1차 처리 결과로 mode를 올리지 않는다(whisper 지시에 whisper+slides 결과 → 판독 없이 실패 기록)."""
+    media = load_media("xRZHLI5SPWo")
+    tr = FakeTransport([])
+    _ctx, out = run(tmp_path, tr, VideoQueueItem(video_id=media.video_id, mode="whisper", reason="대담"), media)
+    assert out.status == "failed" and "mode" in out.note and tr.calls == 0
+
+
+def test_captions_failure_goes_to_fetch_log(tmp_path):
+    def boom(vid):
+        raise RuntimeError("ERROR: Video unavailable")
+
+    item = VideoQueueItem(video_id="CCCCCCCCCCC", mode="captions", reason="업로더 자막")
+    ctx, out = run(tmp_path, FakeTransport([]), item, None, deps=Deps(fetch_info=boom))
+    assert out.status == "failed"
+    assert ctx.db.conn.execute("SELECT status FROM fetch_log").fetchone()[0] == "failed"
+
+
+def test_cli_queue_continues_after_unexpected_error(tmp_path, monkeypatch, capsys):
+    """한 영상의 예상 밖 오류는 기록하고 다음 영상으로(큐 전체가 멈추지 않음)."""
+    from trendsit import cli_video
+    from trendsit.core import context
+    from trendsit.video import pipeline
+
+    ctx = make_ctx(tmp_path, FakeTransport([]))
+    monkeypatch.setattr(context, "open_ctx", lambda *a, **k: ctx)
+    seen = []
+
+    def fake_analyze(item, *a, **k):
+        seen.append(item.video_id)
+        if item.video_id == "AAAAAAAAAAA":
+            raise KeyError("boom")
+        return pipeline.VideoOutcome(item.video_id, "skipped", "테스트")
+
+    monkeypatch.setattr(pipeline, "analyze", fake_analyze)
+    q = tmp_path / "q.json"
+    q.write_text(json.dumps([{"video_id": "AAAAAAAAAAA", "mode": "whisper", "reason": "a"},
+                             {"video_id": "BBBBBBBBBBB", "mode": "whisper", "reason": "b"}]), encoding="utf-8")
+    args = cli_video.argparse.Namespace(queue=str(q), video_id=None, mode=None, start=None, end=None, reason="",
+                                        frames=None, res=None, lang=None, from_json=None, reuse_media=False,
+                                        model=None, no_cache=False, spec="S0")
+    assert cli_video.cmd_run(args) == 1
+    assert seen == ["AAAAAAAAAAA", "BBBBBBBBBBB"]
+    assert ctx.db.conn.execute("SELECT video_id, status FROM video_runs").fetchone()[:] == ("AAAAAAAAAAA", "failed")
+
+
+def test_duplicate_frame_times_keep_reading(tmp_path):
+    """같은 시각 프레임이 둘이면 판독이 있는 쪽 하나만 저장하고 빠진 수를 돌려준다(조용히 덮어쓰지 않음)."""
+    from trendsit.core.artifacts_video import Frame, SlideReading
+
+    ctx = make_ctx(tmp_path, FakeTransport([]))
+    f = Frame(t=5.0, path="frames/a.jpg", reason="uniform", segment_index=None, spoken_text="")
+    reading = SlideReading(frame_kind="other", ocr_text="", numbers=[], table=None, title="", log="x")
+    assert store.save_frames(ctx.db, "XXXXXXXXXXX", [(f, None), (f, reading)]) == 1
+    assert ctx.db.conn.execute("SELECT reading_json IS NOT NULL FROM video_frames").fetchone()[0] == 1

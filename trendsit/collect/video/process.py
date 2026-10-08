@@ -83,10 +83,21 @@ def _env(cfg: VideoConfig, timings: dict[str, float], whisper: bool) -> MediaEnv
                     versions=ff.versions(), timings_sec={k: round(v, 2) for k, v in timings.items()})
 
 
+def _twice(fn: Callable[[], Any], what: str) -> Any:
+    """받기 1회 재시도(S4_TASK 5.1). 두 번 다 실패하면 MediaFailed(파이프라인이 fetch_log에 기록)."""
+    errors = []
+    for _attempt in range(2):
+        try:
+            return fn()
+        except Exception as e:  # noqa: BLE001 - yt-dlp 오류 종류가 많다. 이유를 모아 MediaFailed로
+            errors.append(str(e).strip()[:200])
+    raise MediaFailed(f"{what} 실패(2회): {' / '.join(errors)}")
+
+
 # ---------- captions: 업로더 수동 자막만 ----------
 def _captions(item: VideoQueueItem, cfg: VideoConfig, media_root: Path, deps: Deps) -> MediaResult:
     started = time.monotonic()
-    info = deps.fetch_info(item.video_id)
+    info = _twice(lambda: deps.fetch_info(item.video_id), "메타데이터 받기")
     lang = source.manual_caption_lang(info, cfg.caption_langs)
     if lang is None:
         # whisper로 올리지 않는다(CONTRACTS 1장). 자동 자막은 있어도 쓰지 않는다
@@ -98,7 +109,7 @@ def _captions(item: VideoQueueItem, cfg: VideoConfig, media_root: Path, deps: De
     ws = Workspace(media_root, item.video_id)
     staging = ws.reset_staging()
     try:
-        vtt = deps.download_captions(item.video_id, lang, staging)
+        vtt = _twice(lambda: deps.download_captions(item.video_id, lang, staging), "수동 자막 받기")
         raw = source.parse_vtt(vtt.read_text(encoding="utf-8"))
     finally:
         ws.clear_staging()
@@ -144,7 +155,10 @@ def _whisper(item: VideoQueueItem, cfg: VideoConfig, settings: ModeSettings, med
     need_video = settings.frames != "off"
     media, title = _acquire(item, cfg, ws, need_video, deps)
     timings["download"] = time.monotonic() - started
-    probe = ff.probe_media(media)
+    try:
+        probe = ff.probe_media(media)
+    except ff.ProbeError as e:
+        raise MediaFailed(f"받은 파일을 읽지 못함: {e}") from e
     duration = float(probe["duration"])
     if duration <= 0:
         raise MediaFailed("받은 파일의 길이를 확인할 수 없음")

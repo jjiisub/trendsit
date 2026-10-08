@@ -34,7 +34,7 @@ def readings_of(db: DB, media: MediaResult) -> list:
 def build(db: DB, media: MediaResult, readings: list, window: int) -> dict:
     info = store.video_item(db, media.video_id)
     done = [(f, r) for f, r in readings if r is not None]
-    aligned = align(done, media.segments if media.transcript_quality == "ok" else [], info["item_id"], window)
+    aligned = align(done, media.segments, info["item_id"], window, spoken_usable=media.transcript_quality == "ok")
     return summary_input(media, readings, aligned, info).model_dump(mode="json")
 
 

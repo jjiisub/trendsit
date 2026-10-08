@@ -10,7 +10,7 @@ from .graders import EVAL_ENDINGS, check
 
 NO_CONTENT = "내용 없음"
 # 문장으로 끝남(명사형 아님). 공통 SENTENCE_END는 '필요', '개요'처럼 요로 끝나는 명사도 잡아서 쓰지 않는다
-SENTENCE_END = re.compile(r"(다|니다|까|죠|네요|어요|아요|에요|예요|해요|세요|지요|군요)[.!?…]*$|[.!?]$")
+SENTENCE_END = re.compile(r"(다|니다|까|까요|나요|죠|네요|어요|아요|에요|예요|해요|세요|지요|군요)[.!?…]*$|[.!?]$")
 _VD = re.compile(r"^vd:(\d+)@(\d+)$")
 
 

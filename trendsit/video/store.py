@@ -46,13 +46,19 @@ def save_segments(db: DB, video_id: str, segments: list[Segment], ttl_weeks: int
             [(video_id, i, s.start, s.end, s.text, expires) for i, s in enumerate(segments)])
 
 
-def save_frames(db: DB, video_id: str, frames: list[tuple[Frame, SlideReading | None]]) -> None:
-    """프레임 판독은 텍스트만(이미지 경로는 7일 뒤 사라지므로 저장하지 않음)."""
+def save_frames(db: DB, video_id: str, frames: list[tuple[Frame, SlideReading | None]]) -> int:
+    """프레임 판독은 텍스트만(이미지 경로는 7일 뒤 사라지므로 저장하지 않음). 같은 시각이 둘이면 판독이 있는 쪽 하나만.
+    겹쳐서 빠진 프레임 수를 돌려준다(조용히 덮어쓰지 않게)."""
+    by_t: dict[float, tuple[Frame, SlideReading | None]] = {}
+    for f, r in frames:
+        if f.t not in by_t or (by_t[f.t][1] is None and r is not None):
+            by_t[f.t] = (f, r)
     with db.conn:
         db.conn.execute("DELETE FROM video_frames WHERE video_id = ?", (video_id,))
         db.conn.executemany(
-            "INSERT OR REPLACE INTO video_frames(video_id, t, reason, spoken_text, reading_json) VALUES (?,?,?,?,?)",
-            [(video_id, f.t, f.reason, f.spoken_text, r.model_dump_json() if r else None) for f, r in frames])
+            "INSERT INTO video_frames(video_id, t, reason, spoken_text, reading_json) VALUES (?,?,?,?,?)",
+            [(video_id, f.t, f.reason, f.spoken_text, r.model_dump_json() if r else None) for f, r in by_t.values()])
+    return len(frames) - len(by_t)
 
 
 def save_digest(db: DB, digest: VideoDigest, *, model: str | None, run_id: str) -> None:

@@ -46,6 +46,7 @@ def cmd_run(args: argparse.Namespace) -> int:
     from .core.budget import BudgetExceeded, PriceUnknown
     from .core.context import open_ctx
     from .video.pipeline import analyze
+    from .video.store import save_run
 
     try:
         items = _queue(args)
@@ -53,8 +54,8 @@ def cmd_run(args: argparse.Namespace) -> int:
         print(f"입력 오류: {e}", file=sys.stderr)
         return 2
     media = MediaResult.model_validate_json(Path(args.from_json).read_text(encoding="utf-8")) if args.from_json else None
-    if media is not None and (len(items) != 1 or items[0].video_id != media.video_id):
-        print("--from-json은 같은 영상 하나에만", file=sys.stderr)
+    if media is not None and (len(items) != 1 or items[0].video_id != media.video_id or items[0].mode != media.mode):
+        print("--from-json은 같은 영상, 같은 mode 하나에만", file=sys.stderr)
         return 2
     cfg = load_video_config()
     ctx = open_ctx(None, spec=_spec(args), no_cache=args.no_cache, model=args.model)
@@ -80,6 +81,13 @@ def cmd_run(args: argparse.Namespace) -> int:
             results.append({"video_id": item.video_id, "status": "stopped", "note": str(e)})
             code = 1
             break
+        except Exception as e:  # noqa: BLE001 - 한 영상의 예상 밖 오류가 큐 전체를 멈추지 않게. 기록하고 다음 영상
+            note = f"{type(e).__name__}: {e}"[:500]
+            ctx.tracer.step(kind="code", role="video_analyst", text="예상 밖 오류, 영상 건너뜀", attention=True, error=note)
+            save_run(ctx.db, item_id=None, video_id=item.video_id, mode=item.mode, start_sec=item.start_sec,
+                     end_sec=item.end_sec, reason=item.reason, status="failed", run_id=ctx.tracer.run_id, note=note)
+            results.append({"video_id": item.video_id, "status": "failed", "note": note})
+            code = 1
         finally:
             ctx.tracer.finish(status)
     print(json.dumps(results, ensure_ascii=False, indent=2))

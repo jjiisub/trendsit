@@ -172,3 +172,12 @@ def test_summary_no_sources_is_no_content():
     """A7: 전사도 판독도 없으면 내용 없음 + attention(모델이 지어내도 코드가 비움)."""
     out = summary().enforce(summary_input("suspect_hallucination", slides=False), None)
     assert out.summary == NO_CONTENT and out.key_points == [] and out.timeline == [] and out.attention
+
+
+def test_check_numbers_survive_enforce():
+    """check 값은 보이는 만큼만("1?8") 적으므로 ocr_text 글자 그대로가 아니어도 지우지 않는다(사람 확인 목록)."""
+    r = SlideReading.model_validate_json(slide_json(
+        ocr_text="Latency\np95 128 ms", numbers=[{"confidence": "check", "value": "1?8", "unit": "ms", "what": "p95"},
+                                                {"confidence": "high", "value": "999", "unit": "ms", "what": "p99"}]))
+    out = r.enforce(slide_input(THUMBS[0]), None)
+    assert [n.value for n in out.numbers] == ["1?8"] and out.attention

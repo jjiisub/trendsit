@@ -333,12 +333,15 @@ def test_contract_rejects_broken_copies():
     def frame_after_end(d):
         d["frames"][-1]["t"] = d["duration_sec"] + 50
 
+    def source_swapped(d):
+        d["transcript_source"] = "manual"
+
     def spoken_mismatch(d):
         f = next(f for f in d["frames"] if f["segment_index"] is not None)
         f["spoken_text"] = "다른 문장"
 
     for mutate in (reverse_segments, reverse_frames, over_cap, outside, absolute, bad_quality, frame_after_end,
-                   spoken_mismatch):
+                   spoken_mismatch, source_swapped):
         assert _broken(mutate), mutate.__name__
 
 
@@ -405,3 +408,19 @@ def test_media_process_synthetic_end_to_end(tmp_path):
     r2 = media_process(item, cfg(), tmp_path / "media",
                        deps=Deps(download=lambda *a, **k: pytest.fail("다시 받음"), transcribe=transcribe))
     assert MediaResult.model_validate(r2.model_dump()) and contract.check(r2, check_files=True) == []
+
+
+def test_captions_download_errors_retry_once_then_media_failed(tmp_path):
+    """받기 1회 재시도. 두 번 다 실패하면 MediaFailed(파이프라인이 fetch_log에 기록)."""
+    from trendsit.collect.video.process import MediaFailed
+
+    calls = []
+
+    def boom(vid):
+        calls.append(vid)
+        raise RuntimeError("ERROR: Private video")
+
+    item = VideoQueueItem(video_id="CCCCCCCCCCC", mode="captions", reason="업로더 자막")
+    with pytest.raises(MediaFailed, match="Private video"):
+        media_process(item, cfg(), tmp_path, deps=Deps(fetch_info=boom))
+    assert len(calls) == 2

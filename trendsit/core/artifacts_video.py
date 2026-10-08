@@ -146,7 +146,8 @@ class SlideReading(RoleOutput):
         out = self
         if out.frame_kind != "slide" and out.numbers:
             out = out.fix("numbers", [], "slide가 아닌 화면의 수치 비움")
-        kept = [n for n in out.numbers if n.value and n.value in out.ocr_text]
+        # check 값은 보이는 만큼만 적으라고 했으므로("1?8") ocr_text 글자 그대로가 아닐 수 있다. 사람 확인 목록으로 보냄
+        kept = [n for n in out.numbers if n.value and (n.confidence == "check" or n.value in out.ocr_text)]
         if len(kept) != len(out.numbers):
             out = out.fix("numbers", kept, "ocr_text에 없는 수치 값 지움").fix("attention", True, "수치 값 불일치")
         return out
