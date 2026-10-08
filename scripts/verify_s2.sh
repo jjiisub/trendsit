@@ -75,6 +75,29 @@ print(("OK " if mine and not bad else "BAD ") + f"이 묶음 번호 {mine}, 대�
 PY
 )
 [[ "$A13" == OK* ]] && pass A13 "마이그레이션 대역: ${A13#OK }" || fail A13 "${A13#BAD }"
-for id in A4 A8 A14; do fail "$id" "미구현(2b 단계에서 추가)"; done
+if uv run --quiet python -m trendsit check-config >"$TMP/a4" 2>&1; then
+  A4_MISS=""
+  for r in item_card; do
+    [ -f "roles/$r.md" ] || A4_MISS+=" roles/$r.md"
+    [ -f "eval/rubrics/$r.md" ] || A4_MISS+=" eval/rubrics/$r.md"
+    n=$(grep -c '<example>' "roles/$r.md" 2>/dev/null || echo 0)
+    [ "$n" -ge 3 ] || A4_MISS+=" $r 예시 $n개"
+  done
+  [ -z "$A4_MISS" ] && pt A4 "S2 새 역할 md(item_card)와 채점표가 역할 md 검사 통과, 예시 3개(보통/빈칸/함정). S3 역할은 verify_s3.sh" \
+    tests/test_s1a.py -k "all_role_files" || fail A4 "없음:$A4_MISS"
+else
+  fail A4 "$(head -2 "$TMP/a4" | tr '\n' ' ')"
+fi
+pt A8 "item_card enforce: 본문에 없는 quote, quote에 없는 수치, 목록 밖 키워드·링크 정리 + detail 기록, 코드 채점(인젝션, 인용 일치율)" \
+  tests/test_s2b.py
+A14_MISS=""
+grep -q "trendsit filter" README.md || A14_MISS+=" README:filter"
+grep -q "trendsit summarize" README.md || A14_MISS+=" README:summarize"
+grep -q "^| S2 " README.md || A14_MISS+=" README:성과 행"
+for c in rematch "trendsit filter" filter-fixtures "trendsit summarize"; do grep -q "$c" docs/DEVELOPMENT.md || A14_MISS+=" DEVELOPMENT:$c"; done
+grep -q "## 2a" reports/S2_report.md 2>/dev/null || A14_MISS+=" reports/S2_report.md(2a)"
+grep -q "## 2b" reports/S2_report.md 2>/dev/null || A14_MISS+=" reports/S2_report.md(2b)"
+[ -f reports/S2S3_mac_todo.md ] || A14_MISS+=" reports/S2S3_mac_todo.md"
+[ -z "$A14_MISS" ] && pass A14 "README(기능, 빠른 시작, 성과 행), DEVELOPMENT 명령표, S2 리포트, 맥 확인 목록" || fail A14 "없음:$A14_MISS"
 
 exit $FAILED

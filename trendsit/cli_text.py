@@ -118,6 +118,26 @@ def cmd_filter_fixtures(args: argparse.Namespace) -> int:
     return 0 if worst <= 0.001 else 1
 
 
+# ---------- summarize (2b) ----------
+def cmd_summarize(args: argparse.Namespace) -> int:
+    from .core.context import open_ctx
+    from .summarize import run_summarize, targets
+
+    ctx = open_ctx("summarize", spec=args.spec or "S2", model=args.model, no_cache=args.no_cache,
+                   note=f"summarize {_period(args)}".strip())
+    status = "failed"
+    try:
+        ids = targets(ctx.db, _date(args.since), _date(args.until), redo=args.redo, limit=args.limit)
+        res = run_summarize(ctx, ids, config.load("keywords.yaml"))
+        ctx.tracer.step(kind="code", role="summarize", text=res.summary(), detail=res.__dict__,
+                        attention=bool(res.stopped or res.fallback))
+        print(res.summary())
+        status = "stopped" if res.stopped else "ok"
+    finally:
+        ctx.tracer.finish(status)
+    return 0 if status == "ok" else 1
+
+
 def register(sub: Any) -> None:
     r = sub.add_parser("rematch", help="바뀐 keywords.yaml로 저장된 항목의 키워드 판정을 다시 계산(네트워크 없음)")
     r.add_argument("--since")
@@ -133,6 +153,16 @@ def register(sub: Any) -> None:
     f.add_argument("--labels", action="store_true", help="eval/labels/relevance.csv 40건 생성(채운 expected 보존)")
     f.add_argument("--spec")
     f.set_defaults(fn=cmd_filter)
+
+    sm = sub.add_parser("summarize", help="글 1차 요약(item_card): 필터 keep이고 같은 URL 기준 항목인 글")
+    sm.add_argument("--since")
+    sm.add_argument("--until")
+    sm.add_argument("--limit", type=int)
+    sm.add_argument("--model", help="models.yaml 별칭")
+    sm.add_argument("--redo", action="store_true", help="이미 v1이 있는 글도 다시")
+    sm.add_argument("--no-cache", action="store_true")
+    sm.add_argument("--spec")
+    sm.set_defaults(fn=cmd_summarize)
 
     ff = sub.add_parser("filter-fixtures", help="eval/fixtures/filter 20건 점수(장치별 비교)")
     ff.add_argument("--embedder", choices=["real", "mock"], default="real")

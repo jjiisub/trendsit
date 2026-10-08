@@ -1,0 +1,88 @@
+{
+ "input": {
+  "item_id": 8,
+  "title": "Quoting Felix Rieseberg",
+  "source_name": "Simon Willison's Weblog",
+  "source_kind": "curation",
+  "url": "https://simonwillison.net/2026/Oct/5/felix-rieseberg/",
+  "body": {
+   "id": "it:8",
+   "source": "Simon Willison's Weblog",
+   "text": "5th October 2026\nThe \"old\" version of Cowork runs model inference in the cloud, executing tool calls in an Anthropic-provided VM we shipped to your computer. We added the VM for capability, safety, and security reasons - mapping in just the data you explicitly added to your session. People loved what they were able to do with Claude but didn't love the disk, battery, and performance cost of running the VM locally. Also, people didn't love that closing your laptop means the work stops.\nThe \"new\" version of Cowork runs model inference and the VM in the cloud. Each session gets its own sandbox, not sharing state with other sessions. When the VM needs something on the users' device (like a file), the desktop app is responsible for that file access tool call. [...]\nWe think this solves a lot of problems we've heard about (like using Cowork from a phone, keeping work running, or getting all the same power without losing battery to the VM)\n— Felix Rieseberg, Anthropic, see also this help page\nRecent articles\n- We're going to need default hard budget caps on pretty much everything - 3rd October 2026\n- OpenAI DevDay 2026 live blog - 29th September 2026\n- 2026 in LLMs (so far) - 27th September 2026",
+   "title": "Quoting Felix Rieseberg",
+   "url": "https://simonwillison.net/2026/Oct/5/felix-rieseberg/"
+  },
+  "links": [
+   {
+    "n": 1,
+    "url": "https://twitter.com/felixrieseberg/status/2107206431376334975",
+    "kind": "social",
+    "anchor": "Felix Rieseberg",
+    "role": "body"
+   },
+   {
+    "n": 2,
+    "url": "https://support.claude.com/en/articles/15520349-use-claude-cowork-on-web-desktop-and-mobile#h_f951c27c48",
+    "kind": "other",
+    "anchor": "this help page",
+    "role": "body"
+   }
+  ],
+  "keywords": [
+   {
+    "id": "agent",
+    "name": "AI 에이전트"
+   },
+   {
+    "id": "coding-agent",
+    "name": "코딩 에이전트"
+   },
+   {
+    "id": "mcp-tools",
+    "name": "MCP · 도구 호출"
+   },
+   {
+    "id": "open-weight",
+    "name": "오픈웨이트 · 로컬 LLM"
+   },
+   {
+    "id": "rag-search",
+    "name": "RAG · 검색"
+   },
+   {
+    "id": "multimodal",
+    "name": "멀티모달"
+   },
+   {
+    "id": "reasoning",
+    "name": "추론 · 판단 모델"
+   },
+   {
+    "id": "eval",
+    "name": "평가 · 벤치마크"
+   },
+   {
+    "id": "ai-security",
+    "name": "AI 보안"
+   },
+   {
+    "id": "frontier-release",
+    "name": "프런티어 모델 출시"
+   },
+   {
+    "id": "ai-industry",
+    "name": "AI 산업 · 시장"
+   },
+   {
+    "id": "dev-practice",
+    "name": "개발 실무 · 경험"
+   },
+   {
+    "id": "ai-general",
+    "name": "AI 일반"
+   }
+  ]
+ },
+ "expect": {},
+ "note": "S1 녹화 응답으로 만든 개발 DB(items.id 8). 본문 1207자, 링크 2개, 수치 표현 약 0개"
+}

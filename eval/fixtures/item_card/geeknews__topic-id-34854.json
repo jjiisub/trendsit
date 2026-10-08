@@ -1,0 +1,172 @@
+{
+ "input": {
+  "item_id": 5,
+  "title": "OpenRig - Claude Code와 Codex를 팀으로 운영하는 멀티 에이전트 오케스트레이터",
+  "source_name": "GeekNews",
+  "source_kind": "curation",
+  "url": "https://news.hada.io/topic?id=34854",
+  "body": {
+   "id": "it:5",
+   "source": "GeekNews",
+   "text": "A harness wraps a model. A rig wraps your harnesses. Define your agent team in YAML, boot it with one command. Claude Code and Codex in the same rig, managed as one system.\n\nOpenRig is open-source software for building and running your own network of agents. It turns AI coding agents from a pile of terminal sessions into a persistent, organized team. Talk to a lead agent about the outcome you want; it can coordinate specialists across teams and bring you results and decisions that need your attention. Start with a repository and one useful change, then keep the team's work and context at the same addresses.\n\nIt's the open-source system behind my AI civilization experiments.\n\nGuide: Getting started · Stuck? Help · Questions: Q&A · Updates and demos: @_feralmachine on X\n\nStart here: the guided first-use path: install, talk to the kernel operator, then choose a team for your first useful change.\n\nNot setting this up today? Get the next walkthrough and occasional OpenRig updates → https://openrig.dev/follow\n\nRequires Node.js 22 or 24 and tmux, on macOS or Linux. On Linux, the distribution's own Node.js can be older (Ubuntu 24.04's is 18); install a supported version with nvm (nvm install 22) or NodeSource. On a Mac with Apple silicon, use Node.js 22 (compatibility history). On Windows, use WSL2, the Windows route OpenRig supports; native Windows isn't supported. OpenRig's automated tests don't run on WSL2 yet; see one user's working setup. Launching a rig writes provider hooks and workspace trust settings. Before running the commands below, read what OpenRig changes on your machine and back up the relevant files.\n\nOne command. This runs OpenRig's install script from the v0.6.6 release. It checks Node.js and npm, installs the latest published @openrig/cli with npm install -g, runs the Node.js and SQLite check, then runs rig setup --dry-run and rig setup. The first line prints that plan and changes nothing:\n\ncurl -fsSL https://raw.githubusercontent.com/mvschwarz/openrig/v0.6.6/scripts/install.sh | sh -s -- --dry-run\n\ncurl -fsSL https://raw.githubusercontent.com/mvschwarz/openrig/v0.6.6/scripts/install.sh | sh\n\nIf a provider isn't signed in yet, the last step reports FAILED [4/4], and rig setup lists the sign-in under \"Some steps need attention\". If the only remaining failures are provider sign-ins, the install steps finished; sign in to each selected provider as below and continue.\n\nOr step by step:\n\nnpm install -g @openrig/cli\n\nrig setup --dry-run\n\nTo install with Bun instead, run bun add -g @openrig/cli. OpenRig still runs on Node.js, so install Node.js 22 as well. Bun may block this package's postinstall script, in which case the Node.js and SQLite check described under what OpenRig changes on your machine does not run at install time.\n\nnpm 11 and later can skip that postinstall script and print npm warn install-scripts naming @openrig/cli. That's expected: the CLI still works, and only the Node.js and SQLite check was skipped. To run it yourself, use node \"$(npm root -g)/@openrig/cli/scripts/check-abi.mjs\"; rig doctor checks the Node.js version only.\n\nChoose the working account you already have: Claude Code, Codex, or both. Reuse an explicit choice; no second subscription is required. rig setup --dry-run previews the broader setup; applying rig setup checks both harnesses and installs a missing one, plus Herdr unless declined with --no-herdr. On macOS, the installing agent offers Ghostty once. Setup leaves an existing cmux installation alone. It is optional for the selected-provider path.\n\nA team seat with no permission policy, per-seat choice or (for Codex) named profile launches with OpenRig's team default: Claude runs ordinary rig commands, project reads and common tests without prompting, while lifecycle commands such as rig up and rig down still ask; Codex also gets the OpenRig workspace and its pod's state directory as writable directories. Before launching, your agent recommends keeping that default, and offers to remember selected OpenRig commands in your native settings only if you want that, at personal project scope unless you explicitly choose user-wide sessions. It is not global YOLO or permission to invent work. On Yes, the agent adds and verifies native rules; No or no answer keeps the team default and leaves settings unchanged. An existing explicit choice is reused. Say “Undo the OpenRig command allowances added by this setup” to remove only its additions.\n\nIf permission prompts are slowing you down, consider the workshop bundle. It ships with broad access and non-interruptive mode: its agents bypass permission prompts and supported harness warning dialogs. The listing and before-install view explain that access before you choose it.\n\nCheck tmux -V and only your selected CLI/login: claude --version plus\n\nclaude auth status, or codex --version plus codex login status. If needed,\n\nsign in once with claude auth login or codex login; do not install or log in\n\nto an unused provider.\n\nAsk your agent to “open the welcome screen”, “open the OpenRig view” or “show me my agents”, “show me the terminals” / “let me see my agents.” After checking the selected login, it runs:\n\nrig daemon start  # if stopped\n\nrig terminal open saved:kernel --window\n\n--window opens a new terminal tab or window itself, with TUI | advisor |\n\noperator. An installing agent can run it from its shell on the daemon's\n\ndesktop; the person copies nothing. It uses Herdr when installed, otherwise\n\nthe same layout in plain tmux, and preserves existing conversations. rig tui\n\nis the team dashboard. Installation is finished when you are talking to the\n\noperator; if you choose to talk later, that handoff remains pending.",
+   "title": "OpenRig - Claude Code와 Codex를 팀으로 운영하는 멀티 에이전트 오케스트레이터",
+   "url": "https://news.hada.io/topic?id=34854"
+  },
+  "links": [
+   {
+    "n": 1,
+    "url": "https://github.com/mvschwarz/openrig",
+    "kind": "repo",
+    "anchor": "OpenRig - Claude Code와 Codex를 팀으로 운영하는 멀티 에이전트 오케스트레이터",
+    "role": "origin_candidate"
+   },
+   {
+    "n": 2,
+    "url": "https://x.com/_feralmachine",
+    "kind": "social",
+    "anchor": "@_feralmachine on X",
+    "role": "body"
+   },
+   {
+    "n": 3,
+    "url": "https://openrig.dev/follow",
+    "kind": "other",
+    "anchor": "https://openrig.dev/follow",
+    "role": "body"
+   },
+   {
+    "n": 4,
+    "url": "https://openrig.dev/rigs/workshop",
+    "kind": "other",
+    "anchor": "workshop bundle",
+    "role": "body"
+   },
+   {
+    "n": 5,
+    "url": "https://www.youtube.com/@openrig",
+    "kind": "social",
+    "anchor": "youtube.com/@openrig",
+    "role": "body"
+   },
+   {
+    "n": 6,
+    "url": "https://openrig.dev/tour/workspace",
+    "kind": "other",
+    "anchor": "try the interactive TUI tour",
+    "role": "body"
+   },
+   {
+    "n": 7,
+    "url": "https://www.openrig.dev/help/agents",
+    "kind": "other",
+    "anchor": "openrig.dev/help/agents",
+    "role": "body"
+   },
+   {
+    "n": 8,
+    "url": "https://openrig.dev",
+    "kind": "other",
+    "anchor": "openrig.dev",
+    "role": "body"
+   },
+   {
+    "n": 9,
+    "url": "https://openrig.dev/docs",
+    "kind": "other",
+    "anchor": "openrig.dev/docs",
+    "role": "body"
+   },
+   {
+    "n": 10,
+    "url": "https://openrig.dev/llms.txt",
+    "kind": "other",
+    "anchor": "documentation index for agents",
+    "role": "body"
+   },
+   {
+    "n": 11,
+    "url": "https://openrig.dev/blog",
+    "kind": "other",
+    "anchor": "openrig.dev/blog",
+    "role": "body"
+   },
+   {
+    "n": 12,
+    "url": "https://esoteric.run/blog/why-i-built-openrig",
+    "kind": "other",
+    "anchor": "Why I Built OpenRig",
+    "role": "body"
+   },
+   {
+    "n": 13,
+    "url": "https://openrig.dev/specs",
+    "kind": "other",
+    "anchor": "openrig.dev/specs",
+    "role": "body"
+   },
+   {
+    "n": 14,
+    "url": "https://twitter.com/_feralmachine",
+    "kind": "social",
+    "anchor": "@_feralmachine",
+    "role": "body"
+   }
+  ],
+  "keywords": [
+   {
+    "id": "agent",
+    "name": "AI 에이전트"
+   },
+   {
+    "id": "coding-agent",
+    "name": "코딩 에이전트"
+   },
+   {
+    "id": "mcp-tools",
+    "name": "MCP · 도구 호출"
+   },
+   {
+    "id": "open-weight",
+    "name": "오픈웨이트 · 로컬 LLM"
+   },
+   {
+    "id": "rag-search",
+    "name": "RAG · 검색"
+   },
+   {
+    "id": "multimodal",
+    "name": "멀티모달"
+   },
+   {
+    "id": "reasoning",
+    "name": "추론 · 판단 모델"
+   },
+   {
+    "id": "eval",
+    "name": "평가 · 벤치마크"
+   },
+   {
+    "id": "ai-security",
+    "name": "AI 보안"
+   },
+   {
+    "id": "frontier-release",
+    "name": "프런티어 모델 출시"
+   },
+   {
+    "id": "ai-industry",
+    "name": "AI 산업 · 시장"
+   },
+   {
+    "id": "dev-practice",
+    "name": "개발 실무 · 경험"
+   },
+   {
+    "id": "ai-general",
+    "name": "AI 일반"
+   }
+  ]
+ },
+ "expect": {},
+ "note": "S1 녹화 응답으로 만든 개발 DB(items.id 5). 본문 5694자, 링크 14개, 수치 표현 약 1개"
+}

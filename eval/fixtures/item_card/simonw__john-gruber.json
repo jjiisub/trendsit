@@ -1,0 +1,88 @@
+{
+ "input": {
+  "item_id": 27,
+  "title": "John Gruber",
+  "source_name": "Simon Willison's Weblog",
+  "source_kind": "curation",
+  "url": "https://simonwillison.net/2026/Sep/25/john-gruber/",
+  "body": {
+   "id": "it:27",
+   "source": "Simon Willison's Weblog",
+   "text": "Muse is getting a lot of attention — including mine — because it’s both groundbreaking technically (each user gets their own entire persistent Linux VM running in Meta’s cloud) and because it’s packaged in an easy-to-install easy-to-use way. It’s literally presented as a cute mascot. It’s the first consumer-accessible agentic AI system, and Meta has truly done an amazing job with that. But it’s a genuinely open question whether consumers have any understanding what this means. If you buy a power saw that can cut your fingers off, you are almost certainly aware that you are buying a power saw that can sever your fingers. [...] I don’t think people realize how powerful — and thus dangerous — Muse is, especially if it’s running on your Mac.\n— John Gruber, Muse Looks Cute, but Looks are Deceiving\n# 5:22 pm / john-gruber, ai, generative-ai, llms, meta, general-agents, muse-agent, muse",
+   "title": "John Gruber",
+   "url": "https://simonwillison.net/2026/Sep/25/john-gruber/"
+  },
+  "links": [
+   {
+    "n": 1,
+    "url": "https://daringfireball.net/linked/2026/09/24/song-meta-muse-cute",
+    "kind": "other",
+    "anchor": "a cute mascot",
+    "role": "body"
+   },
+   {
+    "n": 2,
+    "url": "https://daringfireball.net/linked/2026/09/25/aten-muse",
+    "kind": "other",
+    "anchor": "John Gruber",
+    "role": "body"
+   }
+  ],
+  "keywords": [
+   {
+    "id": "agent",
+    "name": "AI 에이전트"
+   },
+   {
+    "id": "coding-agent",
+    "name": "코딩 에이전트"
+   },
+   {
+    "id": "mcp-tools",
+    "name": "MCP · 도구 호출"
+   },
+   {
+    "id": "open-weight",
+    "name": "오픈웨이트 · 로컬 LLM"
+   },
+   {
+    "id": "rag-search",
+    "name": "RAG · 검색"
+   },
+   {
+    "id": "multimodal",
+    "name": "멀티모달"
+   },
+   {
+    "id": "reasoning",
+    "name": "추론 · 판단 모델"
+   },
+   {
+    "id": "eval",
+    "name": "평가 · 벤치마크"
+   },
+   {
+    "id": "ai-security",
+    "name": "AI 보안"
+   },
+   {
+    "id": "frontier-release",
+    "name": "프런티어 모델 출시"
+   },
+   {
+    "id": "ai-industry",
+    "name": "AI 산업 · 시장"
+   },
+   {
+    "id": "dev-practice",
+    "name": "개발 실무 · 경험"
+   },
+   {
+    "id": "ai-general",
+    "name": "AI 일반"
+   }
+  ]
+ },
+ "expect": {},
+ "note": "S1 녹화 응답으로 만든 개발 DB(items.id 27). 본문 892자, 링크 2개, 수치 표현 약 0개"
+}

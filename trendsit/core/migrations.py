@@ -92,6 +92,15 @@ register(10, """
     );
     """)
 
+# 11: S2 2b 글 카드. version 1 = 1차 요약(item_card), 2 = 글 분석가(S3 3b). v2가 v1을 덮지 않음
+register(11, """
+    CREATE TABLE IF NOT EXISTS item_cards (
+        item_id INTEGER NOT NULL, version INTEGER NOT NULL CHECK(version IN (1, 2)), card_json TEXT NOT NULL,
+        model TEXT, run_id TEXT, created_at TEXT, fallback INTEGER NOT NULL DEFAULT 0,
+        PRIMARY KEY(item_id, version)
+    );
+    """)
+
 # ---------- S4 (20~29) ----------
 
 
