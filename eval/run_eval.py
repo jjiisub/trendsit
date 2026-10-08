@@ -55,7 +55,9 @@ def _evaluate(ctx: Any, role_name: str, model: str | None, limit: int | None, no
         before = ctx.budget.session_cost
         out, error, inp = None, None, None
         final = None
-        ctx.resources.pop("fetched_pages", None)  # 도구 에이전트: 이전 픽스처에서 연 페이지를 인용 근거로 쓰지 않게
+        # 도구 에이전트: 운영(deep/text_agent.py)과 같이 항목마다 새로. 지우기만 하면 github_repo가 첫 호출일 때
+        # README를 가져온 페이지로 등록하지 못하고, 이전 픽스처의 깊이 기록이 남는다
+        ctx.resources["fetched_pages"], ctx.resources["page_depth"] = {}, {}
         mark = ctx.db.conn.execute("SELECT COALESCE(MAX(id), 0) FROM steps").fetchone()[0]
         try:
             inp = role.input_cls.model_validate(fx["input"])

@@ -205,3 +205,37 @@ def test_github_name_rejects_path_traversal():
     for bad in ("../user", "a/..", "./x"):
         with pytest.raises(ValueError):
             RepoArgs(name=bad)
+
+
+def test_eval_registers_github_readme_as_fetched_page(tmp_path, monkeypatch):
+    """평가 경로도 운영과 같이 항목마다 fetched_pages를 새로 만든다. github_repo가 첫 호출이어도 README 인용이 남는다."""
+    from eval import graders, run_eval
+    from trendsit.core.textclean import clean_markdown
+
+    repo = "https://github.com/NVIDIA/OpenShell"
+    fx = json.loads((run_eval.ROOT / "eval" / "fixtures" / "text_analyst" / "dev-it5.json").read_text())
+    fx["input"]["links"] = [{"n": 1, "url": repo, "kind": "레포", "anchor": None, "candidate": True}]
+    readme = FixtureTransport("repo_tools").index["https://api.github.com/repos/NVIDIA/OpenShell/readme"]
+    sent = next(s.strip() for s in clean_markdown(__import__("gzip").decompress(readme[0].read_bytes()).decode())
+                .split("\n") if len(s.strip()) > 40)
+    checks = [c["n"] for c in fx["input"]["checks"]]
+    out = v2(trail=[{"url": repo, "depth": 2, "reason": "원문 → 레포"}], quotes=[{"n": 1, "url": repo, "text": sent}],
+             verified=[{"check_n": checks[0], "quote_n": 1, "status": "confirmed"}]
+             + [{"check_n": n, "quote_n": None, "status": "not_found"} for n in checks[1:]],
+             origin={"url": repo, "kind": "repo", "title": "OpenShell", "date": None}, numbers=[],
+             claims=[{"quote_ns": [1], "text": "에이전트 런타임"}])
+    fx_dir = tmp_path / "fixtures" / "text_analyst"
+    fx_dir.mkdir(parents=True)
+    (fx_dir / "it5.json").write_text(json.dumps(fx, ensure_ascii=False), encoding="utf-8")
+    monkeypatch.setattr(run_eval, "FIXTURES", tmp_path / "fixtures")
+    monkeypatch.setattr(run_eval, "REPORTS", tmp_path / "reports")
+    monkeypatch.setattr(run_eval, "ROOT", tmp_path)
+    monkeypatch.setattr(graders, "llm_grade", lambda *a: {"verdicts": {}, "scores": {}, "missing": []})
+    c = make_ctx(tmp_path, FakeTransport([call("github_repo", name="NVIDIA/OpenShell"), call("finish", **out)]),
+                 spec_cap=1.0)
+    c.resources.update(fetcher=fetcher_for(FixtureTransport("repo_tools")), github_headers={})
+    c.resources["fetched_pages"] = {"stale": "이전 픽스처"}  # 이전 픽스처의 기록은 지워져야 함
+    rec = run_eval._evaluate(c, "text_analyst", None, None, "t")["results"][0]
+    assert not any(e["field"] in ("quotes", "verified") for e in rec.get("enforced") or [])
+    assert rec["output"]["verified"][0]["status"] == "confirmed"
+    assert "stale" not in c.resources["fetched_pages"]
