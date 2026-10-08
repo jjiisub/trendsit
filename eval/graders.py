@@ -20,6 +20,8 @@ JUDGE_ROLE = "eval/judge.md"
 
 # 공통 문체 검사 (skills/style_ko.md)
 HAEYO = re.compile(r"(요|세요|어요|아요|에요|예요|해요|죠)[.!?…]*$")
+# "요"로 끝나는 명사(명사형 끝말이라 해요체가 아님). "필요해요"처럼 뒤에 어미가 붙으면 HAEYO가 그대로 잡는다
+NOUN_YO = re.compile(r"(필요|중요|주요|개요|수요|강요|소요)[.!?…]*$")
 EVAL_ENDINGS = ("눈에 띈다", "핵심이다", "주목할 만하다", "공통 교훈이다", "주목할 만한", "눈여겨볼")
 # 평가어(근거 없는 수식). 레포 설명, 포인트에서 쓰지 않는다
 EVAL_WORDS = ("혁신적", "강력한", "놀라운", "최고의", "획기적", "뛰어난", "완벽한", "최첨단", "차세대", "혁명적",
@@ -57,7 +59,7 @@ def style_checks(output: dict[str, Any]) -> list[dict[str, Any]]:
     checks = []
     for key, text in _strings(output):
         sentences = [s.strip() for s in re.split(r"(?<=[.!?])\s+|\n", text) if s.strip()]
-        bad = [s for s in sentences if HAEYO.search(s)]
+        bad = [s for s in sentences if HAEYO.search(s) and not NOUN_YO.search(s)]
         checks.append(check(f"해요체 없음({key})", not bad, "; ".join(bad)[:120]))
         ev = [e for e in EVAL_ENDINGS if e in text]
         checks.append(check(f"평가형 마무리 없음({key})", not ev, ", ".join(ev)))
