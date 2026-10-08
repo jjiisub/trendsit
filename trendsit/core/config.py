@@ -366,5 +366,21 @@ def get_secret(name: str) -> str | None:
     return None
 
 
+SECRET_NAMES = ("OPENROUTER_API_KEY", "GITHUB_TOKEN")
+
+
+def redact_secrets(data: bytes) -> bytes:
+    """녹화 저장 전: 비밀 값(.env, 환경 변수)이 본문에 있으면 [REDACTED]로. 값은 출력하지 않는다."""
+    names = set(SECRET_NAMES)
+    if SECRET_FILE.exists():
+        names |= {line.partition("=")[0].strip() for line in SECRET_FILE.read_text(encoding="utf-8").splitlines()
+                  if "=" in line and not line.lstrip().startswith("#")}
+    for name in names:
+        value = get_secret(name)
+        if value and len(value) >= 8:
+            data = data.replace(value.encode(), b"[REDACTED]")
+    return data
+
+
 def current_spec(override: str | None = None) -> str:
     return override or os.environ.get("TRENDSIT_SPEC") or "S0"

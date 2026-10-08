@@ -3,7 +3,7 @@
 사용: uv run python scripts/record_repo_tools.py owner/name [owner/name ...] [--today YYYY-MM-DD]
 결과: tests/fixtures/http/repo_tools/index.json에 recorded: true로 **추가**(이미 있는 URL은 건너뜀, 합성 응답 유지) + 본문 gzip
 - 도구 함수를 그대로 불러 도구가 실제로 보내는 URL(commits?since=…)을 녹화한다. today는 테스트와 같은 날짜로 고정
-- 토큰 없이(비인증) 부른다. 요청 헤더는 녹화하지 않으므로 비밀이 남지 않는다
+- GITHUB_TOKEN이 있으면 붙여 부른다(한도). 요청 헤더는 저장하지 않고, 본문·location의 비밀 값은 redact_secrets로 지운다
 """
 
 from __future__ import annotations
@@ -19,6 +19,7 @@ from types import SimpleNamespace
 import httpx
 
 from trendsit.collect.fetch import Fetcher
+from trendsit.core.config import get_secret, redact_secrets
 from trendsit.tools.github import CommitsArgs, RepoArgs, contributors, github_repo, recent_commits, releases
 
 OUT = Path(__file__).resolve().parents[1] / "tests" / "fixtures" / "http" / "repo_tools"
@@ -46,7 +47,9 @@ def main() -> None:
     ap.add_argument("--today", default="2026-10-08")
     a = ap.parse_args()
     rec = Recorder()
-    headers = {"Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28"}
+    token = get_secret("GITHUB_TOKEN")
+    headers = {"Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28",
+               **({"Authorization": f"Bearer {token}"} if token else {})}
     state = SimpleNamespace(extras={"fetcher": Fetcher(None, use_cache=False, transport=rec),
                                     "github_headers": headers, "today": date.fromisoformat(a.today)})
     for name in a.repos:
@@ -64,9 +67,10 @@ def main() -> None:
             print(f"건너뜀(이미 있음): {r['url']}")
             continue
         fname = hashlib.sha1(r["url"].encode()).hexdigest()[:20] + ".gz"
-        (OUT / fname).write_bytes(gzip.compress(r["body"], mtime=0))
+        (OUT / fname).write_bytes(gzip.compress(redact_secrets(r["body"]), mtime=0))
+        loc = r["location"] and redact_secrets(r["location"].encode()).decode()
         index[r["url"]] = {"file": fname, "status": r["status"], "content_type": r["content_type"],
-                           "location": r["location"], "recorded": True}
+                           "location": loc, "recorded": True}
     idx_path.write_text(json.dumps(index, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
 
 

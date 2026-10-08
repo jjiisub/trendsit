@@ -26,6 +26,7 @@ import httpx
 from trendsit.collect import youtube
 from trendsit.collect.fetch import Fetcher
 from trendsit.collect.run import collect
+from trendsit.core.config import redact_secrets
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "tests" / "fixtures" / "http"
@@ -156,9 +157,10 @@ def main() -> None:
         elif "html" in ctype:
             body = trim_html(body)
         fname = hashlib.sha256(r["url"].encode()).hexdigest()[:20] + ".gz"
-        (out / fname).write_bytes(gzip.compress(body.encode("utf-8"), mtime=0))
-        index[r["url"]] = {"file": fname, "status": r["status"], "content_type": r["content_type"],
-                           "location": r["location"]}
+        # 요청 헤더(Authorization 등)는 저장하지 않고, 본문·location에 비밀 값이 있으면 지운다
+        (out / fname).write_bytes(gzip.compress(redact_secrets(body.encode("utf-8")), mtime=0))
+        loc = r["location"] and redact_secrets(r["location"].encode()).decode()
+        index[r["url"]] = {"file": fname, "status": r["status"], "content_type": r["content_type"], "location": loc}
     meta = {"since": args.since, "until": args.until, "max_items": args.max_items, "source": args.source,
             "today": today.isoformat(),
             "recorded_at": datetime.now(UTC).isoformat(timespec="seconds"),

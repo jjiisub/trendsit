@@ -242,3 +242,16 @@ def test_recorded_fixtures_have_no_secrets_and_keep_synthetic():
     for m in idx.values():
         body = gzip.decompress((fix / m["file"]).read_bytes())
         assert not any(p in body for p in (b"ghp_", b"github_pat_", b"gho_", b"sk-or-"))
+
+
+def test_github_token_not_persisted_or_sent_to_llm(ctx):
+    """토큰은 GitHub 요청 헤더에만. 실행 기록 DB(steps, llm_calls, fetch_log 등)와 LLM 요청 본문에 남지 않는다."""
+    fake = "github_pat_FAKE0123456789abcdefTOKENVALUE"
+    c = ctx([ONELINER, call("github_repo", name="ollama/ollama"), call("releases", name="ollama/ollama"),
+             call("finish", **card())])
+    c.resources["github_headers"] = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {fake}"}
+    run_repo_analysis(c, [QueueItem("ollama/ollama", 2, "트렌딩")], WEEK, config.load("keywords.yaml"))
+    assert len(tool_steps(c)) == 3
+    dump = "\n".join(c.db.conn.iterdump())
+    assert fake not in dump and "Authorization" not in dump
+    assert fake not in json.dumps(c.llm.transport.bodies, ensure_ascii=False)

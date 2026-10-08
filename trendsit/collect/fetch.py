@@ -264,8 +264,12 @@ class Fetcher:
             self._check_url(current)
             resp, body = self._request(current, headers)
             if resp.status_code in (301, 302, 303, 307, 308) and resp.headers.get("location"):
-                current = urljoin(current, resp.headers["location"])
-                headers = {k: v for k, v in headers.items() if k not in ("If-None-Match", "If-Modified-Since")}
+                nxt = urljoin(current, resp.headers["location"])
+                drop = {"if-none-match", "if-modified-since"}
+                if httpx.URL(nxt).host != httpx.URL(current).host:
+                    drop.add("authorization")  # 토큰은 다른 호스트로 넘기지 않는다
+                current = nxt
+                headers = {k: v for k, v in headers.items() if k.lower() not in drop}
                 continue
             break
         else:
