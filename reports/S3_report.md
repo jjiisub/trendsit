@@ -40,13 +40,14 @@ PASS A14 README(빠른 시작, 성과 행), DEVELOPMENT 명령표, S3 리포트,
 |---|---|---|
 | repo_analyst | judge Q1~Q3 각 80% + 관련 낮은 레포 80% 이상 커밋 도구 없이 finish + 평균 도구 호출 4회 이하 | **실행 안 함**: 도구(커밋·기여자·릴리스·README)가 GitHub API를 부르는데 이 클라우드는 이 저장소 밖이 403. 녹화는 2개 레포뿐이고 커밋 등은 합성. 맥 확인 후 |
 | editor_plan | 코드 채점 전부 + judge Q1~Q2 80% + 영상 mode 동의율 80% | 픽스처 2건(개발 DB 2026-10-04, 10-06): 코드 2/2, Q1 2/2, Q2 2/2 **잠정 통과**($0.0083, 재기록 $0, `reports/eval/editor_plan_generate_20261008-122719.json`). 영상 1편뿐이라 mode 동의율은 맥 |
-| text_analyst | enforce 전 근거 없는 confirmed/differs 0~1건 + judge Q1~Q3 각 80% | 픽스처 6건: 근거 없는 판정 0건, 코드 6/6, Q1~Q3 각 6/6 **잠정 통과**($0.0499 + 재기록 $0.0043, `reports/eval/text_analyst_generate_20261008-122802.json`). 원본 확보 6/6, 깊이 2에서 6건 |
+| text_analyst | enforce 전 근거 없는 confirmed/differs 0~1건 + judge Q1~Q3 각 80% | 픽스처 6건: 근거 없는 판정 0건, 코드 6/6, Q1~Q3 각 6/6 **잠정 통과**($0.0499 + 재기록 $0.0043, `reports/eval/text_analyst_generate_20261008-122802.json`). `원본 확보` 집계는 6/6이지만 it5·it21은 github.com 403으로 공식 사이트·문서를 대신 열어 인용 0, 판정 전부 not_found다. 원본 문장과 실제로 대조한 것은 **4/6**. 깊이 2에서 6건 |
 
 **두 번째 클라우드 세션 픽스처(새로 추가, 기존 없음)**
 - 개발 DB: S1 녹화 응답 5묶음(window, bf_aitimes, bf_geeknews, bf_simonw, bf_youtube)을 테스트와 같은 재생 방식으로 `data/`에 수집 → `rematch` → `filter --embedder real` → `summarize`(15건, $0.0213). 실제 한 주가 아니다
 - `eval/fixtures/editor_plan/dev-2026-10-04.json`(영상 1, 글 3, 레포 0), `dev-2026-10-06.json`(영상 1, 글 5, 레포 11). `plan run --fixture … --no-hype`(과열 검사는 GitHub API라 끔). 10-07도 만들었으나 10-06과 날짜 말고 같아 지움
 - `eval/fixtures/text_analyst/dev-it{5,6,20,21,22,23}.json`: 개발 DB에서 needs_original=true인 6건 전부, `deep text --item N --fixtures`. 원본 후보 접속: it5·it21은 github.com이 403이라 공식 사이트·문서로 대신 확인(not_found 처리), it20은 원본 블로그 열림, it6은 블로그 + arxiv 초록
-- 반복 개선 없음(두 역할 모두 첫 실행에서 문턱값 통과). 라벨 `eval/labels/text_analyst.csv` 6행 만들어 둠(빈칸)
+- 반복 개선 없음(두 역할 모두 첫 실행에서 문턱값 통과). 첫 실행 원자료 JSON(`…-120942`, `…-121347`)은 픽스처 이름을 `dev-`로 바꾼 뒤 다시 기록하면서 지웠다(커밋 전). 다시 기록한 결과는 같고, 첫 실행 비용 $0.0083, $0.0499는 `cost --spec S3` 실행 기록 기준. `S3_quality.md`의 비용 칸($0, $0.0043)은 다시 기록한 실행 값이다
+- `S3_quality.md`는 자동 생성이라 범위 문구가 없다. 거기의 "문턱값: 통과"는 개발 DB 픽스처 2건·6건(스펙 각 10건) 기준이다. editor_plan 장의 "`editor_plan.csv`를 채우면 일치율을 잰다" 안내는 질문 Q5 때문에 지금은 맞지 않는다 라벨 `eval/labels/text_analyst.csv` 6행 만들어 둠(빈칸)
 - `eval editor_plan --label`은 judge 라벨을 `eval/labels/editor_plan.csv`에 쓰는데, 같은 경로를 `plan --labels`(영상 mode 동의 라벨, 스펙 지정)도 쓴다. 서로 덮어써서 judge 라벨은 만들지 않았다(질문 파일 Q5)
 
 ## 3c 레포 분석가
@@ -144,3 +145,19 @@ PASS A14 README(빠른 시작, 성과 행), DEVELOPMENT 명령표, S3 리포트,
 ### 리뷰 뒤 스펙과 다르게 한 것(추가)
 - 도구 호출 상한은 거부된 호출(허용 밖 도구, 인자 오류)도 센다
 - safe_fetch 주소 고정은 환경 변수 프록시가 있으면 꺼진다(프록시가 이름을 풀므로). 판별에 httpx 내부 함수(`httpx._utils.get_environment_proxies`)를 쓴다
+
+### 두 번째 클라우드 세션(관문 B) 리뷰
+새 컨텍스트 서브에이전트에게 스펙(COMMON 2·3·10·11장, S2S3_TASK 7~9장), `5ce27e4..7f3d15e` diff, 리포트만 주고 대조 리뷰를 받았다. 지름길 위반, 숫자 불일치, 비밀은 없다는 결과.
+| 지적 | 처리 |
+|---|---|
+| (중간) "원본 확보 6/6"이 좋게 읽힘(it5·it21은 대체 문서, 인용 0) | README, S3 리포트, 맥 목록에 "원본 문장 대조 4/6" 병기 |
+| (중간) 맥 목록 "기존 17건은 캐시로 0원"이 틀림(캐시는 git 밖) | 다시 생성·채점, 비용 예상, 클라우드 결과와 비교하라고 고침(dev- 픽스처도) |
+| (중간) 맥 S2 몫 0.20 부족 가능 | 맥 목록 머리말에 경고, 질문 Q7(몫 재배분) |
+| (중간) 명령 칸에 `--extra embed` 없음 | 세 명령 고침 |
+| (낮음~중간) `filter-fixtures --device cpu --record`가 클라우드 CPU 기록을 덮어씀 | 명령을 mps만으로 |
+| (낮음) repo_oneliner 행만 `[x]` | 체크 칸은 맥이 채우므로 `[ ]`로 되돌림(결과 칸에 클라우드 결과) |
+| (낮음) 반복 순서가 규칙과 다름, 반복 1 유지 근거 | S2 리포트 2b에 이유 적음 |
+| (낮음) 프롬프트 해시가 frontmatter 미포함 | S2 리포트 남은 문제에 제안(공통 코어라 이번에 고치지 않음) |
+| (낮음) 첫 실행 원자료 JSON 없음, 품질 표 비용 칸이 캐시 재기록 값 | S2·S3 리포트에 적음 |
+| (낮음) 품질 리포트(자동 생성)에 범위 문구 없음, S3_quality의 editor_plan 라벨 안내가 Q5와 어긋남 | 자동 생성 파일이라 손대지 않고 S3 리포트에 적음 |
+| (낮음) `SENTENCE_END`의 같은 오탐, "해 주요" 놓침 | 이번 실패와 무관해 그대로(S2 리포트 5장) |
