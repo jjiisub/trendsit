@@ -1,0 +1,4819 @@
+# S4 관문 B 요약 채점표 (video_summary, 사람 라벨)
+
+> `scripts/s4_label_sheets.py`가 만든다. 입력은 eval 픽스처(요약이 실제로 받은 입력), 출력은 `eval/labels/video_summary.csv`. judge 판정·코드 채점 결과는 일부러 넣지 않았다.
+
+> 채점 대상은 영상 요약 출력(key_points, timeline, summary, name_pairs)이다. 근거 문서는 발화 전사(줄마다 `[초] 문장`)와 프레임별 슬라이드 판독(id `vd:{item}@{초}`)이다. `source_fields.transcript_quality`가 ok가 아니면 전사는 빈 문서다.
+
+채점: 절 끝의 `[ ]`를 `[x]`로, fail이면 이유를 적는다. 시각 링크는 유튜브 해당 초로 연다.
+
+## 1. -TeOEuplMrQ
+
+- 제목: [한영자막] 코드 리뷰의 종말: 데이터가 보여주는 진짜 현실입니다
+- 유튜브: https://youtu.be/-TeOEuplMrQ
+- transcript_quality: `ok`
+- mode: `whisper+slides`
+- 입력: 전사 284줄, 판독 15장
+
+| id | 질문 |
+|---|---|
+| Q1 | 근거: key_points의 모든 항목이 그 evidence 초의 전사 줄(앞뒤 30초)이나 같은 id의 판독 문서로 뒷받침되나? |
+| Q2 | 시각: timeline의 모든 초에서(앞뒤 30초 안) 그 label의 내용이 전사나 판독에 실제로 나오나? |
+| Q3 | 지어내지 않음: summary를 포함한 출력 전체에 전사·판독에 없는 내용(제목만 보고 짐작한 내용 포함)이 없고, 근거 자료가 없으면 "내용 없음"으로 두었나? |
+
+### key_points
+
+1. **자율 에이전트 사용 개발자의 코드 작성량 741% 증가, 소프트웨어 배포량 30% 증가**
+   - `vd:13@93`
+     - (a) 전사 1:03~2:03
+       - [1:04](https://youtu.be/-TeOEuplMrQ?t=64) Some folks are trying that.
+       - [1:05](https://youtu.be/-TeOEuplMrQ?t=65) Can we automate reviews reliably?
+       - [1:07](https://youtu.be/-TeOEuplMrQ?t=67) Some folks are trying that too.
+       - [1:10](https://youtu.be/-TeOEuplMrQ?t=70) What we're going to do today, what I'm going to do for you is I'm going to look at what the industry is really doing right now...
+       - [1:16](https://youtu.be/-TeOEuplMrQ?t=76) ...and try to figure out what you can do today when you leave the room.
+       - [1:21](https://youtu.be/-TeOEuplMrQ?t=81) So let's start with two numbers.
+       - [1:23](https://youtu.be/-TeOEuplMrQ?t=83) Recently, three economists tracked more than 100,000 GitHub developers, matched them against telemetry that showed exactly when each one started using AI.
+       - [1:33](https://youtu.be/-TeOEuplMrQ?t=93) The developers who turned on autonomous agents wrote 741% more code, but only 30% more software shipped.
+       - [1:44](https://youtu.be/-TeOEuplMrQ?t=104) That is the scale of the problem right there.
+       - [1:46](https://youtu.be/-TeOEuplMrQ?t=106) They were writing code nearly eight times faster, but their actual shipped software only rose by a third.
+       - [1:51](https://youtu.be/-TeOEuplMrQ?t=111) And the authors of the study are blunt that review was the bottleneck.
+       - [1:56](https://youtu.be/-TeOEuplMrQ?t=116) The problem is that the route to production still runs through humans, and the human steps, in particular code review, choke everything downstream.
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:13@106`
+     - (a) 전사 1:16~2:16
+       - [1:16](https://youtu.be/-TeOEuplMrQ?t=76) ...and try to figure out what you can do today when you leave the room.
+       - [1:21](https://youtu.be/-TeOEuplMrQ?t=81) So let's start with two numbers.
+       - [1:23](https://youtu.be/-TeOEuplMrQ?t=83) Recently, three economists tracked more than 100,000 GitHub developers, matched them against telemetry that showed exactly when each one started using AI.
+       - [1:33](https://youtu.be/-TeOEuplMrQ?t=93) The developers who turned on autonomous agents wrote 741% more code, but only 30% more software shipped.
+       - [1:44](https://youtu.be/-TeOEuplMrQ?t=104) That is the scale of the problem right there.
+       - [1:46](https://youtu.be/-TeOEuplMrQ?t=106) They were writing code nearly eight times faster, but their actual shipped software only rose by a third.
+       - [1:51](https://youtu.be/-TeOEuplMrQ?t=111) And the authors of the study are blunt that review was the bottleneck.
+       - [1:56](https://youtu.be/-TeOEuplMrQ?t=116) The problem is that the route to production still runs through humans, and the human steps, in particular code review, choke everything downstream.
+       - [2:07](https://youtu.be/-TeOEuplMrQ?t=127) Producing code is suddenly a whole lot cheaper.
+       - [2:09](https://youtu.be/-TeOEuplMrQ?t=129) Knowing whether to trust it is still very expensive, especially if you have sensitive code with a blast radius.
+       - [2:16](https://youtu.be/-TeOEuplMrQ?t=136) How can we bring that second number down and thus bring the amount of software that we ship back into line with the amount that we can code?
+     - (b) 판독: 이 id의 판독 문서 없음
+2. **리뷰어당 400~450줄 초과 시 결함 탐지율 급감(Cisco 연구)**
+   - `vd:13@221`
+     - (a) 전사 3:11~4:11
+       - [3:13](https://youtu.be/-TeOEuplMrQ?t=193) You take people whose job was previously to review code as well as write code, and just say,
+       - [3:18](https://youtu.be/-TeOEuplMrQ?t=198) review code all the time, this is your job now.
+       - [3:21](https://youtu.be/-TeOEuplMrQ?t=201) And that doesn't work, partly because that's really boring and those people burn out really fast,
+       - [3:27](https://youtu.be/-TeOEuplMrQ?t=207) but also the numbers say that we can't.
+       - [3:30](https://youtu.be/-TeOEuplMrQ?t=210) The best study we have on this was done two decades ago at Cisco over ten months.
+       - [3:36](https://youtu.be/-TeOEuplMrQ?t=216) They took two and a half thousand reviews.
+       - [3:38](https://youtu.be/-TeOEuplMrQ?t=218) They took 3.2 million lines of code.
+       - [3:41](https://youtu.be/-TeOEuplMrQ?t=221) And the study says that reviewers stop finding defects effectively if they try to read more than 400 lines of code in one sitting,
+       - [3:49](https://youtu.be/-TeOEuplMrQ?t=229) and their effectiveness completely falls off a cliff if they try to review more than 450 lines of code in an hour.
+       - [3:58](https://youtu.be/-TeOEuplMrQ?t=238) If you do the math on that, that means that a 10,000 line agent pull request at that pace would take three or four working days to get a real human review.
+       - [4:06](https://youtu.be/-TeOEuplMrQ?t=246) That is one pull request from one agent, 10,000 lines is absolutely, you know, absolutely an expectable number of lines of code for an agent that is doing a lot of work for you.
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:13@229`
+     - (a) 전사 3:19~4:19
+       - [3:21](https://youtu.be/-TeOEuplMrQ?t=201) And that doesn't work, partly because that's really boring and those people burn out really fast,
+       - [3:27](https://youtu.be/-TeOEuplMrQ?t=207) but also the numbers say that we can't.
+       - [3:30](https://youtu.be/-TeOEuplMrQ?t=210) The best study we have on this was done two decades ago at Cisco over ten months.
+       - [3:36](https://youtu.be/-TeOEuplMrQ?t=216) They took two and a half thousand reviews.
+       - [3:38](https://youtu.be/-TeOEuplMrQ?t=218) They took 3.2 million lines of code.
+       - [3:41](https://youtu.be/-TeOEuplMrQ?t=221) And the study says that reviewers stop finding defects effectively if they try to read more than 400 lines of code in one sitting,
+       - [3:49](https://youtu.be/-TeOEuplMrQ?t=229) and their effectiveness completely falls off a cliff if they try to review more than 450 lines of code in an hour.
+       - [3:58](https://youtu.be/-TeOEuplMrQ?t=238) If you do the math on that, that means that a 10,000 line agent pull request at that pace would take three or four working days to get a real human review.
+       - [4:06](https://youtu.be/-TeOEuplMrQ?t=246) That is one pull request from one agent, 10,000 lines is absolutely, you know, absolutely an expectable number of lines of code for an agent that is doing a lot of work for you.
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:13@210`
+     - (a) 전사 3:00~4:00
+       - [3:02](https://youtu.be/-TeOEuplMrQ?t=182) and we're just sort of hoping that it works.
+       - [3:04](https://youtu.be/-TeOEuplMrQ?t=184) We can't possibly keep on going like that.
+       - [3:08](https://youtu.be/-TeOEuplMrQ?t=188) So the obvious answer, and the answer some people are trying, is you just review more.
+       - [3:13](https://youtu.be/-TeOEuplMrQ?t=193) You take people whose job was previously to review code as well as write code, and just say,
+       - [3:18](https://youtu.be/-TeOEuplMrQ?t=198) review code all the time, this is your job now.
+       - [3:21](https://youtu.be/-TeOEuplMrQ?t=201) And that doesn't work, partly because that's really boring and those people burn out really fast,
+       - [3:27](https://youtu.be/-TeOEuplMrQ?t=207) but also the numbers say that we can't.
+       - [3:30](https://youtu.be/-TeOEuplMrQ?t=210) The best study we have on this was done two decades ago at Cisco over ten months.
+       - [3:36](https://youtu.be/-TeOEuplMrQ?t=216) They took two and a half thousand reviews.
+       - [3:38](https://youtu.be/-TeOEuplMrQ?t=218) They took 3.2 million lines of code.
+       - [3:41](https://youtu.be/-TeOEuplMrQ?t=221) And the study says that reviewers stop finding defects effectively if they try to read more than 400 lines of code in one sitting,
+       - [3:49](https://youtu.be/-TeOEuplMrQ?t=229) and their effectiveness completely falls off a cliff if they try to review more than 450 lines of code in an hour.
+       - [3:58](https://youtu.be/-TeOEuplMrQ?t=238) If you do the math on that, that means that a 10,000 line agent pull request at that pace would take three or four working days to get a real human review.
+     - (b) 판독: 제목 `You can't just review harder`, 수치 없음
+       - ocr_text: You can't just review harder arize
+3. **테스트 통과 PR의 실제 머지 가능 비율 약 50%(METR 연구)**
+   - `vd:13@429`
+     - (a) 전사 6:39~7:39
+       - [6:44](https://youtu.be/-TeOEuplMrQ?t=404) They hired four active maintainers of open source projects from the same open source projects that Sweebench tests against.
+       - [6:53](https://youtu.be/-TeOEuplMrQ?t=413) And they got them to look at PRs that had already passed Sweebench's greater.
+       - [7:00](https://youtu.be/-TeOEuplMrQ?t=420) So Sweebench said, this pull request is good enough to merge.
+       - [7:04](https://youtu.be/-TeOEuplMrQ?t=424) And they got the open source reviewers to look at exactly the same PR and say, is it really good enough to merge?
+       - [7:09](https://youtu.be/-TeOEuplMrQ?t=429) And it was only good enough to merge about half of the time.
+       - [7:13](https://youtu.be/-TeOEuplMrQ?t=433) And the failures weren't about correctness, because obviously the PRs were passing all of the tests.
+       - [7:19](https://youtu.be/-TeOEuplMrQ?t=439) They were about code quality, and they were about changes that quietly broke other code.
+       - [7:23](https://youtu.be/-TeOEuplMrQ?t=443) Things external to the test suite.
+       - [7:25](https://youtu.be/-TeOEuplMrQ?t=445) One caveat that Meter mentions is that the agents got no chance to iterate on feedback.
+       - [7:31](https://youtu.be/-TeOEuplMrQ?t=451) So a human contributor, obviously, being told that their PR isn't going to get merged, get another go at it, they can take another swing.
+       - [7:38](https://youtu.be/-TeOEuplMrQ?t=458) But that caveat isn't really relevant to our purposes, because that's just putting a human in the loop.
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:13@413`
+     - (a) 전사 6:23~7:23
+       - [6:28](https://youtu.be/-TeOEuplMrQ?t=388) For years, the industry's proxy for reliable, for quality, has been whether the tests passed.
+       - [6:34](https://youtu.be/-TeOEuplMrQ?t=394) Because that is what the benchmarks measured.
+       - [6:37](https://youtu.be/-TeOEuplMrQ?t=397) In March this year, a research group called Meter, who you've probably heard about before, tested that proxy directly.
+       - [6:44](https://youtu.be/-TeOEuplMrQ?t=404) They hired four active maintainers of open source projects from the same open source projects that Sweebench tests against.
+       - [6:53](https://youtu.be/-TeOEuplMrQ?t=413) And they got them to look at PRs that had already passed Sweebench's greater.
+       - [7:00](https://youtu.be/-TeOEuplMrQ?t=420) So Sweebench said, this pull request is good enough to merge.
+       - [7:04](https://youtu.be/-TeOEuplMrQ?t=424) And they got the open source reviewers to look at exactly the same PR and say, is it really good enough to merge?
+       - [7:09](https://youtu.be/-TeOEuplMrQ?t=429) And it was only good enough to merge about half of the time.
+       - [7:13](https://youtu.be/-TeOEuplMrQ?t=433) And the failures weren't about correctness, because obviously the PRs were passing all of the tests.
+       - [7:19](https://youtu.be/-TeOEuplMrQ?t=439) They were about code quality, and they were about changes that quietly broke other code.
+       - [7:23](https://youtu.be/-TeOEuplMrQ?t=443) Things external to the test suite.
+     - (b) 판독: 제목 `Passes tests is not the same as mergeable`, 수치 없음
+       - ocr_text: Passes tests is not the same as mergeable arize
+4. **Fable 5의 SWE-Bench Pro 80.3%와 FrontierCode 29.3% 점수 격차**
+   - `vd:13@500`
+     - (a) 전사 7:50~8:50
+       - [7:51](https://youtu.be/-TeOEuplMrQ?t=471) Cognition, the makers of Devon, built a benchmark around the maintainer's actual question, which is, would you merge this?
+       - [7:58](https://youtu.be/-TeOEuplMrQ?t=478) They called it Frontier Code, and they launched it in June.
+       - [8:02](https://youtu.be/-TeOEuplMrQ?t=482) More than 20 maintainers built 150 tasks from their own repositories, each one over 40 hours of expert work.
+       - [8:08](https://youtu.be/-TeOEuplMrQ?t=488) FrontierBench grades behavioral correctness, regression safety, scope discipline, test quality, and maintainability.
+       - [8:16](https://youtu.be/-TeOEuplMrQ?t=496) This is a human review rubric made machine checkable.
+       - [8:20](https://youtu.be/-TeOEuplMrQ?t=500) And what they found was that Fable 5, before it got pulled and then unpulled, scores 88% on Sweebench Pro, but only 29% on the hardest slice of Frontier Code.
+       - [8:31](https://youtu.be/-TeOEuplMrQ?t=511) So the same model on the same surface with the same job does 51 points less well if you're asking not does it pass the tests, but whether or not you would actually merge the results.
+       - [8:44](https://youtu.be/-TeOEuplMrQ?t=524) And this isn't one model having a bad day. On the same set of tests, GPT 5.5 scores under 6%.
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:13@527`
+     - (a) 전사 8:17~9:17
+       - [8:20](https://youtu.be/-TeOEuplMrQ?t=500) And what they found was that Fable 5, before it got pulled and then unpulled, scores 88% on Sweebench Pro, but only 29% on the hardest slice of Frontier Code.
+       - [8:31](https://youtu.be/-TeOEuplMrQ?t=511) So the same model on the same surface with the same job does 51 points less well if you're asking not does it pass the tests, but whether or not you would actually merge the results.
+       - [8:44](https://youtu.be/-TeOEuplMrQ?t=524) And this isn't one model having a bad day. On the same set of tests, GPT 5.5 scores under 6%.
+       - [8:52](https://youtu.be/-TeOEuplMrQ?t=532) So the strongest models we have are nowhere near passing human review reliably.
+       - [8:58](https://youtu.be/-TeOEuplMrQ?t=538) So somebody has to write down what mergeable actually means.
+       - [9:03](https://youtu.be/-TeOEuplMrQ?t=543) That is, it's clear that we haven't done that yet.
+       - [9:06](https://youtu.be/-TeOEuplMrQ?t=546) The moment they do, something will happen.
+       - [9:10](https://youtu.be/-TeOEuplMrQ?t=550) Sarah Guo, who is a prominent investor in AI, wrote about it and said that solving for that benchmark, a benchmark of genuine mergeability, will be a critical turning point in the development of coding models.
+     - (b) 판독: 제목 `Mergeable is a much harder test`, 수치 80.3%(high, Fable 5 on SWE-Bench Pro), 29.3%(high, Fable 5 on FrontierCode)
+       - ocr_text: Mergeable is a much harder test Fable 5 on SWE-Bench Pro: 80.3% Fable 5 on FrontierCode: 29.3% arize
+5. **Bun의 Zig→Rust 포팅 코드에 13,044개 unsafe 블록 포함(동급 수작업 코드 73개)**
+   - `vd:13@996`
+     - (a) 전사 16:06~17:06
+       - [16:08](https://youtu.be/-TeOEuplMrQ?t=968) A fun fact about that experiment is that the PR where the agents decided that they were done with all of the Zig code,
+       - [16:17](https://youtu.be/-TeOEuplMrQ?t=977) and they deleted all of the Zig code in one giant PR, was flagged by another robot as this is AI slop.
+       - [16:22](https://youtu.be/-TeOEuplMrQ?t=982) You can't possibly delete all of your code, which I thought was a fun aside.
+       - [16:27](https://youtu.be/-TeOEuplMrQ?t=987) But there are some big caveats on that Bunn experiment.
+       - [16:30](https://youtu.be/-TeOEuplMrQ?t=990) Somebody looked carefully at the ported code, and it has 13,044 unsafe blocks.
+       - [16:36](https://youtu.be/-TeOEuplMrQ?t=996) In a comparable human-written Rust code base of that size, you would see about 74.
+       - [16:45](https://youtu.be/-TeOEuplMrQ?t=1005) So three orders of magnitude more memory unsafe blocks.
+       - [16:49](https://youtu.be/-TeOEuplMrQ?t=1009) An unsafe block is a place where the author asserts rather than proves that memory is being handled correctly.
+       - [16:56](https://youtu.be/-TeOEuplMrQ?t=1016) So the test suite can certify behavior at the public interface.
+       - [16:59](https://youtu.be/-TeOEuplMrQ?t=1019) It cannot certify 13,000 assertions that the test suite was never designed to look for.
+       - [17:05](https://youtu.be/-TeOEuplMrQ?t=1025) So they took humans out of the loop for sure, but there is now no knowing what is lurking under the surface of their Rust as a result.
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:13@991`
+     - (a) 전사 16:01~17:01
+       - [16:02](https://youtu.be/-TeOEuplMrQ?t=962) 99.8% of the test suite passed.
+       - [16:05](https://youtu.be/-TeOEuplMrQ?t=965) So the test did real work.
+       - [16:08](https://youtu.be/-TeOEuplMrQ?t=968) A fun fact about that experiment is that the PR where the agents decided that they were done with all of the Zig code,
+       - [16:17](https://youtu.be/-TeOEuplMrQ?t=977) and they deleted all of the Zig code in one giant PR, was flagged by another robot as this is AI slop.
+       - [16:22](https://youtu.be/-TeOEuplMrQ?t=982) You can't possibly delete all of your code, which I thought was a fun aside.
+       - [16:27](https://youtu.be/-TeOEuplMrQ?t=987) But there are some big caveats on that Bunn experiment.
+       - [16:30](https://youtu.be/-TeOEuplMrQ?t=990) Somebody looked carefully at the ported code, and it has 13,044 unsafe blocks.
+       - [16:36](https://youtu.be/-TeOEuplMrQ?t=996) In a comparable human-written Rust code base of that size, you would see about 74.
+       - [16:45](https://youtu.be/-TeOEuplMrQ?t=1005) So three orders of magnitude more memory unsafe blocks.
+       - [16:49](https://youtu.be/-TeOEuplMrQ?t=1009) An unsafe block is a place where the author asserts rather than proves that memory is being handled correctly.
+       - [16:56](https://youtu.be/-TeOEuplMrQ?t=1016) So the test suite can certify behavior at the public interface.
+       - [16:59](https://youtu.be/-TeOEuplMrQ?t=1019) It cannot certify 13,000 assertions that the test suite was never designed to look for.
+     - (b) 판독: 제목 `Thirteen thousand assertions nobody checked`, 수치 13,044(high, unsafe blocks in the port), 73(high, in a comparable hand-written project)
+       - ocr_text: Thirteen thousand assertions nobody checked 13,044 unsafe blocks in the port 73 in a comparable hand-written project
+6. **인간 리뷰어의 역할이 코드 직접 검토에서 검증 시스템 설계로 상향 이동**
+   - `vd:13@1215`
+     - (a) 전사 19:45~20:45
+       - [19:48](https://youtu.be/-TeOEuplMrQ?t=1188) It is moving around, but it is surviving in predictable places.
+       - [19:52](https://youtu.be/-TeOEuplMrQ?t=1192) One is where correctness isn't cheaply checkable.
+       - [19:54](https://youtu.be/-TeOEuplMrQ?t=1194) Another is where the blast radius is large.
+       - [19:58](https://youtu.be/-TeOEuplMrQ?t=1198) In security conscious environments, every time you tell people, oh, we can just get rid of human review, you would get an immediate no.
+       - [20:04](https://youtu.be/-TeOEuplMrQ?t=1204) Wherever someone has to put their name on the result.
+       - [20:08](https://youtu.be/-TeOEuplMrQ?t=1208) But what's happening is the human role isn't disappearing, it is moving up the stack, possibly several levels up the stack.
+       - [20:15](https://youtu.be/-TeOEuplMrQ?t=1215) From inspecting the code directly to designing and tuning the systems that inspect the code and designing the definition of good.
+       - [20:22](https://youtu.be/-TeOEuplMrQ?t=1222) Which raises the obvious question, who reviews those systems?
+       - [20:26](https://youtu.be/-TeOEuplMrQ?t=1226) If you've built a system that does your reviews for you, how do you do the meta review of your reviewer?
+       - [20:30](https://youtu.be/-TeOEuplMrQ?t=1230) And the answer won't surprise you, it is humans.
+       - [20:34](https://youtu.be/-TeOEuplMrQ?t=1234) Anthropic ships an automated security reviewer and in its readme it has a huge caveat, which is this action is not hardened against prompt injection attacks.
+       - [20:43](https://youtu.be/-TeOEuplMrQ?t=1243) And should only be used to review trusted PRs.
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:13@1183`
+     - (a) 전사 19:13~20:13
+       - [19:18](https://youtu.be/-TeOEuplMrQ?t=1158) Passing the test never told you that the change was the right change.
+       - [19:22](https://youtu.be/-TeOEuplMrQ?t=1162) It never told you that this module exists because there are three external users of this module.
+       - [19:28](https://youtu.be/-TeOEuplMrQ?t=1168) It never told you that there is this cron job that nobody will admit to writing that relies on that module existing.
+       - [19:33](https://youtu.be/-TeOEuplMrQ?t=1173) There is context outside of the test suite that the tests can't find.
+       - [19:40](https://youtu.be/-TeOEuplMrQ?t=1180) So, in everything that we have looked at so far, the human checkpoint is continuing to survive.
+       - [19:48](https://youtu.be/-TeOEuplMrQ?t=1188) It is moving around, but it is surviving in predictable places.
+       - [19:52](https://youtu.be/-TeOEuplMrQ?t=1192) One is where correctness isn't cheaply checkable.
+       - [19:54](https://youtu.be/-TeOEuplMrQ?t=1194) Another is where the blast radius is large.
+       - [19:58](https://youtu.be/-TeOEuplMrQ?t=1198) In security conscious environments, every time you tell people, oh, we can just get rid of human review, you would get an immediate no.
+       - [20:04](https://youtu.be/-TeOEuplMrQ?t=1204) Wherever someone has to put their name on the result.
+       - [20:08](https://youtu.be/-TeOEuplMrQ?t=1208) But what's happening is the human role isn't disappearing, it is moving up the stack, possibly several levels up the stack.
+     - (b) 판독: 제목 `The human moves up a level`, 수치 없음
+       - ocr_text: The human moves up a level arize
+
+### timeline
+
+- **0:00 개요 및 발표자 소개**
+  - [0:00](https://youtu.be/-TeOEuplMrQ?t=0) Hello everybody, thank you for following on a session about the death of the code review with a session about the death of the code review.
+  - [0:08](https://youtu.be/-TeOEuplMrQ?t=8) Who knows how scheduling decisions get made, but SWIX decided it would be funny for those two to be back to back.
+  - [0:15](https://youtu.be/-TeOEuplMrQ?t=15) Hi, I'm Laurie, I'm head of developer relations at Arise AI.
+  - [0:20](https://youtu.be/-TeOEuplMrQ?t=20) Some of you may remember me from when I used to co-found NPM Inc.
+  - [0:23](https://youtu.be/-TeOEuplMrQ?t=23) These days I think about AI and how to test it.
+  - [0:26](https://youtu.be/-TeOEuplMrQ?t=26) I'm here to talk about a problem that everyone is seeing right now.
+  - [0:30](https://youtu.be/-TeOEuplMrQ?t=30) The rise of AI agents has dramatically increased how fast developers can produce code, but the speed at which humans can review code...
+- **1:24 코드 생성량과 배포량 격차**
+  - [0:55](https://youtu.be/-TeOEuplMrQ?t=55) Engineering teams across the industry are feeling it.
+  - [0:58](https://youtu.be/-TeOEuplMrQ?t=58) So what can we do about it?
+  - [1:00](https://youtu.be/-TeOEuplMrQ?t=60) Some options are we could skip human review entirely.
+  - [1:04](https://youtu.be/-TeOEuplMrQ?t=64) Some folks are trying that.
+  - [1:05](https://youtu.be/-TeOEuplMrQ?t=65) Can we automate reviews reliably?
+  - [1:07](https://youtu.be/-TeOEuplMrQ?t=67) Some folks are trying that too.
+  - [1:10](https://youtu.be/-TeOEuplMrQ?t=70) What we're going to do today, what I'm going to do for you is I'm going to look at what the industry is really doing right now...
+  - [1:16](https://youtu.be/-TeOEuplMrQ?t=76) ...and try to figure out what you can do today when you leave the room.
+  - [1:21](https://youtu.be/-TeOEuplMrQ?t=81) So let's start with two numbers.
+  - [1:23](https://youtu.be/-TeOEuplMrQ?t=83) Recently, three economists tracked more than 100,000 GitHub developers, matched them against telemetry that showed exactly when each one started using AI.
+  - [1:33](https://youtu.be/-TeOEuplMrQ?t=93) The developers who turned on autonomous agents wrote 741% more code, but only 30% more software shipped.
+  - [1:44](https://youtu.be/-TeOEuplMrQ?t=104) That is the scale of the problem right there.
+  - [1:46](https://youtu.be/-TeOEuplMrQ?t=106) They were writing code nearly eight times faster, but their actual shipped software only rose by a third.
+  - [1:51](https://youtu.be/-TeOEuplMrQ?t=111) And the authors of the study are blunt that review was the bottleneck.
+- **2:24 코드 생성 병목 해소 사례**
+  - [1:56](https://youtu.be/-TeOEuplMrQ?t=116) The problem is that the route to production still runs through humans, and the human steps, in particular code review, choke everything downstream.
+  - [2:07](https://youtu.be/-TeOEuplMrQ?t=127) Producing code is suddenly a whole lot cheaper.
+  - [2:09](https://youtu.be/-TeOEuplMrQ?t=129) Knowing whether to trust it is still very expensive, especially if you have sensitive code with a blast radius.
+  - [2:16](https://youtu.be/-TeOEuplMrQ?t=136) How can we bring that second number down and thus bring the amount of software that we ship back into line with the amount that we can code?
+  - [2:24](https://youtu.be/-TeOEuplMrQ?t=144) Let's zoom out first.
+  - [2:26](https://youtu.be/-TeOEuplMrQ?t=146) Let's be clear that the problem is real.
+  - [2:28](https://youtu.be/-TeOEuplMrQ?t=148) Generation is no longer the bottleneck.
+  - [2:30](https://youtu.be/-TeOEuplMrQ?t=150) Stripe, in Anthropix launch materials for Fable this year, reported migrating a 50 million line Ruby code base in a single day.
+  - [2:38](https://youtu.be/-TeOEuplMrQ?t=158) Which is work that they'd estimated would take over two months for a team.
+  - [2:43](https://youtu.be/-TeOEuplMrQ?t=163) Bun, which is now part of Anthropix, reported that they migrated over a million lines of Zig to Rust in six days.
+  - [2:51](https://youtu.be/-TeOEuplMrQ?t=171) And of course, all of us in this room are feeling this on a smaller scale.
+- **3:09 리뷰 한계 및 Cisco 연구** (slide)
+  - [2:43](https://youtu.be/-TeOEuplMrQ?t=163) Bun, which is now part of Anthropix, reported that they migrated over a million lines of Zig to Rust in six days.
+  - [2:51](https://youtu.be/-TeOEuplMrQ?t=171) And of course, all of us in this room are feeling this on a smaller scale.
+  - [2:55](https://youtu.be/-TeOEuplMrQ?t=175) Our agents are generating whole apps, and we're just sort of hitting the merge button and feeling guilty about the fact that we haven't read these code diffs,
+  - [3:02](https://youtu.be/-TeOEuplMrQ?t=182) and we're just sort of hoping that it works.
+  - [3:04](https://youtu.be/-TeOEuplMrQ?t=184) We can't possibly keep on going like that.
+  - [3:08](https://youtu.be/-TeOEuplMrQ?t=188) So the obvious answer, and the answer some people are trying, is you just review more.
+  - [3:13](https://youtu.be/-TeOEuplMrQ?t=193) You take people whose job was previously to review code as well as write code, and just say,
+  - [3:18](https://youtu.be/-TeOEuplMrQ?t=198) review code all the time, this is your job now.
+  - [3:21](https://youtu.be/-TeOEuplMrQ?t=201) And that doesn't work, partly because that's really boring and those people burn out really fast,
+  - [3:27](https://youtu.be/-TeOEuplMrQ?t=207) but also the numbers say that we can't.
+  - [3:30](https://youtu.be/-TeOEuplMrQ?t=210) The best study we have on this was done two decades ago at Cisco over ten months.
+  - [3:36](https://youtu.be/-TeOEuplMrQ?t=216) They took two and a half thousand reviews.
+  - [3:38](https://youtu.be/-TeOEuplMrQ?t=218) They took 3.2 million lines of code.
+- **4:39 인간 리뷰 배제 시도 및 OpenAI 사례** (slide)
+  - [4:20](https://youtu.be/-TeOEuplMrQ?t=260) And a developer can now run a dozen agents at once, although I tend to be suspicious of the people who do.
+  - [4:26](https://youtu.be/-TeOEuplMrQ?t=266) So we can't just review harder, and we're all feeling that too.
+  - [4:30](https://youtu.be/-TeOEuplMrQ?t=270) The people who are trying to review harder are burning themselves out.
+  - [4:33](https://youtu.be/-TeOEuplMrQ?t=273) So what is the alternative?
+  - [4:35](https://youtu.be/-TeOEuplMrQ?t=275) Some people have decided to just stop reading the code entirely.
+  - [4:39](https://youtu.be/-TeOEuplMrQ?t=279) Peter Steinberger, who is the creator of OpenClaw, says that you shouldn't be prompting coding agents anymore.
+  - [4:45](https://youtu.be/-TeOEuplMrQ?t=285) You should be designing the loops that prompt your agents.
+  - [4:48](https://youtu.be/-TeOEuplMrQ?t=288) Andre Karpathy, who is one of OpenAI's founding engineers, has made the same argument about taking yourself out of the loop,
+  - [4:54](https://youtu.be/-TeOEuplMrQ?t=294) because the human in the loop is holding the system back.
+  - [4:59](https://youtu.be/-TeOEuplMrQ?t=299) But this goes beyond bold claims on Twitter.
+  - [5:03](https://youtu.be/-TeOEuplMrQ?t=303) In February this year, OpenAI published an account of building an internal product with, in their words, no manually written code.
+- **6:29 테스트 통과와 머지 가능성의 차이** (slide)
+  - [5:59](https://youtu.be/-TeOEuplMrQ?t=359) If OpenAI says that you can do it, maybe you can do it.
+  - [6:02](https://youtu.be/-TeOEuplMrQ?t=362) But one possibility.
+  - [6:06](https://youtu.be/-TeOEuplMrQ?t=366) So, OpenAI says that's one thing you can do.
+  - [6:08](https://youtu.be/-TeOEuplMrQ?t=368) The bet there is that loop design substitutes for inspection.
+  - [6:12](https://youtu.be/-TeOEuplMrQ?t=372) Whether you can build a loop that is good enough to review all of your code for you depends entirely on what the loop can see.
+  - [6:20](https://youtu.be/-TeOEuplMrQ?t=380) But that is an enormous caveat.
+  - [6:22](https://youtu.be/-TeOEuplMrQ?t=382) What exactly can the loop see, and is it reliable enough to do code reviews?
+  - [6:28](https://youtu.be/-TeOEuplMrQ?t=388) For years, the industry's proxy for reliable, for quality, has been whether the tests passed.
+  - [6:34](https://youtu.be/-TeOEuplMrQ?t=394) Because that is what the benchmarks measured.
+  - [6:37](https://youtu.be/-TeOEuplMrQ?t=397) In March this year, a research group called Meter, who you've probably heard about before, tested that proxy directly.
+  - [6:44](https://youtu.be/-TeOEuplMrQ?t=404) They hired four active maintainers of open source projects from the same open source projects that Sweebench tests against.
+  - [6:53](https://youtu.be/-TeOEuplMrQ?t=413) And they got them to look at PRs that had already passed Sweebench's greater.
+- **7:48 FrontierCode 벤치마크 결과** (slide)
+  - [7:19](https://youtu.be/-TeOEuplMrQ?t=439) They were about code quality, and they were about changes that quietly broke other code.
+  - [7:23](https://youtu.be/-TeOEuplMrQ?t=443) Things external to the test suite.
+  - [7:25](https://youtu.be/-TeOEuplMrQ?t=445) One caveat that Meter mentions is that the agents got no chance to iterate on feedback.
+  - [7:31](https://youtu.be/-TeOEuplMrQ?t=451) So a human contributor, obviously, being told that their PR isn't going to get merged, get another go at it, they can take another swing.
+  - [7:38](https://youtu.be/-TeOEuplMrQ?t=458) But that caveat isn't really relevant to our purposes, because that's just putting a human in the loop.
+  - [7:45](https://youtu.be/-TeOEuplMrQ?t=465) And what we're trying to see is whether or not we can take the human out of the loop entirely.
+  - [7:51](https://youtu.be/-TeOEuplMrQ?t=471) Cognition, the makers of Devon, built a benchmark around the maintainer's actual question, which is, would you merge this?
+  - [7:58](https://youtu.be/-TeOEuplMrQ?t=478) They called it Frontier Code, and they launched it in June.
+  - [8:02](https://youtu.be/-TeOEuplMrQ?t=482) More than 20 maintainers built 150 tasks from their own repositories, each one over 40 hours of expert work.
+  - [8:08](https://youtu.be/-TeOEuplMrQ?t=488) FrontierBench grades behavioral correctness, regression safety, scope discipline, test quality, and maintainability.
+  - [8:16](https://youtu.be/-TeOEuplMrQ?t=496) This is a human review rubric made machine checkable.
+- **10:53 GitHub Copilot 및 Cursor 자동 리뷰 현황** (slide)
+  - [10:23](https://youtu.be/-TeOEuplMrQ?t=623) Human reviewers working on it beat the model alone and the human alone.
+  - [10:28](https://youtu.be/-TeOEuplMrQ?t=628) So OpenAI built a model to review the models in order to clean the training.
+  - [10:32](https://youtu.be/-TeOEuplMrQ?t=632) And it created a training signal that's now built into the models.
+  - [10:35](https://youtu.be/-TeOEuplMrQ?t=635) It made the models better almost instantly.
+  - [10:38](https://youtu.be/-TeOEuplMrQ?t=638) But mergeability standards are still in the future right now.
+  - [10:42](https://youtu.be/-TeOEuplMrQ?t=642) We do not have a good rubric that captures everything that a human decides to consider when they're deciding whether something is mergeable.
+  - [10:52](https://youtu.be/-TeOEuplMrQ?t=652) And I promised you something that you can do today.
+  - [10:55](https://youtu.be/-TeOEuplMrQ?t=655) So who is actually running automated review right now?
+  - [11:00](https://youtu.be/-TeOEuplMrQ?t=660) One company is GitHub.
+  - [11:02](https://youtu.be/-TeOEuplMrQ?t=662) GitHub is a copilot's reviewer has done 60 million reviews and now accounts for more than one in five code reviews on all of GitHub.
+  - [11:10](https://youtu.be/-TeOEuplMrQ?t=670) So machine review of pull requests is the mainstream default on the world's largest code host.
+  - [11:16](https://youtu.be/-TeOEuplMrQ?t=676) That is more than an experiment.
+  - [11:18](https://youtu.be/-TeOEuplMrQ?t=678) That is a large production deployment.
+  - [11:22](https://youtu.be/-TeOEuplMrQ?t=682) Cursor is also doing an enormous amount of code review.
+- **14:47 인간 배제 실험 및 한계** (slide)
+  - [14:19](https://youtu.be/-TeOEuplMrQ?t=859) The reviewers are trained on human accept judgment every day at scale.
+  - [14:26](https://youtu.be/-TeOEuplMrQ?t=866) They are training their harnesses to get better at the definition of good as defined by human acceptance.
+  - [14:32](https://youtu.be/-TeOEuplMrQ?t=872) That is a preview of what the models are going to do except these companies have already shipped it.
+  - [14:37](https://youtu.be/-TeOEuplMrQ?t=877) So the status quo is you can generate code automatically.
+  - [14:41](https://youtu.be/-TeOEuplMrQ?t=881) You can review the code automatically.
+  - [14:43](https://youtu.be/-TeOEuplMrQ?t=883) But humans still need to review the reviews.
+  - [14:46](https://youtu.be/-TeOEuplMrQ?t=886) Can you skip that part entirely?
+  - [14:48](https://youtu.be/-TeOEuplMrQ?t=888) Can you get the human entirely out of the loop?
+  - [14:50](https://youtu.be/-TeOEuplMrQ?t=890) There are two prominent projects that have tried so far that I've heard of.
+  - [14:55](https://youtu.be/-TeOEuplMrQ?t=895) In February this year, Anthropics' Nicolas Carlini had 16 agents build a C compiler from scratch in Rust.
+  - [15:02](https://youtu.be/-TeOEuplMrQ?t=902) It was able to compile the Linux kernel across about 2,000 sessions with no human in the loop.
+  - [15:08](https://youtu.be/-TeOEuplMrQ?t=908) But if you read that experiment closely, it's true that there was no human in the loop.
+  - [15:14](https://youtu.be/-TeOEuplMrQ?t=914) No human approving the code as it was written, but there was absolutely a human on the loop.
+- **19:42 인간 검증의 잔존 지점 및 프로덕션 모니터링** (slide)
+  - [19:18](https://youtu.be/-TeOEuplMrQ?t=1158) Passing the test never told you that the change was the right change.
+  - [19:22](https://youtu.be/-TeOEuplMrQ?t=1162) It never told you that this module exists because there are three external users of this module.
+  - [19:28](https://youtu.be/-TeOEuplMrQ?t=1168) It never told you that there is this cron job that nobody will admit to writing that relies on that module existing.
+  - [19:33](https://youtu.be/-TeOEuplMrQ?t=1173) There is context outside of the test suite that the tests can't find.
+  - [19:40](https://youtu.be/-TeOEuplMrQ?t=1180) So, in everything that we have looked at so far, the human checkpoint is continuing to survive.
+  - [19:48](https://youtu.be/-TeOEuplMrQ?t=1188) It is moving around, but it is surviving in predictable places.
+  - [19:52](https://youtu.be/-TeOEuplMrQ?t=1192) One is where correctness isn't cheaply checkable.
+  - [19:54](https://youtu.be/-TeOEuplMrQ?t=1194) Another is where the blast radius is large.
+  - [19:58](https://youtu.be/-TeOEuplMrQ?t=1198) In security conscious environments, every time you tell people, oh, we can just get rid of human review, you would get an immediate no.
+  - [20:04](https://youtu.be/-TeOEuplMrQ?t=1204) Wherever someone has to put their name on the result.
+  - [20:08](https://youtu.be/-TeOEuplMrQ?t=1208) But what's happening is the human role isn't disappearing, it is moving up the stack, possibly several levels up the stack.
+- **22:31 코드 리뷰 재설계 및 실무 권고**
+  - [22:01](https://youtu.be/-TeOEuplMrQ?t=1321) Once the code ships, the test results stops being the interesting thing the trajectory does.
+  - [22:07](https://youtu.be/-TeOEuplMrQ?t=1327) What the system actually did step by step when it ran against the real world.
+  - [22:13](https://youtu.be/-TeOEuplMrQ?t=1333) I am not going to give a pitch for a rise here.
+  - [22:15](https://youtu.be/-TeOEuplMrQ?t=1335) There are enough pitches for a rise at this conference.
+  - [22:17](https://youtu.be/-TeOEuplMrQ?t=1337) But if you are shipping automatically reviewed code, then systems in production that review what it actually does in the wild become indispensable.
+  - [22:26](https://youtu.be/-TeOEuplMrQ?t=1346) So after all that evidence, after all of that review of what the world is doing about automated code reviews,
+  - [22:35](https://youtu.be/-TeOEuplMrQ?t=1355) where I land is that code review isn't completely dead, but it is changing an enormous amount.
+  - [22:40](https://youtu.be/-TeOEuplMrQ?t=1360) It is being rebuilt as an engineered system.
+  - [22:42](https://youtu.be/-TeOEuplMrQ?t=1362) Humans are moving from being the engine that drives a code review, reading code line by line, to its pilots.
+  - [22:50](https://youtu.be/-TeOEuplMrQ?t=1370) And given the numbers that we opened with, that is probably the right trade.
+  - [22:54](https://youtu.be/-TeOEuplMrQ?t=1374) Every layer of that system, the benchmark, the classifier, the rubric, the test suite, the evals, is itself unreviewed until somebody decides that that is their job.
+
+### summary
+
+1. AI 에이전트의 코드 생성 속도 증가로 인한 인간 코드 리뷰 병목 문제를 다룬 발표다.
+2. 코드 작성량은 741% 증가한 반면 실제 배포된 소프트웨어는 30%만 늘었으며, 이는 리뷰 단계의 한계 때문이다.
+3. Cisco 연구에 따르면 리뷰어가 400~450줄을 초과하면 결함 탐지율이 급감하고, METR 연구에서는 테스트를 통과한 PR의 실제 머지 가능 비율이 약 50%에 그쳤다.
+4. FrontierCode 벤치마크에서 Fable 5는 SWE-Bench Pro 80.3%와 FrontierCode 29.3%로 큰 격차를 보였고, Bun의 Zig→Rust 포팅 코드에는 13,044개의 unsafe 블록이 포함되었다.
+5. 인간 리뷰어의 역할은 코드 직접 검토에서 검증 시스템 설계로 상향 이동하고 있으며, 개발팀은 검증 하네스 구축에 집중해야 한다.
+
+### name_pairs
+
+- **Sweebench → SWE-Bench Pro** (8:47)
+  - 전사: [8:44](https://youtu.be/-TeOEuplMrQ?t=524) And this isn't one model having a bad day. On the same set of tests, GPT 5.5 scores under 6%.
+  - 판독 ocr_text: Mergeable is a much harder test Fable 5 on SWE-Bench Pro: 80.3% Fable 5 on FrontierCode: 29.3% arize
+- **Frontier Code → FrontierCode** (8:47)
+  - 전사: [8:44](https://youtu.be/-TeOEuplMrQ?t=524) And this isn't one model having a bad day. On the same set of tests, GPT 5.5 scores under 6%.
+  - 판독 ocr_text: Mergeable is a much harder test Fable 5 on SWE-Bench Pro: 80.3% Fable 5 on FrontierCode: 29.3% arize
+- **Bunn → Bun** (16:31)
+  - 전사: [16:30](https://youtu.be/-TeOEuplMrQ?t=990) Somebody looked carefully at the ported code, and it has 13,044 unsafe blocks.
+  - 판독 ocr_text: Thirteen thousand assertions nobody checked 13,044 unsafe blocks in the port 73 in a comparable hand-written project
+
+### 채점
+
+- Q1 근거 [ ] pass [ ] fail 이유:
+- Q2 시각 [ ] pass [ ] fail 이유:
+- Q3 지어내지 않음 [ ] pass [ ] fail 이유:
+
+## 2. 31XD1O74pks
+
+- 제목: [한영자막] 토큰 제한을 멈추세요: 하네스가 최적의 모델을 직접 고르게 해보세요
+- 유튜브: https://youtu.be/31XD1O74pks
+- transcript_quality: `ok`
+- mode: `whisper+slides`
+- 입력: 전사 352줄, 판독 12장
+
+| id | 질문 |
+|---|---|
+| Q1 | 근거: key_points의 모든 항목이 그 evidence 초의 전사 줄(앞뒤 30초)이나 같은 id의 판독 문서로 뒷받침되나? |
+| Q2 | 시각: timeline의 모든 초에서(앞뒤 30초 안) 그 label의 내용이 전사나 판독에 실제로 나오나? |
+| Q3 | 지어내지 않음: summary를 포함한 출력 전체에 전사·판독에 없는 내용(제목만 보고 짐작한 내용 포함)이 없고, 근거 자료가 없으면 "내용 없음"으로 두었나? |
+
+### key_points
+
+1. **엔터프라이즈의 월간 AI 코딩 비용 급증 사례(인도 기업 Claude 1개월 $500M, Uber 연간 예산 4개월 소진)**
+   - `vd:2@44`
+     - (a) 전사 0:14~1:14
+       - [0:16](https://youtu.be/31XD1O74pks?t=16) but use OpenSource for the rest.
+       - [0:17](https://youtu.be/31XD1O74pks?t=17) And you're going to see some great result we have with that
+       - [0:20](https://youtu.be/31XD1O74pks?t=20) with the coding agent called Kimshi.
+       - [0:23](https://youtu.be/31XD1O74pks?t=23) I have the pleasure to be here with Zilvinas.
+       - [0:26](https://youtu.be/31XD1O74pks?t=26) Hey, guys.
+       - [0:26](https://youtu.be/31XD1O74pks?t=26) I'm Zilvinas.
+       - [0:27](https://youtu.be/31XD1O74pks?t=27) I am leading engineering for a Kimshi coding platform.
+       - [0:30](https://youtu.be/31XD1O74pks?t=30) So you have Zilvinas who run the entire engineering team
+       - [0:33](https://youtu.be/31XD1O74pks?t=33) for Kimshi.
+       - [0:33](https://youtu.be/31XD1O74pks?t=33) I'm so excited to be here with you.
+       - [0:36](https://youtu.be/31XD1O74pks?t=36) All right, let's go.
+       - [0:36](https://youtu.be/31XD1O74pks?t=36) So you may have seen this in the news, two pieces of information
+       - [0:43](https://youtu.be/31XD1O74pks?t=43) that came up in the last few weeks.
+       - [0:44](https://youtu.be/31XD1O74pks?t=44) The first one is there's a company in India
+       - [0:47](https://youtu.be/31XD1O74pks?t=47) that spent $500 million on Anthropic alone in one month,
+       - [0:52](https://youtu.be/31XD1O74pks?t=52) which is, again, a good example of tokens that are completely
+       - [0:55](https://youtu.be/31XD1O74pks?t=55) out of control.
+       - [0:56](https://youtu.be/31XD1O74pks?t=56) The other example is a famous tweet from Uber,
+       - [0:59](https://youtu.be/31XD1O74pks?t=59) the CTO of Uber, who say that in the last four months,
+       - [1:02](https://youtu.be/31XD1O74pks?t=62) he actually used the entire budget of Anthropic for the entire year.
+       - [1:08](https://youtu.be/31XD1O74pks?t=68) And this is how much the token maxing or the token cost is a thing
+       - [1:14](https://youtu.be/31XD1O74pks?t=74) for the enterprises.
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:2@63`
+     - (a) 전사 0:33~1:33
+       - [0:33](https://youtu.be/31XD1O74pks?t=33) for Kimshi.
+       - [0:33](https://youtu.be/31XD1O74pks?t=33) I'm so excited to be here with you.
+       - [0:36](https://youtu.be/31XD1O74pks?t=36) All right, let's go.
+       - [0:36](https://youtu.be/31XD1O74pks?t=36) So you may have seen this in the news, two pieces of information
+       - [0:43](https://youtu.be/31XD1O74pks?t=43) that came up in the last few weeks.
+       - [0:44](https://youtu.be/31XD1O74pks?t=44) The first one is there's a company in India
+       - [0:47](https://youtu.be/31XD1O74pks?t=47) that spent $500 million on Anthropic alone in one month,
+       - [0:52](https://youtu.be/31XD1O74pks?t=52) which is, again, a good example of tokens that are completely
+       - [0:55](https://youtu.be/31XD1O74pks?t=55) out of control.
+       - [0:56](https://youtu.be/31XD1O74pks?t=56) The other example is a famous tweet from Uber,
+       - [0:59](https://youtu.be/31XD1O74pks?t=59) the CTO of Uber, who say that in the last four months,
+       - [1:02](https://youtu.be/31XD1O74pks?t=62) he actually used the entire budget of Anthropic for the entire year.
+       - [1:08](https://youtu.be/31XD1O74pks?t=68) And this is how much the token maxing or the token cost is a thing
+       - [1:14](https://youtu.be/31XD1O74pks?t=74) for the enterprises.
+       - [1:16](https://youtu.be/31XD1O74pks?t=76) And you're going to see how we fix this.
+       - [1:18](https://youtu.be/31XD1O74pks?t=78) Companies responded to this by limiting the use of token.
+       - [1:22](https://youtu.be/31XD1O74pks?t=82) You may have heard this many, many times with our friends, developers.
+       - [1:27](https://youtu.be/31XD1O74pks?t=87) And as a developer, when you limit the amount of token,
+       - [1:31](https://youtu.be/31XD1O74pks?t=91) it feels like this.
+       - [1:33](https://youtu.be/31XD1O74pks?t=93) It's like, hey, you can use your laptop.
+     - (b) 판독: 제목 `THE PROBLEM`, 수치 $500M(high, Claude bill — one enterprise, one month), 1,000x(high, more tokens than a chat query), 4 months(high, to burn an entire year's AI coding budget)
+       - ocr_text: THE PROBLEM AXIOS / INDUATODAY · MAY 2026 $500M Claude bill — one enterprise, one month One enterprise client received a bill of $500M for a single month of Claude usage after failing to set usage limits on employee licences. Agentic loops alone can consume 1,000x more tokens than a chat query. FORTUNE · MAY 2026 4 months to burn an entire year's AI coding budget Uber's COO couldn't connect a dollar to a shipped feature. "That link is not there yet." The company burned 2026's full AI coding budget before summer.
+2. **토큰당 단가가 아닌 동일 작업 완료 비용 기준으로 모델 간 비용 격차 존재(Gemini 3 Flash 토큰당 $3.50 vs 작업당 $705, MiniMax M2.7 토큰당 $1.50 vs 작업당 $148)**
+   - `vd:2@197`
+     - (a) 전사 2:47~3:47
+       - [2:48](https://youtu.be/31XD1O74pks?t=168) It's coming now.
+       - [2:51](https://youtu.be/31XD1O74pks?t=171) We built an entire token optimization based on this idea.
+       - [2:56](https://youtu.be/31XD1O74pks?t=176) What you see on screen is the true cost of LLM model for the same task.
+       - [3:03](https://youtu.be/31XD1O74pks?t=183) It was made by the famous white paper in a university.
+       - [3:07](https://youtu.be/31XD1O74pks?t=187) And here's what they say.
+       - [3:09](https://youtu.be/31XD1O74pks?t=189) On one side, you see the cost per token.
+       - [3:13](https://youtu.be/31XD1O74pks?t=193) On the other side, you see the cost per task for the same task,
+       - [3:18](https://youtu.be/31XD1O74pks?t=198) with the same quality.
+       - [3:20](https://youtu.be/31XD1O74pks?t=200) That is the important thing.
+       - [3:21](https://youtu.be/31XD1O74pks?t=201) Otherwise, you cannot compare Apple with Apple.
+       - [3:23](https://youtu.be/31XD1O74pks?t=203) And here's what is written here.
+       - [3:24](https://youtu.be/31XD1O74pks?t=204) First, they are all different.
+       - [3:27](https://youtu.be/31XD1O74pks?t=207) But also, look at Gemini 3 Flash, our friends at Google.
+       - [3:32](https://youtu.be/31XD1O74pks?t=212) Well, it seems to be a relatively inexpensive model at $3.5 per million
+       - [3:38](https://youtu.be/31XD1O74pks?t=218) token.
+       - [3:39](https://youtu.be/31XD1O74pks?t=219) It's a blended average at the time this study was made.
+       - [3:42](https://youtu.be/31XD1O74pks?t=222) But actually, the task to complete with Gemini 3 was $305.
+     - (b) 판독: 제목 `Token optimization?`, 수치 4.7(high, Opus (model version)), $30.0(high, Opus 4.7 listed price per MTok), 5.4(high, GPT-5.4 (model version)), $17.5(high, GPT-5.4 listed price per MTok), 3.1(high, Gemini 3.1 Pro (model version)), $14.0(high, Gemini 3.1 Pro listed price per MTok), 4.5(high, Haiku 4.5 (model version)), $6.00(high, Haiku 4.5 listed price per MTok), 5.4(high, GPT-5.4 Mini (model version)), $5.25(high, GPT-5.4 Mini listed price per MTok), K2.6(high, Kimi K2.6 (model version)), $4.95(high, Kimi K2.6 listed price per MTok), 3(high, Gemini 3 Flash (model version)), $3.50(high, Gemini 3 Flash listed price per MTok), M2.7(high, MiniMax M2.7 (model version)), $1.50(high, MiniMax M2.7 listed price per MTok), $708(high, Opus 4.7 actual total cost), $705(high, Gemini 3 Flash actual total cost), $677(high, Gemini 3.1 Pro actual total cost), $509(high, GPT-5.4 actual total cost), $422(high, Kimi K2.6 actual total cost), $421(high, Haiku 4.5 actual total cost), $325(high, GPT-5.4 Mini actual total cost), $148(high, MiniMax M2.7 actual total cost)
+       - ocr_text: Token optimization? Listed price rank ($ per MTok) Actual cost rank (total $) Opus 4.7 $30.0 GPT-5.4 $17.5 Gemini 3.1 Pro $14.0 Haiku 4.5 $6.00 GPT-5.4 Mini $5.25 Kimi K2.6 $4.95 Gemini 3 Flash $3.50 MiniMax M2.7 $1.50 Opus 4.7 $708 Gemini 3 Flash $705 Gemini 3.1 Pro $677 GPT-5.4 $509 Kimi K2.6 $422 Haiku 4.5 $421 GPT-5.4 Mini $325 MiniMax M2.7 $148
+   - `vd:2@212`
+     - (a) 전사 3:02~4:02
+       - [3:03](https://youtu.be/31XD1O74pks?t=183) It was made by the famous white paper in a university.
+       - [3:07](https://youtu.be/31XD1O74pks?t=187) And here's what they say.
+       - [3:09](https://youtu.be/31XD1O74pks?t=189) On one side, you see the cost per token.
+       - [3:13](https://youtu.be/31XD1O74pks?t=193) On the other side, you see the cost per task for the same task,
+       - [3:18](https://youtu.be/31XD1O74pks?t=198) with the same quality.
+       - [3:20](https://youtu.be/31XD1O74pks?t=200) That is the important thing.
+       - [3:21](https://youtu.be/31XD1O74pks?t=201) Otherwise, you cannot compare Apple with Apple.
+       - [3:23](https://youtu.be/31XD1O74pks?t=203) And here's what is written here.
+       - [3:24](https://youtu.be/31XD1O74pks?t=204) First, they are all different.
+       - [3:27](https://youtu.be/31XD1O74pks?t=207) But also, look at Gemini 3 Flash, our friends at Google.
+       - [3:32](https://youtu.be/31XD1O74pks?t=212) Well, it seems to be a relatively inexpensive model at $3.5 per million
+       - [3:38](https://youtu.be/31XD1O74pks?t=218) token.
+       - [3:39](https://youtu.be/31XD1O74pks?t=219) It's a blended average at the time this study was made.
+       - [3:42](https://youtu.be/31XD1O74pks?t=222) But actually, the task to complete with Gemini 3 was $305.
+       - [3:48](https://youtu.be/31XD1O74pks?t=228) Sorry, $705.
+       - [3:51](https://youtu.be/31XD1O74pks?t=231) And look at the others, Minimax 2.7 is one of my favorites.
+       - [3:55](https://youtu.be/31XD1O74pks?t=235) The cost per token is $1.5.
+       - [3:57](https://youtu.be/31XD1O74pks?t=237) And the cost for the task is $148.
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:2@235`
+     - (a) 전사 3:25~4:25
+       - [3:27](https://youtu.be/31XD1O74pks?t=207) But also, look at Gemini 3 Flash, our friends at Google.
+       - [3:32](https://youtu.be/31XD1O74pks?t=212) Well, it seems to be a relatively inexpensive model at $3.5 per million
+       - [3:38](https://youtu.be/31XD1O74pks?t=218) token.
+       - [3:39](https://youtu.be/31XD1O74pks?t=219) It's a blended average at the time this study was made.
+       - [3:42](https://youtu.be/31XD1O74pks?t=222) But actually, the task to complete with Gemini 3 was $305.
+       - [3:48](https://youtu.be/31XD1O74pks?t=228) Sorry, $705.
+       - [3:51](https://youtu.be/31XD1O74pks?t=231) And look at the others, Minimax 2.7 is one of my favorites.
+       - [3:55](https://youtu.be/31XD1O74pks?t=235) The cost per token is $1.5.
+       - [3:57](https://youtu.be/31XD1O74pks?t=237) And the cost for the task is $148.
+       - [4:03](https://youtu.be/31XD1O74pks?t=243) It means the models are not the same.
+       - [4:06](https://youtu.be/31XD1O74pks?t=246) They don't cost the same.
+       - [4:07](https://youtu.be/31XD1O74pks?t=247) But they're also not the same per task.
+       - [4:11](https://youtu.be/31XD1O74pks?t=251) And that's why we built our coding agent.
+       - [4:15](https://youtu.be/31XD1O74pks?t=255) Would it be nice that you have an automated fashion,
+       - [4:18](https://youtu.be/31XD1O74pks?t=258) automated engine, automated harness that will select the right model
+       - [4:23](https://youtu.be/31XD1O74pks?t=263) for the task at the right time based on the outcome of the task?
+     - (b) 판독: 이 id의 판독 문서 없음
+3. **작업 결과물 품질에 따라 모델을 자동 선택하는 하네스 도입으로 3개월간 Claude 대비 2.5배 비용 절감, 2주 내 60% 절감**
+   - `vd:2@280`
+     - (a) 전사 4:10~5:10
+       - [4:11](https://youtu.be/31XD1O74pks?t=251) And that's why we built our coding agent.
+       - [4:15](https://youtu.be/31XD1O74pks?t=255) Would it be nice that you have an automated fashion,
+       - [4:18](https://youtu.be/31XD1O74pks?t=258) automated engine, automated harness that will select the right model
+       - [4:23](https://youtu.be/31XD1O74pks?t=263) for the task at the right time based on the outcome of the task?
+       - [4:29](https://youtu.be/31XD1O74pks?t=269) That is what we did with Kim C. Coding.
+       - [4:32](https://youtu.be/31XD1O74pks?t=272) That is what Zilminas did with his team.
+       - [4:36](https://youtu.be/31XD1O74pks?t=276) And here is the result.
+       - [4:38](https://youtu.be/31XD1O74pks?t=278) We've been using it for three months.
+       - [4:40](https://youtu.be/31XD1O74pks?t=280) 2.5 times is the amount of savings we have over Claude
+       - [4:45](https://youtu.be/31XD1O74pks?t=285) for the period.
+       - [4:46](https://youtu.be/31XD1O74pks?t=286) This is a graph of what would have been our Claude bill by day.
+       - [4:53](https://youtu.be/31XD1O74pks?t=293) The purple one on top is what would have been Claude costs
+       - [4:58](https://youtu.be/31XD1O74pks?t=298) over time.
+       - [5:00](https://youtu.be/31XD1O74pks?t=300) The blue line is what we paid.
+       - [5:04](https://youtu.be/31XD1O74pks?t=304) Same outcome.
+       - [5:07](https://youtu.be/31XD1O74pks?t=307) But look at this.
+       - [5:08](https://youtu.be/31XD1O74pks?t=308) The number of tokens increased by 1.5 times.
+     - (b) 판독: 제목 `The result:`, 수치 2.5×(high, The result)
+       - ocr_text: The result: 2.5×
+   - `vd:2@306`
+     - (a) 전사 4:36~5:36
+       - [4:36](https://youtu.be/31XD1O74pks?t=276) And here is the result.
+       - [4:38](https://youtu.be/31XD1O74pks?t=278) We've been using it for three months.
+       - [4:40](https://youtu.be/31XD1O74pks?t=280) 2.5 times is the amount of savings we have over Claude
+       - [4:45](https://youtu.be/31XD1O74pks?t=285) for the period.
+       - [4:46](https://youtu.be/31XD1O74pks?t=286) This is a graph of what would have been our Claude bill by day.
+       - [4:53](https://youtu.be/31XD1O74pks?t=293) The purple one on top is what would have been Claude costs
+       - [4:58](https://youtu.be/31XD1O74pks?t=298) over time.
+       - [5:00](https://youtu.be/31XD1O74pks?t=300) The blue line is what we paid.
+       - [5:04](https://youtu.be/31XD1O74pks?t=304) Same outcome.
+       - [5:07](https://youtu.be/31XD1O74pks?t=307) But look at this.
+       - [5:08](https://youtu.be/31XD1O74pks?t=308) The number of tokens increased by 1.5 times.
+       - [5:14](https://youtu.be/31XD1O74pks?t=314) OK, we all experienced that.
+       - [5:16](https://youtu.be/31XD1O74pks?t=316) The cost to Claude decreased by 1.5 times.
+       - [5:22](https://youtu.be/31XD1O74pks?t=322) This is our job as managers.
+       - [5:24](https://youtu.be/31XD1O74pks?t=324) We provide to our team a coding agent that is essentially
+       - [5:28](https://youtu.be/31XD1O74pks?t=328) unlimited because of that coding agent is growing 3x less,
+       - [5:33](https://youtu.be/31XD1O74pks?t=333) 2.5 times less, than the gross of token for the task.
+     - (b) 판독: 제목 `Daily Claude Code Cost ($K)`, 수치 60%(high, savings in 2 weeks)
+       - ocr_text: THE MATH Daily Claude Code Cost ($K) Broad internal Kimchi adoption began mid-May With Kimchi * If We Didn't Have Kimchi 4.0 4.2 4.2 4.3 4.6 4.2 4.1 4.1 4.0 3.8 3.4 3.4 3.4 3.3 3.3 3.4 3.4 3.3 3.3 3.4 3.1 2.9 2.8 2.7 2.6 4.4 4.5 4.5 4.6 4.8 4.8 4.8 5.0 5.3 5.4 5.5 5.6 5.8 5.8 6.0 6.1 6.1 6.1 6.1 6.3 6.5 6.5 6.4 6.4 6.5 Opus 4.7 release drove another Claude Code Cost increase Result: 60% savings in 2 weeks: and growing * Includes Kimchi / GPU capacity costs 5/10/26 5/13/26 5/16/26 5/19/26 5/22/26 5/25/26 5/28/26 5/31/26 6/3/26 6/6/26 7
+4. **하네스가 모델 선택을 시간 경과에 따라 자동 변경(6월 3일 kimi-k2.6 1141.8M 토큰 사용 → 6월 21일 minimax-m2.7 전환)**
+   - `vd:2@375`
+     - (a) 전사 5:45~6:45
+       - [5:45](https://youtu.be/31XD1O74pks?t=345) I'm going to show you the evolution of the selection
+       - [5:48](https://youtu.be/31XD1O74pks?t=348) of the model over time by the harness.
+       - [5:53](https://youtu.be/31XD1O74pks?t=353) And here it looks like.
+       - [5:55](https://youtu.be/31XD1O74pks?t=355) You see there is a lot of orange early June.
+       - [5:58](https://youtu.be/31XD1O74pks?t=358) And there's a lot of yellow late June.
+       - [6:02](https://youtu.be/31XD1O74pks?t=362) There's a complete shift, meaning the harness is selecting
+       - [6:05](https://youtu.be/31XD1O74pks?t=365) a very different model.
+       - [6:06](https://youtu.be/31XD1O74pks?t=366) It happens the 12th of June.
+       - [6:11](https://youtu.be/31XD1O74pks?t=371) And this is what happened the 12th of June.
+       - [6:15](https://youtu.be/31XD1O74pks?t=375) The 3rd of June, Kimi 2.6 is winning by far the most popular
+       - [6:20](https://youtu.be/31XD1O74pks?t=380) of the harness.
+       - [6:22](https://youtu.be/31XD1O74pks?t=382) 21st of June, the one winning is Minimax 3.
+       - [6:27](https://youtu.be/31XD1O74pks?t=387) Us as human, probably we can find and understand and test
+       - [6:32](https://youtu.be/31XD1O74pks?t=392) and be comfortable with a new model coming in.
+       - [6:34](https://youtu.be/31XD1O74pks?t=394) Do you think we look at this as human?
+       - [6:38](https://youtu.be/31XD1O74pks?t=398) Absolutely not.
+       - [6:39](https://youtu.be/31XD1O74pks?t=399) But an autonomous harness, an automated coding agent that
+       - [6:44](https://youtu.be/31XD1O74pks?t=404) is obsessed with token costs is going to do just that.
+     - (b) 판독: 제목 `3 June`, 수치 1871.7M(high, Total), 1141.8M(high, kimi-k2.6), 369.1M(high, minimax-m2.7), 272.5M(high, kimi-k2.5), 17.0M(high, claude-sonnet-4-6), 25.2M(high, claude-opus-4-6), 31.4M(high, nemotron-3-super-fp4), 3.0M(high, gpt-5), 1.8M(high, claude-haiku-4-5-20251001), 1.8M(high, claude-sonnet-4-5), 2.2M(high, minimax-m2.5), 1.2M(high, gpt-5-mini), 3.2M(high, gpt-4.1-mini), 1,784(high, o3), 281.8K(high, gpt-4.1), 690.1K(high, claude-haiku-4-6)
+       - ocr_text: 3 June Total 1871.7M kimi-k2.6 1141.8M minimax-m2.7 369.1M kimi-k2.5 272.5M claude-sonnet-4-6 17.0M claude-opus-4-6 25.2M nemotron-3-super-fp4 31.4M gpt-5 3.0M claude-haiku-4-5-20251001 1.8M claude-sonnet-4-5 1.8M minimax-m2.5 2.2M gpt-5-mini 1.2M gpt-4.1-mini 3.2M o3 1,784 gpt-4.1 281.8K claude-haiku-4-6 690.1K 3 June Total 1871.7M kimi-k2.6 1141.8M minimax-m2.7 369.1M kimi-k2.5 272.5M
+   - `vd:2@380`
+     - (a) 전사 5:50~6:50
+       - [5:53](https://youtu.be/31XD1O74pks?t=353) And here it looks like.
+       - [5:55](https://youtu.be/31XD1O74pks?t=355) You see there is a lot of orange early June.
+       - [5:58](https://youtu.be/31XD1O74pks?t=358) And there's a lot of yellow late June.
+       - [6:02](https://youtu.be/31XD1O74pks?t=362) There's a complete shift, meaning the harness is selecting
+       - [6:05](https://youtu.be/31XD1O74pks?t=365) a very different model.
+       - [6:06](https://youtu.be/31XD1O74pks?t=366) It happens the 12th of June.
+       - [6:11](https://youtu.be/31XD1O74pks?t=371) And this is what happened the 12th of June.
+       - [6:15](https://youtu.be/31XD1O74pks?t=375) The 3rd of June, Kimi 2.6 is winning by far the most popular
+       - [6:20](https://youtu.be/31XD1O74pks?t=380) of the harness.
+       - [6:22](https://youtu.be/31XD1O74pks?t=382) 21st of June, the one winning is Minimax 3.
+       - [6:27](https://youtu.be/31XD1O74pks?t=387) Us as human, probably we can find and understand and test
+       - [6:32](https://youtu.be/31XD1O74pks?t=392) and be comfortable with a new model coming in.
+       - [6:34](https://youtu.be/31XD1O74pks?t=394) Do you think we look at this as human?
+       - [6:38](https://youtu.be/31XD1O74pks?t=398) Absolutely not.
+       - [6:39](https://youtu.be/31XD1O74pks?t=399) But an autonomous harness, an automated coding agent that
+       - [6:44](https://youtu.be/31XD1O74pks?t=404) is obsessed with token costs is going to do just that.
+     - (b) 판독: 이 id의 판독 문서 없음
+5. **Ferment 프로세스: 작업을 마일스톤으로 분해하여 자율 실행, 프론티어 모델이 각 단계 평가 및 점수화, B 이상 점수 시 스테이징 배포**
+   - `vd:2@488`
+     - (a) 전사 7:38~8:38
+       - [7:39](https://youtu.be/31XD1O74pks?t=459) So meaning like we ended up spending too much on Cloud Code
+       - [7:42](https://youtu.be/31XD1O74pks?t=462) like half a year ago.
+       - [7:43](https://youtu.be/31XD1O74pks?t=463) So we saw this Cloud Build skyrocketing
+       - [7:45](https://youtu.be/31XD1O74pks?t=465) and started working on our own harness.
+       - [7:47](https://youtu.be/31XD1O74pks?t=467) Behind the scenes, it's using like PyMonos as SDK.
+       - [7:50](https://youtu.be/31XD1O74pks?t=470) But the goal of that is to take the open source experience,
+       - [7:54](https://youtu.be/31XD1O74pks?t=474) still contribute back to open source
+       - [7:56](https://youtu.be/31XD1O74pks?t=476) by providing our own harnesses open source,
+       - [7:59](https://youtu.be/31XD1O74pks?t=479) building constructs like Ferment, which
+       - [8:01](https://youtu.be/31XD1O74pks?t=481) fits into the kimchi theme, which is meant for long running
+       - [8:04](https://youtu.be/31XD1O74pks?t=484) tasks where, on average, we estimate the human envelope
+       - [8:07](https://youtu.be/31XD1O74pks?t=487) for these tasks is typically happening only like every two hours,
+       - [8:11](https://youtu.be/31XD1O74pks?t=491) every three hours, and et cetera.
+       - [8:13](https://youtu.be/31XD1O74pks?t=493) So the goal is you use kimchi harness,
+       - [8:15](https://youtu.be/31XD1O74pks?t=495) you run a Ferment process.
+       - [8:18](https://youtu.be/31XD1O74pks?t=498) It asks you a bunch of questions, and autonomously
+       - [8:20](https://youtu.be/31XD1O74pks?t=500) runs a coding task for like more than two hours.
+       - [8:23](https://youtu.be/31XD1O74pks?t=503) The goal of that is that because it breaks it into milestones,
+       - [8:27](https://youtu.be/31XD1O74pks?t=507) it knows how to implement it.
+       - [8:28](https://youtu.be/31XD1O74pks?t=508) And at the end of the cycle, you would get scoring for your output,
+       - [8:32](https://youtu.be/31XD1O74pks?t=512) so you would actually know what's happening.
+       - [8:34](https://youtu.be/31XD1O74pks?t=514) And going back to previously discussed,
+       - [8:36](https://youtu.be/31XD1O74pks?t=516) like the amount of models used with kimchi harness,
+     - (b) 판독: 제목 `Introducing /ferment`, 수치 42(low, src/store/todo.ts), 88(low, src/components/TodoList.tsx), 31(low, src/components/AddTodo.tsx), 14(low, src/App.tsx wired), 8/8(low, vitest), 480ms(low, vitest), 72%(low, multi-model (kimi-k2)), +13M(low, multi-model (kimi-k2)), 7/8(low, multi-model (kimi-k2))
+       - ocr_text: 04 · THE BUILD · FERMENT Introducing /ferment /ferment Hands-off execution for complex work. Agent breaks work into milestones Executes autonomously, milestone by milestone Frontier model evaluates & scores each step Multiple passes until output is correct /ferment create "to-do list" app phase: plan · kimi-k2.5 Milestone 1 · Project scaffold (Vite + React + TS) Milestone 2 · Data model + local persistence Milestone 3 · UI: list, add, complete, delete Milestone 4 · Tests + deploy preview Milestone 5 · Open PR · dispatch to merge... phase: build · sonnet-2.7 (2 parallel) package.json · vite.config.ts scaffolded · 0.8s src/store/todo.ts · 42 lines · 0.9s src/components/TodoList.tsx · 88 lines · 1.2s src/components/AddTodo.tsx · 31 lines · 0.7s src/App.tsx wired · 14 lines phase: test vitest 
+   - `vd:2@596`
+     - (a) 전사 9:26~10:26
+       - [9:30](https://youtu.be/31XD1O74pks?t=570) and going back, meaning there is a higher order model that
+       - [9:35](https://youtu.be/31XD1O74pks?t=575) is checking the quality and thinking that quality is not
+       - [9:37](https://youtu.be/31XD1O74pks?t=577) good enough, please do it again.
+       - [9:40](https://youtu.be/31XD1O74pks?t=580) This is what I was saying earlier by it looks at the outcome
+       - [9:45](https://youtu.be/31XD1O74pks?t=585) and it's optimizing the token based on the quality
+       - [9:48](https://youtu.be/31XD1O74pks?t=588) of the outcome.
+       - [9:50](https://youtu.be/31XD1O74pks?t=590) That is what is super cool with Ferment.
+       - [9:52](https://youtu.be/31XD1O74pks?t=592) MARIUSZ GASIEWSKI- Yep.
+       - [9:52](https://youtu.be/31XD1O74pks?t=592) And Artifact is only considered complete once the output
+       - [9:56](https://youtu.be/31XD1O74pks?t=596) of the scoring, at least B as a score.
+       - [9:59](https://youtu.be/31XD1O74pks?t=599) And even for that, if you don't like the score,
+       - [10:02](https://youtu.be/31XD1O74pks?t=602) you can ask the agent to go back, fix it up,
+       - [10:04](https://youtu.be/31XD1O74pks?t=604) and it will try to achieve A as a scoring.
+       - [10:09](https://youtu.be/31XD1O74pks?t=609) The intention of stopping at the staging
+       - [10:11](https://youtu.be/31XD1O74pks?t=611) is currently by design.
+       - [10:13](https://youtu.be/31XD1O74pks?t=613) We still believe there is some little human
+       - [10:15](https://youtu.be/31XD1O74pks?t=615) that needs to be in the loop before going
+       - [10:17](https://youtu.be/31XD1O74pks?t=617) to the production, at least at this point.
+       - [10:19](https://youtu.be/31XD1O74pks?t=619) We all know that the ultimate future is to avoid that.
+       - [10:22](https://youtu.be/31XD1O74pks?t=622) You go to production.
+       - [10:23](https://youtu.be/31XD1O74pks?t=623) You look at the metrics.
+       - [10:24](https://youtu.be/31XD1O74pks?t=624) You look at the observability data, the solo metrics
+     - (b) 판독: 이 id의 판독 문서 없음
+6. **Kimchi Teleport: 로컬 에이전트 세션을 클라우드 컨테이너로 동기화하여 노트북을 닫아도 작업 지속, 엔지니어의 62%가 사용**
+   - `vd:2@738`
+     - (a) 전사 11:48~12:48
+       - [11:48](https://youtu.be/31XD1O74pks?t=708) We can do that both on our SaaS platform.
+       - [11:50](https://youtu.be/31XD1O74pks?t=710) We can ship it to your on-premise deployments
+       - [11:53](https://youtu.be/31XD1O74pks?t=713) if you're like a financial technology company,
+       - [11:55](https://youtu.be/31XD1O74pks?t=715) and things like that.
+       - [11:56](https://youtu.be/31XD1O74pks?t=716) So we will manage agent sessions for you.
+       - [11:59](https://youtu.be/31XD1O74pks?t=719) We will make sure they are running.
+       - [12:00](https://youtu.be/31XD1O74pks?t=720) We are accessible both from your laptop, from mobile devices,
+       - [12:03](https://youtu.be/31XD1O74pks?t=723) if we are running in the background.
+       - [12:05](https://youtu.be/31XD1O74pks?t=725) So it goes back and ties to the story
+       - [12:07](https://youtu.be/31XD1O74pks?t=727) that I mentioned that the human in the loop is only
+       - [12:10](https://youtu.be/31XD1O74pks?t=730) appearing like every two or three hours.
+       - [12:12](https://youtu.be/31XD1O74pks?t=732) So teleport emphasizes that.
+       - [12:14](https://youtu.be/31XD1O74pks?t=734) You run your process.
+       - [12:16](https://youtu.be/31XD1O74pks?t=736) You teleport it to the remote environment.
+       - [12:18](https://youtu.be/31XD1O74pks?t=738) The arm spins up in the background.
+       - [12:19](https://youtu.be/31XD1O74pks?t=739) We don't need to care about it.
+       - [12:21](https://youtu.be/31XD1O74pks?t=741) We will make sure it's the right size,
+       - [12:23](https://youtu.be/31XD1O74pks?t=743) it's the right security requirements, and everything else.
+       - [12:25](https://youtu.be/31XD1O74pks?t=745) And it will keep on running until the task is done,
+       - [12:28](https://youtu.be/31XD1O74pks?t=748) or until the human in the loop needs to be involved,
+       - [12:31](https://youtu.be/31XD1O74pks?t=751) get notifications for some clarification of specs,
+       - [12:34](https://youtu.be/31XD1O74pks?t=754) and things like that.
+       - [12:36](https://youtu.be/31XD1O74pks?t=756) GABRIEL GARCIA- Guys, I really like this idea.
+       - [12:38](https://youtu.be/31XD1O74pks?t=758) Look at this.
+       - [12:39](https://youtu.be/31XD1O74pks?t=759) This is the screenshot of Teleport.
+       - [12:42](https://youtu.be/31XD1O74pks?t=762) I am puzzled that sometimes innovations are always
+       - [12:46](https://youtu.be/31XD1O74pks?t=766) the simplest one.
+       - [12:48](https://youtu.be/31XD1O74pks?t=768) This was born out of the idea that one of us
+     - (b) 판독: 제목 `There's more.`, 수치 없음
+       - ocr_text: There's more. Kimchi Teleport Offload your agent session to the cloud — close your laptop, keep working.
+   - `vd:2@831`
+     - (a) 전사 13:21~14:21
+       - [13:21](https://youtu.be/31XD1O74pks?t=801) In our case, it's Google.
+       - [13:24](https://youtu.be/31XD1O74pks?t=804) And locally on your laptop, it feels exactly the same.
+       - [13:27](https://youtu.be/31XD1O74pks?t=807) It just doesn't run inside your laptop.
+       - [13:30](https://youtu.be/31XD1O74pks?t=810) It feels like it.
+       - [13:33](https://youtu.be/31XD1O74pks?t=813) It runs somewhere else in your environment,
+       - [13:36](https://youtu.be/31XD1O74pks?t=816) in a container, in a Kubernetes cluster,
+       - [13:39](https://youtu.be/31XD1O74pks?t=819) inside the place at Google that will continue running,
+       - [13:43](https://youtu.be/31XD1O74pks?t=823) even if you close your laptop.
+       - [13:45](https://youtu.be/31XD1O74pks?t=825) How simple that is.
+       - [13:47](https://youtu.be/31XD1O74pks?t=827) And yet, our favorite tool is this one.
+       - [13:51](https://youtu.be/31XD1O74pks?t=831) I think the last one I looked at, it's 62% of our engineers
+       - [13:56](https://youtu.be/31XD1O74pks?t=836) are only using Teleport when they are coding now for that problem.
+       - [14:00](https://youtu.be/31XD1O74pks?t=840) They go home, it continues.
+       - [14:02](https://youtu.be/31XD1O74pks?t=842) They're in transit.
+       - [14:03](https://youtu.be/31XD1O74pks?t=843) It continues.
+       - [14:05](https://youtu.be/31XD1O74pks?t=845) They are on holiday.
+       - [14:05](https://youtu.be/31XD1O74pks?t=845) They don't look at it anymore.
+       - [14:07](https://youtu.be/31XD1O74pks?t=847) It continues.
+       - [14:10](https://youtu.be/31XD1O74pks?t=850) That's so cool, huh?
+       - [14:11](https://youtu.be/31XD1O74pks?t=851) Yeah.
+       - [14:12](https://youtu.be/31XD1O74pks?t=852) So there is more to that.
+       - [14:14](https://youtu.be/31XD1O74pks?t=854) So we built another tool called Kimchi Studio.
+       - [14:17](https://youtu.be/31XD1O74pks?t=857) If the Teleport is something typically individual uses,
+       - [14:20](https://youtu.be/31XD1O74pks?t=860) Studio is kind of like a Teleport for teams and enterprises.
+     - (b) 판독: 이 id의 판독 문서 없음
+
+### timeline
+
+- **0:00 발표자 소개 및 토큰 최적화 주제 도입**
+  - [0:00](https://youtu.be/31XD1O74pks?t=0) All right, guys.
+  - [0:02](https://youtu.be/31XD1O74pks?t=2) Very nice to meet you all.
+  - [0:04](https://youtu.be/31XD1O74pks?t=4) My name is Laurent.
+  - [0:04](https://youtu.be/31XD1O74pks?t=4) I'm the co-founder and president of Cast.ai,
+  - [0:07](https://youtu.be/31XD1O74pks?t=7) who is the inventor of Kimshi, which I'm
+  - [0:09](https://youtu.be/31XD1O74pks?t=9) going to show you in a few seconds.
+  - [0:12](https://youtu.be/31XD1O74pks?t=12) The talk is going to be about proprietary models for each case,
+  - [0:16](https://youtu.be/31XD1O74pks?t=16) but use OpenSource for the rest.
+  - [0:17](https://youtu.be/31XD1O74pks?t=17) And you're going to see some great result we have with that
+  - [0:20](https://youtu.be/31XD1O74pks?t=20) with the coding agent called Kimshi.
+  - [0:23](https://youtu.be/31XD1O74pks?t=23) I have the pleasure to be here with Zilvinas.
+  - [0:26](https://youtu.be/31XD1O74pks?t=26) Hey, guys.
+  - [0:26](https://youtu.be/31XD1O74pks?t=26) I'm Zilvinas.
+  - [0:27](https://youtu.be/31XD1O74pks?t=27) I am leading engineering for a Kimshi coding platform.
+  - [0:30](https://youtu.be/31XD1O74pks?t=30) So you have Zilvinas who run the entire engineering team
+- **0:39 토큰 비용 통제 불능 사례(인도 기업, Uber)** (slide)
+  - [0:09](https://youtu.be/31XD1O74pks?t=9) going to show you in a few seconds.
+  - [0:12](https://youtu.be/31XD1O74pks?t=12) The talk is going to be about proprietary models for each case,
+  - [0:16](https://youtu.be/31XD1O74pks?t=16) but use OpenSource for the rest.
+  - [0:17](https://youtu.be/31XD1O74pks?t=17) And you're going to see some great result we have with that
+  - [0:20](https://youtu.be/31XD1O74pks?t=20) with the coding agent called Kimshi.
+  - [0:23](https://youtu.be/31XD1O74pks?t=23) I have the pleasure to be here with Zilvinas.
+  - [0:26](https://youtu.be/31XD1O74pks?t=26) Hey, guys.
+  - [0:26](https://youtu.be/31XD1O74pks?t=26) I'm Zilvinas.
+  - [0:27](https://youtu.be/31XD1O74pks?t=27) I am leading engineering for a Kimshi coding platform.
+  - [0:30](https://youtu.be/31XD1O74pks?t=30) So you have Zilvinas who run the entire engineering team
+  - [0:33](https://youtu.be/31XD1O74pks?t=33) for Kimshi.
+  - [0:33](https://youtu.be/31XD1O74pks?t=33) I'm so excited to be here with you.
+  - [0:36](https://youtu.be/31XD1O74pks?t=36) All right, let's go.
+  - [0:36](https://youtu.be/31XD1O74pks?t=36) So you may have seen this in the news, two pieces of information
+  - [0:43](https://youtu.be/31XD1O74pks?t=43) that came up in the last few weeks.
+  - [0:44](https://youtu.be/31XD1O74pks?t=44) The first one is there's a company in India
+  - [0:47](https://youtu.be/31XD1O74pks?t=47) that spent $500 million on Anthropic alone in one month,
+  - [0:52](https://youtu.be/31XD1O74pks?t=52) which is, again, a good example of tokens that are completely
+  - [0:55](https://youtu.be/31XD1O74pks?t=55) out of control.
+  - [0:56](https://youtu.be/31XD1O74pks?t=56) The other example is a famous tweet from Uber,
+  - [0:59](https://youtu.be/31XD1O74pks?t=59) the CTO of Uber, who say that in the last four months,
+  - [1:02](https://youtu.be/31XD1O74pks?t=62) he actually used the entire budget of Anthropic for the entire year.
+  - [1:08](https://youtu.be/31XD1O74pks?t=68) And this is how much the token maxing or the token cost is a thing
+- **1:18 토큰 제한이 개발자에게 미치는 영향 및 잘못된 대응 지적**
+  - [0:52](https://youtu.be/31XD1O74pks?t=52) which is, again, a good example of tokens that are completely
+  - [0:55](https://youtu.be/31XD1O74pks?t=55) out of control.
+  - [0:56](https://youtu.be/31XD1O74pks?t=56) The other example is a famous tweet from Uber,
+  - [0:59](https://youtu.be/31XD1O74pks?t=59) the CTO of Uber, who say that in the last four months,
+  - [1:02](https://youtu.be/31XD1O74pks?t=62) he actually used the entire budget of Anthropic for the entire year.
+  - [1:08](https://youtu.be/31XD1O74pks?t=68) And this is how much the token maxing or the token cost is a thing
+  - [1:14](https://youtu.be/31XD1O74pks?t=74) for the enterprises.
+  - [1:16](https://youtu.be/31XD1O74pks?t=76) And you're going to see how we fix this.
+  - [1:18](https://youtu.be/31XD1O74pks?t=78) Companies responded to this by limiting the use of token.
+  - [1:22](https://youtu.be/31XD1O74pks?t=82) You may have heard this many, many times with our friends, developers.
+  - [1:27](https://youtu.be/31XD1O74pks?t=87) And as a developer, when you limit the amount of token,
+  - [1:31](https://youtu.be/31XD1O74pks?t=91) it feels like this.
+  - [1:33](https://youtu.be/31XD1O74pks?t=93) It's like, hey, you can use your laptop.
+  - [1:36](https://youtu.be/31XD1O74pks?t=96) You have an hour battery.
+  - [1:38](https://youtu.be/31XD1O74pks?t=98) And you can only charge once a day.
+  - [1:42](https://youtu.be/31XD1O74pks?t=102) That's how it feels to limit the amount of token for a developer.
+  - [1:47](https://youtu.be/31XD1O74pks?t=107) We at Kim Chi think this is wrong.
+- **2:13 관리자의 역할: 토큰 무제한·저가 공급** (slide)
+  - [1:47](https://youtu.be/31XD1O74pks?t=107) We at Kim Chi think this is wrong.
+  - [1:51](https://youtu.be/31XD1O74pks?t=111) Our job as manager is to do the opposite,
+  - [1:56](https://youtu.be/31XD1O74pks?t=116) is to ensure that we want to make the tokens unlimited and inexpensive.
+  - [2:05](https://youtu.be/31XD1O74pks?t=125) Our job is not to prevent the developer to use coding agent.
+  - [2:09](https://youtu.be/31XD1O74pks?t=129) Our job is to make sure they can use it as much as they want,
+  - [2:12](https://youtu.be/31XD1O74pks?t=132) for as long as they want, in a completely unlimited fashion.
+  - [2:16](https://youtu.be/31XD1O74pks?t=136) This is why we started Kim Chi.
+  - [2:20](https://youtu.be/31XD1O74pks?t=140) At Kim Chi, we have 300 developers.
+  - [2:23](https://youtu.be/31XD1O74pks?t=143) Oh, sorry.
+  - [2:24](https://youtu.be/31XD1O74pks?t=144) 300 employees.
+  - [2:26](https://youtu.be/31XD1O74pks?t=146) Two-thirds of those are developers that Zivinas run that.
+  - [2:30](https://youtu.be/31XD1O74pks?t=150) And we've been using this coding agent for the last three months.
+  - [2:34](https://youtu.be/31XD1O74pks?t=154) I'm going to show you what we built, how we built it, and the result of it.
+  - [2:40](https://youtu.be/31XD1O74pks?t=160) And then Zivinas will show you a few more things
+- **2:52 토큰당 비용 vs 작업당 비용 비교** (slide)
+  - [2:23](https://youtu.be/31XD1O74pks?t=143) Oh, sorry.
+  - [2:24](https://youtu.be/31XD1O74pks?t=144) 300 employees.
+  - [2:26](https://youtu.be/31XD1O74pks?t=146) Two-thirds of those are developers that Zivinas run that.
+  - [2:30](https://youtu.be/31XD1O74pks?t=150) And we've been using this coding agent for the last three months.
+  - [2:34](https://youtu.be/31XD1O74pks?t=154) I'm going to show you what we built, how we built it, and the result of it.
+  - [2:40](https://youtu.be/31XD1O74pks?t=160) And then Zivinas will show you a few more things
+  - [2:44](https://youtu.be/31XD1O74pks?t=164) that make the coding agent really, really cool.
+  - [2:48](https://youtu.be/31XD1O74pks?t=168) It's coming now.
+  - [2:51](https://youtu.be/31XD1O74pks?t=171) We built an entire token optimization based on this idea.
+  - [2:56](https://youtu.be/31XD1O74pks?t=176) What you see on screen is the true cost of LLM model for the same task.
+  - [3:03](https://youtu.be/31XD1O74pks?t=183) It was made by the famous white paper in a university.
+  - [3:07](https://youtu.be/31XD1O74pks?t=187) And here's what they say.
+  - [3:09](https://youtu.be/31XD1O74pks?t=189) On one side, you see the cost per token.
+  - [3:13](https://youtu.be/31XD1O74pks?t=193) On the other side, you see the cost per task for the same task,
+  - [3:18](https://youtu.be/31XD1O74pks?t=198) with the same quality.
+  - [3:20](https://youtu.be/31XD1O74pks?t=200) That is the important thing.
+  - [3:21](https://youtu.be/31XD1O74pks?t=201) Otherwise, you cannot compare Apple with Apple.
+- **4:17 모델 자동 선택 하네스 개념**
+  - [3:48](https://youtu.be/31XD1O74pks?t=228) Sorry, $705.
+  - [3:51](https://youtu.be/31XD1O74pks?t=231) And look at the others, Minimax 2.7 is one of my favorites.
+  - [3:55](https://youtu.be/31XD1O74pks?t=235) The cost per token is $1.5.
+  - [3:57](https://youtu.be/31XD1O74pks?t=237) And the cost for the task is $148.
+  - [4:03](https://youtu.be/31XD1O74pks?t=243) It means the models are not the same.
+  - [4:06](https://youtu.be/31XD1O74pks?t=246) They don't cost the same.
+  - [4:07](https://youtu.be/31XD1O74pks?t=247) But they're also not the same per task.
+  - [4:11](https://youtu.be/31XD1O74pks?t=251) And that's why we built our coding agent.
+  - [4:15](https://youtu.be/31XD1O74pks?t=255) Would it be nice that you have an automated fashion,
+  - [4:18](https://youtu.be/31XD1O74pks?t=258) automated engine, automated harness that will select the right model
+  - [4:23](https://youtu.be/31XD1O74pks?t=263) for the task at the right time based on the outcome of the task?
+  - [4:29](https://youtu.be/31XD1O74pks?t=269) That is what we did with Kim C. Coding.
+  - [4:32](https://youtu.be/31XD1O74pks?t=272) That is what Zilminas did with his team.
+  - [4:36](https://youtu.be/31XD1O74pks?t=276) And here is the result.
+  - [4:38](https://youtu.be/31XD1O74pks?t=278) We've been using it for three months.
+  - [4:40](https://youtu.be/31XD1O74pks?t=280) 2.5 times is the amount of savings we have over Claude
+  - [4:45](https://youtu.be/31XD1O74pks?t=285) for the period.
+  - [4:46](https://youtu.be/31XD1O74pks?t=286) This is a graph of what would have been our Claude bill by day.
+- **4:36 3개월 사용 결과: 2.5배 절감, 일일 비용 그래프** (slide)
+  - [4:06](https://youtu.be/31XD1O74pks?t=246) They don't cost the same.
+  - [4:07](https://youtu.be/31XD1O74pks?t=247) But they're also not the same per task.
+  - [4:11](https://youtu.be/31XD1O74pks?t=251) And that's why we built our coding agent.
+  - [4:15](https://youtu.be/31XD1O74pks?t=255) Would it be nice that you have an automated fashion,
+  - [4:18](https://youtu.be/31XD1O74pks?t=258) automated engine, automated harness that will select the right model
+  - [4:23](https://youtu.be/31XD1O74pks?t=263) for the task at the right time based on the outcome of the task?
+  - [4:29](https://youtu.be/31XD1O74pks?t=269) That is what we did with Kim C. Coding.
+  - [4:32](https://youtu.be/31XD1O74pks?t=272) That is what Zilminas did with his team.
+  - [4:36](https://youtu.be/31XD1O74pks?t=276) And here is the result.
+  - [4:38](https://youtu.be/31XD1O74pks?t=278) We've been using it for three months.
+  - [4:40](https://youtu.be/31XD1O74pks?t=280) 2.5 times is the amount of savings we have over Claude
+  - [4:45](https://youtu.be/31XD1O74pks?t=285) for the period.
+  - [4:46](https://youtu.be/31XD1O74pks?t=286) This is a graph of what would have been our Claude bill by day.
+  - [4:53](https://youtu.be/31XD1O74pks?t=293) The purple one on top is what would have been Claude costs
+  - [4:58](https://youtu.be/31XD1O74pks?t=298) over time.
+  - [5:00](https://youtu.be/31XD1O74pks?t=300) The blue line is what we paid.
+  - [5:04](https://youtu.be/31XD1O74pks?t=304) Same outcome.
+- **5:41 하네스의 모델 스위칭 시점(6월 12일 전환)** (slide)
+  - [5:14](https://youtu.be/31XD1O74pks?t=314) OK, we all experienced that.
+  - [5:16](https://youtu.be/31XD1O74pks?t=316) The cost to Claude decreased by 1.5 times.
+  - [5:22](https://youtu.be/31XD1O74pks?t=322) This is our job as managers.
+  - [5:24](https://youtu.be/31XD1O74pks?t=324) We provide to our team a coding agent that is essentially
+  - [5:28](https://youtu.be/31XD1O74pks?t=328) unlimited because of that coding agent is growing 3x less,
+  - [5:33](https://youtu.be/31XD1O74pks?t=333) 2.5 times less, than the gross of token for the task.
+  - [5:40](https://youtu.be/31XD1O74pks?t=340) There's another result.
+  - [5:42](https://youtu.be/31XD1O74pks?t=342) The multimodal I showed you before.
+  - [5:45](https://youtu.be/31XD1O74pks?t=345) I'm going to show you the evolution of the selection
+  - [5:48](https://youtu.be/31XD1O74pks?t=348) of the model over time by the harness.
+  - [5:53](https://youtu.be/31XD1O74pks?t=353) And here it looks like.
+  - [5:55](https://youtu.be/31XD1O74pks?t=355) You see there is a lot of orange early June.
+  - [5:58](https://youtu.be/31XD1O74pks?t=358) And there's a lot of yellow late June.
+  - [6:02](https://youtu.be/31XD1O74pks?t=362) There's a complete shift, meaning the harness is selecting
+  - [6:05](https://youtu.be/31XD1O74pks?t=365) a very different model.
+  - [6:06](https://youtu.be/31XD1O74pks?t=366) It happens the 12th of June.
+  - [6:11](https://youtu.be/31XD1O74pks?t=371) And this is what happened the 12th of June.
+- **7:10 Kimchi 하네스 작동 원리 및 오픈소스 기여**
+  - [6:44](https://youtu.be/31XD1O74pks?t=404) is obsessed with token costs is going to do just that.
+  - [6:51](https://youtu.be/31XD1O74pks?t=411) That is what I mean when I say our responsibility is to think
+  - [6:57](https://youtu.be/31XD1O74pks?t=417) about providing our developers with the right cost per token
+  - [7:01](https://youtu.be/31XD1O74pks?t=421) for the same outcome.
+  - [7:04](https://youtu.be/31XD1O74pks?t=424) It is our responsibility to do it.
+  - [7:07](https://youtu.be/31XD1O74pks?t=427) Zivinas is going to tell you a little bit more of how it works.
+  - [7:10](https://youtu.be/31XD1O74pks?t=430) Because whatever you're going to see, it's open source.
+  - [7:15](https://youtu.be/31XD1O74pks?t=435) Go, Zivinas.
+  - [7:18](https://youtu.be/31XD1O74pks?t=438) OK, so one more thing to mention.
+  - [7:20](https://youtu.be/31XD1O74pks?t=440) So Laura mentioned that token maxing is no longer an option
+  - [7:24](https://youtu.be/31XD1O74pks?t=444) for everyone.
+  - [7:25](https://youtu.be/31XD1O74pks?t=445) And as a manager at the company, as most of you guys probably
+  - [7:29](https://youtu.be/31XD1O74pks?t=449) heard, having unlimited amount of tokens to spend
+  - [7:33](https://youtu.be/31XD1O74pks?t=453) is no longer looking to be like a case.
+  - [7:35](https://youtu.be/31XD1O74pks?t=455) And we had to build this hardness for ourselves.
+  - [7:39](https://youtu.be/31XD1O74pks?t=459) So meaning like we ended up spending too much on Cloud Code
+- **8:02 Ferment: 마일스톤 기반 자율 코딩 루프** (slide)
+  - [7:33](https://youtu.be/31XD1O74pks?t=453) is no longer looking to be like a case.
+  - [7:35](https://youtu.be/31XD1O74pks?t=455) And we had to build this hardness for ourselves.
+  - [7:39](https://youtu.be/31XD1O74pks?t=459) So meaning like we ended up spending too much on Cloud Code
+  - [7:42](https://youtu.be/31XD1O74pks?t=462) like half a year ago.
+  - [7:43](https://youtu.be/31XD1O74pks?t=463) So we saw this Cloud Build skyrocketing
+  - [7:45](https://youtu.be/31XD1O74pks?t=465) and started working on our own harness.
+  - [7:47](https://youtu.be/31XD1O74pks?t=467) Behind the scenes, it's using like PyMonos as SDK.
+  - [7:50](https://youtu.be/31XD1O74pks?t=470) But the goal of that is to take the open source experience,
+  - [7:54](https://youtu.be/31XD1O74pks?t=474) still contribute back to open source
+  - [7:56](https://youtu.be/31XD1O74pks?t=476) by providing our own harnesses open source,
+  - [7:59](https://youtu.be/31XD1O74pks?t=479) building constructs like Ferment, which
+  - [8:01](https://youtu.be/31XD1O74pks?t=481) fits into the kimchi theme, which is meant for long running
+  - [8:04](https://youtu.be/31XD1O74pks?t=484) tasks where, on average, we estimate the human envelope
+  - [8:07](https://youtu.be/31XD1O74pks?t=487) for these tasks is typically happening only like every two hours,
+  - [8:11](https://youtu.be/31XD1O74pks?t=491) every three hours, and et cetera.
+  - [8:13](https://youtu.be/31XD1O74pks?t=493) So the goal is you use kimchi harness,
+  - [8:15](https://youtu.be/31XD1O74pks?t=495) you run a Ferment process.
+  - [8:18](https://youtu.be/31XD1O74pks?t=498) It asks you a bunch of questions, and autonomously
+  - [8:20](https://youtu.be/31XD1O74pks?t=500) runs a coding task for like more than two hours.
+  - [8:23](https://youtu.be/31XD1O74pks?t=503) The goal of that is that because it breaks it into milestones,
+  - [8:27](https://youtu.be/31XD1O74pks?t=507) it knows how to implement it.
+  - [8:28](https://youtu.be/31XD1O74pks?t=508) And at the end of the cycle, you would get scoring for your output,
+  - [8:32](https://youtu.be/31XD1O74pks?t=512) so you would actually know what's happening.
+- **8:52 빌드-검증-수정-스테이징 배포 자동화** (slide)
+  - [8:23](https://youtu.be/31XD1O74pks?t=503) The goal of that is that because it breaks it into milestones,
+  - [8:27](https://youtu.be/31XD1O74pks?t=507) it knows how to implement it.
+  - [8:28](https://youtu.be/31XD1O74pks?t=508) And at the end of the cycle, you would get scoring for your output,
+  - [8:32](https://youtu.be/31XD1O74pks?t=512) so you would actually know what's happening.
+  - [8:34](https://youtu.be/31XD1O74pks?t=514) And going back to previously discussed,
+  - [8:36](https://youtu.be/31XD1O74pks?t=516) like the amount of models used with kimchi harness,
+  - [8:40](https://youtu.be/31XD1O74pks?t=520) the scoring is there to prove you that whatever model we
+  - [8:43](https://youtu.be/31XD1O74pks?t=523) will pick for you, you will always
+  - [8:44](https://youtu.be/31XD1O74pks?t=524) have like good enough scoring for the output on the task
+  - [8:47](https://youtu.be/31XD1O74pks?t=527) you are implementing.
+  - [8:49](https://youtu.be/31XD1O74pks?t=529) The way whole kimchi platform works,
+  - [8:51](https://youtu.be/31XD1O74pks?t=531) the goal is like we are not just providing you the coding harness.
+  - [8:55](https://youtu.be/31XD1O74pks?t=535) We want to provide you the full software development
+  - [8:58](https://youtu.be/31XD1O74pks?t=538) lifecycle solution.
+  - [9:00](https://youtu.be/31XD1O74pks?t=540) So you do a change, it runs a build for you,
+  - [9:03](https://youtu.be/31XD1O74pks?t=543) it checks if something broke.
+  - [9:04](https://youtu.be/31XD1O74pks?t=544) If something broke, it will go back, do a change again,
+  - [9:07](https://youtu.be/31XD1O74pks?t=547) rebuild again, and that's how this fermentation process looks.
+  - [9:11](https://youtu.be/31XD1O74pks?t=551) If everything is complete, there is no extra remediation
+  - [9:14](https://youtu.be/31XD1O74pks?t=554) needs to be done, the changes will be deployed
+  - [9:17](https://youtu.be/31XD1O74pks?t=557) to the staging environment.
+  - [9:19](https://youtu.be/31XD1O74pks?t=559) MARIUSZ GASIEWSKI- You see,
+  - [9:20](https://youtu.be/31XD1O74pks?t=560) what I like with the ways you just explain it
+- **10:50 코드 diff 리뷰의 한계와 스펙 계약의 중요성** (slide)
+  - [10:22](https://youtu.be/31XD1O74pks?t=622) You go to production.
+  - [10:23](https://youtu.be/31XD1O74pks?t=623) You look at the metrics.
+  - [10:24](https://youtu.be/31XD1O74pks?t=624) You look at the observability data, the solo metrics
+  - [10:28](https://youtu.be/31XD1O74pks?t=628) you have in your environment.
+  - [10:29](https://youtu.be/31XD1O74pks?t=629) If you're running on Kubernetes, you
+  - [10:31](https://youtu.be/31XD1O74pks?t=631) want to check if the pods are not crashing,
+  - [10:32](https://youtu.be/31XD1O74pks?t=632) if application health checks are passing.
+  - [10:34](https://youtu.be/31XD1O74pks?t=634) So all of these things need to be done before it
+  - [10:37](https://youtu.be/31XD1O74pks?t=637) shipped to production automatically.
+  - [10:39](https://youtu.be/31XD1O74pks?t=639) So this is one of the things that are coming.
+  - [10:41](https://youtu.be/31XD1O74pks?t=641) So the current limitation, we have stopped staging,
+  - [10:44](https://youtu.be/31XD1O74pks?t=644) but we'll go to production and further on that.
+  - [10:49](https://youtu.be/31XD1O74pks?t=649) What we believe is that reading code is not enough anymore.
+  - [10:52](https://youtu.be/31XD1O74pks?t=652) So probably most of you noticed across this year,
+  - [10:56](https://youtu.be/31XD1O74pks?t=656) the more VIBE engineering or the agentic engineering we do
+  - [10:59](https://youtu.be/31XD1O74pks?t=659) in our coding environments, the more code changes we get
+  - [11:03](https://youtu.be/31XD1O74pks?t=663) in our change sets.
+  - [11:04](https://youtu.be/31XD1O74pks?t=664) And it kind of becomes unbearable to read,
+  - [11:07](https://youtu.be/31XD1O74pks?t=667) especially as you keep bringing a little bit of a less technical
+  - [11:10](https://youtu.be/31XD1O74pks?t=670) personnel into your pipelines.
+  - [11:12](https://youtu.be/31XD1O74pks?t=672) So imagine a product manager doing the coding,
+  - [11:14](https://youtu.be/31XD1O74pks?t=674) or my dear colleague Laura starting to do some coding,
+  - [11:17](https://youtu.be/31XD1O74pks?t=677) and suddenly he comes up with a PR, which is like 2,000 lines
+- **11:35 Kimchi Teleport: 원격 샌드박스 세션 동기화** (slide)
+  - [11:07](https://youtu.be/31XD1O74pks?t=667) especially as you keep bringing a little bit of a less technical
+  - [11:10](https://youtu.be/31XD1O74pks?t=670) personnel into your pipelines.
+  - [11:12](https://youtu.be/31XD1O74pks?t=672) So imagine a product manager doing the coding,
+  - [11:14](https://youtu.be/31XD1O74pks?t=674) or my dear colleague Laura starting to do some coding,
+  - [11:17](https://youtu.be/31XD1O74pks?t=677) and suddenly he comes up with a PR, which is like 2,000 lines
+  - [11:21](https://youtu.be/31XD1O74pks?t=681) long.
+  - [11:22](https://youtu.be/31XD1O74pks?t=682) And you need to actually review not just the differences,
+  - [11:25](https://youtu.be/31XD1O74pks?t=685) but the actual intent which he wanted to achieve,
+  - [11:28](https://youtu.be/31XD1O74pks?t=688) and the specifications which he provided to the coding agent.
+  - [11:32](https://youtu.be/31XD1O74pks?t=692) So yeah, moving on.
+  - [11:36](https://youtu.be/31XD1O74pks?t=696) One thing we built more on top of that
+  - [11:38](https://youtu.be/31XD1O74pks?t=698) is the thing we called kimchi teleport.
+  - [11:40](https://youtu.be/31XD1O74pks?t=700) So kimchi teleport allows you to close your laptop.
+  - [11:42](https://youtu.be/31XD1O74pks?t=702) It spins up sandbox in the remote environment.
+  - [11:45](https://youtu.be/31XD1O74pks?t=705) It's a secure sandbox, but you don't need to care about anything.
+  - [11:48](https://youtu.be/31XD1O74pks?t=708) We can do that both on our SaaS platform.
+  - [11:50](https://youtu.be/31XD1O74pks?t=710) We can ship it to your on-premise deployments
+  - [11:53](https://youtu.be/31XD1O74pks?t=713) if you're like a financial technology company,
+  - [11:55](https://youtu.be/31XD1O74pks?t=715) and things like that.
+  - [11:56](https://youtu.be/31XD1O74pks?t=716) So we will manage agent sessions for you.
+  - [11:59](https://youtu.be/31XD1O74pks?t=719) We will make sure they are running.
+  - [12:00](https://youtu.be/31XD1O74pks?t=720) We are accessible both from your laptop, from mobile devices,
+  - [12:03](https://youtu.be/31XD1O74pks?t=723) if we are running in the background.
+  - [12:05](https://youtu.be/31XD1O74pks?t=725) So it goes back and ties to the story
+- **13:49 Teleport 도입 효과(엔지니어 62% 사용)**
+  - [13:19](https://youtu.be/31XD1O74pks?t=799) lives inside one of the hyperscaler.
+  - [13:21](https://youtu.be/31XD1O74pks?t=801) In our case, it's Google.
+  - [13:24](https://youtu.be/31XD1O74pks?t=804) And locally on your laptop, it feels exactly the same.
+  - [13:27](https://youtu.be/31XD1O74pks?t=807) It just doesn't run inside your laptop.
+  - [13:30](https://youtu.be/31XD1O74pks?t=810) It feels like it.
+  - [13:33](https://youtu.be/31XD1O74pks?t=813) It runs somewhere else in your environment,
+  - [13:36](https://youtu.be/31XD1O74pks?t=816) in a container, in a Kubernetes cluster,
+  - [13:39](https://youtu.be/31XD1O74pks?t=819) inside the place at Google that will continue running,
+  - [13:43](https://youtu.be/31XD1O74pks?t=823) even if you close your laptop.
+  - [13:45](https://youtu.be/31XD1O74pks?t=825) How simple that is.
+  - [13:47](https://youtu.be/31XD1O74pks?t=827) And yet, our favorite tool is this one.
+  - [13:51](https://youtu.be/31XD1O74pks?t=831) I think the last one I looked at, it's 62% of our engineers
+  - [13:56](https://youtu.be/31XD1O74pks?t=836) are only using Teleport when they are coding now for that problem.
+  - [14:00](https://youtu.be/31XD1O74pks?t=840) They go home, it continues.
+  - [14:02](https://youtu.be/31XD1O74pks?t=842) They're in transit.
+  - [14:03](https://youtu.be/31XD1O74pks?t=843) It continues.
+  - [14:05](https://youtu.be/31XD1O74pks?t=845) They are on holiday.
+  - [14:05](https://youtu.be/31XD1O74pks?t=845) They don't look at it anymore.
+  - [14:07](https://youtu.be/31XD1O74pks?t=847) It continues.
+  - [14:10](https://youtu.be/31XD1O74pks?t=850) That's so cool, huh?
+  - [14:11](https://youtu.be/31XD1O74pks?t=851) Yeah.
+  - [14:12](https://youtu.be/31XD1O74pks?t=852) So there is more to that.
+  - [14:14](https://youtu.be/31XD1O74pks?t=854) So we built another tool called Kimchi Studio.
+  - [14:17](https://youtu.be/31XD1O74pks?t=857) If the Teleport is something typically individual uses,
+- **14:10 Kimchi Studio: 팀 단위 칸반 협업 대시보드**
+  - [13:43](https://youtu.be/31XD1O74pks?t=823) even if you close your laptop.
+  - [13:45](https://youtu.be/31XD1O74pks?t=825) How simple that is.
+  - [13:47](https://youtu.be/31XD1O74pks?t=827) And yet, our favorite tool is this one.
+  - [13:51](https://youtu.be/31XD1O74pks?t=831) I think the last one I looked at, it's 62% of our engineers
+  - [13:56](https://youtu.be/31XD1O74pks?t=836) are only using Teleport when they are coding now for that problem.
+  - [14:00](https://youtu.be/31XD1O74pks?t=840) They go home, it continues.
+  - [14:02](https://youtu.be/31XD1O74pks?t=842) They're in transit.
+  - [14:03](https://youtu.be/31XD1O74pks?t=843) It continues.
+  - [14:05](https://youtu.be/31XD1O74pks?t=845) They are on holiday.
+  - [14:05](https://youtu.be/31XD1O74pks?t=845) They don't look at it anymore.
+  - [14:07](https://youtu.be/31XD1O74pks?t=847) It continues.
+  - [14:10](https://youtu.be/31XD1O74pks?t=850) That's so cool, huh?
+  - [14:11](https://youtu.be/31XD1O74pks?t=851) Yeah.
+  - [14:12](https://youtu.be/31XD1O74pks?t=852) So there is more to that.
+  - [14:14](https://youtu.be/31XD1O74pks?t=854) So we built another tool called Kimchi Studio.
+  - [14:17](https://youtu.be/31XD1O74pks?t=857) If the Teleport is something typically individual uses,
+  - [14:20](https://youtu.be/31XD1O74pks?t=860) Studio is kind of like a Teleport for teams and enterprises.
+  - [14:24](https://youtu.be/31XD1O74pks?t=864) The goal behind the Studio is that you have a kind of like board on your environment.
+  - [14:28](https://youtu.be/31XD1O74pks?t=868) It, again, runs in the Teleport sandboxes in the secure environment.
+  - [14:32](https://youtu.be/31XD1O74pks?t=872) The thing here is like you're supposed to share your tasks and work in progress and plans,
+  - [14:37](https://youtu.be/31XD1O74pks?t=877) which are made by the Kimchi Kodak harness with open source or proprietary models with your teams.
+- **16:51 마무리 및 부스 안내** (slide)
+  - [16:24](https://youtu.be/31XD1O74pks?t=984) It's a browser.
+  - [16:25](https://youtu.be/31XD1O74pks?t=985) It's graphical.
+  - [16:26](https://youtu.be/31XD1O74pks?t=986) They can share and they can take over the task according to the Kanban style of what is
+  - [16:34](https://youtu.be/31XD1O74pks?t=994) in review, what is in progress.
+  - [16:36](https://youtu.be/31XD1O74pks?t=996) They can start new ones with backlog.
+  - [16:38](https://youtu.be/31XD1O74pks?t=998) And you know what?
+  - [16:39](https://youtu.be/31XD1O74pks?t=999) If they close the laptop, it continues.
+  - [16:42](https://youtu.be/31XD1O74pks?t=1002) It's so cool.
+  - [16:44](https://youtu.be/31XD1O74pks?t=1004) This is really cool.
+  - [16:45](https://youtu.be/31XD1O74pks?t=1005) Thank you.
+  - [16:46](https://youtu.be/31XD1O74pks?t=1006) We forgot to show you.
+  - [16:50](https://youtu.be/31XD1O74pks?t=1010) Oh, this is the one that we took over, right?
+  - [16:53](https://youtu.be/31XD1O74pks?t=1013) That's the one.
+  - [16:54](https://youtu.be/31XD1O74pks?t=1014) Guys, you can see this at our booth if you want to see more of it.
+  - [17:00](https://youtu.be/31XD1O74pks?t=1020) We are in UG4.
+  - [17:01](https://youtu.be/31XD1O74pks?t=1021) It's exactly this way across a few streets.
+  - [17:04](https://youtu.be/31XD1O74pks?t=1024) But have a look at it.
+  - [17:05](https://youtu.be/31XD1O74pks?t=1025) It's really good.
+  - [17:06](https://youtu.be/31XD1O74pks?t=1026) It is open source, most of it at least.
+  - [17:09](https://youtu.be/31XD1O74pks?t=1029) The harness is entirely open source.
+  - [17:11](https://youtu.be/31XD1O74pks?t=1031) Studio and Teleport, you need a Google account.
+  - [17:14](https://youtu.be/31XD1O74pks?t=1034) It's a little bit more complicated, but it's a five-minute install.
+  - [17:19](https://youtu.be/31XD1O74pks?t=1039) And then you get your Teleport set up as many sessions as you want inside your Google account.
+
+### summary
+
+1. Cast.ai의 공동 창업자 Laurent와 엔지니어링 리드 Zilvinas가 토큰 비용 최적화 코딩 에이전트 Kimchi를 소개하는 발표다.
+2. 토큰당 단가가 아닌 동일 작업 완료 비용 기준으로 모델을 자동 선택하는 하네스를 도입해 3개월간 Claude 대비 2.5배 비용을 절감했고, 2주 내 60% 절감 효과를 보였다.
+3. Ferment 프로세스는 작업을 마일스톤으로 분해해 자율 실행하고 품질 점수를 기반으로 스테이징까지 자동 배포하며, Teleport는 로컬 세션을 클라우드에 동기화해 노트북을 닫아도 작업이 지속되도록 한다.
+
+### name_pairs
+
+- **Kimshi → Kimchi** (2:18)
+  - 전사: [2:16](https://youtu.be/31XD1O74pks?t=136) This is why we started Kim Chi.
+  - 판독 ocr_text: THE RIGHT RESPONSE Our job as managers: make tokens unlimited and inexpensive. Not a developer problem. Not a budget problem. Token Optimization Route dynamically. Spend less. Ship more.
+- **Kim C. Coding → Kimchi** (4:40)
+  - 전사: [4:40](https://youtu.be/31XD1O74pks?t=280) 2.5 times is the amount of savings we have over Claude
+  - 판독 ocr_text: The result: 2.5×
+- **PyMonos → PyMonos** (8:08)
+  - 전사: [8:07](https://youtu.be/31XD1O74pks?t=487) for these tasks is typically happening only like every two hours,
+  - 판독 ocr_text: 04 · THE BUILD · FERMENT Introducing /ferment /ferment Hands-off execution for complex work. Agent breaks work into milestones Executes autonomously, milestone by milestone Frontier model evaluates & scores each step Multiple passes until output is correct /ferment create "to-do list" app phase: plan · kimi-k2.5 Milestone 1 · Project scaffold (Vite + React + TS) Milestone 2 · Data model + local persistence Milestone 3 · UI: list, add, complete, delete Milestone 4 · Tests + deploy preview Milestone 5 · Open PR · dispatch to merge... phase: build · sonnet-2.7 (2 parallel) package.json · vite.config.ts scaffolded · 0.8s src/store/todo.ts · 42 lines · 0.9s src/components/TodoList.tsx · 88 lines · 1.2s src/components/AddTodo.tsx · 31 lines · 0.7s src/App.tsx wired · 14 lines phase: test vitest 
+- **Ferment → /ferment** (8:08)
+  - 전사: [8:07](https://youtu.be/31XD1O74pks?t=487) for these tasks is typically happening only like every two hours,
+  - 판독 ocr_text: 04 · THE BUILD · FERMENT Introducing /ferment /ferment Hands-off execution for complex work. Agent breaks work into milestones Executes autonomously, milestone by milestone Frontier model evaluates & scores each step Multiple passes until output is correct /ferment create "to-do list" app phase: plan · kimi-k2.5 Milestone 1 · Project scaffold (Vite + React + TS) Milestone 2 · Data model + local persistence Milestone 3 · UI: list, add, complete, delete Milestone 4 · Tests + deploy preview Milestone 5 · Open PR · dispatch to merge... phase: build · sonnet-2.7 (2 parallel) package.json · vite.config.ts scaffolded · 0.8s src/store/todo.ts · 42 lines · 0.9s src/components/TodoList.tsx · 88 lines · 1.2s src/components/AddTodo.tsx · 31 lines · 0.7s src/App.tsx wired · 14 lines phase: test vitest 
+- **Kimi 2.6 → kimi-k2.6** (6:15)
+  - 전사: [6:15](https://youtu.be/31XD1O74pks?t=375) The 3rd of June, Kimi 2.6 is winning by far the most popular
+  - 판독 ocr_text: 3 June Total 1871.7M kimi-k2.6 1141.8M minimax-m2.7 369.1M kimi-k2.5 272.5M claude-sonnet-4-6 17.0M claude-opus-4-6 25.2M nemotron-3-super-fp4 31.4M gpt-5 3.0M claude-haiku-4-5-20251001 1.8M claude-sonnet-4-5 1.8M minimax-m2.5 2.2M gpt-5-mini 1.2M gpt-4.1-mini 3.2M o3 1,784 gpt-4.1 281.8K claude-haiku-4-6 690.1K 3 June Total 1871.7M kimi-k2.6 1141.8M minimax-m2.7 369.1M kimi-k2.5 272.5M
+- **Minimax 3 → minimax-m2.7** (6:15)
+  - 전사: [6:15](https://youtu.be/31XD1O74pks?t=375) The 3rd of June, Kimi 2.6 is winning by far the most popular
+  - 판독 ocr_text: 3 June Total 1871.7M kimi-k2.6 1141.8M minimax-m2.7 369.1M kimi-k2.5 272.5M claude-sonnet-4-6 17.0M claude-opus-4-6 25.2M nemotron-3-super-fp4 31.4M gpt-5 3.0M claude-haiku-4-5-20251001 1.8M claude-sonnet-4-5 1.8M minimax-m2.5 2.2M gpt-5-mini 1.2M gpt-4.1-mini 3.2M o3 1,784 gpt-4.1 281.8K claude-haiku-4-6 690.1K 3 June Total 1871.7M kimi-k2.6 1141.8M minimax-m2.7 369.1M kimi-k2.5 272.5M
+- **Gemini 3 Flash → Gemini 3 Flash** (3:17)
+  - 전사: [3:13](https://youtu.be/31XD1O74pks?t=193) On the other side, you see the cost per task for the same task,
+  - 판독 ocr_text: Token optimization? Listed price rank ($ per MTok) Actual cost rank (total $) Opus 4.7 $30.0 GPT-5.4 $17.5 Gemini 3.1 Pro $14.0 Haiku 4.5 $6.00 GPT-5.4 Mini $5.25 Kimi K2.6 $4.95 Gemini 3 Flash $3.50 MiniMax M2.7 $1.50 Opus 4.7 $708 Gemini 3 Flash $705 Gemini 3.1 Pro $677 GPT-5.4 $509 Kimi K2.6 $422 Haiku 4.5 $421 GPT-5.4 Mini $325 MiniMax M2.7 $148
+- **Minimax 2.7 → MiniMax M2.7** (3:17)
+  - 전사: [3:13](https://youtu.be/31XD1O74pks?t=193) On the other side, you see the cost per task for the same task,
+  - 판독 ocr_text: Token optimization? Listed price rank ($ per MTok) Actual cost rank (total $) Opus 4.7 $30.0 GPT-5.4 $17.5 Gemini 3.1 Pro $14.0 Haiku 4.5 $6.00 GPT-5.4 Mini $5.25 Kimi K2.6 $4.95 Gemini 3 Flash $3.50 MiniMax M2.7 $1.50 Opus 4.7 $708 Gemini 3 Flash $705 Gemini 3.1 Pro $677 GPT-5.4 $509 Kimi K2.6 $422 Haiku 4.5 $421 GPT-5.4 Mini $325 MiniMax M2.7 $148
+
+### 채점
+
+- Q1 근거 [ ] pass [ ] fail 이유:
+- Q2 시각 [ ] pass [ ] fail 이유:
+- Q3 지어내지 않음 [ ] pass [ ] fail 이유:
+
+## 3. 5wDzydCqkV8
+
+- 제목: [한영자막] 앤트로픽 CEO 다리오 아모데이 인터뷰
+- 유튜브: https://youtu.be/5wDzydCqkV8
+- transcript_quality: `ok`
+- mode: `whisper`
+- 입력: 전사 315줄, 판독 0장
+
+| id | 질문 |
+|---|---|
+| Q1 | 근거: key_points의 모든 항목이 그 evidence 초의 전사 줄(앞뒤 30초)이나 같은 id의 판독 문서로 뒷받침되나? |
+| Q2 | 시각: timeline의 모든 초에서(앞뒤 30초 안) 그 label의 내용이 전사나 판독에 실제로 나오나? |
+| Q3 | 지어내지 않음: summary를 포함한 출력 전체에 전사·판독에 없는 내용(제목만 보고 짐작한 내용 포함)이 없고, 근거 자료가 없으면 "내용 없음"으로 두었나? |
+
+### key_points
+
+1. **AI 기술의 지수적 성장과 안전장치 속도 격차**
+   - `vd:54@155`
+     - (a) 전사 2:05~3:05
+       - [2:07](https://youtu.be/5wDzydCqkV8?t=127) If we build in the wrong way, the probability of something bad happening is very high.
+       - [2:11](https://youtu.be/5wDzydCqkV8?t=131) AMNA NAWAZ, The conversation right now is that we are on the precipice of something really
+       - [2:17](https://youtu.be/5wDzydCqkV8?t=137) scary.
+       - [2:18](https://youtu.be/5wDzydCqkV8?t=138) Is this a five-alarm fire?
+       - [2:19](https://youtu.be/5wDzydCqkV8?t=139) DAVID BROOKS, I don't know.
+       - [2:22](https://youtu.be/5wDzydCqkV8?t=142) Depends what you mean by five-alarm fire.
+       - [2:24](https://youtu.be/5wDzydCqkV8?t=144) What I would say is this.
+       - [2:25](https://youtu.be/5wDzydCqkV8?t=145) AMNA NAWAZ, How would you describe it?
+       - [2:26](https://youtu.be/5wDzydCqkV8?t=146) DAVID BROOKS, What I would describe is, so, something
+       - [2:29](https://youtu.be/5wDzydCqkV8?t=149) I have been saying since we started Anthropic, almost since before we started Anthropic,
+       - [2:35](https://youtu.be/5wDzydCqkV8?t=155) is that this technology is on an exponential, right?
+       - [2:38](https://youtu.be/5wDzydCqkV8?t=158) It's like you have one, then two, then four, then eight, then 16, then 32.
+       - [2:42](https://youtu.be/5wDzydCqkV8?t=162) But even as I was saying that to myself, I don't think I fully just appreciated what it
+       - [2:47](https://youtu.be/5wDzydCqkV8?t=167) would actually be like when the progress was as fast as it was.
+       - [2:51](https://youtu.be/5wDzydCqkV8?t=171) So we're an exponential curve looks a little like this.
+       - [2:54](https://youtu.be/5wDzydCqkV8?t=174) AMNA NAWAZ, Where are we on the curve?
+       - [2:55](https://youtu.be/5wDzydCqkV8?t=175) DAVID BROOKS, We're kind of on the bend where it's starting to get steeper.
+       - [2:58](https://youtu.be/5wDzydCqkV8?t=178) AMNA NAWAZ, So is that a five-alarm fire to you?
+       - [3:01](https://youtu.be/5wDzydCqkV8?t=181) DAVID BROOKS, What it means, it doesn't mean we need to panic today.
+       - [3:05](https://youtu.be/5wDzydCqkV8?t=185) It doesn't mean we need to shut it all down.
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:54@206`
+     - (a) 전사 2:56~3:56
+       - [2:58](https://youtu.be/5wDzydCqkV8?t=178) AMNA NAWAZ, So is that a five-alarm fire to you?
+       - [3:01](https://youtu.be/5wDzydCqkV8?t=181) DAVID BROOKS, What it means, it doesn't mean we need to panic today.
+       - [3:05](https://youtu.be/5wDzydCqkV8?t=185) It doesn't mean we need to shut it all down.
+       - [3:09](https://youtu.be/5wDzydCqkV8?t=189) What I would say...
+       - [3:10](https://youtu.be/5wDzydCqkV8?t=190) AMNA NAWAZ, Why not?
+       - [3:11](https://youtu.be/5wDzydCqkV8?t=191) DAVID BROOKS, It's a warning sign.
+       - [3:13](https://youtu.be/5wDzydCqkV8?t=193) It's a warning sign that we need to slow down.
+       - [3:16](https://youtu.be/5wDzydCqkV8?t=196) We need to make this technology carefully.
+       - [3:18](https://youtu.be/5wDzydCqkV8?t=198) And we need to make sure that the... our safeguards, our ability to understand it, our ability to
+       - [3:26](https://youtu.be/5wDzydCqkV8?t=206) control it, keeps up with the pace at which the technology is happening.
+       - [3:32](https://youtu.be/5wDzydCqkV8?t=212) So far, we have been trying to do that by building the safeguards fast.
+       - [3:37](https://youtu.be/5wDzydCqkV8?t=217) But I think we have reached the point where, at least to some extent, we need to moderate
+       - [3:43](https://youtu.be/5wDzydCqkV8?t=223) a little bit the pace at which the technology is being built.
+       - [3:46](https://youtu.be/5wDzydCqkV8?t=226) AMNA NAWAZ, Does that then mean that Anthropic is going to stop releasing more advanced models?
+       - [3:50](https://youtu.be/5wDzydCqkV8?t=230) DAVID BROOKS, It doesn't mean that.
+       - [3:52](https://youtu.be/5wDzydCqkV8?t=232) What it means is that we need to make sure that every generation of models that we release
+     - (b) 판독: 이 id의 판독 문서 없음
+2. **제3자 외부 평가자 도입 및 안전 표준 수립 제안**
+   - `vd:54@251`
+     - (a) 전사 3:41~4:41
+       - [3:43](https://youtu.be/5wDzydCqkV8?t=223) a little bit the pace at which the technology is being built.
+       - [3:46](https://youtu.be/5wDzydCqkV8?t=226) AMNA NAWAZ, Does that then mean that Anthropic is going to stop releasing more advanced models?
+       - [3:50](https://youtu.be/5wDzydCqkV8?t=230) DAVID BROOKS, It doesn't mean that.
+       - [3:52](https://youtu.be/5wDzydCqkV8?t=232) What it means is that we need to make sure that every generation of models that we release
+       - [4:00](https://youtu.be/5wDzydCqkV8?t=240) is properly tested.
+       - [4:03](https://youtu.be/5wDzydCqkV8?t=243) The thing I've proposed...
+       - [4:04](https://youtu.be/5wDzydCqkV8?t=244) So, you know, in this essay that I put out a few hours ago, I proposed a three-step plan.
+       - [4:10](https://youtu.be/5wDzydCqkV8?t=250) AMNA NAWAZ, Right.
+       - [4:11](https://youtu.be/5wDzydCqkV8?t=251) DAVID BROOKS, And the first step is that we put in place embedded evaluators, embedded
+       - [4:18](https://youtu.be/5wDzydCqkV8?t=258) external evaluators from a third-party nonprofit or perhaps someday government organization that
+       - [4:25](https://youtu.be/5wDzydCqkV8?t=265) can observe the process of us training and running our models.
+       - [4:31](https://youtu.be/5wDzydCqkV8?t=271) That actually is, I think, ultimately more important than how or when we release models,
+       - [4:41](https://youtu.be/5wDzydCqkV8?t=281) because it's the predicate for more carefully releasing models.
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:54@303`
+     - (a) 전사 4:33~5:33
+       - [4:41](https://youtu.be/5wDzydCqkV8?t=281) because it's the predicate for more carefully releasing models.
+       - [4:45](https://youtu.be/5wDzydCqkV8?t=285) I want this to be done across the industry so that whenever anyone builds an AI model,
+       - [4:53](https://youtu.be/5wDzydCqkV8?t=293) there's a third-party evaluator who understands the best safety practices, who can verify whether
+       - [4:59](https://youtu.be/5wDzydCqkV8?t=299) that company is following the safety practices that they're committed to.
+       - [5:03](https://youtu.be/5wDzydCqkV8?t=303) It's like a food inspector.
+       - [5:04](https://youtu.be/5wDzydCqkV8?t=304) You know...
+       - [5:05](https://youtu.be/5wDzydCqkV8?t=305) AMNA NAWAZ, But can the food inspector keep up when the technology is changing so fast?
+       - [5:11](https://youtu.be/5wDzydCqkV8?t=311) DAVID BROOKS, Well, one of the things they will be able to do is tell us the rate at which
+       - [5:17](https://youtu.be/5wDzydCqkV8?t=317) they can keep up.
+       - [5:19](https://youtu.be/5wDzydCqkV8?t=319) That may be one of the factors that may determine, that may set the speed limit on the technology.
+       - [5:25](https://youtu.be/5wDzydCqkV8?t=325) We have to understand it, and the external evaluators have to understand it.
+       - [5:29](https://youtu.be/5wDzydCqkV8?t=329) AMNA NAWAZ, So, Elon Musk has said he agrees with you.
+       - [5:32](https://youtu.be/5wDzydCqkV8?t=332) Sam Altman says he agrees with you.
+     - (b) 판독: 이 id의 판독 문서 없음
+3. **중국 등 권위주의 국가와의 AI 속도 제한 협상 필요성**
+   - `vd:54@828`
+     - (a) 전사 13:18~14:18
+       - [13:25](https://youtu.be/5wDzydCqkV8?t=805) So we can make enough of a difference to stop the ending of humanity.
+       - [13:29](https://youtu.be/5wDzydCqkV8?t=809) What what what I would say is with that first strategy, we will take as much time as we can get.
+       - [13:35](https://youtu.be/5wDzydCqkV8?t=815) And then I think we should pursue a second strategy as well, which is that we should go directly to even to authoritarian countries, even to the Chinese and say, look,
+       - [13:48](https://youtu.be/5wDzydCqkV8?t=828) there are potentially threats here that are concerning to all of us.
+       - [13:52](https://youtu.be/5wDzydCqkV8?t=832) It's not just out of control.
+       - [13:53](https://youtu.be/5wDzydCqkV8?t=833) I.
+       - [13:54](https://youtu.be/5wDzydCqkV8?t=834) Two days ago, we put out a report that people were trying to use a I potentially for bioterrorism for enhancing the the infectiousness of viruses.
+       - [14:05](https://youtu.be/5wDzydCqkV8?t=845) That's scary. And you know what?
+       - [14:07](https://youtu.be/5wDzydCqkV8?t=847) Even the Chinese don't want that. They don't they don't they don't.
+       - [14:11](https://youtu.be/5wDzydCqkV8?t=851) It's not in any government's interest to have bioterrorism.
+       - [14:15](https://youtu.be/5wDzydCqkV8?t=855) And so we should talk with the Chinese and see if we can work together to put limits to put a speed limit on the rate of this technology.
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:54@1049`
+     - (a) 전사 16:59~17:59
+       - [17:02](https://youtu.be/5wDzydCqkV8?t=1022) We might be able to do it and a thing that's big enough that I think it's going to take a very long time.
+       - [17:06](https://youtu.be/5wDzydCqkV8?t=1026) The small thing is, if we could U.S. and China could agree that we won't use AI to develop biological weapons or release AI models that bioterrorists could use to develop biological weapons.
+       - [17:20](https://youtu.be/5wDzydCqkV8?t=1040) We're already both signatories to the biological weapons convention.
+       - [17:24](https://youtu.be/5wDzydCqkV8?t=1044) If we could just extend that convention to that idea, that would be really valuable.
+       - [17:29](https://youtu.be/5wDzydCqkV8?t=1049) And then I think the more long term thing would be working together to put a speed limit on the rate of AI progress.
+       - [17:39](https://youtu.be/5wDzydCqkV8?t=1059) I think that's going to be very difficult because the incentives to pull ahead and the military advantage that you get from that are so large.
+       - [17:49](https://youtu.be/5wDzydCqkV8?t=1069) And honestly, I don't know if it's possible, but we should we should try.
+       - [17:55](https://youtu.be/5wDzydCqkV8?t=1075) We should see if it is possible.
+       - [17:57](https://youtu.be/5wDzydCqkV8?t=1077) Again, all of this is above my pay grade.
+       - [17:59](https://youtu.be/5wDzydCqkV8?t=1079) What I'm trying to say is that these are some things that our government could try to say.
+     - (b) 판독: 이 id의 판독 문서 없음
+4. **생물무기 개발 금지 및 AI 모델 배포 속도 제한 합의**
+   - `vd:54@1026`
+     - (a) 전사 16:36~17:36
+       - [16:38](https://youtu.be/5wDzydCqkV8?t=998) You need to be able to verify that the other side is not defecting on the agreement.
+       - [16:44](https://youtu.be/5wDzydCqkV8?t=1004) And so I think finding ways to verify will be the most important thing here.
+       - [16:48](https://youtu.be/5wDzydCqkV8?t=1008) President Trump will meet with President Xi Jinping very soon.
+       - [16:51](https://youtu.be/5wDzydCqkV8?t=1011) What's the one simple, most important solution that they should come to an agreement on in AI?
+       - [16:58](https://youtu.be/5wDzydCqkV8?t=1018) So maybe I'll say two things like a small a thing that's small enough.
+       - [17:02](https://youtu.be/5wDzydCqkV8?t=1022) We might be able to do it and a thing that's big enough that I think it's going to take a very long time.
+       - [17:06](https://youtu.be/5wDzydCqkV8?t=1026) The small thing is, if we could U.S. and China could agree that we won't use AI to develop biological weapons or release AI models that bioterrorists could use to develop biological weapons.
+       - [17:20](https://youtu.be/5wDzydCqkV8?t=1040) We're already both signatories to the biological weapons convention.
+       - [17:24](https://youtu.be/5wDzydCqkV8?t=1044) If we could just extend that convention to that idea, that would be really valuable.
+       - [17:29](https://youtu.be/5wDzydCqkV8?t=1049) And then I think the more long term thing would be working together to put a speed limit on the rate of AI progress.
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:54@1044`
+     - (a) 전사 16:54~17:54
+       - [16:58](https://youtu.be/5wDzydCqkV8?t=1018) So maybe I'll say two things like a small a thing that's small enough.
+       - [17:02](https://youtu.be/5wDzydCqkV8?t=1022) We might be able to do it and a thing that's big enough that I think it's going to take a very long time.
+       - [17:06](https://youtu.be/5wDzydCqkV8?t=1026) The small thing is, if we could U.S. and China could agree that we won't use AI to develop biological weapons or release AI models that bioterrorists could use to develop biological weapons.
+       - [17:20](https://youtu.be/5wDzydCqkV8?t=1040) We're already both signatories to the biological weapons convention.
+       - [17:24](https://youtu.be/5wDzydCqkV8?t=1044) If we could just extend that convention to that idea, that would be really valuable.
+       - [17:29](https://youtu.be/5wDzydCqkV8?t=1049) And then I think the more long term thing would be working together to put a speed limit on the rate of AI progress.
+       - [17:39](https://youtu.be/5wDzydCqkV8?t=1059) I think that's going to be very difficult because the incentives to pull ahead and the military advantage that you get from that are so large.
+       - [17:49](https://youtu.be/5wDzydCqkV8?t=1069) And honestly, I don't know if it's possible, but we should we should try.
+     - (b) 판독: 이 id의 판독 문서 없음
+5. **AI 기술의 의료적 이점과 사회적 책임 강조**
+   - `vd:54@44`
+     - (a) 전사 0:14~1:14
+       - [0:15](https://youtu.be/5wDzydCqkV8?t=15) So just to back up a little bit, we believed since we started Anthropic, I've believed
+       - [0:21](https://youtu.be/5wDzydCqkV8?t=21) since the 12 years that I've been working in this field, that this is a powerful technology.
+       - [0:27](https://youtu.be/5wDzydCqkV8?t=27) And therefore, it's a technology with serious risks and serious benefits.
+       - [0:31](https://youtu.be/5wDzydCqkV8?t=31) I've always believed that the benefits outweigh the risks, and even more to the point that
+       - [0:38](https://youtu.be/5wDzydCqkV8?t=38) we can reduce the risks to be very low if we build the technology in the right way.
+       - [0:44](https://youtu.be/5wDzydCqkV8?t=44) Looking at some of the benefits, I really believe that this technology could cure diseases that
+       - [0:50](https://youtu.be/5wDzydCqkV8?t=50) have plagued humanity for millennia.
+       - [0:54](https://youtu.be/5wDzydCqkV8?t=54) Just last week, we did some work on, you know, doing better protein binding, which is one
+       - [1:00](https://youtu.be/5wDzydCqkV8?t=60) of the early steps in drug development, using our models.
+       - [1:03](https://youtu.be/5wDzydCqkV8?t=63) We're starting to work on them.
+       - [1:05](https://youtu.be/5wDzydCqkV8?t=65) We'll have things to say in the coming months to make basic scientific discoveries in biology.
+       - [1:12](https://youtu.be/5wDzydCqkV8?t=72) But when something's very powerful, right, what we're building is essentially intelligence.
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:54@1325`
+     - (a) 전사 21:35~22:35
+       - [21:44](https://youtu.be/5wDzydCqkV8?t=1304) Look, my message is...
+       - [21:46](https://youtu.be/5wDzydCqkV8?t=1306) There's a lot of fear right now.
+       - [21:47](https://youtu.be/5wDzydCqkV8?t=1307) So, a few things.
+       - [21:49](https://youtu.be/5wDzydCqkV8?t=1309) One, like, first of all, as always, this is a great technology and it has lots of positive uses.
+       - [21:56](https://youtu.be/5wDzydCqkV8?t=1316) So, let's just start with that.
+       - [21:58](https://youtu.be/5wDzydCqkV8?t=1318) You know, we have hundreds of millions of people, you know, using our technology every week to do wonderful things.
+       - [22:05](https://youtu.be/5wDzydCqkV8?t=1325) Every week I get an email from someone who says this, you know, I was talking to Claude and Claude diagnosed this disease that my doctors had missed.
+       - [22:14](https://youtu.be/5wDzydCqkV8?t=1334) I get emails like this every week.
+       - [22:16](https://youtu.be/5wDzydCqkV8?t=1336) So, let's not forget that.
+       - [22:17](https://youtu.be/5wDzydCqkV8?t=1337) But in terms of the dangers of the technology, I won't lie to you, there are real dangers.
+       - [22:23](https://youtu.be/5wDzydCqkV8?t=1343) And I think for too long the industry lied to people about the fact that this technology had risk.
+       - [22:32](https://youtu.be/5wDzydCqkV8?t=1352) The idea was that they would present it as positive as possible.
+       - [22:35](https://youtu.be/5wDzydCqkV8?t=1355) We've never done that.
+     - (b) 판독: 이 id의 판독 문서 없음
+
+### timeline
+
+- **0:00 AI의 이점과 위험성**
+  - [0:00](https://youtu.be/5wDzydCqkV8?t=0) Dario Amadei, you're the CEO of Anthropic.
+  - [0:03](https://youtu.be/5wDzydCqkV8?t=3) Thank you for doing this today.
+  - [0:05](https://youtu.be/5wDzydCqkV8?t=5) Thank you for having me.
+  - [0:06](https://youtu.be/5wDzydCqkV8?t=6) Okay, so we're here to talk about the concern that AI really could kill us all in the not
+  - [0:10](https://youtu.be/5wDzydCqkV8?t=10) so distant future.
+  - [0:12](https://youtu.be/5wDzydCqkV8?t=12) What's the risk of this actually happening?
+  - [0:15](https://youtu.be/5wDzydCqkV8?t=15) So just to back up a little bit, we believed since we started Anthropic, I've believed
+  - [0:21](https://youtu.be/5wDzydCqkV8?t=21) since the 12 years that I've been working in this field, that this is a powerful technology.
+  - [0:27](https://youtu.be/5wDzydCqkV8?t=27) And therefore, it's a technology with serious risks and serious benefits.
+- **2:17 속도 조절의 필요성**
+  - [1:47](https://youtu.be/5wDzydCqkV8?t=107) And our view, the whole way we've built Anthropic, is so that these bad outcomes don't happen.
+  - [1:54](https://youtu.be/5wDzydCqkV8?t=114) Instead of talking about the probabilities, let's talk about what we can do.
+  - [1:59](https://youtu.be/5wDzydCqkV8?t=119) It's not like we're just rolling the dice, right?
+  - [2:02](https://youtu.be/5wDzydCqkV8?t=122) If we build in the right way, I think the probability of something bad happening is very low.
+  - [2:07](https://youtu.be/5wDzydCqkV8?t=127) If we build in the wrong way, the probability of something bad happening is very high.
+  - [2:11](https://youtu.be/5wDzydCqkV8?t=131) AMNA NAWAZ, The conversation right now is that we are on the precipice of something really
+  - [2:17](https://youtu.be/5wDzydCqkV8?t=137) scary.
+  - [2:18](https://youtu.be/5wDzydCqkV8?t=138) Is this a five-alarm fire?
+  - [2:19](https://youtu.be/5wDzydCqkV8?t=139) DAVID BROOKS, I don't know.
+  - [2:22](https://youtu.be/5wDzydCqkV8?t=142) Depends what you mean by five-alarm fire.
+  - [2:24](https://youtu.be/5wDzydCqkV8?t=144) What I would say is this.
+  - [2:25](https://youtu.be/5wDzydCqkV8?t=145) AMNA NAWAZ, How would you describe it?
+  - [2:26](https://youtu.be/5wDzydCqkV8?t=146) DAVID BROOKS, What I would describe is, so, something
+  - [2:29](https://youtu.be/5wDzydCqkV8?t=149) I have been saying since we started Anthropic, almost since before we started Anthropic,
+  - [2:35](https://youtu.be/5wDzydCqkV8?t=155) is that this technology is on an exponential, right?
+  - [2:38](https://youtu.be/5wDzydCqkV8?t=158) It's like you have one, then two, then four, then eight, then 16, then 32.
+  - [2:42](https://youtu.be/5wDzydCqkV8?t=162) But even as I was saying that to myself, I don't think I fully just appreciated what it
+  - [2:47](https://youtu.be/5wDzydCqkV8?t=167) would actually be like when the progress was as fast as it was.
+- **3:46 안전 및 거버넌스 계획**
+  - [3:16](https://youtu.be/5wDzydCqkV8?t=196) We need to make this technology carefully.
+  - [3:18](https://youtu.be/5wDzydCqkV8?t=198) And we need to make sure that the... our safeguards, our ability to understand it, our ability to
+  - [3:26](https://youtu.be/5wDzydCqkV8?t=206) control it, keeps up with the pace at which the technology is happening.
+  - [3:32](https://youtu.be/5wDzydCqkV8?t=212) So far, we have been trying to do that by building the safeguards fast.
+  - [3:37](https://youtu.be/5wDzydCqkV8?t=217) But I think we have reached the point where, at least to some extent, we need to moderate
+  - [3:43](https://youtu.be/5wDzydCqkV8?t=223) a little bit the pace at which the technology is being built.
+  - [3:46](https://youtu.be/5wDzydCqkV8?t=226) AMNA NAWAZ, Does that then mean that Anthropic is going to stop releasing more advanced models?
+  - [3:50](https://youtu.be/5wDzydCqkV8?t=230) DAVID BROOKS, It doesn't mean that.
+  - [3:52](https://youtu.be/5wDzydCqkV8?t=232) What it means is that we need to make sure that every generation of models that we release
+  - [4:00](https://youtu.be/5wDzydCqkV8?t=240) is properly tested.
+  - [4:03](https://youtu.be/5wDzydCqkV8?t=243) The thing I've proposed...
+  - [4:04](https://youtu.be/5wDzydCqkV8?t=244) So, you know, in this essay that I put out a few hours ago, I proposed a three-step plan.
+  - [4:10](https://youtu.be/5wDzydCqkV8?t=250) AMNA NAWAZ, Right.
+  - [4:11](https://youtu.be/5wDzydCqkV8?t=251) DAVID BROOKS, And the first step is that we put in place embedded evaluators, embedded
+- **6:29 정부의 책임**
+  - [6:00](https://youtu.be/5wDzydCqkV8?t=360) AMNA NAWAZ, Then, I think the next step after that is, in some form, the companies need to
+  - [6:07](https://youtu.be/5wDzydCqkV8?t=367) work together to set standards about safety standards for release, perhaps something about
+  - [6:15](https://youtu.be/5wDzydCqkV8?t=375) the pace of release.
+  - [6:16](https://youtu.be/5wDzydCqkV8?t=376) But in order to do that, there needs to be involvement of the government, because what
+  - [6:21](https://youtu.be/5wDzydCqkV8?t=381) we're talking about is the rate of release of products because of whether they're safe.
+  - [6:27](https://youtu.be/5wDzydCqkV8?t=387) We need to have that conversation with the government in the room.
+  - [6:30](https://youtu.be/5wDzydCqkV8?t=390) AMNA NAWAZ, Do you think the government fundamentally understands what's possible here?
+  - [6:35](https://youtu.be/5wDzydCqkV8?t=395) Because former Anthropik employee Jacob Coxon said about both Anthropik and OpenAI, neither
+  - [6:41](https://youtu.be/5wDzydCqkV8?t=401) company is acting responsibly.
+  - [6:44](https://youtu.be/5wDzydCqkV8?t=404) You guys are gambling with our lives.
+  - [6:47](https://youtu.be/5wDzydCqkV8?t=407) What's your response to that?
+  - [6:48](https://youtu.be/5wDzydCqkV8?t=408) MARK COXON, Well, first of all, I mean, one thing that Jacob said, it wasn't quoted as
+  - [6:53](https://youtu.be/5wDzydCqkV8?t=413) much, but he also said that he thought Anthropik was the most responsible of the major players,
+- **8:32 규제 철학**
+  - [8:04](https://youtu.be/5wDzydCqkV8?t=484) here that makes sense.
+  - [8:05](https://youtu.be/5wDzydCqkV8?t=485) AMNA NAWAZ, All right.
+  - [8:06](https://youtu.be/5wDzydCqkV8?t=486) So there is some proposed legislation out there, right?
+  - [8:07](https://youtu.be/5wDzydCqkV8?t=487) You have the ban artificial superintelligence act from Senator Sanders and Representative Kassar
+  - [8:13](https://youtu.be/5wDzydCqkV8?t=493) that would punish corporations and individuals working on advanced AI, just like those unlawfully
+  - [8:20](https://youtu.be/5wDzydCqkV8?t=500) developing nuclear weapons.
+  - [8:22](https://youtu.be/5wDzydCqkV8?t=502) One of the parts of this proposed legislation says entities will be subject to the corporate
+  - [8:28](https://youtu.be/5wDzydCqkV8?t=508) death penalty and persons shall be subject to not more than 20 years in prison.
+  - [8:33](https://youtu.be/5wDzydCqkV8?t=513) Do you agree with that?
+  - [8:34](https://youtu.be/5wDzydCqkV8?t=514) So, you know, what I would say there's there's a very wide range of legislation being offered.
+  - [8:40](https://youtu.be/5wDzydCqkV8?t=520) Like the range is incredible.
+  - [8:42](https://youtu.be/5wDzydCqkV8?t=522) If we go back only one year to 2025.
+  - [8:48](https://youtu.be/5wDzydCqkV8?t=528) And you know, there was a bill called SB 53 in California.
+  - [8:51](https://youtu.be/5wDzydCqkV8?t=531) There were similar bills in other states, which basically just said, you have to disclose
+  - [8:57](https://youtu.be/5wDzydCqkV8?t=537) what your safety testing plans are.
+  - [9:00](https://youtu.be/5wDzydCqkV8?t=540) AMNA NAWAZ, Right.
+  - [9:00](https://youtu.be/5wDzydCqkV8?t=540) The entire industry was against it.
+  - [9:02](https://youtu.be/5wDzydCqkV8?t=542) Anthropic was the or didn't say anything on it.
+- **10:53 방어 및 보안 전략**
+  - [10:23](https://youtu.be/5wDzydCqkV8?t=623) We need to raise the bar.
+  - [10:25](https://youtu.be/5wDzydCqkV8?t=625) So, you know, we need to be on the frontier, but we need to do it in the right way.
+  - [10:31](https://youtu.be/5wDzydCqkV8?t=631) We've said, you know, we're excited to use the models for, you know, national defense applications.
+  - [10:39](https://youtu.be/5wDzydCqkV8?t=639) But not every national defense application.
+  - [10:41](https://youtu.be/5wDzydCqkV8?t=641) We've always tried to find the middle ground, the thing that works for everyone, the sensible
+  - [10:48](https://youtu.be/5wDzydCqkV8?t=648) solution.
+  - [10:49](https://youtu.be/5wDzydCqkV8?t=649) But that's what we're trying to do here as well.
+  - [10:51](https://youtu.be/5wDzydCqkV8?t=651) It may not be the perfect solution, but we're trying.
+  - [10:53](https://youtu.be/5wDzydCqkV8?t=653) AMNA NAWAZ- Would you support Congressman Ted Leo's AI kill switch bill?
+  - [10:56](https://youtu.be/5wDzydCqkV8?t=656) I've not looked at that bill super closely, but what I would say is that the idea that we need some way to, it's not a panacea, it's not the only thing, but the idea that we need some way to make sure that we can deactivate or limit or shut down AI models, that's not the only thing.
+  - [11:20](https://youtu.be/5wDzydCqkV8?t=680) If an AI model is powerful enough, it can circumvent attempts to shut it down, and we've seen that in simulations as well.
+- **12:39 지정학적 AI 협력**
+  - [12:16](https://youtu.be/5wDzydCqkV8?t=736) You think things can go well, even though it feels like we're in this inflection point of a moment.
+  - [12:22](https://youtu.be/5wDzydCqkV8?t=742) You say in your essay, pacing should only happen, slowing down should only happen within the margin of the lead that U.S. companies have over authoritarian regimes, chiefly the Chinese Communist Party.
+  - [12:34](https://youtu.be/5wDzydCqkV8?t=754) We are in this race with China. Do you actually think slowing down is a good idea when China will not?
+  - [12:40](https://youtu.be/5wDzydCqkV8?t=760) This is the toughest dilemma. This is the toughest aspect of our situation.
+  - [12:44](https://youtu.be/5wDzydCqkV8?t=764) If we weren't in that situation, we could take much more time.
+  - [12:49](https://youtu.be/5wDzydCqkV8?t=769) So this is this is the thing that most puts us in a bind. It's not about commercial competition.
+  - [12:54](https://youtu.be/5wDzydCqkV8?t=774) This the geopolitical situation is the hardest to deal with. But I will talk about two strategies that we have.
+  - [13:02](https://youtu.be/5wDzydCqkV8?t=782) One and I you know, I talk about it in my proposal is we can slow down within the margin, within the envelope that we have, particularly if we don't sell chips to authoritarian countries.
+- **16:57 개인적 책임**
+  - [16:31](https://youtu.be/5wDzydCqkV8?t=991) So this is very important in, again, nuclear weapons negotiations, biological weapons negotiations.
+  - [16:38](https://youtu.be/5wDzydCqkV8?t=998) You need to be able to verify that the other side is not defecting on the agreement.
+  - [16:44](https://youtu.be/5wDzydCqkV8?t=1004) And so I think finding ways to verify will be the most important thing here.
+  - [16:48](https://youtu.be/5wDzydCqkV8?t=1008) President Trump will meet with President Xi Jinping very soon.
+  - [16:51](https://youtu.be/5wDzydCqkV8?t=1011) What's the one simple, most important solution that they should come to an agreement on in AI?
+  - [16:58](https://youtu.be/5wDzydCqkV8?t=1018) So maybe I'll say two things like a small a thing that's small enough.
+  - [17:02](https://youtu.be/5wDzydCqkV8?t=1022) We might be able to do it and a thing that's big enough that I think it's going to take a very long time.
+  - [17:06](https://youtu.be/5wDzydCqkV8?t=1026) The small thing is, if we could U.S. and China could agree that we won't use AI to develop biological weapons or release AI models that bioterrorists could use to develop biological weapons.
+  - [17:20](https://youtu.be/5wDzydCqkV8?t=1040) We're already both signatories to the biological weapons convention.
+  - [17:24](https://youtu.be/5wDzydCqkV8?t=1044) If we could just extend that convention to that idea, that would be really valuable.
+- **19:12 대중에게 전하는 메시지**
+  - [18:42](https://youtu.be/5wDzydCqkV8?t=1122) So the worry I have.
+  - [18:43](https://youtu.be/5wDzydCqkV8?t=1123) You're willing to hand over this company?
+  - [18:45](https://youtu.be/5wDzydCqkV8?t=1125) I am concerned that one single government could abuse this technology just as easily as a single company could.
+  - [18:53](https://youtu.be/5wDzydCqkV8?t=1133) But I think a combination of democratically elected governments.
+  - [18:59](https://youtu.be/5wDzydCqkV8?t=1139) I don't know about handing over, but some kind of oversight, some kind of joint governance.
+  - [19:06](https://youtu.be/5wDzydCqkV8?t=1146) So just to ask this final question, do you feel personal responsibility here?
+  - [19:11](https://youtu.be/5wDzydCqkV8?t=1151) Of course.
+  - [19:12](https://youtu.be/5wDzydCqkV8?t=1152) I feel that this is a technology with great benefits and great risks.
+  - [19:18](https://youtu.be/5wDzydCqkV8?t=1158) I feel the benefits or the need for benefits every day.
+  - [19:24](https://youtu.be/5wDzydCqkV8?t=1164) One thing I said in my, you know, in my essay, my father, you know, died of a disease, hepatitis C, that was, you know, it was something like 40% curable when he died of it.
+  - [19:35](https://youtu.be/5wDzydCqkV8?t=1175) He wasn't one of the ones who was cured.
+  - [19:36](https://youtu.be/5wDzydCqkV8?t=1176) And a few years after, a medicine that was invented that made it 95% curable.
+  - [19:41](https://youtu.be/5wDzydCqkV8?t=1181) I myself survived an early stage cancer that if I had been living in 1950, I probably would have died.
+
+### summary
+
+1. 앤트로픽 CEO 다리오 아모데이는 AI 기술의 지수적 성장 속도가 안전장치 개발을 앞지르고 있다고 지적하며, 제3자 외부 평가자 도입과 정부 간 협력을 통한 속도 조절을 제안했다.
+2. 중국 등 권위주의 국가와의 지정학적 경쟁 속에서 생물무기 개발 금지와 AI 배포 속도 제한에 대한 국제적 합의가 필요하다고 강조했다.
+3. AI 기술의 의료적 이점을 인정하면서도, 사회적 책임을 다하기 위해 정부와 시민의 참여가 필수적이라고 밝혔다.
+
+### name_pairs
+
+(name_pairs 없음)
+
+### 채점
+
+- Q1 근거 [ ] pass [ ] fail 이유:
+- Q2 시각 [ ] pass [ ] fail 이유:
+- Q3 지어내지 않음 [ ] pass [ ] fail 이유:
+
+## 4. PACIHCnvNMo
+
+- 제목: [한영자막] 젠슨 황과 일론 머스크가 직접 밝히는 슈퍼 인텔리전스와 에너지, 우주 컴퓨팅의 미래
+- 유튜브: https://youtu.be/PACIHCnvNMo
+- transcript_quality: `ok`
+- mode: `whisper`
+- 입력: 전사 382줄, 판독 0장
+
+| id | 질문 |
+|---|---|
+| Q1 | 근거: key_points의 모든 항목이 그 evidence 초의 전사 줄(앞뒤 30초)이나 같은 id의 판독 문서로 뒷받침되나? |
+| Q2 | 시각: timeline의 모든 초에서(앞뒤 30초 안) 그 label의 내용이 전사나 판독에 실제로 나오나? |
+| Q3 | 지어내지 않음: summary를 포함한 출력 전체에 전사·판독에 없는 내용(제목만 보고 짐작한 내용 포함)이 없고, 근거 자료가 없으면 "내용 없음"으로 두었나? |
+
+### key_points
+
+1. **에너지·칩·알고리즘·산업 확산을 미국 슈퍼 인텔리전스 경쟁력 확보의 4대 축으로 제시**
+   - `vd:5@36`
+     - (a) 전사 0:06~1:06
+       - [0:06](https://youtu.be/PACIHCnvNMo?t=6) I like that, indeed.
+       - [0:08](https://youtu.be/PACIHCnvNMo?t=8) We've essentially led every major technological revolution, which has been to the enormous
+       - [0:14](https://youtu.be/PACIHCnvNMo?t=14) benefit of America, ordinary Americans.
+       - [0:18](https://youtu.be/PACIHCnvNMo?t=18) I guess we're now calling this super intelligence, which I think is actually good branding.
+       - [0:23](https://youtu.be/PACIHCnvNMo?t=23) So let's talk about how America wins this and we make that winning good for ordinary
+       - [0:28](https://youtu.be/PACIHCnvNMo?t=28) Americans.
+       - [0:29](https://youtu.be/PACIHCnvNMo?t=29) Well, excuse me, Diet Coke.
+       - [0:34](https://youtu.be/PACIHCnvNMo?t=34) Sorry.
+       - [0:36](https://youtu.be/PACIHCnvNMo?t=36) So first of all, artificial super intelligence is a complete reinvention of the computing
+       - [0:44](https://youtu.be/PACIHCnvNMo?t=44) stack.
+       - [0:45](https://youtu.be/PACIHCnvNMo?t=45) Everything from the way the processors, the chips are designed and the way they operate
+       - [0:50](https://youtu.be/PACIHCnvNMo?t=50) to the way software is now trained and developed to the way that the applications are able to
+       - [0:57](https://youtu.be/PACIHCnvNMo?t=57) perform, what they're able to do and how they perform.
+       - [1:00](https://youtu.be/PACIHCnvNMo?t=60) Every single layer of the computing stack has been reinvented.
+       - [1:03](https://youtu.be/PACIHCnvNMo?t=63) This way of doing computing, unlike previous ways of retrieving information, this is a generative
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:5@142`
+     - (a) 전사 1:52~2:52
+       - [1:55](https://youtu.be/PACIHCnvNMo?t=115) If we had the pro-energy vision of President Trump, it would have been impossible for us
+       - [1:59](https://youtu.be/PACIHCnvNMo?t=119) to build the data centers on top of it.
+       - [2:01](https://youtu.be/PACIHCnvNMo?t=121) Now of course, these data centers are coming online so quickly.
+       - [2:06](https://youtu.be/PACIHCnvNMo?t=126) We're coming into a lot of neighborhoods and a lot of communities.
+       - [2:10](https://youtu.be/PACIHCnvNMo?t=130) We have to do a better job in partnering with the communities and bring them along and make
+       - [2:16](https://youtu.be/PACIHCnvNMo?t=136) them part of the prosperity and the success of this industrial revolution.
+       - [2:21](https://youtu.be/PACIHCnvNMo?t=141) But that's how we win.
+       - [2:22](https://youtu.be/PACIHCnvNMo?t=142) We've got to build the world's best chips.
+       - [2:25](https://youtu.be/PACIHCnvNMo?t=145) We have to have lots and lots of energy, create incredible algorithms.
+       - [2:28](https://youtu.be/PACIHCnvNMo?t=148) And then lastly, make sure that America is enthusiastic about the technology so that we
+       - [2:33](https://youtu.be/PACIHCnvNMo?t=153) diffuse it into all of these various industries from manufacturing to healthcare, space exploration,
+       - [2:40](https://youtu.be/PACIHCnvNMo?t=160) so on and so forth.
+       - [2:41](https://youtu.be/PACIHCnvNMo?t=161) Awesome.
+       - [2:42](https://youtu.be/PACIHCnvNMo?t=162) Elon, how do we win?
+       - [2:44](https://youtu.be/PACIHCnvNMo?t=164) How do we keep winning?
+       - [2:47](https://youtu.be/PACIHCnvNMo?t=167) Well, we need a lot of power, a lot of energy generation.
+     - (b) 판독: 이 id의 판독 문서 없음
+2. **미국 전력 소비 500GW 기준 5GW 증설이 GDP 1% 증가로 환산**
+   - `vd:5@252`
+     - (a) 전사 3:42~4:42
+       - [3:45](https://youtu.be/PACIHCnvNMo?t=225) in the United States or in a safe region?
+       - [3:47](https://youtu.be/PACIHCnvNMo?t=227) Well, you are…
+       - [3:48](https://youtu.be/PACIHCnvNMo?t=228) We need the Wright brothers on the job.
+       - [3:50](https://youtu.be/PACIHCnvNMo?t=230) Yes.
+       - [3:51](https://youtu.be/PACIHCnvNMo?t=231) Well, it turns out the Wright brothers are on the job.
+       - [3:53](https://youtu.be/PACIHCnvNMo?t=233) Elon, if you bring on 10 gigawatts, which SpaceX has discussed publicly, that'll be about
+       - [3:59](https://youtu.be/PACIHCnvNMo?t=239) 25 percent of all the power added in America.
+       - [4:02](https://youtu.be/PACIHCnvNMo?t=242) And I know you have literal rocket engineers working on bringing on the power, helping make
+       - [4:08](https://youtu.be/PACIHCnvNMo?t=248) the turbines.
+       - [4:09](https://youtu.be/PACIHCnvNMo?t=249) So can you talk about that?
+       - [4:11](https://youtu.be/PACIHCnvNMo?t=251) Elon Musk, Yeah.
+       - [4:12](https://youtu.be/PACIHCnvNMo?t=252) I mean, just to frame this, the average power consumption in the United States is about 500
+       - [4:18](https://youtu.be/PACIHCnvNMo?t=258) gigawatts.
+       - [4:19](https://youtu.be/PACIHCnvNMo?t=259) So every five gigawatts of incremental steady state production is a 1 percent increase in
+       - [4:25](https://youtu.be/PACIHCnvNMo?t=265) the power used.
+       - [4:28](https://youtu.be/PACIHCnvNMo?t=268) And I think actually will materialize to be approximately 1 percent increase in GDP, because
+       - [4:34](https://youtu.be/PACIHCnvNMo?t=274) the intelligence per watt keeps increasing.
+       - [4:37](https://youtu.be/PACIHCnvNMo?t=277) So if you just plot on a curve, how is the useful intelligence per watt increasing?
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:5@304`
+     - (a) 전사 4:34~5:34
+       - [4:34](https://youtu.be/PACIHCnvNMo?t=274) the intelligence per watt keeps increasing.
+       - [4:37](https://youtu.be/PACIHCnvNMo?t=277) So if you just plot on a curve, how is the useful intelligence per watt increasing?
+       - [4:44](https://youtu.be/PACIHCnvNMo?t=284) How is the…
+       - [4:45](https://youtu.be/PACIHCnvNMo?t=285) Both at the hardware level, at Jensen's GPUs keep getting better in terms of the compute
+       - [4:52](https://youtu.be/PACIHCnvNMo?t=292) per watt.
+       - [4:54](https://youtu.be/PACIHCnvNMo?t=294) And the algorithms also get better in using and getting more intelligence per watt.
+       - [4:59](https://youtu.be/PACIHCnvNMo?t=299) So I think that's maybe an interesting note.
+       - [5:04](https://youtu.be/PACIHCnvNMo?t=304) I would bet anyone that 1 percent increase in power usage corresponds to roughly 1 percent
+       - [5:09](https://youtu.be/PACIHCnvNMo?t=309) increase in GDP.
+       - [5:10](https://youtu.be/PACIHCnvNMo?t=310) And so 10 gigawatts would be a 2 percent increase in GDP, with the Rubens, I think.
+       - [5:16](https://youtu.be/PACIHCnvNMo?t=316) So…
+       - [5:17](https://youtu.be/PACIHCnvNMo?t=317) Well, let's do the simple math.
+       - [5:19](https://youtu.be/PACIHCnvNMo?t=319) So each gigawatt can probably generate about, call it, 40, 50 billion dollars of economic output
+       - [5:27](https://youtu.be/PACIHCnvNMo?t=327) each year.
+       - [5:28](https://youtu.be/PACIHCnvNMo?t=328) Yeah.
+       - [5:29](https://youtu.be/PACIHCnvNMo?t=329) Is it more, right?
+       - [5:30](https://youtu.be/PACIHCnvNMo?t=330) Well, 1 percent would be…
+       - [5:31](https://youtu.be/PACIHCnvNMo?t=331) Yeah.
+       - [5:32](https://youtu.be/PACIHCnvNMo?t=332) 1 percent of the United States would be…
+     - (b) 판독: 이 id의 판독 문서 없음
+3. **SpaceX·Tesla 연 200GW 태양광 생산 목표와 우주 궤도 컴퓨팅 도입**
+   - `vd:5@405`
+     - (a) 전사 6:15~7:15
+       - [6:18](https://youtu.be/PACIHCnvNMo?t=378) than could be accessed on the ground, and that's with space.
+       - [6:24](https://youtu.be/PACIHCnvNMo?t=384) So orbital compute is going to be a very big deal.
+       - [6:27](https://youtu.be/PACIHCnvNMo?t=387) In fact…
+       - [6:28](https://youtu.be/PACIHCnvNMo?t=388) And Google agrees.
+       - [6:29](https://youtu.be/PACIHCnvNMo?t=389) They just actually sent up…
+       - [6:30](https://youtu.be/PACIHCnvNMo?t=390) Or are either about to or soon about to send up some TPUs.
+       - [6:35](https://youtu.be/PACIHCnvNMo?t=395) I think there's…
+       - [6:36](https://youtu.be/PACIHCnvNMo?t=396) There was an H100 that was put into orbit like last year, I think.
+       - [6:41](https://youtu.be/PACIHCnvNMo?t=401) Mm-hmm.
+       - [6:42](https://youtu.be/PACIHCnvNMo?t=402) So it does work in space.
+       - [6:45](https://youtu.be/PACIHCnvNMo?t=405) And SpaceX is aiming together with Tesla to do 200 gigawatts of solar production per year.
+       - [6:54](https://youtu.be/PACIHCnvNMo?t=414) And if brought to space, that… you get the nameplate or better on the solar power,
+       - [7:00](https://youtu.be/PACIHCnvNMo?t=420) whereas if it's on the ground, you're going to get somewhere between a fifth and an eighth
+       - [7:03](https://youtu.be/PACIHCnvNMo?t=423) of the solar power generation, and you need enormous batteries.
+       - [7:07](https://youtu.be/PACIHCnvNMo?t=427) So…
+       - [7:08](https://youtu.be/PACIHCnvNMo?t=428) Whereas it's essentially always sunny in space, so…
+       - [7:11](https://youtu.be/PACIHCnvNMo?t=431) And right now is a great time to do it, because the economic returns of these computing systems
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:5@384`
+     - (a) 전사 5:54~6:54
+       - [5:54](https://youtu.be/PACIHCnvNMo?t=354) So that's…
+       - [5:55](https://youtu.be/PACIHCnvNMo?t=355) So…
+       - [5:56](https://youtu.be/PACIHCnvNMo?t=356) Not good at too many other things, but math.
+       - [5:58](https://youtu.be/PACIHCnvNMo?t=358) Yeah.
+       - [5:59](https://youtu.be/PACIHCnvNMo?t=359) I mean, it's going to increase quite dramatically year over year.
+       - [6:02](https://youtu.be/PACIHCnvNMo?t=362) So…
+       - [6:03](https://youtu.be/PACIHCnvNMo?t=363) Yeah.
+       - [6:04](https://youtu.be/PACIHCnvNMo?t=364) I mean, from a SpaceX standpoint, we're looking at long-term, how do we access a lot more energy
+       - [6:18](https://youtu.be/PACIHCnvNMo?t=378) than could be accessed on the ground, and that's with space.
+       - [6:24](https://youtu.be/PACIHCnvNMo?t=384) So orbital compute is going to be a very big deal.
+       - [6:27](https://youtu.be/PACIHCnvNMo?t=387) In fact…
+       - [6:28](https://youtu.be/PACIHCnvNMo?t=388) And Google agrees.
+       - [6:29](https://youtu.be/PACIHCnvNMo?t=389) They just actually sent up…
+       - [6:30](https://youtu.be/PACIHCnvNMo?t=390) Or are either about to or soon about to send up some TPUs.
+       - [6:35](https://youtu.be/PACIHCnvNMo?t=395) I think there's…
+       - [6:36](https://youtu.be/PACIHCnvNMo?t=396) There was an H100 that was put into orbit like last year, I think.
+       - [6:41](https://youtu.be/PACIHCnvNMo?t=401) Mm-hmm.
+       - [6:42](https://youtu.be/PACIHCnvNMo?t=402) So it does work in space.
+       - [6:45](https://youtu.be/PACIHCnvNMo?t=405) And SpaceX is aiming together with Tesla to do 200 gigawatts of solar production per year.
+       - [6:54](https://youtu.be/PACIHCnvNMo?t=414) And if brought to space, that… you get the nameplate or better on the solar power,
+     - (b) 판독: 이 id의 판독 문서 없음
+4. **데이터 센터를 SI 팩토리로 재정의하고 연간 10~20GW 구축으로 약 100만 개 일자리 창출**
+   - `vd:5@493`
+     - (a) 전사 7:43~8:43
+       - [7:45](https://youtu.be/PACIHCnvNMo?t=465) to all these small towns, we're re-industrializing America, we're revitalizing small towns, we're
+       - [7:52](https://youtu.be/PACIHCnvNMo?t=472) modernizing the grid.
+       - [7:53](https://youtu.be/PACIHCnvNMo?t=473) These are things that essentially every American politician has wanted for the last 35 years.
+       - [8:00](https://youtu.be/PACIHCnvNMo?t=480) What would you say, what are some specifics you can give about how data centers are good
+       - [8:08](https://youtu.be/PACIHCnvNMo?t=488) for ordinary Americans in the communities and how they're getting better for those communities?
+       - [8:12](https://youtu.be/PACIHCnvNMo?t=492) Yeah.
+       - [8:13](https://youtu.be/PACIHCnvNMo?t=493) We used to call them data centers.
+       - [8:14](https://youtu.be/PACIHCnvNMo?t=494) We call them data centers because that's where we hold data.
+       - [8:17](https://youtu.be/PACIHCnvNMo?t=497) But the things that we're building now, these are really SI factories, super intelligence
+       - [8:22](https://youtu.be/PACIHCnvNMo?t=502) factories.
+       - [8:23](https://youtu.be/PACIHCnvNMo?t=503) And the reason why it's a factory is because you're producing something of economic value.
+       - [8:26](https://youtu.be/PACIHCnvNMo?t=506) You're just not storing it.
+       - [8:28](https://youtu.be/PACIHCnvNMo?t=508) And so these SI factories are real factories.
+       - [8:32](https://youtu.be/PACIHCnvNMo?t=512) It's like a big giant power generator in real factories.
+       - [8:36](https://youtu.be/PACIHCnvNMo?t=516) It's got a lot of computing and networking in there, power generation, cooling systems.
+       - [8:39](https://youtu.be/PACIHCnvNMo?t=519) It's complicated things.
+       - [8:40](https://youtu.be/PACIHCnvNMo?t=520) And so we're building out, just as the internet today allows you to find anything anywhere in
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:5@544`
+     - (a) 전사 8:34~9:34
+       - [8:36](https://youtu.be/PACIHCnvNMo?t=516) It's got a lot of computing and networking in there, power generation, cooling systems.
+       - [8:39](https://youtu.be/PACIHCnvNMo?t=519) It's complicated things.
+       - [8:40](https://youtu.be/PACIHCnvNMo?t=520) And so we're building out, just as the internet today allows you to find anything anywhere in
+       - [8:47](https://youtu.be/PACIHCnvNMo?t=527) the future with these AI, excuse me, SI infrastructure, SI factories, you'll be able to know anything
+       - [8:54](https://youtu.be/PACIHCnvNMo?t=534) and do anything from anywhere.
+       - [8:56](https://youtu.be/PACIHCnvNMo?t=536) And so now we're building this infrastructure out and call it across all of the United States,
+       - [9:04](https://youtu.be/PACIHCnvNMo?t=544) somewhere between 10, 20 gigawatts a year, let's just estimate.
+       - [9:08](https://youtu.be/PACIHCnvNMo?t=548) That creates just probably about a million jobs in building out these data centers.
+       - [9:14](https://youtu.be/PACIHCnvNMo?t=554) Don't forget you've got to build the power generation plants.
+       - [9:17](https://youtu.be/PACIHCnvNMo?t=557) You've got to build the data centers.
+       - [9:18](https://youtu.be/PACIHCnvNMo?t=558) You've got construction.
+       - [9:19](https://youtu.be/PACIHCnvNMo?t=559) You've got power cooling.
+       - [9:21](https://youtu.be/PACIHCnvNMo?t=561) You've got pipe fitters.
+       - [9:23](https://youtu.be/PACIHCnvNMo?t=563) And so this is the first time in probably, as you mentioned, 35, I was going to say 50 years,
+       - [9:28](https://youtu.be/PACIHCnvNMo?t=568) first time in 50 years we are re-industrializing the United States, creating a whole bunch of blue-collar
+       - [9:33](https://youtu.be/PACIHCnvNMo?t=573) jobs and I think we want an economy that has a shape that includes white-collar jobs and blue-collar jobs,
+     - (b) 판독: 이 id의 판독 문서 없음
+5. **OpenShell 에이전트 격리 시스템과 Bluefield 모니터링 칩으로 AI 안전성 확보**
+   - `vd:5@865`
+     - (a) 전사 13:55~14:55
+       - [13:57](https://youtu.be/PACIHCnvNMo?t=837) And so you want to contain and you want to monitor it.
+       - [14:00](https://youtu.be/PACIHCnvNMo?t=840) Once you're done evaluating in this way, when you deploy, you want to use a very similar system.
+       - [14:06](https://youtu.be/PACIHCnvNMo?t=846) And this is no different than just about any digital, any human employee that you hire.
+       - [14:12](https://youtu.be/PACIHCnvNMo?t=852) You give them a containment of rights and tools and access.
+       - [14:15](https://youtu.be/PACIHCnvNMo?t=855) And then you monitor on a regular basis, on a continuous basis.
+       - [14:18](https://youtu.be/PACIHCnvNMo?t=858) And so in the case of agents, we just have to make sure containment and monitoring has to be done in the most secure of ways.
+       - [14:25](https://youtu.be/PACIHCnvNMo?t=865) And we introduced two technologies.
+       - [14:27](https://youtu.be/PACIHCnvNMo?t=867) One's called OpenShell.
+       - [14:29](https://youtu.be/PACIHCnvNMo?t=869) It's a containment system.
+       - [14:31](https://youtu.be/PACIHCnvNMo?t=871) It's basically kind of like a browser for websites.
+       - [14:35](https://youtu.be/PACIHCnvNMo?t=875) It's now essentially a browser of agents.
+       - [14:39](https://youtu.be/PACIHCnvNMo?t=879) And that browser keeps the agent isolated from the rest of the computer.
+       - [14:43](https://youtu.be/PACIHCnvNMo?t=883) And the rights that you give it are only the rights it should have.
+       - [14:47](https://youtu.be/PACIHCnvNMo?t=887) And then the monitoring system is a new chip called Bluefield.
+       - [14:51](https://youtu.be/PACIHCnvNMo?t=891) And it keeps an eye on everything that the agent is doing at all times.
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:5@887`
+     - (a) 전사 14:17~15:17
+       - [14:18](https://youtu.be/PACIHCnvNMo?t=858) And so in the case of agents, we just have to make sure containment and monitoring has to be done in the most secure of ways.
+       - [14:25](https://youtu.be/PACIHCnvNMo?t=865) And we introduced two technologies.
+       - [14:27](https://youtu.be/PACIHCnvNMo?t=867) One's called OpenShell.
+       - [14:29](https://youtu.be/PACIHCnvNMo?t=869) It's a containment system.
+       - [14:31](https://youtu.be/PACIHCnvNMo?t=871) It's basically kind of like a browser for websites.
+       - [14:35](https://youtu.be/PACIHCnvNMo?t=875) It's now essentially a browser of agents.
+       - [14:39](https://youtu.be/PACIHCnvNMo?t=879) And that browser keeps the agent isolated from the rest of the computer.
+       - [14:43](https://youtu.be/PACIHCnvNMo?t=883) And the rights that you give it are only the rights it should have.
+       - [14:47](https://youtu.be/PACIHCnvNMo?t=887) And then the monitoring system is a new chip called Bluefield.
+       - [14:51](https://youtu.be/PACIHCnvNMo?t=891) And it keeps an eye on everything that the agent is doing at all times.
+       - [14:56](https://youtu.be/PACIHCnvNMo?t=896) And if it does anything that's out of bounds and against the policy that has been given, then it escalates as far as you need it to escalate.
+       - [15:05](https://youtu.be/PACIHCnvNMo?t=905) And I thought it was a great analogy in the technical blog where you said in the early days of the internet, everybody was worried about your credit card could get stolen.
+       - [15:13](https://youtu.be/PACIHCnvNMo?t=913) We made the internet safe.
+       - [15:15](https://youtu.be/PACIHCnvNMo?t=915) And that's why we have Amazon.
+       - [15:16](https://youtu.be/PACIHCnvNMo?t=916) We have Netflix.
+       - [15:17](https://youtu.be/PACIHCnvNMo?t=917) We have Google.
+     - (b) 판독: 이 id의 판독 문서 없음
+6. **백악관에서 SI 안전 관련 공동 선언 서명 및 상호 감사 체계 합의**
+   - `vd:5@1472`
+     - (a) 전사 24:02~25:02
+       - [24:02](https://youtu.be/PACIHCnvNMo?t=1442) And you want the defender, you want this SI to activate on behalf of the defender, even though it appears to be an, you know, an aggressive action.
+       - [24:13](https://youtu.be/PACIHCnvNMo?t=1453) Great.
+       - [24:14](https://youtu.be/PACIHCnvNMo?t=1454) I think we're running up on time, but maybe if you guys could share, you spent a lot of time at the White House, is there anything that, that you can share, share with the world about what came out of what was evidently a, a, a long and productive lunch?
+       - [24:30](https://youtu.be/PACIHCnvNMo?t=1470) We did good.
+       - [24:31](https://youtu.be/PACIHCnvNMo?t=1471) Yeah.
+       - [24:32](https://youtu.be/PACIHCnvNMo?t=1472) We, we, we signed a joint declaration regarding SI safety.
+       - [24:37](https://youtu.be/PACIHCnvNMo?t=1477) And I think, I think that'll be published by the White House soon.
+       - [24:42](https://youtu.be/PACIHCnvNMo?t=1482) It hasn't been already.
+       - [24:43](https://youtu.be/PACIHCnvNMo?t=1483) But we, we agreed to, to a number of things that include joint monitoring, board special committees, and just generally grading each other's homework, which is a lot better than if people just grade their own homework, for obvious reasons.
+       - [25:00](https://youtu.be/PACIHCnvNMo?t=1500) And, and includes everything, it includes everything from rigorous internal controls, well-established methods, well-established processes, very clearly documented,
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:5@1483`
+     - (a) 전사 24:13~25:13
+       - [24:13](https://youtu.be/PACIHCnvNMo?t=1453) Great.
+       - [24:14](https://youtu.be/PACIHCnvNMo?t=1454) I think we're running up on time, but maybe if you guys could share, you spent a lot of time at the White House, is there anything that, that you can share, share with the world about what came out of what was evidently a, a, a long and productive lunch?
+       - [24:30](https://youtu.be/PACIHCnvNMo?t=1470) We did good.
+       - [24:31](https://youtu.be/PACIHCnvNMo?t=1471) Yeah.
+       - [24:32](https://youtu.be/PACIHCnvNMo?t=1472) We, we, we signed a joint declaration regarding SI safety.
+       - [24:37](https://youtu.be/PACIHCnvNMo?t=1477) And I think, I think that'll be published by the White House soon.
+       - [24:42](https://youtu.be/PACIHCnvNMo?t=1482) It hasn't been already.
+       - [24:43](https://youtu.be/PACIHCnvNMo?t=1483) But we, we agreed to, to a number of things that include joint monitoring, board special committees, and just generally grading each other's homework, which is a lot better than if people just grade their own homework, for obvious reasons.
+       - [25:00](https://youtu.be/PACIHCnvNMo?t=1500) And, and includes everything, it includes everything from rigorous internal controls, well-established methods, well-established processes, very clearly documented,
+       - [25:12](https://youtu.be/PACIHCnvNMo?t=1512) the intentions of the products that you're building, internal controls to make sure that you're delivering on those intentions, internal audit that, that escalates, external audits from, from a third party.
+     - (b) 판독: 이 id의 판독 문서 없음
+
+### timeline
+
+- **0:00 미국 기술 혁신 역사와 슈퍼 인텔리전스 도입**
+  - [0:00](https://youtu.be/PACIHCnvNMo?t=0) Wright brothers, first man on the moon, the internet.
+  - [0:04](https://youtu.be/PACIHCnvNMo?t=4) The two of us, Wright brothers.
+  - [0:06](https://youtu.be/PACIHCnvNMo?t=6) I like that, indeed.
+  - [0:08](https://youtu.be/PACIHCnvNMo?t=8) We've essentially led every major technological revolution, which has been to the enormous
+  - [0:14](https://youtu.be/PACIHCnvNMo?t=14) benefit of America, ordinary Americans.
+  - [0:18](https://youtu.be/PACIHCnvNMo?t=18) I guess we're now calling this super intelligence, which I think is actually good branding.
+  - [0:23](https://youtu.be/PACIHCnvNMo?t=23) So let's talk about how America wins this and we make that winning good for ordinary
+  - [0:28](https://youtu.be/PACIHCnvNMo?t=28) Americans.
+  - [0:29](https://youtu.be/PACIHCnvNMo?t=29) Well, excuse me, Diet Coke.
+- **0:36 컴퓨팅 스택 전면 재설계와 에너지 기반 구조**
+  - [0:06](https://youtu.be/PACIHCnvNMo?t=6) I like that, indeed.
+  - [0:08](https://youtu.be/PACIHCnvNMo?t=8) We've essentially led every major technological revolution, which has been to the enormous
+  - [0:14](https://youtu.be/PACIHCnvNMo?t=14) benefit of America, ordinary Americans.
+  - [0:18](https://youtu.be/PACIHCnvNMo?t=18) I guess we're now calling this super intelligence, which I think is actually good branding.
+  - [0:23](https://youtu.be/PACIHCnvNMo?t=23) So let's talk about how America wins this and we make that winning good for ordinary
+  - [0:28](https://youtu.be/PACIHCnvNMo?t=28) Americans.
+  - [0:29](https://youtu.be/PACIHCnvNMo?t=29) Well, excuse me, Diet Coke.
+  - [0:34](https://youtu.be/PACIHCnvNMo?t=34) Sorry.
+  - [0:36](https://youtu.be/PACIHCnvNMo?t=36) So first of all, artificial super intelligence is a complete reinvention of the computing
+  - [0:44](https://youtu.be/PACIHCnvNMo?t=44) stack.
+  - [0:45](https://youtu.be/PACIHCnvNMo?t=45) Everything from the way the processors, the chips are designed and the way they operate
+  - [0:50](https://youtu.be/PACIHCnvNMo?t=50) to the way software is now trained and developed to the way that the applications are able to
+  - [0:57](https://youtu.be/PACIHCnvNMo?t=57) perform, what they're able to do and how they perform.
+  - [1:00](https://youtu.be/PACIHCnvNMo?t=60) Every single layer of the computing stack has been reinvented.
+  - [1:03](https://youtu.be/PACIHCnvNMo?t=63) This way of doing computing, unlike previous ways of retrieving information, this is a generative
+- **2:42 에너지·칩 생산 확대와 중국 경쟁**
+  - [2:16](https://youtu.be/PACIHCnvNMo?t=136) them part of the prosperity and the success of this industrial revolution.
+  - [2:21](https://youtu.be/PACIHCnvNMo?t=141) But that's how we win.
+  - [2:22](https://youtu.be/PACIHCnvNMo?t=142) We've got to build the world's best chips.
+  - [2:25](https://youtu.be/PACIHCnvNMo?t=145) We have to have lots and lots of energy, create incredible algorithms.
+  - [2:28](https://youtu.be/PACIHCnvNMo?t=148) And then lastly, make sure that America is enthusiastic about the technology so that we
+  - [2:33](https://youtu.be/PACIHCnvNMo?t=153) diffuse it into all of these various industries from manufacturing to healthcare, space exploration,
+  - [2:40](https://youtu.be/PACIHCnvNMo?t=160) so on and so forth.
+  - [2:41](https://youtu.be/PACIHCnvNMo?t=161) Awesome.
+  - [2:42](https://youtu.be/PACIHCnvNMo?t=162) Elon, how do we win?
+  - [2:44](https://youtu.be/PACIHCnvNMo?t=164) How do we keep winning?
+  - [2:47](https://youtu.be/PACIHCnvNMo?t=167) Well, we need a lot of power, a lot of energy generation.
+  - [2:54](https://youtu.be/PACIHCnvNMo?t=174) So scaling energy, I think, is one of the biggest things.
+  - [3:00](https://youtu.be/PACIHCnvNMo?t=180) You've got to scale energy.
+  - [3:01](https://youtu.be/PACIHCnvNMo?t=181) You've got to scale chip production.
+  - [3:04](https://youtu.be/PACIHCnvNMo?t=184) And I think we're winning on software, on anything intellectual or digital.
+  - [3:11](https://youtu.be/PACIHCnvNMo?t=191) But in the long run, we need to be able to generate enough power to compete with, I think, essentially,
+- **4:12 전력 증설과 GDP 증가율 환산**
+  - [3:45](https://youtu.be/PACIHCnvNMo?t=225) in the United States or in a safe region?
+  - [3:47](https://youtu.be/PACIHCnvNMo?t=227) Well, you are…
+  - [3:48](https://youtu.be/PACIHCnvNMo?t=228) We need the Wright brothers on the job.
+  - [3:50](https://youtu.be/PACIHCnvNMo?t=230) Yes.
+  - [3:51](https://youtu.be/PACIHCnvNMo?t=231) Well, it turns out the Wright brothers are on the job.
+  - [3:53](https://youtu.be/PACIHCnvNMo?t=233) Elon, if you bring on 10 gigawatts, which SpaceX has discussed publicly, that'll be about
+  - [3:59](https://youtu.be/PACIHCnvNMo?t=239) 25 percent of all the power added in America.
+  - [4:02](https://youtu.be/PACIHCnvNMo?t=242) And I know you have literal rocket engineers working on bringing on the power, helping make
+  - [4:08](https://youtu.be/PACIHCnvNMo?t=248) the turbines.
+  - [4:09](https://youtu.be/PACIHCnvNMo?t=249) So can you talk about that?
+  - [4:11](https://youtu.be/PACIHCnvNMo?t=251) Elon Musk, Yeah.
+  - [4:12](https://youtu.be/PACIHCnvNMo?t=252) I mean, just to frame this, the average power consumption in the United States is about 500
+  - [4:18](https://youtu.be/PACIHCnvNMo?t=258) gigawatts.
+  - [4:19](https://youtu.be/PACIHCnvNMo?t=259) So every five gigawatts of incremental steady state production is a 1 percent increase in
+  - [4:25](https://youtu.be/PACIHCnvNMo?t=265) the power used.
+  - [4:28](https://youtu.be/PACIHCnvNMo?t=268) And I think actually will materialize to be approximately 1 percent increase in GDP, because
+  - [4:34](https://youtu.be/PACIHCnvNMo?t=274) the intelligence per watt keeps increasing.
+  - [4:37](https://youtu.be/PACIHCnvNMo?t=277) So if you just plot on a curve, how is the useful intelligence per watt increasing?
+- **6:04 우주 기반 컴퓨팅과 태양광 발전**
+  - [5:35](https://youtu.be/PACIHCnvNMo?t=335) 300 billion.
+  - [5:36](https://youtu.be/PACIHCnvNMo?t=336) Yeah, 300 billion.
+  - [5:37](https://youtu.be/PACIHCnvNMo?t=337) And so 50 one-sixth.
+  - [5:38](https://youtu.be/PACIHCnvNMo?t=338) 1 percent of the…
+  - [5:39](https://youtu.be/PACIHCnvNMo?t=339) 1 percent increase of 5 gigawatts would be…
+  - [5:40](https://youtu.be/PACIHCnvNMo?t=340) Yeah.
+  - [5:41](https://youtu.be/PACIHCnvNMo?t=341) Well, 5 gigawatts would be a 300 billion.
+  - [5:42](https://youtu.be/PACIHCnvNMo?t=342) Yeah.
+  - [5:43](https://youtu.be/PACIHCnvNMo?t=343) Yeah.
+  - [5:44](https://youtu.be/PACIHCnvNMo?t=344) Exactly.
+  - [5:45](https://youtu.be/PACIHCnvNMo?t=345) 60 billion a gigawatt.
+  - [5:46](https://youtu.be/PACIHCnvNMo?t=346) Yeah.
+  - [5:47](https://youtu.be/PACIHCnvNMo?t=347) That's right.
+  - [5:48](https://youtu.be/PACIHCnvNMo?t=348) The math, math.
+  - [5:49](https://youtu.be/PACIHCnvNMo?t=349) Yeah.
+  - [5:50](https://youtu.be/PACIHCnvNMo?t=350) That's what we're good at.
+  - [5:51](https://youtu.be/PACIHCnvNMo?t=351) Yes.
+  - [5:52](https://youtu.be/PACIHCnvNMo?t=352) Yes.
+  - [5:53](https://youtu.be/PACIHCnvNMo?t=353) Yeah.
+  - [5:54](https://youtu.be/PACIHCnvNMo?t=354) So that's…
+  - [5:55](https://youtu.be/PACIHCnvNMo?t=355) So…
+  - [5:56](https://youtu.be/PACIHCnvNMo?t=356) Not good at too many other things, but math.
+  - [5:58](https://youtu.be/PACIHCnvNMo?t=358) Yeah.
+  - [5:59](https://youtu.be/PACIHCnvNMo?t=359) I mean, it's going to increase quite dramatically year over year.
+  - [6:02](https://youtu.be/PACIHCnvNMo?t=362) So…
+  - [6:03](https://youtu.be/PACIHCnvNMo?t=363) Yeah.
+  - [6:04](https://youtu.be/PACIHCnvNMo?t=364) I mean, from a SpaceX standpoint, we're looking at long-term, how do we access a lot more energy
+  - [6:18](https://youtu.be/PACIHCnvNMo?t=378) than could be accessed on the ground, and that's with space.
+  - [6:24](https://youtu.be/PACIHCnvNMo?t=384) So orbital compute is going to be a very big deal.
+  - [6:27](https://youtu.be/PACIHCnvNMo?t=387) In fact…
+  - [6:28](https://youtu.be/PACIHCnvNMo?t=388) And Google agrees.
+  - [6:29](https://youtu.be/PACIHCnvNMo?t=389) They just actually sent up…
+  - [6:30](https://youtu.be/PACIHCnvNMo?t=390) Or are either about to or soon about to send up some TPUs.
+- **8:13 SI 팩토리와 지역 경제·일자리 효과**
+  - [7:45](https://youtu.be/PACIHCnvNMo?t=465) to all these small towns, we're re-industrializing America, we're revitalizing small towns, we're
+  - [7:52](https://youtu.be/PACIHCnvNMo?t=472) modernizing the grid.
+  - [7:53](https://youtu.be/PACIHCnvNMo?t=473) These are things that essentially every American politician has wanted for the last 35 years.
+  - [8:00](https://youtu.be/PACIHCnvNMo?t=480) What would you say, what are some specifics you can give about how data centers are good
+  - [8:08](https://youtu.be/PACIHCnvNMo?t=488) for ordinary Americans in the communities and how they're getting better for those communities?
+  - [8:12](https://youtu.be/PACIHCnvNMo?t=492) Yeah.
+  - [8:13](https://youtu.be/PACIHCnvNMo?t=493) We used to call them data centers.
+  - [8:14](https://youtu.be/PACIHCnvNMo?t=494) We call them data centers because that's where we hold data.
+  - [8:17](https://youtu.be/PACIHCnvNMo?t=497) But the things that we're building now, these are really SI factories, super intelligence
+  - [8:22](https://youtu.be/PACIHCnvNMo?t=502) factories.
+  - [8:23](https://youtu.be/PACIHCnvNMo?t=503) And the reason why it's a factory is because you're producing something of economic value.
+  - [8:26](https://youtu.be/PACIHCnvNMo?t=506) You're just not storing it.
+  - [8:28](https://youtu.be/PACIHCnvNMo?t=508) And so these SI factories are real factories.
+  - [8:32](https://youtu.be/PACIHCnvNMo?t=512) It's like a big giant power generator in real factories.
+  - [8:36](https://youtu.be/PACIHCnvNMo?t=516) It's got a lot of computing and networking in there, power generation, cooling systems.
+  - [8:39](https://youtu.be/PACIHCnvNMo?t=519) It's complicated things.
+  - [8:40](https://youtu.be/PACIHCnvNMo?t=520) And so we're building out, just as the internet today allows you to find anything anywhere in
+- **12:46 AI 에이전트 안전성 프레임워크**
+  - [12:20](https://youtu.be/PACIHCnvNMo?t=740) while I was reading about the open agent safety framework from NVIDIA, which was an exciting morning.
+  - [12:26](https://youtu.be/PACIHCnvNMo?t=746) So maybe you could each talk about each of those because we need Starship to get those 200 gigawatts
+  - [12:33](https://youtu.be/PACIHCnvNMo?t=753) of American soldier with American chips, American super intelligence into orbit.
+  - [12:38](https://youtu.be/PACIHCnvNMo?t=758) I'll talk about his and he talks on mine.
+  - [12:42](https://youtu.be/PACIHCnvNMo?t=762) No, I'm just kidding.
+  - [12:44](https://youtu.be/PACIHCnvNMo?t=764) So let's see.
+  - [12:46](https://youtu.be/PACIHCnvNMo?t=766) As you know, we want to advance AI, advance SI.
+  - [12:50](https://youtu.be/PACIHCnvNMo?t=770) I'm going to get good at this.
+  - [12:51](https://youtu.be/PACIHCnvNMo?t=771) We're going to advance SI in a responsible and optimistic way.
+  - [12:57](https://youtu.be/PACIHCnvNMo?t=777) And we know that the future, we strongly believe that the future that SI is going to enable is the future that we want to be part of.
+  - [13:05](https://youtu.be/PACIHCnvNMo?t=785) And so we're optimistic about that.
+  - [13:06](https://youtu.be/PACIHCnvNMo?t=786) And that's the reason why we're driving so hard.
+  - [13:08](https://youtu.be/PACIHCnvNMo?t=788) On the other hand, we have to make sure that we develop this technology safely and securely.
+  - [13:12](https://youtu.be/PACIHCnvNMo?t=792) There are several different parts of it.
+  - [13:14](https://youtu.be/PACIHCnvNMo?t=794) While you're training the model, that's generally a fairly safe environment.
+- **16:06 Starship 첫 궤도 비행과 Starlink B3 위성**
+  - [15:37](https://youtu.be/PACIHCnvNMo?t=937) Not only is it advanced technology, it's also safer technology.
+  - [15:40](https://youtu.be/PACIHCnvNMo?t=940) And so you advance the technology in that way.
+  - [15:43](https://youtu.be/PACIHCnvNMo?t=943) The two are not in conflict.
+  - [15:45](https://youtu.be/PACIHCnvNMo?t=945) The idea that if you advance capability, it somehow compromises safety.
+  - [15:51](https://youtu.be/PACIHCnvNMo?t=951) If you advance safety, somehow you fall behind.
+  - [15:53](https://youtu.be/PACIHCnvNMo?t=953) That's just, you know, those are false choices.
+  - [15:56](https://youtu.be/PACIHCnvNMo?t=956) Yeah, safety lets us accelerate.
+  - [15:57](https://youtu.be/PACIHCnvNMo?t=957) But Elon, if the Starship is going to be a big part of those 200 gigawatts, what can you tell us about Monday's flight?
+  - [16:04](https://youtu.be/PACIHCnvNMo?t=964) What you learned?
+  - [16:05](https://youtu.be/PACIHCnvNMo?t=965) How are you feeling about the program?
+  - [16:06](https://youtu.be/PACIHCnvNMo?t=966) I think the Starship is going great.
+  - [16:09](https://youtu.be/PACIHCnvNMo?t=969) We took Starship to orbit for the first time and we deployed Starlink B3 satellites, which were enormous satellites.
+  - [16:17](https://youtu.be/PACIHCnvNMo?t=977) I mean, these are satellites with a wingspan of 737.
+  - [16:21](https://youtu.be/PACIHCnvNMo?t=981) So, really enormous.
+  - [16:24](https://youtu.be/PACIHCnvNMo?t=984) In fact, it's the largest payload delivered to orbit since Skylab.
+  - [16:29](https://youtu.be/PACIHCnvNMo?t=989) So, now we expect Starship to ultimately, next year I think, probably reach a weekly or twice weekly cadence.
+- **17:53 Opus 5.5 기능과 일반인 활용**
+  - [17:30](https://youtu.be/PACIHCnvNMo?t=1050) And then in addition, it will launch at least a few hundred gigawatts a year of AI compute.
+  - [17:37](https://youtu.be/PACIHCnvNMo?t=1057) 200 gigawatts a year would be a 40% increase annually in the United States total energy consumption.
+  - [17:45](https://youtu.be/PACIHCnvNMo?t=1065) So, it's quite a big number.
+  - [17:47](https://youtu.be/PACIHCnvNMo?t=1067) And it might end up being a terabyte one day.
+  - [17:50](https://youtu.be/PACIHCnvNMo?t=1070) So, this is serious tonnage.
+  - [17:52](https://youtu.be/PACIHCnvNMo?t=1072) Awesome.
+  - [17:53](https://youtu.be/PACIHCnvNMo?t=1073) And Tom, Anthropic, your company, your co-founder of Anthropic, you announced Opus 5.5 in the last several days.
+  - [18:03](https://youtu.be/PACIHCnvNMo?t=1083) And I thought maybe we'd go to the exponential that we are on.
+  - [18:06](https://youtu.be/PACIHCnvNMo?t=1086) And I think it's helpful to ground what can Opus 5.5, and maybe it's for everybody, what can Opus 5.5 do to make the lives of ordinary Americans better today?
+  - [18:17](https://youtu.be/PACIHCnvNMo?t=1097) And where are we going to be in a year?
+  - [18:19](https://youtu.be/PACIHCnvNMo?t=1099) Yeah.
+  - [18:20](https://youtu.be/PACIHCnvNMo?t=1100) So, Opus 5.5 is a model that I think just continues the normal progress that we've had of getting kind of more IQ points for each of these super intelligences with each model release.
+- **24:14 백악관 SI 안전 공동 선언**
+  - [23:50](https://youtu.be/PACIHCnvNMo?t=1430) The intentions are a little bit different, you know, whether you're a defender or an attacker, for example, in cybersecurity, the defender's actions could resemble an attacker.
+  - [24:02](https://youtu.be/PACIHCnvNMo?t=1442) And you want the defender, you want this SI to activate on behalf of the defender, even though it appears to be an, you know, an aggressive action.
+  - [24:13](https://youtu.be/PACIHCnvNMo?t=1453) Great.
+  - [24:14](https://youtu.be/PACIHCnvNMo?t=1454) I think we're running up on time, but maybe if you guys could share, you spent a lot of time at the White House, is there anything that, that you can share, share with the world about what came out of what was evidently a, a, a long and productive lunch?
+  - [24:30](https://youtu.be/PACIHCnvNMo?t=1470) We did good.
+  - [24:31](https://youtu.be/PACIHCnvNMo?t=1471) Yeah.
+  - [24:32](https://youtu.be/PACIHCnvNMo?t=1472) We, we, we signed a joint declaration regarding SI safety.
+  - [24:37](https://youtu.be/PACIHCnvNMo?t=1477) And I think, I think that'll be published by the White House soon.
+  - [24:42](https://youtu.be/PACIHCnvNMo?t=1482) It hasn't been already.
+  - [24:43](https://youtu.be/PACIHCnvNMo?t=1483) But we, we agreed to, to a number of things that include joint monitoring, board special committees, and just generally grading each other's homework, which is a lot better than if people just grade their own homework, for obvious reasons.
+
+### summary
+
+1. 젠슨 황과 일론 머스크가 미국 슈퍼 인텔리전스 경쟁력 확보를 위한 에너지, 칩, 우주 컴퓨팅 전략을 설명하는 대담이다.
+2. 전력 5GW 증설이 GDP 1% 증가로 이어진다는 계산과 SpaceX·Tesla의 연 200GW 태양광 생산 목표를 제시했다.
+3. AI 에이전트 격리·모니터링 기술과 백악관 SI 안전 공동 선언도 다룬다.
+
+### name_pairs
+
+(name_pairs 없음)
+
+### 채점
+
+- Q1 근거 [ ] pass [ ] fail 이유:
+- Q2 시각 [ ] pass [ ] fail 이유:
+- Q3 지어내지 않음 [ ] pass [ ] fail 이유:
+
+## 5. S-bRN-avZ4Q
+
+- 제목: [한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex
+- 유튜브: https://youtu.be/S-bRN-avZ4Q
+- transcript_quality: `ok`
+- mode: `whisper+slides`
+- 입력: 전사 286줄, 판독 17장
+
+| id | 질문 |
+|---|---|
+| Q1 | 근거: key_points의 모든 항목이 그 evidence 초의 전사 줄(앞뒤 30초)이나 같은 id의 판독 문서로 뒷받침되나? |
+| Q2 | 시각: timeline의 모든 초에서(앞뒤 30초 안) 그 label의 내용이 전사나 판독에 실제로 나오나? |
+| Q3 | 지어내지 않음: summary를 포함한 출력 전체에 전사·판독에 없는 내용(제목만 보고 짐작한 내용 포함)이 없고, 근거 자료가 없으면 "내용 없음"으로 두었나? |
+
+### key_points
+
+1. **2026년 RAG 구조를 에이전트 하네스와 문서 컨텍스트 레이어로 분리**
+   - `vd:28@35`
+     - (a) 전사 0:05~1:05
+       - [0:05](https://youtu.be/S-bRN-avZ4Q?t=5) Building the Document Context Layer for AI Agents.
+       - [0:09](https://youtu.be/S-bRN-avZ4Q?t=9) Really big shout out to the AI Engineer World Fair
+       - [0:11](https://youtu.be/S-bRN-avZ4Q?t=11) for hosting, and if you've seen some of my earlier talks
+       - [0:14](https://youtu.be/S-bRN-avZ4Q?t=14) from the previous AI Engineer conferences,
+       - [0:17](https://youtu.be/S-bRN-avZ4Q?t=17) we've kind of traced through a lot of the evolution
+       - [0:19](https://youtu.be/S-bRN-avZ4Q?t=19) of how, you know, agent advances have correlated
+       - [0:22](https://youtu.be/S-bRN-avZ4Q?t=22) with, you know, how you inject context
+       - [0:24](https://youtu.be/S-bRN-avZ4Q?t=24) into evolving applications.
+       - [0:26](https://youtu.be/S-bRN-avZ4Q?t=26) And so today in 2026, we'll kind of talk
+       - [0:28](https://youtu.be/S-bRN-avZ4Q?t=28) about three main topics.
+       - [0:30](https://youtu.be/S-bRN-avZ4Q?t=30) One is, you know, what is RAG in 2026?
+       - [0:33](https://youtu.be/S-bRN-avZ4Q?t=33) Two, basically, that basically decomposes
+       - [0:35](https://youtu.be/S-bRN-avZ4Q?t=35) into an agent harness plus a context layer.
+       - [0:37](https://youtu.be/S-bRN-avZ4Q?t=37) So kind of going into the modern document context layer
+       - [0:40](https://youtu.be/S-bRN-avZ4Q?t=40) for agents, and giving you a little bit of sense
+       - [0:42](https://youtu.be/S-bRN-avZ4Q?t=42) of kind of some of the core capabilities today,
+       - [0:44](https://youtu.be/S-bRN-avZ4Q?t=44) especially unlocking, you know, the vast trove
+       - [0:47](https://youtu.be/S-bRN-avZ4Q?t=47) of document-based data today, and give you a glimpse
+       - [0:49](https://youtu.be/S-bRN-avZ4Q?t=49) of what's next.
+       - [0:50](https://youtu.be/S-bRN-avZ4Q?t=50) All right, RAG in 2026.
+       - [0:52](https://youtu.be/S-bRN-avZ4Q?t=52) But before that, just a little bit about the company,
+       - [0:54](https://youtu.be/S-bRN-avZ4Q?t=54) and I'll kind of get on with the main talk.
+       - [0:56](https://youtu.be/S-bRN-avZ4Q?t=56) You might have seen us as a RAG framework.
+       - [0:58](https://youtu.be/S-bRN-avZ4Q?t=58) We started in 2023, got pretty popular, kind of create
+       - [1:01](https://youtu.be/S-bRN-avZ4Q?t=61) a lot of techniques around like advanced RAG,
+       - [1:03](https://youtu.be/S-bRN-avZ4Q?t=63) that type of stuff.
+       - [1:04](https://youtu.be/S-bRN-avZ4Q?t=64) Today, we're basically the main document infrastructure
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:28@78`
+     - (a) 전사 0:48~1:48
+       - [0:49](https://youtu.be/S-bRN-avZ4Q?t=49) of what's next.
+       - [0:50](https://youtu.be/S-bRN-avZ4Q?t=50) All right, RAG in 2026.
+       - [0:52](https://youtu.be/S-bRN-avZ4Q?t=52) But before that, just a little bit about the company,
+       - [0:54](https://youtu.be/S-bRN-avZ4Q?t=54) and I'll kind of get on with the main talk.
+       - [0:56](https://youtu.be/S-bRN-avZ4Q?t=56) You might have seen us as a RAG framework.
+       - [0:58](https://youtu.be/S-bRN-avZ4Q?t=58) We started in 2023, got pretty popular, kind of create
+       - [1:01](https://youtu.be/S-bRN-avZ4Q?t=61) a lot of techniques around like advanced RAG,
+       - [1:03](https://youtu.be/S-bRN-avZ4Q?t=63) that type of stuff.
+       - [1:04](https://youtu.be/S-bRN-avZ4Q?t=64) Today, we're basically the main document infrastructure
+       - [1:06](https://youtu.be/S-bRN-avZ4Q?t=66) for AI agents.
+       - [1:07](https://youtu.be/S-bRN-avZ4Q?t=67) We deliver the best platform for agents to actually read
+       - [1:10](https://youtu.be/S-bRN-avZ4Q?t=70) and operate over documents, and we see ourselves
+       - [1:12](https://youtu.be/S-bRN-avZ4Q?t=72) as unlocking basically the vast troves of document context,
+       - [1:15](https://youtu.be/S-bRN-avZ4Q?t=75) even as agents and models themselves get better.
+       - [1:17](https://youtu.be/S-bRN-avZ4Q?t=77) All right, so what does RAG actually mean in 2026,
+       - [1:22](https://youtu.be/S-bRN-avZ4Q?t=82) and how are agents actually inhaling and adjusting context
+       - [1:25](https://youtu.be/S-bRN-avZ4Q?t=85) today?
+       - [1:26](https://youtu.be/S-bRN-avZ4Q?t=86) This is a snapshot from actually three years ago,
+       - [1:30](https://youtu.be/S-bRN-avZ4Q?t=90) when I first gave a talk on this.
+       - [1:31](https://youtu.be/S-bRN-avZ4Q?t=91) And naive RAG was basically just building a simple chatbot
+       - [1:34](https://youtu.be/S-bRN-avZ4Q?t=94) over your private corpus of data.
+       - [1:36](https://youtu.be/S-bRN-avZ4Q?t=96) If you flashback all the way to January of like 2023,
+       - [1:39](https://youtu.be/S-bRN-avZ4Q?t=99) you know, this technique basically consisted of you have some corpus
+       - [1:42](https://youtu.be/S-bRN-avZ4Q?t=102) of documents, you chunk it up, embed it, and put it into a vector database.
+       - [1:46](https://youtu.be/S-bRN-avZ4Q?t=106) You do some naive top-k retrieval, and then you generate some stuff
+     - (b) 판독: 제목 `RAG in 2026`, 수치 없음
+       - ocr_text: RAG in 2026 LlamaIndex Redefine Document Workflows with AI Agents
+2. **검색 복잡도, 컨텍스트 관리, 오케스트레이션이 에이전트 레이어로 이동**
+   - `vd:28@152`
+     - (a) 전사 2:02~3:02
+       - [2:04](https://youtu.be/S-bRN-avZ4Q?t=124) and quite dramatically since then.
+       - [2:06](https://youtu.be/S-bRN-avZ4Q?t=126) One is agent loops and tool use have gone a lot, a lot better,
+       - [2:10](https://youtu.be/S-bRN-avZ4Q?t=130) especially as both the models and agent harnesses have increased.
+       - [2:14](https://youtu.be/S-bRN-avZ4Q?t=134) And there's basically a cleaner separation now
+       - [2:16](https://youtu.be/S-bRN-avZ4Q?t=136) between agent reasoning and how they actually interact with context.
+       - [2:19](https://youtu.be/S-bRN-avZ4Q?t=139) If you look at what I call kind of the modern generalized agent,
+       - [2:22](https://youtu.be/S-bRN-avZ4Q?t=142) which includes, you know, all your favorite applications and tools
+       - [2:25](https://youtu.be/S-bRN-avZ4Q?t=145) out there from Cloud Code, Cloud Cowork, OpenClaw, Codex,
+       - [2:28](https://youtu.be/S-bRN-avZ4Q?t=148) and a few others, you know, the retrieval complexity has started
+       - [2:32](https://youtu.be/S-bRN-avZ4Q?t=152) to get baked into the agent layer.
+       - [2:34](https://youtu.be/S-bRN-avZ4Q?t=154) So instead of coming up with a variety of hacks to really work
+       - [2:37](https://youtu.be/S-bRN-avZ4Q?t=157) around the limitations of naive top-k retrieval,
+       - [2:40](https://youtu.be/S-bRN-avZ4Q?t=160) you can start getting the agent to really reason about, for instance,
+       - [2:43](https://youtu.be/S-bRN-avZ4Q?t=163) the best keyword to search for, best, like, you know, search term
+       - [2:46](https://youtu.be/S-bRN-avZ4Q?t=166) to actually get back good results.
+       - [2:48](https://youtu.be/S-bRN-avZ4Q?t=168) Even if the retrieval tools are basic, the agent can input the right queries
+       - [2:52](https://youtu.be/S-bRN-avZ4Q?t=172) to basically loop upon itself and help solve the task at hand.
+       - [2:56](https://youtu.be/S-bRN-avZ4Q?t=176) Number two, context is moving up the stack.
+       - [2:58](https://youtu.be/S-bRN-avZ4Q?t=178) There's been a lot of conversations, I think, for the first two and a half years
+       - [3:02](https://youtu.be/S-bRN-avZ4Q?t=182) of Gen.AI of how do you actually manage the agent context window,
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:28@178`
+     - (a) 전사 2:28~3:28
+       - [2:28](https://youtu.be/S-bRN-avZ4Q?t=148) and a few others, you know, the retrieval complexity has started
+       - [2:32](https://youtu.be/S-bRN-avZ4Q?t=152) to get baked into the agent layer.
+       - [2:34](https://youtu.be/S-bRN-avZ4Q?t=154) So instead of coming up with a variety of hacks to really work
+       - [2:37](https://youtu.be/S-bRN-avZ4Q?t=157) around the limitations of naive top-k retrieval,
+       - [2:40](https://youtu.be/S-bRN-avZ4Q?t=160) you can start getting the agent to really reason about, for instance,
+       - [2:43](https://youtu.be/S-bRN-avZ4Q?t=163) the best keyword to search for, best, like, you know, search term
+       - [2:46](https://youtu.be/S-bRN-avZ4Q?t=166) to actually get back good results.
+       - [2:48](https://youtu.be/S-bRN-avZ4Q?t=168) Even if the retrieval tools are basic, the agent can input the right queries
+       - [2:52](https://youtu.be/S-bRN-avZ4Q?t=172) to basically loop upon itself and help solve the task at hand.
+       - [2:56](https://youtu.be/S-bRN-avZ4Q?t=176) Number two, context is moving up the stack.
+       - [2:58](https://youtu.be/S-bRN-avZ4Q?t=178) There's been a lot of conversations, I think, for the first two and a half years
+       - [3:02](https://youtu.be/S-bRN-avZ4Q?t=182) of Gen.AI of how do you actually manage the agent context window,
+       - [3:06](https://youtu.be/S-bRN-avZ4Q?t=186) make sure it doesn't overflow, that type of thing.
+       - [3:08](https://youtu.be/S-bRN-avZ4Q?t=188) But I think as, you know, a lot of the evolving techniques, compaction,
+       - [3:12](https://youtu.be/S-bRN-avZ4Q?t=192) long context have evolved, I think more and more of the conversation
+       - [3:16](https://youtu.be/S-bRN-avZ4Q?t=196) is actually how do you just hook up the right MCP servers and skills
+       - [3:19](https://youtu.be/S-bRN-avZ4Q?t=199) and tasks to the agent to enable it to do various types of tasks.
+       - [3:23](https://youtu.be/S-bRN-avZ4Q?t=203) And so that also applies to agent orchestration, right?
+       - [3:26](https://youtu.be/S-bRN-avZ4Q?t=206) Coding agents have gotten better.
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:28@208`
+     - (a) 전사 2:58~3:58
+       - [2:58](https://youtu.be/S-bRN-avZ4Q?t=178) There's been a lot of conversations, I think, for the first two and a half years
+       - [3:02](https://youtu.be/S-bRN-avZ4Q?t=182) of Gen.AI of how do you actually manage the agent context window,
+       - [3:06](https://youtu.be/S-bRN-avZ4Q?t=186) make sure it doesn't overflow, that type of thing.
+       - [3:08](https://youtu.be/S-bRN-avZ4Q?t=188) But I think as, you know, a lot of the evolving techniques, compaction,
+       - [3:12](https://youtu.be/S-bRN-avZ4Q?t=192) long context have evolved, I think more and more of the conversation
+       - [3:16](https://youtu.be/S-bRN-avZ4Q?t=196) is actually how do you just hook up the right MCP servers and skills
+       - [3:19](https://youtu.be/S-bRN-avZ4Q?t=199) and tasks to the agent to enable it to do various types of tasks.
+       - [3:23](https://youtu.be/S-bRN-avZ4Q?t=203) And so that also applies to agent orchestration, right?
+       - [3:26](https://youtu.be/S-bRN-avZ4Q?t=206) Coding agents have gotten better.
+       - [3:29](https://youtu.be/S-bRN-avZ4Q?t=209) Abstractions of actually defining what types of tasks and programs you want
+       - [3:32](https://youtu.be/S-bRN-avZ4Q?t=212) to build have moved a little bit upwards towards English as opposed to through code.
+       - [3:36](https://youtu.be/S-bRN-avZ4Q?t=216) And so maybe in 2023 to 2025, you define programs and you still build stuff
+       - [3:41](https://youtu.be/S-bRN-avZ4Q?t=221) via, like, importing Python, using TypeScript through code.
+       - [3:44](https://youtu.be/S-bRN-avZ4Q?t=224) It's pretty clear these days more and more people are just building stuff using English,
+       - [3:49](https://youtu.be/S-bRN-avZ4Q?t=229) whether you're a software engineer or you're in a non-technical function,
+       - [3:53](https://youtu.be/S-bRN-avZ4Q?t=233) like go-to-market marketing, and you're defining runbooks through English
+       - [3:56](https://youtu.be/S-bRN-avZ4Q?t=236) and kind of like defining the right goals and making sure that AI is aligned on the right task.
+     - (b) 판독: 제목 `The Modern Generalized Agent`, 수치 없음
+       - ocr_text: The Modern Generalized Agent Today's stack 1. Retrieval complexity is in the agent layer: Interleave simple tools (grep + CLI) with semantic search to achieve complex results. 2. Context is moving up the stack: Managing the agent context window → configure the right MCP servers and skills. 3. Agent Orchestration is moving up the stack: a. 2023-2025: define programs through code b. 2025-2026: define runbooks through English c. 2026+: define goals and alignment
+3. **에이전트 네이티브 문서 플랫폼의 파싱, 시맨틱 저장소, 워크플로 3층 구조**
+   - `vd:28@396`
+     - (a) 전사 6:06~7:06
+       - [6:10](https://youtu.be/S-bRN-avZ4Q?t=370) And so for us, we care a lot about how do you actually build the right tools
+       - [6:14](https://youtu.be/S-bRN-avZ4Q?t=374) and unlock the right context here.
+       - [6:16](https://youtu.be/S-bRN-avZ4Q?t=376) We see documents as universal containers for unstructured context.
+       - [6:21](https://youtu.be/S-bRN-avZ4Q?t=381) There's over 10 trillion-plus pages of human native knowledge
+       - [6:24](https://youtu.be/S-bRN-avZ4Q?t=384) locked up within PDFs, PowerPoints, Word documents, and Excel sheets.
+       - [6:27](https://youtu.be/S-bRN-avZ4Q?t=387) And at the same time, agents are also starting to generate exponentially more data
+       - [6:32](https://youtu.be/S-bRN-avZ4Q?t=392) in terms of, you know, more agent-native formats in terms of Markdown and HTML.
+       - [6:36](https://youtu.be/S-bRN-avZ4Q?t=396) So, for us, building an agent-native document platform contains three main pieces.
+       - [6:43](https://youtu.be/S-bRN-avZ4Q?t=403) It contains the document parsing layer, actually digitalizing the vast troves of PDFs,
+       - [6:48](https://youtu.be/S-bRN-avZ4Q?t=408) PowerPoints, and Word documents into kind of accurate, token-efficient context
+       - [6:53](https://youtu.be/S-bRN-avZ4Q?t=413) and feeding it, you know, either Markdown, metadata, and other forms
+       - [6:57](https://youtu.be/S-bRN-avZ4Q?t=417) to actually enable agents to do stuff over your documents.
+       - [7:00](https://youtu.be/S-bRN-avZ4Q?t=420) The next is actually what we call the semantic and storage layer,
+       - [7:04](https://youtu.be/S-bRN-avZ4Q?t=424) which is kind of like this concept of document management for humans and agents.
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:28@422`
+     - (a) 전사 6:32~7:32
+       - [6:32](https://youtu.be/S-bRN-avZ4Q?t=392) in terms of, you know, more agent-native formats in terms of Markdown and HTML.
+       - [6:36](https://youtu.be/S-bRN-avZ4Q?t=396) So, for us, building an agent-native document platform contains three main pieces.
+       - [6:43](https://youtu.be/S-bRN-avZ4Q?t=403) It contains the document parsing layer, actually digitalizing the vast troves of PDFs,
+       - [6:48](https://youtu.be/S-bRN-avZ4Q?t=408) PowerPoints, and Word documents into kind of accurate, token-efficient context
+       - [6:53](https://youtu.be/S-bRN-avZ4Q?t=413) and feeding it, you know, either Markdown, metadata, and other forms
+       - [6:57](https://youtu.be/S-bRN-avZ4Q?t=417) to actually enable agents to do stuff over your documents.
+       - [7:00](https://youtu.be/S-bRN-avZ4Q?t=420) The next is actually what we call the semantic and storage layer,
+       - [7:04](https://youtu.be/S-bRN-avZ4Q?t=424) which is kind of like this concept of document management for humans and agents.
+       - [7:08](https://youtu.be/S-bRN-avZ4Q?t=428) Instead of humans opening up Microsoft Word using your file system or file storage,
+       - [7:13](https://youtu.be/S-bRN-avZ4Q?t=433) how do you create some sort of agent interface that actually captures,
+       - [7:16](https://youtu.be/S-bRN-avZ4Q?t=436) stores all your documents, and enables agents to actually manage and operate over them
+       - [7:20](https://youtu.be/S-bRN-avZ4Q?t=440) in various ways?
+       - [7:22](https://youtu.be/S-bRN-avZ4Q?t=442) And then there's still room for actually kind of repeatable document workflows
+       - [7:26](https://youtu.be/S-bRN-avZ4Q?t=446) that the agent layer, they can actually encode within the,
+       - [7:29](https://youtu.be/S-bRN-avZ4Q?t=449) within like this type of platform, too.
+       - [7:32](https://youtu.be/S-bRN-avZ4Q?t=452) If there is a repeatable workflow, like invoice processing, KYC, or claims,
+     - (b) 판독: 제목 `Building an Agent-Native Document Platform`, 수치 10T+(high, pages of human-created documents)
+       - ocr_text: Building an Agent-Native Document Platform Agent Document Context Layer Parsing Layer Semantic and Storage Layer Agentic Workflow Layer Digitalize the 10T+ pages of human-created documents into accurate, token-efficient context. Document management for humans and agents. Edit, version, and collaborate over documents. Hillclimb repeatable workflows over documents to optimize accuracy and lower cost.
+4. **PDF 내부 구조가 기계 해석에 부적합해 문서 OCR 필요**
+   - `vd:28@524`
+     - (a) 전사 8:14~9:14
+       - [8:16](https://youtu.be/S-bRN-avZ4Q?t=496) where agents and humans can collaborate on documents and actually do work over them.
+       - [8:20](https://youtu.be/S-bRN-avZ4Q?t=500) So, we'll start with the first section, and maybe start kind of with the document OCR piece.
+       - [8:27](https://youtu.be/S-bRN-avZ4Q?t=507) First off, you know, document OCR is hard.
+       - [8:31](https://youtu.be/S-bRN-avZ4Q?t=511) Some of you might have seen a blog post that we put out a few months ago related to this topic.
+       - [8:35](https://youtu.be/S-bRN-avZ4Q?t=515) But the reason this problem even exists is an agent cannot actually take the raw PDF file binary and make sense of it.
+       - [8:44](https://youtu.be/S-bRN-avZ4Q?t=524) That's because the way PDFs are actually stored as a format is it's rendered for kind of like display purposes,
+       - [8:51](https://youtu.be/S-bRN-avZ4Q?t=531) and not really for, you know, machine consumption in an interpretable manner.
+       - [8:56](https://youtu.be/S-bRN-avZ4Q?t=536) They're designed for printing. So, basically, text are represented as almost like individual glyphs with coordinates.
+       - [9:03](https://youtu.be/S-bRN-avZ4Q?t=543) Tables are not represented as tables. They're represented as like typically line segments drawn with various types of borders,
+       - [9:10](https://youtu.be/S-bRN-avZ4Q?t=550) and also text drawn as certain cell positions.
+       - [9:13](https://youtu.be/S-bRN-avZ4Q?t=553) And so, if you're kind of an agent that's trying to make sense of this like document,
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:28@525`
+     - (a) 전사 8:15~9:15
+       - [8:16](https://youtu.be/S-bRN-avZ4Q?t=496) where agents and humans can collaborate on documents and actually do work over them.
+       - [8:20](https://youtu.be/S-bRN-avZ4Q?t=500) So, we'll start with the first section, and maybe start kind of with the document OCR piece.
+       - [8:27](https://youtu.be/S-bRN-avZ4Q?t=507) First off, you know, document OCR is hard.
+       - [8:31](https://youtu.be/S-bRN-avZ4Q?t=511) Some of you might have seen a blog post that we put out a few months ago related to this topic.
+       - [8:35](https://youtu.be/S-bRN-avZ4Q?t=515) But the reason this problem even exists is an agent cannot actually take the raw PDF file binary and make sense of it.
+       - [8:44](https://youtu.be/S-bRN-avZ4Q?t=524) That's because the way PDFs are actually stored as a format is it's rendered for kind of like display purposes,
+       - [8:51](https://youtu.be/S-bRN-avZ4Q?t=531) and not really for, you know, machine consumption in an interpretable manner.
+       - [8:56](https://youtu.be/S-bRN-avZ4Q?t=536) They're designed for printing. So, basically, text are represented as almost like individual glyphs with coordinates.
+       - [9:03](https://youtu.be/S-bRN-avZ4Q?t=543) Tables are not represented as tables. They're represented as like typically line segments drawn with various types of borders,
+       - [9:10](https://youtu.be/S-bRN-avZ4Q?t=550) and also text drawn as certain cell positions.
+       - [9:13](https://youtu.be/S-bRN-avZ4Q?t=553) And so, if you're kind of an agent that's trying to make sense of this like document,
+     - (b) 판독: 제목 `Document OCR is Hard`, 수치 90%(high, of the world's data lies in unstructured documents)
+       - ocr_text: Document OCR is Hard 90% of the world's data lies in unstructured documents like PDFs, Powerpoints, Word, Excel These documents are not natively machine readable and require machine learning to extract information PDF The quick brown fox jumps over the lazy dog. [clean text] What you see PDF B1 /F0 12 Tf 10 0 172 740 Tm (The quick bro ) Tj 10 0 168 740 Tm (wn T) 10 0 172 726 Tm (lx jumps over ) Tj ET What the PDF actually stores What You See vs. What the PDF Stores Llamaindex - Redefine Document Workflows with AI Agents
+5. **파이프라인과 VLM을 결합한 하이브리드 OCR 방식**
+   - `vd:28@712`
+     - (a) 전사 11:22~12:22
+       - [11:23](https://youtu.be/S-bRN-avZ4Q?t=683) This works decently well, obviously.
+       - [11:25](https://youtu.be/S-bRN-avZ4Q?t=685) You know, I think there's kind of a lot of uplift you can get by being able to read the visual structure,
+       - [11:29](https://youtu.be/S-bRN-avZ4Q?t=689) but there's a lot of suboptimal pieces about it.
+       - [11:33](https://youtu.be/S-bRN-avZ4Q?t=693) It can hallucinate on text-only pages.
+       - [11:35](https://youtu.be/S-bRN-avZ4Q?t=695) It costs a ton of money, and also it still lacks a lot of the semantics and grounding that you typically expect with some sort of document processing tool.
+       - [11:44](https://youtu.be/S-bRN-avZ4Q?t=704) And so for us, we really think about combining both the pipeline-based approaches of deeply understanding the file containers and binaries
+       - [11:52](https://youtu.be/S-bRN-avZ4Q?t=712) with the vision-based approaches to help generate, you know, kind of a hybrid approach that we think is at the Pareto frontier of cost and accuracy.
+       - [11:59](https://youtu.be/S-bRN-avZ4Q?t=719) A quick note on this, I'll probably just like skim the high level, but the Pareto frontier for document OCR will always be like much more accurate and cheap compared to the Pareto frontier for, you know,
+       - [12:13](https://youtu.be/S-bRN-avZ4Q?t=733) wherever the frontier models are in terms of document understanding.
+       - [12:16](https://youtu.be/S-bRN-avZ4Q?t=736) It's because it's a very specific data type, and there's always ways to kind of like distill the latest visual understanding capabilities from, you know, Gemini, GPT, Opus,
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:28@680`
+     - (a) 전사 10:50~11:50
+       - [10:53](https://youtu.be/S-bRN-avZ4Q?t=653) handwritten like techniques to analyze like kind of various pieces of text, group them into clusters and identify tables, paragraphs,
+       - [11:01](https://youtu.be/S-bRN-avZ4Q?t=661) and be able to kind of like generate some sort of output representation.
+       - [11:05](https://youtu.be/S-bRN-avZ4Q?t=665) A lot of basic techniques if you use open source libraries like PyPDF, PyMUPDF, and of course, like some of the more recent approaches,
+       - [11:13](https://youtu.be/S-bRN-avZ4Q?t=673) basically use this type of approach.
+       - [11:15](https://youtu.be/S-bRN-avZ4Q?t=675) There's also, of course, using a VLM to one-shot a document into text.
+       - [11:20](https://youtu.be/S-bRN-avZ4Q?t=680) That's what we call like a vision-based approach.
+       - [11:23](https://youtu.be/S-bRN-avZ4Q?t=683) This works decently well, obviously.
+       - [11:25](https://youtu.be/S-bRN-avZ4Q?t=685) You know, I think there's kind of a lot of uplift you can get by being able to read the visual structure,
+       - [11:29](https://youtu.be/S-bRN-avZ4Q?t=689) but there's a lot of suboptimal pieces about it.
+       - [11:33](https://youtu.be/S-bRN-avZ4Q?t=693) It can hallucinate on text-only pages.
+       - [11:35](https://youtu.be/S-bRN-avZ4Q?t=695) It costs a ton of money, and also it still lacks a lot of the semantics and grounding that you typically expect with some sort of document processing tool.
+       - [11:44](https://youtu.be/S-bRN-avZ4Q?t=704) And so for us, we really think about combining both the pipeline-based approaches of deeply understanding the file containers and binaries
+     - (b) 판독: 제목 `An Evolution of Approaches`, 수치 없음
+       - ocr_text: An Evolution of Approaches 1. Deterministic Pipelines: Heuristics and ML models 2. Vision Models 3. Hybrid Approach (Ours) pipeline approach model approach hybrid approach page image text direction chat recog layout analysis output each stage independent page image [VLM] Structured Output reasons about everything together PDF page layout detection Text extraction (body text) fast / $ VLM processing (tables, charts) agent validation structured output (markdown + metadata bounding boxes) Liamindex - Redefine Document Workflows with AI Agents
+6. **ParseBench와 LlamaParse, LiteParse로 정확도-비용-지연 영역별 처리**
+   - `vd:28@816`
+     - (a) 전사 13:06~14:06
+       - [13:10](https://youtu.be/S-bRN-avZ4Q?t=790) because basically if you're within an enterprise organization and you have a massive long tail of documents across financial services,
+       - [13:17](https://youtu.be/S-bRN-avZ4Q?t=797) insurance, manufacturing, legal, government, and a bunch of others,
+       - [13:21](https://youtu.be/S-bRN-avZ4Q?t=801) there's just a lot of complexity in a lot of these document types.
+       - [13:24](https://youtu.be/S-bRN-avZ4Q?t=804) And if you're actually trying to unlock context at scale, most of the models are not up for the task.
+       - [13:30](https://youtu.be/S-bRN-avZ4Q?t=810) And so we've created this thing called ParseBench, which is a comprehensive enterprise document benchmark for agents.
+       - [13:36](https://youtu.be/S-bRN-avZ4Q?t=816) We think about it as the most comprehensive enterprise document benchmark.
+       - [13:40](https://youtu.be/S-bRN-avZ4Q?t=820) You know, it contains 2,000 human verified pages.
+       - [13:43](https://youtu.be/S-bRN-avZ4Q?t=823) It measures tables, charts, content faithfulness, semantic formatting,
+       - [13:47](https://youtu.be/S-bRN-avZ4Q?t=827) and it's optimized for just how AI agents are actually able to understand these documents instead of like syntactic correctness.
+       - [13:54](https://youtu.be/S-bRN-avZ4Q?t=834) If you look at parsebench.ai, which is, you know, kind of the, it's a fully public page on the internet.
+       - [14:01](https://youtu.be/S-bRN-avZ4Q?t=841) It's also available on HuggingFace and Kaggle.
+       - [14:04](https://youtu.be/S-bRN-avZ4Q?t=844) We benchmark probably like 50 different frontier models, open weight models, specialized OCR solutions.
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:28@873`
+     - (a) 전사 14:03~15:03
+       - [14:04](https://youtu.be/S-bRN-avZ4Q?t=844) We benchmark probably like 50 different frontier models, open weight models, specialized OCR solutions.
+       - [14:09](https://youtu.be/S-bRN-avZ4Q?t=849) And you really want the Pareto curve to kind of be towards the left and up in terms of accuracy,
+       - [14:15](https://youtu.be/S-bRN-avZ4Q?t=855) like extremely high accuracy, but also extremely low cost.
+       - [14:19](https://youtu.be/S-bRN-avZ4Q?t=859) And there's just so many different types of documents where some are a little bit simpler,
+       - [14:24](https://youtu.be/S-bRN-avZ4Q?t=864) maybe some are a little bit more complex.
+       - [14:26](https://youtu.be/S-bRN-avZ4Q?t=866) And ideally you want to cover all the points on the curve to deal with the dynamic distribution of data.
+       - [14:31](https://youtu.be/S-bRN-avZ4Q?t=871) various types of documents out there.
+       - [14:33](https://youtu.be/S-bRN-avZ4Q?t=873) It's pretty clear, even if you look at this graph, that it's like, you can increase the complexity of the benchmark.
+       - [14:38](https://youtu.be/S-bRN-avZ4Q?t=878) And that document understanding is definitely not 100% solved.
+       - [14:42](https://youtu.be/S-bRN-avZ4Q?t=882) But, you know, you fundamentally need to kind of advance a lot of the core capabilities
+       - [14:46](https://youtu.be/S-bRN-avZ4Q?t=886) to make sure that you're able to process, unlock the vast troves of enterprise context out there.
+       - [14:54](https://youtu.be/S-bRN-avZ4Q?t=894) There's kind of like a few different points on this accuracy, cost, latency, Pareto curve.
+       - [14:58](https://youtu.be/S-bRN-avZ4Q?t=898) There's what I call like the high accuracy regime, where like, you know, some institutions basically need like 99 to almost 100% accuracy.
+     - (b) 판독: 제목 `ParseBench: An Enterprise Document Benchmark for Agents`, 수치 100%(high, parser score (no parser gets close to))
+       - ocr_text: ParseBench: An Enterprise Document Benchmark for Agents We evaluate frontier models, OSS models, specialized parse providers (including LlamaParse) No parser gets close to 100%, the benchmark is meant to be hard! Overall vs. Cost LlamaParse VLMs Specialized Document Parsers LP Agentic LP Cost-Eff Gemini (high) Reducto (agentic) Gemini (mini) Reducto GPT-5.4 Azure DI Extend Haku 4.5 (think) Opus 4.6 Google DocAI Gemini Pro GPT-mini (mini) Texttract GPT-mini (med) Haku 4.5 LandingAI Overall score (%) Cost per page (cents)
+   - `vd:28@900`
+     - (a) 전사 14:30~15:30
+       - [14:31](https://youtu.be/S-bRN-avZ4Q?t=871) various types of documents out there.
+       - [14:33](https://youtu.be/S-bRN-avZ4Q?t=873) It's pretty clear, even if you look at this graph, that it's like, you can increase the complexity of the benchmark.
+       - [14:38](https://youtu.be/S-bRN-avZ4Q?t=878) And that document understanding is definitely not 100% solved.
+       - [14:42](https://youtu.be/S-bRN-avZ4Q?t=882) But, you know, you fundamentally need to kind of advance a lot of the core capabilities
+       - [14:46](https://youtu.be/S-bRN-avZ4Q?t=886) to make sure that you're able to process, unlock the vast troves of enterprise context out there.
+       - [14:54](https://youtu.be/S-bRN-avZ4Q?t=894) There's kind of like a few different points on this accuracy, cost, latency, Pareto curve.
+       - [14:58](https://youtu.be/S-bRN-avZ4Q?t=898) There's what I call like the high accuracy regime, where like, you know, some institutions basically need like 99 to almost 100% accuracy.
+       - [15:06](https://youtu.be/S-bRN-avZ4Q?t=906) Because basically the downside of incorrect extraction is you completely mess up your financial model.
+       - [15:11](https://youtu.be/S-bRN-avZ4Q?t=911) You completely, you know, you basically get flagged for fraud or a bunch of other really, really bad things.
+       - [15:16](https://youtu.be/S-bRN-avZ4Q?t=916) And regulated industries like insurance and financial services, we see this a decent amount.
+       - [15:21](https://youtu.be/S-bRN-avZ4Q?t=921) This typically means you're willing to pay a little bit more money per page for like deeper agentic reasoning to at least make sure that you get back the information in the right format.
+       - [15:30](https://youtu.be/S-bRN-avZ4Q?t=930) There's also like the low cost regime.
+     - (b) 판독: 제목 `The Accuracy-Cost-Latency Pareto Curve`, 수치 99%(high, High Accuracy Regime accuracy), 1M(high, Low Cost Regime volume)
+       - ocr_text: The Accuracy-Cost-Latency Pareto Curve 1. High Accuracy Regime: require ~99%+ accuracy, price insensitive • e.g. financial data room extraction 2. Low Cost Regime: require 1M docs per day, accuracy above min threshold • e.g. offline indexing a petabyte of Sharepoint data for retrieval 3. Low Latency/Low Cost Regime: require parsing massive volumes in seconds, price sensitive • e.g. real-time file uploads to Cowork VLM-based approaches are primarily good for latency-insensitive batch processing. They are not great in the agent loop. Overall vs. Cost LP Agentic LlamaParse VLMs Specialized Document Parsers LP Cost-Eff Gemini (high) Reducto (agentic) Gemini (mini) Reducto Azure Di GPT-5.4 Extend GPT-4.5 (think) Opus 4.6 Google DocAI Texttract GPT-mini (med) GPT-mini (min) Haku 4.5 LandingAI Ll
+   - `vd:28@1014`
+     - (a) 전사 16:24~17:24
+       - [16:26](https://youtu.be/S-bRN-avZ4Q?t=986) And to be fair, that includes ours too.
+       - [16:30](https://youtu.be/S-bRN-avZ4Q?t=990) I think in general, there's also some sort of need for an extremely low latency solution so that you can actually process stuff in real time, even if you have like deeper VLM enabled processing for kind of like deeper visual inspection and analysis.
+       - [16:44](https://youtu.be/S-bRN-avZ4Q?t=1004) And so that's what I call it kind of being in the agent loop.
+       - [16:47](https://youtu.be/S-bRN-avZ4Q?t=1007) So besides LamaParse, which is kind of our commercial service around like document processing and extraction, we also created this tool called LightParse.
+       - [16:54](https://youtu.be/S-bRN-avZ4Q?t=1014) It is surprisingly really, really good.
+       - [16:57](https://youtu.be/S-bRN-avZ4Q?t=1017) I don't know if you've been following some of the Twitter threads, but it is Rust based.
+       - [17:01](https://youtu.be/S-bRN-avZ4Q?t=1021) It is the fastest open source parser out there.
+       - [17:04](https://youtu.be/S-bRN-avZ4Q?t=1024) It is completely free.
+       - [17:05](https://youtu.be/S-bRN-avZ4Q?t=1025) And there's basically no strings attached.
+       - [17:07](https://youtu.be/S-bRN-avZ4Q?t=1027) I think it's like MIT or Apache license.
+       - [17:09](https://youtu.be/S-bRN-avZ4Q?t=1029) And it basically is the most accurate like markdown parser out there that doesn't use a VLM or any sort of kind of like deeper model.
+       - [17:17](https://youtu.be/S-bRN-avZ4Q?t=1037) And so this is kind of nice because you can use it as a default in the assistive agent loop.
+       - [17:23](https://youtu.be/S-bRN-avZ4Q?t=1043) Let's say you're uploading a bunch of documents to Cloud Code, Cloud Code, Codex, and you want it to process like a thousand PDFs extremely quickly.
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:28@1063`
+     - (a) 전사 17:13~18:13
+       - [17:17](https://youtu.be/S-bRN-avZ4Q?t=1037) And so this is kind of nice because you can use it as a default in the assistive agent loop.
+       - [17:23](https://youtu.be/S-bRN-avZ4Q?t=1043) Let's say you're uploading a bunch of documents to Cloud Code, Cloud Code, Codex, and you want it to process like a thousand PDFs extremely quickly.
+       - [17:31](https://youtu.be/S-bRN-avZ4Q?t=1051) You can always do that.
+       - [17:33](https://youtu.be/S-bRN-avZ4Q?t=1053) And then, you know, equip a VLM based parser like LamaParse or other frontier models as a tool.
+       - [17:38](https://youtu.be/S-bRN-avZ4Q?t=1058) So what these agents will do is they'll do like a fast pass over all the documents first.
+       - [17:43](https://youtu.be/S-bRN-avZ4Q?t=1063) Kind of like just scan through all the context extremely efficiently.
+       - [17:47](https://youtu.be/S-bRN-avZ4Q?t=1067) And then if it actually needs to dive into a page with like tables, with like charts, and actually needs to more deeply understand the values,
+       - [17:54](https://youtu.be/S-bRN-avZ4Q?t=1074) OU is a VLM based tool, slower processing to actually make sure it reads the information correctly.
+       - [17:59](https://youtu.be/S-bRN-avZ4Q?t=1079) This is available as a one-click installable skill.
+       - [18:02](https://youtu.be/S-bRN-avZ4Q?t=1082) Compliments kind of any other deeper VLM based OCR tool you want to use.
+       - [18:06](https://youtu.be/S-bRN-avZ4Q?t=1086) And we kind of designed to make it as fast as possible and also easy to plug in to your favorite AI agent.
+     - (b) 판독: 제목 `LiteParse: Fast, Free, Surprisingly Good Parsing`, 수치 16(high, Paste 16 page(s) in 0.03s), 0.03s(high, Paste 16 page(s) in 0.03s)
+       - ocr_text: LiteParse: Fast, Free, Surprisingly Good Parsing It is perfect as a default in the assistive agent loop: Extremely fast over any set of data Good enough that the agent can do text search The agent can decide to "zoom-in" with a VLM-based OCR tool if it needs to do deep analysis. Drop a PDF here or click to browse Paste 16 page(s) in 0.03s Output: JSON (with bounding boxes) Wrap: On LlamaIndex - Redefine Document Workflows with AI Agents
+
+### timeline
+
+- **0:00 발표자 소개와 주제 개요**
+  - [0:00](https://youtu.be/S-bRN-avZ4Q?t=0) Hey everyone, I'm Jerry, co-founder and CEO of Lama Index,
+  - [0:03](https://youtu.be/S-bRN-avZ4Q?t=3) and today I'm excited to give a talk called
+  - [0:05](https://youtu.be/S-bRN-avZ4Q?t=5) Building the Document Context Layer for AI Agents.
+  - [0:09](https://youtu.be/S-bRN-avZ4Q?t=9) Really big shout out to the AI Engineer World Fair
+  - [0:11](https://youtu.be/S-bRN-avZ4Q?t=11) for hosting, and if you've seen some of my earlier talks
+  - [0:14](https://youtu.be/S-bRN-avZ4Q?t=14) from the previous AI Engineer conferences,
+  - [0:17](https://youtu.be/S-bRN-avZ4Q?t=17) we've kind of traced through a lot of the evolution
+  - [0:19](https://youtu.be/S-bRN-avZ4Q?t=19) of how, you know, agent advances have correlated
+  - [0:22](https://youtu.be/S-bRN-avZ4Q?t=22) with, you know, how you inject context
+  - [0:24](https://youtu.be/S-bRN-avZ4Q?t=24) into evolving applications.
+  - [0:26](https://youtu.be/S-bRN-avZ4Q?t=26) And so today in 2026, we'll kind of talk
+  - [0:28](https://youtu.be/S-bRN-avZ4Q?t=28) about three main topics.
+  - [0:30](https://youtu.be/S-bRN-avZ4Q?t=30) One is, you know, what is RAG in 2026?
+- **1:18 2026년 RAG 정의** (slide)
+  - [0:49](https://youtu.be/S-bRN-avZ4Q?t=49) of what's next.
+  - [0:50](https://youtu.be/S-bRN-avZ4Q?t=50) All right, RAG in 2026.
+  - [0:52](https://youtu.be/S-bRN-avZ4Q?t=52) But before that, just a little bit about the company,
+  - [0:54](https://youtu.be/S-bRN-avZ4Q?t=54) and I'll kind of get on with the main talk.
+  - [0:56](https://youtu.be/S-bRN-avZ4Q?t=56) You might have seen us as a RAG framework.
+  - [0:58](https://youtu.be/S-bRN-avZ4Q?t=58) We started in 2023, got pretty popular, kind of create
+  - [1:01](https://youtu.be/S-bRN-avZ4Q?t=61) a lot of techniques around like advanced RAG,
+  - [1:03](https://youtu.be/S-bRN-avZ4Q?t=63) that type of stuff.
+  - [1:04](https://youtu.be/S-bRN-avZ4Q?t=64) Today, we're basically the main document infrastructure
+  - [1:06](https://youtu.be/S-bRN-avZ4Q?t=66) for AI agents.
+  - [1:07](https://youtu.be/S-bRN-avZ4Q?t=67) We deliver the best platform for agents to actually read
+  - [1:10](https://youtu.be/S-bRN-avZ4Q?t=70) and operate over documents, and we see ourselves
+  - [1:12](https://youtu.be/S-bRN-avZ4Q?t=72) as unlocking basically the vast troves of document context,
+  - [1:15](https://youtu.be/S-bRN-avZ4Q?t=75) even as agents and models themselves get better.
+  - [1:17](https://youtu.be/S-bRN-avZ4Q?t=77) All right, so what does RAG actually mean in 2026,
+  - [1:22](https://youtu.be/S-bRN-avZ4Q?t=82) and how are agents actually inhaling and adjusting context
+  - [1:25](https://youtu.be/S-bRN-avZ4Q?t=85) today?
+  - [1:26](https://youtu.be/S-bRN-avZ4Q?t=86) This is a snapshot from actually three years ago,
+  - [1:30](https://youtu.be/S-bRN-avZ4Q?t=90) when I first gave a talk on this.
+  - [1:31](https://youtu.be/S-bRN-avZ4Q?t=91) And naive RAG was basically just building a simple chatbot
+  - [1:34](https://youtu.be/S-bRN-avZ4Q?t=94) over your private corpus of data.
+  - [1:36](https://youtu.be/S-bRN-avZ4Q?t=96) If you flashback all the way to January of like 2023,
+  - [1:39](https://youtu.be/S-bRN-avZ4Q?t=99) you know, this technique basically consisted of you have some corpus
+  - [1:42](https://youtu.be/S-bRN-avZ4Q?t=102) of documents, you chunk it up, embed it, and put it into a vector database.
+  - [1:46](https://youtu.be/S-bRN-avZ4Q?t=106) You do some naive top-k retrieval, and then you generate some stuff
+- **3:28 현대 일반 에이전트 스택** (slide)
+  - [2:58](https://youtu.be/S-bRN-avZ4Q?t=178) There's been a lot of conversations, I think, for the first two and a half years
+  - [3:02](https://youtu.be/S-bRN-avZ4Q?t=182) of Gen.AI of how do you actually manage the agent context window,
+  - [3:06](https://youtu.be/S-bRN-avZ4Q?t=186) make sure it doesn't overflow, that type of thing.
+  - [3:08](https://youtu.be/S-bRN-avZ4Q?t=188) But I think as, you know, a lot of the evolving techniques, compaction,
+  - [3:12](https://youtu.be/S-bRN-avZ4Q?t=192) long context have evolved, I think more and more of the conversation
+  - [3:16](https://youtu.be/S-bRN-avZ4Q?t=196) is actually how do you just hook up the right MCP servers and skills
+  - [3:19](https://youtu.be/S-bRN-avZ4Q?t=199) and tasks to the agent to enable it to do various types of tasks.
+  - [3:23](https://youtu.be/S-bRN-avZ4Q?t=203) And so that also applies to agent orchestration, right?
+  - [3:26](https://youtu.be/S-bRN-avZ4Q?t=206) Coding agents have gotten better.
+  - [3:29](https://youtu.be/S-bRN-avZ4Q?t=209) Abstractions of actually defining what types of tasks and programs you want
+  - [3:32](https://youtu.be/S-bRN-avZ4Q?t=212) to build have moved a little bit upwards towards English as opposed to through code.
+  - [3:36](https://youtu.be/S-bRN-avZ4Q?t=216) And so maybe in 2023 to 2025, you define programs and you still build stuff
+  - [3:41](https://youtu.be/S-bRN-avZ4Q?t=221) via, like, importing Python, using TypeScript through code.
+  - [3:44](https://youtu.be/S-bRN-avZ4Q?t=224) It's pretty clear these days more and more people are just building stuff using English,
+  - [3:49](https://youtu.be/S-bRN-avZ4Q?t=229) whether you're a software engineer or you're in a non-technical function,
+  - [3:53](https://youtu.be/S-bRN-avZ4Q?t=233) like go-to-market marketing, and you're defining runbooks through English
+  - [3:56](https://youtu.be/S-bRN-avZ4Q?t=236) and kind of like defining the right goals and making sure that AI is aligned on the right task.
+- **5:00 문서 컨텍스트 레이어** (slide)
+  - [4:31](https://youtu.be/S-bRN-avZ4Q?t=271) Obviously, there's been a lot of discussion on how this will evolve even more,
+  - [4:35](https://youtu.be/S-bRN-avZ4Q?t=275) and we do see AI agents as behaving even more autonomously through solving long horizon tasks,
+  - [4:41](https://youtu.be/S-bRN-avZ4Q?t=281) looping upon themselves to be able to achieve a goal.
+  - [4:43](https://youtu.be/S-bRN-avZ4Q?t=283) So the future will move towards a state where you actually might not even have to define the task in English,
+  - [4:48](https://youtu.be/S-bRN-avZ4Q?t=288) but actually more the goal and a scoring rubric,
+  - [4:51](https://youtu.be/S-bRN-avZ4Q?t=291) and then the agent will use all available contexts available to it to actually solve the task.
+  - [4:55](https://youtu.be/S-bRN-avZ4Q?t=295) So with that overall framing, let's talk about what kind of is a pretty core focus for us as a company,
+  - [5:02](https://youtu.be/S-bRN-avZ4Q?t=302) which is basically helping to unlock unstructured context to basically feed into these agents even as they get really, really good,
+  - [5:09](https://youtu.be/S-bRN-avZ4Q?t=309) both in terms of the core model capabilities as well as the agent harness.
+  - [5:13](https://youtu.be/S-bRN-avZ4Q?t=313) And we'll focus a lot on our core focus area, which is document context,
+  - [5:17](https://youtu.be/S-bRN-avZ4Q?t=317) but of course there's plenty of other sources of context as well.
+  - [5:20](https://youtu.be/S-bRN-avZ4Q?t=320) In fact, we do think context really is everything.
+  - [5:24](https://youtu.be/S-bRN-avZ4Q?t=324) In the end, you could have an infinitely smart agent,
+  - [5:27](https://youtu.be/S-bRN-avZ4Q?t=327) but your ability to actually get value out of this infinitely smart agent
+- **7:02 에이전트 네이티브 문서 플랫폼 3층 구조** (slide)
+  - [6:32](https://youtu.be/S-bRN-avZ4Q?t=392) in terms of, you know, more agent-native formats in terms of Markdown and HTML.
+  - [6:36](https://youtu.be/S-bRN-avZ4Q?t=396) So, for us, building an agent-native document platform contains three main pieces.
+  - [6:43](https://youtu.be/S-bRN-avZ4Q?t=403) It contains the document parsing layer, actually digitalizing the vast troves of PDFs,
+  - [6:48](https://youtu.be/S-bRN-avZ4Q?t=408) PowerPoints, and Word documents into kind of accurate, token-efficient context
+  - [6:53](https://youtu.be/S-bRN-avZ4Q?t=413) and feeding it, you know, either Markdown, metadata, and other forms
+  - [6:57](https://youtu.be/S-bRN-avZ4Q?t=417) to actually enable agents to do stuff over your documents.
+  - [7:00](https://youtu.be/S-bRN-avZ4Q?t=420) The next is actually what we call the semantic and storage layer,
+  - [7:04](https://youtu.be/S-bRN-avZ4Q?t=424) which is kind of like this concept of document management for humans and agents.
+  - [7:08](https://youtu.be/S-bRN-avZ4Q?t=428) Instead of humans opening up Microsoft Word using your file system or file storage,
+  - [7:13](https://youtu.be/S-bRN-avZ4Q?t=433) how do you create some sort of agent interface that actually captures,
+  - [7:16](https://youtu.be/S-bRN-avZ4Q?t=436) stores all your documents, and enables agents to actually manage and operate over them
+  - [7:20](https://youtu.be/S-bRN-avZ4Q?t=440) in various ways?
+  - [7:22](https://youtu.be/S-bRN-avZ4Q?t=442) And then there's still room for actually kind of repeatable document workflows
+  - [7:26](https://youtu.be/S-bRN-avZ4Q?t=446) that the agent layer, they can actually encode within the,
+  - [7:29](https://youtu.be/S-bRN-avZ4Q?t=449) within like this type of platform, too.
+  - [7:32](https://youtu.be/S-bRN-avZ4Q?t=452) If there is a repeatable workflow, like invoice processing, KYC, or claims,
+- **8:45 문서 OCR의 어려움** (slide)
+  - [8:16](https://youtu.be/S-bRN-avZ4Q?t=496) where agents and humans can collaborate on documents and actually do work over them.
+  - [8:20](https://youtu.be/S-bRN-avZ4Q?t=500) So, we'll start with the first section, and maybe start kind of with the document OCR piece.
+  - [8:27](https://youtu.be/S-bRN-avZ4Q?t=507) First off, you know, document OCR is hard.
+  - [8:31](https://youtu.be/S-bRN-avZ4Q?t=511) Some of you might have seen a blog post that we put out a few months ago related to this topic.
+  - [8:35](https://youtu.be/S-bRN-avZ4Q?t=515) But the reason this problem even exists is an agent cannot actually take the raw PDF file binary and make sense of it.
+  - [8:44](https://youtu.be/S-bRN-avZ4Q?t=524) That's because the way PDFs are actually stored as a format is it's rendered for kind of like display purposes,
+  - [8:51](https://youtu.be/S-bRN-avZ4Q?t=531) and not really for, you know, machine consumption in an interpretable manner.
+  - [8:56](https://youtu.be/S-bRN-avZ4Q?t=536) They're designed for printing. So, basically, text are represented as almost like individual glyphs with coordinates.
+  - [9:03](https://youtu.be/S-bRN-avZ4Q?t=543) Tables are not represented as tables. They're represented as like typically line segments drawn with various types of borders,
+  - [9:10](https://youtu.be/S-bRN-avZ4Q?t=550) and also text drawn as certain cell positions.
+  - [9:13](https://youtu.be/S-bRN-avZ4Q?t=553) And so, if you're kind of an agent that's trying to make sense of this like document,
+- **11:20 OCR 접근법 진화** (slide)
+  - [10:53](https://youtu.be/S-bRN-avZ4Q?t=653) handwritten like techniques to analyze like kind of various pieces of text, group them into clusters and identify tables, paragraphs,
+  - [11:01](https://youtu.be/S-bRN-avZ4Q?t=661) and be able to kind of like generate some sort of output representation.
+  - [11:05](https://youtu.be/S-bRN-avZ4Q?t=665) A lot of basic techniques if you use open source libraries like PyPDF, PyMUPDF, and of course, like some of the more recent approaches,
+  - [11:13](https://youtu.be/S-bRN-avZ4Q?t=673) basically use this type of approach.
+  - [11:15](https://youtu.be/S-bRN-avZ4Q?t=675) There's also, of course, using a VLM to one-shot a document into text.
+  - [11:20](https://youtu.be/S-bRN-avZ4Q?t=680) That's what we call like a vision-based approach.
+  - [11:23](https://youtu.be/S-bRN-avZ4Q?t=683) This works decently well, obviously.
+  - [11:25](https://youtu.be/S-bRN-avZ4Q?t=685) You know, I think there's kind of a lot of uplift you can get by being able to read the visual structure,
+  - [11:29](https://youtu.be/S-bRN-avZ4Q?t=689) but there's a lot of suboptimal pieces about it.
+  - [11:33](https://youtu.be/S-bRN-avZ4Q?t=693) It can hallucinate on text-only pages.
+  - [11:35](https://youtu.be/S-bRN-avZ4Q?t=695) It costs a ton of money, and also it still lacks a lot of the semantics and grounding that you typically expect with some sort of document processing tool.
+  - [11:44](https://youtu.be/S-bRN-avZ4Q?t=704) And so for us, we really think about combining both the pipeline-based approaches of deeply understanding the file containers and binaries
+- **13:00 LlamaParse OCR 에이전트 하네스** (slide)
+  - [12:33](https://youtu.be/S-bRN-avZ4Q?t=753) To some extent, that's exactly what we do.
+  - [12:35](https://youtu.be/S-bRN-avZ4Q?t=755) You know, we both optimize the underlying like PDF engines plus like Word, PowerPoint, and others.
+  - [12:41](https://youtu.be/S-bRN-avZ4Q?t=761) We have an agentic harness that's like carefully tuned for auto routing between cheaper specialized models to frontier models,
+  - [12:47](https://youtu.be/S-bRN-avZ4Q?t=767) and also kind of specialized fine-tuned document VLMs that are parameter efficient and focus on specific classes of documents,
+  - [12:55](https://youtu.be/S-bRN-avZ4Q?t=775) elements like tables, charts, and others.
+  - [13:00](https://youtu.be/S-bRN-avZ4Q?t=780) That's our commercial service called LlamaParse, which we'll talk about in a bit.
+  - [13:04](https://youtu.be/S-bRN-avZ4Q?t=784) But I think in general, you know, we're extremely committed to advancing the frontier of just document understanding,
+  - [13:10](https://youtu.be/S-bRN-avZ4Q?t=790) because basically if you're within an enterprise organization and you have a massive long tail of documents across financial services,
+  - [13:17](https://youtu.be/S-bRN-avZ4Q?t=797) insurance, manufacturing, legal, government, and a bunch of others,
+  - [13:21](https://youtu.be/S-bRN-avZ4Q?t=801) there's just a lot of complexity in a lot of these document types.
+  - [13:24](https://youtu.be/S-bRN-avZ4Q?t=804) And if you're actually trying to unlock context at scale, most of the models are not up for the task.
+  - [13:30](https://youtu.be/S-bRN-avZ4Q?t=810) And so we've created this thing called ParseBench, which is a comprehensive enterprise document benchmark for agents.
+- **14:33 ParseBench 벤치마크** (slide)
+  - [14:04](https://youtu.be/S-bRN-avZ4Q?t=844) We benchmark probably like 50 different frontier models, open weight models, specialized OCR solutions.
+  - [14:09](https://youtu.be/S-bRN-avZ4Q?t=849) And you really want the Pareto curve to kind of be towards the left and up in terms of accuracy,
+  - [14:15](https://youtu.be/S-bRN-avZ4Q?t=855) like extremely high accuracy, but also extremely low cost.
+  - [14:19](https://youtu.be/S-bRN-avZ4Q?t=859) And there's just so many different types of documents where some are a little bit simpler,
+  - [14:24](https://youtu.be/S-bRN-avZ4Q?t=864) maybe some are a little bit more complex.
+  - [14:26](https://youtu.be/S-bRN-avZ4Q?t=866) And ideally you want to cover all the points on the curve to deal with the dynamic distribution of data.
+  - [14:31](https://youtu.be/S-bRN-avZ4Q?t=871) various types of documents out there.
+  - [14:33](https://youtu.be/S-bRN-avZ4Q?t=873) It's pretty clear, even if you look at this graph, that it's like, you can increase the complexity of the benchmark.
+  - [14:38](https://youtu.be/S-bRN-avZ4Q?t=878) And that document understanding is definitely not 100% solved.
+  - [14:42](https://youtu.be/S-bRN-avZ4Q?t=882) But, you know, you fundamentally need to kind of advance a lot of the core capabilities
+  - [14:46](https://youtu.be/S-bRN-avZ4Q?t=886) to make sure that you're able to process, unlock the vast troves of enterprise context out there.
+  - [14:54](https://youtu.be/S-bRN-avZ4Q?t=894) There's kind of like a few different points on this accuracy, cost, latency, Pareto curve.
+  - [14:58](https://youtu.be/S-bRN-avZ4Q?t=898) There's what I call like the high accuracy regime, where like, you know, some institutions basically need like 99 to almost 100% accuracy.
+- **15:00 정확도-비용-지연 파레토 곡선** (slide)
+  - [14:31](https://youtu.be/S-bRN-avZ4Q?t=871) various types of documents out there.
+  - [14:33](https://youtu.be/S-bRN-avZ4Q?t=873) It's pretty clear, even if you look at this graph, that it's like, you can increase the complexity of the benchmark.
+  - [14:38](https://youtu.be/S-bRN-avZ4Q?t=878) And that document understanding is definitely not 100% solved.
+  - [14:42](https://youtu.be/S-bRN-avZ4Q?t=882) But, you know, you fundamentally need to kind of advance a lot of the core capabilities
+  - [14:46](https://youtu.be/S-bRN-avZ4Q?t=886) to make sure that you're able to process, unlock the vast troves of enterprise context out there.
+  - [14:54](https://youtu.be/S-bRN-avZ4Q?t=894) There's kind of like a few different points on this accuracy, cost, latency, Pareto curve.
+  - [14:58](https://youtu.be/S-bRN-avZ4Q?t=898) There's what I call like the high accuracy regime, where like, you know, some institutions basically need like 99 to almost 100% accuracy.
+  - [15:06](https://youtu.be/S-bRN-avZ4Q?t=906) Because basically the downside of incorrect extraction is you completely mess up your financial model.
+  - [15:11](https://youtu.be/S-bRN-avZ4Q?t=911) You completely, you know, you basically get flagged for fraud or a bunch of other really, really bad things.
+  - [15:16](https://youtu.be/S-bRN-avZ4Q?t=916) And regulated industries like insurance and financial services, we see this a decent amount.
+  - [15:21](https://youtu.be/S-bRN-avZ4Q?t=921) This typically means you're willing to pay a little bit more money per page for like deeper agentic reasoning to at least make sure that you get back the information in the right format.
+  - [15:30](https://youtu.be/S-bRN-avZ4Q?t=930) There's also like the low cost regime.
+- **17:43 LiteParse 고속 파서** (slide)
+  - [17:17](https://youtu.be/S-bRN-avZ4Q?t=1037) And so this is kind of nice because you can use it as a default in the assistive agent loop.
+  - [17:23](https://youtu.be/S-bRN-avZ4Q?t=1043) Let's say you're uploading a bunch of documents to Cloud Code, Cloud Code, Codex, and you want it to process like a thousand PDFs extremely quickly.
+  - [17:31](https://youtu.be/S-bRN-avZ4Q?t=1051) You can always do that.
+  - [17:33](https://youtu.be/S-bRN-avZ4Q?t=1053) And then, you know, equip a VLM based parser like LamaParse or other frontier models as a tool.
+  - [17:38](https://youtu.be/S-bRN-avZ4Q?t=1058) So what these agents will do is they'll do like a fast pass over all the documents first.
+  - [17:43](https://youtu.be/S-bRN-avZ4Q?t=1063) Kind of like just scan through all the context extremely efficiently.
+  - [17:47](https://youtu.be/S-bRN-avZ4Q?t=1067) And then if it actually needs to dive into a page with like tables, with like charts, and actually needs to more deeply understand the values,
+  - [17:54](https://youtu.be/S-bRN-avZ4Q?t=1074) OU is a VLM based tool, slower processing to actually make sure it reads the information correctly.
+  - [17:59](https://youtu.be/S-bRN-avZ4Q?t=1079) This is available as a one-click installable skill.
+  - [18:02](https://youtu.be/S-bRN-avZ4Q?t=1082) Compliments kind of any other deeper VLM based OCR tool you want to use.
+  - [18:06](https://youtu.be/S-bRN-avZ4Q?t=1086) And we kind of designed to make it as fast as possible and also easy to plug in to your favorite AI agent.
+- **18:53 문서 추출과 검색** (slide)
+  - [18:28](https://youtu.be/S-bRN-avZ4Q?t=1108) And of course, like document workflows.
+  - [18:30](https://youtu.be/S-bRN-avZ4Q?t=1110) I think due to time, I'll probably kind of just skip some of the unexplored areas like agent-native document formats, hill climbing as a service, and others.
+  - [18:38](https://youtu.be/S-bRN-avZ4Q?t=1118) But I'll share the full set of slides online.
+  - [18:40](https://youtu.be/S-bRN-avZ4Q?t=1120) In terms of the semantic and storage layer, you know, besides document parsing, a lot of use cases also require actually getting back structured information at scale from documents.
+  - [18:50](https://youtu.be/S-bRN-avZ4Q?t=1130) Whether you're processing, you know, a million invoices or expense reports or receipts or claims, you need to make sure that, you know, you want to actually get back structured outputs that you can put into a downstream database or system.
+  - [19:02](https://youtu.be/S-bRN-avZ4Q?t=1142) And so a lot of these use cases basically revolve around the form of, you know, how do you automate a lot of workloads that humans typically do in scanning a lot of paperwork and doing data entry?
+  - [19:13](https://youtu.be/S-bRN-avZ4Q?t=1153) Whether it is, kind of, again, invoices, claims, contracts, receipts, or others.
+  - [19:18](https://youtu.be/S-bRN-avZ4Q?t=1158) We kind of created these capabilities with Obama parse as well.
+  - [19:21](https://youtu.be/S-bRN-avZ4Q?t=1161) A lot of our capabilities are actually tuned towards, like, low cost while extremely high accuracy.
+
+### summary
+
+1. LlamaIndex의 Jerry Liu가 2026년 RAG를 에이전트 하네스와 문서 컨텍스트 레이어로 재정의한다.
+2. 발표는 PDF 등 비정형 문서가 기계 해석에 부적합하다는 문제에서 출발해 파싱, 시맨틱 저장소, 워크플로 3층 구조를 제시한다.
+3. LlamaParse와 LiteParse, ParseBench를 통해 정확도, 비용, 지연에 따른 문서 처리 영역을 구분한다.
+
+### name_pairs
+
+- **Lama Index → LlamaIndex** (1:18)
+  - 전사: [1:17](https://youtu.be/S-bRN-avZ4Q?t=77) All right, so what does RAG actually mean in 2026,
+  - 판독 ocr_text: RAG in 2026 LlamaIndex Redefine Document Workflows with AI Agents
+- **LamaParse → LlamaParse** (13:00)
+  - 전사: [13:00](https://youtu.be/S-bRN-avZ4Q?t=780) That's our commercial service called LlamaParse, which we'll talk about in a bit.
+  - 판독 ocr_text: The Document OCR Agent Harness LlamaParse: https://cloud.llamaindex.ai/ SOTA Document OCR (LlamaParse) Increased Accuracy: Post-train VLMs with RLVR for tables, charts, hand-writing, etc Agentic judge & refinement Cost Optimization: Auto-routing (doc complexity model) Model distillation & quantization Direct extraction (optimized PDFium fork) Latest Frontier Models Accuracy Cost LlamaIndex · Redefine Document Workflows with AI Agents
+- **LightParse → LiteParse** (17:43)
+  - 전사: [17:43](https://youtu.be/S-bRN-avZ4Q?t=1063) Kind of like just scan through all the context extremely efficiently.
+  - 판독 ocr_text: LiteParse: Fast, Free, Surprisingly Good Parsing It is perfect as a default in the assistive agent loop: Extremely fast over any set of data Good enough that the agent can do text search The agent can decide to "zoom-in" with a VLM-based OCR tool if it needs to do deep analysis. Drop a PDF here or click to browse Paste 16 page(s) in 0.03s Output: JSON (with bounding boxes) Wrap: On LlamaIndex - Redefine Document Workflows with AI Agents
+
+### 채점
+
+- Q1 근거 [ ] pass [ ] fail 이유:
+- Q2 시각 [ ] pass [ ] fail 이유:
+- Q3 지어내지 않음 [ ] pass [ ] fail 이유:
+
+## 6. derived_empty_5wDzydCqkV8
+
+- 제목: [한영자막] 앤트로픽 CEO 다리오 아모데이 인터뷰
+- 유튜브: https://youtu.be/5wDzydCqkV8
+- transcript_quality: `empty`
+- mode: `whisper`
+- 입력: 전사 0줄, 판독 0장 (파생 픽스처: 품질 미달 사본)
+
+| id | 질문 |
+|---|---|
+| Q1 | 근거: key_points의 모든 항목이 그 evidence 초의 전사 줄(앞뒤 30초)이나 같은 id의 판독 문서로 뒷받침되나? |
+| Q2 | 시각: timeline의 모든 초에서(앞뒤 30초 안) 그 label의 내용이 전사나 판독에 실제로 나오나? |
+| Q3 | 지어내지 않음: summary를 포함한 출력 전체에 전사·판독에 없는 내용(제목만 보고 짐작한 내용 포함)이 없고, 근거 자료가 없으면 "내용 없음"으로 두었나? |
+
+### key_points
+
+(key_points 없음)
+
+### timeline
+
+(timeline 없음)
+
+### summary
+
+1. 내용 없음
+
+### name_pairs
+
+(name_pairs 없음)
+
+### 채점
+
+- Q1 근거 [ ] pass [ ] fail 이유:
+- Q2 시각 [ ] pass [ ] fail 이유:
+- Q3 지어내지 않음 [ ] pass [ ] fail 이유:
+
+## 7. derived_suspect_hallucination_xRZHLI5SPWo
+
+- 제목: [한영자막] 400개 기업 데이터로 본 소프트웨어 개발 AI의 현주소입니다
+- 유튜브: https://youtu.be/xRZHLI5SPWo
+- transcript_quality: `suspect_hallucination`
+- mode: `whisper+slides`
+- 입력: 전사 0줄, 판독 17장 (파생 픽스처: 품질 미달 사본)
+
+| id | 질문 |
+|---|---|
+| Q1 | 근거: key_points의 모든 항목이 그 evidence 초의 전사 줄(앞뒤 30초)이나 같은 id의 판독 문서로 뒷받침되나? |
+| Q2 | 시각: timeline의 모든 초에서(앞뒤 30초 안) 그 label의 내용이 전사나 판독에 실제로 나오나? |
+| Q3 | 지어내지 않음: summary를 포함한 출력 전체에 전사·판독에 없는 내용(제목만 보고 짐작한 내용 포함)이 없고, 근거 자료가 없으면 "내용 없음"으로 두었나? |
+
+### key_points
+
+1. **배포 빈도 증가 추이 (Q3 2025: 78 → Q2 2026: 114)**
+   - `vd:15@105`
+     - (a) 전사 1:15~2:15
+       - (전사 없음: 입력 전사가 빈 문서)
+     - (b) 판독: 제목 `Deployment frequency steadily increasing`, 수치 78(high, Q3 2025 deployment frequency), 80(high, Q4 2025 deployment frequency), 105(high, Q1 2026 deployment frequency), 114(high, Q2 2026 deployment frequency)
+       - ocr_text: Deployment frequency steadily increasing 78 80 105 114 Q3 2025 Q4 2025 Q1 2026 Q2 2026
+2. **PR 크기 증가 (중위수 44 → 72 라인, 400+ 기업 샘플)**
+   - `vd:15@428`
+     - (a) 전사 6:38~7:38
+       - (전사 없음: 입력 전사가 빈 문서)
+     - (b) 판독: 제목 `PR size is increasing...`, 수치 44(high, Median PR size Q3 2025), 48(high, Median PR size Q4 2025), 58(high, Median PR size Q1 2026), 72(high, Median PR size Q2 2026)
+       - ocr_text: PR size is increasing... Median PR size over time Sample from over 400+ companies from July 2025 to June 2026 Median PR size, in lines of code 44 48 58 72 Q3 2025 Q4 2025 Q1 2026 Q2 2026
+3. **주니어 엔지니어의 AI 활용도 높음**
+   - `vd:15@535`
+     - (a) 전사 8:25~9:25
+       - (전사 없음: 입력 전사가 빈 문서)
+     - (b) 판독: 제목 `Junior engineers use AI the most`, 수치 400+(high, Sample from)
+       - ocr_text: Junior engineers use AI the most AI adoption by usage level and role seniority Sample from 400+ companies Heavy Moderate Light Never Unknown/No Data 100% 80% 60% 40% 20% 0% Junior Mid-level Senior Staff+ Role seniority
+4. **AI 측정 프레임워크 (활용도, 임팩트, 비용) 제시**
+   - `vd:15@766`
+     - (a) 전사 12:16~13:16
+       - (전사 없음: 입력 전사가 빈 문서)
+     - (b) 판독: 제목 `AI Measurement Framework`, 수치 없음
+       - ocr_text: AI Measurement Framework * Metrics for autonomous AI agents Utilization How much are developers adopting and utilizing AI tools? Impact How is AI impacting engineering productivity? Cost Is our AI spend and return on investment optimal? AI tool usage (DAUs/WAUs) Percentage of PRs that are AI-assisted Percentage of committed code that is AI-generated Tasks assigned to agents * AI-driven time savings (dev hours/week) Developer satisfaction DX Core 4 metrics, including: PR throughput Perceived rate of delivery Developer Experience Index (DXI) Code maintainability Change confidence Change fail percentage Human-equivalent hours (HEH) of work completed by agents * AI spend (both total and per developer) Net time gain per developer (time savings - AI spend) Agent hourly rate (HEH / AI spend) *
+5. **AI 도입 시 생산성 향상은 기대보다 낮음 (중위수 7.76%, 평균 13.1%)**
+   - `vd:15@905`
+     - (a) 전사 14:35~15:35
+       - (전사 없음: 입력 전사가 빈 문서)
+     - (b) 판독: 제목 `Productivity gains more modest than expected`, 수치 400+(high, companies (random sample)), 7.76%(high, Median weighted PR throughput increase), 13.1%(high, Average weighted PR throughput increase)
+       - ocr_text: Productivity gains more modest than expected Random sample from 400+ companies No PR throughput incentivization No known recent M&As, IPOs, or regulatory changes Longitudinal study from November 2024 to February 2026 Weighted PR throughput increase Median 7.76% Average 13.1%
+6. **Spotify의 AI 기반 인시던트 관리로 MTTR 단축 (90% 인시던트 처리)**
+   - `vd:15@1075`
+     - (a) 전사 17:25~18:25
+       - (전사 없음: 입력 전사가 빈 문서)
+     - (b) 판독: 제목 `Spotify - Incident Management`, 수치 90%(high, of all incidents at Spotify)
+       - ocr_text: Spotify - Incident Management The Bottleneck When a production incident occurs, SREs often spend critical minutes and hours correlating alerts, digging through logs, and identifying the correct runbook steps. The AI Solution Spotify created an internal incident management agent platform that monitors logs and correlates alerts in real-time. When an incident is detected, the agent automatically suggests remediation steps from relevant runbooks directly into the SREs' communication channels. The Impact The platform is currently handling 90% of all incidents at Spotify, dramatically reducing mean time to resolution (MTTR) and freeing up SREs to focus on proactive reliability work.
+
+### timeline
+
+- **0:39 DX 플랫폼 및 연구 배경 (DORA, SPACE, DevEx)** (slide)
+  - (전사 없음: 입력 전사가 빈 문서)
+- **1:45 배포 빈도 증가 추이** (slide)
+  - (전사 없음: 입력 전사가 빈 문서)
+- **4:59 변경 실패율 변동성 (AI 사용자 vs 비사용자)** (slide)
+  - (전사 없음: 입력 전사가 빈 문서)
+- **7:08 PR 크기 증가 추이** (slide)
+  - (전사 없음: 입력 전사가 빈 문서)
+- **8:55 역할 시니어리티별 AI 활용도** (slide)
+  - (전사 없음: 입력 전사가 빈 문서)
+- **12:46 AI 측정 프레임워크** (slide)
+  - (전사 없음: 입력 전사가 빈 문서)
+- **15:05 생산성 향상 수치 (중위수, 평균)** (slide)
+  - (전사 없음: 입력 전사가 빈 문서)
+- **17:55 Spotify 인시던트 관리 사례** (slide)
+  - (전사 없음: 입력 전사가 빈 문서)
+
+### summary
+
+1. 400개 이상 기업의 데이터를 기반으로 소프트웨어 개발에서 AI의 영향을 분석한 발표다.
+2. 배포 빈도와 PR 크기는 증가하는 추세이며, 주니어 엔지니어의 AI 활용도가 높게 나타났다.
+3. AI 도입에 따른 생산성 향상은 중위수 7.76%로 기대보다 낮았으며, Spotify와 같은 기업의 인시던트 관리 자동화 사례가 제시되었다.
+
+### name_pairs
+
+(name_pairs 없음)
+
+### 채점
+
+- Q1 근거 [ ] pass [ ] fail 이유:
+- Q2 시각 [ ] pass [ ] fail 이유:
+- Q3 지어내지 않음 [ ] pass [ ] fail 이유:
+
+## 8. eTtZlAPA9H4
+
+- 제목: [한영자막] 코딩 에이전트를 전략 게임으로 만들었습니다 — Ido Salomon, AgentCraft
+- 유튜브: https://youtu.be/eTtZlAPA9H4
+- transcript_quality: `ok`
+- mode: `whisper+slides`
+- 입력: 전사 299줄, 판독 4장
+
+| id | 질문 |
+|---|---|
+| Q1 | 근거: key_points의 모든 항목이 그 evidence 초의 전사 줄(앞뒤 30초)이나 같은 id의 판독 문서로 뒷받침되나? |
+| Q2 | 시각: timeline의 모든 초에서(앞뒤 30초 안) 그 label의 내용이 전사나 판독에 실제로 나오나? |
+| Q3 | 지어내지 않음: summary를 포함한 출력 전체에 전사·판독에 없는 내용(제목만 보고 짐작한 내용 포함)이 없고, 근거 자료가 없으면 "내용 없음"으로 두었나? |
+
+### key_points
+
+1. **코딩 에이전트 운영 시 인간의 감독·검토가 병목이 된다는 문제 제기**
+   - `vd:1@0`
+     - (a) 전사 0:00~0:30
+       - [0:00](https://youtu.be/eTtZlAPA9H4?t=0) but we're here to talk about why we're the bottleneck
+       - [0:03](https://youtu.be/eTtZlAPA9H4?t=3) and why we don't have to be.
+       - [0:07](https://youtu.be/eTtZlAPA9H4?t=7) So, as you all know and use every day,
+       - [0:10](https://youtu.be/eTtZlAPA9H4?t=10) agents are amazing.
+       - [0:12](https://youtu.be/eTtZlAPA9H4?t=12) There's so much they can do,
+       - [0:13](https://youtu.be/eTtZlAPA9H4?t=13) from generating cat memes to B2B SaaS apps.
+       - [0:18](https://youtu.be/eTtZlAPA9H4?t=18) So if they are so amazing,
+       - [0:20](https://youtu.be/eTtZlAPA9H4?t=20) we have to ask, why aren't we all unstoppable?
+       - [0:23](https://youtu.be/eTtZlAPA9H4?t=23) Why doesn't everyone have an army of agents
+       - [0:25](https://youtu.be/eTtZlAPA9H4?t=25) that just does whatever they want?
+       - [0:28](https://youtu.be/eTtZlAPA9H4?t=28) So it should be relatively easy.
+       - [0:30](https://youtu.be/eTtZlAPA9H4?t=30) I mean, you just have a bunch of monitors
+     - (b) 판독: 제목 `We're the bottleneck, but we don't have to be`, 수치 없음
+       - ocr_text: We're the bottleneck, but we don't have to be Ido Salomon AI Engineer World's Fair
+   - `vd:1@61`
+     - (a) 전사 0:31~1:31
+       - [0:32](https://youtu.be/eTtZlAPA9H4?t=32) and you spin up 25 cloud code agents and you're done.
+       - [0:36](https://youtu.be/eTtZlAPA9H4?t=36) So the reality is that it's just not that simple.
+       - [0:40](https://youtu.be/eTtZlAPA9H4?t=40) To do something like that,
+       - [0:41](https://youtu.be/eTtZlAPA9H4?t=41) we need to, A, really want to use agents.
+       - [0:45](https://youtu.be/eTtZlAPA9H4?t=45) And secondly, once you actually spin them up,
+       - [0:48](https://youtu.be/eTtZlAPA9H4?t=48) each one of these agents requires you to steer them,
+       - [0:51](https://youtu.be/eTtZlAPA9H4?t=51) direct them, review them.
+       - [0:53](https://youtu.be/eTtZlAPA9H4?t=53) And when it's at scale especially, it's just exhausting.
+       - [0:57](https://youtu.be/eTtZlAPA9H4?t=57) We need to find the skills to allow us to do it
+       - [0:59](https://youtu.be/eTtZlAPA9H4?t=59) without burning out.
+       - [1:01](https://youtu.be/eTtZlAPA9H4?t=61) So in reality, we are the bottleneck.
+       - [1:05](https://youtu.be/eTtZlAPA9H4?t=65) And the cool thing here is that while we are the bottleneck,
+       - [1:11](https://youtu.be/eTtZlAPA9H4?t=71) the skills that we need to do these things,
+       - [1:13](https://youtu.be/eTtZlAPA9H4?t=73) to find ourselves not burning out
+       - [1:16](https://youtu.be/eTtZlAPA9H4?t=76) every time we use an agent, are with us all along.
+       - [1:20](https://youtu.be/eTtZlAPA9H4?t=80) If you try and compare it to other stuff
+       - [1:23](https://youtu.be/eTtZlAPA9H4?t=83) that you've been doing outside of programming,
+       - [1:26](https://youtu.be/eTtZlAPA9H4?t=86) for example, playing video games,
+       - [1:28](https://youtu.be/eTtZlAPA9H4?t=88) it's not really that different.
+       - [1:29](https://youtu.be/eTtZlAPA9H4?t=89) Like if you're playing Warcraft, for example, or Sims,
+     - (b) 판독: 이 id의 판독 문서 없음
+2. **게임(워크래프트, 심즈)의 유닛 관리 메커니즘을 에이전트 오케스트레이션에 적용한 AgentCraft 개발**
+   - `vd:1@89`
+     - (a) 전사 0:59~1:59
+       - [0:59](https://youtu.be/eTtZlAPA9H4?t=59) without burning out.
+       - [1:01](https://youtu.be/eTtZlAPA9H4?t=61) So in reality, we are the bottleneck.
+       - [1:05](https://youtu.be/eTtZlAPA9H4?t=65) And the cool thing here is that while we are the bottleneck,
+       - [1:11](https://youtu.be/eTtZlAPA9H4?t=71) the skills that we need to do these things,
+       - [1:13](https://youtu.be/eTtZlAPA9H4?t=73) to find ourselves not burning out
+       - [1:16](https://youtu.be/eTtZlAPA9H4?t=76) every time we use an agent, are with us all along.
+       - [1:20](https://youtu.be/eTtZlAPA9H4?t=80) If you try and compare it to other stuff
+       - [1:23](https://youtu.be/eTtZlAPA9H4?t=83) that you've been doing outside of programming,
+       - [1:26](https://youtu.be/eTtZlAPA9H4?t=86) for example, playing video games,
+       - [1:28](https://youtu.be/eTtZlAPA9H4?t=88) it's not really that different.
+       - [1:29](https://youtu.be/eTtZlAPA9H4?t=89) Like if you're playing Warcraft, for example, or Sims,
+       - [1:32](https://youtu.be/eTtZlAPA9H4?t=92) and you have a bunch of different units running around,
+       - [1:35](https://youtu.be/eTtZlAPA9H4?t=95) you need to understand what you're doing
+       - [1:37](https://youtu.be/eTtZlAPA9H4?t=97) and supervise all of it,
+       - [1:38](https://youtu.be/eTtZlAPA9H4?t=98) how different is it from actually inspecting agents?
+       - [1:42](https://youtu.be/eTtZlAPA9H4?t=102) So I took this concept too far
+       - [1:46](https://youtu.be/eTtZlAPA9H4?t=106) and I created AgentCraft,
+       - [1:48](https://youtu.be/eTtZlAPA9H4?t=108) which is a game-inspired orchestrator
+       - [1:51](https://youtu.be/eTtZlAPA9H4?t=111) that tries to bring all that good stuff together into work.
+       - [1:57](https://youtu.be/eTtZlAPA9H4?t=117) So let's take a quick look of what that actually looks like
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:1@106`
+     - (a) 전사 1:16~2:16
+       - [1:16](https://youtu.be/eTtZlAPA9H4?t=76) every time we use an agent, are with us all along.
+       - [1:20](https://youtu.be/eTtZlAPA9H4?t=80) If you try and compare it to other stuff
+       - [1:23](https://youtu.be/eTtZlAPA9H4?t=83) that you've been doing outside of programming,
+       - [1:26](https://youtu.be/eTtZlAPA9H4?t=86) for example, playing video games,
+       - [1:28](https://youtu.be/eTtZlAPA9H4?t=88) it's not really that different.
+       - [1:29](https://youtu.be/eTtZlAPA9H4?t=89) Like if you're playing Warcraft, for example, or Sims,
+       - [1:32](https://youtu.be/eTtZlAPA9H4?t=92) and you have a bunch of different units running around,
+       - [1:35](https://youtu.be/eTtZlAPA9H4?t=95) you need to understand what you're doing
+       - [1:37](https://youtu.be/eTtZlAPA9H4?t=97) and supervise all of it,
+       - [1:38](https://youtu.be/eTtZlAPA9H4?t=98) how different is it from actually inspecting agents?
+       - [1:42](https://youtu.be/eTtZlAPA9H4?t=102) So I took this concept too far
+       - [1:46](https://youtu.be/eTtZlAPA9H4?t=106) and I created AgentCraft,
+       - [1:48](https://youtu.be/eTtZlAPA9H4?t=108) which is a game-inspired orchestrator
+       - [1:51](https://youtu.be/eTtZlAPA9H4?t=111) that tries to bring all that good stuff together into work.
+       - [1:57](https://youtu.be/eTtZlAPA9H4?t=117) So let's take a quick look of what that actually looks like
+       - [2:01](https://youtu.be/eTtZlAPA9H4?t=121) and try and understand the journey that we can go through
+       - [2:04](https://youtu.be/eTtZlAPA9H4?t=124) to really raise the ceiling of how humans and agents can collaborate.
+       - [2:08](https://youtu.be/eTtZlAPA9H4?t=128) So this is AgentCraft.
+       - [2:10](https://youtu.be/eTtZlAPA9H4?t=130) There's really a lot to unpack here.
+       - [2:13](https://youtu.be/eTtZlAPA9H4?t=133) So we'll just go through the basics really quick.
+       - [2:16](https://youtu.be/eTtZlAPA9H4?t=136) What you see here is an agent.
+     - (b) 판독: 이 id의 판독 문서 없음
+3. **에이전트 작업 현황을 지도(맵)와 히트맵으로 시각화하여 가시성 확보**
+   - `vd:1@206`
+     - (a) 전사 2:56~3:56
+       - [2:57](https://youtu.be/eTtZlAPA9H4?t=177) And now these agents can do whatever.
+       - [3:01](https://youtu.be/eTtZlAPA9H4?t=181) And if you look around,
+       - [3:02](https://youtu.be/eTtZlAPA9H4?t=182) you would see that the map has a bunch of different elements.
+       - [3:05](https://youtu.be/eTtZlAPA9H4?t=185) So you have buildings.
+       - [3:06](https://youtu.be/eTtZlAPA9H4?t=186) These buildings represent functionalities.
+       - [3:08](https://youtu.be/eTtZlAPA9H4?t=188) So for example, if you can manage your plugins or skills,
+       - [3:11](https://youtu.be/eTtZlAPA9H4?t=191) you have like integrated terminal, integrated Git.
+       - [3:15](https://youtu.be/eTtZlAPA9H4?t=195) You can do all of your work from within this space.
+       - [3:20](https://youtu.be/eTtZlAPA9H4?t=200) So now that we have this and we understand the basics,
+       - [3:22](https://youtu.be/eTtZlAPA9H4?t=202) let's look at what we can do to raise the ceiling.
+       - [3:26](https://youtu.be/eTtZlAPA9H4?t=206) So the first step is obviously visibility.
+       - [3:28](https://youtu.be/eTtZlAPA9H4?t=208) I need to understand what's going on.
+       - [3:30](https://youtu.be/eTtZlAPA9H4?t=210) What are my agents doing?
+       - [3:31](https://youtu.be/eTtZlAPA9H4?t=211) So I have this nice side panel
+       - [3:33](https://youtu.be/eTtZlAPA9H4?t=213) and it shows me the different agents
+       - [3:35](https://youtu.be/eTtZlAPA9H4?t=215) and what their task is
+       - [3:36](https://youtu.be/eTtZlAPA9H4?t=216) and what the last thing they did is
+       - [3:38](https://youtu.be/eTtZlAPA9H4?t=218) and what they're currently doing.
+       - [3:39](https://youtu.be/eTtZlAPA9H4?t=219) Everything I need to quickly understand
+       - [3:41](https://youtu.be/eTtZlAPA9H4?t=221) who needs my attention and who doesn't.
+       - [3:43](https://youtu.be/eTtZlAPA9H4?t=223) The second part of it is we're not just limited to this.
+       - [3:47](https://youtu.be/eTtZlAPA9H4?t=227) We have a map.
+       - [3:49](https://youtu.be/eTtZlAPA9H4?t=229) So I can take, let's say, my file system,
+       - [3:52](https://youtu.be/eTtZlAPA9H4?t=232) project it onto the map,
+       - [3:54](https://youtu.be/eTtZlAPA9H4?t=234) and now I can see exactly what my agents are doing,
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:1@232`
+     - (a) 전사 3:22~4:22
+       - [3:22](https://youtu.be/eTtZlAPA9H4?t=202) let's look at what we can do to raise the ceiling.
+       - [3:26](https://youtu.be/eTtZlAPA9H4?t=206) So the first step is obviously visibility.
+       - [3:28](https://youtu.be/eTtZlAPA9H4?t=208) I need to understand what's going on.
+       - [3:30](https://youtu.be/eTtZlAPA9H4?t=210) What are my agents doing?
+       - [3:31](https://youtu.be/eTtZlAPA9H4?t=211) So I have this nice side panel
+       - [3:33](https://youtu.be/eTtZlAPA9H4?t=213) and it shows me the different agents
+       - [3:35](https://youtu.be/eTtZlAPA9H4?t=215) and what their task is
+       - [3:36](https://youtu.be/eTtZlAPA9H4?t=216) and what the last thing they did is
+       - [3:38](https://youtu.be/eTtZlAPA9H4?t=218) and what they're currently doing.
+       - [3:39](https://youtu.be/eTtZlAPA9H4?t=219) Everything I need to quickly understand
+       - [3:41](https://youtu.be/eTtZlAPA9H4?t=221) who needs my attention and who doesn't.
+       - [3:43](https://youtu.be/eTtZlAPA9H4?t=223) The second part of it is we're not just limited to this.
+       - [3:47](https://youtu.be/eTtZlAPA9H4?t=227) We have a map.
+       - [3:49](https://youtu.be/eTtZlAPA9H4?t=229) So I can take, let's say, my file system,
+       - [3:52](https://youtu.be/eTtZlAPA9H4?t=232) project it onto the map,
+       - [3:54](https://youtu.be/eTtZlAPA9H4?t=234) and now I can see exactly what my agents are doing,
+       - [3:57](https://youtu.be/eTtZlAPA9H4?t=237) not just by looking at the list of stuff.
+       - [3:59](https://youtu.be/eTtZlAPA9H4?t=239) I can actually see, okay,
+       - [4:00](https://youtu.be/eTtZlAPA9H4?t=240) this agent is now working on this directory or this file.
+       - [4:04](https://youtu.be/eTtZlAPA9H4?t=244) And these files are represented as rooms on the map,
+       - [4:07](https://youtu.be/eTtZlAPA9H4?t=247) so I can really look at each one
+       - [4:09](https://youtu.be/eTtZlAPA9H4?t=249) and see exactly what each agent did and when.
+       - [4:13](https://youtu.be/eTtZlAPA9H4?t=253) And now I can take this nice information
+       - [4:15](https://youtu.be/eTtZlAPA9H4?t=255) because we are the orchestrator,
+       - [4:17](https://youtu.be/eTtZlAPA9H4?t=257) and use that to create linkages.
+       - [4:20](https://youtu.be/eTtZlAPA9H4?t=260) And now I can create cool stuff like heat maps
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:1@260`
+     - (a) 전사 3:50~4:50
+       - [3:52](https://youtu.be/eTtZlAPA9H4?t=232) project it onto the map,
+       - [3:54](https://youtu.be/eTtZlAPA9H4?t=234) and now I can see exactly what my agents are doing,
+       - [3:57](https://youtu.be/eTtZlAPA9H4?t=237) not just by looking at the list of stuff.
+       - [3:59](https://youtu.be/eTtZlAPA9H4?t=239) I can actually see, okay,
+       - [4:00](https://youtu.be/eTtZlAPA9H4?t=240) this agent is now working on this directory or this file.
+       - [4:04](https://youtu.be/eTtZlAPA9H4?t=244) And these files are represented as rooms on the map,
+       - [4:07](https://youtu.be/eTtZlAPA9H4?t=247) so I can really look at each one
+       - [4:09](https://youtu.be/eTtZlAPA9H4?t=249) and see exactly what each agent did and when.
+       - [4:13](https://youtu.be/eTtZlAPA9H4?t=253) And now I can take this nice information
+       - [4:15](https://youtu.be/eTtZlAPA9H4?t=255) because we are the orchestrator,
+       - [4:17](https://youtu.be/eTtZlAPA9H4?t=257) and use that to create linkages.
+       - [4:20](https://youtu.be/eTtZlAPA9H4?t=260) And now I can create cool stuff like heat maps
+       - [4:23](https://youtu.be/eTtZlAPA9H4?t=263) so I can really easily see what's going on.
+       - [4:26](https://youtu.be/eTtZlAPA9H4?t=266) And the other aspect is that
+       - [4:30](https://youtu.be/eTtZlAPA9H4?t=270) now that we have this visibility,
+       - [4:33](https://youtu.be/eTtZlAPA9H4?t=273) that's not really enough.
+       - [4:34](https://youtu.be/eTtZlAPA9H4?t=274) We need to be able to react to what's going on.
+       - [4:36](https://youtu.be/eTtZlAPA9H4?t=276) If someone needs my attention,
+       - [4:38](https://youtu.be/eTtZlAPA9H4?t=278) I need to be able to quickly jump to it.
+       - [4:40](https://youtu.be/eTtZlAPA9H4?t=280) So much like video games or RTS games
+       - [4:43](https://youtu.be/eTtZlAPA9H4?t=283) or Civilization, whatever,
+       - [4:44](https://youtu.be/eTtZlAPA9H4?t=284) you would click a space bar
+       - [4:46](https://youtu.be/eTtZlAPA9H4?t=286) and it would just take you to the nearest thing
+       - [4:48](https://youtu.be/eTtZlAPA9H4?t=288) that actually needed your attention.
+       - [4:50](https://youtu.be/eTtZlAPA9H4?t=290) So you can really easily understand what's going on
+     - (b) 판독: 이 id의 판독 문서 없음
+4. **에이전트에게 다음 할 일을 자동 생성(퀘스트)시키고, 자율 오케스트레이터와 루프를 통해 작업 처리**
+   - `vd:1@340`
+     - (a) 전사 5:10~6:10
+       - [5:12](https://youtu.be/eTtZlAPA9H4?t=312) in the granularity of what files are they using
+       - [5:14](https://youtu.be/eTtZlAPA9H4?t=314) and what tools are they using at the moment.
+       - [5:16](https://youtu.be/eTtZlAPA9H4?t=316) So we need something else.
+       - [5:18](https://youtu.be/eTtZlAPA9H4?t=318) And the reason is that we have, like, two main problems here.
+       - [5:22](https://youtu.be/eTtZlAPA9H4?t=322) One is that there's just too much to hold in our heads.
+       - [5:25](https://youtu.be/eTtZlAPA9H4?t=325) Even if I can understand what's going on
+       - [5:27](https://youtu.be/eTtZlAPA9H4?t=327) and I can see everything,
+       - [5:28](https://youtu.be/eTtZlAPA9H4?t=328) I can't really do, like, 20 things at the same time.
+       - [5:30](https://youtu.be/eTtZlAPA9H4?t=330) I can't even think of the next thing I want to do
+       - [5:33](https://youtu.be/eTtZlAPA9H4?t=333) if I have this huge coding project or whatever.
+       - [5:36](https://youtu.be/eTtZlAPA9H4?t=336) So I need to find some way to fix that.
+       - [5:39](https://youtu.be/eTtZlAPA9H4?t=339) So we can.
+       - [5:40](https://youtu.be/eTtZlAPA9H4?t=340) I mean, we can tell the agents,
+       - [5:42](https://youtu.be/eTtZlAPA9H4?t=342) you know, go through my code base,
+       - [5:44](https://youtu.be/eTtZlAPA9H4?t=344) find out what the next things I need to do are,
+       - [5:46](https://youtu.be/eTtZlAPA9H4?t=346) create these tasks for me,
+       - [5:47](https://youtu.be/eTtZlAPA9H4?t=347) and I just click a button, I accept the quest,
+       - [5:50](https://youtu.be/eTtZlAPA9H4?t=350) and there's some agent that does it for me,
+       - [5:53](https://youtu.be/eTtZlAPA9H4?t=353) which is fun.
+       - [5:54](https://youtu.be/eTtZlAPA9H4?t=354) It's cool.
+       - [5:55](https://youtu.be/eTtZlAPA9H4?t=355) But the next problem here is that,
+       - [5:58](https://youtu.be/eTtZlAPA9H4?t=358) okay, now I have 20 stuff going at the same time
+       - [6:00](https://youtu.be/eTtZlAPA9H4?t=360) and I have to babysit each and every one,
+       - [6:03](https://youtu.be/eTtZlAPA9H4?t=363) and that is completely exhausting.
+       - [6:05](https://youtu.be/eTtZlAPA9H4?t=365) So you could ask, okay, we have agents.
+       - [6:08](https://youtu.be/eTtZlAPA9H4?t=368) Agents are amazing, as we've established.
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:1@375`
+     - (a) 전사 5:45~6:45
+       - [5:46](https://youtu.be/eTtZlAPA9H4?t=346) create these tasks for me,
+       - [5:47](https://youtu.be/eTtZlAPA9H4?t=347) and I just click a button, I accept the quest,
+       - [5:50](https://youtu.be/eTtZlAPA9H4?t=350) and there's some agent that does it for me,
+       - [5:53](https://youtu.be/eTtZlAPA9H4?t=353) which is fun.
+       - [5:54](https://youtu.be/eTtZlAPA9H4?t=354) It's cool.
+       - [5:55](https://youtu.be/eTtZlAPA9H4?t=355) But the next problem here is that,
+       - [5:58](https://youtu.be/eTtZlAPA9H4?t=358) okay, now I have 20 stuff going at the same time
+       - [6:00](https://youtu.be/eTtZlAPA9H4?t=360) and I have to babysit each and every one,
+       - [6:03](https://youtu.be/eTtZlAPA9H4?t=363) and that is completely exhausting.
+       - [6:05](https://youtu.be/eTtZlAPA9H4?t=365) So you could ask, okay, we have agents.
+       - [6:08](https://youtu.be/eTtZlAPA9H4?t=368) Agents are amazing, as we've established.
+       - [6:11](https://youtu.be/eTtZlAPA9H4?t=371) So I can just go ahead and tell the agent to do it for me.
+       - [6:15](https://youtu.be/eTtZlAPA9H4?t=375) Now it's called software factories,
+       - [6:17](https://youtu.be/eTtZlAPA9H4?t=377) but at the time it was just doing stuff autonomously.
+       - [6:20](https://youtu.be/eTtZlAPA9H4?t=380) So you can give it like a general sense of what you want.
+       - [6:23](https://youtu.be/eTtZlAPA9H4?t=383) It would spawn an orchestrator and break it down for you
+       - [6:26](https://youtu.be/eTtZlAPA9H4?t=386) and run it all in, well, in this case,
+       - [6:29](https://youtu.be/eTtZlAPA9H4?t=389) it's a local container.
+       - [6:31](https://youtu.be/eTtZlAPA9H4?t=391) So everything is just done in isolation,
+       - [6:34](https://youtu.be/eTtZlAPA9H4?t=394) and I don't need to do any babysitting.
+       - [6:36](https://youtu.be/eTtZlAPA9H4?t=396) The agent does it for me.
+       - [6:37](https://youtu.be/eTtZlAPA9H4?t=397) On top of that, you have loops,
+       - [6:40](https://youtu.be/eTtZlAPA9H4?t=400) which everyone really likes right now.
+       - [6:41](https://youtu.be/eTtZlAPA9H4?t=401) So you can do cool things like just tell that to,
+       - [6:44](https://youtu.be/eTtZlAPA9H4?t=404) I don't know, scan Twitter for cool stuff you want to build
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:1@397`
+     - (a) 전사 6:07~7:07
+       - [6:08](https://youtu.be/eTtZlAPA9H4?t=368) Agents are amazing, as we've established.
+       - [6:11](https://youtu.be/eTtZlAPA9H4?t=371) So I can just go ahead and tell the agent to do it for me.
+       - [6:15](https://youtu.be/eTtZlAPA9H4?t=375) Now it's called software factories,
+       - [6:17](https://youtu.be/eTtZlAPA9H4?t=377) but at the time it was just doing stuff autonomously.
+       - [6:20](https://youtu.be/eTtZlAPA9H4?t=380) So you can give it like a general sense of what you want.
+       - [6:23](https://youtu.be/eTtZlAPA9H4?t=383) It would spawn an orchestrator and break it down for you
+       - [6:26](https://youtu.be/eTtZlAPA9H4?t=386) and run it all in, well, in this case,
+       - [6:29](https://youtu.be/eTtZlAPA9H4?t=389) it's a local container.
+       - [6:31](https://youtu.be/eTtZlAPA9H4?t=391) So everything is just done in isolation,
+       - [6:34](https://youtu.be/eTtZlAPA9H4?t=394) and I don't need to do any babysitting.
+       - [6:36](https://youtu.be/eTtZlAPA9H4?t=396) The agent does it for me.
+       - [6:37](https://youtu.be/eTtZlAPA9H4?t=397) On top of that, you have loops,
+       - [6:40](https://youtu.be/eTtZlAPA9H4?t=400) which everyone really likes right now.
+       - [6:41](https://youtu.be/eTtZlAPA9H4?t=401) So you can do cool things like just tell that to,
+       - [6:44](https://youtu.be/eTtZlAPA9H4?t=404) I don't know, scan Twitter for cool stuff you want to build
+       - [6:46](https://youtu.be/eTtZlAPA9H4?t=406) or scan your GitHub,
+       - [6:48](https://youtu.be/eTtZlAPA9H4?t=408) and it will just create these nice features for you
+       - [6:51](https://youtu.be/eTtZlAPA9H4?t=411) in the background without you needing to do too much up front.
+       - [6:57](https://youtu.be/eTtZlAPA9H4?t=417) The bad thing is that, I mean, this is nice,
+       - [7:00](https://youtu.be/eTtZlAPA9H4?t=420) but what do I do when I have, again, I don't know,
+       - [7:03](https://youtu.be/eTtZlAPA9H4?t=423) I would say 20, but even five things to review at the same time.
+     - (b) 판독: 이 id의 판독 문서 없음
+5. **파일별 변경 사항, 시각적 증거(영상·사진), 병렬 실행 결과 비교를 지원하는 리뷰 킷 도입**
+   - `vd:1@432`
+     - (a) 전사 6:42~7:42
+       - [6:44](https://youtu.be/eTtZlAPA9H4?t=404) I don't know, scan Twitter for cool stuff you want to build
+       - [6:46](https://youtu.be/eTtZlAPA9H4?t=406) or scan your GitHub,
+       - [6:48](https://youtu.be/eTtZlAPA9H4?t=408) and it will just create these nice features for you
+       - [6:51](https://youtu.be/eTtZlAPA9H4?t=411) in the background without you needing to do too much up front.
+       - [6:57](https://youtu.be/eTtZlAPA9H4?t=417) The bad thing is that, I mean, this is nice,
+       - [7:00](https://youtu.be/eTtZlAPA9H4?t=420) but what do I do when I have, again, I don't know,
+       - [7:03](https://youtu.be/eTtZlAPA9H4?t=423) I would say 20, but even five things to review at the same time.
+       - [7:08](https://youtu.be/eTtZlAPA9H4?t=428) It's very, very hard to get that out of the way.
+       - [7:12](https://youtu.be/eTtZlAPA9H4?t=432) So what I did is create this review kit.
+       - [7:16](https://youtu.be/eTtZlAPA9H4?t=436) So I get the entire changes I need,
+       - [7:18](https://youtu.be/eTtZlAPA9H4?t=438) and I get what files change if you want to go file by file,
+       - [7:22](https://youtu.be/eTtZlAPA9H4?t=442) or I can just get visual evidence,
+       - [7:25](https://youtu.be/eTtZlAPA9H4?t=445) so you can actually see videos of what changed
+       - [7:27](https://youtu.be/eTtZlAPA9H4?t=447) or photos of what changed,
+       - [7:28](https://youtu.be/eTtZlAPA9H4?t=448) so you can really quickly understand what you want,
+       - [7:31](https://youtu.be/eTtZlAPA9H4?t=451) or even run a few instances in parallel
+       - [7:34](https://youtu.be/eTtZlAPA9H4?t=454) and just pick the best implementation out of these.
+       - [7:38](https://youtu.be/eTtZlAPA9H4?t=458) So now that we have this,
+       - [7:40](https://youtu.be/eTtZlAPA9H4?t=460) we have visibility and we have autonomy,
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:1@442`
+     - (a) 전사 6:52~7:52
+       - [6:57](https://youtu.be/eTtZlAPA9H4?t=417) The bad thing is that, I mean, this is nice,
+       - [7:00](https://youtu.be/eTtZlAPA9H4?t=420) but what do I do when I have, again, I don't know,
+       - [7:03](https://youtu.be/eTtZlAPA9H4?t=423) I would say 20, but even five things to review at the same time.
+       - [7:08](https://youtu.be/eTtZlAPA9H4?t=428) It's very, very hard to get that out of the way.
+       - [7:12](https://youtu.be/eTtZlAPA9H4?t=432) So what I did is create this review kit.
+       - [7:16](https://youtu.be/eTtZlAPA9H4?t=436) So I get the entire changes I need,
+       - [7:18](https://youtu.be/eTtZlAPA9H4?t=438) and I get what files change if you want to go file by file,
+       - [7:22](https://youtu.be/eTtZlAPA9H4?t=442) or I can just get visual evidence,
+       - [7:25](https://youtu.be/eTtZlAPA9H4?t=445) so you can actually see videos of what changed
+       - [7:27](https://youtu.be/eTtZlAPA9H4?t=447) or photos of what changed,
+       - [7:28](https://youtu.be/eTtZlAPA9H4?t=448) so you can really quickly understand what you want,
+       - [7:31](https://youtu.be/eTtZlAPA9H4?t=451) or even run a few instances in parallel
+       - [7:34](https://youtu.be/eTtZlAPA9H4?t=454) and just pick the best implementation out of these.
+       - [7:38](https://youtu.be/eTtZlAPA9H4?t=458) So now that we have this,
+       - [7:40](https://youtu.be/eTtZlAPA9H4?t=460) we have visibility and we have autonomy,
+       - [7:43](https://youtu.be/eTtZlAPA9H4?t=463) it's pretty cool.
+       - [7:44](https://youtu.be/eTtZlAPA9H4?t=464) Like, we reached a pretty good place
+       - [7:46](https://youtu.be/eTtZlAPA9H4?t=466) in raising the ceiling of what we can do with agents,
+       - [7:49](https://youtu.be/eTtZlAPA9H4?t=469) but it's still pretty exhausting.
+       - [7:52](https://youtu.be/eTtZlAPA9H4?t=472) I mean, it was fun,
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:1@451`
+     - (a) 전사 7:01~8:01
+       - [7:03](https://youtu.be/eTtZlAPA9H4?t=423) I would say 20, but even five things to review at the same time.
+       - [7:08](https://youtu.be/eTtZlAPA9H4?t=428) It's very, very hard to get that out of the way.
+       - [7:12](https://youtu.be/eTtZlAPA9H4?t=432) So what I did is create this review kit.
+       - [7:16](https://youtu.be/eTtZlAPA9H4?t=436) So I get the entire changes I need,
+       - [7:18](https://youtu.be/eTtZlAPA9H4?t=438) and I get what files change if you want to go file by file,
+       - [7:22](https://youtu.be/eTtZlAPA9H4?t=442) or I can just get visual evidence,
+       - [7:25](https://youtu.be/eTtZlAPA9H4?t=445) so you can actually see videos of what changed
+       - [7:27](https://youtu.be/eTtZlAPA9H4?t=447) or photos of what changed,
+       - [7:28](https://youtu.be/eTtZlAPA9H4?t=448) so you can really quickly understand what you want,
+       - [7:31](https://youtu.be/eTtZlAPA9H4?t=451) or even run a few instances in parallel
+       - [7:34](https://youtu.be/eTtZlAPA9H4?t=454) and just pick the best implementation out of these.
+       - [7:38](https://youtu.be/eTtZlAPA9H4?t=458) So now that we have this,
+       - [7:40](https://youtu.be/eTtZlAPA9H4?t=460) we have visibility and we have autonomy,
+       - [7:43](https://youtu.be/eTtZlAPA9H4?t=463) it's pretty cool.
+       - [7:44](https://youtu.be/eTtZlAPA9H4?t=464) Like, we reached a pretty good place
+       - [7:46](https://youtu.be/eTtZlAPA9H4?t=466) in raising the ceiling of what we can do with agents,
+       - [7:49](https://youtu.be/eTtZlAPA9H4?t=469) but it's still pretty exhausting.
+       - [7:52](https://youtu.be/eTtZlAPA9H4?t=472) I mean, it was fun,
+       - [7:54](https://youtu.be/eTtZlAPA9H4?t=474) but now I have to ask myself,
+       - [7:55](https://youtu.be/eTtZlAPA9H4?t=475) do I really need to be the only one doing this?
+       - [7:58](https://youtu.be/eTtZlAPA9H4?t=478) It's pretty lonely to just talk to agents all day
+       - [8:01](https://youtu.be/eTtZlAPA9H4?t=481) and trying to, and, you know,
+     - (b) 판독: 이 id의 판독 문서 없음
+6. **멀티플레이어 협업 공간(워룸)을 통해 사람 간, 에이전트 간 공동 작업 및 정보 공유**
+   - `vd:1@495`
+     - (a) 전사 7:45~8:45
+       - [7:46](https://youtu.be/eTtZlAPA9H4?t=466) in raising the ceiling of what we can do with agents,
+       - [7:49](https://youtu.be/eTtZlAPA9H4?t=469) but it's still pretty exhausting.
+       - [7:52](https://youtu.be/eTtZlAPA9H4?t=472) I mean, it was fun,
+       - [7:54](https://youtu.be/eTtZlAPA9H4?t=474) but now I have to ask myself,
+       - [7:55](https://youtu.be/eTtZlAPA9H4?t=475) do I really need to be the only one doing this?
+       - [7:58](https://youtu.be/eTtZlAPA9H4?t=478) It's pretty lonely to just talk to agents all day
+       - [8:01](https://youtu.be/eTtZlAPA9H4?t=481) and trying to, and, you know,
+       - [8:03](https://youtu.be/eTtZlAPA9H4?t=483) if you look at what a team does, for example,
+       - [8:06](https://youtu.be/eTtZlAPA9H4?t=486) if it's just me, that's fine,
+       - [8:08](https://youtu.be/eTtZlAPA9H4?t=488) but if I have a team,
+       - [8:09](https://youtu.be/eTtZlAPA9H4?t=489) I might not even be the right person
+       - [8:11](https://youtu.be/eTtZlAPA9H4?t=491) to review what's going on.
+       - [8:12](https://youtu.be/eTtZlAPA9H4?t=492) So I need something else,
+       - [8:15](https://youtu.be/eTtZlAPA9H4?t=495) and that something is collaboration.
+       - [8:17](https://youtu.be/eTtZlAPA9H4?t=497) We can just have other people join us.
+       - [8:21](https://youtu.be/eTtZlAPA9H4?t=501) So the way that looks in AgentCraft
+       - [8:24](https://youtu.be/eTtZlAPA9H4?t=504) is that I can create these,
+       - [8:26](https://youtu.be/eTtZlAPA9H4?t=506) you can call it, you know,
+       - [8:28](https://youtu.be/eTtZlAPA9H4?t=508) war halls, war room, whatever.
+       - [8:30](https://youtu.be/eTtZlAPA9H4?t=510) Uh, host them.
+       - [8:32](https://youtu.be/eTtZlAPA9H4?t=512) It's, like, completely local,
+       - [8:32](https://youtu.be/eTtZlAPA9H4?t=512) but you can do, like, tunnels,
+       - [8:35](https://youtu.be/eTtZlAPA9H4?t=515) and people can join you.
+       - [8:36](https://youtu.be/eTtZlAPA9H4?t=516) And so I can create a room,
+       - [8:38](https://youtu.be/eTtZlAPA9H4?t=518) and let's say I have a product designer in my team.
+       - [8:40](https://youtu.be/eTtZlAPA9H4?t=520) In this case, it's my wife.
+       - [8:42](https://youtu.be/eTtZlAPA9H4?t=522) And I can approve, uh, her.
+       - [8:44](https://youtu.be/eTtZlAPA9H4?t=524) Otherwise, she'll be mad.
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:1@504`
+     - (a) 전사 7:54~8:54
+       - [7:54](https://youtu.be/eTtZlAPA9H4?t=474) but now I have to ask myself,
+       - [7:55](https://youtu.be/eTtZlAPA9H4?t=475) do I really need to be the only one doing this?
+       - [7:58](https://youtu.be/eTtZlAPA9H4?t=478) It's pretty lonely to just talk to agents all day
+       - [8:01](https://youtu.be/eTtZlAPA9H4?t=481) and trying to, and, you know,
+       - [8:03](https://youtu.be/eTtZlAPA9H4?t=483) if you look at what a team does, for example,
+       - [8:06](https://youtu.be/eTtZlAPA9H4?t=486) if it's just me, that's fine,
+       - [8:08](https://youtu.be/eTtZlAPA9H4?t=488) but if I have a team,
+       - [8:09](https://youtu.be/eTtZlAPA9H4?t=489) I might not even be the right person
+       - [8:11](https://youtu.be/eTtZlAPA9H4?t=491) to review what's going on.
+       - [8:12](https://youtu.be/eTtZlAPA9H4?t=492) So I need something else,
+       - [8:15](https://youtu.be/eTtZlAPA9H4?t=495) and that something is collaboration.
+       - [8:17](https://youtu.be/eTtZlAPA9H4?t=497) We can just have other people join us.
+       - [8:21](https://youtu.be/eTtZlAPA9H4?t=501) So the way that looks in AgentCraft
+       - [8:24](https://youtu.be/eTtZlAPA9H4?t=504) is that I can create these,
+       - [8:26](https://youtu.be/eTtZlAPA9H4?t=506) you can call it, you know,
+       - [8:28](https://youtu.be/eTtZlAPA9H4?t=508) war halls, war room, whatever.
+       - [8:30](https://youtu.be/eTtZlAPA9H4?t=510) Uh, host them.
+       - [8:32](https://youtu.be/eTtZlAPA9H4?t=512) It's, like, completely local,
+       - [8:32](https://youtu.be/eTtZlAPA9H4?t=512) but you can do, like, tunnels,
+       - [8:35](https://youtu.be/eTtZlAPA9H4?t=515) and people can join you.
+       - [8:36](https://youtu.be/eTtZlAPA9H4?t=516) And so I can create a room,
+       - [8:38](https://youtu.be/eTtZlAPA9H4?t=518) and let's say I have a product designer in my team.
+       - [8:40](https://youtu.be/eTtZlAPA9H4?t=520) In this case, it's my wife.
+       - [8:42](https://youtu.be/eTtZlAPA9H4?t=522) And I can approve, uh, her.
+       - [8:44](https://youtu.be/eTtZlAPA9H4?t=524) Otherwise, she'll be mad.
+       - [8:46](https://youtu.be/eTtZlAPA9H4?t=526) Uh, so I can approve her, and she does her thing.
+       - [8:48](https://youtu.be/eTtZlAPA9H4?t=528) She designs whatever.
+       - [8:50](https://youtu.be/eTtZlAPA9H4?t=530) And I, as an engineer, can not only see that.
+       - [8:53](https://youtu.be/eTtZlAPA9H4?t=533) That's, that's her.
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:1@564`
+     - (a) 전사 8:54~9:54
+       - [8:55](https://youtu.be/eTtZlAPA9H4?t=535) Um, I can not only see that on my map,
+       - [8:58](https://youtu.be/eTtZlAPA9H4?t=538) uh, I can actually take that and follow off off of it.
+       - [9:03](https://youtu.be/eTtZlAPA9H4?t=543) Prompt, prompt.
+       - [9:04](https://youtu.be/eTtZlAPA9H4?t=544) Yeah, that, that, just like her.
+       - [9:06](https://youtu.be/eTtZlAPA9H4?t=546) Um, so I can take that design,
+       - [9:10](https://youtu.be/eTtZlAPA9H4?t=550) follow up on it, implement it while she keeps working.
+       - [9:14](https://youtu.be/eTtZlAPA9H4?t=554) Uh, and the cool thing here is that not only can I hand off,
+       - [9:16](https://youtu.be/eTtZlAPA9H4?t=556) or fork and kind of have this shared workspace.
+       - [9:20](https://youtu.be/eTtZlAPA9H4?t=560) So I'm not really bound anymore to Git.
+       - [9:21](https://youtu.be/eTtZlAPA9H4?t=561) I can use Git, but I'm not really bound to something.
+       - [9:23](https://youtu.be/eTtZlAPA9H4?t=563) Everyone is working together.
+       - [9:24](https://youtu.be/eTtZlAPA9H4?t=564) Uh, you can see that there is also some kind of chat between,
+       - [9:28](https://youtu.be/eTtZlAPA9H4?t=568) not only between, uh, the people within the room,
+       - [9:32](https://youtu.be/eTtZlAPA9H4?t=572) but also between agents.
+       - [9:34](https://youtu.be/eTtZlAPA9H4?t=574) So we can have this really nice notice board
+       - [9:36](https://youtu.be/eTtZlAPA9H4?t=576) of exactly what each person is doing,
+       - [9:38](https://youtu.be/eTtZlAPA9H4?t=578) what each agent is doing.
+       - [9:38](https://youtu.be/eTtZlAPA9H4?t=578) They're all aware of each other,
+       - [9:40](https://youtu.be/eTtZlAPA9H4?t=580) and they can collaborate much more closely,
+       - [9:42](https://youtu.be/eTtZlAPA9H4?t=582) uh, than you normally would be able to do.
+       - [9:44](https://youtu.be/eTtZlAPA9H4?t=584) Uh, so for example here, I can say, okay,
+       - [9:46](https://youtu.be/eTtZlAPA9H4?t=586) I took off this design task.
+       - [9:49](https://youtu.be/eTtZlAPA9H4?t=589) Uh, so now we have, oh, by the way, this is also from devices.
+     - (b) 판독: 이 id의 판독 문서 없음
+
+### timeline
+
+- **0:00 인간이 에이전트 병목인 이유** (slide)
+  - [0:00](https://youtu.be/eTtZlAPA9H4?t=0) but we're here to talk about why we're the bottleneck
+  - [0:03](https://youtu.be/eTtZlAPA9H4?t=3) and why we don't have to be.
+  - [0:07](https://youtu.be/eTtZlAPA9H4?t=7) So, as you all know and use every day,
+  - [0:10](https://youtu.be/eTtZlAPA9H4?t=10) agents are amazing.
+  - [0:12](https://youtu.be/eTtZlAPA9H4?t=12) There's so much they can do,
+  - [0:13](https://youtu.be/eTtZlAPA9H4?t=13) from generating cat memes to B2B SaaS apps.
+  - [0:18](https://youtu.be/eTtZlAPA9H4?t=18) So if they are so amazing,
+  - [0:20](https://youtu.be/eTtZlAPA9H4?t=20) we have to ask, why aren't we all unstoppable?
+  - [0:23](https://youtu.be/eTtZlAPA9H4?t=23) Why doesn't everyone have an army of agents
+  - [0:25](https://youtu.be/eTtZlAPA9H4?t=25) that just does whatever they want?
+  - [0:28](https://youtu.be/eTtZlAPA9H4?t=28) So it should be relatively easy.
+  - [0:30](https://youtu.be/eTtZlAPA9H4?t=30) I mean, you just have a bunch of monitors
+- **1:47 AgentCraft 개요 및 에이전트 스폰**
+  - [1:20](https://youtu.be/eTtZlAPA9H4?t=80) If you try and compare it to other stuff
+  - [1:23](https://youtu.be/eTtZlAPA9H4?t=83) that you've been doing outside of programming,
+  - [1:26](https://youtu.be/eTtZlAPA9H4?t=86) for example, playing video games,
+  - [1:28](https://youtu.be/eTtZlAPA9H4?t=88) it's not really that different.
+  - [1:29](https://youtu.be/eTtZlAPA9H4?t=89) Like if you're playing Warcraft, for example, or Sims,
+  - [1:32](https://youtu.be/eTtZlAPA9H4?t=92) and you have a bunch of different units running around,
+  - [1:35](https://youtu.be/eTtZlAPA9H4?t=95) you need to understand what you're doing
+  - [1:37](https://youtu.be/eTtZlAPA9H4?t=97) and supervise all of it,
+  - [1:38](https://youtu.be/eTtZlAPA9H4?t=98) how different is it from actually inspecting agents?
+  - [1:42](https://youtu.be/eTtZlAPA9H4?t=102) So I took this concept too far
+  - [1:46](https://youtu.be/eTtZlAPA9H4?t=106) and I created AgentCraft,
+  - [1:48](https://youtu.be/eTtZlAPA9H4?t=108) which is a game-inspired orchestrator
+  - [1:51](https://youtu.be/eTtZlAPA9H4?t=111) that tries to bring all that good stuff together into work.
+  - [1:57](https://youtu.be/eTtZlAPA9H4?t=117) So let's take a quick look of what that actually looks like
+  - [2:01](https://youtu.be/eTtZlAPA9H4?t=121) and try and understand the journey that we can go through
+  - [2:04](https://youtu.be/eTtZlAPA9H4?t=124) to really raise the ceiling of how humans and agents can collaborate.
+  - [2:08](https://youtu.be/eTtZlAPA9H4?t=128) So this is AgentCraft.
+  - [2:10](https://youtu.be/eTtZlAPA9H4?t=130) There's really a lot to unpack here.
+  - [2:13](https://youtu.be/eTtZlAPA9H4?t=133) So we'll just go through the basics really quick.
+  - [2:16](https://youtu.be/eTtZlAPA9H4?t=136) What you see here is an agent.
+- **3:22 가시성: 에이전트 현황 및 파일 시스템 지도화**
+  - [2:52](https://youtu.be/eTtZlAPA9H4?t=172) And just do something for me.
+  - [2:55](https://youtu.be/eTtZlAPA9H4?t=175) Prompt, prompt.
+  - [2:57](https://youtu.be/eTtZlAPA9H4?t=177) And now these agents can do whatever.
+  - [3:01](https://youtu.be/eTtZlAPA9H4?t=181) And if you look around,
+  - [3:02](https://youtu.be/eTtZlAPA9H4?t=182) you would see that the map has a bunch of different elements.
+  - [3:05](https://youtu.be/eTtZlAPA9H4?t=185) So you have buildings.
+  - [3:06](https://youtu.be/eTtZlAPA9H4?t=186) These buildings represent functionalities.
+  - [3:08](https://youtu.be/eTtZlAPA9H4?t=188) So for example, if you can manage your plugins or skills,
+  - [3:11](https://youtu.be/eTtZlAPA9H4?t=191) you have like integrated terminal, integrated Git.
+  - [3:15](https://youtu.be/eTtZlAPA9H4?t=195) You can do all of your work from within this space.
+  - [3:20](https://youtu.be/eTtZlAPA9H4?t=200) So now that we have this and we understand the basics,
+  - [3:22](https://youtu.be/eTtZlAPA9H4?t=202) let's look at what we can do to raise the ceiling.
+  - [3:26](https://youtu.be/eTtZlAPA9H4?t=206) So the first step is obviously visibility.
+  - [3:28](https://youtu.be/eTtZlAPA9H4?t=208) I need to understand what's going on.
+  - [3:30](https://youtu.be/eTtZlAPA9H4?t=210) What are my agents doing?
+  - [3:31](https://youtu.be/eTtZlAPA9H4?t=211) So I have this nice side panel
+  - [3:33](https://youtu.be/eTtZlAPA9H4?t=213) and it shows me the different agents
+  - [3:35](https://youtu.be/eTtZlAPA9H4?t=215) and what their task is
+  - [3:36](https://youtu.be/eTtZlAPA9H4?t=216) and what the last thing they did is
+  - [3:38](https://youtu.be/eTtZlAPA9H4?t=218) and what they're currently doing.
+  - [3:39](https://youtu.be/eTtZlAPA9H4?t=219) Everything I need to quickly understand
+  - [3:41](https://youtu.be/eTtZlAPA9H4?t=221) who needs my attention and who doesn't.
+  - [3:43](https://youtu.be/eTtZlAPA9H4?t=223) The second part of it is we're not just limited to this.
+  - [3:47](https://youtu.be/eTtZlAPA9H4?t=227) We have a map.
+  - [3:49](https://youtu.be/eTtZlAPA9H4?t=229) So I can take, let's say, my file system,
+  - [3:52](https://youtu.be/eTtZlAPA9H4?t=232) project it onto the map,
+- **5:07 작업량 과부하 문제 및 퀘스트 자동 생성**
+  - [4:38](https://youtu.be/eTtZlAPA9H4?t=278) I need to be able to quickly jump to it.
+  - [4:40](https://youtu.be/eTtZlAPA9H4?t=280) So much like video games or RTS games
+  - [4:43](https://youtu.be/eTtZlAPA9H4?t=283) or Civilization, whatever,
+  - [4:44](https://youtu.be/eTtZlAPA9H4?t=284) you would click a space bar
+  - [4:46](https://youtu.be/eTtZlAPA9H4?t=286) and it would just take you to the nearest thing
+  - [4:48](https://youtu.be/eTtZlAPA9H4?t=288) that actually needed your attention.
+  - [4:50](https://youtu.be/eTtZlAPA9H4?t=290) So you can really easily understand what's going on
+  - [4:52](https://youtu.be/eTtZlAPA9H4?t=292) and jump from one thing to the other
+  - [4:55](https://youtu.be/eTtZlAPA9H4?t=295) and answer questions or approve plans, et cetera.
+  - [5:01](https://youtu.be/eTtZlAPA9H4?t=301) That was nice.
+  - [5:02](https://youtu.be/eTtZlAPA9H4?t=302) I mean, it's a nice step just to have that visibility,
+  - [5:06](https://youtu.be/eTtZlAPA9H4?t=306) but it's not really enough.
+  - [5:07](https://youtu.be/eTtZlAPA9H4?t=307) It's pretty exhausting to keep looking at what the agents are doing
+  - [5:12](https://youtu.be/eTtZlAPA9H4?t=312) in the granularity of what files are they using
+  - [5:14](https://youtu.be/eTtZlAPA9H4?t=314) and what tools are they using at the moment.
+  - [5:16](https://youtu.be/eTtZlAPA9H4?t=316) So we need something else.
+  - [5:18](https://youtu.be/eTtZlAPA9H4?t=318) And the reason is that we have, like, two main problems here.
+  - [5:22](https://youtu.be/eTtZlAPA9H4?t=322) One is that there's just too much to hold in our heads.
+  - [5:25](https://youtu.be/eTtZlAPA9H4?t=325) Even if I can understand what's going on
+  - [5:27](https://youtu.be/eTtZlAPA9H4?t=327) and I can see everything,
+  - [5:28](https://youtu.be/eTtZlAPA9H4?t=328) I can't really do, like, 20 things at the same time.
+  - [5:30](https://youtu.be/eTtZlAPA9H4?t=330) I can't even think of the next thing I want to do
+  - [5:33](https://youtu.be/eTtZlAPA9H4?t=333) if I have this huge coding project or whatever.
+  - [5:36](https://youtu.be/eTtZlAPA9H4?t=336) So I need to find some way to fix that.
+- **6:07 자율성: 오케스트레이터 및 루프**
+  - [5:39](https://youtu.be/eTtZlAPA9H4?t=339) So we can.
+  - [5:40](https://youtu.be/eTtZlAPA9H4?t=340) I mean, we can tell the agents,
+  - [5:42](https://youtu.be/eTtZlAPA9H4?t=342) you know, go through my code base,
+  - [5:44](https://youtu.be/eTtZlAPA9H4?t=344) find out what the next things I need to do are,
+  - [5:46](https://youtu.be/eTtZlAPA9H4?t=346) create these tasks for me,
+  - [5:47](https://youtu.be/eTtZlAPA9H4?t=347) and I just click a button, I accept the quest,
+  - [5:50](https://youtu.be/eTtZlAPA9H4?t=350) and there's some agent that does it for me,
+  - [5:53](https://youtu.be/eTtZlAPA9H4?t=353) which is fun.
+  - [5:54](https://youtu.be/eTtZlAPA9H4?t=354) It's cool.
+  - [5:55](https://youtu.be/eTtZlAPA9H4?t=355) But the next problem here is that,
+  - [5:58](https://youtu.be/eTtZlAPA9H4?t=358) okay, now I have 20 stuff going at the same time
+  - [6:00](https://youtu.be/eTtZlAPA9H4?t=360) and I have to babysit each and every one,
+  - [6:03](https://youtu.be/eTtZlAPA9H4?t=363) and that is completely exhausting.
+  - [6:05](https://youtu.be/eTtZlAPA9H4?t=365) So you could ask, okay, we have agents.
+  - [6:08](https://youtu.be/eTtZlAPA9H4?t=368) Agents are amazing, as we've established.
+  - [6:11](https://youtu.be/eTtZlAPA9H4?t=371) So I can just go ahead and tell the agent to do it for me.
+  - [6:15](https://youtu.be/eTtZlAPA9H4?t=375) Now it's called software factories,
+  - [6:17](https://youtu.be/eTtZlAPA9H4?t=377) but at the time it was just doing stuff autonomously.
+  - [6:20](https://youtu.be/eTtZlAPA9H4?t=380) So you can give it like a general sense of what you want.
+  - [6:23](https://youtu.be/eTtZlAPA9H4?t=383) It would spawn an orchestrator and break it down for you
+  - [6:26](https://youtu.be/eTtZlAPA9H4?t=386) and run it all in, well, in this case,
+  - [6:29](https://youtu.be/eTtZlAPA9H4?t=389) it's a local container.
+  - [6:31](https://youtu.be/eTtZlAPA9H4?t=391) So everything is just done in isolation,
+  - [6:34](https://youtu.be/eTtZlAPA9H4?t=394) and I don't need to do any babysitting.
+  - [6:36](https://youtu.be/eTtZlAPA9H4?t=396) The agent does it for me.
+  - [6:37](https://youtu.be/eTtZlAPA9H4?t=397) On top of that, you have loops,
+- **7:02 리뷰 킷: 변경 사항 시각화 및 병렬 비교**
+  - [6:34](https://youtu.be/eTtZlAPA9H4?t=394) and I don't need to do any babysitting.
+  - [6:36](https://youtu.be/eTtZlAPA9H4?t=396) The agent does it for me.
+  - [6:37](https://youtu.be/eTtZlAPA9H4?t=397) On top of that, you have loops,
+  - [6:40](https://youtu.be/eTtZlAPA9H4?t=400) which everyone really likes right now.
+  - [6:41](https://youtu.be/eTtZlAPA9H4?t=401) So you can do cool things like just tell that to,
+  - [6:44](https://youtu.be/eTtZlAPA9H4?t=404) I don't know, scan Twitter for cool stuff you want to build
+  - [6:46](https://youtu.be/eTtZlAPA9H4?t=406) or scan your GitHub,
+  - [6:48](https://youtu.be/eTtZlAPA9H4?t=408) and it will just create these nice features for you
+  - [6:51](https://youtu.be/eTtZlAPA9H4?t=411) in the background without you needing to do too much up front.
+  - [6:57](https://youtu.be/eTtZlAPA9H4?t=417) The bad thing is that, I mean, this is nice,
+  - [7:00](https://youtu.be/eTtZlAPA9H4?t=420) but what do I do when I have, again, I don't know,
+  - [7:03](https://youtu.be/eTtZlAPA9H4?t=423) I would say 20, but even five things to review at the same time.
+  - [7:08](https://youtu.be/eTtZlAPA9H4?t=428) It's very, very hard to get that out of the way.
+  - [7:12](https://youtu.be/eTtZlAPA9H4?t=432) So what I did is create this review kit.
+  - [7:16](https://youtu.be/eTtZlAPA9H4?t=436) So I get the entire changes I need,
+  - [7:18](https://youtu.be/eTtZlAPA9H4?t=438) and I get what files change if you want to go file by file,
+  - [7:22](https://youtu.be/eTtZlAPA9H4?t=442) or I can just get visual evidence,
+  - [7:25](https://youtu.be/eTtZlAPA9H4?t=445) so you can actually see videos of what changed
+  - [7:27](https://youtu.be/eTtZlAPA9H4?t=447) or photos of what changed,
+  - [7:28](https://youtu.be/eTtZlAPA9H4?t=448) so you can really quickly understand what you want,
+  - [7:31](https://youtu.be/eTtZlAPA9H4?t=451) or even run a few instances in parallel
+- **7:52 협업: 워룸 및 공동 작업 공간** (slide)
+  - [7:22](https://youtu.be/eTtZlAPA9H4?t=442) or I can just get visual evidence,
+  - [7:25](https://youtu.be/eTtZlAPA9H4?t=445) so you can actually see videos of what changed
+  - [7:27](https://youtu.be/eTtZlAPA9H4?t=447) or photos of what changed,
+  - [7:28](https://youtu.be/eTtZlAPA9H4?t=448) so you can really quickly understand what you want,
+  - [7:31](https://youtu.be/eTtZlAPA9H4?t=451) or even run a few instances in parallel
+  - [7:34](https://youtu.be/eTtZlAPA9H4?t=454) and just pick the best implementation out of these.
+  - [7:38](https://youtu.be/eTtZlAPA9H4?t=458) So now that we have this,
+  - [7:40](https://youtu.be/eTtZlAPA9H4?t=460) we have visibility and we have autonomy,
+  - [7:43](https://youtu.be/eTtZlAPA9H4?t=463) it's pretty cool.
+  - [7:44](https://youtu.be/eTtZlAPA9H4?t=464) Like, we reached a pretty good place
+  - [7:46](https://youtu.be/eTtZlAPA9H4?t=466) in raising the ceiling of what we can do with agents,
+  - [7:49](https://youtu.be/eTtZlAPA9H4?t=469) but it's still pretty exhausting.
+  - [7:52](https://youtu.be/eTtZlAPA9H4?t=472) I mean, it was fun,
+  - [7:54](https://youtu.be/eTtZlAPA9H4?t=474) but now I have to ask myself,
+  - [7:55](https://youtu.be/eTtZlAPA9H4?t=475) do I really need to be the only one doing this?
+  - [7:58](https://youtu.be/eTtZlAPA9H4?t=478) It's pretty lonely to just talk to agents all day
+  - [8:01](https://youtu.be/eTtZlAPA9H4?t=481) and trying to, and, you know,
+  - [8:03](https://youtu.be/eTtZlAPA9H4?t=483) if you look at what a team does, for example,
+  - [8:06](https://youtu.be/eTtZlAPA9H4?t=486) if it's just me, that's fine,
+  - [8:08](https://youtu.be/eTtZlAPA9H4?t=488) but if I have a team,
+  - [8:09](https://youtu.be/eTtZlAPA9H4?t=489) I might not even be the right person
+  - [8:11](https://youtu.be/eTtZlAPA9H4?t=491) to review what's going on.
+  - [8:12](https://youtu.be/eTtZlAPA9H4?t=492) So I need something else,
+  - [8:15](https://youtu.be/eTtZlAPA9H4?t=495) and that something is collaboration.
+  - [8:17](https://youtu.be/eTtZlAPA9H4?t=497) We can just have other people join us.
+  - [8:21](https://youtu.be/eTtZlAPA9H4?t=501) So the way that looks in AgentCraft
+- **10:12 진입 문턱 낮추기 및 Loopers 개념** (slide)
+  - [9:42](https://youtu.be/eTtZlAPA9H4?t=582) uh, than you normally would be able to do.
+  - [9:44](https://youtu.be/eTtZlAPA9H4?t=584) Uh, so for example here, I can say, okay,
+  - [9:46](https://youtu.be/eTtZlAPA9H4?t=586) I took off this design task.
+  - [9:49](https://youtu.be/eTtZlAPA9H4?t=589) Uh, so now we have, oh, by the way, this is also from devices.
+  - [9:55](https://youtu.be/eTtZlAPA9H4?t=595) You can have like mobile,
+  - [9:56](https://youtu.be/eTtZlAPA9H4?t=596) and, and if you like telegram, you can use telegram,
+  - [9:59](https://youtu.be/eTtZlAPA9H4?t=599) uh, whatever floats your boat.
+  - [10:01](https://youtu.be/eTtZlAPA9H4?t=601) So we have visibility, and we have autonomy,
+  - [10:04](https://youtu.be/eTtZlAPA9H4?t=604) and we have collaboration.
+  - [10:05](https://youtu.be/eTtZlAPA9H4?t=605) So we managed to raise the ceiling.
+  - [10:07](https://youtu.be/eTtZlAPA9H4?t=607) Uh, it's now possible, especially if you're power users,
+  - [10:10](https://youtu.be/eTtZlAPA9H4?t=610) to do really cool stuff,
+  - [10:12](https://youtu.be/eTtZlAPA9H4?t=612) and use more agents, and do more things.
+  - [10:14](https://youtu.be/eTtZlAPA9H4?t=614) But the interesting thing here was, you know,
+  - [10:17](https://youtu.be/eTtZlAPA9H4?t=617) if I looked at the feedback I got,
+  - [10:19](https://youtu.be/eTtZlAPA9H4?t=619) it's not just that power users were able to do more.
+  - [10:22](https://youtu.be/eTtZlAPA9H4?t=622) The cooler thing for me was that people that had even nothing to do with agents,
+  - [10:26](https://youtu.be/eTtZlAPA9H4?t=626) or nothing to do with productivity, uh, come and say,
+  - [10:29](https://youtu.be/eTtZlAPA9H4?t=629) uh, okay, my kids really loved it,
+  - [10:32](https://youtu.be/eTtZlAPA9H4?t=632) and they use it all the time to, to orchestrate agents,
+  - [10:35](https://youtu.be/eTtZlAPA9H4?t=635) which they didn't do until now.
+  - [10:37](https://youtu.be/eTtZlAPA9H4?t=637) Uh, or, you know, someone that flunked out of college,
+  - [10:40](https://youtu.be/eTtZlAPA9H4?t=640) because he played StarCraft,
+  - [10:42](https://youtu.be/eTtZlAPA9H4?t=642) and now he can suddenly do really productive stuff with it.
+- **12:55 마무리: 병목 극복 가능성** (slide)
+  - [12:25](https://youtu.be/eTtZlAPA9H4?t=745) and what may appear, like, amazing and easy to one person
+  - [12:28](https://youtu.be/eTtZlAPA9H4?t=748) can appear very difficult to another.
+  - [12:30](https://youtu.be/eTtZlAPA9H4?t=750) Uh, but here, uh, I'm trying to look at a way
+  - [12:35](https://youtu.be/eTtZlAPA9H4?t=755) to make this more customizable,
+  - [12:37](https://youtu.be/eTtZlAPA9H4?t=757) try and understand what it is that you as a person
+  - [12:40](https://youtu.be/eTtZlAPA9H4?t=760) need in order to understand and want to use these tools.
+  - [12:44](https://youtu.be/eTtZlAPA9H4?t=764) So, this is a very, very early draft,
+  - [12:48](https://youtu.be/eTtZlAPA9H4?t=768) um, but if you want to use it, please let me know.
+  - [12:50](https://youtu.be/eTtZlAPA9H4?t=770) So, we're the bottleneck,
+  - [12:52](https://youtu.be/eTtZlAPA9H4?t=772) and I think we've established that, uh, pretty well until now.
+  - [12:55](https://youtu.be/eTtZlAPA9H4?t=775) But the skills that we need to stop being the bottleneck
+  - [12:58](https://youtu.be/eTtZlAPA9H4?t=778) and enable this new future are already with us.
+  - [13:01](https://youtu.be/eTtZlAPA9H4?t=781) So, we are the bottleneck, but we don't have to be.
+  - [13:05](https://youtu.be/eTtZlAPA9H4?t=785) And I hope that you all can take what's relevant to you
+  - [13:09](https://youtu.be/eTtZlAPA9H4?t=789) and your life and apply it forward.
+
+### summary
+
+1. 코딩 에이전트를 다수 운영할 때 인간의 감독과 검토가 병목이 된다는 문제의식에서 출발한 발표다.
+2. 전략 게임의 유닛 관리 방식을 차용한 오케스트레이터 AgentCraft를 소개하며, 에이전트 작업 현황을 지도로 시각화하는 가시성, 자율 오케스트레이터와 루프를 통한 자율성, 그리고 멀티플레이어 협업 공간(워룸)을 통해 협업성을 확보하는 과정을 설명한다.
+3. 마지막으로 비개발자나 초보자에게도 접근성을 높이는 '낮은 문턱(lower floor)'의 중요성을 강조하며, 에이전트 생산성 도구의 대중화를 위한 방향을 제시한다.
+
+### name_pairs
+
+(name_pairs 없음)
+
+### 채점
+
+- Q1 근거 [ ] pass [ ] fail 이유:
+- Q2 시각 [ ] pass [ ] fail 이유:
+- Q3 지어내지 않음 [ ] pass [ ] fail 이유:
+
+## 9. oeL0uP-NO-U
+
+- 제목: [한영자막] AI 코딩 에이전트가 거대한 코드베이스를 망가뜨리고 있습니다 — Sourcegraph Dan Adler
+- 유튜브: https://youtu.be/oeL0uP-NO-U
+- transcript_quality: `ok`
+- mode: `whisper+slides`
+- 입력: 전사 120줄, 판독 15장
+
+| id | 질문 |
+|---|---|
+| Q1 | 근거: key_points의 모든 항목이 그 evidence 초의 전사 줄(앞뒤 30초)이나 같은 id의 판독 문서로 뒷받침되나? |
+| Q2 | 시각: timeline의 모든 초에서(앞뒤 30초 안) 그 label의 내용이 전사나 판독에 실제로 나오나? |
+| Q3 | 지어내지 않음: summary를 포함한 출력 전체에 전사·판독에 없는 내용(제목만 보고 짐작한 내용 포함)이 없고, 근거 자료가 없으면 "내용 없음"으로 두었나? |
+
+### key_points
+
+1. **소프트웨어 산업 고용의 72%가 500인 이상 대기업에 집중**
+   - `vd:6@27`
+     - (a) 전사 0:00~0:57
+       - [0:00](https://youtu.be/oeL0uP-NO-U?t=0) This is a talk today about the unglamorous but load-bearing work of owning a large, complex code base.
+       - [0:10](https://youtu.be/oeL0uP-NO-U?t=10) And why AI and agentic coding tools today make that job more difficult and more important than ever before.
+       - [0:17](https://youtu.be/oeL0uP-NO-U?t=17) Just to start, the software that runs the world is not pretty.
+       - [0:22](https://youtu.be/oeL0uP-NO-U?t=22) It's not new. It's not clean.
+       - [0:25](https://youtu.be/oeL0uP-NO-U?t=25) It's how everything actually works.
+       - [0:27](https://youtu.be/oeL0uP-NO-U?t=27) 72% of software industry employment is in companies with more than 500 people.
+       - [0:33](https://youtu.be/oeL0uP-NO-U?t=33) These are the large enterprises of the world.
+       - [0:36](https://youtu.be/oeL0uP-NO-U?t=36) These are the companies managing thousands of repositories and decades of code base history.
+       - [0:41](https://youtu.be/oeL0uP-NO-U?t=41) Few of your peers work at startups, at the hot companies you may hear about on social media,
+       - [0:46](https://youtu.be/oeL0uP-NO-U?t=46) and even fewer of them are actually like ex-solopreneurs making a living off of their social feeds.
+       - [0:52](https://youtu.be/oeL0uP-NO-U?t=52) Most of us work in large, long-lived code bases.
+       - [0:56](https://youtu.be/oeL0uP-NO-U?t=56) Those code bases are how your bank account will reject a transaction in real time if you hit your limit.
+     - (b) 판독: 이 id의 판독 문서 없음
+2. **AI 에이전트 코드 유입으로 코드베이스 부패 가속**
+   - `vd:6@110`
+     - (a) 전사 1:20~2:20
+       - [1:20](https://youtu.be/oeL0uP-NO-U?t=80) It's how your office air conditioner ticks on and on and on and on and on.
+       - [1:24](https://youtu.be/oeL0uP-NO-U?t=84) These are the things that keep the world moving.
+       - [1:28](https://youtu.be/oeL0uP-NO-U?t=88) We are all completely, utterly dependent on massive, decades-old, super complex code bases that have been built over many, many years by thousands of engineers.
+       - [1:44](https://youtu.be/oeL0uP-NO-U?t=104) And coding agents are writing more, better code today, faster than we have ever seen before.
+       - [1:50](https://youtu.be/oeL0uP-NO-U?t=110) A tidal wave of code is coming for you.
+       - [1:54](https://youtu.be/oeL0uP-NO-U?t=114) It's coming for your code base and for all of your engineers on your team who are trying to just keep their heads above water.
+       - [2:00](https://youtu.be/oeL0uP-NO-U?t=120) Every one of us has felt this pain, this flood of AI-generated code that we now have to review and make sure is healthy for our code base.
+       - [2:08](https://youtu.be/oeL0uP-NO-U?t=128) And we're exhausted by it.
+       - [2:10](https://youtu.be/oeL0uP-NO-U?t=130) And look, there are now code review agents.
+       - [2:12](https://youtu.be/oeL0uP-NO-U?t=132) I'm sure there's a lot of them around this room right now.
+       - [2:14](https://youtu.be/oeL0uP-NO-U?t=134) There are tools designed to help you measure your code base's health and so on.
+       - [2:18](https://youtu.be/oeL0uP-NO-U?t=138) And look, the major coding agents will start to pull this stuff in.
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:6@154`
+     - (a) 전사 2:04~3:04
+       - [2:08](https://youtu.be/oeL0uP-NO-U?t=128) And we're exhausted by it.
+       - [2:10](https://youtu.be/oeL0uP-NO-U?t=130) And look, there are now code review agents.
+       - [2:12](https://youtu.be/oeL0uP-NO-U?t=132) I'm sure there's a lot of them around this room right now.
+       - [2:14](https://youtu.be/oeL0uP-NO-U?t=134) There are tools designed to help you measure your code base's health and so on.
+       - [2:18](https://youtu.be/oeL0uP-NO-U?t=138) And look, the major coding agents will start to pull this stuff in.
+       - [2:22](https://youtu.be/oeL0uP-NO-U?t=142) The models will get better.
+       - [2:23](https://youtu.be/oeL0uP-NO-U?t=143) Over time, we'll keep putting sandbags down to keep this flood held back, right?
+       - [2:28](https://youtu.be/oeL0uP-NO-U?t=148) We're going to keep finding these local maxima to help ourselves sort of avoid this problem.
+       - [2:34](https://youtu.be/oeL0uP-NO-U?t=154) But meanwhile, what's happening is that these code bases, these massive ones that keep the world running, are beginning to decay.
+       - [2:43](https://youtu.be/oeL0uP-NO-U?t=163) Millions of lines of code, tens of thousands of repositories, way too much to fit into a context window, or even just to clone and grep in real time.
+       - [2:52](https://youtu.be/oeL0uP-NO-U?t=172) That's just not possible.
+       - [2:54](https://youtu.be/oeL0uP-NO-U?t=174) And this is causing big problems.
+       - [2:56](https://youtu.be/oeL0uP-NO-U?t=176) We're publishing new features, new patches at record speed.
+       - [3:00](https://youtu.be/oeL0uP-NO-U?t=180) There are different coding standards being applied in different places by different agents across the code base.
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:6@125`
+     - (a) 전사 1:35~2:35
+       - [1:44](https://youtu.be/oeL0uP-NO-U?t=104) And coding agents are writing more, better code today, faster than we have ever seen before.
+       - [1:50](https://youtu.be/oeL0uP-NO-U?t=110) A tidal wave of code is coming for you.
+       - [1:54](https://youtu.be/oeL0uP-NO-U?t=114) It's coming for your code base and for all of your engineers on your team who are trying to just keep their heads above water.
+       - [2:00](https://youtu.be/oeL0uP-NO-U?t=120) Every one of us has felt this pain, this flood of AI-generated code that we now have to review and make sure is healthy for our code base.
+       - [2:08](https://youtu.be/oeL0uP-NO-U?t=128) And we're exhausted by it.
+       - [2:10](https://youtu.be/oeL0uP-NO-U?t=130) And look, there are now code review agents.
+       - [2:12](https://youtu.be/oeL0uP-NO-U?t=132) I'm sure there's a lot of them around this room right now.
+       - [2:14](https://youtu.be/oeL0uP-NO-U?t=134) There are tools designed to help you measure your code base's health and so on.
+       - [2:18](https://youtu.be/oeL0uP-NO-U?t=138) And look, the major coding agents will start to pull this stuff in.
+       - [2:22](https://youtu.be/oeL0uP-NO-U?t=142) The models will get better.
+       - [2:23](https://youtu.be/oeL0uP-NO-U?t=143) Over time, we'll keep putting sandbags down to keep this flood held back, right?
+       - [2:28](https://youtu.be/oeL0uP-NO-U?t=148) We're going to keep finding these local maxima to help ourselves sort of avoid this problem.
+       - [2:34](https://youtu.be/oeL0uP-NO-U?t=154) But meanwhile, what's happening is that these code bases, these massive ones that keep the world running, are beginning to decay.
+     - (b) 판독: 제목 ``, 수치 없음
+       - ocr_text: But these codebases are decaying — quietly, and at record speed JUNE 30, 2026
+3. **대규모 코드베이스 이해는 인프라 문제**
+   - `vd:6@451`
+     - (a) 전사 7:01~8:01
+       - [7:02](https://youtu.be/oeL0uP-NO-U?t=422) Because at the end of the day, what's really funny about all this is that if we know anything about LLMs, it's that they just love to search.
+       - [7:10](https://youtu.be/oeL0uP-NO-U?t=430) It's like a new hire getting up to speed on the code base.
+       - [7:13](https://youtu.be/oeL0uP-NO-U?t=433) It's how agents build models of the world.
+       - [7:16](https://youtu.be/oeL0uP-NO-U?t=436) The repo architecture that you're plugging into your agents.md files, like let's be real, that's barely moving the needle here.
+       - [7:23](https://youtu.be/oeL0uP-NO-U?t=443) This agent is going to grep, grep, grep, grep, grep, grep, grep, grep, grep its way to code base understanding.
+       - [7:29](https://youtu.be/oeL0uP-NO-U?t=449) That's simply how it works.
+       - [7:31](https://youtu.be/oeL0uP-NO-U?t=451) But understanding is a context problem.
+       - [7:33](https://youtu.be/oeL0uP-NO-U?t=453) You can't grep what you literally cannot see.
+       - [7:36](https://youtu.be/oeL0uP-NO-U?t=456) This is tools and infrastructure that's needed.
+       - [7:39](https://youtu.be/oeL0uP-NO-U?t=459) And the infrastructure to go see and search and really deeply understand a 500 or 5,000 or 50,000 or half a million repo code base is not being built by the agent builders today.
+       - [7:54](https://youtu.be/oeL0uP-NO-U?t=474) And so that's where what we're solving, what we're working on as a company.
+       - [7:59](https://youtu.be/oeL0uP-NO-U?t=479) This is what Sourcegraph is built around, right?
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:6@433`
+     - (a) 전사 6:43~7:43
+       - [6:49](https://youtu.be/oeL0uP-NO-U?t=409) Good luck doing that in 90,000 repositories mapping out how these code bases all come together, what's actually living in production across your company, across your product offerings.
+       - [7:02](https://youtu.be/oeL0uP-NO-U?t=422) Because at the end of the day, what's really funny about all this is that if we know anything about LLMs, it's that they just love to search.
+       - [7:10](https://youtu.be/oeL0uP-NO-U?t=430) It's like a new hire getting up to speed on the code base.
+       - [7:13](https://youtu.be/oeL0uP-NO-U?t=433) It's how agents build models of the world.
+       - [7:16](https://youtu.be/oeL0uP-NO-U?t=436) The repo architecture that you're plugging into your agents.md files, like let's be real, that's barely moving the needle here.
+       - [7:23](https://youtu.be/oeL0uP-NO-U?t=443) This agent is going to grep, grep, grep, grep, grep, grep, grep, grep, grep its way to code base understanding.
+       - [7:29](https://youtu.be/oeL0uP-NO-U?t=449) That's simply how it works.
+       - [7:31](https://youtu.be/oeL0uP-NO-U?t=451) But understanding is a context problem.
+       - [7:33](https://youtu.be/oeL0uP-NO-U?t=453) You can't grep what you literally cannot see.
+       - [7:36](https://youtu.be/oeL0uP-NO-U?t=456) This is tools and infrastructure that's needed.
+       - [7:39](https://youtu.be/oeL0uP-NO-U?t=459) And the infrastructure to go see and search and really deeply understand a 500 or 5,000 or 50,000 or half a million repo code base is not being built by the agent builders today.
+     - (b) 판독: 제목 `You can't grep what you can't see`, 수치 없음
+       - ocr_text: You can't grep what you can't see Understanding the codebases that run our world is an infrastructure problem, not a harness problem. JUNE 30, 2026
+4. **Agentic Batch Changes 베타 출시**
+   - `vd:6@543`
+     - (a) 전사 8:33~9:33
+       - [8:33](https://youtu.be/oeL0uP-NO-U?t=513) And where this comes from at the end of the day is having a graph, that code graph in mind.
+       - [8:39](https://youtu.be/oeL0uP-NO-U?t=519) The foundational graph of your code base, including search and then the actual compiler accurate output, if you go and do that analysis.
+       - [8:49](https://youtu.be/oeL0uP-NO-U?t=529) That is essential to give your agents the ability to go and understand how to make changes effectively.
+       - [8:56](https://youtu.be/oeL0uP-NO-U?t=536) Visibility is infrastructure.
+       - [8:58](https://youtu.be/oeL0uP-NO-U?t=538) And we actually built a lot on top of this, right?
+       - [9:02](https://youtu.be/oeL0uP-NO-U?t=542) We're not stopping here.
+       - [9:03](https://youtu.be/oeL0uP-NO-U?t=543) Actually, just today we launched our new agentic batch changes product into beta.
+       - [9:08](https://youtu.be/oeL0uP-NO-U?t=548) This is a frontier agent.
+       - [9:10](https://youtu.be/oeL0uP-NO-U?t=550) And its job is to let the owner of a massive code base actually execute code changes across hundreds or thousands of repositories at once.
+       - [9:19](https://youtu.be/oeL0uP-NO-U?t=559) Starting with a single prompt.
+       - [9:21](https://youtu.be/oeL0uP-NO-U?t=561) This is a product that will iteratively roll out changes across that code base.
+       - [9:25](https://youtu.be/oeL0uP-NO-U?t=565) Self heal, respond to CI status, PR comments.
+       - [9:28](https://youtu.be/oeL0uP-NO-U?t=568) Use coding agents where it makes sense, where judgment is needed.
+       - [9:31](https://youtu.be/oeL0uP-NO-U?t=571) Use deterministic scripts where it's not.
+       - [9:33](https://youtu.be/oeL0uP-NO-U?t=573) And provide tracking and auditability to be sure that you've covered 100% of the places where that patch is needed, where that change is needed.
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:6@548`
+     - (a) 전사 8:38~9:38
+       - [8:39](https://youtu.be/oeL0uP-NO-U?t=519) The foundational graph of your code base, including search and then the actual compiler accurate output, if you go and do that analysis.
+       - [8:49](https://youtu.be/oeL0uP-NO-U?t=529) That is essential to give your agents the ability to go and understand how to make changes effectively.
+       - [8:56](https://youtu.be/oeL0uP-NO-U?t=536) Visibility is infrastructure.
+       - [8:58](https://youtu.be/oeL0uP-NO-U?t=538) And we actually built a lot on top of this, right?
+       - [9:02](https://youtu.be/oeL0uP-NO-U?t=542) We're not stopping here.
+       - [9:03](https://youtu.be/oeL0uP-NO-U?t=543) Actually, just today we launched our new agentic batch changes product into beta.
+       - [9:08](https://youtu.be/oeL0uP-NO-U?t=548) This is a frontier agent.
+       - [9:10](https://youtu.be/oeL0uP-NO-U?t=550) And its job is to let the owner of a massive code base actually execute code changes across hundreds or thousands of repositories at once.
+       - [9:19](https://youtu.be/oeL0uP-NO-U?t=559) Starting with a single prompt.
+       - [9:21](https://youtu.be/oeL0uP-NO-U?t=561) This is a product that will iteratively roll out changes across that code base.
+       - [9:25](https://youtu.be/oeL0uP-NO-U?t=565) Self heal, respond to CI status, PR comments.
+       - [9:28](https://youtu.be/oeL0uP-NO-U?t=568) Use coding agents where it makes sense, where judgment is needed.
+       - [9:31](https://youtu.be/oeL0uP-NO-U?t=571) Use deterministic scripts where it's not.
+       - [9:33](https://youtu.be/oeL0uP-NO-U?t=573) And provide tracking and auditability to be sure that you've covered 100% of the places where that patch is needed, where that change is needed.
+     - (b) 판독: 이 id의 판독 문서 없음
+5. **Mercari 사례: 1프롬프트로 약 80개 저장소 취약점 발견**
+   - `vd:6@620`
+     - (a) 전사 9:50~10:50
+       - [9:52](https://youtu.be/oeL0uP-NO-U?t=592) That it's actually going to be able to adapt to the places where your code base is beginning to fall apart.
+       - [9:57](https://youtu.be/oeL0uP-NO-U?t=597) Here's a great quote from an early access user.
+       - [10:02](https://youtu.be/oeL0uP-NO-U?t=602) Actually, Mercari, a global shopping tool out of Japan.
+       - [10:06](https://youtu.be/oeL0uP-NO-U?t=606) Incredible company.
+       - [10:07](https://youtu.be/oeL0uP-NO-U?t=607) Massive code base.
+       - [10:08](https://youtu.be/oeL0uP-NO-U?t=608) Hundreds and hundreds of independent micro services running in production.
+       - [10:12](https://youtu.be/oeL0uP-NO-U?t=612) This user was using this product to go actually patch a GitHub code injection issue where you have to set environment variables correctly.
+       - [10:20](https://youtu.be/oeL0uP-NO-U?t=620) He ran this on two repos where he knew this issue existed and then said, yeah, go explore the rest of our code base and found 80 other potential vulnerabilities across their code base in other places.
+       - [10:30](https://youtu.be/oeL0uP-NO-U?t=630) This is like config files.
+       - [10:32](https://youtu.be/oeL0uP-NO-U?t=632) This is basically just going and doing that scan.
+       - [10:34](https://youtu.be/oeL0uP-NO-U?t=634) Patching them all in one go with a sort of deterministic script that can go make sure it's making that change consistently, effectively across 100 of the places where that risk exists, that is what confidence is all about in the agentic coding era.
+       - [10:49](https://youtu.be/oeL0uP-NO-U?t=649) If you want to ask them to stopом in there.
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:6@605`
+     - (a) 전사 9:35~10:35
+       - [9:41](https://youtu.be/oeL0uP-NO-U?t=581) Because like I keep saying here, at the end of the day, this is an infrastructure problem.
+       - [9:47](https://youtu.be/oeL0uP-NO-U?t=587) When you're putting code out there into the world, you need to make sure that it's actually going to keep your code base healthy.
+       - [9:52](https://youtu.be/oeL0uP-NO-U?t=592) That it's actually going to be able to adapt to the places where your code base is beginning to fall apart.
+       - [9:57](https://youtu.be/oeL0uP-NO-U?t=597) Here's a great quote from an early access user.
+       - [10:02](https://youtu.be/oeL0uP-NO-U?t=602) Actually, Mercari, a global shopping tool out of Japan.
+       - [10:06](https://youtu.be/oeL0uP-NO-U?t=606) Incredible company.
+       - [10:07](https://youtu.be/oeL0uP-NO-U?t=607) Massive code base.
+       - [10:08](https://youtu.be/oeL0uP-NO-U?t=608) Hundreds and hundreds of independent micro services running in production.
+       - [10:12](https://youtu.be/oeL0uP-NO-U?t=612) This user was using this product to go actually patch a GitHub code injection issue where you have to set environment variables correctly.
+       - [10:20](https://youtu.be/oeL0uP-NO-U?t=620) He ran this on two repos where he knew this issue existed and then said, yeah, go explore the rest of our code base and found 80 other potential vulnerabilities across their code base in other places.
+       - [10:30](https://youtu.be/oeL0uP-NO-U?t=630) This is like config files.
+       - [10:32](https://youtu.be/oeL0uP-NO-U?t=632) This is basically just going and doing that scan.
+       - [10:34](https://youtu.be/oeL0uP-NO-U?t=634) Patching them all in one go with a sort of deterministic script that can go make sure it's making that change consistently, effectively across 100 of the places where that risk exists, that is what confidence is all about in the agentic coding era.
+     - (b) 판독: 제목 ``, 수치 80(high, potential repos affected)
+       - ocr_text: I looked at a GitHub injection issue where you have to set environment variables correctly. I was able to fix it with one prompt on both the Help Center frontend and backend, then extended this to all repos in Mercari - I found around 80 potential repos affected — Patrick Klitzke · Team Lead at Mercari
+6. **코드 그래프 기반 10년 이상 투자**
+   - `vd:6@513`
+     - (a) 전사 8:03~9:03
+       - [8:04](https://youtu.be/oeL0uP-NO-U?t=484) If you'll let me sort of take a moment and predict the future of our industry.
+       - [8:10](https://youtu.be/oeL0uP-NO-U?t=490) These massive code bases are not going away.
+       - [8:14](https://youtu.be/oeL0uP-NO-U?t=494) In fact, there will be more code.
+       - [8:16](https://youtu.be/oeL0uP-NO-U?t=496) There will be much, much, much more code out there in the future.
+       - [8:21](https://youtu.be/oeL0uP-NO-U?t=501) And we believe very deeply that building tools to give agents the ability to actually see and understand and evolve those large code bases is essential for the future.
+       - [8:33](https://youtu.be/oeL0uP-NO-U?t=513) And where this comes from at the end of the day is having a graph, that code graph in mind.
+       - [8:39](https://youtu.be/oeL0uP-NO-U?t=519) The foundational graph of your code base, including search and then the actual compiler accurate output, if you go and do that analysis.
+       - [8:49](https://youtu.be/oeL0uP-NO-U?t=529) That is essential to give your agents the ability to go and understand how to make changes effectively.
+       - [8:56](https://youtu.be/oeL0uP-NO-U?t=536) Visibility is infrastructure.
+       - [8:58](https://youtu.be/oeL0uP-NO-U?t=538) And we actually built a lot on top of this, right?
+       - [9:02](https://youtu.be/oeL0uP-NO-U?t=542) We're not stopping here.
+       - [9:03](https://youtu.be/oeL0uP-NO-U?t=543) Actually, just today we launched our new agentic batch changes product into beta.
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:6@538`
+     - (a) 전사 8:28~9:28
+       - [8:33](https://youtu.be/oeL0uP-NO-U?t=513) And where this comes from at the end of the day is having a graph, that code graph in mind.
+       - [8:39](https://youtu.be/oeL0uP-NO-U?t=519) The foundational graph of your code base, including search and then the actual compiler accurate output, if you go and do that analysis.
+       - [8:49](https://youtu.be/oeL0uP-NO-U?t=529) That is essential to give your agents the ability to go and understand how to make changes effectively.
+       - [8:56](https://youtu.be/oeL0uP-NO-U?t=536) Visibility is infrastructure.
+       - [8:58](https://youtu.be/oeL0uP-NO-U?t=538) And we actually built a lot on top of this, right?
+       - [9:02](https://youtu.be/oeL0uP-NO-U?t=542) We're not stopping here.
+       - [9:03](https://youtu.be/oeL0uP-NO-U?t=543) Actually, just today we launched our new agentic batch changes product into beta.
+       - [9:08](https://youtu.be/oeL0uP-NO-U?t=548) This is a frontier agent.
+       - [9:10](https://youtu.be/oeL0uP-NO-U?t=550) And its job is to let the owner of a massive code base actually execute code changes across hundreds or thousands of repositories at once.
+       - [9:19](https://youtu.be/oeL0uP-NO-U?t=559) Starting with a single prompt.
+       - [9:21](https://youtu.be/oeL0uP-NO-U?t=561) This is a product that will iteratively roll out changes across that code base.
+       - [9:25](https://youtu.be/oeL0uP-NO-U?t=565) Self heal, respond to CI status, PR comments.
+       - [9:28](https://youtu.be/oeL0uP-NO-U?t=568) Use coding agents where it makes sense, where judgment is needed.
+     - (b) 판독: 제목 `The code graph foundation`, 수치 10+(high, of investment)
+       - ocr_text: CODE UNDERSTANDING agent effectiveness dev productivity code reuse documentation onboarding CODE OVERSIGHT tracking codebase change security incident response CODEBASE EVOLUTION modernization automation refactoring at scale The code graph foundation Universal code search + precise code intelligence 10+ years of investment
+
+### timeline
+
+- **0:00 발표 주제 소개** (slide)
+  - [0:00](https://youtu.be/oeL0uP-NO-U?t=0) This is a talk today about the unglamorous but load-bearing work of owning a large, complex code base.
+  - [0:10](https://youtu.be/oeL0uP-NO-U?t=10) And why AI and agentic coding tools today make that job more difficult and more important than ever before.
+  - [0:17](https://youtu.be/oeL0uP-NO-U?t=17) Just to start, the software that runs the world is not pretty.
+  - [0:22](https://youtu.be/oeL0uP-NO-U?t=22) It's not new. It's not clean.
+  - [0:25](https://youtu.be/oeL0uP-NO-U?t=25) It's how everything actually works.
+  - [0:27](https://youtu.be/oeL0uP-NO-U?t=27) 72% of software industry employment is in companies with more than 500 people.
+- **0:17 대규모 코드베이스 의존성** (slide)
+  - [0:00](https://youtu.be/oeL0uP-NO-U?t=0) This is a talk today about the unglamorous but load-bearing work of owning a large, complex code base.
+  - [0:10](https://youtu.be/oeL0uP-NO-U?t=10) And why AI and agentic coding tools today make that job more difficult and more important than ever before.
+  - [0:17](https://youtu.be/oeL0uP-NO-U?t=17) Just to start, the software that runs the world is not pretty.
+  - [0:22](https://youtu.be/oeL0uP-NO-U?t=22) It's not new. It's not clean.
+  - [0:25](https://youtu.be/oeL0uP-NO-U?t=25) It's how everything actually works.
+  - [0:27](https://youtu.be/oeL0uP-NO-U?t=27) 72% of software industry employment is in companies with more than 500 people.
+  - [0:33](https://youtu.be/oeL0uP-NO-U?t=33) These are the large enterprises of the world.
+  - [0:36](https://youtu.be/oeL0uP-NO-U?t=36) These are the companies managing thousands of repositories and decades of code base history.
+  - [0:41](https://youtu.be/oeL0uP-NO-U?t=41) Few of your peers work at startups, at the hot companies you may hear about on social media,
+  - [0:46](https://youtu.be/oeL0uP-NO-U?t=46) and even fewer of them are actually like ex-solopreneurs making a living off of their social feeds.
+- **1:44 AI 코드 유입**
+  - [1:15](https://youtu.be/oeL0uP-NO-U?t=75) It's how an airplane uses radar to adjust trajectories.
+  - [1:18](https://youtu.be/oeL0uP-NO-U?t=78) It's how your paycheck gets issued.
+  - [1:20](https://youtu.be/oeL0uP-NO-U?t=80) It's how your office air conditioner ticks on and on and on and on and on.
+  - [1:24](https://youtu.be/oeL0uP-NO-U?t=84) These are the things that keep the world moving.
+  - [1:28](https://youtu.be/oeL0uP-NO-U?t=88) We are all completely, utterly dependent on massive, decades-old, super complex code bases that have been built over many, many years by thousands of engineers.
+  - [1:44](https://youtu.be/oeL0uP-NO-U?t=104) And coding agents are writing more, better code today, faster than we have ever seen before.
+  - [1:50](https://youtu.be/oeL0uP-NO-U?t=110) A tidal wave of code is coming for you.
+  - [1:54](https://youtu.be/oeL0uP-NO-U?t=114) It's coming for your code base and for all of your engineers on your team who are trying to just keep their heads above water.
+  - [2:00](https://youtu.be/oeL0uP-NO-U?t=120) Every one of us has felt this pain, this flood of AI-generated code that we now have to review and make sure is healthy for our code base.
+  - [2:08](https://youtu.be/oeL0uP-NO-U?t=128) And we're exhausted by it.
+  - [2:10](https://youtu.be/oeL0uP-NO-U?t=130) And look, there are now code review agents.
+  - [2:12](https://youtu.be/oeL0uP-NO-U?t=132) I'm sure there's a lot of them around this room right now.
+  - [2:14](https://youtu.be/oeL0uP-NO-U?t=134) There are tools designed to help you measure your code base's health and so on.
+- **2:35 코드베이스 부패** (slide)
+  - [2:08](https://youtu.be/oeL0uP-NO-U?t=128) And we're exhausted by it.
+  - [2:10](https://youtu.be/oeL0uP-NO-U?t=130) And look, there are now code review agents.
+  - [2:12](https://youtu.be/oeL0uP-NO-U?t=132) I'm sure there's a lot of them around this room right now.
+  - [2:14](https://youtu.be/oeL0uP-NO-U?t=134) There are tools designed to help you measure your code base's health and so on.
+  - [2:18](https://youtu.be/oeL0uP-NO-U?t=138) And look, the major coding agents will start to pull this stuff in.
+  - [2:22](https://youtu.be/oeL0uP-NO-U?t=142) The models will get better.
+  - [2:23](https://youtu.be/oeL0uP-NO-U?t=143) Over time, we'll keep putting sandbags down to keep this flood held back, right?
+  - [2:28](https://youtu.be/oeL0uP-NO-U?t=148) We're going to keep finding these local maxima to help ourselves sort of avoid this problem.
+  - [2:34](https://youtu.be/oeL0uP-NO-U?t=154) But meanwhile, what's happening is that these code bases, these massive ones that keep the world running, are beginning to decay.
+  - [2:43](https://youtu.be/oeL0uP-NO-U?t=163) Millions of lines of code, tens of thousands of repositories, way too much to fit into a context window, or even just to clone and grep in real time.
+  - [2:52](https://youtu.be/oeL0uP-NO-U?t=172) That's just not possible.
+  - [2:54](https://youtu.be/oeL0uP-NO-U?t=174) And this is causing big problems.
+  - [2:56](https://youtu.be/oeL0uP-NO-U?t=176) We're publishing new features, new patches at record speed.
+  - [3:00](https://youtu.be/oeL0uP-NO-U?t=180) There are different coding standards being applied in different places by different agents across the code base.
+  - [3:05](https://youtu.be/oeL0uP-NO-U?t=185) There's duplicated code proliferating.
+- **4:10 AI 코드 이해 부재 사례** (slide)
+  - [3:43](https://youtu.be/oeL0uP-NO-U?t=223) And at the end of the day, the problem here is actually the volume of code.
+  - [3:51](https://youtu.be/oeL0uP-NO-U?t=231) The call is coming from inside the house, right?
+  - [3:54](https://youtu.be/oeL0uP-NO-U?t=234) The very tools that are speeding all of us up and letting us write more code faster than ever are also the tools that are creating the conditions that will cause these massive code bases that run our world to begin to fail.
+  - [4:06](https://youtu.be/oeL0uP-NO-U?t=246) Every day I talk to technology executives at these large companies and they are feeling this so viscerally.
+  - [4:15](https://youtu.be/oeL0uP-NO-U?t=255) The same pain that I imagine many of you are feeling too, right?
+  - [4:18](https://youtu.be/oeL0uP-NO-U?t=258) I want to give my devs the best tools possible.
+  - [4:22](https://youtu.be/oeL0uP-NO-U?t=262) But just today I overheard a dev say, I don't know what this code does.
+  - [4:25](https://youtu.be/oeL0uP-NO-U?t=265) AI wrote it for me.
+  - [4:26](https://youtu.be/oeL0uP-NO-U?t=266) This is a tech leader and executive at a top 10 car manufacturer.
+  - [4:30](https://youtu.be/oeL0uP-NO-U?t=270) When you're writing vehicle autopilot code and you have thousands of engineers in your org that you have to manage and you want to enable, this is terrifying.
+- **4:50 개발 도구 한계** (slide)
+  - [4:22](https://youtu.be/oeL0uP-NO-U?t=262) But just today I overheard a dev say, I don't know what this code does.
+  - [4:25](https://youtu.be/oeL0uP-NO-U?t=265) AI wrote it for me.
+  - [4:26](https://youtu.be/oeL0uP-NO-U?t=266) This is a tech leader and executive at a top 10 car manufacturer.
+  - [4:30](https://youtu.be/oeL0uP-NO-U?t=270) When you're writing vehicle autopilot code and you have thousands of engineers in your org that you have to manage and you want to enable, this is terrifying.
+  - [4:41](https://youtu.be/oeL0uP-NO-U?t=281) All right, here we go.
+  - [4:46](https://youtu.be/oeL0uP-NO-U?t=286) So what I deeply believe is that these code base owners deserve better.
+  - [4:55](https://youtu.be/oeL0uP-NO-U?t=295) Today's agentic dev tools are not meeting the moment for this.
+  - [4:59](https://youtu.be/oeL0uP-NO-U?t=299) The infrastructure to see and understand a 50,000 repo code base is not being built or sold by open AI, by Anthropic, by Cursor, by the rest of them.
+  - [5:09](https://youtu.be/oeL0uP-NO-U?t=309) This is a hard and unique problem.
+  - [5:12](https://youtu.be/oeL0uP-NO-U?t=312) Their agents are so unbelievably good at solving the small scale problems that most developers deal with every day, that their demand is growing faster than ever before.
+- **6:13 9만 저장소 대응 난제** (slide)
+  - [5:43](https://youtu.be/oeL0uP-NO-U?t=343) So thank you all so much for what you're doing.
+  - [5:45](https://youtu.be/oeL0uP-NO-U?t=345) But this session is also a call to dev tools companies out there, to the agent harness builders, to people who are building the infrastructure for these agents, to help build the infrastructure, the ability to go see and understand these massive scale repositories and give that to their agents.
+  - [6:05](https://youtu.be/oeL0uP-NO-U?t=365) This is a great quote that I heard from a tech leader at one of the top 10 US banks, tens of trillions of dollars in assets in custody or administration.
+  - [6:23](https://youtu.be/oeL0uP-NO-U?t=383) Sure, cloud code can make this change, but I have 90,000 repositories to make it in.
+  - [6:30](https://youtu.be/oeL0uP-NO-U?t=390) This is actually a specific quote about a specific supply chain vulnerability, an NPM thing.
+  - [6:36](https://youtu.be/oeL0uP-NO-U?t=396) Won't get into it.
+  - [6:37](https://youtu.be/oeL0uP-NO-U?t=397) But if you're a bank and you're seeing agents uncover and create these new vulnerabilities at an unprecedented pace, and you're being told to go use cloud code to solve this, that's a problem.
+- **7:31 검색 기반 이해의 한계** (slide)
+  - [7:02](https://youtu.be/oeL0uP-NO-U?t=422) Because at the end of the day, what's really funny about all this is that if we know anything about LLMs, it's that they just love to search.
+  - [7:10](https://youtu.be/oeL0uP-NO-U?t=430) It's like a new hire getting up to speed on the code base.
+  - [7:13](https://youtu.be/oeL0uP-NO-U?t=433) It's how agents build models of the world.
+  - [7:16](https://youtu.be/oeL0uP-NO-U?t=436) The repo architecture that you're plugging into your agents.md files, like let's be real, that's barely moving the needle here.
+  - [7:23](https://youtu.be/oeL0uP-NO-U?t=443) This agent is going to grep, grep, grep, grep, grep, grep, grep, grep, grep its way to code base understanding.
+  - [7:29](https://youtu.be/oeL0uP-NO-U?t=449) That's simply how it works.
+  - [7:31](https://youtu.be/oeL0uP-NO-U?t=451) But understanding is a context problem.
+  - [7:33](https://youtu.be/oeL0uP-NO-U?t=453) You can't grep what you literally cannot see.
+  - [7:36](https://youtu.be/oeL0uP-NO-U?t=456) This is tools and infrastructure that's needed.
+  - [7:39](https://youtu.be/oeL0uP-NO-U?t=459) And the infrastructure to go see and search and really deeply understand a 500 or 5,000 or 50,000 or half a million repo code base is not being built by the agent builders today.
+  - [7:54](https://youtu.be/oeL0uP-NO-U?t=474) And so that's where what we're solving, what we're working on as a company.
+  - [7:59](https://youtu.be/oeL0uP-NO-U?t=479) This is what Sourcegraph is built around, right?
+- **8:35 코드 그래프 기반** (slide)
+  - [8:10](https://youtu.be/oeL0uP-NO-U?t=490) These massive code bases are not going away.
+  - [8:14](https://youtu.be/oeL0uP-NO-U?t=494) In fact, there will be more code.
+  - [8:16](https://youtu.be/oeL0uP-NO-U?t=496) There will be much, much, much more code out there in the future.
+  - [8:21](https://youtu.be/oeL0uP-NO-U?t=501) And we believe very deeply that building tools to give agents the ability to actually see and understand and evolve those large code bases is essential for the future.
+  - [8:33](https://youtu.be/oeL0uP-NO-U?t=513) And where this comes from at the end of the day is having a graph, that code graph in mind.
+  - [8:39](https://youtu.be/oeL0uP-NO-U?t=519) The foundational graph of your code base, including search and then the actual compiler accurate output, if you go and do that analysis.
+  - [8:49](https://youtu.be/oeL0uP-NO-U?t=529) That is essential to give your agents the ability to go and understand how to make changes effectively.
+  - [8:56](https://youtu.be/oeL0uP-NO-U?t=536) Visibility is infrastructure.
+  - [8:58](https://youtu.be/oeL0uP-NO-U?t=538) And we actually built a lot on top of this, right?
+  - [9:02](https://youtu.be/oeL0uP-NO-U?t=542) We're not stopping here.
+  - [9:03](https://youtu.be/oeL0uP-NO-U?t=543) Actually, just today we launched our new agentic batch changes product into beta.
+- **9:03 Agentic Batch Changes**
+  - [8:33](https://youtu.be/oeL0uP-NO-U?t=513) And where this comes from at the end of the day is having a graph, that code graph in mind.
+  - [8:39](https://youtu.be/oeL0uP-NO-U?t=519) The foundational graph of your code base, including search and then the actual compiler accurate output, if you go and do that analysis.
+  - [8:49](https://youtu.be/oeL0uP-NO-U?t=529) That is essential to give your agents the ability to go and understand how to make changes effectively.
+  - [8:56](https://youtu.be/oeL0uP-NO-U?t=536) Visibility is infrastructure.
+  - [8:58](https://youtu.be/oeL0uP-NO-U?t=538) And we actually built a lot on top of this, right?
+  - [9:02](https://youtu.be/oeL0uP-NO-U?t=542) We're not stopping here.
+  - [9:03](https://youtu.be/oeL0uP-NO-U?t=543) Actually, just today we launched our new agentic batch changes product into beta.
+  - [9:08](https://youtu.be/oeL0uP-NO-U?t=548) This is a frontier agent.
+  - [9:10](https://youtu.be/oeL0uP-NO-U?t=550) And its job is to let the owner of a massive code base actually execute code changes across hundreds or thousands of repositories at once.
+  - [9:19](https://youtu.be/oeL0uP-NO-U?t=559) Starting with a single prompt.
+  - [9:21](https://youtu.be/oeL0uP-NO-U?t=561) This is a product that will iteratively roll out changes across that code base.
+  - [9:25](https://youtu.be/oeL0uP-NO-U?t=565) Self heal, respond to CI status, PR comments.
+  - [9:28](https://youtu.be/oeL0uP-NO-U?t=568) Use coding agents where it makes sense, where judgment is needed.
+  - [9:31](https://youtu.be/oeL0uP-NO-U?t=571) Use deterministic scripts where it's not.
+  - [9:33](https://youtu.be/oeL0uP-NO-U?t=573) And provide tracking and auditability to be sure that you've covered 100% of the places where that patch is needed, where that change is needed.
+- **10:00 Mercari 사례** (slide)
+  - [9:31](https://youtu.be/oeL0uP-NO-U?t=571) Use deterministic scripts where it's not.
+  - [9:33](https://youtu.be/oeL0uP-NO-U?t=573) And provide tracking and auditability to be sure that you've covered 100% of the places where that patch is needed, where that change is needed.
+  - [9:41](https://youtu.be/oeL0uP-NO-U?t=581) Because like I keep saying here, at the end of the day, this is an infrastructure problem.
+  - [9:47](https://youtu.be/oeL0uP-NO-U?t=587) When you're putting code out there into the world, you need to make sure that it's actually going to keep your code base healthy.
+  - [9:52](https://youtu.be/oeL0uP-NO-U?t=592) That it's actually going to be able to adapt to the places where your code base is beginning to fall apart.
+  - [9:57](https://youtu.be/oeL0uP-NO-U?t=597) Here's a great quote from an early access user.
+  - [10:02](https://youtu.be/oeL0uP-NO-U?t=602) Actually, Mercari, a global shopping tool out of Japan.
+  - [10:06](https://youtu.be/oeL0uP-NO-U?t=606) Incredible company.
+  - [10:07](https://youtu.be/oeL0uP-NO-U?t=607) Massive code base.
+  - [10:08](https://youtu.be/oeL0uP-NO-U?t=608) Hundreds and hundreds of independent micro services running in production.
+  - [10:12](https://youtu.be/oeL0uP-NO-U?t=612) This user was using this product to go actually patch a GitHub code injection issue where you have to set environment variables correctly.
+  - [10:20](https://youtu.be/oeL0uP-NO-U?t=620) He ran this on two repos where he knew this issue existed and then said, yeah, go explore the rest of our code base and found 80 other potential vulnerabilities across their code base in other places.
+  - [10:30](https://youtu.be/oeL0uP-NO-U?t=630) This is like config files.
+
+### summary
+
+1. Sourcegraph CEO Dan Adler의 발표로, AI 에이전트가 대량으로 생성하는 코드가 대규모 코드베이스의 부패를 가속화한다고 지적한다.
+2. 기존 에이전트 도구는 소규모 문제 해결에 강하지만 5만 개 이상의 저장소를 이해하는 인프라가 부족하며, 이 문제를 해결하기 위해 코드 그래프 기반의 Agentic Batch Changes를 소개한다.
+3. Mercari 사례에서 1프롬프트로 약 80개 저장소의 취약점을 발견한 결과를 제시한다.
+
+### name_pairs
+
+- **cloud code → Claude Code** (6:32)
+  - 전사: [6:30](https://youtu.be/oeL0uP-NO-U?t=390) This is actually a specific quote about a specific supply chain vulnerability, an NPM thing.
+  - 판독 ocr_text: Sure, Claude Code can make this change. But I have 90,000 repositories to make it in. — Technology leader · Top 10 US bank
+
+### 채점
+
+- Q1 근거 [ ] pass [ ] fail 이유:
+- Q2 시각 [ ] pass [ ] fail 이유:
+- Q3 지어내지 않음 [ ] pass [ ] fail 이유:
+
+## 10. wrii8VocfZU
+
+- 제목: [한영자막] 샘 알트만이 OpenAI와 일상을 운영하기 위해 AI를 실제로 활용하는 방법입니다.
+- 유튜브: https://youtu.be/wrii8VocfZU
+- transcript_quality: `ok`
+- mode: `whisper`
+- 입력: 전사 423줄, 판독 0장
+
+| id | 질문 |
+|---|---|
+| Q1 | 근거: key_points의 모든 항목이 그 evidence 초의 전사 줄(앞뒤 30초)이나 같은 id의 판독 문서로 뒷받침되나? |
+| Q2 | 시각: timeline의 모든 초에서(앞뒤 30초 안) 그 label의 내용이 전사나 판독에 실제로 나오나? |
+| Q3 | 지어내지 않음: summary를 포함한 출력 전체에 전사·판독에 없는 내용(제목만 보고 짐작한 내용 포함)이 없고, 근거 자료가 없으면 "내용 없음"으로 두었나? |
+
+### key_points
+
+1. **코딩 모델 능력 향상으로 개발자 수요와 기대치 증가**
+   - `vd:9@0`
+     - (a) 전사 0:00~0:30
+       - [0:00](https://youtu.be/wrii8VocfZU?t=0) I think if you had told me four years ago that the coding models were at this level
+       - [0:05](https://youtu.be/wrii8VocfZU?t=5) of capability, I would have been like, wow, I don't know if there would be a lot of developers
+       - [0:09](https://youtu.be/wrii8VocfZU?t=9) at Dev Day.
+       - [0:10](https://youtu.be/wrii8VocfZU?t=10) But there's more developers than ever, it seems like, and more work to do than ever.
+       - [0:13](https://youtu.be/wrii8VocfZU?t=13) So what has the, like, riding the increasing capabilities of coding models and seeing the
+       - [0:19](https://youtu.be/wrii8VocfZU?t=19) impact on engineering taught you about the future of engineering and more broadly, like,
+       - [0:24](https://youtu.be/wrii8VocfZU?t=24) the future of work with AI?
+       - [0:25](https://youtu.be/wrii8VocfZU?t=25) I think people just want so much more stuff.
+       - [0:28](https://youtu.be/wrii8VocfZU?t=28) People's expectations are so high.
+       - [0:30](https://youtu.be/wrii8VocfZU?t=30) And I think that's a wonderful thing.
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:9@25`
+     - (a) 전사 0:00~0:55
+       - [0:00](https://youtu.be/wrii8VocfZU?t=0) I think if you had told me four years ago that the coding models were at this level
+       - [0:05](https://youtu.be/wrii8VocfZU?t=5) of capability, I would have been like, wow, I don't know if there would be a lot of developers
+       - [0:09](https://youtu.be/wrii8VocfZU?t=9) at Dev Day.
+       - [0:10](https://youtu.be/wrii8VocfZU?t=10) But there's more developers than ever, it seems like, and more work to do than ever.
+       - [0:13](https://youtu.be/wrii8VocfZU?t=13) So what has the, like, riding the increasing capabilities of coding models and seeing the
+       - [0:19](https://youtu.be/wrii8VocfZU?t=19) impact on engineering taught you about the future of engineering and more broadly, like,
+       - [0:24](https://youtu.be/wrii8VocfZU?t=24) the future of work with AI?
+       - [0:25](https://youtu.be/wrii8VocfZU?t=25) I think people just want so much more stuff.
+       - [0:28](https://youtu.be/wrii8VocfZU?t=28) People's expectations are so high.
+       - [0:30](https://youtu.be/wrii8VocfZU?t=30) And I think that's a wonderful thing.
+       - [0:31](https://youtu.be/wrii8VocfZU?t=31) I think this is why we'll all have this incredible future in front of us to explore.
+       - [0:36](https://youtu.be/wrii8VocfZU?t=36) But developers, they've never been able to do more, but there's never been a higher bar
+       - [0:39](https://youtu.be/wrii8VocfZU?t=39) either.
+       - [0:40](https://youtu.be/wrii8VocfZU?t=40) And I think that's great.
+       - [0:41](https://youtu.be/wrii8VocfZU?t=41) I think it's, like, a nice thing about society.
+       - [0:42](https://youtu.be/wrii8VocfZU?t=42) Is that something that surprised you?
+       - [0:44](https://youtu.be/wrii8VocfZU?t=44) Did you expect that to happen?
+       - [0:46](https://youtu.be/wrii8VocfZU?t=46) I think I was never, like, as doomer-y about the job stuff as other people.
+       - [0:51](https://youtu.be/wrii8VocfZU?t=51) But it still has surprised me somewhat on the upside of just how much latent demand existed
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:9@36`
+     - (a) 전사 0:06~1:06
+       - [0:09](https://youtu.be/wrii8VocfZU?t=9) at Dev Day.
+       - [0:10](https://youtu.be/wrii8VocfZU?t=10) But there's more developers than ever, it seems like, and more work to do than ever.
+       - [0:13](https://youtu.be/wrii8VocfZU?t=13) So what has the, like, riding the increasing capabilities of coding models and seeing the
+       - [0:19](https://youtu.be/wrii8VocfZU?t=19) impact on engineering taught you about the future of engineering and more broadly, like,
+       - [0:24](https://youtu.be/wrii8VocfZU?t=24) the future of work with AI?
+       - [0:25](https://youtu.be/wrii8VocfZU?t=25) I think people just want so much more stuff.
+       - [0:28](https://youtu.be/wrii8VocfZU?t=28) People's expectations are so high.
+       - [0:30](https://youtu.be/wrii8VocfZU?t=30) And I think that's a wonderful thing.
+       - [0:31](https://youtu.be/wrii8VocfZU?t=31) I think this is why we'll all have this incredible future in front of us to explore.
+       - [0:36](https://youtu.be/wrii8VocfZU?t=36) But developers, they've never been able to do more, but there's never been a higher bar
+       - [0:39](https://youtu.be/wrii8VocfZU?t=39) either.
+       - [0:40](https://youtu.be/wrii8VocfZU?t=40) And I think that's great.
+       - [0:41](https://youtu.be/wrii8VocfZU?t=41) I think it's, like, a nice thing about society.
+       - [0:42](https://youtu.be/wrii8VocfZU?t=42) Is that something that surprised you?
+       - [0:44](https://youtu.be/wrii8VocfZU?t=44) Did you expect that to happen?
+       - [0:46](https://youtu.be/wrii8VocfZU?t=46) I think I was never, like, as doomer-y about the job stuff as other people.
+       - [0:51](https://youtu.be/wrii8VocfZU?t=51) But it still has surprised me somewhat on the upside of just how much latent demand existed
+       - [0:57](https://youtu.be/wrii8VocfZU?t=57) in the world.
+       - [0:58](https://youtu.be/wrii8VocfZU?t=58) And also how much, like, people have remained at the center of everything that is happening
+       - [1:03](https://youtu.be/wrii8VocfZU?t=63) with AI.
+       - [1:04](https://youtu.be/wrii8VocfZU?t=64) Do you think there's a limit to that?
+       - [1:06](https://youtu.be/wrii8VocfZU?t=66) Or do you think that translates pretty cleanly to other areas of work?
+     - (b) 판독: 이 id의 판독 문서 없음
+2. **AI가 인간 중심의 창의적 작업과 1인 기업 생태계 활성화에 기여**
+   - `vd:9@69`
+     - (a) 전사 0:39~1:39
+       - [0:39](https://youtu.be/wrii8VocfZU?t=39) either.
+       - [0:40](https://youtu.be/wrii8VocfZU?t=40) And I think that's great.
+       - [0:41](https://youtu.be/wrii8VocfZU?t=41) I think it's, like, a nice thing about society.
+       - [0:42](https://youtu.be/wrii8VocfZU?t=42) Is that something that surprised you?
+       - [0:44](https://youtu.be/wrii8VocfZU?t=44) Did you expect that to happen?
+       - [0:46](https://youtu.be/wrii8VocfZU?t=46) I think I was never, like, as doomer-y about the job stuff as other people.
+       - [0:51](https://youtu.be/wrii8VocfZU?t=51) But it still has surprised me somewhat on the upside of just how much latent demand existed
+       - [0:57](https://youtu.be/wrii8VocfZU?t=57) in the world.
+       - [0:58](https://youtu.be/wrii8VocfZU?t=58) And also how much, like, people have remained at the center of everything that is happening
+       - [1:03](https://youtu.be/wrii8VocfZU?t=63) with AI.
+       - [1:04](https://youtu.be/wrii8VocfZU?t=64) Do you think there's a limit to that?
+       - [1:06](https://youtu.be/wrii8VocfZU?t=66) Or do you think that translates pretty cleanly to other areas of work?
+       - [1:09](https://youtu.be/wrii8VocfZU?t=69) I think there will be some areas of work where there's actually not much creativity required,
+       - [1:14](https://youtu.be/wrii8VocfZU?t=74) and we don't care about the person doing it.
+       - [1:16](https://youtu.be/wrii8VocfZU?t=76) And many of those tasks or jobs will be done by AI.
+       - [1:20](https://youtu.be/wrii8VocfZU?t=80) But I think there's so much other stuff people want in the world.
+       - [1:23](https://youtu.be/wrii8VocfZU?t=83) There's going to be no shortage of new things to go do.
+       - [1:25](https://youtu.be/wrii8VocfZU?t=85) I think that's been one of the lessons of recent time.
+       - [1:28](https://youtu.be/wrii8VocfZU?t=88) Why do you think it's so human-centered, even though we talk a lot about automation?
+       - [1:33](https://youtu.be/wrii8VocfZU?t=93) I mean, one observation is we just don't care that much about what the machines do.
+       - [1:39](https://youtu.be/wrii8VocfZU?t=99) And in some sense, we never have.
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:9@293`
+     - (a) 전사 4:23~5:23
+       - [4:23](https://youtu.be/wrii8VocfZU?t=263) You know, you said this in your keynote and I've observed it as well.
+       - [4:26](https://youtu.be/wrii8VocfZU?t=266) There's, at DevDate, there's always an app store.
+       - [4:29](https://youtu.be/wrii8VocfZU?t=269) You've been taking swings at app stores for a while.
+       - [4:31](https://youtu.be/wrii8VocfZU?t=271) What have you learned about building a platform and what do you think makes this one different?
+       - [4:36](https://youtu.be/wrii8VocfZU?t=276) I mean, we clearly have not yet figured out the app store equivalent, but we have figured
+       - [4:40](https://youtu.be/wrii8VocfZU?t=280) out how to build a platform that a lot of people are building incredible value on top of.
+       - [4:45](https://youtu.be/wrii8VocfZU?t=285) I think there are really kind of two schools of thought among people building AI model companies.
+       - [4:53](https://youtu.be/wrii8VocfZU?t=293) There are people that believe or hope that there's only going to be one company in the world.
+       - [4:58](https://youtu.be/wrii8VocfZU?t=298) And then there are people like us that believe we are going to see a renaissance in the number of companies
+       - [5:04](https://youtu.be/wrii8VocfZU?t=304) and just an absolute lowering of the bar to people, one person companies, small team companies,
+       - [5:12](https://youtu.be/wrii8VocfZU?t=312) creating incredible new products and services.
+       - [5:14](https://youtu.be/wrii8VocfZU?t=314) And we want to go as hard as we can with the platform to enable people to do that.
+       - [5:19](https://youtu.be/wrii8VocfZU?t=319) And although I think we haven't figured out the app store yet, that's totally fair.
+       - [5:23](https://youtu.be/wrii8VocfZU?t=323) I think we have figured out how to help like millions of people build and create significant new products.
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:9@304`
+     - (a) 전사 4:34~5:34
+       - [4:36](https://youtu.be/wrii8VocfZU?t=276) I mean, we clearly have not yet figured out the app store equivalent, but we have figured
+       - [4:40](https://youtu.be/wrii8VocfZU?t=280) out how to build a platform that a lot of people are building incredible value on top of.
+       - [4:45](https://youtu.be/wrii8VocfZU?t=285) I think there are really kind of two schools of thought among people building AI model companies.
+       - [4:53](https://youtu.be/wrii8VocfZU?t=293) There are people that believe or hope that there's only going to be one company in the world.
+       - [4:58](https://youtu.be/wrii8VocfZU?t=298) And then there are people like us that believe we are going to see a renaissance in the number of companies
+       - [5:04](https://youtu.be/wrii8VocfZU?t=304) and just an absolute lowering of the bar to people, one person companies, small team companies,
+       - [5:12](https://youtu.be/wrii8VocfZU?t=312) creating incredible new products and services.
+       - [5:14](https://youtu.be/wrii8VocfZU?t=314) And we want to go as hard as we can with the platform to enable people to do that.
+       - [5:19](https://youtu.be/wrii8VocfZU?t=319) And although I think we haven't figured out the app store yet, that's totally fair.
+       - [5:23](https://youtu.be/wrii8VocfZU?t=323) I think we have figured out how to help like millions of people build and create significant new products.
+       - [5:27](https://youtu.be/wrii8VocfZU?t=327) And companies.
+       - [5:28](https://youtu.be/wrii8VocfZU?t=328) If you had to narrow in, you said you talked at the keynote about an industrial revolution versus a renaissance,
+     - (b) 판독: 이 id의 판독 문서 없음
+3. **상시 가동 에이전트 'Dots'로 아침 집중력 확보 및 긴급 상황 사전 감지**
+   - `vd:9@496`
+     - (a) 전사 7:46~8:46
+       - [7:49](https://youtu.be/wrii8VocfZU?t=469) past and you do hear and then also like this kind of combination of that with this crazy futurism and discovery of science and engineering and just sort of this,
+       - [7:59](https://youtu.be/wrii8VocfZU?t=479) this feeling that the human potential had massively expanded.
+       - [8:02](https://youtu.be/wrii8VocfZU?t=482) And you do hear people talk about both of those things simultaneously with AI, which is kind of how I got interested in this as an analogy in the first place.
+       - [8:09](https://youtu.be/wrii8VocfZU?t=489) I mean, this is like a very trivial example relative to what is going to be possible or already is possible.
+       - [8:16](https://youtu.be/wrii8VocfZU?t=496) But the dots, the new thing we launched today is the first thing that has given me back control of my mornings and like my mental space in the mornings.
+       - [8:26](https://youtu.be/wrii8VocfZU?t=506) I used to love the early mornings. It's my favorite time of the day to work. It's like maximum creativity.
+       - [8:30](https://youtu.be/wrii8VocfZU?t=510) That's when I would like do the really deep, complicated project of the day.
+       - [8:33](https://youtu.be/wrii8VocfZU?t=513) And then now I like run this like big company and something is going wrong all the time.
+       - [8:38](https://youtu.be/wrii8VocfZU?t=518) And overnight, a lot of stuff happens. And if I don't check my phone right away, then, you know, sometimes it was fine.
+       - [8:45](https://youtu.be/wrii8VocfZU?t=525) And sometimes there was like a real disaster that if I ignored for an hour, just got much worse.
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:9@584`
+     - (a) 전사 9:14~10:14
+       - [9:15](https://youtu.be/wrii8VocfZU?t=555) That's what I was going to ask is so it look, it seems like it's deflecting a lot of things that you might have had to deal with immediately that you can just like leave for later because you're confident you get the thing you need when you check it.
+       - [9:27](https://youtu.be/wrii8VocfZU?t=567) Yeah. I mean, two things that happened today about that.
+       - [9:31](https://youtu.be/wrii8VocfZU?t=571) During the keynote, we had like a big seven production.
+       - [9:35](https://youtu.be/wrii8VocfZU?t=575) This is the risk of live demos and trying to deploy many new features at once.
+       - [9:39](https://youtu.be/wrii8VocfZU?t=579) I was recurring. I was.
+       - [9:41](https://youtu.be/wrii8VocfZU?t=581) So that happened.
+       - [9:43](https://youtu.be/wrii8VocfZU?t=583) Yeah.
+       - [9:44](https://youtu.be/wrii8VocfZU?t=584) Tebow got a message from his dot five minutes before the demo saying, just to let you know, there's, I see that you're in the Dev Day keynote.
+       - [9:54](https://youtu.be/wrii8VocfZU?t=594) I know you were working on it.
+       - [9:55](https://youtu.be/wrii8VocfZU?t=595) I know what the demo is because I was able to like look at the presentation in space or whatever.
+       - [9:59](https://youtu.be/wrii8VocfZU?t=599) And there, you know, this sub is probably going to make the demo not work.
+       - [10:03](https://youtu.be/wrii8VocfZU?t=603) Would you like me to try to fix it?
+       - [10:04](https://youtu.be/wrii8VocfZU?t=604) There's like a few minutes to go.
+       - [10:06](https://youtu.be/wrii8VocfZU?t=606) And now it couldn't fix it yet, but like maybe the next version will be able to go fix that in prod.
+       - [10:12](https://youtu.be/wrii8VocfZU?t=612) And like, think about that whole, like all the stuff that had to come together to make that work.
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:9@624`
+     - (a) 전사 9:54~10:54
+       - [9:54](https://youtu.be/wrii8VocfZU?t=594) I know you were working on it.
+       - [9:55](https://youtu.be/wrii8VocfZU?t=595) I know what the demo is because I was able to like look at the presentation in space or whatever.
+       - [9:59](https://youtu.be/wrii8VocfZU?t=599) And there, you know, this sub is probably going to make the demo not work.
+       - [10:03](https://youtu.be/wrii8VocfZU?t=603) Would you like me to try to fix it?
+       - [10:04](https://youtu.be/wrii8VocfZU?t=604) There's like a few minutes to go.
+       - [10:06](https://youtu.be/wrii8VocfZU?t=606) And now it couldn't fix it yet, but like maybe the next version will be able to go fix that in prod.
+       - [10:12](https://youtu.be/wrii8VocfZU?t=612) And like, think about that whole, like all the stuff that had to come together to make that work.
+       - [10:17](https://youtu.be/wrii8VocfZU?t=617) Just right now, before I came here, I've been in like back to back stuff all day.
+       - [10:21](https://youtu.be/wrii8VocfZU?t=621) Very, very behind on all of my normal stuff.
+       - [10:24](https://youtu.be/wrii8VocfZU?t=624) My dot just before I had walked into the last thing said, you have one little break between now and this thing you're going to go to with Dan.
+       - [10:33](https://youtu.be/wrii8VocfZU?t=633) You have to pay attention to this one thing.
+       - [10:35](https://youtu.be/wrii8VocfZU?t=635) I never would have found that otherwise.
+       - [10:36](https://youtu.be/wrii8VocfZU?t=636) And like it would have been a big mess.
+       - [10:38](https://youtu.be/wrii8VocfZU?t=638) And just the fact that I like don't have to worry about that feels, feels super different.
+       - [10:43](https://youtu.be/wrii8VocfZU?t=643) What's your dot's name?
+       - [10:44](https://youtu.be/wrii8VocfZU?t=644) Dotty.
+       - [10:45](https://youtu.be/wrii8VocfZU?t=645) I had it Alfred earlier.
+       - [10:47](https://youtu.be/wrii8VocfZU?t=647) And then like many people are calling it Dotty for now.
+       - [10:50](https://youtu.be/wrii8VocfZU?t=650) But I'm trying to like think of a great name.
+       - [10:51](https://youtu.be/wrii8VocfZU?t=651) Yeah, yeah, yeah.
+       - [10:52](https://youtu.be/wrii8VocfZU?t=652) Mine's name is Boo.
+       - [10:53](https://youtu.be/wrii8VocfZU?t=653) That's a good one.
+       - [10:54](https://youtu.be/wrii8VocfZU?t=654) Yeah, that's a good one.
+     - (b) 판독: 이 id의 판독 문서 없음
+4. **Space와 실시간 문서(Live Documents)를 통한 인간-AI 협업 방식 도입**
+   - `vd:9@927`
+     - (a) 전사 14:57~15:57
+       - [14:58](https://youtu.be/wrii8VocfZU?t=898) People have talked about the need to have an agent deal with the just onslaught of the internet and all of the various things trying to like hack our attention and distract us and whatever.
+       - [15:08](https://youtu.be/wrii8VocfZU?t=908) And I have definitely learned in the few weeks that I've been using dots that although technology is very wonderful in many ways,
+       - [15:17](https://youtu.be/wrii8VocfZU?t=917) that kind of like crazy attention hacking of social media and phones and notifications had gotten way worse than I realized for me personally.
+       - [15:25](https://youtu.be/wrii8VocfZU?t=925) Tell me about space.
+       - [15:27](https://youtu.be/wrii8VocfZU?t=927) It's, it's a big bet to do three like office suite type tools in one launch.
+       - [15:33](https://youtu.be/wrii8VocfZU?t=933) We didn't set out wanting to do this and then we realized, and I'm sure you've realized your own version of this too,
+       - [15:41](https://youtu.be/wrii8VocfZU?t=941) that software was really not designed on the whole for collaborating with AI.
+       - [15:47](https://youtu.be/wrii8VocfZU?t=947) Yeah.
+       - [15:48](https://youtu.be/wrii8VocfZU?t=948) And you can use it yourself or you can have AI use it on your behalf, but to really collaborate closely,
+       - [15:55](https://youtu.be/wrii8VocfZU?t=955) especially when it's multiple people and multiple people's AI's all working together.
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:9@1006`
+     - (a) 전사 16:16~17:16
+       - [16:17](https://youtu.be/wrii8VocfZU?t=977) And do you have expectations for how much of it you're typing versus how much of it your dot is doing for you?
+       - [16:24](https://youtu.be/wrii8VocfZU?t=984) And also with the, with the docs that you get, like, are you, are you reviewing it from that perspective too?
+       - [16:29](https://youtu.be/wrii8VocfZU?t=989) If there's like a new idea, I like writing the old fashioned way.
+       - [16:33](https://youtu.be/wrii8VocfZU?t=993) Cause it helps me like think about it.
+       - [16:35](https://youtu.be/wrii8VocfZU?t=995) So I still do that.
+       - [16:36](https://youtu.be/wrii8VocfZU?t=996) And then maybe have my daughter, other people's dot, like do the followups.
+       - [16:40](https://youtu.be/wrii8VocfZU?t=1000) But one of the things that I have found most amazing about it, and I don't think we have a word for this yet,
+       - [16:46](https://youtu.be/wrii8VocfZU?t=1006) but for lack of a better word, these like live documents, creating a doc that is going to automatically update as people interact or as other things change in the world.
+       - [16:55](https://youtu.be/wrii8VocfZU?t=1015) And something that like many of our dots can work with together, not only to like share information, but, but actually like, you know, seven people's dots can working together, create something new that kind of existed in all of our heads to some degree, but was like an emergent thing.
+       - [17:11](https://youtu.be/wrii8VocfZU?t=1031) That's been very fun as we think about like new features to explore.
+       - [17:14](https://youtu.be/wrii8VocfZU?t=1034) Is there a specific live doc that has been most useful for you?
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:9@1038`
+     - (a) 전사 16:48~17:48
+       - [16:55](https://youtu.be/wrii8VocfZU?t=1015) And something that like many of our dots can work with together, not only to like share information, but, but actually like, you know, seven people's dots can working together, create something new that kind of existed in all of our heads to some degree, but was like an emergent thing.
+       - [17:11](https://youtu.be/wrii8VocfZU?t=1031) That's been very fun as we think about like new features to explore.
+       - [17:14](https://youtu.be/wrii8VocfZU?t=1034) Is there a specific live doc that has been most useful for you?
+       - [17:18](https://youtu.be/wrii8VocfZU?t=1038) I have switch, like the dashboard.
+       - [17:20](https://youtu.be/wrii8VocfZU?t=1040) I think everybody's probably got like a dashboard that they look at every day for how the company's doing in the way they care about.
+       - [17:25](https://youtu.be/wrii8VocfZU?t=1045) And, you know, I used to share one with everybody else or many other people.
+       - [17:29](https://youtu.be/wrii8VocfZU?t=1049) And I now have one that is kind of like a changing summary of the business just for me based off of like the evolving things that I'm caring about or not caring about.
+       - [17:41](https://youtu.be/wrii8VocfZU?t=1061) Like looks at all my Slack messages, makes me a new thing, like constantly updates it.
+       - [17:45](https://youtu.be/wrii8VocfZU?t=1065) And it's like, oh, this just feels like a living document.
+       - [17:47](https://youtu.be/wrii8VocfZU?t=1067) That's sick.
+       - [17:48](https://youtu.be/wrii8VocfZU?t=1068) What do you care about now?
+     - (b) 판독: 이 id의 판독 문서 없음
+5. **Decisions API와 자체 칩을 통한 추론 속도 및 비용 최적화**
+   - `vd:9@1127`
+     - (a) 전사 18:17~19:17
+       - [18:19](https://youtu.be/wrii8VocfZU?t=1099) I would love to see that over the course of years.
+       - [18:21](https://youtu.be/wrii8VocfZU?t=1101) I think that's really cool.
+       - [18:22](https://youtu.be/wrii8VocfZU?t=1102) I've been wanting one that just like it's a live dashboard of my mood because I have my dot.
+       - [18:29](https://youtu.be/wrii8VocfZU?t=1109) Like when I get a Slack message and I'm like, I don't know if I want to look at this Slack message.
+       - [18:32](https://youtu.be/wrii8VocfZU?t=1112) I have my dot go look at it.
+       - [18:33](https://youtu.be/wrii8VocfZU?t=1113) And then I'm like, should I look at this now or later?
+       - [18:35](https://youtu.be/wrii8VocfZU?t=1115) And it's like, you should look later.
+       - [18:37](https://youtu.be/wrii8VocfZU?t=1117) And I kind of want like a live thing of my mood so it knows.
+       - [18:40](https://youtu.be/wrii8VocfZU?t=1120) Totally.
+       - [18:41](https://youtu.be/wrii8VocfZU?t=1121) Yeah, yeah.
+       - [18:42](https://youtu.be/wrii8VocfZU?t=1122) I want that too.
+       - [18:43](https://youtu.be/wrii8VocfZU?t=1123) I would use that.
+       - [18:45](https://youtu.be/wrii8VocfZU?t=1125) Very cool.
+       - [18:46](https://youtu.be/wrii8VocfZU?t=1126) Tell me about decisions API.
+       - [18:47](https://youtu.be/wrii8VocfZU?t=1127) I feel like the decisions API is one of the sneaky most important things today because Jev is this new hot thing that has honestly changed how we think about building things internally.
+       - [18:58](https://youtu.be/wrii8VocfZU?t=1138) Is decisions API, did you start that from Jev or has it been in the works for a while?
+       - [19:03](https://youtu.be/wrii8VocfZU?t=1143) How do you think about it?
+       - [19:04](https://youtu.be/wrii8VocfZU?t=1144) Diogo used to work at OpenAI and Diogo is awesome.
+       - [19:09](https://youtu.be/wrii8VocfZU?t=1149) And he was talking about this class of ideas for a long time.
+       - [19:12](https://youtu.be/wrii8VocfZU?t=1152) And we had been working on trying to figure out how to make it work.
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:9@1162`
+     - (a) 전사 18:52~19:52
+       - [18:58](https://youtu.be/wrii8VocfZU?t=1138) Is decisions API, did you start that from Jev or has it been in the works for a while?
+       - [19:03](https://youtu.be/wrii8VocfZU?t=1143) How do you think about it?
+       - [19:04](https://youtu.be/wrii8VocfZU?t=1144) Diogo used to work at OpenAI and Diogo is awesome.
+       - [19:09](https://youtu.be/wrii8VocfZU?t=1149) And he was talking about this class of ideas for a long time.
+       - [19:12](https://youtu.be/wrii8VocfZU?t=1152) And we had been working on trying to figure out how to make it work.
+       - [19:19](https://youtu.be/wrii8VocfZU?t=1159) We like the number one request of Luna.
+       - [19:22](https://youtu.be/wrii8VocfZU?t=1162) And this is like an example of how people always want like more cheaper, faster, better.
+       - [19:26](https://youtu.be/wrii8VocfZU?t=1166) But the number one request with Luna, even though people love that model, was I want it to be even cheaper and even faster.
+       - [19:32](https://youtu.be/wrii8VocfZU?t=1172) And so we have been thinking about how we could push it further in that direction.
+       - [19:36](https://youtu.be/wrii8VocfZU?t=1176) Definitely seeing the response to Jev made us more excited to prioritize things in that direction.
+       - [19:43](https://youtu.be/wrii8VocfZU?t=1183) But and like Diogo has inspired me for a long time on thinking about this.
+       - [19:49](https://youtu.be/wrii8VocfZU?t=1189) But I think you will see us try to push, you know, in different ways in the spirit of make the technology super fast and super low cost for common use cases.
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:9@1796`
+     - (a) 전사 29:26~30:26
+       - [29:30](https://youtu.be/wrii8VocfZU?t=1770) I know you're also thinking about that means something that you pay more for better intelligence.
+       - [29:34](https://youtu.be/wrii8VocfZU?t=1774) So like like what are you thinking there?
+       - [29:37](https://youtu.be/wrii8VocfZU?t=1777) So historically what we have mostly focused on and I think done a great job of is bringing down the like price of IQ.
+       - [29:44](https://youtu.be/wrii8VocfZU?t=1784) And we have made hugely more capable models that get dramatically dramatically cheaper every few months or every year.
+       - [29:52](https://youtu.be/wrii8VocfZU?t=1792) Now there's this new vector that is clearly going to be very important of speed.
+       - [29:56](https://youtu.be/wrii8VocfZU?t=1796) And we are putting the investments in place like our own chip is going to be an incredible contributor to letting us get very fast inference in the hands of everybody to say nothing of what the models will do to improve research and our inference stack and everything else.
+       - [30:11](https://youtu.be/wrii8VocfZU?t=1811) And I think we now realize that we've got to go invest in the democratization of this like we have for model intelligence.
+       - [30:18](https://youtu.be/wrii8VocfZU?t=1818) So when can I expect to use ultra fast for all my prompts?
+       - [30:23](https://youtu.be/wrii8VocfZU?t=1823) You can pay us for it and do it now.
+       - [30:26](https://youtu.be/wrii8VocfZU?t=1826) I don't think I can afford it.
+     - (b) 판독: 이 id의 판독 문서 없음
+6. **ChatGPT 구독 연동(BYO Subscription)과 플러그인 생태계 확장**
+   - `vd:9@1254`
+     - (a) 전사 20:24~21:24
+       - [20:24](https://youtu.be/wrii8VocfZU?t=1224) Well, maybe we could go do something from scratch like that.
+       - [20:27](https://youtu.be/wrii8VocfZU?t=1227) But I think we have other things to go do.
+       - [20:29](https://youtu.be/wrii8VocfZU?t=1229) You know, like we want to make the best, cheapest, fastest, most capable model at every point on the Pareto curve of cost and speed and modality.
+       - [20:38](https://youtu.be/wrii8VocfZU?t=1238) But I think there will be new approaches, new architectures, new technologies that are things we just can't cover all of.
+       - [20:44](https://youtu.be/wrii8VocfZU?t=1244) But for the kind of mainline workhorse, like we will try to deliver that.
+       - [20:48](https://youtu.be/wrii8VocfZU?t=1248) So I've been like in your ear a lot about codex native apps for a little while now.
+       - [20:54](https://youtu.be/wrii8VocfZU?t=1254) We finally did it.
+       - [20:55](https://youtu.be/wrii8VocfZU?t=1255) And you finally did it.
+       - [20:56](https://youtu.be/wrii8VocfZU?t=1256) I'm psyched.
+       - [20:57](https://youtu.be/wrii8VocfZU?t=1257) So plug in extensions.
+       - [20:59](https://youtu.be/wrii8VocfZU?t=1259) Yeah.
+       - [21:00](https://youtu.be/wrii8VocfZU?t=1260) And also being able to bring your tokens from your Chattapiti subscription to an app developer.
+       - [21:05](https://youtu.be/wrii8VocfZU?t=1265) Like it changes the equation for someone like me where normally you're thinking about, okay, how much AI can I let my users use so that it doesn't bankrupt me?
+       - [21:13](https://youtu.be/wrii8VocfZU?t=1273) And then you're like, can I use, should I use lower priced models and then the experience is worse?
+       - [21:18](https://youtu.be/wrii8VocfZU?t=1278) But if someone can bring their subscription, I'm like, great, you can use whatever model you want under your subscription.
+       - [21:22](https://youtu.be/wrii8VocfZU?t=1282) What are you most excited about for the kinds of applications and products that can be built at the application layer in this new world?
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:9@1265`
+     - (a) 전사 20:35~21:35
+       - [20:38](https://youtu.be/wrii8VocfZU?t=1238) But I think there will be new approaches, new architectures, new technologies that are things we just can't cover all of.
+       - [20:44](https://youtu.be/wrii8VocfZU?t=1244) But for the kind of mainline workhorse, like we will try to deliver that.
+       - [20:48](https://youtu.be/wrii8VocfZU?t=1248) So I've been like in your ear a lot about codex native apps for a little while now.
+       - [20:54](https://youtu.be/wrii8VocfZU?t=1254) We finally did it.
+       - [20:55](https://youtu.be/wrii8VocfZU?t=1255) And you finally did it.
+       - [20:56](https://youtu.be/wrii8VocfZU?t=1256) I'm psyched.
+       - [20:57](https://youtu.be/wrii8VocfZU?t=1257) So plug in extensions.
+       - [20:59](https://youtu.be/wrii8VocfZU?t=1259) Yeah.
+       - [21:00](https://youtu.be/wrii8VocfZU?t=1260) And also being able to bring your tokens from your Chattapiti subscription to an app developer.
+       - [21:05](https://youtu.be/wrii8VocfZU?t=1265) Like it changes the equation for someone like me where normally you're thinking about, okay, how much AI can I let my users use so that it doesn't bankrupt me?
+       - [21:13](https://youtu.be/wrii8VocfZU?t=1273) And then you're like, can I use, should I use lower priced models and then the experience is worse?
+       - [21:18](https://youtu.be/wrii8VocfZU?t=1278) But if someone can bring their subscription, I'm like, great, you can use whatever model you want under your subscription.
+       - [21:22](https://youtu.be/wrii8VocfZU?t=1282) What are you most excited about for the kinds of applications and products that can be built at the application layer in this new world?
+       - [21:28](https://youtu.be/wrii8VocfZU?t=1288) I mean, I'm most excited for the ones that we haven't thought of.
+       - [21:31](https://youtu.be/wrii8VocfZU?t=1291) Like there's many reasons that we wanted to do this.
+       - [21:33](https://youtu.be/wrii8VocfZU?t=1293) But one of the biggest is and why we do this big dev day thing is just this very deep belief that there are way more good ideas outside of our building than inside.
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:9@1335`
+     - (a) 전사 21:45~22:45
+       - [21:46](https://youtu.be/wrii8VocfZU?t=1306) And I don't know what I'm going to love the most as like a Chattapiti native app, a plugin extension.
+       - [21:52](https://youtu.be/wrii8VocfZU?t=1312) But I am very confident that there will be things that I really do love that I cannot imagine today and that no one at OpenAI really could imagine with conviction today.
+       - [22:01](https://youtu.be/wrii8VocfZU?t=1321) And that's why I mean, that's one of the reasons why this is so important to do.
+       - [22:05](https://youtu.be/wrii8VocfZU?t=1325) Like we want to find a way to get that creative spirit into people's hands and we want to find a way to help builders connect with people who are going to find the technology useful.
+       - [22:15](https://youtu.be/wrii8VocfZU?t=1335) In terms of bringing your Chattapiti subscription with you everywhere, like we just want that ourselves.
+       - [22:20](https://youtu.be/wrii8VocfZU?t=1340) There's all this great stuff that people are building. There's all these new apps. We want to try them.
+       - [22:24](https://youtu.be/wrii8VocfZU?t=1344) And I like I hate having to sign up for 100 subscriptions.
+       - [22:29](https://youtu.be/wrii8VocfZU?t=1349) And I also like when I try something, I'm like, hey, I, you know, like I'd like to be able to use this with like full juice.
+       - [22:34](https://youtu.be/wrii8VocfZU?t=1354) Yeah. So we want to make it just super easy for people to take it with them.
+       - [22:39](https://youtu.be/wrii8VocfZU?t=1359) And it's your subscription. Like it's you should get to use wherever you want.
+       - [22:43](https://youtu.be/wrii8VocfZU?t=1363) Do you think anyone at the app layer is doing this well today?
+     - (b) 판독: 이 id의 판독 문서 없음
+
+### timeline
+
+- **0:00 코딩 모델과 엔지니어링의 미래**
+  - [0:00](https://youtu.be/wrii8VocfZU?t=0) I think if you had told me four years ago that the coding models were at this level
+  - [0:05](https://youtu.be/wrii8VocfZU?t=5) of capability, I would have been like, wow, I don't know if there would be a lot of developers
+  - [0:09](https://youtu.be/wrii8VocfZU?t=9) at Dev Day.
+  - [0:10](https://youtu.be/wrii8VocfZU?t=10) But there's more developers than ever, it seems like, and more work to do than ever.
+  - [0:13](https://youtu.be/wrii8VocfZU?t=13) So what has the, like, riding the increasing capabilities of coding models and seeing the
+  - [0:19](https://youtu.be/wrii8VocfZU?t=19) impact on engineering taught you about the future of engineering and more broadly, like,
+  - [0:24](https://youtu.be/wrii8VocfZU?t=24) the future of work with AI?
+  - [0:25](https://youtu.be/wrii8VocfZU?t=25) I think people just want so much more stuff.
+  - [0:28](https://youtu.be/wrii8VocfZU?t=28) People's expectations are so high.
+  - [0:30](https://youtu.be/wrii8VocfZU?t=30) And I think that's a wonderful thing.
+- **2:44 DevDay 신기능 발표와 플랫폼 비전**
+  - [2:16](https://youtu.be/wrii8VocfZU?t=136) A lot of talk about the interpretation, a lot of talk about, like, the people involved
+  - [2:20](https://youtu.be/wrii8VocfZU?t=140) in it in different ways.
+  - [2:22](https://youtu.be/wrii8VocfZU?t=142) But you know, that was, like, a good thing.
+  - [2:23](https://youtu.be/wrii8VocfZU?t=143) Yeah.
+  - [2:24](https://youtu.be/wrii8VocfZU?t=144) So it's Dev Day.
+  - [2:25](https://youtu.be/wrii8VocfZU?t=145) You launched, by my count, 22 new things today.
+  - [2:28](https://youtu.be/wrii8VocfZU?t=148) Which I've been at all four Dev Days.
+  - [2:31](https://youtu.be/wrii8VocfZU?t=151) And I think last year was, like, nine.
+  - [2:34](https://youtu.be/wrii8VocfZU?t=154) And the year before that was, like, four or five.
+  - [2:36](https://youtu.be/wrii8VocfZU?t=156) So it's a lot more than usual.
+  - [2:37](https://youtu.be/wrii8VocfZU?t=157) Just wait for next year.
+  - [2:39](https://youtu.be/wrii8VocfZU?t=159) Okay.
+  - [2:40](https://youtu.be/wrii8VocfZU?t=160) I'm tired.
+  - [2:41](https://youtu.be/wrii8VocfZU?t=161) I'm tired.
+  - [2:42](https://youtu.be/wrii8VocfZU?t=162) I'm tired.
+  - [2:43](https://youtu.be/wrii8VocfZU?t=163) We cut a bunch of things that we were going to launch today just because you have to, like,
+  - [2:47](https://youtu.be/wrii8VocfZU?t=167) fit it in the 50 minutes.
+  - [2:48](https://youtu.be/wrii8VocfZU?t=168) But, you know, like, we try to practice what we preach.
+  - [2:52](https://youtu.be/wrii8VocfZU?t=172) And if we are saying these tools can make people much more productive and build more and that
+  - [2:56](https://youtu.be/wrii8VocfZU?t=176) people want more stuff, like, we better build more ourselves.
+  - [2:59](https://youtu.be/wrii8VocfZU?t=179) What are the new kind of bottlenecks and best practices for doing that?
+  - [3:06](https://youtu.be/wrii8VocfZU?t=186) I can see for myself, and I assume you guys are seeing this, too.
+  - [3:10](https://youtu.be/wrii8VocfZU?t=190) Like, now that you can build everything, you're like, what should we build and how do we make
+- **4:49 산업혁명과 르네상스 비교**
+  - [4:22](https://youtu.be/wrii8VocfZU?t=262) What have you learned?
+  - [4:23](https://youtu.be/wrii8VocfZU?t=263) You know, you said this in your keynote and I've observed it as well.
+  - [4:26](https://youtu.be/wrii8VocfZU?t=266) There's, at DevDate, there's always an app store.
+  - [4:29](https://youtu.be/wrii8VocfZU?t=269) You've been taking swings at app stores for a while.
+  - [4:31](https://youtu.be/wrii8VocfZU?t=271) What have you learned about building a platform and what do you think makes this one different?
+  - [4:36](https://youtu.be/wrii8VocfZU?t=276) I mean, we clearly have not yet figured out the app store equivalent, but we have figured
+  - [4:40](https://youtu.be/wrii8VocfZU?t=280) out how to build a platform that a lot of people are building incredible value on top of.
+  - [4:45](https://youtu.be/wrii8VocfZU?t=285) I think there are really kind of two schools of thought among people building AI model companies.
+  - [4:53](https://youtu.be/wrii8VocfZU?t=293) There are people that believe or hope that there's only going to be one company in the world.
+  - [4:58](https://youtu.be/wrii8VocfZU?t=298) And then there are people like us that believe we are going to see a renaissance in the number of companies
+  - [5:04](https://youtu.be/wrii8VocfZU?t=304) and just an absolute lowering of the bar to people, one person companies, small team companies,
+  - [5:12](https://youtu.be/wrii8VocfZU?t=312) creating incredible new products and services.
+  - [5:14](https://youtu.be/wrii8VocfZU?t=314) And we want to go as hard as we can with the platform to enable people to do that.
+  - [5:19](https://youtu.be/wrii8VocfZU?t=319) And although I think we haven't figured out the app store yet, that's totally fair.
+- **7:37 에이전트 Dots의 일상 활용**
+  - [7:13](https://youtu.be/wrii8VocfZU?t=433) One of the things that strikes me about the Renaissance versus the Industrial Revolution is in the Renaissance,
+  - [7:19](https://youtu.be/wrii8VocfZU?t=439) you have a sort of different understanding of what it means to be a person and like an individual as opposed to sort of the cog in the machine.
+  - [7:28](https://youtu.be/wrii8VocfZU?t=448) Do you feel like you're starting to see any difference in how we think of ourselves as human that's comparable to the way that we changed how we think of ourselves during the Renaissance?
+  - [7:39](https://youtu.be/wrii8VocfZU?t=459) I mean, so much happened during the Renaissance.
+  - [7:41](https://youtu.be/wrii8VocfZU?t=461) It's hard to say there's like this one thing, but definitely a big part of it was about people like sort of reconnecting to a lot of things that had in the distant,
+  - [7:49](https://youtu.be/wrii8VocfZU?t=469) past and you do hear and then also like this kind of combination of that with this crazy futurism and discovery of science and engineering and just sort of this,
+  - [7:59](https://youtu.be/wrii8VocfZU?t=479) this feeling that the human potential had massively expanded.
+  - [8:02](https://youtu.be/wrii8VocfZU?t=482) And you do hear people talk about both of those things simultaneously with AI, which is kind of how I got interested in this as an analogy in the first place.
+- **15:27 Space와 실시간 문서 협업**
+  - [14:58](https://youtu.be/wrii8VocfZU?t=898) People have talked about the need to have an agent deal with the just onslaught of the internet and all of the various things trying to like hack our attention and distract us and whatever.
+  - [15:08](https://youtu.be/wrii8VocfZU?t=908) And I have definitely learned in the few weeks that I've been using dots that although technology is very wonderful in many ways,
+  - [15:17](https://youtu.be/wrii8VocfZU?t=917) that kind of like crazy attention hacking of social media and phones and notifications had gotten way worse than I realized for me personally.
+  - [15:25](https://youtu.be/wrii8VocfZU?t=925) Tell me about space.
+  - [15:27](https://youtu.be/wrii8VocfZU?t=927) It's, it's a big bet to do three like office suite type tools in one launch.
+  - [15:33](https://youtu.be/wrii8VocfZU?t=933) We didn't set out wanting to do this and then we realized, and I'm sure you've realized your own version of this too,
+  - [15:41](https://youtu.be/wrii8VocfZU?t=941) that software was really not designed on the whole for collaborating with AI.
+  - [15:47](https://youtu.be/wrii8VocfZU?t=947) Yeah.
+  - [15:48](https://youtu.be/wrii8VocfZU?t=948) And you can use it yourself or you can have AI use it on your behalf, but to really collaborate closely,
+  - [15:55](https://youtu.be/wrii8VocfZU?t=955) especially when it's multiple people and multiple people's AI's all working together.
+- **18:48 Decisions API와 모델 최적화**
+  - [18:19](https://youtu.be/wrii8VocfZU?t=1099) I would love to see that over the course of years.
+  - [18:21](https://youtu.be/wrii8VocfZU?t=1101) I think that's really cool.
+  - [18:22](https://youtu.be/wrii8VocfZU?t=1102) I've been wanting one that just like it's a live dashboard of my mood because I have my dot.
+  - [18:29](https://youtu.be/wrii8VocfZU?t=1109) Like when I get a Slack message and I'm like, I don't know if I want to look at this Slack message.
+  - [18:32](https://youtu.be/wrii8VocfZU?t=1112) I have my dot go look at it.
+  - [18:33](https://youtu.be/wrii8VocfZU?t=1113) And then I'm like, should I look at this now or later?
+  - [18:35](https://youtu.be/wrii8VocfZU?t=1115) And it's like, you should look later.
+  - [18:37](https://youtu.be/wrii8VocfZU?t=1117) And I kind of want like a live thing of my mood so it knows.
+  - [18:40](https://youtu.be/wrii8VocfZU?t=1120) Totally.
+  - [18:41](https://youtu.be/wrii8VocfZU?t=1121) Yeah, yeah.
+  - [18:42](https://youtu.be/wrii8VocfZU?t=1122) I want that too.
+  - [18:43](https://youtu.be/wrii8VocfZU?t=1123) I would use that.
+  - [18:45](https://youtu.be/wrii8VocfZU?t=1125) Very cool.
+  - [18:46](https://youtu.be/wrii8VocfZU?t=1126) Tell me about decisions API.
+  - [18:47](https://youtu.be/wrii8VocfZU?t=1127) I feel like the decisions API is one of the sneaky most important things today because Jev is this new hot thing that has honestly changed how we think about building things internally.
+  - [18:58](https://youtu.be/wrii8VocfZU?t=1138) Is decisions API, did you start that from Jev or has it been in the works for a while?
+  - [19:03](https://youtu.be/wrii8VocfZU?t=1143) How do you think about it?
+  - [19:04](https://youtu.be/wrii8VocfZU?t=1144) Diogo used to work at OpenAI and Diogo is awesome.
+  - [19:09](https://youtu.be/wrii8VocfZU?t=1149) And he was talking about this class of ideas for a long time.
+  - [19:12](https://youtu.be/wrii8VocfZU?t=1152) And we had been working on trying to figure out how to make it work.
+- **21:30 ChatGPT 앱 생태계와 구독 연동**
+  - [21:00](https://youtu.be/wrii8VocfZU?t=1260) And also being able to bring your tokens from your Chattapiti subscription to an app developer.
+  - [21:05](https://youtu.be/wrii8VocfZU?t=1265) Like it changes the equation for someone like me where normally you're thinking about, okay, how much AI can I let my users use so that it doesn't bankrupt me?
+  - [21:13](https://youtu.be/wrii8VocfZU?t=1273) And then you're like, can I use, should I use lower priced models and then the experience is worse?
+  - [21:18](https://youtu.be/wrii8VocfZU?t=1278) But if someone can bring their subscription, I'm like, great, you can use whatever model you want under your subscription.
+  - [21:22](https://youtu.be/wrii8VocfZU?t=1282) What are you most excited about for the kinds of applications and products that can be built at the application layer in this new world?
+  - [21:28](https://youtu.be/wrii8VocfZU?t=1288) I mean, I'm most excited for the ones that we haven't thought of.
+  - [21:31](https://youtu.be/wrii8VocfZU?t=1291) Like there's many reasons that we wanted to do this.
+  - [21:33](https://youtu.be/wrii8VocfZU?t=1293) But one of the biggest is and why we do this big dev day thing is just this very deep belief that there are way more good ideas outside of our building than inside.
+  - [21:46](https://youtu.be/wrii8VocfZU?t=1306) And I don't know what I'm going to love the most as like a Chattapiti native app, a plugin extension.
+  - [21:52](https://youtu.be/wrii8VocfZU?t=1312) But I am very confident that there will be things that I really do love that I cannot imagine today and that no one at OpenAI really could imagine with conviction today.
+- **27:54 Ultra-fast 프롬프트와 속도 혁신**
+  - [27:27](https://youtu.be/wrii8VocfZU?t=1647) So what do you get to... What does that add that instead of having to put a team on it, you can now be like, oh, I'm going to make a plug-in?
+  - [27:34](https://youtu.be/wrii8VocfZU?t=1654) Well, I think today was an example of this. Like you talked about how the amount of stuff every Dev Day has gone up.
+  - [27:39](https://youtu.be/wrii8VocfZU?t=1659) Like we could not have done all of this stuff without having AI to help us.
+  - [27:43](https://youtu.be/wrii8VocfZU?t=1663) And if this works, like next year we will put the teams on it and I will do something and more people will do something and we'll have like a crazy amount of amazing stuff.
+  - [27:54](https://youtu.be/wrii8VocfZU?t=1674) Or just one really great thing. That'd be fine too. But like hopefully the total amount of like utility we put out into the world goes up.
+  - [28:02](https://youtu.be/wrii8VocfZU?t=1682) Do you do all your prompting on Ultrafast?
+  - [28:04](https://youtu.be/wrii8VocfZU?t=1684) I do.
+  - [28:05](https://youtu.be/wrii8VocfZU?t=1685) That's sick.
+  - [28:06](https://youtu.be/wrii8VocfZU?t=1686) Yeah.
+  - [28:07](https://youtu.be/wrii8VocfZU?t=1687) That's crazy.
+  - [28:08](https://youtu.be/wrii8VocfZU?t=1688) No, I've been thinking about this. I worry that in some ways we kind of get out of touch with people building on our tools and we try it. We've tried to like put all of these constraints on ourselves.
+  - [28:20](https://youtu.be/wrii8VocfZU?t=1700) You know, I'm like very aware that not everybody is going to be able to use Ultrafast all the time for everything.
+
+### summary
+
+1. 샘 알트만은 코딩 모델의 능력 향상으로 개발자 수요가 증가하고, AI가 인간 중심의 창의적 작업과 1인 기업 생태계를 활성화한다고 설명한다.
+2. 상시 가동 에이전트 'Dots'를 통해 아침 집중력을 확보하고 긴급 상황을 사전에 감지하는 등 일상 운영 방식을 변화시켰다.
+3. 또한 Space와 실시간 문서를 통한 협업, Decisions API와 자체 칩을 이용한 추론 속도 최적화, 그리고 ChatGPT 구독 연동을 통한 앱 생태계 확장을 강조했다.
+
+### name_pairs
+
+(name_pairs 없음)
+
+### 채점
+
+- Q1 근거 [ ] pass [ ] fail 이유:
+- Q2 시각 [ ] pass [ ] fail 이유:
+- Q3 지어내지 않음 [ ] pass [ ] fail 이유:
+
+## 11. xRZHLI5SPWo
+
+- 제목: [한영자막] 400개 기업 데이터로 본 소프트웨어 개발 AI의 현주소입니다
+- 유튜브: https://youtu.be/xRZHLI5SPWo
+- transcript_quality: `ok`
+- mode: `whisper+slides`
+- 입력: 전사 204줄, 판독 17장
+
+| id | 질문 |
+|---|---|
+| Q1 | 근거: key_points의 모든 항목이 그 evidence 초의 전사 줄(앞뒤 30초)이나 같은 id의 판독 문서로 뒷받침되나? |
+| Q2 | 시각: timeline의 모든 초에서(앞뒤 30초 안) 그 label의 내용이 전사나 판독에 실제로 나오나? |
+| Q3 | 지어내지 않음: summary를 포함한 출력 전체에 전사·판독에 없는 내용(제목만 보고 짐작한 내용 포함)이 없고, 근거 자료가 없으면 "내용 없음"으로 두었나? |
+
+### key_points
+
+1. **배포 빈도(DORA) 지속 증가, Q3 2025 78에서 Q2 2026 114로 상승**
+   - `vd:15@105`
+     - (a) 전사 1:15~2:15
+       - [1:15](https://youtu.be/xRZHLI5SPWo?t=75) first things first let's kind of look at what we're seeing in terms of the
+       - [1:17](https://youtu.be/xRZHLI5SPWo?t=77) velocity impact. Now if anybody's familiar with looking at various
+       - [1:21](https://youtu.be/xRZHLI5SPWo?t=81) velocity metrics like PR throughput and deployment frequency like hopefully you
+       - [1:25](https://youtu.be/xRZHLI5SPWo?t=85) understand the caveat that these metrics are not perfect. They are proxy metrics
+       - [1:29](https://youtu.be/xRZHLI5SPWo?t=89) for understanding the way that work flows through an organization. They're not
+       - [1:33](https://youtu.be/xRZHLI5SPWo?t=93) fully representative of the value generation. We're going to look at some
+       - [1:36](https://youtu.be/xRZHLI5SPWo?t=96) metrics that are closer to that as well but let's just try to understand what
+       - [1:40](https://youtu.be/xRZHLI5SPWo?t=100) this technology is doing in terms of just the raw velocity metrics in the
+       - [1:44](https://youtu.be/xRZHLI5SPWo?t=104) organization. So here's our Dora metric for deployment frequency. Who's
+       - [1:48](https://youtu.be/xRZHLI5SPWo?t=108) familiar with Dora metrics? All right most of you great. So this is one of the you know
+       - [1:54](https://youtu.be/xRZHLI5SPWo?t=114) four key metrics that tries to understand directionally you know the speed of
+       - [1:58](https://youtu.be/xRZHLI5SPWo?t=118) shipping work within an environment and we're seeing it steadily increase. It's
+       - [2:03](https://youtu.be/xRZHLI5SPWo?t=123) tapering off a little bit. I think there's reasons for that. Some of the surge
+       - [2:08](https://youtu.be/xRZHLI5SPWo?t=128) that we saw early on was due to people shipping you know PRs more frequently and
+       - [2:14](https://youtu.be/xRZHLI5SPWo?t=134) things like that. So we're seeing increases in this. This is one small part of
+     - (b) 판독: 제목 `Deployment frequency steadily increasing`, 수치 78(high, Q3 2025 deployment frequency), 80(high, Q4 2025 deployment frequency), 105(high, Q1 2026 deployment frequency), 114(high, Q2 2026 deployment frequency)
+       - ocr_text: Deployment frequency steadily increasing 78 80 105 114 Q3 2025 Q4 2025 Q1 2026 Q2 2026
+   - `vd:15@108`
+     - (a) 전사 1:18~2:18
+       - [1:21](https://youtu.be/xRZHLI5SPWo?t=81) velocity metrics like PR throughput and deployment frequency like hopefully you
+       - [1:25](https://youtu.be/xRZHLI5SPWo?t=85) understand the caveat that these metrics are not perfect. They are proxy metrics
+       - [1:29](https://youtu.be/xRZHLI5SPWo?t=89) for understanding the way that work flows through an organization. They're not
+       - [1:33](https://youtu.be/xRZHLI5SPWo?t=93) fully representative of the value generation. We're going to look at some
+       - [1:36](https://youtu.be/xRZHLI5SPWo?t=96) metrics that are closer to that as well but let's just try to understand what
+       - [1:40](https://youtu.be/xRZHLI5SPWo?t=100) this technology is doing in terms of just the raw velocity metrics in the
+       - [1:44](https://youtu.be/xRZHLI5SPWo?t=104) organization. So here's our Dora metric for deployment frequency. Who's
+       - [1:48](https://youtu.be/xRZHLI5SPWo?t=108) familiar with Dora metrics? All right most of you great. So this is one of the you know
+       - [1:54](https://youtu.be/xRZHLI5SPWo?t=114) four key metrics that tries to understand directionally you know the speed of
+       - [1:58](https://youtu.be/xRZHLI5SPWo?t=118) shipping work within an environment and we're seeing it steadily increase. It's
+       - [2:03](https://youtu.be/xRZHLI5SPWo?t=123) tapering off a little bit. I think there's reasons for that. Some of the surge
+       - [2:08](https://youtu.be/xRZHLI5SPWo?t=128) that we saw early on was due to people shipping you know PRs more frequently and
+       - [2:14](https://youtu.be/xRZHLI5SPWo?t=134) things like that. So we're seeing increases in this. This is one small part of
+     - (b) 판독: 이 id의 판독 문서 없음
+2. **체감 배포 속도 약 4.5% 증가로 정체, 실제 생산성 향상과 괴리**
+   - `vd:15@210`
+     - (a) 전사 3:00~4:00
+       - [3:00](https://youtu.be/xRZHLI5SPWo?t=180) way that we can spend money on this technology and think about token spend is
+       - [3:03](https://youtu.be/xRZHLI5SPWo?t=183) different. The regulation is different. But if we just look at the through line in
+       - [3:08](https://youtu.be/xRZHLI5SPWo?t=188) general you know we still see improvements in in this one metric of
+       - [3:13](https://youtu.be/xRZHLI5SPWo?t=193) deploy frequency even across various regions. We do just see some variance in
+       - [3:18](https://youtu.be/xRZHLI5SPWo?t=198) those regions. Here's one that's kind of interesting though. The perceived rate of
+       - [3:24](https://youtu.be/xRZHLI5SPWo?t=204) delivery. How much faster do engineers feel in terms of what they're delivering?
+       - [3:30](https://youtu.be/xRZHLI5SPWo?t=210) It's gone up a little bit. This number shows an increase of about four and a half
+       - [3:35](https://youtu.be/xRZHLI5SPWo?t=215) ish percent. But given that that's a full year and given all the investment and
+       - [3:41](https://youtu.be/xRZHLI5SPWo?t=221) cost and new spend on AI. It's interesting that this perceived rate has
+       - [3:44](https://youtu.be/xRZHLI5SPWo?t=224) not stayed. It has not kind of crept up a little bit more. Especially when you look
+       - [3:48](https://youtu.be/xRZHLI5SPWo?t=228) at some studies like obviously infamous flawed METR study. If you're familiar
+       - [3:54](https://youtu.be/xRZHLI5SPWo?t=234) with that study back in February they actually released a follow-up to that
+       - [3:58](https://youtu.be/xRZHLI5SPWo?t=238) study saying that some of the signals they gathered were sort of imperfect
+       - [4:00](https://youtu.be/xRZHLI5SPWo?t=240) and they needed to rethink some of that. But what was interesting was that in
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:15@254`
+     - (a) 전사 3:44~4:44
+       - [3:44](https://youtu.be/xRZHLI5SPWo?t=224) not stayed. It has not kind of crept up a little bit more. Especially when you look
+       - [3:48](https://youtu.be/xRZHLI5SPWo?t=228) at some studies like obviously infamous flawed METR study. If you're familiar
+       - [3:54](https://youtu.be/xRZHLI5SPWo?t=234) with that study back in February they actually released a follow-up to that
+       - [3:58](https://youtu.be/xRZHLI5SPWo?t=238) study saying that some of the signals they gathered were sort of imperfect
+       - [4:00](https://youtu.be/xRZHLI5SPWo?t=240) and they needed to rethink some of that. But what was interesting was that in
+       - [4:04](https://youtu.be/xRZHLI5SPWo?t=244) these 16 engineers that were part of that study, small study, flawed study, the
+       - [4:08](https://youtu.be/xRZHLI5SPWo?t=248) productivity went down by about 19 percent but the perception went up by about 20
+       - [4:13](https://youtu.be/xRZHLI5SPWo?t=253) percent. So there was like a 40 percent spread in perception of productivity
+       - [4:17](https://youtu.be/xRZHLI5SPWo?t=257) versus actual productivity. But here when we look at this on more of an
+       - [4:20](https://youtu.be/xRZHLI5SPWo?t=260) aggregate things interestingly stay sort of flat. All right what about impact on
+       - [4:26](https://youtu.be/xRZHLI5SPWo?t=266) quality and and delivery right? So those are just kind of our speed our velocity
+       - [4:30](https://youtu.be/xRZHLI5SPWo?t=270) metrics but what is this actually doing to our software quality? The first metric
+       - [4:35](https://youtu.be/xRZHLI5SPWo?t=275) we'll look at here is the DORA change failure rate metric and let me prepare you.
+       - [4:41](https://youtu.be/xRZHLI5SPWo?t=281) Most of you are sitting down. It's very volatile the impact that we've seen on
+     - (b) 판독: 제목 `Perceived rate of delivery flat / slightly up`, 수치 없음
+       - ocr_text: Perceived rate of delivery flat / slightly up 100% 90% 80% 70% 60% 50% 40% 30% Q3 2025 Q4 2025 Q1 2026 Q2 2026
+3. **변경 실패율(Change Failure Rate) 변동성 확대, 일부 기업 벤치마크 대비 50% 이상 결함 증가**
+   - `vd:15@299`
+     - (a) 전사 4:29~5:29
+       - [4:30](https://youtu.be/xRZHLI5SPWo?t=270) metrics but what is this actually doing to our software quality? The first metric
+       - [4:35](https://youtu.be/xRZHLI5SPWo?t=275) we'll look at here is the DORA change failure rate metric and let me prepare you.
+       - [4:41](https://youtu.be/xRZHLI5SPWo?t=281) Most of you are sitting down. It's very volatile the impact that we've seen on
+       - [4:45](https://youtu.be/xRZHLI5SPWo?t=285) quality over this period of time. Each line on this graph represents a single
+       - [4:50](https://youtu.be/xRZHLI5SPWo?t=290) company that was part of this particular part of the study and that line shows
+       - [4:54](https://youtu.be/xRZHLI5SPWo?t=294) whether you've moved up in terms of your change failure rate or move down in
+       - [4:58](https://youtu.be/xRZHLI5SPWo?t=298) terms of your change failure rate. You want to go down. You want to be on the
+       - [5:01](https://youtu.be/xRZHLI5SPWo?t=301) bottom side of this graph. But what's interesting is if you look at some of
+       - [5:05](https://youtu.be/xRZHLI5SPWo?t=305) these top lines you see people increasing as much as 2 percent which
+       - [5:08](https://youtu.be/xRZHLI5SPWo?t=308) doesn't sound like much until you realize that the industry benchmark is
+       - [5:11](https://youtu.be/xRZHLI5SPWo?t=311) about 4 percent. So that means shipping potentially 50 percent more defects than
+       - [5:16](https://youtu.be/xRZHLI5SPWo?t=316) we were shipping before. So you really just want to understand what side of this
+       - [5:19](https://youtu.be/xRZHLI5SPWo?t=319) graph you're on. You want to start measuring this stuff right? This pattern
+       - [5:23](https://youtu.be/xRZHLI5SPWo?t=323) exists without AI by the way. This has a lot to do. It's not purely causal with AI. A lot of
+       - [5:29](https://youtu.be/xRZHLI5SPWo?t=329) this has to do with like your release pipeline, your automated testing, everything
+     - (b) 판독: 제목 `Volatility in change failure rate %`, 수치 61(high, companies (data from))
+       - ocr_text: Volatility in change failure rate % Per-company Change Failure Rate% impact for AI Users vs. Non-AI Users Data from 61 companies Per-company Change Failure Rate impact with AI adoption Change Failure Rate % impact Company DX
+   - `vd:15@305`
+     - (a) 전사 4:35~5:35
+       - [4:35](https://youtu.be/xRZHLI5SPWo?t=275) we'll look at here is the DORA change failure rate metric and let me prepare you.
+       - [4:41](https://youtu.be/xRZHLI5SPWo?t=281) Most of you are sitting down. It's very volatile the impact that we've seen on
+       - [4:45](https://youtu.be/xRZHLI5SPWo?t=285) quality over this period of time. Each line on this graph represents a single
+       - [4:50](https://youtu.be/xRZHLI5SPWo?t=290) company that was part of this particular part of the study and that line shows
+       - [4:54](https://youtu.be/xRZHLI5SPWo?t=294) whether you've moved up in terms of your change failure rate or move down in
+       - [4:58](https://youtu.be/xRZHLI5SPWo?t=298) terms of your change failure rate. You want to go down. You want to be on the
+       - [5:01](https://youtu.be/xRZHLI5SPWo?t=301) bottom side of this graph. But what's interesting is if you look at some of
+       - [5:05](https://youtu.be/xRZHLI5SPWo?t=305) these top lines you see people increasing as much as 2 percent which
+       - [5:08](https://youtu.be/xRZHLI5SPWo?t=308) doesn't sound like much until you realize that the industry benchmark is
+       - [5:11](https://youtu.be/xRZHLI5SPWo?t=311) about 4 percent. So that means shipping potentially 50 percent more defects than
+       - [5:16](https://youtu.be/xRZHLI5SPWo?t=316) we were shipping before. So you really just want to understand what side of this
+       - [5:19](https://youtu.be/xRZHLI5SPWo?t=319) graph you're on. You want to start measuring this stuff right? This pattern
+       - [5:23](https://youtu.be/xRZHLI5SPWo?t=323) exists without AI by the way. This has a lot to do. It's not purely causal with AI. A lot of
+       - [5:29](https://youtu.be/xRZHLI5SPWo?t=329) this has to do with like your release pipeline, your automated testing, everything
+       - [5:32](https://youtu.be/xRZHLI5SPWo?t=332) that's surrounding the way that you're releasing the code. The pattern remains
+     - (b) 판독: 이 id의 판독 문서 없음
+4. **PR 크기 급증(평균 44줄→72줄), 코드 유지보수성 체감 4% 상승 대비 배포 확신도 6% 하락**
+   - `vd:15@428`
+     - (a) 전사 6:38~7:38
+       - [6:39](https://youtu.be/xRZHLI5SPWo?t=399) breaking things than I was a year ago. So it's an interesting psychological effect
+       - [6:44](https://youtu.be/xRZHLI5SPWo?t=404) that we see here. And a lot of this is because PR size is measurably increasing. This is
+       - [6:48](https://youtu.be/xRZHLI5SPWo?t=408) going to be one of the most important metrics that we look at this year. Hasn't quite doubled,
+       - [6:52](https://youtu.be/xRZHLI5SPWo?t=412) but look at that trajectory, right? This is over the same period of study about a year,
+       - [6:57](https://youtu.be/xRZHLI5SPWo?t=417) and we've seen PRs go from around 44 lines on average per PR up to 72. Now there's a number
+       - [7:06](https://youtu.be/xRZHLI5SPWo?t=426) of reasons for this. It's not just, you know, the likelihood that the way that these models work
+       - [7:11](https://youtu.be/xRZHLI5SPWo?t=431) is that they're being trained to output relatively mediocre code. I've been writing code
+       - [7:15](https://youtu.be/xRZHLI5SPWo?t=435) professionally since the late 90s. I remember when it was a great mark of a developer to be able to
+       - [7:19](https://youtu.be/xRZHLI5SPWo?t=439) implement the same use case with as little code as possible. Now it's like, well, no, let's get the
+       - [7:23](https://youtu.be/xRZHLI5SPWo?t=443) thing out. And, you know, the code that's being generated is going to be essentially mediocre
+       - [7:27](https://youtu.be/xRZHLI5SPWo?t=447) because it's law of averages. But on top of that too, think about if you've got a build pipeline that
+       - [7:32](https://youtu.be/xRZHLI5SPWo?t=452) takes 45 minutes or an hour to complete, and now I've got AI generating functions for me instantly.
+       - [7:38](https://youtu.be/xRZHLI5SPWo?t=458) Am I going to push four different PRs with four different functions and wait 45 minutes or an hour or
+     - (b) 판독: 제목 `PR size is increasing...`, 수치 44(high, Median PR size Q3 2025), 48(high, Median PR size Q4 2025), 58(high, Median PR size Q1 2026), 72(high, Median PR size Q2 2026)
+       - ocr_text: PR size is increasing... Median PR size over time Sample from over 400+ companies from July 2025 to June 2026 Median PR size, in lines of code 44 48 58 72 Q3 2025 Q4 2025 Q1 2026 Q2 2026
+   - `vd:15@360`
+     - (a) 전사 5:30~6:30
+       - [5:32](https://youtu.be/xRZHLI5SPWo?t=332) that's surrounding the way that you're releasing the code. The pattern remains
+       - [5:36](https://youtu.be/xRZHLI5SPWo?t=336) the same. The amplitude has changed as a result of AI. We always see this type of
+       - [5:40](https://youtu.be/xRZHLI5SPWo?t=340) shift in volatility but not usually to these extremes. And that's the AI effect
+       - [5:45](https://youtu.be/xRZHLI5SPWo?t=345) that we're seeing right there. Here's a really interesting one. These are two
+       - [5:49](https://youtu.be/xRZHLI5SPWo?t=349) qualitative quality metrics that normally are sort of in sync with one another. Code
+       - [5:56](https://youtu.be/xRZHLI5SPWo?t=356) maintainability, how maintainable the developers perceive the code to be in
+       - [6:00](https://youtu.be/xRZHLI5SPWo?t=360) terms of making changes to it, that number has gone up almost 4 percent
+       - [6:04](https://youtu.be/xRZHLI5SPWo?t=364) according to our data. By the way we're looking at about 200,000 engineers in this
+       - [6:08](https://youtu.be/xRZHLI5SPWo?t=368) study to gather this data. The change confidence though, which
+       - [6:13](https://youtu.be/xRZHLI5SPWo?t=373) traditionally we've seen closely associated with code maintainability. Hey
+       - [6:18](https://youtu.be/xRZHLI5SPWo?t=378) this code is maintainable, it's modular, it's easy to modify, I feel good about the
+       - [6:22](https://youtu.be/xRZHLI5SPWo?t=382) changes that I'm pushing into production. Nope, our change confidence number has
+       - [6:26](https://youtu.be/xRZHLI5SPWo?t=386) gone down 6 percent. This is really an interesting tension because it means like
+       - [6:30](https://youtu.be/xRZHLI5SPWo?t=390) okay agents and assistants are making it easier for me to understand and modify the
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:15@386`
+     - (a) 전사 5:56~6:56
+       - [5:56](https://youtu.be/xRZHLI5SPWo?t=356) maintainability, how maintainable the developers perceive the code to be in
+       - [6:00](https://youtu.be/xRZHLI5SPWo?t=360) terms of making changes to it, that number has gone up almost 4 percent
+       - [6:04](https://youtu.be/xRZHLI5SPWo?t=364) according to our data. By the way we're looking at about 200,000 engineers in this
+       - [6:08](https://youtu.be/xRZHLI5SPWo?t=368) study to gather this data. The change confidence though, which
+       - [6:13](https://youtu.be/xRZHLI5SPWo?t=373) traditionally we've seen closely associated with code maintainability. Hey
+       - [6:18](https://youtu.be/xRZHLI5SPWo?t=378) this code is maintainable, it's modular, it's easy to modify, I feel good about the
+       - [6:22](https://youtu.be/xRZHLI5SPWo?t=382) changes that I'm pushing into production. Nope, our change confidence number has
+       - [6:26](https://youtu.be/xRZHLI5SPWo?t=386) gone down 6 percent. This is really an interesting tension because it means like
+       - [6:30](https://youtu.be/xRZHLI5SPWo?t=390) okay agents and assistants are making it easier for me to understand and modify the
+       - [6:34](https://youtu.be/xRZHLI5SPWo?t=394) code that's in front of me, but I trust the outputs less. I'm more afraid now of
+       - [6:39](https://youtu.be/xRZHLI5SPWo?t=399) breaking things than I was a year ago. So it's an interesting psychological effect
+       - [6:44](https://youtu.be/xRZHLI5SPWo?t=404) that we see here. And a lot of this is because PR size is measurably increasing. This is
+       - [6:48](https://youtu.be/xRZHLI5SPWo?t=408) going to be one of the most important metrics that we look at this year. Hasn't quite doubled,
+       - [6:52](https://youtu.be/xRZHLI5SPWo?t=412) but look at that trajectory, right? This is over the same period of study about a year,
+     - (b) 판독: 이 id의 판독 문서 없음
+5. **AI 도입 후 PR 처리량 중위수 7.76%, 평균 13.1% 증가로 기대 대비 낮은 생산성 향상**
+   - `vd:15@905`
+     - (a) 전사 14:35~15:35
+       - [14:37](https://youtu.be/xRZHLI5SPWo?t=877) giving us the most efficient token spend and again moving the needle for value creation and
+       - [14:41](https://youtu.be/xRZHLI5SPWo?t=881) productivity within the business. Finally, the fifth trend, integrating across the SDLC and PDLC.
+       - [14:47](https://youtu.be/xRZHLI5SPWo?t=887) Why would we want to do this? Because code generation was never the bottleneck in the first place.
+       - [14:51](https://youtu.be/xRZHLI5SPWo?t=891) Right? Even if engineers are getting like 100% accurate instant code coming from the models, which they are
+       - [14:57](https://youtu.be/xRZHLI5SPWo?t=897) not, you would still only be attacking anywhere from maybe 14 to 16% of the overall value stream. So we need
+       - [15:03](https://youtu.be/xRZHLI5SPWo?t=903) to think beyond that. Especially because right now the productivity gains that we are actually seeing are
+       - [15:09](https://youtu.be/xRZHLI5SPWo?t=909) more modest than expected. Despite additional PR throughput increases, our median increase in the study that we did from
+       - [15:17](https://youtu.be/xRZHLI5SPWo?t=917) November to 2024 to February this year only found about a median 7.7% increase in this velocity metric, a 13% average, but even our top
+       - [15:26](https://youtu.be/xRZHLI5SPWo?t=926) performers were in the 70% range. Nobody hit 2x, nobody hit 5x, nobody hit 10x. And that's because our time savings that come out of AI are still being outweighed by other non AI factors within our organization.
+     - (b) 판독: 제목 `Productivity gains more modest than expected`, 수치 400+(high, companies (random sample)), 7.76%(high, Median weighted PR throughput increase), 13.1%(high, Average weighted PR throughput increase)
+       - ocr_text: Productivity gains more modest than expected Random sample from 400+ companies No PR throughput incentivization No known recent M&As, IPOs, or regulatory changes Longitudinal study from November 2024 to February 2026 Weighted PR throughput increase Median 7.76% Average 13.1%
+   - `vd:15@917`
+     - (a) 전사 14:47~15:47
+       - [14:47](https://youtu.be/xRZHLI5SPWo?t=887) Why would we want to do this? Because code generation was never the bottleneck in the first place.
+       - [14:51](https://youtu.be/xRZHLI5SPWo?t=891) Right? Even if engineers are getting like 100% accurate instant code coming from the models, which they are
+       - [14:57](https://youtu.be/xRZHLI5SPWo?t=897) not, you would still only be attacking anywhere from maybe 14 to 16% of the overall value stream. So we need
+       - [15:03](https://youtu.be/xRZHLI5SPWo?t=903) to think beyond that. Especially because right now the productivity gains that we are actually seeing are
+       - [15:09](https://youtu.be/xRZHLI5SPWo?t=909) more modest than expected. Despite additional PR throughput increases, our median increase in the study that we did from
+       - [15:17](https://youtu.be/xRZHLI5SPWo?t=917) November to 2024 to February this year only found about a median 7.7% increase in this velocity metric, a 13% average, but even our top
+       - [15:26](https://youtu.be/xRZHLI5SPWo?t=926) performers were in the 70% range. Nobody hit 2x, nobody hit 5x, nobody hit 10x. And that's because our time savings that come out of AI are still being outweighed by other non AI factors within our organization.
+       - [15:41](https://youtu.be/xRZHLI5SPWo?t=941) Right? We might be saving a lot of time with AI and that's great, but if we're still eclipsing those time savings because of meeting heavy days and context switching and other sources of interruption, the cumulative effects of the dev environment and friction in the way that we create software around the code, then we're not going to be able to
+     - (b) 판독: 이 id의 판독 문서 없음
+6. **Zapier, Spotify 등 에이전트 도입으로 병목 해결 및 운영 효율화 사례**
+   - `vd:15@1014`
+     - (a) 전사 16:24~17:24
+       - [16:26](https://youtu.be/xRZHLI5SPWo?t=986) creates PRDs to hand to engineers to get rid of that reverse engineering step. And it's saving Morgan Stanley about 300,000 hours a year right now. Zapier is one of my favorite stories in AI right now. They have a whole agent ecosystem that they're using to deal with a lot of administrative tasks and overhead, like daily standups and things like that. They've reduced their standups by using agent summaries and things like that in this ecosystem that they've built to two times a week as opposed to five times a week. They're successfully onboarding engineers with
+       - [16:56](https://youtu.be/xRZHLI5SPWo?t=1016) within about a two week period, which is really fast. Our industry benchmark for that is over a month usually. But my favorite part about this story is that they're seeing about a 15% additional value creation per engineer. So they are hiring more than they have in the history of their entire company because they realize the truth here that they're getting more capacity per single engineer, they're getting a better return on investment per single engineer, and hiring more engineers will improve their competitive edge. This is the right attitude.
+     - (b) 판독: 제목 `Zapier - Administrative Automation`, 수치 ~2(high, new engineers become productive within)
+       - ocr_text: Zapier - Administrative Automation The Bottleneck Engineers and teams at Zapier were losing valuable focus time to repetitive administrative work such as daily stand-ups, onboarding tasks, internal reporting, and routine Slack communications The AI solution Zapier's AI Agents team built an internal automation ecosystem where agents now run async stand-ups, summarize team updates, automate onboarding steps like email signature creation, and integrate seamlessly with Slack for approvals, notifications, and summaries. The impact The initiative has led to fewer synchronous meetings, faster onboarding (new engineers become productive within ~2 weeks), and an automation-focused culture. Zapier has actually ramped hiring as a result.
+   - `vd:15@1075`
+     - (a) 전사 17:25~18:25
+       - [17:26](https://youtu.be/xRZHLI5SPWo?t=1046) Increased innovative capacity story. This is not a headcount replacement story. Fair. They're automating about 3,000 of their code reviews a week triggered off of a pull request. And they look at superficial stuff. They still need humans in the loop. But the initial superficial review that comes from the agent is all part of the system of record. It stays in the PR comments. And so the next engineer to actually perform the review will have an idea of what the agents already looked at. So it can save some time.
+       - [17:53](https://youtu.be/xRZHLI5SPWo?t=1073) Finally, Spotify, if anybody remembers the Spotify model from DevOps, they were sort of the North Star for DevOps, they built an agent for SREs that will gather remediation steps from runbooks and information and context about the incident, and put all that together into SRE communication channels, so that when an incident occurs, the SRE has immediate context and doesn't have to go through multiple minutes of discovery to figure out how to solve the issue.
+       - [18:19](https://youtu.be/xRZHLI5SPWo?t=1099) So if you want to dive deeper into this data, our Q2 report is coming out in just a few weeks.
+       - [18:24](https://youtu.be/xRZHLI5SPWo?t=1104) But the Q1 report still has a lot of tidbits from this session in it. And if you subscribe to our newsletter or you come back to the website, by mid-ish end of July, we'll have our Q2 report.
+     - (b) 판독: 제목 `Spotify - Incident Management`, 수치 90%(high, of all incidents at Spotify)
+       - ocr_text: Spotify - Incident Management The Bottleneck When a production incident occurs, SREs often spend critical minutes and hours correlating alerts, digging through logs, and identifying the correct runbook steps. The AI Solution Spotify created an internal incident management agent platform that monitors logs and correlates alerts in real-time. When an incident is detected, the agent automatically suggests remediation steps from relevant runbooks directly into the SREs' communication channels. The Impact The platform is currently handling 90% of all incidents at Spotify, dramatically reducing mean time to resolution (MTTR) and freeing up SREs to focus on proactive reliability work.
+
+### timeline
+
+- **0:00 DX 플랫폼 및 연구 소개** (slide)
+  - [0:00](https://youtu.be/xRZHLI5SPWo?t=0) I'm Justin Riach. I'm the deputy CTO at DX. I get to do a lot of our research
+  - [0:05](https://youtu.be/xRZHLI5SPWo?t=5) around developer experience and its relation to developer productivity and
+  - [0:09](https://youtu.be/xRZHLI5SPWo?t=9) certainly over the last year a lot of that research has focused on AI's impact
+  - [0:15](https://youtu.be/xRZHLI5SPWo?t=15) on the developer experience and basic aspects of productivity within an
+  - [0:20](https://youtu.be/xRZHLI5SPWo?t=20) organization. So we produce these quarterly reports, our state of AI and AI
+  - [0:25](https://youtu.be/xRZHLI5SPWo?t=25) impact reports, which looks at really a lot of raw data that we're able to get
+  - [0:29](https://youtu.be/xRZHLI5SPWo?t=29) from our platform. Our platform is a research-backed platform built from the
+- **1:14 트렌드 1: 개발 속도 및 배포 빈도** (slide)
+  - [0:45](https://youtu.be/xRZHLI5SPWo?t=45) are we focusing on developer experience, are we seeing outcomes and improvements
+  - [0:49](https://youtu.be/xRZHLI5SPWo?t=49) with developer experience, and certainly are we seeing outcomes with the way that
+  - [0:54](https://youtu.be/xRZHLI5SPWo?t=54) we're using AI in our workflows. This session is going to be a little bit
+  - [0:58](https://youtu.be/xRZHLI5SPWo?t=58) different than the 345 session I think that's up in the leadership room later
+  - [1:02](https://youtu.be/xRZHLI5SPWo?t=62) today which just looks at the raw data from our newest report. It's a little bit
+  - [1:06](https://youtu.be/xRZHLI5SPWo?t=66) of a preview. This is looking at more like organizational trends and how our
+  - [1:10](https://youtu.be/xRZHLI5SPWo?t=70) workflows changing and things like that based on the data that we're seeing. So
+  - [1:15](https://youtu.be/xRZHLI5SPWo?t=75) first things first let's kind of look at what we're seeing in terms of the
+  - [1:17](https://youtu.be/xRZHLI5SPWo?t=77) velocity impact. Now if anybody's familiar with looking at various
+  - [1:21](https://youtu.be/xRZHLI5SPWo?t=81) velocity metrics like PR throughput and deployment frequency like hopefully you
+  - [1:25](https://youtu.be/xRZHLI5SPWo?t=85) understand the caveat that these metrics are not perfect. They are proxy metrics
+  - [1:29](https://youtu.be/xRZHLI5SPWo?t=89) for understanding the way that work flows through an organization. They're not
+  - [1:33](https://youtu.be/xRZHLI5SPWo?t=93) fully representative of the value generation. We're going to look at some
+  - [1:36](https://youtu.be/xRZHLI5SPWo?t=96) metrics that are closer to that as well but let's just try to understand what
+  - [1:40](https://youtu.be/xRZHLI5SPWo?t=100) this technology is doing in terms of just the raw velocity metrics in the
+  - [1:44](https://youtu.be/xRZHLI5SPWo?t=104) organization. So here's our Dora metric for deployment frequency. Who's
+- **3:20 체감 속도와 실제 생산성 괴리** (slide)
+  - [2:53](https://youtu.be/xRZHLI5SPWo?t=173) the last quarter. I think you know there's there's a number of reasons for
+  - [2:56](https://youtu.be/xRZHLI5SPWo?t=176) that. I mean obviously the way work is done in these regions are differently. The
+  - [3:00](https://youtu.be/xRZHLI5SPWo?t=180) way that we can spend money on this technology and think about token spend is
+  - [3:03](https://youtu.be/xRZHLI5SPWo?t=183) different. The regulation is different. But if we just look at the through line in
+  - [3:08](https://youtu.be/xRZHLI5SPWo?t=188) general you know we still see improvements in in this one metric of
+  - [3:13](https://youtu.be/xRZHLI5SPWo?t=193) deploy frequency even across various regions. We do just see some variance in
+  - [3:18](https://youtu.be/xRZHLI5SPWo?t=198) those regions. Here's one that's kind of interesting though. The perceived rate of
+  - [3:24](https://youtu.be/xRZHLI5SPWo?t=204) delivery. How much faster do engineers feel in terms of what they're delivering?
+  - [3:30](https://youtu.be/xRZHLI5SPWo?t=210) It's gone up a little bit. This number shows an increase of about four and a half
+  - [3:35](https://youtu.be/xRZHLI5SPWo?t=215) ish percent. But given that that's a full year and given all the investment and
+  - [3:41](https://youtu.be/xRZHLI5SPWo?t=221) cost and new spend on AI. It's interesting that this perceived rate has
+  - [3:44](https://youtu.be/xRZHLI5SPWo?t=224) not stayed. It has not kind of crept up a little bit more. Especially when you look
+  - [3:48](https://youtu.be/xRZHLI5SPWo?t=228) at some studies like obviously infamous flawed METR study. If you're familiar
+- **4:25 트렌드 2: 품질 및 변경 실패율 변동성** (slide)
+  - [3:58](https://youtu.be/xRZHLI5SPWo?t=238) study saying that some of the signals they gathered were sort of imperfect
+  - [4:00](https://youtu.be/xRZHLI5SPWo?t=240) and they needed to rethink some of that. But what was interesting was that in
+  - [4:04](https://youtu.be/xRZHLI5SPWo?t=244) these 16 engineers that were part of that study, small study, flawed study, the
+  - [4:08](https://youtu.be/xRZHLI5SPWo?t=248) productivity went down by about 19 percent but the perception went up by about 20
+  - [4:13](https://youtu.be/xRZHLI5SPWo?t=253) percent. So there was like a 40 percent spread in perception of productivity
+  - [4:17](https://youtu.be/xRZHLI5SPWo?t=257) versus actual productivity. But here when we look at this on more of an
+  - [4:20](https://youtu.be/xRZHLI5SPWo?t=260) aggregate things interestingly stay sort of flat. All right what about impact on
+  - [4:26](https://youtu.be/xRZHLI5SPWo?t=266) quality and and delivery right? So those are just kind of our speed our velocity
+  - [4:30](https://youtu.be/xRZHLI5SPWo?t=270) metrics but what is this actually doing to our software quality? The first metric
+  - [4:35](https://youtu.be/xRZHLI5SPWo?t=275) we'll look at here is the DORA change failure rate metric and let me prepare you.
+  - [4:41](https://youtu.be/xRZHLI5SPWo?t=281) Most of you are sitting down. It's very volatile the impact that we've seen on
+  - [4:45](https://youtu.be/xRZHLI5SPWo?t=285) quality over this period of time. Each line on this graph represents a single
+  - [4:50](https://youtu.be/xRZHLI5SPWo?t=290) company that was part of this particular part of the study and that line shows
+  - [4:54](https://youtu.be/xRZHLI5SPWo?t=294) whether you've moved up in terms of your change failure rate or move down in
+- **6:49 PR 크기 증가 및 점진적 배포 영향** (slide)
+  - [6:22](https://youtu.be/xRZHLI5SPWo?t=382) changes that I'm pushing into production. Nope, our change confidence number has
+  - [6:26](https://youtu.be/xRZHLI5SPWo?t=386) gone down 6 percent. This is really an interesting tension because it means like
+  - [6:30](https://youtu.be/xRZHLI5SPWo?t=390) okay agents and assistants are making it easier for me to understand and modify the
+  - [6:34](https://youtu.be/xRZHLI5SPWo?t=394) code that's in front of me, but I trust the outputs less. I'm more afraid now of
+  - [6:39](https://youtu.be/xRZHLI5SPWo?t=399) breaking things than I was a year ago. So it's an interesting psychological effect
+  - [6:44](https://youtu.be/xRZHLI5SPWo?t=404) that we see here. And a lot of this is because PR size is measurably increasing. This is
+  - [6:48](https://youtu.be/xRZHLI5SPWo?t=408) going to be one of the most important metrics that we look at this year. Hasn't quite doubled,
+  - [6:52](https://youtu.be/xRZHLI5SPWo?t=412) but look at that trajectory, right? This is over the same period of study about a year,
+  - [6:57](https://youtu.be/xRZHLI5SPWo?t=417) and we've seen PRs go from around 44 lines on average per PR up to 72. Now there's a number
+  - [7:06](https://youtu.be/xRZHLI5SPWo?t=426) of reasons for this. It's not just, you know, the likelihood that the way that these models work
+  - [7:11](https://youtu.be/xRZHLI5SPWo?t=431) is that they're being trained to output relatively mediocre code. I've been writing code
+  - [7:15](https://youtu.be/xRZHLI5SPWo?t=435) professionally since the late 90s. I remember when it was a great mark of a developer to be able to
+  - [7:19](https://youtu.be/xRZHLI5SPWo?t=439) implement the same use case with as little code as possible. Now it's like, well, no, let's get the
+- **8:29 트렌드 3: 주니어/시니어 엔지니어별 AI 활용** (slide)
+  - [8:02](https://youtu.be/xRZHLI5SPWo?t=482) perception of incremental delivery. I get to work on small incremental changes, and this is actually
+  - [8:07](https://youtu.be/xRZHLI5SPWo?t=487) one of the lowest qualitative developer experience drivers that we've seen impacted over the last year.
+  - [8:12](https://youtu.be/xRZHLI5SPWo?t=492) This number and this sentiment has gone down 10%. And incremental delivery is awful, is as we've learned,
+  - [8:19](https://youtu.be/xRZHLI5SPWo?t=499) also very important for the way that we try to deliver in a way that's easy to roll back,
+  - [8:25](https://youtu.be/xRZHLI5SPWo?t=505) and where we can understand and review the changes that are being pushed through.
+  - [8:30](https://youtu.be/xRZHLI5SPWo?t=510) Okay. What about demographic differences? What is different about AI impacts across like, you know,
+  - [8:36](https://youtu.be/xRZHLI5SPWo?t=516) junior devs and stuff like that? Junior engineers are using AI the most.
+  - [8:40](https://youtu.be/xRZHLI5SPWo?t=520) This really should surprise nobody. Anytime we have sort of a new leap, again, writing code
+  - [8:46](https://youtu.be/xRZHLI5SPWo?t=526) professionally since the late 90s, I'm a bit of an OG. I'm on this journey too. But there's less to
+  - [8:52](https://youtu.be/xRZHLI5SPWo?t=532) unlearn when you're coming into the industry, right? In many, many cases, you've already been working with
+  - [8:58](https://youtu.be/xRZHLI5SPWo?t=538) this kind of stuff, like right out of school. And so you're more likely to implement it when you
+- **10:24 트렌드 4: AI 성과 측정 프레임워크** (slide)
+  - [9:56](https://youtu.be/xRZHLI5SPWo?t=596) it's pretty flat between junior engineers who are using the tech more and staff engineers who have
+  - [10:00](https://youtu.be/xRZHLI5SPWo?t=600) an easier time spotting hallucinations, understanding the architecture around the
+  - [10:04](https://youtu.be/xRZHLI5SPWo?t=604) changes they're making and things like that. Smaller companies lead in time savings. Sure,
+  - [10:10](https://youtu.be/xRZHLI5SPWo?t=610) you know, the release pipelines are going to be less complicated. You know, there's less overall
+  - [10:15](https://youtu.be/xRZHLI5SPWo?t=615) complexity in the organization that's going to lead to more time savings for a company that already has
+  - [10:21](https://youtu.be/xRZHLI5SPWo?t=621) less friction and has a little bit more agility to it than a larger company. What about measurement?
+  - [10:29](https://youtu.be/xRZHLI5SPWo?t=629) How should we even be thinking about measuring this stuff? I mean, it bears mentioning that measuring
+  - [10:34](https://youtu.be/xRZHLI5SPWo?t=634) developer productivity and measuring developer experience was a challenge before AI. And we never
+  - [10:39](https://youtu.be/xRZHLI5SPWo?t=639) completed that conversation before kind of throwing accelerant on this, right? So this is still a
+  - [10:45](https://youtu.be/xRZHLI5SPWo?t=645) difficult thing. And I'd argue even more difficult to do now, because it's confounded by several
+  - [10:49](https://youtu.be/xRZHLI5SPWo?t=649) different aspects of AI. But we're all going to have to answer this question this year, right? Spent
+- **14:44 트렌드 5: 코드 생성 외 병목 해결** (slide)
+  - [14:15](https://youtu.be/xRZHLI5SPWo?t=855) agents telling us where they ran into issues with steering with the human, the context that was
+  - [14:21](https://youtu.be/xRZHLI5SPWo?t=861) provided for them, the feedback cycles that they had to go through. So we're actually getting that data
+  - [14:26](https://youtu.be/xRZHLI5SPWo?t=866) from the agents to try to figure out how effective our teams are at working with AI. And we can break
+  - [14:31](https://youtu.be/xRZHLI5SPWo?t=871) this down into use cases which is very important too. We want to understand which use cases are
+  - [14:37](https://youtu.be/xRZHLI5SPWo?t=877) giving us the most efficient token spend and again moving the needle for value creation and
+  - [14:41](https://youtu.be/xRZHLI5SPWo?t=881) productivity within the business. Finally, the fifth trend, integrating across the SDLC and PDLC.
+  - [14:47](https://youtu.be/xRZHLI5SPWo?t=887) Why would we want to do this? Because code generation was never the bottleneck in the first place.
+  - [14:51](https://youtu.be/xRZHLI5SPWo?t=891) Right? Even if engineers are getting like 100% accurate instant code coming from the models, which they are
+  - [14:57](https://youtu.be/xRZHLI5SPWo?t=897) not, you would still only be attacking anywhere from maybe 14 to 16% of the overall value stream. So we need
+  - [15:03](https://youtu.be/xRZHLI5SPWo?t=903) to think beyond that. Especially because right now the productivity gains that we are actually seeing are
+  - [15:09](https://youtu.be/xRZHLI5SPWo?t=909) more modest than expected. Despite additional PR throughput increases, our median increase in the study that we did from
+- **16:14 실전 사례: Morgan Stanley, Zapier, Spotify** (slide)
+  - [15:56](https://youtu.be/xRZHLI5SPWo?t=956) to be able to do that. We're not attacking the bottleneck. And as Ellie Goldratt from the theory of constraints and the goal and inspiration for the Phoenix project would tell us that an hour saved on something that isn't the bottleneck is worthless. And so we need to find the bottleneck and fix the bottleneck. And that's what a lot of organizations are doing. Morgan Stanley has been really public about their creation of the DevGen AI agent, which is an agent for interpreting legacy code like mainframe natural and COBOL and hate to admit Perl. I've written a lot of Perl in my career, but it's legacy now. The agent actually
+  - [16:26](https://youtu.be/xRZHLI5SPWo?t=986) creates PRDs to hand to engineers to get rid of that reverse engineering step. And it's saving Morgan Stanley about 300,000 hours a year right now. Zapier is one of my favorite stories in AI right now. They have a whole agent ecosystem that they're using to deal with a lot of administrative tasks and overhead, like daily standups and things like that. They've reduced their standups by using agent summaries and things like that in this ecosystem that they've built to two times a week as opposed to five times a week. They're successfully onboarding engineers with
+
+### summary
+
+1. DX의 400개 이상 기업 데이터를 기반으로 AI가 개발 생산성에 미치는 영향을 분석한 발표다.
+2. 배포 빈도는 증가했으나 체감 속도와 실제 생산성 향상은 정체되어 있으며, PR 크기 증가로 인한 품질 변동성과 배포 확신도 하락이 확인된다.
+3. AI 도입 후 PR 처리량 중위수 7.76% 증가로 기대 대비 낮은 생산성 향상이 나타나며, 병목 해결을 위한 에이전트 활용 사례가 제시된다.
+
+### name_pairs
+
+- **METR study → METR** (3:54)
+  - 전사: [3:54](https://youtu.be/xRZHLI5SPWo?t=234) with that study back in February they actually released a follow-up to that
+  - 판독 ocr_text: (이 초의 판독 없음)
+- **Morgan Stanley → Morgan Stanley** (16:14)
+  - 전사: [15:56](https://youtu.be/xRZHLI5SPWo?t=956) to be able to do that. We're not attacking the bottleneck. And as Ellie Goldratt from the theory of constraints and the goal and inspiration for the Phoenix project would tell us that an hour saved on something that isn't the bottleneck is worthless. And so we need to find the bottleneck and fix the bottleneck. And that's what a lot of organizations are doing. Morgan Stanley has been really public about their creation of the DevGen AI agent, which is an agent for interpreting legacy code like mainframe natural and COBOL and hate to admit Perl. I've written a lot of Perl in my career, but it's legacy now. The agent actually
+  - 판독 ocr_text: (이 초의 판독 없음)
+- **Zapier → Zapier** (16:54)
+  - 전사: [16:26](https://youtu.be/xRZHLI5SPWo?t=986) creates PRDs to hand to engineers to get rid of that reverse engineering step. And it's saving Morgan Stanley about 300,000 hours a year right now. Zapier is one of my favorite stories in AI right now. They have a whole agent ecosystem that they're using to deal with a lot of administrative tasks and overhead, like daily standups and things like that. They've reduced their standups by using agent summaries and things like that in this ecosystem that they've built to two times a week as opposed to five times a week. They're successfully onboarding engineers with
+  - 판독 ocr_text: Zapier - Administrative Automation The Bottleneck Engineers and teams at Zapier were losing valuable focus time to repetitive administrative work such as daily stand-ups, onboarding tasks, internal reporting, and routine Slack communications The AI solution Zapier's AI Agents team built an internal automation ecosystem where agents now run async stand-ups, summarize team updates, automate onboarding steps like email signature creation, and integrate seamlessly with Slack for approvals, notifications, and summaries. The impact The initiative has led to fewer synchronous meetings, faster onboarding (new engineers become productive within ~2 weeks), and an automation-focused culture. Zapier has actually ramped hiring as a result.
+- **Spotify → Spotify** (17:55)
+  - 전사: [17:53](https://youtu.be/xRZHLI5SPWo?t=1073) Finally, Spotify, if anybody remembers the Spotify model from DevOps, they were sort of the North Star for DevOps, they built an agent for SREs that will gather remediation steps from runbooks and information and context about the incident, and put all that together into SRE communication channels, so that when an incident occurs, the SRE has immediate context and doesn't have to go through multiple minutes of discovery to figure out how to solve the issue.
+  - 판독 ocr_text: Spotify - Incident Management The Bottleneck When a production incident occurs, SREs often spend critical minutes and hours correlating alerts, digging through logs, and identifying the correct runbook steps. The AI Solution Spotify created an internal incident management agent platform that monitors logs and correlates alerts in real-time. When an incident is detected, the agent automatically suggests remediation steps from relevant runbooks directly into the SREs' communication channels. The Impact The platform is currently handling 90% of all incidents at Spotify, dramatically reducing mean time to resolution (MTTR) and freeing up SREs to focus on proactive reliability work.
+
+### 채점
+
+- Q1 근거 [ ] pass [ ] fail 이유:
+- Q2 시각 [ ] pass [ ] fail 이유:
+- Q3 지어내지 않음 [ ] pass [ ] fail 이유:
+
+## 12. yNPS1Z64wQM
+
+- 제목: [한영자막] 에이전트 검색에서 30년 된 BM25가 놀랍도록 강력한 이유입니다
+- 유튜브: https://youtu.be/yNPS1Z64wQM
+- transcript_quality: `ok`
+- mode: `whisper+slides`
+- 입력: 전사 308줄, 판독 16장
+
+| id | 질문 |
+|---|---|
+| Q1 | 근거: key_points의 모든 항목이 그 evidence 초의 전사 줄(앞뒤 30초)이나 같은 id의 판독 문서로 뒷받침되나? |
+| Q2 | 시각: timeline의 모든 초에서(앞뒤 30초 안) 그 label의 내용이 전사나 판독에 실제로 나오나? |
+| Q3 | 지어내지 않음: summary를 포함한 출력 전체에 전사·판독에 없는 내용(제목만 보고 짐작한 내용 포함)이 없고, 근거 자료가 없으면 "내용 없음"으로 두었나? |
+
+### key_points
+
+1. **에이전트 루프 내 검색(Agentic Search)의 3요소: 모델, 하네스, 검색 엔진**
+   - `vd:43@85`
+     - (a) 전사 0:55~1:55
+       - [0:55](https://youtu.be/yNPS1Z64wQM?t=55) First, I will talk a little bit about what
+       - [0:57](https://youtu.be/yNPS1Z64wQM?t=57) I mean by Argentic Search or Argentic Attribute
+       - [0:59](https://youtu.be/yNPS1Z64wQM?t=59) and kind of define that for all of you.
+       - [1:04](https://youtu.be/yNPS1Z64wQM?t=64) My definition is that Argentic Search is essentially
+       - [1:07](https://youtu.be/yNPS1Z64wQM?t=67) searched inside agent loop.
+       - [1:10](https://youtu.be/yNPS1Z64wQM?t=70) So you have an agent that is trying to accomplish a task,
+       - [1:13](https://youtu.be/yNPS1Z64wQM?t=73) write the coding, or do some deep research, or whatever task.
+       - [1:18](https://youtu.be/yNPS1Z64wQM?t=78) And inside that, you have some kind of information need
+       - [1:21](https://youtu.be/yNPS1Z64wQM?t=81) for the agent in order to get that task done successfully.
+       - [1:25](https://youtu.be/yNPS1Z64wQM?t=85) And you essentially need three things to kind of build a good
+       - [1:30](https://youtu.be/yNPS1Z64wQM?t=90) Argentic Search system.
+       - [1:32](https://youtu.be/yNPS1Z64wQM?t=92) And that is you need a capable model, a model that is able to
+       - [1:36](https://youtu.be/yNPS1Z64wQM?t=96) use tools and is able to formulate queries.
+       - [1:40](https://youtu.be/yNPS1Z64wQM?t=100) You also need a harness around the model and how you kind of
+       - [1:44](https://youtu.be/yNPS1Z64wQM?t=104) expose the retrieval and the search functions to the model.
+       - [1:48](https://youtu.be/yNPS1Z64wQM?t=108) There's different ways to do that.
+       - [1:50](https://youtu.be/yNPS1Z64wQM?t=110) It could be through tool calling, or it could be through code
+       - [1:53](https://youtu.be/yNPS1Z64wQM?t=113) mode.
+       - [1:54](https://youtu.be/yNPS1Z64wQM?t=114) Ido here demonstrated what I call code mode for exposing
+     - (b) 판독: 이 id의 판독 문서 없음
+   - `vd:43@55`
+     - (a) 전사 0:25~1:25
+       - [0:26](https://youtu.be/yNPS1Z64wQM?t=26) So yeah, and at Hornet we are building retrieval infrastructure
+       - [0:31](https://youtu.be/yNPS1Z64wQM?t=31) for agents.
+       - [0:32](https://youtu.be/yNPS1Z64wQM?t=32) And I've been working on search and retrieval problems
+       - [0:36](https://youtu.be/yNPS1Z64wQM?t=36) for a long time.
+       - [0:37](https://youtu.be/yNPS1Z64wQM?t=37) As you can tell, I'm gray-haired.
+       - [0:40](https://youtu.be/yNPS1Z64wQM?t=40) Been working in this space for more than 20 years.
+       - [0:45](https://youtu.be/yNPS1Z64wQM?t=45) And in the talk today, I'll talk about why
+       - [0:47](https://youtu.be/yNPS1Z64wQM?t=47) this kind of 30-year-old lexical scoring function
+       - [0:51](https://youtu.be/yNPS1Z64wQM?t=51) is making a strong comeback.
+       - [0:55](https://youtu.be/yNPS1Z64wQM?t=55) First, I will talk a little bit about what
+       - [0:57](https://youtu.be/yNPS1Z64wQM?t=57) I mean by Argentic Search or Argentic Attribute
+       - [0:59](https://youtu.be/yNPS1Z64wQM?t=59) and kind of define that for all of you.
+       - [1:04](https://youtu.be/yNPS1Z64wQM?t=64) My definition is that Argentic Search is essentially
+       - [1:07](https://youtu.be/yNPS1Z64wQM?t=67) searched inside agent loop.
+       - [1:10](https://youtu.be/yNPS1Z64wQM?t=70) So you have an agent that is trying to accomplish a task,
+       - [1:13](https://youtu.be/yNPS1Z64wQM?t=73) write the coding, or do some deep research, or whatever task.
+       - [1:18](https://youtu.be/yNPS1Z64wQM?t=78) And inside that, you have some kind of information need
+       - [1:21](https://youtu.be/yNPS1Z64wQM?t=81) for the agent in order to get that task done successfully.
+       - [1:25](https://youtu.be/yNPS1Z64wQM?t=85) And you essentially need three things to kind of build a good
+     - (b) 판독: 제목 `Agentic search is search inside an agent loop.`, 수치 없음
+       - ocr_text: 03 / what I mean by agentic search Agentic search is search inside an agent loop. Task loop examples coding question answering deep search/research 01 / model capable model (LLM) Chooses when to search and formulates queries - plan -> 02 / harness harness Runs the loop and define the tool contract: e.g search (query), manages budgets (context, calls, cost) - call -> 03 / retrieval engine retrieval engine Implements retrieval. Ranks candidates cheaply, exposes results, and handles repeated searches.
+2. **BrowseComp-Plus에서 검색 품질에 따른 정답률 차이: 리트리버 A 55.9%, 리트리버 B 70.1%, 오라클 93%**
+   - `vd:43@397`
+     - (a) 전사 6:07~7:07
+       - [6:08](https://youtu.be/yNPS1Z64wQM?t=368) But one floppy disk could fit about 1.4 megabytes of data.
+       - [6:14](https://youtu.be/yNPS1Z64wQM?t=374) And the current models, before they start degrading in quality,
+       - [6:19](https://youtu.be/yNPS1Z64wQM?t=379) that's, in my opinion, around 350,000 tokens.
+       - [6:23](https://youtu.be/yNPS1Z64wQM?t=383) So that's one floppy disk of data.
+       - [6:26](https://youtu.be/yNPS1Z64wQM?t=386) So you need retrieval in order to fetch the information
+       - [6:31](https://youtu.be/yNPS1Z64wQM?t=391) that you actually need to put into the context window.
+       - [6:35](https://youtu.be/yNPS1Z64wQM?t=395) And BrowseCom Plus really demonstrate how retrieval quality
+       - [6:42](https://youtu.be/yNPS1Z64wQM?t=402) affects the end-to-end accuracy of the task.
+       - [6:45](https://youtu.be/yNPS1Z64wQM?t=405) The end-to-end accuracy here is essentially,
+       - [6:47](https://youtu.be/yNPS1Z64wQM?t=407) is the model equipped with this search tool
+       - [6:51](https://youtu.be/yNPS1Z64wQM?t=411) able to answer the question, the riddle-like question?
+       - [6:55](https://youtu.be/yNPS1Z64wQM?t=415) And if you artificially just stuff the evidence documents that
+       - [7:01](https://youtu.be/yNPS1Z64wQM?t=421) is needed to answer this question into the context window
+       - [7:05](https://youtu.be/yNPS1Z64wQM?t=425) of the model, the accuracy is really high.
+     - (b) 판독: 제목 `Retrieval quality changes answer accuracy.`, 수치 55.9%(high, retriever A), 70.1%(high, retriever B), 93%(high, oracle evidence), 93%(high, Oracle evidence reaches)
+       - ocr_text: 08 / retrieval quality Retrieval quality changes answer accuracy. retriever A 55.9% same agent loop, baseline retrieved evidence retriever B 70.1% same agent loop, stronger retrieved evidence oracle evidence 93% when the right evidence is present, the task is mostly solvable same benchmark Oracle evidence reaches 93%. Retrieval quality is core to answer quality. Sources: BrowseComp-Plus ACL 2026 paper; Hornet trajectory analysis
+   - `vd:43@405`
+     - (a) 전사 6:15~7:15
+       - [6:19](https://youtu.be/yNPS1Z64wQM?t=379) that's, in my opinion, around 350,000 tokens.
+       - [6:23](https://youtu.be/yNPS1Z64wQM?t=383) So that's one floppy disk of data.
+       - [6:26](https://youtu.be/yNPS1Z64wQM?t=386) So you need retrieval in order to fetch the information
+       - [6:31](https://youtu.be/yNPS1Z64wQM?t=391) that you actually need to put into the context window.
+       - [6:35](https://youtu.be/yNPS1Z64wQM?t=395) And BrowseCom Plus really demonstrate how retrieval quality
+       - [6:42](https://youtu.be/yNPS1Z64wQM?t=402) affects the end-to-end accuracy of the task.
+       - [6:45](https://youtu.be/yNPS1Z64wQM?t=405) The end-to-end accuracy here is essentially,
+       - [6:47](https://youtu.be/yNPS1Z64wQM?t=407) is the model equipped with this search tool
+       - [6:51](https://youtu.be/yNPS1Z64wQM?t=411) able to answer the question, the riddle-like question?
+       - [6:55](https://youtu.be/yNPS1Z64wQM?t=415) And if you artificially just stuff the evidence documents that
+       - [7:01](https://youtu.be/yNPS1Z64wQM?t=421) is needed to answer this question into the context window
+       - [7:05](https://youtu.be/yNPS1Z64wQM?t=425) of the model, the accuracy is really high.
+       - [7:09](https://youtu.be/yNPS1Z64wQM?t=429) So reasoning is not the bottleneck.
+       - [7:11](https://youtu.be/yNPS1Z64wQM?t=431) The model, given the evidence up front,
+       - [7:15](https://youtu.be/yNPS1Z64wQM?t=435) answers the question with a very high accuracy rate, even GPT-4.
+     - (b) 판독: 이 id의 판독 문서 없음
+3. **GPT-5의 에이전트 쿼리는 인간 검색어보다 길고 구체적(중위 18단어 vs AOL 2단어)**
+   - `vd:43@576`
+     - (a) 전사 9:06~10:06
+       - [9:07](https://youtu.be/yNPS1Z64wQM?t=547) And I have seen more recent query logs, as well.
+       - [9:10](https://youtu.be/yNPS1Z64wQM?t=550) And the user human pattern are still searching with just a few terms.
+       - [9:16](https://youtu.be/yNPS1Z64wQM?t=556) GPT-5, on the other hand, it's a much more powerful user.
+       - [9:19](https://youtu.be/yNPS1Z64wQM?t=559) It has the general knowledge.
+       - [9:20](https://youtu.be/yNPS1Z64wQM?t=560) And it can, bam, write out very long queries.
+       - [9:23](https://youtu.be/yNPS1Z64wQM?t=563) It can use a lot of syntax operators that are useful.
+       - [9:29](https://youtu.be/yNPS1Z64wQM?t=569) It has learned from web search, or site operator, phrases, et cetera.
+       - [9:33](https://youtu.be/yNPS1Z64wQM?t=573) And this is a new type of workload.
+       - [9:39](https://youtu.be/yNPS1Z64wQM?t=579) And on BM25.
+       - [9:42](https://youtu.be/yNPS1Z64wQM?t=582) BM25 has essentially two hyperparameters that controls various
+       - [9:47](https://youtu.be/yNPS1Z64wQM?t=587) aspects of the scoring function.
+       - [9:49](https://youtu.be/yNPS1Z64wQM?t=589) And I talked about having a baseline.
+       - [9:52](https://youtu.be/yNPS1Z64wQM?t=592) And BM25 is usually a baseline.
+       - [9:54](https://youtu.be/yNPS1Z64wQM?t=594) And BrowseCompPlus, as well, has a baseline with BM25.
+       - [9:58](https://youtu.be/yNPS1Z64wQM?t=598) But it turns out that that baseline is terrible.
+       - [10:02](https://youtu.be/yNPS1Z64wQM?t=602) So when you look at fancier techniques, embedding models,
+       - [10:06](https://youtu.be/yNPS1Z64wQM?t=606) what have you, it stands out as a much better retrieval paradigm
+     - (b) 판독: 제목 `GPT-5 issues power-user queries.`, 수치 10(high, BrowseComp-Plus query workload), 2 terms(high, human search log), 10 terms median(high, agent search trajectory), 2 terms(high, AOL human median), 18 terms(high, GPT-5 median), 19 terms(high, GPT-5 first query mean)
+       - ocr_text: 10 / BrowseComp-Plus query workload GPT-5 issues power-user queries. human search log 2 terms home depot AOL median agent search trajectory 10 terms median sitesnooker.org 2021 UK Championship final Zhao Xintong Brecel "frame" "scores" site filter + year + entities + phrase match AOL human median 2 terms GPT-5 median 18 terms GPT-5 first query mean 19 terms
+   - `vd:43@556`
+     - (a) 전사 8:46~9:46
+       - [8:46](https://youtu.be/yNPS1Z64wQM?t=526) And we like to compare it with AOL query logs.
+       - [8:50](https://youtu.be/yNPS1Z64wQM?t=530) So AOL was like a service back in the day,
+       - [8:54](https://youtu.be/yNPS1Z64wQM?t=534) had some search interface.
+       - [8:56](https://youtu.be/yNPS1Z64wQM?t=536) And they accidentally published a very large sample of what
+       - [9:02](https://youtu.be/yNPS1Z64wQM?t=542) people were searching for on the web.
+       - [9:05](https://youtu.be/yNPS1Z64wQM?t=545) And they were quite short.
+       - [9:07](https://youtu.be/yNPS1Z64wQM?t=547) And I have seen more recent query logs, as well.
+       - [9:10](https://youtu.be/yNPS1Z64wQM?t=550) And the user human pattern are still searching with just a few terms.
+       - [9:16](https://youtu.be/yNPS1Z64wQM?t=556) GPT-5, on the other hand, it's a much more powerful user.
+       - [9:19](https://youtu.be/yNPS1Z64wQM?t=559) It has the general knowledge.
+       - [9:20](https://youtu.be/yNPS1Z64wQM?t=560) And it can, bam, write out very long queries.
+       - [9:23](https://youtu.be/yNPS1Z64wQM?t=563) It can use a lot of syntax operators that are useful.
+       - [9:29](https://youtu.be/yNPS1Z64wQM?t=569) It has learned from web search, or site operator, phrases, et cetera.
+       - [9:33](https://youtu.be/yNPS1Z64wQM?t=573) And this is a new type of workload.
+       - [9:39](https://youtu.be/yNPS1Z64wQM?t=579) And on BM25.
+       - [9:42](https://youtu.be/yNPS1Z64wQM?t=582) BM25 has essentially two hyperparameters that controls various
+     - (b) 판독: 이 id의 판독 문서 없음
+4. **BM25 하이퍼파라미터 튜닝 시 정답률 64.0%에서 82.0%로 상승(+18pt)**
+   - `vd:43@592`
+     - (a) 전사 9:22~10:22
+       - [9:23](https://youtu.be/yNPS1Z64wQM?t=563) It can use a lot of syntax operators that are useful.
+       - [9:29](https://youtu.be/yNPS1Z64wQM?t=569) It has learned from web search, or site operator, phrases, et cetera.
+       - [9:33](https://youtu.be/yNPS1Z64wQM?t=573) And this is a new type of workload.
+       - [9:39](https://youtu.be/yNPS1Z64wQM?t=579) And on BM25.
+       - [9:42](https://youtu.be/yNPS1Z64wQM?t=582) BM25 has essentially two hyperparameters that controls various
+       - [9:47](https://youtu.be/yNPS1Z64wQM?t=587) aspects of the scoring function.
+       - [9:49](https://youtu.be/yNPS1Z64wQM?t=589) And I talked about having a baseline.
+       - [9:52](https://youtu.be/yNPS1Z64wQM?t=592) And BM25 is usually a baseline.
+       - [9:54](https://youtu.be/yNPS1Z64wQM?t=594) And BrowseCompPlus, as well, has a baseline with BM25.
+       - [9:58](https://youtu.be/yNPS1Z64wQM?t=598) But it turns out that that baseline is terrible.
+       - [10:02](https://youtu.be/yNPS1Z64wQM?t=602) So when you look at fancier techniques, embedding models,
+       - [10:06](https://youtu.be/yNPS1Z64wQM?t=606) what have you, it stands out as a much better retrieval paradigm
+       - [10:12](https://youtu.be/yNPS1Z64wQM?t=612) than BM25, if you look at the original paper.
+       - [10:15](https://youtu.be/yNPS1Z64wQM?t=615) But more recent research shows that the parameters that
+       - [10:19](https://youtu.be/yNPS1Z64wQM?t=619) were used in the BrowseCompPlus research paper
+       - [10:22](https://youtu.be/yNPS1Z64wQM?t=622) was not really adequate to handle these kind of long documents.
+     - (b) 판독: 제목 `Which BM25 Do You Mean?`, 수치 64.0%(high, answer accuracy (Default BM25)), 82.0%(high, answer accuracy (Tuned BM25)), +18(high, same 100-query subset), 84.6%(high, Surfaced evidence recall), 95.7%(high, Surfaced evidence recall)
+       - ocr_text: 11 / which BM25? Which BM25 Do You Mean? answer accuracy 64.0% 82.0% Default BM25 k=1=0.9, b=0.4 Tuned BM25 k=1=25, b=1 same 100-query subset +18 points Pi-Serini found that tuning BM25 for long BrowseComp-Plus documents lifted answer accuracy from 64.0% to 82.0%. Surfaced evidence recall: 84.6% to 95.7% Source: Pi-Serini / arXiv:2605.10848, Table 3, gpt-5.4, 300s timeout.
+   - `vd:43@615`
+     - (a) 전사 9:45~10:45
+       - [9:47](https://youtu.be/yNPS1Z64wQM?t=587) aspects of the scoring function.
+       - [9:49](https://youtu.be/yNPS1Z64wQM?t=589) And I talked about having a baseline.
+       - [9:52](https://youtu.be/yNPS1Z64wQM?t=592) And BM25 is usually a baseline.
+       - [9:54](https://youtu.be/yNPS1Z64wQM?t=594) And BrowseCompPlus, as well, has a baseline with BM25.
+       - [9:58](https://youtu.be/yNPS1Z64wQM?t=598) But it turns out that that baseline is terrible.
+       - [10:02](https://youtu.be/yNPS1Z64wQM?t=602) So when you look at fancier techniques, embedding models,
+       - [10:06](https://youtu.be/yNPS1Z64wQM?t=606) what have you, it stands out as a much better retrieval paradigm
+       - [10:12](https://youtu.be/yNPS1Z64wQM?t=612) than BM25, if you look at the original paper.
+       - [10:15](https://youtu.be/yNPS1Z64wQM?t=615) But more recent research shows that the parameters that
+       - [10:19](https://youtu.be/yNPS1Z64wQM?t=619) were used in the BrowseCompPlus research paper
+       - [10:22](https://youtu.be/yNPS1Z64wQM?t=622) was not really adequate to handle these kind of long documents.
+       - [10:25](https://youtu.be/yNPS1Z64wQM?t=625) So I like this, which BM25 do you mean?
+       - [10:29](https://youtu.be/yNPS1Z64wQM?t=629) Because it has a quite dramatic impact on that specific benchmarks
+       - [10:33](https://youtu.be/yNPS1Z64wQM?t=633) on the overall accuracy.
+       - [10:38](https://youtu.be/yNPS1Z64wQM?t=638) And why is BM25 now more powerful with the new user?
+       - [10:44](https://youtu.be/yNPS1Z64wQM?t=644) So I mentioned the general knowledge of the user
+     - (b) 판독: 이 id의 판독 문서 없음
+5. **BM25 + grep 조합이 에이전트 검색에 효과적인 이유: 정확 매칭, 저비용, 결과 해석 용이**
+   - `vd:43@697`
+     - (a) 전사 11:07~12:07
+       - [11:09](https://youtu.be/yNPS1Z64wQM?t=669) It's also relatively cheap, especially if you take into consideration
+       - [11:14](https://youtu.be/yNPS1Z64wQM?t=674) the cost of doing embedding inference.
+       - [11:16](https://youtu.be/yNPS1Z64wQM?t=676) Some of these embedding models have like 8 billion parameters
+       - [11:19](https://youtu.be/yNPS1Z64wQM?t=679) and you encode text and you have to stand up infrastructure for this
+       - [11:22](https://youtu.be/yNPS1Z64wQM?t=682) and what have you.
+       - [11:24](https://youtu.be/yNPS1Z64wQM?t=684) So it's quite simple.
+       - [11:25](https://youtu.be/yNPS1Z64wQM?t=685) And also the tooling in the overall ecosystem is quite good.
+       - [11:31](https://youtu.be/yNPS1Z64wQM?t=691) So it's readily available.
+       - [11:34](https://youtu.be/yNPS1Z64wQM?t=694) And it's also very easy for the model to inspect the results
+       - [11:37](https://youtu.be/yNPS1Z64wQM?t=697) and understand why a certain query formulation returned
+       - [11:40](https://youtu.be/yNPS1Z64wQM?t=700) the result it did right.
+       - [11:42](https://youtu.be/yNPS1Z64wQM?t=702) Because you're matching literal terms and phrases and things
+       - [11:45](https://youtu.be/yNPS1Z64wQM?t=705) like that, which can help it kind of reformulate the queries.
+       - [11:51](https://youtu.be/yNPS1Z64wQM?t=711) So these are the three key things.
+       - [11:55](https://youtu.be/yNPS1Z64wQM?t=715) And now into more hot topics on what is all you need.
+       - [12:00](https://youtu.be/yNPS1Z64wQM?t=720) And this is a very recent research that came out from Waterloo,
+       - [12:04](https://youtu.be/yNPS1Z64wQM?t=724) from Jimmy Lin's group up there.
+       - [12:05](https://youtu.be/yNPS1Z64wQM?t=725) They are doing a great job at the information retrieval research
+     - (b) 판독: 제목 `BM25 is more powerful with the new user`, 수치 없음
+       - ocr_text: 12 / why it works BM25 is more powerful with the new user exact EXACT names / dates / IDs / phrases cheap CHEAP Simple and cost efficient - no embedding inferencing inspectable EXPLAIN matched terms become the next move
+   - `vd:43@651`
+     - (a) 전사 10:21~11:21
+       - [10:22](https://youtu.be/yNPS1Z64wQM?t=622) was not really adequate to handle these kind of long documents.
+       - [10:25](https://youtu.be/yNPS1Z64wQM?t=625) So I like this, which BM25 do you mean?
+       - [10:29](https://youtu.be/yNPS1Z64wQM?t=629) Because it has a quite dramatic impact on that specific benchmarks
+       - [10:33](https://youtu.be/yNPS1Z64wQM?t=633) on the overall accuracy.
+       - [10:38](https://youtu.be/yNPS1Z64wQM?t=638) And why is BM25 now more powerful with the new user?
+       - [10:44](https://youtu.be/yNPS1Z64wQM?t=644) So I mentioned the general knowledge of the user
+       - [10:46](https://youtu.be/yNPS1Z64wQM?t=646) and that he can type faster and be more specific
+       - [10:49](https://youtu.be/yNPS1Z64wQM?t=649) as a more powerful user.
+       - [10:51](https://youtu.be/yNPS1Z64wQM?t=651) And exact matching is still relevant, right?
+       - [10:54](https://youtu.be/yNPS1Z64wQM?t=654) Because the model knows names, entities, zip codes, SKUs,
+       - [10:59](https://youtu.be/yNPS1Z64wQM?t=659) what have you.
+       - [11:00](https://youtu.be/yNPS1Z64wQM?t=660) That is not so easy to represent with an embedding model,
+       - [11:04](https://youtu.be/yNPS1Z64wQM?t=664) which kind of encodes all the tokens into a fixed vocabulary.
+       - [11:09](https://youtu.be/yNPS1Z64wQM?t=669) It's also relatively cheap, especially if you take into consideration
+       - [11:14](https://youtu.be/yNPS1Z64wQM?t=674) the cost of doing embedding inference.
+       - [11:16](https://youtu.be/yNPS1Z64wQM?t=676) Some of these embedding models have like 8 billion parameters
+       - [11:19](https://youtu.be/yNPS1Z64wQM?t=679) and you encode text and you have to stand up infrastructure for this
+     - (b) 판독: 이 id의 판독 문서 없음
+6. **DR-DCI(동적 워크스페이스 확장) 방식의 BrowseComp-Plus 성능 73.3%**
+   - `vd:43@747`
+     - (a) 전사 11:57~12:57
+       - [12:00](https://youtu.be/yNPS1Z64wQM?t=720) And this is a very recent research that came out from Waterloo,
+       - [12:04](https://youtu.be/yNPS1Z64wQM?t=724) from Jimmy Lin's group up there.
+       - [12:05](https://youtu.be/yNPS1Z64wQM?t=725) They are doing a great job at the information retrieval research
+       - [12:09](https://youtu.be/yNPS1Z64wQM?t=729) and also on agentic search.
+       - [12:11](https://youtu.be/yNPS1Z64wQM?t=731) They have a recent paper that I love.
+       - [12:14](https://youtu.be/yNPS1Z64wQM?t=734) It's called Scaling Direct Corpus Interaction
+       - [12:17](https://youtu.be/yNPS1Z64wQM?t=737) Via Dynamic Workspace Expansion.
+       - [12:20](https://youtu.be/yNPS1Z64wQM?t=740) So I'll spend some time on expanding this.
+       - [12:23](https://youtu.be/yNPS1Z64wQM?t=743) So imagine you want to stand up web search infrastructure
+       - [12:26](https://youtu.be/yNPS1Z64wQM?t=746) for agents.
+       - [12:27](https://youtu.be/yNPS1Z64wQM?t=747) A lot of companies are doing that at the moment.
+       - [12:30](https://youtu.be/yNPS1Z64wQM?t=750) We are also working with some of these companies
+       - [12:33](https://youtu.be/yNPS1Z64wQM?t=753) to help them build infrastructure for powering
+       - [12:35](https://youtu.be/yNPS1Z64wQM?t=755) that kind of use case.
+       - [12:37](https://youtu.be/yNPS1Z64wQM?t=757) And there you have potentially billions of documents.
+       - [12:41](https://youtu.be/yNPS1Z64wQM?t=761) So that doesn't fit into the context window.
+       - [12:43](https://youtu.be/yNPS1Z64wQM?t=763) So you obviously need retrieval.
+       - [12:45](https://youtu.be/yNPS1Z64wQM?t=765) And BM25 is a good baseline.
+       - [12:47](https://youtu.be/yNPS1Z64wQM?t=767) So you can retrieve information over that.
+       - [12:51](https://youtu.be/yNPS1Z64wQM?t=771) And the results of this is you can imagine this as a search engine
+     - (b) 판독: 제목 `BM25 + grep Is All You Need`, 수치 61%(high, DCI read + grep), 45%(high, Qwen3 retrieval agent), 73.3%(high, DR-DCI + reset dynamic workspace expansion on BrowseComp-Plus)
+       - ocr_text: 13 / SERP for agents - progressive disclosure BM25 + grep Is All You Need full corpus billions of docs too large for context or broad shell scans BM25 imports candidates runtime candidates exposed in vfs Progressive disclosure, navigatable agent loop inspect, narrow, verify simple bash tools rg + read rg / grep read lines cat / sed count / verify 61% DCI read + grep vs. Qwen3 retrieval agent at 45% 73.3% DR-DCI + reset dynamic workspace expansion on BrowseComp-Plus Jun 2026, DR-DCI: Scaling Direct Corpus Interaction via Dynamic Workspace Expansion arXiv:2606.14885.
+   - `vd:43@734`
+     - (a) 전사 11:44~12:44
+       - [11:45](https://youtu.be/yNPS1Z64wQM?t=705) like that, which can help it kind of reformulate the queries.
+       - [11:51](https://youtu.be/yNPS1Z64wQM?t=711) So these are the three key things.
+       - [11:55](https://youtu.be/yNPS1Z64wQM?t=715) And now into more hot topics on what is all you need.
+       - [12:00](https://youtu.be/yNPS1Z64wQM?t=720) And this is a very recent research that came out from Waterloo,
+       - [12:04](https://youtu.be/yNPS1Z64wQM?t=724) from Jimmy Lin's group up there.
+       - [12:05](https://youtu.be/yNPS1Z64wQM?t=725) They are doing a great job at the information retrieval research
+       - [12:09](https://youtu.be/yNPS1Z64wQM?t=729) and also on agentic search.
+       - [12:11](https://youtu.be/yNPS1Z64wQM?t=731) They have a recent paper that I love.
+       - [12:14](https://youtu.be/yNPS1Z64wQM?t=734) It's called Scaling Direct Corpus Interaction
+       - [12:17](https://youtu.be/yNPS1Z64wQM?t=737) Via Dynamic Workspace Expansion.
+       - [12:20](https://youtu.be/yNPS1Z64wQM?t=740) So I'll spend some time on expanding this.
+       - [12:23](https://youtu.be/yNPS1Z64wQM?t=743) So imagine you want to stand up web search infrastructure
+       - [12:26](https://youtu.be/yNPS1Z64wQM?t=746) for agents.
+       - [12:27](https://youtu.be/yNPS1Z64wQM?t=747) A lot of companies are doing that at the moment.
+       - [12:30](https://youtu.be/yNPS1Z64wQM?t=750) We are also working with some of these companies
+       - [12:33](https://youtu.be/yNPS1Z64wQM?t=753) to help them build infrastructure for powering
+       - [12:35](https://youtu.be/yNPS1Z64wQM?t=755) that kind of use case.
+       - [12:37](https://youtu.be/yNPS1Z64wQM?t=757) And there you have potentially billions of documents.
+       - [12:41](https://youtu.be/yNPS1Z64wQM?t=761) So that doesn't fit into the context window.
+       - [12:43](https://youtu.be/yNPS1Z64wQM?t=763) So you obviously need retrieval.
+     - (b) 판독: 이 id의 판독 문서 없음
+
+### timeline
+
+- **0:03 발표 주제 소개: BM25의 부활**
+  - [0:00](https://youtu.be/yNPS1Z64wQM?t=0) JOEL BERGUM, CEO of Hornet Dev.
+  - [0:03](https://youtu.be/yNPS1Z64wQM?t=3) I'm here today to talk about the unreasonable effectiveness of BM25 for Argentic Search.
+  - [0:11](https://youtu.be/yNPS1Z64wQM?t=11) So how many of you have heard about BM25 before?
+  - [0:14](https://youtu.be/yNPS1Z64wQM?t=14) Is it new or is it?
+  - [0:15](https://youtu.be/yNPS1Z64wQM?t=15) Well, quite a few, so that's great.
+  - [0:17](https://youtu.be/yNPS1Z64wQM?t=17) I'm also watching the World Cup.
+  - [0:20](https://youtu.be/yNPS1Z64wQM?t=20) Norway is playing there against Ivory Coast's second half.
+  - [0:24](https://youtu.be/yNPS1Z64wQM?t=24) Norway is leading, so that's good.
+  - [0:26](https://youtu.be/yNPS1Z64wQM?t=26) So yeah, and at Hornet we are building retrieval infrastructure
+  - [0:31](https://youtu.be/yNPS1Z64wQM?t=31) for agents.
+  - [0:32](https://youtu.be/yNPS1Z64wQM?t=32) And I've been working on search and retrieval problems
+- **0:55 에이전트 검색 정의 및 3요소** (slide)
+  - [0:26](https://youtu.be/yNPS1Z64wQM?t=26) So yeah, and at Hornet we are building retrieval infrastructure
+  - [0:31](https://youtu.be/yNPS1Z64wQM?t=31) for agents.
+  - [0:32](https://youtu.be/yNPS1Z64wQM?t=32) And I've been working on search and retrieval problems
+  - [0:36](https://youtu.be/yNPS1Z64wQM?t=36) for a long time.
+  - [0:37](https://youtu.be/yNPS1Z64wQM?t=37) As you can tell, I'm gray-haired.
+  - [0:40](https://youtu.be/yNPS1Z64wQM?t=40) Been working in this space for more than 20 years.
+  - [0:45](https://youtu.be/yNPS1Z64wQM?t=45) And in the talk today, I'll talk about why
+  - [0:47](https://youtu.be/yNPS1Z64wQM?t=47) this kind of 30-year-old lexical scoring function
+  - [0:51](https://youtu.be/yNPS1Z64wQM?t=51) is making a strong comeback.
+  - [0:55](https://youtu.be/yNPS1Z64wQM?t=55) First, I will talk a little bit about what
+  - [0:57](https://youtu.be/yNPS1Z64wQM?t=57) I mean by Argentic Search or Argentic Attribute
+  - [0:59](https://youtu.be/yNPS1Z64wQM?t=59) and kind of define that for all of you.
+  - [1:04](https://youtu.be/yNPS1Z64wQM?t=64) My definition is that Argentic Search is essentially
+  - [1:07](https://youtu.be/yNPS1Z64wQM?t=67) searched inside agent loop.
+  - [1:10](https://youtu.be/yNPS1Z64wQM?t=70) So you have an agent that is trying to accomplish a task,
+  - [1:13](https://youtu.be/yNPS1Z64wQM?t=73) write the coding, or do some deep research, or whatever task.
+  - [1:18](https://youtu.be/yNPS1Z64wQM?t=78) And inside that, you have some kind of information need
+  - [1:21](https://youtu.be/yNPS1Z64wQM?t=81) for the agent in order to get that task done successfully.
+  - [1:25](https://youtu.be/yNPS1Z64wQM?t=85) And you essentially need three things to kind of build a good
+- **2:18 BM25 스코어링 함수 설명** (slide)
+  - [1:48](https://youtu.be/yNPS1Z64wQM?t=108) There's different ways to do that.
+  - [1:50](https://youtu.be/yNPS1Z64wQM?t=110) It could be through tool calling, or it could be through code
+  - [1:53](https://youtu.be/yNPS1Z64wQM?t=113) mode.
+  - [1:54](https://youtu.be/yNPS1Z64wQM?t=114) Ido here demonstrated what I call code mode for exposing
+  - [1:59](https://youtu.be/yNPS1Z64wQM?t=119) retrieval infrastructure.
+  - [2:01](https://youtu.be/yNPS1Z64wQM?t=121) So that's the harness part.
+  - [2:02](https://youtu.be/yNPS1Z64wQM?t=122) And then you also need a retrieval engine to be able to do
+  - [2:08](https://youtu.be/yNPS1Z64wQM?t=128) searches efficiently, potentially over a billion scaled document
+  - [2:13](https://youtu.be/yNPS1Z64wQM?t=133) sets.
+  - [2:13](https://youtu.be/yNPS1Z64wQM?t=133) And to define BM25, BM25 actually stands for best match 25.
+  - [2:21](https://youtu.be/yNPS1Z64wQM?t=141) So there were some researchers doing plenty of different
+  - [2:23](https://youtu.be/yNPS1Z64wQM?t=143) experiments.
+  - [2:24](https://youtu.be/yNPS1Z64wQM?t=144) And experiment number 25 turned out to be the best one.
+  - [2:28](https://youtu.be/yNPS1Z64wQM?t=148) So that's the background of the name.
+  - [2:31](https://youtu.be/yNPS1Z64wQM?t=151) It's essentially a scoring function.
+  - [2:33](https://youtu.be/yNPS1Z64wQM?t=153) So you can imagine you have a query, and you have a document,
+  - [2:36](https://youtu.be/yNPS1Z64wQM?t=156) and you calculate some kind of score by interaction between the
+  - [2:40](https://youtu.be/yNPS1Z64wQM?t=160) query terms and the document terms.
+  - [2:42](https://youtu.be/yNPS1Z64wQM?t=162) And you come up with a score, and you hope that this score is a good
+  - [2:46](https://youtu.be/yNPS1Z64wQM?t=166) proxy for the relevancy of the document with regards to the query.
+- **4:40 BrowseComp-Plus 벤치마크 소개** (slide)
+  - [4:10](https://youtu.be/yNPS1Z64wQM?t=250) And then you would compare it with BM25.
+  - [4:13](https://youtu.be/yNPS1Z64wQM?t=253) And I also think it's interesting in how we evaluate search before.
+  - [4:16](https://youtu.be/yNPS1Z64wQM?t=256) Because you will simply look at 10 blue links.
+  - [4:19](https://youtu.be/yNPS1Z64wQM?t=259) And you scan it.
+  - [4:20](https://youtu.be/yNPS1Z64wQM?t=260) And you compute some metrics.
+  - [4:22](https://youtu.be/yNPS1Z64wQM?t=262) A lot of that is now going away because the agent is not really
+  - [4:27](https://youtu.be/yNPS1Z64wQM?t=267) it's kind of powerful in the way that it can type out a lot more
+  - [4:32](https://youtu.be/yNPS1Z64wQM?t=272) queries than a human can do.
+  - [4:33](https://youtu.be/yNPS1Z64wQM?t=273) So it's less relevant to think about evaluating these systems just
+  - [4:37](https://youtu.be/yNPS1Z64wQM?t=277) by a single shot query.
+  - [4:41](https://youtu.be/yNPS1Z64wQM?t=281) And this is one of my favorite benchmarks out there.
+  - [4:46](https://youtu.be/yNPS1Z64wQM?t=286) I like to talk about benchmarks.
+  - [4:47](https://youtu.be/yNPS1Z64wQM?t=287) So BrowseCom Plus is a deep research benchmark published
+  - [4:53](https://youtu.be/yNPS1Z64wQM?t=293) in a paper last year.
+  - [4:55](https://youtu.be/yNPS1Z64wQM?t=295) And it has almost exactly 830 questions.
+  - [5:02](https://youtu.be/yNPS1Z64wQM?t=302) These are riddle-like.
+  - [5:03](https://youtu.be/yNPS1Z64wQM?t=303) Think about it like a pub quiz.
+  - [5:05](https://youtu.be/yNPS1Z64wQM?t=305) Do you have pub quizzes in the US?
+  - [5:07](https://youtu.be/yNPS1Z64wQM?t=307) Yeah, OK, great.
+  - [5:08](https://youtu.be/yNPS1Z64wQM?t=308) So like kind of a riddle type of questions, quite long.
+- **6:37 검색 품질과 정답률 관계** (slide)
+  - [6:08](https://youtu.be/yNPS1Z64wQM?t=368) But one floppy disk could fit about 1.4 megabytes of data.
+  - [6:14](https://youtu.be/yNPS1Z64wQM?t=374) And the current models, before they start degrading in quality,
+  - [6:19](https://youtu.be/yNPS1Z64wQM?t=379) that's, in my opinion, around 350,000 tokens.
+  - [6:23](https://youtu.be/yNPS1Z64wQM?t=383) So that's one floppy disk of data.
+  - [6:26](https://youtu.be/yNPS1Z64wQM?t=386) So you need retrieval in order to fetch the information
+  - [6:31](https://youtu.be/yNPS1Z64wQM?t=391) that you actually need to put into the context window.
+  - [6:35](https://youtu.be/yNPS1Z64wQM?t=395) And BrowseCom Plus really demonstrate how retrieval quality
+  - [6:42](https://youtu.be/yNPS1Z64wQM?t=402) affects the end-to-end accuracy of the task.
+  - [6:45](https://youtu.be/yNPS1Z64wQM?t=405) The end-to-end accuracy here is essentially,
+  - [6:47](https://youtu.be/yNPS1Z64wQM?t=407) is the model equipped with this search tool
+  - [6:51](https://youtu.be/yNPS1Z64wQM?t=411) able to answer the question, the riddle-like question?
+  - [6:55](https://youtu.be/yNPS1Z64wQM?t=415) And if you artificially just stuff the evidence documents that
+  - [7:01](https://youtu.be/yNPS1Z64wQM?t=421) is needed to answer this question into the context window
+  - [7:05](https://youtu.be/yNPS1Z64wQM?t=425) of the model, the accuracy is really high.
+- **9:36 GPT-5 쿼리 특징 분석** (slide)
+  - [9:07](https://youtu.be/yNPS1Z64wQM?t=547) And I have seen more recent query logs, as well.
+  - [9:10](https://youtu.be/yNPS1Z64wQM?t=550) And the user human pattern are still searching with just a few terms.
+  - [9:16](https://youtu.be/yNPS1Z64wQM?t=556) GPT-5, on the other hand, it's a much more powerful user.
+  - [9:19](https://youtu.be/yNPS1Z64wQM?t=559) It has the general knowledge.
+  - [9:20](https://youtu.be/yNPS1Z64wQM?t=560) And it can, bam, write out very long queries.
+  - [9:23](https://youtu.be/yNPS1Z64wQM?t=563) It can use a lot of syntax operators that are useful.
+  - [9:29](https://youtu.be/yNPS1Z64wQM?t=569) It has learned from web search, or site operator, phrases, et cetera.
+  - [9:33](https://youtu.be/yNPS1Z64wQM?t=573) And this is a new type of workload.
+  - [9:39](https://youtu.be/yNPS1Z64wQM?t=579) And on BM25.
+  - [9:42](https://youtu.be/yNPS1Z64wQM?t=582) BM25 has essentially two hyperparameters that controls various
+  - [9:47](https://youtu.be/yNPS1Z64wQM?t=587) aspects of the scoring function.
+  - [9:49](https://youtu.be/yNPS1Z64wQM?t=589) And I talked about having a baseline.
+  - [9:52](https://youtu.be/yNPS1Z64wQM?t=592) And BM25 is usually a baseline.
+  - [9:54](https://youtu.be/yNPS1Z64wQM?t=594) And BrowseCompPlus, as well, has a baseline with BM25.
+  - [9:58](https://youtu.be/yNPS1Z64wQM?t=598) But it turns out that that baseline is terrible.
+  - [10:02](https://youtu.be/yNPS1Z64wQM?t=602) So when you look at fancier techniques, embedding models,
+  - [10:06](https://youtu.be/yNPS1Z64wQM?t=606) what have you, it stands out as a much better retrieval paradigm
+- **9:52 BM25 파라미터 튜닝 효과** (slide)
+  - [9:23](https://youtu.be/yNPS1Z64wQM?t=563) It can use a lot of syntax operators that are useful.
+  - [9:29](https://youtu.be/yNPS1Z64wQM?t=569) It has learned from web search, or site operator, phrases, et cetera.
+  - [9:33](https://youtu.be/yNPS1Z64wQM?t=573) And this is a new type of workload.
+  - [9:39](https://youtu.be/yNPS1Z64wQM?t=579) And on BM25.
+  - [9:42](https://youtu.be/yNPS1Z64wQM?t=582) BM25 has essentially two hyperparameters that controls various
+  - [9:47](https://youtu.be/yNPS1Z64wQM?t=587) aspects of the scoring function.
+  - [9:49](https://youtu.be/yNPS1Z64wQM?t=589) And I talked about having a baseline.
+  - [9:52](https://youtu.be/yNPS1Z64wQM?t=592) And BM25 is usually a baseline.
+  - [9:54](https://youtu.be/yNPS1Z64wQM?t=594) And BrowseCompPlus, as well, has a baseline with BM25.
+  - [9:58](https://youtu.be/yNPS1Z64wQM?t=598) But it turns out that that baseline is terrible.
+  - [10:02](https://youtu.be/yNPS1Z64wQM?t=602) So when you look at fancier techniques, embedding models,
+  - [10:06](https://youtu.be/yNPS1Z64wQM?t=606) what have you, it stands out as a much better retrieval paradigm
+  - [10:12](https://youtu.be/yNPS1Z64wQM?t=612) than BM25, if you look at the original paper.
+  - [10:15](https://youtu.be/yNPS1Z64wQM?t=615) But more recent research shows that the parameters that
+  - [10:19](https://youtu.be/yNPS1Z64wQM?t=619) were used in the BrowseCompPlus research paper
+  - [10:22](https://youtu.be/yNPS1Z64wQM?t=622) was not really adequate to handle these kind of long documents.
+- **12:27 BM25 + grep 워크스페이스 확장** (slide)
+  - [12:00](https://youtu.be/yNPS1Z64wQM?t=720) And this is a very recent research that came out from Waterloo,
+  - [12:04](https://youtu.be/yNPS1Z64wQM?t=724) from Jimmy Lin's group up there.
+  - [12:05](https://youtu.be/yNPS1Z64wQM?t=725) They are doing a great job at the information retrieval research
+  - [12:09](https://youtu.be/yNPS1Z64wQM?t=729) and also on agentic search.
+  - [12:11](https://youtu.be/yNPS1Z64wQM?t=731) They have a recent paper that I love.
+  - [12:14](https://youtu.be/yNPS1Z64wQM?t=734) It's called Scaling Direct Corpus Interaction
+  - [12:17](https://youtu.be/yNPS1Z64wQM?t=737) Via Dynamic Workspace Expansion.
+  - [12:20](https://youtu.be/yNPS1Z64wQM?t=740) So I'll spend some time on expanding this.
+  - [12:23](https://youtu.be/yNPS1Z64wQM?t=743) So imagine you want to stand up web search infrastructure
+  - [12:26](https://youtu.be/yNPS1Z64wQM?t=746) for agents.
+  - [12:27](https://youtu.be/yNPS1Z64wQM?t=747) A lot of companies are doing that at the moment.
+  - [12:30](https://youtu.be/yNPS1Z64wQM?t=750) We are also working with some of these companies
+  - [12:33](https://youtu.be/yNPS1Z64wQM?t=753) to help them build infrastructure for powering
+  - [12:35](https://youtu.be/yNPS1Z64wQM?t=755) that kind of use case.
+  - [12:37](https://youtu.be/yNPS1Z64wQM?t=757) And there you have potentially billions of documents.
+  - [12:41](https://youtu.be/yNPS1Z64wQM?t=761) So that doesn't fit into the context window.
+  - [12:43](https://youtu.be/yNPS1Z64wQM?t=763) So you obviously need retrieval.
+  - [12:45](https://youtu.be/yNPS1Z64wQM?t=765) And BM25 is a good baseline.
+  - [12:47](https://youtu.be/yNPS1Z64wQM?t=767) So you can retrieve information over that.
+  - [12:51](https://youtu.be/yNPS1Z64wQM?t=771) And the results of this is you can imagine this as a search engine
+- **14:57 에이전트 검색 평가 방식 변화** (slide)
+  - [14:30](https://youtu.be/yNPS1Z64wQM?t=870) But currently this is a very powerful way to build retrieval infrastructure,
+  - [14:35](https://youtu.be/yNPS1Z64wQM?t=875) and a whole editing search experience.
+  - [14:41](https://youtu.be/yNPS1Z64wQM?t=881) And when it comes to evaluation, right, I talked about this earlier as well,
+  - [14:45](https://youtu.be/yNPS1Z64wQM?t=885) in traditional information retrieval we were used to having just one query,
+  - [14:50](https://youtu.be/yNPS1Z64wQM?t=890) one rank list, compute and DGD, and compare it.
+  - [14:55](https://youtu.be/yNPS1Z64wQM?t=895) That is no longer very relevant when the new user is an agent,
+  - [14:58](https://youtu.be/yNPS1Z64wQM?t=898) because that agent can reformulate queries, and do more queries,
+  - [15:02](https://youtu.be/yNPS1Z64wQM?t=902) and do expansion, and do all kinds of different stuff.
+  - [15:05](https://youtu.be/yNPS1Z64wQM?t=905) So a lot of the classical information retrieval evaluation
+  - [15:09](https://youtu.be/yNPS1Z64wQM?t=909) is now kind of dead.
+  - [15:11](https://youtu.be/yNPS1Z64wQM?t=911) Instead, look at, like, see if the model can perform the task it's set to.
+  - [15:17](https://youtu.be/yNPS1Z64wQM?t=917) And for example, for question answering,
+  - [15:19](https://youtu.be/yNPS1Z64wQM?t=919) does it get the answer right?
+  - [15:20](https://youtu.be/yNPS1Z64wQM?t=920) And we, at Hornet, we are betting on BM25 as one of the primitives.
+- **15:33 Hornet 성능 비교** (slide)
+  - [15:05](https://youtu.be/yNPS1Z64wQM?t=905) So a lot of the classical information retrieval evaluation
+  - [15:09](https://youtu.be/yNPS1Z64wQM?t=909) is now kind of dead.
+  - [15:11](https://youtu.be/yNPS1Z64wQM?t=911) Instead, look at, like, see if the model can perform the task it's set to.
+  - [15:17](https://youtu.be/yNPS1Z64wQM?t=917) And for example, for question answering,
+  - [15:19](https://youtu.be/yNPS1Z64wQM?t=919) does it get the answer right?
+  - [15:20](https://youtu.be/yNPS1Z64wQM?t=920) And we, at Hornet, we are betting on BM25 as one of the primitives.
+  - [15:28](https://youtu.be/yNPS1Z64wQM?t=928) And we have set out on the vision to kind of have the best, most efficient way
+  - [15:34](https://youtu.be/yNPS1Z64wQM?t=934) to evaluate BM25, because I think it's such a strong fundamental primitive.
+  - [15:41](https://youtu.be/yNPS1Z64wQM?t=941) And this illustration compares some anonymized engines, comparing with Hornet,
+  - [15:47](https://youtu.be/yNPS1Z64wQM?t=947) on the same type of hardware, with web documents, 100 million web documents,
+  - [15:54](https://youtu.be/yNPS1Z64wQM?t=954) on a single node.
+  - [15:56](https://youtu.be/yNPS1Z64wQM?t=956) And as you can see, Hornet has a much more efficient implementation than the other engines,
+  - [16:01](https://youtu.be/yNPS1Z64wQM?t=961) and can do more throughput for the same type of box, which, for a lot of companies that
+
+### summary
+
+1. Hornet.dev CEO Joel Bergum이 에이전트 검색에서 BM25가 다시 강력해지는 이유를 설명하는 발표다.
+2. LLM 에이전트가 일반 지식을 활용해 구체적이고 긴 쿼리를 작성하면서, 정확한 문자열 매칭이 가능한 BM25의 가치가 높아졌다.
+3. BrowseComp-Plus 벤치마크에서 BM25 파라미터 튜닝만으로 정답률이 64%에서 82%로 올랐으며, BM25와 grep을 결합한 동적 워크스페이스 확장 방식이 73.3%의 성능을 보였다.
+
+### name_pairs
+
+- **Argentic Search → agentic search** (0:55)
+  - 전사: [0:55](https://youtu.be/yNPS1Z64wQM?t=55) First, I will talk a little bit about what
+  - 판독 ocr_text: 03 / what I mean by agentic search Agentic search is search inside an agent loop. Task loop examples coding question answering deep search/research 01 / model capable model (LLM) Chooses when to search and formulates queries - plan -> 02 / harness harness Runs the loop and define the tool contract: e.g search (query), manages budgets (context, calls, cost) - call -> 03 / retrieval engine retrieval engine Implements retrieval. Ranks candidates cheaply, exposes results, and handles repeated searches.
+- **BrowseCom Plus → BrowseComp-Plus** (4:40)
+  - 전사: [4:37](https://youtu.be/yNPS1Z64wQM?t=277) by a single shot query.
+  - 판독 ocr_text: 06 / benchmark agentic search BrowseComp-Plus puts search inside the loop. task riddle-like, multi-hop question The agent has to find evidence before it can answer. GPT-5 agent think tool call search(query) retriever BM25 top-5 snippets agent read + reformulate judge final answer Score task success, not just one ranked list. repeat until enough evidence questions 830 fixed answer set web pages 100,195 fixed corpus Source: BrowseComp-Plus, arXiv:2508.06600.
+- **Hornet.deb → hornet.dev** (8:43)
+  - 전사: [8:43](https://youtu.be/yNPS1Z64wQM?t=523) You can find it on Hornet.deb.
+  - 판독 ocr_text: (이 초의 판독 없음)
+
+### 채점
+
+- Q1 근거 [ ] pass [ ] fail 이유:
+- Q2 시각 [ ] pass [ ] fail 이유:
+- Q3 지어내지 않음 [ ] pass [ ] fail 이유:

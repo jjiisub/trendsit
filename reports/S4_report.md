@@ -14,6 +14,7 @@
 - [x] 관문 A 전부 PASS
 - [x] 서브에이전트 리뷰(13건 반영), PR
 - [ ] 사용자 라벨(리뷰 때): `eval/labels/video_summary.csv` 12행, `reports/S4_video/README.md`의 체크 칸
+  - 채점표 준비 완료: 판독 수치는 `reports/S4_video/README.md` 4장(124행 전부 썸네일, '쓸 수 없음' 칸), 요약은 `reports/S4_video/label_summary.md`(12절, Q1~Q3 칸). `scripts/s4_label_sheets.py`
 
 ## 준비물 (S4_TASK 2장)
 | 준비물 | 결과 |
