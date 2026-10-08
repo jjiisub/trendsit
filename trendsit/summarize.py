@@ -10,7 +10,7 @@ from typing import Any
 
 from .core import config
 from .core.artifacts import Document
-from .core.artifacts_text import ItemCardInput, ItemCardV1, KeywordRef, LinkRef
+from .core.artifacts_text import ItemCardInput, ItemCardV1, KeywordRef, LinkRef, clipped_quotes
 from .core.db import DB, now_kst
 
 BODY_LIMIT = 6000  # 본문 상한(자). 문단 경계에서 자른다
@@ -98,12 +98,15 @@ class SummarizeResult:
     stopped: str | None = None
     relevance: dict[str, int] = field(default_factory=dict)
     needs_original: int = 0
+    quotes: int = 0
+    clipped: int = 0  # 설계 결정 Q6: 코드가 자른 인용 수(다시 볼 조건: 5% 초과)
     cost_usd: float = 0.0
 
     def summary(self) -> str:
         rel = ", ".join(f"{k} {v}" for k, v in sorted(self.relevance.items()))
         return (f"대상 {self.n}건 중 {self.done}건 요약(대체 {self.fallback}), relevance [{rel}], "
-                f"원본 확인 필요 {self.needs_original}건, ${self.cost_usd:.4f}"
+                f"원본 확인 필요 {self.needs_original}건, 잘린 인용 {self.clipped}/{self.quotes}"
+                + (f"({self.clipped / self.quotes:.1%})" if self.quotes else "") + f", ${self.cost_usd:.4f}"
                 + (f", 중단: {self.stopped}" if self.stopped else ""))
 
 
@@ -133,5 +136,7 @@ def run_summarize(ctx: Any, ids: list[int], keywords: config.KeywordsConfig) -> 
         res.fallback += int(fb)
         res.relevance[card.relevance] = res.relevance.get(card.relevance, 0) + 1
         res.needs_original += int(card.needs_original)
+        res.quotes += len(card.quotes)
+        res.clipped += clipped_quotes(card.enforced)
     res.cost_usd = round(ctx.budget.session_cost - before, 6)
     return res

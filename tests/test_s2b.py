@@ -9,7 +9,7 @@ from eval.graders_text import aggregate_item_card
 from tests.conftest import FakeTransport, make_ctx, response
 from trendsit.core import config
 from trendsit.core.artifacts import Document, apply_enforce
-from trendsit.core.artifacts_text import ItemCardInput, ItemCardV1
+from trendsit.core.artifacts_text import QUOTE_CHARS, ItemCardInput, ItemCardV1, clip_quote, squash
 from trendsit.core.db import DB
 from trendsit.core.role import load_role, run_role
 from trendsit.summarize import BODY_LIMIT, build_input, cut_body, load_card, run_summarize, targets
@@ -58,6 +58,61 @@ def test_enforce_cleans_quotes_numbers_keywords_links():
     fields = [c["field"] for c in out.enforced]
     assert fields == ["quotes", "numbers", "claims", "keywords", "origin_candidates", "attention"]
     assert out.raw_dump()["quotes"][1]["text"] == "본문에 없는 문장."  # 원래 출력 보존
+
+
+# ---------- 설계 결정 Q6: 긴 인용 자르기 ----------
+LONG = ("Jump Trading said the new cluster cut model training time from 14 days to 3 days while the team "
+        "kept the same budget and the same number of engineers on the infrastructure group, which had been "
+        "asked to support several new research projects at once, and it plans to expand the system to 4,096 GPUs next year according to the "
+        "company statement released on Monday morning in Chicago.")
+
+
+def test_clip_quote_contiguous_word_boundary_prefers_numbers():
+    assert len(LONG) > QUOTE_CHARS
+    front = clip_quote(LONG, [])
+    assert len(front) <= QUOTE_CHARS and LONG.startswith(front) and not front.endswith(" ")
+    assert LONG[len(front)] == " "  # 단어 경계에서 자름, 말줄임 없음
+    tail = clip_quote(LONG, ["4,096 GPUs", "Chicago"])
+    assert tail in LONG and "4,096 GPUs" in tail and "Chicago" in tail and len(tail) <= QUOTE_CHARS
+    assert clip_quote(LONG, ["14 days", "Chicago"]) == front  # 한 구간에 다 안 들어가면 앞에서부터
+    assert clip_quote("가" * 300, []) == "가" * QUOTE_CHARS  # 공백 없는 덩어리는 글자 단위
+    assert clip_quote("짧은 인용", ["x"]) == "짧은 인용"
+
+
+def test_enforce_clips_long_quote_as_owned_without_attention():
+    body = f"머리말.\n\n{LONG}\n\n끝."
+    c = card(quotes=[{"n": 1, "text": LONG}],
+             numbers=[{"quote_n": 1, "value": "4,096", "unit": "GPU", "what": "확장 규모"},
+                      {"quote_n": 1, "value": "14 days", "unit": "", "what": "이전 학습 시간"},
+                      {"quote_n": 1, "value": "99%", "unit": "", "what": "모델이 지어낸 수치"}],
+             claims=[{"quote_ns": [1], "text": "학습 시간 단축"}], summary="학습 시간이 줄었다.")
+    item = inp(body=Document(id="it:7", source="OpenAI", text=body))
+    out = apply_enforce(c, item, None)
+    q = out.quotes[0].text
+    assert len(q) <= QUOTE_CHARS and q in squash(body) and LONG.startswith(q)  # 두 수치가 한 구간에 안 들어가 앞에서부터
+    assert [x.value for x in out.numbers] == ["14 days"]
+    rules = [(e["field"], e["rule"], e["owned"]) for e in out.enforced]
+    assert rules[0][0] == "quotes" and rules[0][2] is True
+    assert ("numbers", "자른 인용 밖으로 나간 수치 삭제", True) in rules  # 잘려 나간 4,096
+    assert ("numbers", "인용에 없는 수치 삭제", False) in rules  # 지어낸 99%는 품질 정리
+    assert out.attention is True  # 99% 품질 정리 때문(자르기만으로는 켜지 않음)
+    graded = ItemCardV1.graded_output(out.raw_dump(), out.enforced)
+    assert graded["quotes"][0]["text"] == q and [x["value"] for x in graded["numbers"]] == ["14 days", "99%"]
+
+
+def test_clip_alone_keeps_attention_off():
+    body = f"{LONG}\n\n끝."
+    c = card(quotes=[{"n": 1, "text": LONG}], numbers=[], claims=[{"quote_ns": [1], "text": "학습 시간 단축"}],
+             summary="학습 시간이 줄었다.")
+    out = apply_enforce(c, inp(body=Document(id="it:7", source="OpenAI", text=body)), None)
+    assert out.attention is False and len(out.quotes[0].text) <= QUOTE_CHARS
+    assert [e["field"] for e in out.enforced] == ["quotes"]
+
+
+def test_quote_schema_safety_cap():
+    ItemCardV1.model_validate(card().model_dump() | {"quotes": [{"n": 1, "text": "가" * 999}]})
+    with pytest.raises(ValueError):
+        ItemCardV1.model_validate(card().model_dump() | {"quotes": [{"n": 1, "text": "가" * 1001}]})
 
 
 def test_run_role_records_item_card_enforce(tmp_path, models):

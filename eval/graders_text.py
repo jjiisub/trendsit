@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from trendsit.core.artifacts_text import squash
+from trendsit.core.artifacts_text import clipped_quotes, squash
 
 from . import graders
 from .graders import check
@@ -66,7 +66,9 @@ def aggregate_item_card(results: list[dict[str, Any]]) -> tuple[dict[str, Any], 
             hit, total = hit + h, total + t
     rate = round(hit / total, 3) if total else None
     reasons = [] if rate is not None and rate >= QUOTE_RATE else [f"인용 본문 일치 {hit}/{total} < {QUOTE_RATE:.0%}"]
-    return {"인용 본문 일치": f"{hit}/{total}" + (f" ({rate:.1%})" if rate is not None else "")}, reasons
+    cut = sum(clipped_quotes(r.get("enforced") or []) for r in results)  # 설계 결정 Q6(보고용, 판정 아님)
+    return {"인용 본문 일치": f"{hit}/{total}" + (f" ({rate:.1%})" if rate is not None else ""),
+            "잘린 인용": f"{cut}/{total}" + (f" ({cut / total:.1%})" if total else "")}, reasons
 
 
 graders.ROLE_CHECKS["item_card"] = code_item_card

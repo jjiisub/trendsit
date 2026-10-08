@@ -51,9 +51,47 @@ class ItemCardInput(RoleInput):
     keywords: list[KeywordRef] = []
 
 
+QUOTE_CHARS = 200  # 인용 길이(역할 md 지시, enforce가 자름). 설계 결정 Q6
+QUOTE_SCHEMA_MAX = 1000  # 모델용 스키마 안전 상한. 이보다 짧으면 스키마 오류로 다시 묻지 않는다
+QUOTE_CLIP_RULE = f"{QUOTE_CHARS}자 넘는 인용을 본문 연속 구간으로 자름"
+
+
+def clipped_quotes(enforced: list[dict]) -> int:
+    """enforce 기록에서 긴 인용 자르기로 바뀐 인용 수."""
+    return sum(1 for e in enforced if e["rule"] == QUOTE_CLIP_RULE
+               for b, a in zip(e["before"], e["after"], strict=False) if b["text"] != a["text"])
+
+
 class Quote(Strict):
     n: int = Field(ge=1, description="인용 번호(1부터). 근거 id는 it:{item_id}#q{n}")
-    text: str = Field(max_length=200, description="본문 문장을 한 글자도 바꾸지 않고 그대로. 200자 이내")
+    text: str = Field(max_length=QUOTE_SCHEMA_MAX, description="본문 문장을 한 글자도 바꾸지 않고 그대로. 200자 이내")
+
+
+def clip_quote(text: str, values: list[str], limit: int = QUOTE_CHARS) -> str:
+    """limit자를 넘는 인용을 연속 부분 문자열로 자른다(설계 결정 Q6). 공백에서 자르고 말줄임 기호는 붙이지 않는다.
+
+    values(이 인용을 가리키는 수치)가 모두 들어가는 구간 중 가장 앞의 것, 없으면 앞에서부터.
+    공백 없이 limit자를 넘는 한 덩어리뿐이면 글자 단위로 앞에서 자른다.
+    """
+    text = squash(text)
+    if len(text) <= limit:
+        return text
+    words = text.split(" ")
+    starts = [0]
+    for w in words[:-1]:
+        starts.append(starts[-1] + len(w) + 1)
+    windows = []
+    for i in range(len(words)):
+        j = i
+        while j + 1 < len(words) and starts[j + 1] + len(words[j + 1]) - starts[i] <= limit:
+            j += 1
+        if starts[j] + len(words[j]) - starts[i] <= limit:
+            windows.append(text[starts[i]:starts[j] + len(words[j])])
+    need = [squash(v) for v in values if squash(v)]
+    for w in windows:
+        if all(v in w for v in need):
+            return w
+    return windows[0] if windows else text[:limit]
 
 
 class NumberFact(Strict):
@@ -96,13 +134,14 @@ class ItemCardV1(RoleOutput):
     def enforce(self, inp: ItemCardInput, ctx: Ctx | None) -> Self:
         """인용이 본문에 있는지, 수치가 인용에 있는지, 목록 밖 키워드·링크 번호를 코드가 정리한다(S2S3_TASK 5.2)."""
         body = squash(inp.body.text)
-        out = self
-        kept = [q for q in self.quotes if squash(q.text) and squash(q.text) in body]
-        if len(kept) != len(self.quotes):
+        out = self.clip_quotes(body)
+        kept = [q for q in out.quotes if squash(q.text) and squash(q.text) in body]
+        if len(kept) != len(out.quotes):
             out = out.fix("quotes", kept, "본문에 없는 인용 삭제")
         ok_n = {q.n: squash(q.text) for q in kept}
-        nums = [x for x in self.numbers if x.quote_n in ok_n and squash(x.value) and squash(x.value) in ok_n[x.quote_n]]
-        if len(nums) != len(self.numbers):
+        before_nums = out.numbers
+        nums = [x for x in before_nums if x.quote_n in ok_n and squash(x.value) and squash(x.value) in ok_n[x.quote_n]]
+        if len(nums) != len(before_nums):
             out = out.fix("numbers", nums, "인용에 없는 수치 삭제")
         claims = []
         for c in self.claims:
@@ -119,8 +158,32 @@ class ItemCardV1(RoleOutput):
         origins = [n for n in self.origin_candidates if n in link_ns]
         if origins != self.origin_candidates:
             out = out.fix("origin_candidates", origins, "없는 링크 번호 삭제")
-        if len(kept) != len(self.quotes) or len(nums) != len(self.numbers):
+        if len(kept) != len(self.quotes) or len(nums) != len(before_nums):
             out = out.fix("attention", True, "인용·수치 정리가 있어 사람 확인")
+        return out
+
+    def clip_quotes(self, body: str) -> Self:
+        """본문에 있는 QUOTE_CHARS자 초과 인용을 자르고, 잘려 나간 수치를 지운다(설계 결정 Q6, 코드 소유. attention 없음)."""
+        quotes, cut = [], {}  # cut: 인용 번호 → (원래, 자른 것)
+        for q in self.quotes:
+            t = squash(q.text)
+            if len(t) > QUOTE_CHARS and t in body:
+                short = clip_quote(t, [x.value for x in self.numbers if x.quote_n == q.n])
+                quotes.append(q.model_copy(update={"text": short}))
+                cut[q.n] = (t, short)
+            else:
+                quotes.append(q)
+        if not cut:
+            return self
+        out = self.fix("quotes", quotes, QUOTE_CLIP_RULE, owned=True)
+
+        def lost(x: NumberFact) -> bool:  # 원래 인용에는 있었는데 잘려 나간 수치만(모델이 틀린 수치는 품질 정리로)
+            v = squash(x.value)
+            return x.quote_n in cut and bool(v) and v in cut[x.quote_n][0] and v not in cut[x.quote_n][1]
+
+        nums = [x for x in self.numbers if not lost(x)]
+        if len(nums) != len(self.numbers):
+            out = out.fix("numbers", nums, "자른 인용 밖으로 나간 수치 삭제", owned=True)
         return out
 
 
