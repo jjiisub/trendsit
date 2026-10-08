@@ -27,8 +27,9 @@ grep -q '^FAIL' "$TMP/s0" "$TMP/s1" || pass A1 "verify_s0.sh $(grep -c '^PASS' "
 # A2 정적 검사, 테스트(맥 전용은 mac_video 표시 하나로만 건너뜀)
 if uv run --quiet "${EXTRA[@]}" ruff check . >"$TMP/ruff" 2>&1 && uv run --quiet "${EXTRA[@]}" pytest -q -rs >"$TMP/pt" 2>&1; then
   skips=$(grep -c '^SKIPPED' "$TMP/pt" || true)
-  other=$(grep '^SKIPPED' "$TMP/pt" | grep -vc 'video 묶음' || true)
-  if [ "$other" = "0" ]; then pass A2 "ruff 0, pytest $(tail -1 "$TMP/pt") (건너뜀 ${skips}건은 맥 전용 표시뿐)"; else fail A2 "맥 전용 밖의 건너뜀 ${other}건"; fi
+  # 허용: 맥 전용(video 묶음) + S2 실제 임베더 테스트의 embed 묶음 없음(이 스크립트는 --extra video만 넣음)
+  other=$(grep '^SKIPPED' "$TMP/pt" | grep -v 'video 묶음' | grep -vc 'embed 선택 묶음 없음' || true)
+  if [ "$other" = "0" ]; then pass A2 "ruff 0, pytest $(tail -1 "$TMP/pt") (건너뜀 ${skips}건은 맥 전용·embed 묶음 표시뿐)"; else fail A2 "허용 밖의 건너뜀 ${other}건"; fi
 else
   fail A2 "$(tail -1 "$TMP/ruff") / $(tail -1 "$TMP/pt")"
 fi
