@@ -1,0 +1,60 @@
+{
+ "input": {
+  "item_id": 54,
+  "transcript": {
+   "id": "vd:54@0",
+   "source": "전사(whisper)",
+   "text": "",
+   "title": null,
+   "url": null
+  },
+  "transcript_quality": "empty",
+  "slides": [],
+  "slide_only_facts": [],
+  "title": "[한영자막] 앤트로픽 CEO 다리오 아모데이 인터뷰",
+  "duration_sec": 1427,
+  "span_start": 0,
+  "span_end": 1427,
+  "chapters": [
+   {
+    "sec": 0,
+    "title": "AI benefits and risks"
+   },
+   {
+    "sec": 137,
+    "title": "The need to slow down"
+   },
+   {
+    "sec": 226,
+    "title": "Safety and governance plans"
+   },
+   {
+    "sec": 389,
+    "title": "Governmental responsibility"
+   },
+   {
+    "sec": 512,
+    "title": "Regulatory philosophy"
+   },
+   {
+    "sec": 653,
+    "title": "Defense and security strategies"
+   },
+   {
+    "sec": 759,
+    "title": "Geopolitical AI cooperation"
+   },
+   {
+    "sec": 1017,
+    "title": "Personal responsibility"
+   },
+   {
+    "sec": 1152,
+    "title": "Message to the public"
+   }
+  ],
+  "mode": "whisper"
+ },
+ "expect": {},
+ "note": "파생(A7): 5wDzydCqkV8의 전사 품질을 empty로, 판독 없음"
+}

@@ -1,0 +1,641 @@
+{
+ "input": {
+  "item_id": 15,
+  "transcript": {
+   "id": "vd:15@0",
+   "source": "전사(whisper)",
+   "text": "",
+   "title": null,
+   "url": null
+  },
+  "transcript_quality": "suspect_hallucination",
+  "slides": [
+   {
+    "id": "vd:15@39",
+    "source": "슬라이드 판독",
+    "text": "DX platform built from research behind\nDORA, SPACE, DevEx\nDORA\nSPACE\nDevEx\nDX Core 4\nAI measurement\n2018\n2021\n2023\n2024\n2025\nDX\nDX",
+    "title": "DX platform built from research behind DORA, SPACE, DevEx",
+    "url": null
+   },
+   {
+    "id": "vd:15@94",
+    "source": "슬라이드 판독",
+    "text": "DX\nTrend #1: Velocity impact",
+    "title": "Trend #1: Velocity impact",
+    "url": null
+   },
+   {
+    "id": "vd:15@105",
+    "source": "슬라이드 판독",
+    "text": "Deployment frequency steadily increasing\n78\n80\n105\n114\nQ3 2025\nQ4 2025\nQ1 2026\nQ2 2026",
+    "title": "Deployment frequency steadily increasing",
+    "url": null
+   },
+   {
+    "id": "vd:15@181",
+    "source": "슬라이드 판독",
+    "text": "Trends vary across NA, EU, and APAC\nAsia-Pacific\nNorth America - Non-SV\nNorth America - SV\nEurope\nQ3 2025\nQ4 2025\nQ1 2026\nQ2 2026\nDX",
+    "title": "Trends vary across NA, EU, and APAC",
+    "url": null
+   },
+   {
+    "id": "vd:15@254",
+    "source": "슬라이드 판독",
+    "text": "Perceived rate of delivery flat / slightly up\n100%\n90%\n80%\n70%\n60%\n50%\n40%\n30%\nQ3 2025\nQ4 2025\nQ1 2026\nQ2 2026",
+    "title": "Perceived rate of delivery flat / slightly up",
+    "url": null
+   },
+   {
+    "id": "vd:15@279",
+    "source": "슬라이드 판독",
+    "text": "DX\nTrend #2: Quality and delivery impact",
+    "title": "Trend #2: Quality and delivery impact",
+    "url": null
+   },
+   {
+    "id": "vd:15@299",
+    "source": "슬라이드 판독",
+    "text": "Volatility in change failure rate %\nPer-company Change Failure Rate% impact for AI Users vs. Non-AI Users\nData from 61 companies\nPer-company Change Failure Rate impact with AI adoption\nChange Failure Rate % impact\nCompany\nDX",
+    "title": "Volatility in change failure rate %",
+    "url": null
+   },
+   {
+    "id": "vd:15@428",
+    "source": "슬라이드 판독",
+    "text": "PR size is increasing...\nMedian PR size over time\nSample from over 400+ companies from July 2025 to June 2026\nMedian PR size, in lines of code\n44\n48\n58\n72\nQ3 2025\nQ4 2025\nQ1 2026\nQ2 2026",
+    "title": "PR size is increasing...",
+    "url": null
+   },
+   {
+    "id": "vd:15@535",
+    "source": "슬라이드 판독",
+    "text": "Junior engineers use AI the most\nAI adoption by usage level and role seniority\nSample from 400+ companies\nHeavy Moderate Light Never Unknown/No Data\n100%\n80%\n60%\n40%\n20%\n0%\nJunior\nMid-level\nSenior\nStaff+\nRole seniority",
+    "title": "Junior engineers use AI the most",
+    "url": null
+   },
+   {
+    "id": "vd:15@650",
+    "source": "슬라이드 판독",
+    "text": "\"We spent $10M on tokens,\nwhere is the 10x productivity?\"\n- Your executive leadership",
+    "title": null,
+    "url": null
+   },
+   {
+    "id": "vd:15@766",
+    "source": "슬라이드 판독",
+    "text": "AI Measurement Framework\n* Metrics for autonomous AI agents\nUtilization\nHow much are developers adopting and utilizing AI tools?\nImpact\nHow is AI impacting engineering productivity?\nCost\nIs our AI spend and return on investment optimal?\nAI tool usage (DAUs/WAUs)\nPercentage of PRs that are AI-assisted\nPercentage of committed code that is AI-generated\nTasks assigned to agents *\nAI-driven time savings (dev hours/week)\nDeveloper satisfaction\nDX Core 4 metrics, including:\nPR throughput\nPerceived rate of delivery\nDeveloper Experience Index (DXI)\nCode maintainability\nChange confidence\nChange fail percentage\nHuman-equivalent hours (HEH) of work completed by agents *\nAI spend (both total and per developer)\nNet time gain per developer (time savings - AI spend)\nAgent hourly rate (HEH / AI spend) *",
+    "title": "AI Measurement Framework",
+    "url": null
+   },
+   {
+    "id": "vd:15@833",
+    "source": "슬라이드 판독",
+    "text": "AI Readiness\nIncomplete 336\nBronze 1\n2 hours ago\nScores Checks Trends Exemptions Audit log\nBronze Options\nDefined owner\nAGENT.md exists\nREADME.md exists\nLocal development docs\nSilver\n> 80% code coverage\nLinter configured\nBranch protection configured\nGold\nUses feature flags\nSecret management configured\nAPI schema documentation\nGauging AI Readiness...\nClear, accurate, well-structured documentation\nData structures with straightforward relations\nReadable, manageable, modular code\nFast, reliable local and CI feedback loops\nStable (read: non-flaky) robust test suites",
+    "title": "Gauging AI Readiness...",
+    "url": null
+   },
+   {
+    "id": "vd:15@905",
+    "source": "슬라이드 판독",
+    "text": "Productivity gains more modest than expected\nRandom sample from 400+ companies\nNo PR throughput incentivization\nNo known recent M&As, IPOs, or regulatory changes\nLongitudinal study from November 2024 to February 2026\nWeighted PR throughput increase\nMedian\n7.76%\nAverage\n13.1%",
+    "title": "Productivity gains more modest than expected",
+    "url": null
+   },
+   {
+    "id": "vd:15@966",
+    "source": "슬라이드 판독",
+    "text": "Find the bottleneck.\nFix the bottleneck.\nSupplier\nProduction Control\nCustomer\nMolding\nMax. 2500 per color\nmax. 12,500 pcs\nPT = 6 s\nCT = 8 s\nA = 60%\nCTeff = 10 s\nPainting\nMax. 2500 per color\n3\nPT = 24 s\nCT = 8 s\nA = 10%\nCTeff = 30 min\nLogo Printing\nMax. 333\n10 pcs 1\nPT = 80 s\nCT = 5 min\nBPEL = 7.5 h\nCTeff = 9 s\nAssembly + gas filling\nMax. 2500\nFIFO\n3\nPT = 35 s\nCT = 10 s\nA = 100%\nCTeff = 10 s\nWT\n135,000\n3,600\n?\n1,800\n27,000\n6\n24\n80\n35\nWT: 144,000 sec\nPT: 151 sec\nPLT: 144,151 sec",
+    "title": "Find the bottleneck. Fix the bottleneck.",
+    "url": null
+   },
+   {
+    "id": "vd:15@1014",
+    "source": "슬라이드 판독",
+    "text": "Zapier - Administrative Automation\nThe Bottleneck\nEngineers and teams at Zapier were losing valuable focus time to repetitive administrative work such as daily stand-ups, onboarding tasks, internal reporting, and routine Slack communications\nThe AI solution\nZapier's AI Agents team built an internal automation ecosystem where agents now run async stand-ups, summarize team updates, automate onboarding steps like email signature creation, and integrate seamlessly with Slack for approvals, notifications, and summaries.\nThe impact\nThe initiative has led to fewer synchronous meetings, faster onboarding (new engineers become productive within ~2 weeks), and an automation-focused culture. Zapier has actually ramped hiring as a result.",
+    "title": "Zapier - Administrative Automation",
+    "url": null
+   },
+   {
+    "id": "vd:15@1075",
+    "source": "슬라이드 판독",
+    "text": "Spotify - Incident Management\nThe Bottleneck\nWhen a production incident occurs, SREs often spend critical minutes and hours correlating alerts, digging through logs, and identifying the correct runbook steps.\nThe AI Solution\nSpotify created an internal incident management agent platform that monitors logs and correlates alerts in real-time. When an incident is detected, the agent automatically suggests remediation steps from relevant runbooks directly into the SREs' communication channels.\nThe Impact\nThe platform is currently handling 90% of all incidents at Spotify, dramatically reducing mean time to resolution (MTTR) and freeing up SREs to focus on proactive reliability work.",
+    "title": "Spotify - Incident Management",
+    "url": null
+   },
+   {
+    "id": "vd:15@1120",
+    "source": "슬라이드 판독",
+    "text": "AI-assisted engineering\nQ1 impact report",
+    "title": null,
+    "url": null
+   }
+  ],
+  "slide_only_facts": [
+   {
+    "fact": "Q3 2025 deployment frequency",
+    "value": "78",
+    "unit": "",
+    "sec": 105,
+    "evidence": "vd:15@105",
+    "confidence": "high"
+   },
+   {
+    "fact": "Q4 2025 deployment frequency",
+    "value": "80",
+    "unit": "",
+    "sec": 105,
+    "evidence": "vd:15@105",
+    "confidence": "high"
+   },
+   {
+    "fact": "Q1 2026 deployment frequency",
+    "value": "105",
+    "unit": "",
+    "sec": 105,
+    "evidence": "vd:15@105",
+    "confidence": "high"
+   },
+   {
+    "fact": "Q2 2026 deployment frequency",
+    "value": "114",
+    "unit": "",
+    "sec": 105,
+    "evidence": "vd:15@105",
+    "confidence": "high"
+   },
+   {
+    "fact": "companies (data from)",
+    "value": "61",
+    "unit": "",
+    "sec": 299,
+    "evidence": "vd:15@299",
+    "confidence": "high"
+   },
+   {
+    "fact": "Median PR size Q3 2025",
+    "value": "44",
+    "unit": "lines of code",
+    "sec": 428,
+    "evidence": "vd:15@428",
+    "confidence": "high"
+   },
+   {
+    "fact": "Median PR size Q4 2025",
+    "value": "48",
+    "unit": "lines of code",
+    "sec": 428,
+    "evidence": "vd:15@428",
+    "confidence": "high"
+   },
+   {
+    "fact": "Median PR size Q1 2026",
+    "value": "58",
+    "unit": "lines of code",
+    "sec": 428,
+    "evidence": "vd:15@428",
+    "confidence": "high"
+   },
+   {
+    "fact": "Median PR size Q2 2026",
+    "value": "72",
+    "unit": "lines of code",
+    "sec": 428,
+    "evidence": "vd:15@428",
+    "confidence": "high"
+   },
+   {
+    "fact": "Sample from",
+    "value": "400+",
+    "unit": "companies",
+    "sec": 535,
+    "evidence": "vd:15@535",
+    "confidence": "high"
+   },
+   {
+    "fact": "spent on tokens",
+    "value": "$10M",
+    "unit": "M",
+    "sec": 650,
+    "evidence": "vd:15@650",
+    "confidence": "high"
+   },
+   {
+    "fact": "productivity",
+    "value": "10x",
+    "unit": "x",
+    "sec": 650,
+    "evidence": "vd:15@650",
+    "confidence": "high"
+   },
+   {
+    "fact": "Incomplete",
+    "value": "336",
+    "unit": "",
+    "sec": 833,
+    "evidence": "vd:15@833",
+    "confidence": "high"
+   },
+   {
+    "fact": "Bronze",
+    "value": "1",
+    "unit": "",
+    "sec": 833,
+    "evidence": "vd:15@833",
+    "confidence": "high"
+   },
+   {
+    "fact": "time",
+    "value": "2",
+    "unit": "hours ago",
+    "sec": 833,
+    "evidence": "vd:15@833",
+    "confidence": "high"
+   },
+   {
+    "fact": "code coverage",
+    "value": "> 80%",
+    "unit": "%",
+    "sec": 833,
+    "evidence": "vd:15@833",
+    "confidence": "high"
+   },
+   {
+    "fact": "companies (random sample)",
+    "value": "400+",
+    "unit": "",
+    "sec": 905,
+    "evidence": "vd:15@905",
+    "confidence": "high"
+   },
+   {
+    "fact": "Median weighted PR throughput increase",
+    "value": "7.76%",
+    "unit": "%",
+    "sec": 905,
+    "evidence": "vd:15@905",
+    "confidence": "high"
+   },
+   {
+    "fact": "Average weighted PR throughput increase",
+    "value": "13.1%",
+    "unit": "%",
+    "sec": 905,
+    "evidence": "vd:15@905",
+    "confidence": "high"
+   },
+   {
+    "fact": "Molding Max. per color",
+    "value": "2500",
+    "unit": "",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Molding max.",
+    "value": "12,500",
+    "unit": "pcs",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Molding PT",
+    "value": "6 s",
+    "unit": "s",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Molding CT",
+    "value": "8 s",
+    "unit": "s",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Molding A",
+    "value": "60%",
+    "unit": "%",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Molding CTeff",
+    "value": "10 s",
+    "unit": "s",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Painting Max. per color",
+    "value": "2500",
+    "unit": "",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Painting (count)",
+    "value": "3",
+    "unit": "",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Painting PT",
+    "value": "24 s",
+    "unit": "s",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Painting CT",
+    "value": "8 s",
+    "unit": "s",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Painting A",
+    "value": "10%",
+    "unit": "%",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Painting CTeff",
+    "value": "30 min",
+    "unit": "min",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Logo Printing Max.",
+    "value": "333",
+    "unit": "",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Logo Printing",
+    "value": "10 pcs",
+    "unit": "pcs",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Logo Printing PT",
+    "value": "80 s",
+    "unit": "s",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Logo Printing CT",
+    "value": "5 min",
+    "unit": "min",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Logo Printing BPEL",
+    "value": "7.5 h",
+    "unit": "h",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Logo Printing CTeff",
+    "value": "9 s",
+    "unit": "s",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Assembly PT",
+    "value": "35 s",
+    "unit": "s",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Assembly CT",
+    "value": "10 s",
+    "unit": "s",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Assembly A",
+    "value": "100%",
+    "unit": "%",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Assembly CTeff",
+    "value": "10 s",
+    "unit": "s",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Assembly Max.",
+    "value": "2500",
+    "unit": "",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Assembly (count)",
+    "value": "3",
+    "unit": "",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "WT (first)",
+    "value": "135,000",
+    "unit": "",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "WT",
+    "value": "3,600",
+    "unit": "",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "WT",
+    "value": "1,800",
+    "unit": "",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "WT (last)",
+    "value": "27,000",
+    "unit": "",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "WT (interval)",
+    "value": "6",
+    "unit": "",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "WT (interval)",
+    "value": "24",
+    "unit": "",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "WT (interval)",
+    "value": "80",
+    "unit": "",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "WT (interval)",
+    "value": "35",
+    "unit": "",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "WT",
+    "value": "144,000",
+    "unit": "sec",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "PT",
+    "value": "151",
+    "unit": "sec",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "PLT",
+    "value": "144,151",
+    "unit": "sec",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "of all incidents at Spotify",
+    "value": "90%",
+    "unit": "%",
+    "sec": 1075,
+    "evidence": "vd:15@1075",
+    "confidence": "high"
+   }
+  ],
+  "title": "[한영자막] 400개 기업 데이터로 본 소프트웨어 개발 AI의 현주소입니다",
+  "duration_sec": 1123,
+  "span_start": 0,
+  "span_end": 1122,
+  "chapters": [
+   {
+    "sec": 0,
+    "title": "오프닝: DX의 AI 영향력 연구 소개"
+   },
+   {
+    "sec": 74,
+    "title": "트렌드 1: 개발 속도와 배포 빈도"
+   },
+   {
+    "sec": 160,
+    "title": "지역별 차이 (북미 vs 유럽)"
+   },
+   {
+    "sec": 200,
+    "title": "체감 속도와 실제 생산성의 괴리"
+   },
+   {
+    "sec": 265,
+    "title": "트렌드 2: 소프트웨어 품질과 변경 실패율 변동성"
+   },
+   {
+    "sec": 349,
+    "title": "유지보수성은 상승, 배포 확신도는 하락"
+   },
+   {
+    "sec": 409,
+    "title": "커지는 PR 크기와 점진적 배포의 위기"
+   },
+   {
+    "sec": 509,
+    "title": "트렌드 3: 주니어 vs 시니어 엔지니어와 기업 규모"
+   },
+   {
+    "sec": 624,
+    "title": "트렌드 4: AI 성과 측정 프레임워크 (활용도·임팩트·비용)"
+   },
+   {
+    "sec": 794,
+    "title": "플랫폼 AI 준비도: 좋은 DevEx가 좋은 AX"
+   },
+   {
+    "sec": 844,
+    "title": "에이전트의 직접 피드백 경청"
+   },
+   {
+    "sec": 884,
+    "title": "트렌드 5: 코드 생성은 결코 병목이 아니었다"
+   },
+   {
+    "sec": 974,
+    "title": "실전 사례 연구: Morgan Stanley, Zapier, Spotify"
+   },
+   {
+    "sec": 1099,
+    "title": "2분기 리포트 안내 및 마무리"
+   }
+  ],
+  "mode": "whisper+slides"
+ },
+ "expect": {},
+ "note": "파생(A7): xRZHLI5SPWo의 전사 품질을 suspect_hallucination로"
+}

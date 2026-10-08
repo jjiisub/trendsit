@@ -1,0 +1,125 @@
+{
+ "input": {
+  "item_id": 1,
+  "transcript": {
+   "id": "vd:1@0",
+   "source": "전사(whisper)",
+   "text": "[0] but we're here to talk about why we're the bottleneck\n[3] and why we don't have to be.\n[7] So, as you all know and use every day,\n[10] agents are amazing.\n[12] There's so much they can do,\n[13] from generating cat memes to B2B SaaS apps.\n[18] So if they are so amazing,\n[20] we have to ask, why aren't we all unstoppable?\n[23] Why doesn't everyone have an army of agents\n[25] that just does whatever they want?\n[28] So it should be relatively easy.\n[30] I mean, you just have a bunch of monitors\n[32] and you spin up 25 cloud code agents and you're done.\n[36] So the reality is that it's just not that simple.\n[40] To do something like that,\n[41] we need to, A, really want to use agents.\n[45] And secondly, once you actually spin them up,\n[48] each one of these agents requires you to steer them,\n[51] direct them, review them.\n[53] And when it's at scale especially, it's just exhausting.\n[57] We need to find the skills to allow us to do it\n[59] without burning out.\n[61] So in reality, we are the bottleneck.\n[65] And the cool thing here is that while we are the bottleneck,\n[71] the skills that we need to do these things,\n[73] to find ourselves not burning out\n[76] every time we use an agent, are with us all along.\n[80] If you try and compare it to other stuff\n[83] that you've been doing outside of programming,\n[86] for example, playing video games,\n[88] it's not really that different.\n[89] Like if you're playing Warcraft, for example, or Sims,\n[92] and you have a bunch of different units running around,\n[95] you need to understand what you're doing\n[97] and supervise all of it,\n[98] how different is it from actually inspecting agents?\n[102] So I took this concept too far\n[106] and I created AgentCraft,\n[108] which is a game-inspired orchestrator\n[111] that tries to bring all that good stuff together into work.\n[117] So let's take a quick look of what that actually looks like\n[121] and try and understand the journey that we can go through\n[124] to really raise the ceiling of how humans and agents can collaborate.\n[128] So this is AgentCraft.\n[130] There's really a lot to unpack here.\n[133] So we'll just go through the basics really quick.\n[136] What you see here is an agent.\n[139] It's an actual representation of a cloud code or openclaw,\n[145] whatever agent that you can imagine.\n[147] It can be detected on your device\n[149] or you can actually spawn new ones directly from AgentCraft.\n[154] So like I said, you have like codecs and openclaw, et cetera.\n[158] At your command.\n[161] And these agents can do everything.\n[163] They're just normal agents.\n[165] So I can just prompt them in this nice side panel\n[168] that also has voice.\n[169] So there's multimodality here.\n[172] And just do something for me.\n[175] Prompt, prompt.\n[177] And now these agents can do whatever.\n[181] And if you look around,\n[182] you would see that the map has a bunch of different elements.\n[185] So you have buildings.\n[186] These buildings represent functionalities.\n[188] So for example, if you can manage your plugins or skills,\n[191] you have like integrated terminal, integrated Git.\n[195] You can do all of your work from within this space.\n[200] So now that we have this and we understand the basics,\n[202] let's look at what we can do to raise the ceiling.\n[206] So the first step is obviously visibility.\n[208] I need to understand what's going on.\n[210] What are my agents doing?\n[211] So I have this nice side panel\n[213] and it shows me the different agents\n[215] and what their task is\n[216] and what the last thing they did is\n[218] and what they're currently doing.\n[219] Everything I need to quickly understand\n[221] who needs my attention and who doesn't.\n[223] The second part of it is we're not just limited to this.\n[227] We have a map.\n[229] So I can take, let's say, my file system,\n[232] project it onto the map,\n[234] and now I can see exactly what my agents are doing,\n[237] not just by looking at the list of stuff.\n[239] I can actually see, okay,\n[240] this agent is now working on this directory or this file.\n[244] And these files are represented as rooms on the map,\n[247] so I can really look at each one\n[249] and see exactly what each agent did and when.\n[253] And now I can take this nice information\n[255] because we are the orchestrator,\n[257] and use that to create linkages.\n[260] And now I can create cool stuff like heat maps\n[263] so I can really easily see what's going on.\n[266] And the other aspect is that\n[270] now that we have this visibility,\n[273] that's not really enough.\n[274] We need to be able to react to what's going on.\n[276] If someone needs my attention,\n[278] I need to be able to quickly jump to it.\n[280] So much like video games or RTS games\n[283] or Civilization, whatever,\n[284] you would click a space bar\n[286] and it would just take you to the nearest thing\n[288] that actually needed your attention.\n[290] So you can really easily understand what's going on\n[292] and jump from one thing to the other\n[295] and answer questions or approve plans, et cetera.\n[301] That was nice.\n[302] I mean, it's a nice step just to have that visibility,\n[306] but it's not really enough.\n[307] It's pretty exhausting to keep looking at what the agents are doing\n[312] in the granularity of what files are they using\n[314] and what tools are they using at the moment.\n[316] So we need something else.\n[318] And the reason is that we have, like, two main problems here.\n[322] One is that there's just too much to hold in our heads.\n[325] Even if I can understand what's going on\n[327] and I can see everything,\n[328] I can't really do, like, 20 things at the same time.\n[330] I can't even think of the next thing I want to do\n[333] if I have this huge coding project or whatever.\n[336] So I need to find some way to fix that.\n[339] So we can.\n[340] I mean, we can tell the agents,\n[342] you know, go through my code base,\n[344] find out what the next things I need to do are,\n[346] create these tasks for me,\n[347] and I just click a button, I accept the quest,\n[350] and there's some agent that does it for me,\n[353] which is fun.\n[354] It's cool.\n[355] But the next problem here is that,\n[358] okay, now I have 20 stuff going at the same time\n[360] and I have to babysit each and every one,\n[363] and that is completely exhausting.\n[365] So you could ask, okay, we have agents.\n[368] Agents are amazing, as we've established.\n[371] So I can just go ahead and tell the agent to do it for me.\n[375] Now it's called software factories,\n[377] but at the time it was just doing stuff autonomously.\n[380] So you can give it like a general sense of what you want.\n[383] It would spawn an orchestrator and break it down for you\n[386] and run it all in, well, in this case,\n[389] it's a local container.\n[391] So everything is just done in isolation,\n[394] and I don't need to do any babysitting.\n[396] The agent does it for me.\n[397] On top of that, you have loops,\n[400] which everyone really likes right now.\n[401] So you can do cool things like just tell that to,\n[404] I don't know, scan Twitter for cool stuff you want to build\n[406] or scan your GitHub,\n[408] and it will just create these nice features for you\n[411] in the background without you needing to do too much up front.\n[417] The bad thing is that, I mean, this is nice,\n[420] but what do I do when I have, again, I don't know,\n[423] I would say 20, but even five things to review at the same time.\n[428] It's very, very hard to get that out of the way.\n[432] So what I did is create this review kit.\n[436] So I get the entire changes I need,\n[438] and I get what files change if you want to go file by file,\n[442] or I can just get visual evidence,\n[445] so you can actually see videos of what changed\n[447] or photos of what changed,\n[448] so you can really quickly understand what you want,\n[451] or even run a few instances in parallel\n[454] and just pick the best implementation out of these.\n[458] So now that we have this,\n[460] we have visibility and we have autonomy,\n[463] it's pretty cool.\n[464] Like, we reached a pretty good place\n[466] in raising the ceiling of what we can do with agents,\n[469] but it's still pretty exhausting.\n[472] I mean, it was fun,\n[474] but now I have to ask myself,\n[475] do I really need to be the only one doing this?\n[478] It's pretty lonely to just talk to agents all day\n[481] and trying to, and, you know,\n[483] if you look at what a team does, for example,\n[486] if it's just me, that's fine,\n[488] but if I have a team,\n[489] I might not even be the right person\n[491] to review what's going on.\n[492] So I need something else,\n[495] and that something is collaboration.\n[497] We can just have other people join us.\n[501] So the way that looks in AgentCraft\n[504] is that I can create these,\n[506] you can call it, you know,\n[508] war halls, war room, whatever.\n[510] Uh, host them.\n[512] It's, like, completely local,\n[512] but you can do, like, tunnels,\n[515] and people can join you.\n[516] And so I can create a room,\n[518] and let's say I have a product designer in my team.\n[520] In this case, it's my wife.\n[522] And I can approve, uh, her.\n[524] Otherwise, she'll be mad.\n[526] Uh, so I can approve her, and she does her thing.\n[528] She designs whatever.\n[530] And I, as an engineer, can not only see that.\n[533] That's, that's her.\n[535] Um, I can not only see that on my map,\n[538] uh, I can actually take that and follow off off of it.\n[543] Prompt, prompt.\n[544] Yeah, that, that, just like her.\n[546] Um, so I can take that design,\n[550] follow up on it, implement it while she keeps working.\n[554] Uh, and the cool thing here is that not only can I hand off,\n[556] or fork and kind of have this shared workspace.\n[560] So I'm not really bound anymore to Git.\n[561] I can use Git, but I'm not really bound to something.\n[563] Everyone is working together.\n[564] Uh, you can see that there is also some kind of chat between,\n[568] not only between, uh, the people within the room,\n[572] but also between agents.\n[574] So we can have this really nice notice board\n[576] of exactly what each person is doing,\n[578] what each agent is doing.\n[578] They're all aware of each other,\n[580] and they can collaborate much more closely,\n[582] uh, than you normally would be able to do.\n[584] Uh, so for example here, I can say, okay,\n[586] I took off this design task.\n[589] Uh, so now we have, oh, by the way, this is also from devices.\n[595] You can have like mobile,\n[596] and, and if you like telegram, you can use telegram,\n[599] uh, whatever floats your boat.\n[601] So we have visibility, and we have autonomy,\n[604] and we have collaboration.\n[605] So we managed to raise the ceiling.\n[607] Uh, it's now possible, especially if you're power users,\n[610] to do really cool stuff,\n[612] and use more agents, and do more things.\n[614] But the interesting thing here was, you know,\n[617] if I looked at the feedback I got,\n[619] it's not just that power users were able to do more.\n[622] The cooler thing for me was that people that had even nothing to do with agents,\n[626] or nothing to do with productivity, uh, come and say,\n[629] uh, okay, my kids really loved it,\n[632] and they use it all the time to, to orchestrate agents,\n[635] which they didn't do until now.\n[637] Uh, or, you know, someone that flunked out of college,\n[640] because he played StarCraft,\n[642] and now he can suddenly do really productive stuff with it.\n[644] Uh, and a bunch of other examples of kind of bringing communities\n[648] that so far were kind of behind into this new world of productivity.\n[653] So we need to raise the ceiling,\n[656] but we also need to, uh, lower the floor.\n[660] We need to have some kind of way to take,\n[663] you know, probably around 90% of the people in the world\n[666] and bring them into this gigantic future\n[668] without having them burn out.\n[670] So, again, I took it too far.\n[674] Um, and there's this, uh, currently named TBD,\n[679] um, potentially loopers.\n[681] Uh, the idea here is, okay, why do,\n[683] why do we need something like, you know, Warcraft,\n[685] which is potentially very complicated, uh, especially,\n[688] it might be even daunting if you're not into the granularity\n[691] of what files are there or how, uh, complex the UI is,\n[695] and kind of try to find a lower denominator\n[698] of what makes stuff accessible,\n[700] especially now that agents are much more capable.\n[703] So instead of granularity or having, like,\n[706] exactly what files they're working on,\n[708] maybe I can have it more of a mobile game level,\n[711] uh, have projects that I keep returning to.\n[714] And use loops and other stuff, uh,\n[717] that rely on agents being more autonomous\n[720] to have, like, a very basic level of,\n[722] I prompt, I get a result,\n[724] I don't really care perhaps about the way,\n[726] I can see it if I want to,\n[728] and have this really nice interactive and cool experience\n[731] that makes me want to come back to this.\n[734] And obviously, I mean, this is one visualization,\n[737] uh, it can really, uh, resonate with some people,\n[740] but might not, might not resonate with others\n[743] because we're not all the same,\n[745] and what may appear, like, amazing and easy to one person\n[748] can appear very difficult to another.\n[750] Uh, but here, uh, I'm trying to look at a way\n[755] to make this more customizable,\n[757] try and understand what it is that you as a person\n[760] need in order to understand and want to use these tools.\n[764] So, this is a very, very early draft,\n[768] um, but if you want to use it, please let me know.\n[770] So, we're the bottleneck,\n[772] and I think we've established that, uh, pretty well until now.\n[775] But the skills that we need to stop being the bottleneck\n[778] and enable this new future are already with us.\n[781] So, we are the bottleneck, but we don't have to be.\n[785] And I hope that you all can take what's relevant to you\n[789] and your life and apply it forward.",
+   "title": null,
+   "url": null
+  },
+  "transcript_quality": "ok",
+  "slides": [
+   {
+    "id": "vd:1@0",
+    "source": "슬라이드 판독",
+    "text": "We're the bottleneck,\nbut we don't have to be\nIdo Salomon\nAI Engineer World's Fair",
+    "title": "We're the bottleneck, but we don't have to be",
+    "url": null
+   },
+   {
+    "id": "vd:1@484",
+    "source": "슬라이드 판독",
+    "text": "?\nAutonomy\nVisibility\nEngineering the future of AI",
+    "title": "Engineering the future of AI",
+    "url": null
+   },
+   {
+    "id": "vd:1@663",
+    "source": "슬라이드 판독",
+    "text": "...we need a lower floor",
+    "title": "...we need a lower floor",
+    "url": null
+   },
+   {
+    "id": "vd:1@788",
+    "source": "슬라이드 판독",
+    "text": "We're the bottleneck\nBut we don't have to be",
+    "title": "We're the bottleneck But we don't have to be",
+    "url": null
+   }
+  ],
+  "slide_only_facts": [],
+  "title": "[한영자막] 코딩 에이전트를 전략 게임으로 만들었습니다 — Ido Salomon, AgentCraft",
+  "duration_sec": 793,
+  "span_start": 0,
+  "span_end": 792,
+  "chapters": [
+   {
+    "sec": 0,
+    "title": "<Untitled Chapter 1>"
+   },
+   {
+    "sec": 2,
+    "title": "에이전트가 대단한데 왜 뭐든 해내지 못할까요?"
+   },
+   {
+    "sec": 37,
+    "title": "우리가 병목입니다"
+   },
+   {
+    "sec": 77,
+    "title": "게임에서 배우는 방법"
+   },
+   {
+    "sec": 107,
+    "title": "AgentCraft 소개"
+   },
+   {
+    "sec": 137,
+    "title": "지도 위의 에이전트"
+   },
+   {
+    "sec": 187,
+    "title": "건물: 플러그인·스킬·터미널·Git"
+   },
+   {
+    "sec": 202,
+    "title": "가능성 넓히기: 가시성"
+   },
+   {
+    "sec": 232,
+    "title": "파일 시스템을 지도로 보기"
+   },
+   {
+    "sec": 267,
+    "title": "주의가 필요한 곳으로 바로 이동"
+   },
+   {
+    "sec": 307,
+    "title": "머릿속에 담아 둘 일이 너무 많습니다"
+   },
+   {
+    "sec": 342,
+    "title": "퀘스트"
+   },
+   {
+    "sec": 367,
+    "title": "자율성: 오케스트레이터와 루프"
+   },
+   {
+    "sec": 422,
+    "title": "검토 도구"
+   },
+   {
+    "sec": 472,
+    "title": "협업: 함께 쓰는 방"
+   },
+   {
+    "sec": 612,
+    "title": "진입 문턱 낮추기"
+   },
+   {
+    "sec": 677,
+    "title": "Loopers: 더 단순한 방식"
+   },
+   {
+    "sec": 775,
+    "title": "마무리"
+   }
+  ],
+  "mode": "whisper+slides"
+ },
+ "expect": {},
+ "note": "관문 B 실제 실행: AgentCraft 발표와 데모 (whisper+slides)"
+}

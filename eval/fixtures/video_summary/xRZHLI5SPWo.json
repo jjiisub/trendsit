@@ -1,0 +1,553 @@
+{
+ "input": {
+  "item_id": 15,
+  "transcript": {
+   "id": "vd:15@0",
+   "source": "전사(whisper)",
+   "text": "[0] I'm Justin Riach. I'm the deputy CTO at DX. I get to do a lot of our research\n[5] around developer experience and its relation to developer productivity and\n[9] certainly over the last year a lot of that research has focused on AI's impact\n[15] on the developer experience and basic aspects of productivity within an\n[20] organization. So we produce these quarterly reports, our state of AI and AI\n[25] impact reports, which looks at really a lot of raw data that we're able to get\n[29] from our platform. Our platform is a research-backed platform built from the\n[34] same folks who worked on Dora metrics and the space framework and the Devex\n[38] framework and really at the end of the day it's a data gathering platform that\n[41] can look at a lot of different trends across an organization with you know how\n[45] are we focusing on developer experience, are we seeing outcomes and improvements\n[49] with developer experience, and certainly are we seeing outcomes with the way that\n[54] we're using AI in our workflows. This session is going to be a little bit\n[58] different than the 345 session I think that's up in the leadership room later\n[62] today which just looks at the raw data from our newest report. It's a little bit\n[66] of a preview. This is looking at more like organizational trends and how our\n[70] workflows changing and things like that based on the data that we're seeing. So\n[75] first things first let's kind of look at what we're seeing in terms of the\n[77] velocity impact. Now if anybody's familiar with looking at various\n[81] velocity metrics like PR throughput and deployment frequency like hopefully you\n[85] understand the caveat that these metrics are not perfect. They are proxy metrics\n[89] for understanding the way that work flows through an organization. They're not\n[93] fully representative of the value generation. We're going to look at some\n[96] metrics that are closer to that as well but let's just try to understand what\n[100] this technology is doing in terms of just the raw velocity metrics in the\n[104] organization. So here's our Dora metric for deployment frequency. Who's\n[108] familiar with Dora metrics? All right most of you great. So this is one of the you know\n[114] four key metrics that tries to understand directionally you know the speed of\n[118] shipping work within an environment and we're seeing it steadily increase. It's\n[123] tapering off a little bit. I think there's reasons for that. Some of the surge\n[128] that we saw early on was due to people shipping you know PRs more frequently and\n[134] things like that. So we're seeing increases in this. This is one small part of\n[140] the SDLC PDLC right. This is like the creation of the PR to actually trying to\n[145] deploy this into production. It doesn't tell us about revert rates. It doesn't\n[149] tell us about defect ratios. It doesn't tell us about change failure rate. It just\n[153] tells us about how much stuff are we now kind of pushing out into production. But\n[157] you know the data is showing us that this number is steadily increasing. Okay the\n[162] trends vary a little bit across regions. We are seeing North America just sort of\n[168] like trending up. We've seen Europe actually pull back a little bit just in\n[173] the last quarter. I think you know there's there's a number of reasons for\n[176] that. I mean obviously the way work is done in these regions are differently. The\n[180] way that we can spend money on this technology and think about token spend is\n[183] different. The regulation is different. But if we just look at the through line in\n[188] general you know we still see improvements in in this one metric of\n[193] deploy frequency even across various regions. We do just see some variance in\n[198] those regions. Here's one that's kind of interesting though. The perceived rate of\n[204] delivery. How much faster do engineers feel in terms of what they're delivering?\n[210] It's gone up a little bit. This number shows an increase of about four and a half\n[215] ish percent. But given that that's a full year and given all the investment and\n[221] cost and new spend on AI. It's interesting that this perceived rate has\n[224] not stayed. It has not kind of crept up a little bit more. Especially when you look\n[228] at some studies like obviously infamous flawed METR study. If you're familiar\n[234] with that study back in February they actually released a follow-up to that\n[238] study saying that some of the signals they gathered were sort of imperfect\n[240] and they needed to rethink some of that. But what was interesting was that in\n[244] these 16 engineers that were part of that study, small study, flawed study, the\n[248] productivity went down by about 19 percent but the perception went up by about 20\n[253] percent. So there was like a 40 percent spread in perception of productivity\n[257] versus actual productivity. But here when we look at this on more of an\n[260] aggregate things interestingly stay sort of flat. All right what about impact on\n[266] quality and and delivery right? So those are just kind of our speed our velocity\n[270] metrics but what is this actually doing to our software quality? The first metric\n[275] we'll look at here is the DORA change failure rate metric and let me prepare you.\n[281] Most of you are sitting down. It's very volatile the impact that we've seen on\n[285] quality over this period of time. Each line on this graph represents a single\n[290] company that was part of this particular part of the study and that line shows\n[294] whether you've moved up in terms of your change failure rate or move down in\n[298] terms of your change failure rate. You want to go down. You want to be on the\n[301] bottom side of this graph. But what's interesting is if you look at some of\n[305] these top lines you see people increasing as much as 2 percent which\n[308] doesn't sound like much until you realize that the industry benchmark is\n[311] about 4 percent. So that means shipping potentially 50 percent more defects than\n[316] we were shipping before. So you really just want to understand what side of this\n[319] graph you're on. You want to start measuring this stuff right? This pattern\n[323] exists without AI by the way. This has a lot to do. It's not purely causal with AI. A lot of\n[329] this has to do with like your release pipeline, your automated testing, everything\n[332] that's surrounding the way that you're releasing the code. The pattern remains\n[336] the same. The amplitude has changed as a result of AI. We always see this type of\n[340] shift in volatility but not usually to these extremes. And that's the AI effect\n[345] that we're seeing right there. Here's a really interesting one. These are two\n[349] qualitative quality metrics that normally are sort of in sync with one another. Code\n[356] maintainability, how maintainable the developers perceive the code to be in\n[360] terms of making changes to it, that number has gone up almost 4 percent\n[364] according to our data. By the way we're looking at about 200,000 engineers in this\n[368] study to gather this data. The change confidence though, which\n[373] traditionally we've seen closely associated with code maintainability. Hey\n[378] this code is maintainable, it's modular, it's easy to modify, I feel good about the\n[382] changes that I'm pushing into production. Nope, our change confidence number has\n[386] gone down 6 percent. This is really an interesting tension because it means like\n[390] okay agents and assistants are making it easier for me to understand and modify the\n[394] code that's in front of me, but I trust the outputs less. I'm more afraid now of\n[399] breaking things than I was a year ago. So it's an interesting psychological effect\n[404] that we see here. And a lot of this is because PR size is measurably increasing. This is\n[408] going to be one of the most important metrics that we look at this year. Hasn't quite doubled,\n[412] but look at that trajectory, right? This is over the same period of study about a year,\n[417] and we've seen PRs go from around 44 lines on average per PR up to 72. Now there's a number\n[426] of reasons for this. It's not just, you know, the likelihood that the way that these models work\n[431] is that they're being trained to output relatively mediocre code. I've been writing code\n[435] professionally since the late 90s. I remember when it was a great mark of a developer to be able to\n[439] implement the same use case with as little code as possible. Now it's like, well, no, let's get the\n[443] thing out. And, you know, the code that's being generated is going to be essentially mediocre\n[447] because it's law of averages. But on top of that too, think about if you've got a build pipeline that\n[452] takes 45 minutes or an hour to complete, and now I've got AI generating functions for me instantly.\n[458] Am I going to push four different PRs with four different functions and wait 45 minutes or an hour or\n[463] whatever that is for build? Or I'm just going to cram all that code into a single PR, right?\n[468] So there's multiple reasons for this, but it really bears mentioning that like every extra line of code\n[472] is a potential bug, a potential vulnerability. It's more to review. It makes the code less portable.\n[477] So we need to pay attention to this metric as well. Because we're also seeing this associated with\n[482] perception of incremental delivery. I get to work on small incremental changes, and this is actually\n[487] one of the lowest qualitative developer experience drivers that we've seen impacted over the last year.\n[492] This number and this sentiment has gone down 10%. And incremental delivery is awful, is as we've learned,\n[499] also very important for the way that we try to deliver in a way that's easy to roll back,\n[505] and where we can understand and review the changes that are being pushed through.\n[510] Okay. What about demographic differences? What is different about AI impacts across like, you know,\n[516] junior devs and stuff like that? Junior engineers are using AI the most.\n[520] This really should surprise nobody. Anytime we have sort of a new leap, again, writing code\n[526] professionally since the late 90s, I'm a bit of an OG. I'm on this journey too. But there's less to\n[532] unlearn when you're coming into the industry, right? In many, many cases, you've already been working with\n[538] this kind of stuff, like right out of school. And so you're more likely to implement it when you\n[543] actually start working. Now, we've seen some other trends there too. We have interesting ways of\n[549] looking per use case at efficiency, which I'll get into in the second talk later today. And one of those\n[554] is looking at agent experience. Like literally, we're asking agents about their experience working\n[560] with humans. We're trying to figure out what use cases are they working on and how many tokens did\n[565] they spend. And definitely, we also see a trend where the more junior developers for the same use case\n[571] will spend more tokens than a more senior developer on the same use case. And that's just a learning\n[575] curve, right? Again, that should surprise nobody. But in terms of who's using it the most, we do see\n[579] juniors using it the most. However, despite that additional use, we see staff plus some more senior\n[585] engineers saving about the same amount of time, right? And burning less tokens. I want to make sure\n[591] that that's kind of clear too. So in terms of like raw time savings and the aggregate output of this,\n[596] it's pretty flat between junior engineers who are using the tech more and staff engineers who have\n[600] an easier time spotting hallucinations, understanding the architecture around the\n[604] changes they're making and things like that. Smaller companies lead in time savings. Sure,\n[610] you know, the release pipelines are going to be less complicated. You know, there's less overall\n[615] complexity in the organization that's going to lead to more time savings for a company that already has\n[621] less friction and has a little bit more agility to it than a larger company. What about measurement?\n[629] How should we even be thinking about measuring this stuff? I mean, it bears mentioning that measuring\n[634] developer productivity and measuring developer experience was a challenge before AI. And we never\n[639] completed that conversation before kind of throwing accelerant on this, right? So this is still a\n[645] difficult thing. And I'd argue even more difficult to do now, because it's confounded by several\n[649] different aspects of AI. But we're all going to have to answer this question this year, right? Spent\n[655] 10 million or way more if you come to my talk later today on tokens. Where's our 10x productivity?\n[663] When we're thinking about this stuff, it's important to bear in mind that we don't throw away what we're\n[668] measuring, right? Our foundational developer experience and developer productivity metrics are\n[672] still what matter the most, right? We want to understand how AI is impacting these trusted metrics that\n[679] we've already been looking at. Like we want to maybe look at cohorts of users. We maybe want to take\n[685] data from the API telemetry and things that come out of the tools and use that to understand who's using\n[690] what and where. But we would only want to use those cohorts and look at them comparatively across our\n[695] foundational metrics. What is this actually doing to quality? What is this actually doing to speed?\n[700] What is this doing to impact to the organization and value generation? And so this is where our AI\n[705] measurement framework comes from. I won't spend too much time on this. We have a big white paper\n[709] available. My colleague Anton, who's standing in the back of the room in the white shirt, will be able\n[715] to hand out some hard copies of reports that we have after the talk that go into the way that we derive\n[719] this methodology and how to use it and think about it. It focuses on three key dimensions of measurement,\n[725] so looking at utilization, our daily active users, weekly active users, that sort of thing.\n[729] It looks at impact. So which metric should we be looking for moving the needle based on utilization?\n[736] As our utilization goes up, what do we hope to see in terms of impact to the business? And then cost.\n[743] It's a fair joke that we're 15 years after the last major hype cycle and we're still trying to figure\n[747] out cloud costs, but this stuff is getting pretty expensive. We're going to have to measure it.\n[751] So you can think about this as a bit of a maturity curve as well. Most people start with utilization on\n[755] the left, just figuring out what's happening in the organization with the tech, who's using it,\n[759] using how often and for what use cases, and then how do we then cross-reference those to the impact\n[764] metrics, the value generation, what we really want to understand to know whether these investments\n[769] are actually working, which is what we really want to figure out. This is just an example of how we\n[774] might correlate such a thing. So you could look at two separate cohorts of users and you could compare\n[779] them across metrics like PR cycle time or PR size or pushback in review. So lots of the way to think\n[786] about this again is to right now separate cohorts and then look at how that plays out across these\n[792] foundational productivity metrics that we've learned to trust. We also need to be able to understand our\n[797] platform's readiness. I like to say that in 2024 we gave everybody a coding assistant. In 2025 we started\n[803] building agents. Now we're realizing that our infrastructure wasn't ready for any of this.\n[808] A lot of the vendors that are here are selling solutions that help you with this problem.\n[812] I think if you can measure your platform's AI readiness you're going to have a much better\n[816] handle on how efficient you're going to be spending tokens and providing context to these agents. So\n[821] these are things like clear and accurate well-structured documentation, data structures with\n[825] straightforward relations, manageable modular code, reliable local CI, and non-flaky test suites. If by\n[832] the way any of this sounds familiar to you it's because we used to just call this good developer\n[836] experience. But it turns out that what's good for humans is also good for agents. So we may finally\n[841] paradoxically be making those investments that we should have been making over the last couple of\n[846] decades. We also want to understand the effectiveness of the way that we work with AI. And this is one\n[851] way of doing that. What you're actually seeing here is feedback, qualitative feedback coming back from\n[855] agents telling us where they ran into issues with steering with the human, the context that was\n[861] provided for them, the feedback cycles that they had to go through. So we're actually getting that data\n[866] from the agents to try to figure out how effective our teams are at working with AI. And we can break\n[871] this down into use cases which is very important too. We want to understand which use cases are\n[877] giving us the most efficient token spend and again moving the needle for value creation and\n[881] productivity within the business. Finally, the fifth trend, integrating across the SDLC and PDLC.\n[887] Why would we want to do this? Because code generation was never the bottleneck in the first place.\n[891] Right? Even if engineers are getting like 100% accurate instant code coming from the models, which they are\n[897] not, you would still only be attacking anywhere from maybe 14 to 16% of the overall value stream. So we need\n[903] to think beyond that. Especially because right now the productivity gains that we are actually seeing are\n[909] more modest than expected. Despite additional PR throughput increases, our median increase in the study that we did from\n[917] November to 2024 to February this year only found about a median 7.7% increase in this velocity metric, a 13% average, but even our top\n[926] performers were in the 70% range. Nobody hit 2x, nobody hit 5x, nobody hit 10x. And that's because our time savings that come out of AI are still being outweighed by other non AI factors within our organization.\n[941] Right? We might be saving a lot of time with AI and that's great, but if we're still eclipsing those time savings because of meeting heavy days and context switching and other sources of interruption, the cumulative effects of the dev environment and friction in the way that we create software around the code, then we're not going to be able to\n[956] to be able to do that. We're not attacking the bottleneck. And as Ellie Goldratt from the theory of constraints and the goal and inspiration for the Phoenix project would tell us that an hour saved on something that isn't the bottleneck is worthless. And so we need to find the bottleneck and fix the bottleneck. And that's what a lot of organizations are doing. Morgan Stanley has been really public about their creation of the DevGen AI agent, which is an agent for interpreting legacy code like mainframe natural and COBOL and hate to admit Perl. I've written a lot of Perl in my career, but it's legacy now. The agent actually\n[986] creates PRDs to hand to engineers to get rid of that reverse engineering step. And it's saving Morgan Stanley about 300,000 hours a year right now. Zapier is one of my favorite stories in AI right now. They have a whole agent ecosystem that they're using to deal with a lot of administrative tasks and overhead, like daily standups and things like that. They've reduced their standups by using agent summaries and things like that in this ecosystem that they've built to two times a week as opposed to five times a week. They're successfully onboarding engineers with\n[1016] within about a two week period, which is really fast. Our industry benchmark for that is over a month usually. But my favorite part about this story is that they're seeing about a 15% additional value creation per engineer. So they are hiring more than they have in the history of their entire company because they realize the truth here that they're getting more capacity per single engineer, they're getting a better return on investment per single engineer, and hiring more engineers will improve their competitive edge. This is the right attitude.\n[1046] Increased innovative capacity story. This is not a headcount replacement story. Fair. They're automating about 3,000 of their code reviews a week triggered off of a pull request. And they look at superficial stuff. They still need humans in the loop. But the initial superficial review that comes from the agent is all part of the system of record. It stays in the PR comments. And so the next engineer to actually perform the review will have an idea of what the agents already looked at. So it can save some time.\n[1073] Finally, Spotify, if anybody remembers the Spotify model from DevOps, they were sort of the North Star for DevOps, they built an agent for SREs that will gather remediation steps from runbooks and information and context about the incident, and put all that together into SRE communication channels, so that when an incident occurs, the SRE has immediate context and doesn't have to go through multiple minutes of discovery to figure out how to solve the issue.\n[1099] So if you want to dive deeper into this data, our Q2 report is coming out in just a few weeks.\n[1104] But the Q1 report still has a lot of tidbits from this session in it. And if you subscribe to our newsletter or you come back to the website, by mid-ish end of July, we'll have our Q2 report.\n[1114] And if you want to see a preview of that report, that's the talk that I'm giving later this afternoon. Thanks, everybody, for your time. I appreciate it.\n[1120] Thank you.\n[1121] Thank you.\n[1122] Thank you.",
+   "title": null,
+   "url": null
+  },
+  "transcript_quality": "ok",
+  "slides": [
+   {
+    "id": "vd:15@39",
+    "source": "슬라이드 판독",
+    "text": "DX platform built from research behind\nDORA, SPACE, DevEx\nDORA\nSPACE\nDevEx\nDX Core 4\nAI measurement\n2018\n2021\n2023\n2024\n2025\nDX\nDX",
+    "title": "DX platform built from research behind DORA, SPACE, DevEx",
+    "url": null
+   },
+   {
+    "id": "vd:15@94",
+    "source": "슬라이드 판독",
+    "text": "DX\nTrend #1: Velocity impact",
+    "title": "Trend #1: Velocity impact",
+    "url": null
+   },
+   {
+    "id": "vd:15@105",
+    "source": "슬라이드 판독",
+    "text": "Deployment frequency steadily increasing\n78\n80\n105\n114\nQ3 2025\nQ4 2025\nQ1 2026\nQ2 2026",
+    "title": "Deployment frequency steadily increasing",
+    "url": null
+   },
+   {
+    "id": "vd:15@181",
+    "source": "슬라이드 판독",
+    "text": "Trends vary across NA, EU, and APAC\nAsia-Pacific\nNorth America - Non-SV\nNorth America - SV\nEurope\nQ3 2025\nQ4 2025\nQ1 2026\nQ2 2026\nDX",
+    "title": "Trends vary across NA, EU, and APAC",
+    "url": null
+   },
+   {
+    "id": "vd:15@254",
+    "source": "슬라이드 판독",
+    "text": "Perceived rate of delivery flat / slightly up\n100%\n90%\n80%\n70%\n60%\n50%\n40%\n30%\nQ3 2025\nQ4 2025\nQ1 2026\nQ2 2026",
+    "title": "Perceived rate of delivery flat / slightly up",
+    "url": null
+   },
+   {
+    "id": "vd:15@279",
+    "source": "슬라이드 판독",
+    "text": "DX\nTrend #2: Quality and delivery impact",
+    "title": "Trend #2: Quality and delivery impact",
+    "url": null
+   },
+   {
+    "id": "vd:15@299",
+    "source": "슬라이드 판독",
+    "text": "Volatility in change failure rate %\nPer-company Change Failure Rate% impact for AI Users vs. Non-AI Users\nData from 61 companies\nPer-company Change Failure Rate impact with AI adoption\nChange Failure Rate % impact\nCompany\nDX",
+    "title": "Volatility in change failure rate %",
+    "url": null
+   },
+   {
+    "id": "vd:15@428",
+    "source": "슬라이드 판독",
+    "text": "PR size is increasing...\nMedian PR size over time\nSample from over 400+ companies from July 2025 to June 2026\nMedian PR size, in lines of code\n44\n48\n58\n72\nQ3 2025\nQ4 2025\nQ1 2026\nQ2 2026",
+    "title": "PR size is increasing...",
+    "url": null
+   },
+   {
+    "id": "vd:15@535",
+    "source": "슬라이드 판독",
+    "text": "Junior engineers use AI the most\nAI adoption by usage level and role seniority\nSample from 400+ companies\nHeavy Moderate Light Never Unknown/No Data\n100%\n80%\n60%\n40%\n20%\n0%\nJunior\nMid-level\nSenior\nStaff+\nRole seniority",
+    "title": "Junior engineers use AI the most",
+    "url": null
+   },
+   {
+    "id": "vd:15@650",
+    "source": "슬라이드 판독",
+    "text": "\"We spent $10M on tokens,\nwhere is the 10x productivity?\"\n- Your executive leadership",
+    "title": null,
+    "url": null
+   },
+   {
+    "id": "vd:15@766",
+    "source": "슬라이드 판독",
+    "text": "AI Measurement Framework\n* Metrics for autonomous AI agents\nUtilization\nHow much are developers adopting and utilizing AI tools?\nImpact\nHow is AI impacting engineering productivity?\nCost\nIs our AI spend and return on investment optimal?\nAI tool usage (DAUs/WAUs)\nPercentage of PRs that are AI-assisted\nPercentage of committed code that is AI-generated\nTasks assigned to agents *\nAI-driven time savings (dev hours/week)\nDeveloper satisfaction\nDX Core 4 metrics, including:\nPR throughput\nPerceived rate of delivery\nDeveloper Experience Index (DXI)\nCode maintainability\nChange confidence\nChange fail percentage\nHuman-equivalent hours (HEH) of work completed by agents *\nAI spend (both total and per developer)\nNet time gain per developer (time savings - AI spend)\nAgent hourly rate (HEH / AI spend) *",
+    "title": "AI Measurement Framework",
+    "url": null
+   },
+   {
+    "id": "vd:15@833",
+    "source": "슬라이드 판독",
+    "text": "AI Readiness\nIncomplete 336\nBronze 1\n2 hours ago\nScores Checks Trends Exemptions Audit log\nBronze Options\nDefined owner\nAGENT.md exists\nREADME.md exists\nLocal development docs\nSilver\n> 80% code coverage\nLinter configured\nBranch protection configured\nGold\nUses feature flags\nSecret management configured\nAPI schema documentation\nGauging AI Readiness...\nClear, accurate, well-structured documentation\nData structures with straightforward relations\nReadable, manageable, modular code\nFast, reliable local and CI feedback loops\nStable (read: non-flaky) robust test suites",
+    "title": "Gauging AI Readiness...",
+    "url": null
+   },
+   {
+    "id": "vd:15@905",
+    "source": "슬라이드 판독",
+    "text": "Productivity gains more modest than expected\nRandom sample from 400+ companies\nNo PR throughput incentivization\nNo known recent M&As, IPOs, or regulatory changes\nLongitudinal study from November 2024 to February 2026\nWeighted PR throughput increase\nMedian\n7.76%\nAverage\n13.1%",
+    "title": "Productivity gains more modest than expected",
+    "url": null
+   },
+   {
+    "id": "vd:15@966",
+    "source": "슬라이드 판독",
+    "text": "Find the bottleneck.\nFix the bottleneck.\nSupplier\nProduction Control\nCustomer\nMolding\nMax. 2500 per color\nmax. 12,500 pcs\nPT = 6 s\nCT = 8 s\nA = 60%\nCTeff = 10 s\nPainting\nMax. 2500 per color\n3\nPT = 24 s\nCT = 8 s\nA = 10%\nCTeff = 30 min\nLogo Printing\nMax. 333\n10 pcs 1\nPT = 80 s\nCT = 5 min\nBPEL = 7.5 h\nCTeff = 9 s\nAssembly + gas filling\nMax. 2500\nFIFO\n3\nPT = 35 s\nCT = 10 s\nA = 100%\nCTeff = 10 s\nWT\n135,000\n3,600\n?\n1,800\n27,000\n6\n24\n80\n35\nWT: 144,000 sec\nPT: 151 sec\nPLT: 144,151 sec",
+    "title": "Find the bottleneck. Fix the bottleneck.",
+    "url": null
+   },
+   {
+    "id": "vd:15@1014",
+    "source": "슬라이드 판독",
+    "text": "Zapier - Administrative Automation\nThe Bottleneck\nEngineers and teams at Zapier were losing valuable focus time to repetitive administrative work such as daily stand-ups, onboarding tasks, internal reporting, and routine Slack communications\nThe AI solution\nZapier's AI Agents team built an internal automation ecosystem where agents now run async stand-ups, summarize team updates, automate onboarding steps like email signature creation, and integrate seamlessly with Slack for approvals, notifications, and summaries.\nThe impact\nThe initiative has led to fewer synchronous meetings, faster onboarding (new engineers become productive within ~2 weeks), and an automation-focused culture. Zapier has actually ramped hiring as a result.",
+    "title": "Zapier - Administrative Automation",
+    "url": null
+   },
+   {
+    "id": "vd:15@1075",
+    "source": "슬라이드 판독",
+    "text": "Spotify - Incident Management\nThe Bottleneck\nWhen a production incident occurs, SREs often spend critical minutes and hours correlating alerts, digging through logs, and identifying the correct runbook steps.\nThe AI Solution\nSpotify created an internal incident management agent platform that monitors logs and correlates alerts in real-time. When an incident is detected, the agent automatically suggests remediation steps from relevant runbooks directly into the SREs' communication channels.\nThe Impact\nThe platform is currently handling 90% of all incidents at Spotify, dramatically reducing mean time to resolution (MTTR) and freeing up SREs to focus on proactive reliability work.",
+    "title": "Spotify - Incident Management",
+    "url": null
+   },
+   {
+    "id": "vd:15@1120",
+    "source": "슬라이드 판독",
+    "text": "AI-assisted engineering\nQ1 impact report",
+    "title": null,
+    "url": null
+   }
+  ],
+  "slide_only_facts": [
+   {
+    "fact": "Q3 2025 deployment frequency",
+    "value": "78",
+    "unit": "",
+    "sec": 105,
+    "evidence": "vd:15@105",
+    "confidence": "high"
+   },
+   {
+    "fact": "Q4 2025 deployment frequency",
+    "value": "80",
+    "unit": "",
+    "sec": 105,
+    "evidence": "vd:15@105",
+    "confidence": "high"
+   },
+   {
+    "fact": "Q1 2026 deployment frequency",
+    "value": "105",
+    "unit": "",
+    "sec": 105,
+    "evidence": "vd:15@105",
+    "confidence": "high"
+   },
+   {
+    "fact": "Q2 2026 deployment frequency",
+    "value": "114",
+    "unit": "",
+    "sec": 105,
+    "evidence": "vd:15@105",
+    "confidence": "high"
+   },
+   {
+    "fact": "companies (data from)",
+    "value": "61",
+    "unit": "",
+    "sec": 299,
+    "evidence": "vd:15@299",
+    "confidence": "high"
+   },
+   {
+    "fact": "Median PR size Q4 2025",
+    "value": "48",
+    "unit": "lines of code",
+    "sec": 428,
+    "evidence": "vd:15@428",
+    "confidence": "high"
+   },
+   {
+    "fact": "Median PR size Q1 2026",
+    "value": "58",
+    "unit": "lines of code",
+    "sec": 428,
+    "evidence": "vd:15@428",
+    "confidence": "high"
+   },
+   {
+    "fact": "Sample from",
+    "value": "400+",
+    "unit": "companies",
+    "sec": 535,
+    "evidence": "vd:15@535",
+    "confidence": "high"
+   },
+   {
+    "fact": "Incomplete",
+    "value": "336",
+    "unit": "",
+    "sec": 833,
+    "evidence": "vd:15@833",
+    "confidence": "high"
+   },
+   {
+    "fact": "time",
+    "value": "2",
+    "unit": "hours ago",
+    "sec": 833,
+    "evidence": "vd:15@833",
+    "confidence": "high"
+   },
+   {
+    "fact": "code coverage",
+    "value": "> 80%",
+    "unit": "%",
+    "sec": 833,
+    "evidence": "vd:15@833",
+    "confidence": "high"
+   },
+   {
+    "fact": "companies (random sample)",
+    "value": "400+",
+    "unit": "",
+    "sec": 905,
+    "evidence": "vd:15@905",
+    "confidence": "high"
+   },
+   {
+    "fact": "Median weighted PR throughput increase",
+    "value": "7.76%",
+    "unit": "%",
+    "sec": 905,
+    "evidence": "vd:15@905",
+    "confidence": "high"
+   },
+   {
+    "fact": "Average weighted PR throughput increase",
+    "value": "13.1%",
+    "unit": "%",
+    "sec": 905,
+    "evidence": "vd:15@905",
+    "confidence": "high"
+   },
+   {
+    "fact": "Molding Max. per color",
+    "value": "2500",
+    "unit": "",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Molding max.",
+    "value": "12,500",
+    "unit": "pcs",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Molding PT",
+    "value": "6 s",
+    "unit": "s",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Molding CT",
+    "value": "8 s",
+    "unit": "s",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Molding A",
+    "value": "60%",
+    "unit": "%",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Painting Max. per color",
+    "value": "2500",
+    "unit": "",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Painting (count)",
+    "value": "3",
+    "unit": "",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Painting PT",
+    "value": "24 s",
+    "unit": "s",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Painting CT",
+    "value": "8 s",
+    "unit": "s",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Painting CTeff",
+    "value": "30 min",
+    "unit": "min",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Logo Printing Max.",
+    "value": "333",
+    "unit": "",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Logo Printing PT",
+    "value": "80 s",
+    "unit": "s",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Logo Printing BPEL",
+    "value": "7.5 h",
+    "unit": "h",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Logo Printing CTeff",
+    "value": "9 s",
+    "unit": "s",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Assembly PT",
+    "value": "35 s",
+    "unit": "s",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Assembly A",
+    "value": "100%",
+    "unit": "%",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Assembly Max.",
+    "value": "2500",
+    "unit": "",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "Assembly (count)",
+    "value": "3",
+    "unit": "",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "WT (first)",
+    "value": "135,000",
+    "unit": "",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "WT",
+    "value": "3,600",
+    "unit": "",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "WT",
+    "value": "1,800",
+    "unit": "",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "WT (last)",
+    "value": "27,000",
+    "unit": "",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "WT (interval)",
+    "value": "6",
+    "unit": "",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "WT (interval)",
+    "value": "24",
+    "unit": "",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "WT (interval)",
+    "value": "80",
+    "unit": "",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "WT (interval)",
+    "value": "35",
+    "unit": "",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "WT",
+    "value": "144,000",
+    "unit": "sec",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "PT",
+    "value": "151",
+    "unit": "sec",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "PLT",
+    "value": "144,151",
+    "unit": "sec",
+    "sec": 966,
+    "evidence": "vd:15@966",
+    "confidence": "high"
+   },
+   {
+    "fact": "of all incidents at Spotify",
+    "value": "90%",
+    "unit": "%",
+    "sec": 1075,
+    "evidence": "vd:15@1075",
+    "confidence": "high"
+   }
+  ],
+  "title": "[한영자막] 400개 기업 데이터로 본 소프트웨어 개발 AI의 현주소입니다",
+  "duration_sec": 1123,
+  "span_start": 0,
+  "span_end": 1122,
+  "chapters": [
+   {
+    "sec": 0,
+    "title": "오프닝: DX의 AI 영향력 연구 소개"
+   },
+   {
+    "sec": 74,
+    "title": "트렌드 1: 개발 속도와 배포 빈도"
+   },
+   {
+    "sec": 160,
+    "title": "지역별 차이 (북미 vs 유럽)"
+   },
+   {
+    "sec": 200,
+    "title": "체감 속도와 실제 생산성의 괴리"
+   },
+   {
+    "sec": 265,
+    "title": "트렌드 2: 소프트웨어 품질과 변경 실패율 변동성"
+   },
+   {
+    "sec": 349,
+    "title": "유지보수성은 상승, 배포 확신도는 하락"
+   },
+   {
+    "sec": 409,
+    "title": "커지는 PR 크기와 점진적 배포의 위기"
+   },
+   {
+    "sec": 509,
+    "title": "트렌드 3: 주니어 vs 시니어 엔지니어와 기업 규모"
+   },
+   {
+    "sec": 624,
+    "title": "트렌드 4: AI 성과 측정 프레임워크 (활용도·임팩트·비용)"
+   },
+   {
+    "sec": 794,
+    "title": "플랫폼 AI 준비도: 좋은 DevEx가 좋은 AX"
+   },
+   {
+    "sec": 844,
+    "title": "에이전트의 직접 피드백 경청"
+   },
+   {
+    "sec": 884,
+    "title": "트렌드 5: 코드 생성은 결코 병목이 아니었다"
+   },
+   {
+    "sec": 974,
+    "title": "실전 사례 연구: Morgan Stanley, Zapier, Spotify"
+   },
+   {
+    "sec": 1099,
+    "title": "2분기 리포트 안내 및 마무리"
+   }
+  ],
+  "mode": "whisper+slides"
+ },
+ "expect": {},
+ "note": "관문 B 실제 실행: AI Engineer 발표, 400개 기업 데이터 그래프 많음 (whisper+slides)"
+}
