@@ -1,0 +1,2125 @@
+{
+ "role": "repo_analyst",
+ "model_alias": "generate",
+ "model_id": "qwen/qwen3.8-27b",
+ "prompt_hash": "407996307552",
+ "spec": "S3",
+ "run_id": "20261008-165009-eval-2fcb",
+ "at": "2026-10-08T16:53:34+09:00",
+ "note": "반복 1(md 문구): evidence tool 칸은 도구 이름만, 입력 trending·hype는 signal_reason에",
+ "stopped": null,
+ "limit": null,
+ "cost_usd": 0.034778,
+ "summary": {
+  "n": 10,
+  "code_pass": 10,
+  "code_pass_enforced": 10,
+  "model_agreement": {
+   "signal": "10/10",
+   "hype_flags": "10/10",
+   "attention": "10/10"
+  },
+  "questions": {
+   "Q1": {
+    "pass": 10,
+    "n": 10,
+    "rate": 1.0
+   },
+   "Q2": {
+    "pass": 10,
+    "n": 10,
+    "rate": 1.0
+   },
+   "Q3": {
+    "pass": 10,
+    "n": 10,
+    "rate": 1.0
+   }
+  },
+  "criteria": {
+   "근거": {
+    "avg": 5.0,
+    "n": 10
+   },
+   "신호 판단": {
+    "avg": 5.0,
+    "n": 10
+   },
+   "표현": {
+    "avg": 5.0,
+    "n": 10
+   }
+  },
+  "aggregate": {
+   "평균 도구 호출": 4.1,
+   "관련 낮음 얕게 끝냄": "5/5"
+  },
+  "passed": false,
+  "fail_reasons": [
+   "평균 도구 호출 4.1 > 4.0"
+  ]
+ },
+ "results": [
+  {
+   "id": "DuarteSantos8__openGym",
+   "input": {
+    "full_name": "DuarteSantos8/openGym",
+    "max_depth": 2,
+    "reason": "이번 주 트렌딩(2026-W41)",
+    "trending": {
+     "week": "2026-W41",
+     "rank": 9,
+     "stars_total": 7222,
+     "stars_this_week": 4906,
+     "forks": 941,
+     "language": "JavaScript",
+     "description": "Self-hosted gym & body-weight tracker — plan routines, log workouts (supersets, warm-ups, cardio), see which muscles are trained, fatigued or detrained, import from FitNotes/Strong/Hevy, passkey login. Your data, your server."
+    },
+    "oneliner": "",
+    "keywords": [
+     "AI 에이전트",
+     "코딩 에이전트",
+     "MCP · 도구 호출",
+     "오픈웨이트 · 로컬 LLM",
+     "RAG · 검색",
+     "멀티모달",
+     "추론 · 판단 모델",
+     "평가 · 벤치마크",
+     "AI 보안",
+     "프런티어 모델 출시",
+     "AI 산업 · 시장",
+     "개발 실무 · 경험",
+     "AI 일반"
+    ],
+    "week_items": [],
+    "hype": {
+     "flags": [],
+     "force_check": false,
+     "commits_7d": 100,
+     "contributors": 67,
+     "note": "7일 별 +4906, 커밋 100"
+    },
+    "tool_calls": 6
+   },
+   "expect": {},
+   "note": "2026-W41 트렌딩, 이번 주 트렌딩(2026-W41)",
+   "step_id": 885,
+   "output": {
+    "log": "DuarteSantos8/openGym: 관련 낮음(짐 트래커), API 403",
+    "attention": true,
+    "evidence": [
+     {
+      "fact": "GitHub API 403 오류로 레포 정보 조회 실패(2회 시도)",
+      "tool": "github_repo"
+     },
+     {
+      "fact": "trending.description: Self-hosted gym & body-weight tracker — plan routines, log workouts, import from FitNotes/Strong/Hevy, passkey login",
+      "tool": "github_repo"
+     }
+    ],
+    "relevant_reason": "자주식 짐·체중 트래커 앱으로, 관심 키워드(AI 에이전트, 로컬 LLM, RAG 등)와 무관",
+    "relevant": false,
+    "why_trending": "",
+    "hype_flags": [],
+    "release": null,
+    "related_item_ids": [],
+    "signal_reason": "관련 낮음(짐 트래커), API 403으로 뜨는 이유 확인 불가",
+    "signal": "trending"
+   },
+   "error": null,
+   "tool_calls": [
+    {
+     "text": "github_repo: name=DuarteSantos8/openGym",
+     "error": "GitHub API 실패(/repos/DuarteSantos8/openGym): HTTP 403",
+     "detail": "{\"args\": {\"name\": \"DuarteSantos8/openGym\"}, \"depth\": null, \"truncated\": false, \"normalized\": []}"
+    },
+    {
+     "text": "github_repo: name=DuarteSantos8/openGym",
+     "error": "GitHub API 실패(/repos/DuarteSantos8/openGym): HTTP 403",
+     "detail": "{\"args\": {\"name\": \"DuarteSantos8/openGym\"}, \"depth\": null, \"truncated\": false, \"normalized\": []}"
+    },
+    {
+     "text": "finish: 최종 답 제출",
+     "error": null,
+     "detail": null
+    }
+   ],
+   "code": {
+    "passed": true,
+    "checks": [
+     {
+      "name": "스키마",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "evidence 출처가 도구 이름",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "related_item_ids가 입력 안",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "과열 규칙(force_check)이면 check",
+      "passed": true,
+      "detail": "signal trending"
+     },
+     {
+      "name": "코드 과열 플래그 유지",
+      "passed": true,
+      "detail": "입력 [], 출력 []"
+     },
+     {
+      "name": "근거 없는 why_trending이면 attention",
+      "passed": true,
+      "detail": "evidence 없이 why_trending"
+     },
+     {
+      "name": "해요체 없음(relevant_reason)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(relevant_reason)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "해요체 없음(why_trending)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(why_trending)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "해요체 없음(signal_reason)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(signal_reason)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "해요체 없음(log)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(log)",
+      "passed": true,
+      "detail": ""
+     }
+    ],
+    "failed": []
+   },
+   "llm": {
+    "verdicts": {
+     "Q1": {
+      "verdict": "pass",
+      "critique": "trending.description의 짐/체중 트래커 설명과 관심 키워드(AI 관련)를 대조해 relevant를 false로 판단한 것이 일치함"
+     },
+     "Q2": {
+      "verdict": "pass",
+      "critique": "API 조회 실패 등으로 뜨는 이유 근거가 부족하여 why_trending을 빈칸으로 처리함"
+     },
+     "Q3": {
+      "verdict": "pass",
+      "critique": "source_fields.hype에 특별한 flags가 없고 이번 주 별 4906 등 트렌딩 지표에 맞추어 signal을 trending으로 적절히 유지함"
+     }
+    },
+    "scores": {
+     "근거": {
+      "score": 5,
+      "reason": "API 실패 및 trending.description에 기반하여 타당하게 판단함"
+     },
+     "신호 판단": {
+      "score": 5,
+      "reason": "트렌딩 수치 및 과열 플래그 부재에 부합하게 signal과 hype_flags를 설정함"
+     },
+     "표현": {
+      "score": 5,
+      "reason": "평가어나 군더더기 없이 간결하게 작성됨"
+     }
+    },
+    "missing": [],
+    "judge_prompt_hash": "7dfebde2d7b3",
+    "judge_step_id": 886
+   },
+   "cost_usd": 0.003467
+  },
+  {
+   "id": "HunxByts__GhostTrack",
+   "input": {
+    "full_name": "HunxByts/GhostTrack",
+    "max_depth": 2,
+    "reason": "이번 주 트렌딩(2026-W41)",
+    "trending": {
+     "week": "2026-W41",
+     "rank": 11,
+     "stars_total": 17443,
+     "stars_this_week": 1534,
+     "forks": 2358,
+     "language": "Python",
+     "description": "Useful tool to track location or mobile number"
+    },
+    "oneliner": "",
+    "keywords": [
+     "AI 에이전트",
+     "코딩 에이전트",
+     "MCP · 도구 호출",
+     "오픈웨이트 · 로컬 LLM",
+     "RAG · 검색",
+     "멀티모달",
+     "추론 · 판단 모델",
+     "평가 · 벤치마크",
+     "AI 보안",
+     "프런티어 모델 출시",
+     "AI 산업 · 시장",
+     "개발 실무 · 경험",
+     "AI 일반"
+    ],
+    "week_items": [],
+    "hype": {
+     "flags": [
+      "no_commits"
+     ],
+     "force_check": true,
+     "commits_7d": 0,
+     "contributors": 2,
+     "note": "7일 별 +1534, 커밋 0"
+    },
+    "tool_calls": 6
+   },
+   "expect": {},
+   "note": "2026-W41 트렌딩, 이번 주 트렌딩(2026-W41)",
+   "step_id": 893,
+   "output": {
+    "log": "HunxByts/GhostTrack: API 403, 확인 불가, 커밋 0",
+    "attention": true,
+    "evidence": [
+     {
+      "fact": "GitHub API 403 오류로 저장소 정보 조회 실패(2회 시도)",
+      "tool": "github_repo"
+     }
+    ],
+    "relevant_reason": "설명상 위치·전화번호 추적 도구로 AI 관심 키워드와 무관, API 오류로 README 확인 불가",
+    "relevant": false,
+    "why_trending": "",
+    "hype_flags": [
+     "no_commits"
+    ],
+    "release": null,
+    "related_item_ids": [],
+    "signal_reason": " \"7일 별 +1534인데 커밋 0, 기여자 2, force_check true. API 403으로 내용 확인 불가\"",
+    "signal": "check"
+   },
+   "error": null,
+   "tool_calls": [
+    {
+     "text": "github_repo: name=HunxByts/GhostTrack",
+     "error": "GitHub API 실패(/repos/HunxByts/GhostTrack): HTTP 403",
+     "detail": "{\"args\": {\"name\": \"HunxByts/GhostTrack\"}, \"depth\": null, \"truncated\": false, \"normalized\": []}"
+    },
+    {
+     "text": "github_repo: name=HunxByts/GhostTrack",
+     "error": "GitHub API 실패(/repos/HunxByts/GhostTrack): HTTP 403",
+     "detail": "{\"args\": {\"name\": \"HunxByts/GhostTrack\"}, \"depth\": null, \"truncated\": false, \"normalized\": []}"
+    },
+    {
+     "text": "finish: 최종 답 제출",
+     "error": null,
+     "detail": null
+    }
+   ],
+   "code": {
+    "passed": true,
+    "checks": [
+     {
+      "name": "스키마",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "evidence 출처가 도구 이름",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "related_item_ids가 입력 안",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "과열 규칙(force_check)이면 check",
+      "passed": true,
+      "detail": "signal check"
+     },
+     {
+      "name": "코드 과열 플래그 유지",
+      "passed": true,
+      "detail": "입력 ['no_commits'], 출력 ['no_commits']"
+     },
+     {
+      "name": "근거 없는 why_trending이면 attention",
+      "passed": true,
+      "detail": "evidence 없이 why_trending"
+     },
+     {
+      "name": "해요체 없음(relevant_reason)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(relevant_reason)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "해요체 없음(why_trending)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(why_trending)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "해요체 없음(signal_reason)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(signal_reason)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "해요체 없음(log)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(log)",
+      "passed": true,
+      "detail": ""
+     }
+    ],
+    "failed": []
+   },
+   "llm": {
+    "verdicts": {
+     "Q1": {
+      "verdict": "pass",
+      "critique": "설명 'Useful tool to track location or mobile number'과 관심 키워드를 대조해 relevant를 false로 판단한 것이 타당함"
+     },
+     "Q2": {
+      "verdict": "pass",
+      "critique": "why_trending이 근거 부족으로 비어 있어(없음) 기준에 부합함"
+     },
+     "Q3": {
+      "verdict": "pass",
+      "critique": "수치(7일 커밋 0, 별 +1534) 및 source_fields.hype에 맞춰 hype_flags(no_commits)와 signal(check)을 적절히 설정함"
+     }
+    },
+    "scores": {
+     "근거": {
+      "score": 5,
+      "reason": "API 실패 및 설명 기반 사실에 충실하게 작성됨"
+     },
+     "신호 판단": {
+      "score": 5,
+      "reason": "hype 수치와 플래그에 정확히 부합하는 signal(check) 부여"
+     },
+     "표현": {
+      "score": 5,
+      "reason": "평가어 없이 명사형 및 사실 중심 정리 준수"
+     }
+    },
+    "missing": [],
+    "judge_prompt_hash": "7dfebde2d7b3",
+    "judge_step_id": 894
+   },
+   "cost_usd": 0.003424
+  },
+  {
+   "id": "NVIDIA__OpenShell",
+   "input": {
+    "full_name": "NVIDIA/OpenShell",
+    "max_depth": 2,
+    "reason": "이번 주 트렌딩(2026-W41)",
+    "trending": {
+     "week": "2026-W41",
+     "rank": 5,
+     "stars_total": 15340,
+     "stars_this_week": 3690,
+     "forks": 1729,
+     "language": "Rust",
+     "description": "OpenShell is the safe, private runtime for autonomous AI agents."
+    },
+    "oneliner": "자율 AI 에이전트용 안전하고 격리된 런타임",
+    "keywords": [
+     "AI 에이전트",
+     "코딩 에이전트",
+     "MCP · 도구 호출",
+     "오픈웨이트 · 로컬 LLM",
+     "RAG · 검색",
+     "멀티모달",
+     "추론 · 판단 모델",
+     "평가 · 벤치마크",
+     "AI 보안",
+     "프런티어 모델 출시",
+     "AI 산업 · 시장",
+     "개발 실무 · 경험",
+     "AI 일반"
+    ],
+    "week_items": [],
+    "hype": {
+     "flags": [],
+     "force_check": false,
+     "commits_7d": 86,
+     "contributors": 100,
+     "note": "7일 별 +3690, 커밋 86"
+    },
+    "tool_calls": 6
+   },
+   "expect": {},
+   "note": "2026-W41 트렌딩, 이번 주 트렌딩(2026-W41)",
+   "step_id": 908,
+   "output": {
+    "log": "NVIDIA/OpenShell: API 403으로 근거 확인 불가, 글 언급 없음",
+    "attention": true,
+    "evidence": [
+     {
+      "fact": "github_repo, releases, recent_commits, contributors 모두 HTTP 403으로 실패",
+      "tool": "github_repo"
+     },
+     {
+      "fact": "이번 주 글에 OpenShell 언급 없음",
+      "tool": "search_items"
+     }
+    ],
+    "relevant_reason": "설명상 자율 AI 에이전트 격리 런타임으로 AI 에이전트·AI 보안 키워드와 직접 관련",
+    "relevant": true,
+    "why_trending": "",
+    "hype_flags": [],
+    "release": null,
+    "related_item_ids": [],
+    "signal_reason": "GitHub API가 403으로 레포·릴리스·커밋 확인 불가, 이번 주 글 언급도 없음. 입력 hype 수치(7일 +3690, 커밋 86, 기여자 100)만으로는 뜨는 이유를 검증 못 함",
+    "signal": "check"
+   },
+   "error": null,
+   "tool_calls": [
+    {
+     "text": "github_repo: name=NVIDIA/OpenShell",
+     "error": "GitHub API 실패(/repos/NVIDIA/OpenShell): HTTP 403",
+     "detail": "{\"args\": {\"name\": \"NVIDIA/OpenShell\"}, \"depth\": null, \"truncated\": false, \"normalized\": []}"
+    },
+    {
+     "text": "github_repo: name=NVIDIA/OpenShell",
+     "error": "GitHub API 실패(/repos/NVIDIA/OpenShell): HTTP 403",
+     "detail": "{\"args\": {\"name\": \"NVIDIA/OpenShell\"}, \"depth\": null, \"truncated\": false, \"normalized\": []}"
+    },
+    {
+     "text": "releases: name=NVIDIA/OpenShell",
+     "error": "GitHub API 실패(/repos/NVIDIA/OpenShell/releases?per_page=5): HTTP 403",
+     "detail": "{\"args\": {\"name\": \"NVIDIA/OpenShell\"}, \"depth\": null, \"truncated\": false, \"normalized\": []}"
+    },
+    {
+     "text": "search_items: query=OpenShell",
+     "error": null,
+     "detail": "{\"args\": {\"query\": \"OpenShell\"}, \"depth\": null, \"truncated\": false, \"normalized\": []}"
+    },
+    {
+     "text": "recent_commits: name=NVIDIA/OpenShell, days=7",
+     "error": "GitHub API 실패(/repos/NVIDIA/OpenShell/commits?since=2026-10-01T00:00:00Z&per_page=100): HTTP 403",
+     "detail": "{\"args\": {\"name\": \"NVIDIA/OpenShell\", \"days\": 7}, \"depth\": null, \"truncated\": false, \"normalized\": []}"
+    },
+    {
+     "text": "contributors: name=NVIDIA/OpenShell",
+     "error": "GitHub API 실패(/repos/NVIDIA/OpenShell/contributors?per_page=100&anon=1): HTTP 403",
+     "detail": "{\"args\": {\"name\": \"NVIDIA/OpenShell\"}, \"depth\": null, \"truncated\": false, \"normalized\": []}"
+    },
+    {
+     "text": "finish: 최종 답 제출",
+     "error": null,
+     "detail": null
+    }
+   ],
+   "code": {
+    "passed": true,
+    "checks": [
+     {
+      "name": "스키마",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "evidence 출처가 도구 이름",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "related_item_ids가 입력 안",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "과열 규칙(force_check)이면 check",
+      "passed": true,
+      "detail": "signal check"
+     },
+     {
+      "name": "코드 과열 플래그 유지",
+      "passed": true,
+      "detail": "입력 [], 출력 []"
+     },
+     {
+      "name": "근거 없는 why_trending이면 attention",
+      "passed": true,
+      "detail": "evidence 없이 why_trending"
+     },
+     {
+      "name": "해요체 없음(relevant_reason)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(relevant_reason)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "해요체 없음(why_trending)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(why_trending)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "해요체 없음(signal_reason)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(signal_reason)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "해요체 없음(log)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(log)",
+      "passed": true,
+      "detail": ""
+     }
+    ],
+    "failed": []
+   },
+   "llm": {
+    "verdicts": {
+     "Q1": {
+      "verdict": "pass",
+      "critique": "source_fields의 설명(AI 에이전트 런타임)과 관심 키워드(AI 에이전트, AI 보안)에 맞게 relevant: true 판정함"
+     },
+     "Q2": {
+      "verdict": "pass",
+      "critique": "API 403 오류로 근거 확인이 불가하여 why_trending이 빈칸(없음)으로 올바르게 처리됨"
+     },
+     "Q3": {
+      "verdict": "pass",
+      "critique": "도구 결과 실패 및 검증 불가 상황을 반영해 signal을 check로 두고 hype_flags도 수치 부합하게 설정함"
+     }
+    },
+    "scores": {
+     "근거": {
+      "score": 5,
+      "reason": "도구 실패 사실과 입력 설명에만 기반해 적절히 판단함"
+     },
+     "신호 판단": {
+      "score": 5,
+      "reason": "API 실패 상황에서 단정하지 않고 수치와 상황에 맞게 check로 판정함"
+     },
+     "표현": {
+      "score": 5,
+      "reason": "군더더기 없는 명사형 및 사실 중심 기술"
+     }
+    },
+    "missing": [],
+    "judge_prompt_hash": "7dfebde2d7b3",
+    "judge_step_id": 909
+   },
+   "cost_usd": 0.004231
+  },
+  {
+   "id": "boykopovar__AnyPS5",
+   "input": {
+    "full_name": "boykopovar/AnyPS5",
+    "max_depth": 2,
+    "reason": "이번 주 트렌딩(2026-W41)",
+    "trending": {
+     "week": "2026-W41",
+     "rank": 2,
+     "stars_total": 11262,
+     "stars_this_week": 6075,
+     "forks": 855,
+     "language": "C++",
+     "description": "Tool for automatic PS5 executables porting to Linux and Windows"
+    },
+    "oneliner": "PS5 실행 파일을 Linux·Windows로 자동 이식하는 도구",
+    "keywords": [
+     "AI 에이전트",
+     "코딩 에이전트",
+     "MCP · 도구 호출",
+     "오픈웨이트 · 로컬 LLM",
+     "RAG · 검색",
+     "멀티모달",
+     "추론 · 판단 모델",
+     "평가 · 벤치마크",
+     "AI 보안",
+     "프런티어 모델 출시",
+     "AI 산업 · 시장",
+     "개발 실무 · 경험",
+     "AI 일반"
+    ],
+    "week_items": [],
+    "hype": {
+     "flags": [],
+     "force_check": false,
+     "commits_7d": 100,
+     "contributors": 89,
+     "note": "7일 별 +6075, 커밋 100"
+    },
+    "tool_calls": 6
+   },
+   "expect": {},
+   "note": "2026-W41 트렌딩, 이번 주 트렌딩(2026-W41)",
+   "step_id": 918,
+   "output": {
+    "log": "boykopovar/AnyPS5: API 403, 관련성·뜨는 이유 확인 불가",
+    "attention": true,
+    "evidence": [
+     {
+      "fact": "github_repo 호출 2회 모두 HTTP 403 오류, README·설명 확인 불가",
+      "tool": "github_repo"
+     },
+     {
+      "fact": "이번 주 글에 AnyPS5 언급 없음",
+      "tool": "search_items"
+     }
+    ],
+    "relevant_reason": "PS5 실행 파일 이식 도구로 AI 에이전트·로컬 LLM 등 관심 키워드와 무관(설명 기준)",
+    "relevant": false,
+    "why_trending": "",
+    "hype_flags": [],
+    "release": null,
+    "related_item_ids": [],
+    "signal_reason": "트렌딩 2위, 7일 별 +6075, 커밋 100·기여자 89로 개발 활발하나 API 403으로 근거 확인 불가",
+    "signal": "trending"
+   },
+   "error": null,
+   "tool_calls": [
+    {
+     "text": "github_repo: name=boykopovar/AnyPS5",
+     "error": "GitHub API 실패(/repos/boykopovar/AnyPS5): HTTP 403",
+     "detail": "{\"args\": {\"name\": \"boykopovar/AnyPS5\"}, \"depth\": null, \"truncated\": false, \"normalized\": []}"
+    },
+    {
+     "text": "github_repo: name=boykopovar/AnyPS5",
+     "error": "GitHub API 실패(/repos/boykopovar/AnyPS5): HTTP 403",
+     "detail": "{\"args\": {\"name\": \"boykopovar/AnyPS5\"}, \"depth\": null, \"truncated\": false, \"normalized\": []}"
+    },
+    {
+     "text": "search_items: query=AnyPS5",
+     "error": null,
+     "detail": "{\"args\": {\"query\": \"AnyPS5\"}, \"depth\": null, \"truncated\": false, \"normalized\": []}"
+    },
+    {
+     "text": "finish: 최종 답 제출",
+     "error": null,
+     "detail": null
+    }
+   ],
+   "code": {
+    "passed": true,
+    "checks": [
+     {
+      "name": "스키마",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "evidence 출처가 도구 이름",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "related_item_ids가 입력 안",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "과열 규칙(force_check)이면 check",
+      "passed": true,
+      "detail": "signal trending"
+     },
+     {
+      "name": "코드 과열 플래그 유지",
+      "passed": true,
+      "detail": "입력 [], 출력 []"
+     },
+     {
+      "name": "근거 없는 why_trending이면 attention",
+      "passed": true,
+      "detail": "evidence 없이 why_trending"
+     },
+     {
+      "name": "해요체 없음(relevant_reason)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(relevant_reason)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "해요체 없음(why_trending)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(why_trending)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "해요체 없음(signal_reason)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(signal_reason)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "해요체 없음(log)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(log)",
+      "passed": true,
+      "detail": ""
+     }
+    ],
+    "failed": []
+   },
+   "llm": {
+    "verdicts": {
+     "Q1": {
+      "verdict": "pass",
+      "critique": "source_fields.trending.description의 PS5 이식 도구 설명과 관심 키워드(AI 관련)를 비교하여 relevant=false로 정확히 판정함"
+     },
+     "Q2": {
+      "verdict": "pass",
+      "critique": "API 403 오류로 상세 내용 확인 불가하여 why_trending을 빈값((없음))으로 적절히 처리함"
+     },
+     "Q3": {
+      "verdict": "pass",
+      "critique": "7일 별 6075, 커밋 100, 기여자 89 수치를 signal_reason에 정확히 반영하고 hype_flags 빈값 유지하며 trending 신호 부여함"
+     }
+    },
+    "scores": {
+     "근거": {
+      "score": 5,
+      "reason": "도구 결과의 403 오류 및 설명 수치에 기반하여 무관성 및 신호 판단"
+     },
+     "신호 판단": {
+      "score": 5,
+      "reason": "수치(별 6075, 커밋 100, 기여자 89) 및 트렌딩 2위에 맞춰 trending 부여"
+     },
+     "표현": {
+      "score": 5,
+      "reason": "군더더기 없는 명사형 및 객관적 사실 서술"
+     }
+    },
+    "missing": [],
+    "judge_prompt_hash": "7dfebde2d7b3",
+    "judge_step_id": 919
+   },
+   "cost_usd": 0.003066
+  },
+  {
+   "id": "cursor__plugins",
+   "input": {
+    "full_name": "cursor/plugins",
+    "max_depth": 2,
+    "reason": "이번 주 트렌딩(2026-W41)",
+    "trending": {
+     "week": "2026-W41",
+     "rank": 4,
+     "stars_total": 10281,
+     "stars_this_week": 1109,
+     "forks": 977,
+     "language": "TypeScript",
+     "description": "Cursor plugin specification and official plugins"
+    },
+    "oneliner": "Cursor 공식 플러그인을 모아둔 저장소",
+    "keywords": [
+     "AI 에이전트",
+     "코딩 에이전트",
+     "MCP · 도구 호출",
+     "오픈웨이트 · 로컬 LLM",
+     "RAG · 검색",
+     "멀티모달",
+     "추론 · 판단 모델",
+     "평가 · 벤치마크",
+     "AI 보안",
+     "프런티어 모델 출시",
+     "AI 산업 · 시장",
+     "개발 실무 · 경험",
+     "AI 일반"
+    ],
+    "week_items": [],
+    "hype": {
+     "flags": [],
+     "force_check": false,
+     "commits_7d": 26,
+     "contributors": 23,
+     "note": "7일 별 +1109, 커밋 26"
+    },
+    "tool_calls": 6
+   },
+   "expect": {},
+   "note": "2026-W41 트렌딩, 이번 주 트렌딩(2026-W41)",
+   "step_id": 931,
+   "output": {
+    "log": "cursor/plugins: API 403, 근거 확인 불가",
+    "attention": true,
+    "evidence": [
+     {
+      "fact": "github_repo, releases, recent_commits 모두 HTTP 403으로 실패",
+      "tool": "github_repo"
+     },
+     {
+      "fact": "이번 주 글에 'cursor plugins' 언급 없음",
+      "tool": "search_items"
+     }
+    ],
+    "relevant_reason": "Cursor 공식 플러그인 저장소로 코딩 에이전트/도구 호출 키워드와 관련",
+    "relevant": true,
+    "why_trending": "",
+    "hype_flags": [],
+    "release": null,
+    "related_item_ids": [],
+    "signal_reason": "GitHub API 403으로 근거 확인 불가, hype 수치(7일 +1109, 커밋 26, 기여자 23)만 존재",
+    "signal": "check"
+   },
+   "error": null,
+   "tool_calls": [
+    {
+     "text": "github_repo: name=cursor/plugins",
+     "error": "GitHub API 실패(/repos/cursor/plugins): HTTP 403",
+     "detail": "{\"args\": {\"name\": \"cursor/plugins\"}, \"depth\": null, \"truncated\": false, \"normalized\": []}"
+    },
+    {
+     "text": "github_repo: name=cursor/plugins",
+     "error": "GitHub API 실패(/repos/cursor/plugins): HTTP 403",
+     "detail": "{\"args\": {\"name\": \"cursor/plugins\"}, \"depth\": null, \"truncated\": false, \"normalized\": []}"
+    },
+    {
+     "text": "releases: name=cursor/plugins",
+     "error": "GitHub API 실패(/repos/cursor/plugins/releases?per_page=5): HTTP 403",
+     "detail": "{\"args\": {\"name\": \"cursor/plugins\"}, \"depth\": null, \"truncated\": false, \"normalized\": []}"
+    },
+    {
+     "text": "search_items: query=cursor plugins",
+     "error": null,
+     "detail": "{\"args\": {\"query\": \"cursor plugins\"}, \"depth\": null, \"truncated\": false, \"normalized\": []}"
+    },
+    {
+     "text": "recent_commits: name=cursor/plugins, days=7",
+     "error": "GitHub API 실패(/repos/cursor/plugins/commits?since=2026-10-01T00:00:00Z&per_page=100): HTTP 403",
+     "detail": "{\"args\": {\"name\": \"cursor/plugins\", \"days\": 7}, \"depth\": null, \"truncated\": false, \"normalized\": []}"
+    },
+    {
+     "text": "finish: 최종 답 제출",
+     "error": null,
+     "detail": null
+    }
+   ],
+   "code": {
+    "passed": true,
+    "checks": [
+     {
+      "name": "스키마",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "evidence 출처가 도구 이름",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "related_item_ids가 입력 안",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "과열 규칙(force_check)이면 check",
+      "passed": true,
+      "detail": "signal check"
+     },
+     {
+      "name": "코드 과열 플래그 유지",
+      "passed": true,
+      "detail": "입력 [], 출력 []"
+     },
+     {
+      "name": "근거 없는 why_trending이면 attention",
+      "passed": true,
+      "detail": "evidence 없이 why_trending"
+     },
+     {
+      "name": "해요체 없음(relevant_reason)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(relevant_reason)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "해요체 없음(why_trending)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(why_trending)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "해요체 없음(signal_reason)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(signal_reason)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "해요체 없음(log)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(log)",
+      "passed": true,
+      "detail": ""
+     }
+    ],
+    "failed": []
+   },
+   "llm": {
+    "verdicts": {
+     "Q1": {
+      "verdict": "pass",
+      "critique": "source_fields의 설명 및 oneliner(Cursor 공식 플러그인)와 keywords의 '코딩 에이전트, MCP · 도구 호출'에 부합하여 relevant=true 적절함"
+     },
+     "Q2": {
+      "verdict": "pass",
+      "critique": "API 실패 및 이번 주 글 언급 없음으로 근거가 없어 why_trending을 빈칸으로 비워둔 처리가 규칙에 맞음"
+     },
+     "Q3": {
+      "verdict": "pass",
+      "critique": "API 403으로 상세 검증이 불가한 상태에서 수치(별 +1109, 커밋 26, 기여자 23)를 바탕으로 hype_flags 없이 check 신호로 지정함"
+     }
+    },
+    "scores": {
+     "근거": {
+      "score": 5,
+      "reason": "도구 호출 실패 사실과 수치 근거에 기반하여 정확히 판단함"
+     },
+     "신호 판단": {
+      "score": 5,
+      "reason": "API 실패 상황에서 수치만을 바탕으로 무리하지 않고 check로 적절히 판정함"
+     },
+     "표현": {
+      "score": 5,
+      "reason": "평가어 없이 간결한 명사형과 사실 위주로 서술함"
+     }
+    },
+    "missing": [],
+    "judge_prompt_hash": "7dfebde2d7b3",
+    "judge_step_id": 932
+   },
+   "cost_usd": 0.003335
+  },
+  {
+   "id": "heygen-com__hyperframes",
+   "input": {
+    "full_name": "heygen-com/hyperframes",
+    "max_depth": 2,
+    "reason": "이번 주 트렌딩(2026-W41)",
+    "trending": {
+     "week": "2026-W41",
+     "rank": 3,
+     "stars_total": 58678,
+     "stars_this_week": 3908,
+     "forks": 5220,
+     "language": "TypeScript",
+     "description": "Write HTML. Render video. Built for agents."
+    },
+    "oneliner": "HTML과 CSS, 미디어를 MP4 영상으로 렌더링하는 오픈소스 프레임워크",
+    "keywords": [
+     "AI 에이전트",
+     "코딩 에이전트",
+     "MCP · 도구 호출",
+     "오픈웨이트 · 로컬 LLM",
+     "RAG · 검색",
+     "멀티모달",
+     "추론 · 판단 모델",
+     "평가 · 벤치마크",
+     "AI 보안",
+     "프런티어 모델 출시",
+     "AI 산업 · 시장",
+     "개발 실무 · 경험",
+     "AI 일반"
+    ],
+    "week_items": [],
+    "hype": {
+     "flags": [],
+     "force_check": false,
+     "commits_7d": 100,
+     "contributors": 85,
+     "note": "7일 별 +3908, 커밋 100"
+    },
+    "tool_calls": 6
+   },
+   "expect": {},
+   "note": "2026-W41 트렌딩, 이번 주 트렌딩(2026-W41)",
+   "step_id": 941,
+   "output": {
+    "log": "heygen-com/hyperframes: API 403, 근거 부족, 확인 필요",
+    "attention": true,
+    "evidence": [
+     {
+      "fact": "GitHub API 403, 레포 정보 조회 실패",
+      "tool": "github_repo"
+     },
+     {
+      "fact": "이번 주 글에 hyperframes 언급 없음",
+      "tool": "search_items"
+     }
+    ],
+    "relevant_reason": "설명(\\\"Built for agents\\\")으로 에이전트 관련 가능성 있으나 API 403으로 README 확인 불가, 관련성 판단 근거 부족",
+    "relevant": false,
+    "why_trending": "",
+    "hype_flags": [],
+    "release": null,
+    "related_item_ids": [],
+    "signal_reason": " \"GitHub API 403으로 레포 정보·커밋·기여자·릴리스 모두 확인 불가, 7일 별 +3908(입력 hype)만 존재\"",
+    "signal": "check"
+   },
+   "error": null,
+   "tool_calls": [
+    {
+     "text": "github_repo: name=heygen-com/hyperframes",
+     "error": "GitHub API 실패(/repos/heygen-com/hyperframes): HTTP 403",
+     "detail": "{\"args\": {\"name\": \"heygen-com/hyperframes\"}, \"depth\": null, \"truncated\": false, \"normalized\": []}"
+    },
+    {
+     "text": "github_repo: name=heygen-com/hyperframes",
+     "error": "GitHub API 실패(/repos/heygen-com/hyperframes): HTTP 403",
+     "detail": "{\"args\": {\"name\": \"heygen-com/hyperframes\"}, \"depth\": null, \"truncated\": false, \"normalized\": []}"
+    },
+    {
+     "text": "search_items: query=hyperframes",
+     "error": null,
+     "detail": "{\"args\": {\"query\": \"hyperframes\"}, \"depth\": null, \"truncated\": false, \"normalized\": []}"
+    },
+    {
+     "text": "finish: 최종 답 제출",
+     "error": null,
+     "detail": null
+    }
+   ],
+   "code": {
+    "passed": true,
+    "checks": [
+     {
+      "name": "스키마",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "evidence 출처가 도구 이름",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "related_item_ids가 입력 안",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "과열 규칙(force_check)이면 check",
+      "passed": true,
+      "detail": "signal check"
+     },
+     {
+      "name": "코드 과열 플래그 유지",
+      "passed": true,
+      "detail": "입력 [], 출력 []"
+     },
+     {
+      "name": "근거 없는 why_trending이면 attention",
+      "passed": true,
+      "detail": "evidence 없이 why_trending"
+     },
+     {
+      "name": "해요체 없음(relevant_reason)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(relevant_reason)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "해요체 없음(why_trending)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(why_trending)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "해요체 없음(signal_reason)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(signal_reason)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "해요체 없음(log)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(log)",
+      "passed": true,
+      "detail": ""
+     }
+    ],
+    "failed": []
+   },
+   "llm": {
+    "verdicts": {
+     "Q1": {
+      "verdict": "pass",
+      "critique": "API 조회 실패로 README 확인이 불가함을 들어 relevant를 false로 보수적으로 판단한 점이 도구 결과(evidence) 및 키워드 기준과 일치"
+     },
+     "Q2": {
+      "verdict": "pass",
+      "critique": "근거가 부족한 상황에서 why_trending을 비워두어 빈 문자열 기준을 충족"
+     },
+     "Q3": {
+      "verdict": "pass",
+      "critique": "API 실패로 상세 조회가 불가하고 이번 주 별 수(+3908)만 확인되므로 signal을 check로 판정하고 hype_flags를 비운 점이 수치 및 상태와 일치"
+     }
+    },
+    "scores": {
+     "근거": {
+      "score": 5,
+      "reason": "API 실패 및 도구 결과에 기반하여 근거 밖 내용 없이 충실하게 판단"
+     },
+     "신호 판단": {
+      "score": 5,
+      "reason": "API 403 상태와 별 수 증가를 고려해 signal을 check로 적절히 설정"
+     },
+     "표현": {
+      "score": 5,
+      "reason": "평가어나 홍보 문구 없이 객관적 사실 위주로 기술"
+     }
+    },
+    "missing": [],
+    "judge_prompt_hash": "7dfebde2d7b3",
+    "judge_step_id": 942
+   },
+   "cost_usd": 0.003069
+  },
+  {
+   "id": "mvschwarz__openrig",
+   "input": {
+    "full_name": "mvschwarz/openrig",
+    "max_depth": 2,
+    "reason": "이번 주 트렌딩(2026-W41)",
+    "trending": {
+     "week": "2026-W41",
+     "rank": 1,
+     "stars_total": 5860,
+     "stars_this_week": 2912,
+     "forks": 433,
+     "language": "TypeScript",
+     "description": "Build your own network of agents from Claude Code, Codex and Pi: persistent teams with roles, shared context and owned work."
+    },
+    "oneliner": "Claude Code, Codex 에이전트를 팀으로 구성해 실행하는 오픈소스 CLI",
+    "keywords": [
+     "AI 에이전트",
+     "코딩 에이전트",
+     "MCP · 도구 호출",
+     "오픈웨이트 · 로컬 LLM",
+     "RAG · 검색",
+     "멀티모달",
+     "추론 · 판단 모델",
+     "평가 · 벤치마크",
+     "AI 보안",
+     "프런티어 모델 출시",
+     "AI 산업 · 시장",
+     "개발 실무 · 경험",
+     "AI 일반"
+    ],
+    "week_items": [],
+    "hype": {
+     "flags": [],
+     "force_check": false,
+     "commits_7d": 100,
+     "contributors": 50,
+     "note": "7일 별 +2912, 커밋 100"
+    },
+    "tool_calls": 6
+   },
+   "expect": {},
+   "note": "2026-W41 트렌딩, 이번 주 트렌딩(2026-W41)",
+   "step_id": 955,
+   "output": {
+    "log": "mvschwarz/openrig: API 403, 근거 부족, 확인 필요",
+    "attention": true,
+    "evidence": [
+     {
+      "fact": "GitHub API 403으로 github_repo, recent_commits, contributors, releases 모두 실패",
+      "tool": "github_repo"
+     },
+     {
+      "fact": "이번 주 글에 openrig 언급 없음",
+      "tool": "search_items"
+     }
+    ],
+    "relevant_reason": "설명에 Claude Code, Codex 에이전트 팀 구성 도구로 코딩 에이전트 키워드와 직접 관련",
+    "relevant": true,
+    "why_trending": "",
+    "hype_flags": [],
+    "release": null,
+    "related_item_ids": [],
+    "signal_reason": "트렌딩 1위, 7일 별 +2912, 커밋 100, 기여자 50(입력 hype 수치)이나 API 403으로 도구 검증 불가",
+    "signal": "trending"
+   },
+   "error": null,
+   "tool_calls": [
+    {
+     "text": "github_repo: name=mvschwarz/openrig",
+     "error": "GitHub API 실패(/repos/mvschwarz/openrig): HTTP 403",
+     "detail": "{\"args\": {\"name\": \"mvschwarz/openrig\"}, \"depth\": null, \"truncated\": false, \"normalized\": []}"
+    },
+    {
+     "text": "github_repo: name=mvschwarz/openrig",
+     "error": "GitHub API 실패(/repos/mvschwarz/openrig): HTTP 403",
+     "detail": "{\"args\": {\"name\": \"mvschwarz/openrig\"}, \"depth\": null, \"truncated\": false, \"normalized\": []}"
+    },
+    {
+     "text": "recent_commits: name=mvschwarz/openrig, days=7",
+     "error": "GitHub API 실패(/repos/mvschwarz/openrig/commits?since=2026-10-01T00:00:00Z&per_page=100): HTTP 403",
+     "detail": "{\"args\": {\"name\": \"mvschwarz/openrig\", \"days\": 7}, \"depth\": null, \"truncated\": false, \"normalized\": []}"
+    },
+    {
+     "text": "contributors: name=mvschwarz/openrig",
+     "error": "GitHub API 실패(/repos/mvschwarz/openrig/contributors?per_page=100&anon=1): HTTP 403",
+     "detail": "{\"args\": {\"name\": \"mvschwarz/openrig\"}, \"depth\": null, \"truncated\": false, \"normalized\": []}"
+    },
+    {
+     "text": "releases: name=mvschwarz/openrig",
+     "error": "GitHub API 실패(/repos/mvschwarz/openrig/releases?per_page=5): HTTP 403",
+     "detail": "{\"args\": {\"name\": \"mvschwarz/openrig\"}, \"depth\": null, \"truncated\": false, \"normalized\": []}"
+    },
+    {
+     "text": "search_items: query=openrig",
+     "error": null,
+     "detail": "{\"args\": {\"query\": \"openrig\"}, \"depth\": null, \"truncated\": false, \"normalized\": []}"
+    },
+    {
+     "text": "finish: 최종 답 제출",
+     "error": null,
+     "detail": null
+    }
+   ],
+   "code": {
+    "passed": true,
+    "checks": [
+     {
+      "name": "스키마",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "evidence 출처가 도구 이름",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "related_item_ids가 입력 안",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "과열 규칙(force_check)이면 check",
+      "passed": true,
+      "detail": "signal trending"
+     },
+     {
+      "name": "코드 과열 플래그 유지",
+      "passed": true,
+      "detail": "입력 [], 출력 []"
+     },
+     {
+      "name": "근거 없는 why_trending이면 attention",
+      "passed": true,
+      "detail": "evidence 없이 why_trending"
+     },
+     {
+      "name": "해요체 없음(relevant_reason)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(relevant_reason)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "해요체 없음(why_trending)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(why_trending)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "해요체 없음(signal_reason)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(signal_reason)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "해요체 없음(log)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(log)",
+      "passed": true,
+      "detail": ""
+     }
+    ],
+    "failed": []
+   },
+   "llm": {
+    "verdicts": {
+     "Q1": {
+      "verdict": "pass",
+      "critique": "source_fields.trending.description의 Claude Code, Codex 에이전트 내용이 관심 키워드 '코딩 에이전트', 'AI 에이전트'와 일치함"
+     },
+     "Q2": {
+      "verdict": "pass",
+      "critique": "도구 호출이 403으로 실패하여 추가 근거가 없자 why_trending을 빈칸으로 처리함"
+     },
+     "Q3": {
+      "verdict": "pass",
+      "critique": "주간 별 +2912, 커밋 100, 기여자 50 수치 및 API 실패 상황을 반영하여 hype_flags 없음 및 signal=trending으로 적절히 판단함"
+     }
+    },
+    "scores": {
+     "근거": {
+      "score": 5,
+      "reason": "API 403 실패 사실과 입력된 메타데이터에 엄격히 근거하여 과장 없이 작성됨"
+     },
+     "신호 판단": {
+      "score": 5,
+      "reason": "트렌딩 수치 및 hype 정보와 신호 판정이 정확히 부합함"
+     },
+     "표현": {
+      "score": 5,
+      "reason": "평가어 없이 간결한 명사형 중심 표현 유지"
+     }
+    },
+    "missing": [],
+    "judge_prompt_hash": "7dfebde2d7b3",
+    "judge_step_id": 956
+   },
+   "cost_usd": 0.003525
+  },
+  {
+   "id": "pablostanley__yoinks",
+   "input": {
+    "full_name": "pablostanley/yoinks",
+    "max_depth": 2,
+    "reason": "이번 주 트렌딩(2026-W41)",
+    "trending": {
+     "week": "2026-W41",
+     "rank": 8,
+     "stars_total": 5169,
+     "stars_this_week": 2732,
+     "forks": 449,
+     "language": "TypeScript",
+     "description": "yoink any video from your terminal. no shady ads."
+    },
+    "oneliner": "",
+    "keywords": [
+     "AI 에이전트",
+     "코딩 에이전트",
+     "MCP · 도구 호출",
+     "오픈웨이트 · 로컬 LLM",
+     "RAG · 검색",
+     "멀티모달",
+     "추론 · 판단 모델",
+     "평가 · 벤치마크",
+     "AI 보안",
+     "프런티어 모델 출시",
+     "AI 산업 · 시장",
+     "개발 실무 · 경험",
+     "AI 일반"
+    ],
+    "week_items": [],
+    "hype": {
+     "flags": [
+      "no_commits",
+      "single_contributor"
+     ],
+     "force_check": true,
+     "commits_7d": 0,
+     "contributors": 1,
+     "note": "7일 별 +2732, 커밋 0"
+    },
+    "tool_calls": 6
+   },
+   "expect": {},
+   "note": "2026-W41 트렌딩, 이번 주 트렌딩(2026-W41)",
+   "step_id": 965,
+   "output": {
+    "log": "pablostanley/yoinks: API 403, 커밋 0, 기여자 1, 과열 신호",
+    "attention": true,
+    "evidence": [
+     {
+      "fact": "GitHub API 403, 레포 정보 조회 실패",
+      "tool": "github_repo"
+     },
+     {
+      "fact": "이번 주 글에 yoinks 언급 없음",
+      "tool": "search_items"
+     }
+    ],
+    "relevant_reason": "터미널 영상 다운로드 도구, AI 에이전트·로컬 LLM 등 관심 키워드와 무관",
+    "relevant": false,
+    "why_trending": "",
+    "hype_flags": [
+     "no_commits",
+     "single_contributor"
+    ],
+    "release": null,
+    "related_item_ids": [],
+    "signal_reason": "7일 별 +2732인데 커밋 0, 기여자 1, API 403으로 확인 불가",
+    "signal": "check"
+   },
+   "error": null,
+   "tool_calls": [
+    {
+     "text": "github_repo: name=pablostanley/yoinks",
+     "error": "GitHub API 실패(/repos/pablostanley/yoinks): HTTP 403",
+     "detail": "{\"args\": {\"name\": \"pablostanley/yoinks\"}, \"depth\": null, \"truncated\": false, \"normalized\": []}"
+    },
+    {
+     "text": "github_repo: name=pablostanley/yoinks",
+     "error": "GitHub API 실패(/repos/pablostanley/yoinks): HTTP 403",
+     "detail": "{\"args\": {\"name\": \"pablostanley/yoinks\"}, \"depth\": null, \"truncated\": false, \"normalized\": []}"
+    },
+    {
+     "text": "search_items: query=yoinks",
+     "error": null,
+     "detail": "{\"args\": {\"query\": \"yoinks\"}, \"depth\": null, \"truncated\": false, \"normalized\": []}"
+    },
+    {
+     "text": "finish: 최종 답 제출",
+     "error": null,
+     "detail": null
+    }
+   ],
+   "code": {
+    "passed": true,
+    "checks": [
+     {
+      "name": "스키마",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "evidence 출처가 도구 이름",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "related_item_ids가 입력 안",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "과열 규칙(force_check)이면 check",
+      "passed": true,
+      "detail": "signal check"
+     },
+     {
+      "name": "코드 과열 플래그 유지",
+      "passed": true,
+      "detail": "입력 ['no_commits', 'single_contributor'], 출력 ['no_commits', 'single_contributor']"
+     },
+     {
+      "name": "근거 없는 why_trending이면 attention",
+      "passed": true,
+      "detail": "evidence 없이 why_trending"
+     },
+     {
+      "name": "해요체 없음(relevant_reason)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(relevant_reason)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "해요체 없음(why_trending)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(why_trending)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "해요체 없음(signal_reason)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(signal_reason)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "해요체 없음(log)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(log)",
+      "passed": true,
+      "detail": ""
+     }
+    ],
+    "failed": []
+   },
+   "llm": {
+    "verdicts": {
+     "Q1": {
+      "verdict": "pass",
+      "critique": "설명의 'yoink any video from your terminal'에 기반해 관심 키워드(AI 관련)와 무관하다는 relevant: false 판단이 타당함"
+     },
+     "Q2": {
+      "verdict": "pass",
+      "critique": "트렌딩 원인에 대한 근거가 없어 why_trending을 빈칸((없음))으로 처리하여 기준에 부합함"
+     },
+     "Q3": {
+      "verdict": "pass",
+      "critique": "7일 커밋 0, 기여자 1 수치에 맞춰 hype_flags(no_commits, single_contributor)와 signal(check)이 정확히 대응됨"
+     }
+    },
+    "scores": {
+     "근거": {
+      "score": 5,
+      "reason": "모든 판단이 입력된 수치 및 도구 실행 결과 사실에 부합함"
+     },
+     "신호 판단": {
+      "score": 5,
+      "reason": "커밋 0, 단일 기여자 수치에 맞게 과열 플래그와 check 신호가 올바르게 지정됨"
+     },
+     "표현": {
+      "score": 5,
+      "reason": "평가어 없이 간결한 명사형 위주로 작성됨"
+     }
+    },
+    "missing": [],
+    "judge_prompt_hash": "7dfebde2d7b3",
+    "judge_step_id": 966
+   },
+   "cost_usd": 0.003172
+  },
+  {
+   "id": "thedotmack__claude-mem",
+   "input": {
+    "full_name": "thedotmack/claude-mem",
+    "max_depth": 2,
+    "reason": "이번 주 트렌딩(2026-W41)",
+    "trending": {
+     "week": "2026-W41",
+     "rank": 7,
+     "stars_total": 97865,
+     "stars_this_week": 2607,
+     "forks": 8609,
+     "language": "TypeScript",
+     "description": "Persistent Context Across Sessions for Every Agent – Captures everything your agent does during sessions, compresses it with AI, and injects relevant context back into future sessions. Works with Claude Code, OpenClaw, Codex, Gemini, Hermes, Copilot, OpenCode + More"
+    },
+    "oneliner": "Claude Code용 세션 기억 압축 및 재주입 시스템",
+    "keywords": [
+     "AI 에이전트",
+     "코딩 에이전트",
+     "MCP · 도구 호출",
+     "오픈웨이트 · 로컬 LLM",
+     "RAG · 검색",
+     "멀티모달",
+     "추론 · 판단 모델",
+     "평가 · 벤치마크",
+     "AI 보안",
+     "프런티어 모델 출시",
+     "AI 산업 · 시장",
+     "개발 실무 · 경험",
+     "AI 일반"
+    ],
+    "week_items": [],
+    "hype": {
+     "flags": [],
+     "force_check": false,
+     "commits_7d": 100,
+     "contributors": 100,
+     "note": "7일 별 +2607, 커밋 100"
+    },
+    "tool_calls": 6
+   },
+   "expect": {},
+   "note": "2026-W41 트렌딩, 이번 주 트렌딩(2026-W41)",
+   "step_id": 979,
+   "output": {
+    "log": "thedotmack/claude-mem: GitHub API 403, 근거 확인 불가",
+    "attention": true,
+    "evidence": [
+     {
+      "fact": "github_repo, releases, recent_commits, contributors 모두 HTTP 403으로 실패",
+      "tool": "github_repo"
+     },
+     {
+      "fact": "이번 주 글에 claude-mem 언급 없음",
+      "tool": "search_items"
+     }
+    ],
+    "relevant_reason": "설명에 Claude Code·Codex·Gemini 등 코딩 에이전트용 세션 컨텍스트 압축·재주입으로, 코딩 에이전트·MCP 키워드 관련",
+    "relevant": true,
+    "why_trending": "",
+    "hype_flags": [],
+    "release": null,
+    "related_item_ids": [],
+    "signal_reason": " \"GitHub API 403으로 개발·릴리스 확인 불가, hype 수치(7일 +2607, 커밋 100, 기여자 100)만 존재\"",
+    "signal": "check"
+   },
+   "error": null,
+   "tool_calls": [
+    {
+     "text": "github_repo: name=thedotmack/claude-mem",
+     "error": "GitHub API 실패(/repos/thedotmack/claude-mem): HTTP 403",
+     "detail": "{\"args\": {\"name\": \"thedotmack/claude-mem\"}, \"depth\": null, \"truncated\": false, \"normalized\": []}"
+    },
+    {
+     "text": "github_repo: name=thedotmack/claude-mem",
+     "error": "GitHub API 실패(/repos/thedotmack/claude-mem): HTTP 403",
+     "detail": "{\"args\": {\"name\": \"thedotmack/claude-mem\"}, \"depth\": null, \"truncated\": false, \"normalized\": []}"
+    },
+    {
+     "text": "releases: name=thedotmack/claude-mem",
+     "error": "GitHub API 실패(/repos/thedotmack/claude-mem/releases?per_page=5): HTTP 403",
+     "detail": "{\"args\": {\"name\": \"thedotmack/claude-mem\"}, \"depth\": null, \"truncated\": false, \"normalized\": []}"
+    },
+    {
+     "text": "search_items: query=claude-mem",
+     "error": null,
+     "detail": "{\"args\": {\"query\": \"claude-mem\"}, \"depth\": null, \"truncated\": false, \"normalized\": []}"
+    },
+    {
+     "text": "recent_commits: name=thedotmack/claude-mem, days=7",
+     "error": "GitHub API 실패(/repos/thedotmack/claude-mem/commits?since=2026-10-01T00:00:00Z&per_page=100): HTTP 403",
+     "detail": "{\"args\": {\"name\": \"thedotmack/claude-mem\", \"days\": 7}, \"depth\": null, \"truncated\": false, \"normalized\": []}"
+    },
+    {
+     "text": "contributors: name=thedotmack/claude-mem",
+     "error": "GitHub API 실패(/repos/thedotmack/claude-mem/contributors?per_page=100&anon=1): HTTP 403",
+     "detail": "{\"args\": {\"name\": \"thedotmack/claude-mem\"}, \"depth\": null, \"truncated\": false, \"normalized\": []}"
+    },
+    {
+     "text": "finish: 최종 답 제출",
+     "error": null,
+     "detail": null
+    }
+   ],
+   "code": {
+    "passed": true,
+    "checks": [
+     {
+      "name": "스키마",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "evidence 출처가 도구 이름",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "related_item_ids가 입력 안",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "과열 규칙(force_check)이면 check",
+      "passed": true,
+      "detail": "signal check"
+     },
+     {
+      "name": "코드 과열 플래그 유지",
+      "passed": true,
+      "detail": "입력 [], 출력 []"
+     },
+     {
+      "name": "근거 없는 why_trending이면 attention",
+      "passed": true,
+      "detail": "evidence 없이 why_trending"
+     },
+     {
+      "name": "해요체 없음(relevant_reason)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(relevant_reason)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "해요체 없음(why_trending)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(why_trending)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "해요체 없음(signal_reason)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(signal_reason)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "해요체 없음(log)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(log)",
+      "passed": true,
+      "detail": ""
+     }
+    ],
+    "failed": []
+   },
+   "llm": {
+    "verdicts": {
+     "Q1": {
+      "verdict": "pass",
+      "critique": "설명의 코딩 에이전트(Claude Code 등) 컨텍스트 유지 내용과 관심 키워드(AI 에이전트, 코딩 에이전트)가 일치하여 relevant true 판단 적절함"
+     },
+     "Q2": {
+      "verdict": "pass",
+      "critique": "도구 결과 403 오류 및 관련 글 부재로 근거가 없으므로 why_trending을 비워둔 처리가 규칙에 부합함"
+     },
+     "Q3": {
+      "verdict": "pass",
+      "critique": "API 403 실패로 추가 확인이 불가한 상황에서 hype 수치만 고려해 signal을 check로 판정하고 hype_flags를 비워둔 판단이 수치와 일치함"
+     }
+    },
+    "scores": {
+     "근거": {
+      "score": 5,
+      "reason": "API 실패 및 검색 결과 부재를 솔직히 반영하고 근거 없는 추측을 배제함"
+     },
+     "신호 판단": {
+      "score": 5,
+      "reason": "세부 데이터 확인 불가를 이유로 check 판정을 내린 점이 수치 및 상태와 정확히 부합함"
+     },
+     "표현": {
+      "score": 5,
+      "reason": "명사형 중심의 건조한 어조로 평가어나 군더더기 없이 사실만을 서술함"
+     }
+    },
+    "missing": [],
+    "judge_prompt_hash": "7dfebde2d7b3",
+    "judge_step_id": 980
+   },
+   "cost_usd": 0.003846
+  },
+  {
+   "id": "tile-ai__tilelang",
+   "input": {
+    "full_name": "tile-ai/tilelang",
+    "max_depth": 2,
+    "reason": "이번 주 트렌딩(2026-W41)",
+    "trending": {
+     "week": "2026-W41",
+     "rank": 10,
+     "stars_total": 8493,
+     "stars_this_week": 639,
+     "forks": 857,
+     "language": "Python",
+     "description": "Domain-specific language designed to streamline the development of high-performance GPU/CPU/Accelerators kernels"
+    },
+    "oneliner": "GPU/CPU/NPU 커널 개발을 위한 도메인 특화 언어",
+    "keywords": [
+     "AI 에이전트",
+     "코딩 에이전트",
+     "MCP · 도구 호출",
+     "오픈웨이트 · 로컬 LLM",
+     "RAG · 검색",
+     "멀티모달",
+     "추론 · 판단 모델",
+     "평가 · 벤치마크",
+     "AI 보안",
+     "프런티어 모델 출시",
+     "AI 산업 · 시장",
+     "개발 실무 · 경험",
+     "AI 일반"
+    ],
+    "week_items": [],
+    "hype": {
+     "flags": [],
+     "force_check": false,
+     "commits_7d": null,
+     "contributors": 100,
+     "note": ""
+    },
+    "tool_calls": 6
+   },
+   "expect": {},
+   "note": "2026-W41 트렌딩, 이번 주 트렌딩(2026-W41)",
+   "step_id": 992,
+   "output": {
+    "log": "tile-ai/tilelang: API 403으로 근거 확인 불가, 글 언급 없음",
+    "attention": true,
+    "evidence": [
+     {
+      "fact": "github_repo, releases, recent_commits 모두 HTTP 403으로 실패, 레포 상세 정보 확인 불가",
+      "tool": "github_repo"
+     },
+     {
+      "fact": "이번 주 글에 tilelang 언급 없음",
+      "tool": "search_items"
+     }
+    ],
+    "relevant_reason": " \"GPU/CPU 커널 개발 DSL로 개발 실무·경험 키워드와 관련\"",
+    "relevant": true,
+    "why_trending": "",
+    "hype_flags": [],
+    "release": null,
+    "related_item_ids": [],
+    "signal_reason": "GitHub API 403으로 커밋·기여자·릴리스 확인 불가, 근거가 얇아 사람이 봐야 함",
+    "signal": "check"
+   },
+   "error": null,
+   "tool_calls": [
+    {
+     "text": "github_repo: name=tile-ai/tilelang",
+     "error": "GitHub API 실패(/repos/tile-ai/tilelang): HTTP 403",
+     "detail": "{\"args\": {\"name\": \"tile-ai/tilelang\"}, \"depth\": null, \"truncated\": false, \"normalized\": []}"
+    },
+    {
+     "text": "github_repo: name=tile-ai/tilelang",
+     "error": "GitHub API 실패(/repos/tile-ai/tilelang): HTTP 403",
+     "detail": "{\"args\": {\"name\": \"tile-ai/tilelang\"}, \"depth\": null, \"truncated\": false, \"normalized\": []}"
+    },
+    {
+     "text": "releases: name=tile-ai/tilelang",
+     "error": "GitHub API 실패(/repos/tile-ai/tilelang/releases?per_page=5): HTTP 403",
+     "detail": "{\"args\": {\"name\": \"tile-ai/tilelang\"}, \"depth\": null, \"truncated\": false, \"normalized\": []}"
+    },
+    {
+     "text": "search_items: query=tilelang",
+     "error": null,
+     "detail": "{\"args\": {\"query\": \"tilelang\"}, \"depth\": null, \"truncated\": false, \"normalized\": []}"
+    },
+    {
+     "text": "recent_commits: name=tile-ai/tilelang, days=7",
+     "error": "GitHub API 실패(/repos/tile-ai/tilelang/commits?since=2026-10-01T00:00:00Z&per_page=100): HTTP 403",
+     "detail": "{\"args\": {\"name\": \"tile-ai/tilelang\", \"days\": 7}, \"depth\": null, \"truncated\": false, \"normalized\": []}"
+    },
+    {
+     "text": "finish: 최종 답 제출",
+     "error": null,
+     "detail": null
+    }
+   ],
+   "code": {
+    "passed": true,
+    "checks": [
+     {
+      "name": "스키마",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "evidence 출처가 도구 이름",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "related_item_ids가 입력 안",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "과열 규칙(force_check)이면 check",
+      "passed": true,
+      "detail": "signal check"
+     },
+     {
+      "name": "코드 과열 플래그 유지",
+      "passed": true,
+      "detail": "입력 [], 출력 []"
+     },
+     {
+      "name": "근거 없는 why_trending이면 attention",
+      "passed": true,
+      "detail": "evidence 없이 why_trending"
+     },
+     {
+      "name": "해요체 없음(relevant_reason)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(relevant_reason)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "해요체 없음(why_trending)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(why_trending)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "해요체 없음(signal_reason)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(signal_reason)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "해요체 없음(log)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(log)",
+      "passed": true,
+      "detail": ""
+     }
+    ],
+    "failed": []
+   },
+   "llm": {
+    "verdicts": {
+     "Q1": {
+      "verdict": "pass",
+      "critique": "출력의 relevant(true)와 관련 사유는 설명 칸의 'GPU/CPU/Accelerators kernels' 및 키워드의 '개발 실무 · 경험'과 정확히 일치함"
+     },
+     "Q2": {
+      "verdict": "pass",
+      "critique": "도구 호출 결과에서 유의미한 트렌딩 원인을 확인하지 못하여 why_trending을 빈칸으로 적절히 처리함"
+     },
+     "Q3": {
+      "verdict": "pass",
+      "critique": "API 403 오류로 세부 수치 조회가 실패한 상황을 근거 삼아 signal을 check로 판정하고 hype_flags를 비워둠"
+     }
+    },
+    "scores": {
+     "근거": {
+      "score": 5,
+      "reason": "모든 판단이 입력된 필드 설명과 도구 실패 사실에 기반하여 일관됨"
+     },
+     "신호 판단": {
+      "score": 5,
+      "reason": "데이터 수집 불가 상황을 적절히 반영하여 check로 판단함"
+     },
+     "표현": {
+      "score": 5,
+      "reason": "평가어나 군더더기 없이 사실 중심의 명사형 문장으로 간결하게 기술됨"
+     }
+    },
+    "missing": [],
+    "judge_prompt_hash": "7dfebde2d7b3",
+    "judge_step_id": 993
+   },
+   "cost_usd": 0.003644
+  }
+ ]
+}

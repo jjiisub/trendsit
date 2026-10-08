@@ -216,12 +216,71 @@ class KeywordsConfig(Strict):
         return self
 
 
+# ---------- filter.yaml (S2 임베딩 관련성 필터) ----------
+class Interest(Strict):
+    keyword_id: str = Field(pattern=r"^[a-z0-9-]+$")
+    text: str = Field(min_length=10)  # 관심사 설명 1~2문장. 쿼리로 임베딩
+
+
+class FilterConfig(Strict):
+    model: str = Field(min_length=1)  # 임베딩 모델(sentence-transformers 이름)
+    instruction: str = Field(min_length=1)  # 쿼리 쪽 지시문(Qwen3-Embedding 모델 카드 방식)
+    doc_chars: int = Field(default=1000, gt=0)  # 글 입력 = 제목 + 요약 + 본문 앞 doc_chars자
+    drop_below: float = Field(ge=-1, le=1)  # 키워드 통과 + 점수 < drop_below → drop
+    rescue_above: float = Field(ge=-1, le=1)  # 키워드 걸러짐(no_keyword) + 점수 ≥ rescue_above → keep
+    thresholds_status: Literal["provisional", "confirmed"] = "provisional"  # 라벨로 확정 전에는 잠정
+    thresholds_basis: str = ""  # 문턱값 근거 한 줄(리포트와 같이)
+    interests: list[Interest] = Field(min_length=1)
+    # URL 중복 연결의 기준 항목: 원본에 가까운 쪽. 소스 종류(sources.yaml kind) 순위, source_kind로 소스별 덮어쓰기
+    origin_rank: list[str] = ["primary", "blog", "news", "curation"]
+    source_kind: dict[str, str] = {}
+    similar_pairs: int = Field(default=30, ge=0)  # 리포트에 남길 유사 쌍 수(S5 묶기 재료)
+    batch_size: int = Field(default=16, gt=0)
+
+    @model_validator(mode="after")
+    def _check(self) -> FilterConfig:
+        if self.rescue_above < self.drop_below:
+            raise ValueError("rescue_above는 drop_below 이상이어야 함(걸러진 글을 통과 글보다 쉽게 살리지 않게)")
+        bad = sorted({k for k in self.source_kind.values() if k not in self.origin_rank})
+        if bad:
+            raise ValueError(f"source_kind에 origin_rank 밖 종류: {', '.join(bad)}")
+        return self
+
+
+# ---------- deep.yaml (S3 밤 깊게 보기 예산과 상한) ----------
+MAX_DEPTH_ALL = 4  # 전체 깊이 상한(코드 상수). deep.yaml의 max_text_depth는 이 아래로만
+
+
+class DeepConfig(Strict):
+    video_minutes: int = Field(ge=0)  # 밤 하나에 처리할 영상 분(skip 제외, 60분 넘는 영상은 처리 구간만)
+    slide_videos: int = Field(ge=0)  # whisper+slides 영상 수
+    vlm_frames: int = Field(ge=0)  # 슬라이드 판독 프레임 총수
+    frames_per_slide_video: int = Field(default=20, ge=1)  # 영상당 프레임 상한(S4 --frames-cap)
+    text_items: int = Field(ge=0)  # 글 분석가 항목 수
+    text_tool_calls_per_item: int = Field(ge=1)
+    repo_items: int = Field(ge=0)
+    repo_tool_calls_per_item: int = Field(ge=1)
+    default_text_depth: int = Field(ge=1)
+    max_text_depth: int = Field(ge=1, le=MAX_DEPTH_ALL)
+    plan_share: float = Field(default=0.8, gt=0, le=1)  # 계획은 예산의 이 비율까지(나머지는 재시도 몫)
+    video_max_minutes: int = Field(default=60, ge=1)  # 영상 하나 처리 구간 상한(CONTRACTS 1장)
+    lookback_days: int = Field(default=7, ge=1)  # 계획 입력: day 포함 최근 며칠의 영상·글
+
+    @model_validator(mode="after")
+    def _depths(self) -> DeepConfig:
+        if self.default_text_depth > self.max_text_depth:
+            raise ValueError("default_text_depth가 max_text_depth보다 큼")
+        return self
+
+
 FILES: dict[str, type[BaseModel]] = {
     "models.yaml": ModelsConfig,
     "budget.yaml": BudgetConfig,
     "sources.yaml": SourcesConfig,
     "keywords.yaml": KeywordsConfig,
     "link_kinds.yaml": LinkKindsConfig,
+    "filter.yaml": FilterConfig,  # S2
+    "deep.yaml": DeepConfig,  # S3
     "video.yaml": VideoConfig,  # S4
 }
 
@@ -275,7 +334,7 @@ def load(name: str, config_dir: Path | None = None) -> Any:
 
 
 def check_all(config_dir: Path | None = None) -> list[ConfigError]:
-    """네 파일 전부 검증하고 오류를 모두 모은다."""
+    """FILES의 설정 파일 전부 검증하고 오류를 모두 모은다."""
     errors: list[ConfigError] = []
     for name, cls in FILES.items():
         path = (config_dir or ROOT / "config") / name
@@ -285,7 +344,17 @@ def check_all(config_dir: Path | None = None) -> list[ConfigError]:
             errors.append(e)
         except ValidationError as e:
             errors.extend(_errors(name, e))
+    if not errors:
+        errors += _cross_check(config_dir)
     return errors
+
+
+def _cross_check(config_dir: Path | None) -> list[ConfigError]:
+    """파일 사이 참조: filter.yaml 관심사의 keyword_id는 keywords.yaml에 있어야 한다."""
+    kw = {k.id for k in load("keywords.yaml", config_dir).keywords}
+    flt = load("filter.yaml", config_dir)
+    return [ConfigError("filter.yaml", f"interests[{i}].keyword_id", f"keywords.yaml에 없는 키워드 '{x.keyword_id}'")
+            for i, x in enumerate(flt.interests) if x.keyword_id not in kw]
 
 
 def get_secret(name: str) -> str | None:
@@ -298,6 +367,32 @@ def get_secret(name: str) -> str | None:
             if sep and key.strip() == name and value.strip():
                 return value.strip().strip("'\"")
     return None
+
+
+# 라벨 파일 labeler 칸: 이 값이 아니면(예: opus-5.5, 리뷰 세션 2차 채점) 그 라벨로 낸 일치율·문턱값은 잠정
+HUMAN_LABELERS = {"human", "사람", "user", "사용자"}
+
+
+def labeler_info(rows: list[dict[str, str]]) -> dict[str, Any]:
+    """채운 라벨 행들의 labeler 목록과 잠정 여부."""
+    names = sorted({(r.get("labeler") or "").strip() for r in rows} - {""})
+    return {"labelers": names, "provisional": any(n.lower() not in HUMAN_LABELERS for n in names)}
+
+
+SECRET_NAMES = ("OPENROUTER_API_KEY", "GITHUB_TOKEN")
+
+
+def redact_secrets(data: bytes) -> bytes:
+    """녹화 저장 전: 비밀 값(.env, 환경 변수)이 본문에 있으면 [REDACTED]로. 값은 출력하지 않는다."""
+    names = set(SECRET_NAMES)
+    if SECRET_FILE.exists():
+        names |= {line.partition("=")[0].strip() for line in SECRET_FILE.read_text(encoding="utf-8").splitlines()
+                  if "=" in line and not line.lstrip().startswith("#")}
+    for name in names:
+        value = get_secret(name)
+        if value and len(value) >= 8:
+            data = data.replace(value.encode(), b"[REDACTED]")
+    return data
 
 
 def current_spec(override: str | None = None) -> str:

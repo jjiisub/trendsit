@@ -47,3 +47,16 @@ def test_same_name_from_two_modules_is_an_error(monkeypatch):
     monkeypatch.setattr(artifacts, "INPUTS", dict(artifacts.INPUTS))
     with pytest.raises(ValueError, match="LookupInput"):
         artifacts._merge("artifacts_clash")
+
+
+@pytest.mark.parametrize("module", ["trendsit.core.artifacts_text", "trendsit.core.artifacts_repo", "trendsit.deep.plan",
+                                    "trendsit.deep.text_agent", "eval.graders_text", "trendsit.tools.web"])
+def test_spec_modules_import_first(module):
+    """진입점이 스키마 모듈부터 읽어도(순환 import) 모든 스키마가 등록된다."""
+    import subprocess
+
+    code = (f"import {module}\nfrom trendsit.core.artifacts import INPUTS, OUTPUTS\n"
+            "assert {'ItemCardInput','PlanInput','TextAnalystInput','RepoAnalystInput'} <= set(INPUTS)\n"
+            "assert {'ItemCardV1','ItemCardV2','RepoCard','CollectionPlan'} <= set(OUTPUTS)")
+    r = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True)
+    assert r.returncode == 0, r.stderr[-400:]

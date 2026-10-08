@@ -1,0 +1,235 @@
+{
+ "input": {
+  "day": "2026-10-06",
+  "new_videos": [
+   {
+    "video_id": "cHsunDt0QUc",
+    "item_id": 25,
+    "title": "[한영자막] 진짜 '소프트웨어 팩토리'를 만들려면 무엇이 필요할까요? — Factory Tereza",
+    "duration_min": 21.9,
+    "manual_sub_langs": [],
+    "has_auto_sub": true,
+    "description_head": "모두가 '소프트웨어 팩토리'를 말하지만, 이를 실제로 구현하고 운영하는 방법은 무엇일까요?\nAdobe, EY 등 글로벌 엔터프라이즈를 위한 소프트웨어 팩토리를 구축해 온 Factory의 Tereza Tížková가 소프트웨어 개발 전 주기를 자율화하기 위한 3대 핵심 원칙과 실전 아키텍처를 소개합니다.\n\n📌 주요 내용:\n• 단순한 코딩 에이전트 무리가 아닌, 신호 수집부터 검증·개선까지 전 주기를 아우르는 소프트웨어 팩토리의 정의\n• 모델/도구 비종속성(Agnostic): 자동 모델 라우팅으로 25% 이상 비용 절감 및 안정성 확보",
+    "published": "2026-10-01T20:00:16+09:00",
+    "chapters": 28
+   }
+  ],
+  "repo_candidates": [
+   {
+    "full_name": "Panniantong/Agent-Reach",
+    "rank": 6,
+    "stars_this_week": 6454,
+    "stars_total": 92933,
+    "forks": 8144,
+    "language": "Python",
+    "description": "Give your AI agent eyes to see the entire internet. Read & search Twitter, Reddit, YouTube, GitHub, Bilibili, XiaoHongShu — one CLI, zero API fees.",
+    "tracked_release": null,
+    "hype_flags": [],
+    "force_check": false
+   },
+   {
+    "full_name": "NVIDIA/OpenShell",
+    "rank": 5,
+    "stars_this_week": 5228,
+    "stars_total": 15205,
+    "forks": 1719,
+    "language": "Rust",
+    "description": "OpenShell is the safe, private runtime for autonomous AI agents.",
+    "tracked_release": null,
+    "hype_flags": [],
+    "force_check": false
+   },
+   {
+    "full_name": "heygen-com/hyperframes",
+    "rank": 3,
+    "stars_this_week": 3614,
+    "stars_total": 58223,
+    "forks": 5182,
+    "language": "TypeScript",
+    "description": "Write HTML. Render video. Built for agents.",
+    "tracked_release": null,
+    "hype_flags": [],
+    "force_check": false
+   },
+   {
+    "full_name": "mvschwarz/openrig",
+    "rank": 1,
+    "stars_this_week": 3327,
+    "stars_total": 5622,
+    "forks": 413,
+    "language": "TypeScript",
+    "description": "Build your own network of agents from Claude Code, Codex and Pi: persistent teams with roles, shared context and owned work.",
+    "tracked_release": null,
+    "hype_flags": [],
+    "force_check": false
+   },
+   {
+    "full_name": "thedotmack/claude-mem",
+    "rank": 7,
+    "stars_this_week": 2104,
+    "stars_total": 97401,
+    "forks": 8581,
+    "language": "TypeScript",
+    "description": "Persistent Context Across Sessions for Every Agent – Captures everything your agent does during sessions, compresses it with AI, and injects relevant context back into future sessions. Works with Claude Code, OpenClaw, Codex, Gemini, Hermes, Copilot, OpenCode + More",
+    "tracked_release": null,
+    "hype_flags": [],
+    "force_check": false
+   },
+   {
+    "full_name": "cursor/plugins",
+    "rank": 4,
+    "stars_this_week": 1106,
+    "stars_total": 10179,
+    "forks": 965,
+    "language": "TypeScript",
+    "description": "Cursor plugin specification and official plugins",
+    "tracked_release": null,
+    "hype_flags": [],
+    "force_check": false
+   },
+   {
+    "full_name": "tile-ai/tilelang",
+    "rank": 10,
+    "stars_this_week": 675,
+    "stars_total": 8456,
+    "forks": 856,
+    "language": "Python",
+    "description": "Domain-specific language designed to streamline the development of high-performance GPU/CPU/Accelerators kernels",
+    "tracked_release": null,
+    "hype_flags": [],
+    "force_check": false
+   },
+   {
+    "full_name": "NousResearch/hermes-agent",
+    "rank": null,
+    "stars_this_week": null,
+    "stars_total": null,
+    "forks": null,
+    "language": null,
+    "description": null,
+    "tracked_release": "NousResearch/hermes-agent v0.21.4+canary.20261006T070224Z",
+    "hype_flags": [],
+    "force_check": false
+   },
+   {
+    "full_name": "openai/codex",
+    "rank": null,
+    "stars_this_week": null,
+    "stars_total": null,
+    "forks": null,
+    "language": null,
+    "description": null,
+    "tracked_release": "openai/codex 0.161.0-alpha.13.1",
+    "hype_flags": [],
+    "force_check": false
+   },
+   {
+    "full_name": "anthropics/claude-code",
+    "rank": null,
+    "stars_this_week": null,
+    "stars_total": null,
+    "forks": null,
+    "language": null,
+    "description": null,
+    "tracked_release": "anthropics/claude-code v2.1.291",
+    "hype_flags": [],
+    "force_check": false
+   },
+   {
+    "full_name": "ollama/ollama",
+    "rank": null,
+    "stars_this_week": null,
+    "stars_total": null,
+    "forks": null,
+    "language": null,
+    "description": null,
+    "tracked_release": "ollama/ollama v0.40.0-rc5",
+    "hype_flags": [],
+    "force_check": false
+   }
+  ],
+  "text_candidates": [
+   {
+    "item_id": 5,
+    "title": "OpenRig - Claude Code와 Codex를 팀으로 운영하는 멀티 에이전트 오케스트레이터",
+    "source": "geeknews",
+    "relevance": "high",
+    "needs_original_reason": "GeekNews 큐레이션 글이며 도구 상세 스펙과 기능 설명의 원본이 GitHub 레포(링크 1)",
+    "origin_link_kinds": [
+     "repo"
+    ]
+   },
+   {
+    "item_id": 6,
+    "title": "에이전트가 쓴 테스트는 무엇을 증명하나",
+    "source": "geeknews",
+    "relevance": "high",
+    "needs_original_reason": "본문은 개인 블로그(danbom425.tistory.com)의 큐레이션/분석 글이며, 인용된 연구(Zhao et al., METR)의 원본 수치와 결론을 직접 확인해야 함",
+    "origin_link_kinds": [
+     "other"
+    ]
+   },
+   {
+    "item_id": 20,
+    "title": "화면 안 보고 게임한다…GPT-6 아스트라, 'WoW' 40분 만에 클리어",
+    "source": "aitimes",
+    "relevance": "high",
+    "needs_original_reason": "핵심 수치(40분, 28종)와 실험 상세 내용이 에드워즈의 원본 블로그(링크 1)에 기반함",
+    "origin_link_kinds": [
+     "other"
+    ]
+   },
+   {
+    "item_id": 21,
+    "title": "CogSend - 여러 소셜 플랫폼에 글을 예약 발행하는 셀프 호스팅 도구",
+    "source": "geeknews",
+    "relevance": "mid",
+    "needs_original_reason": "GeekNews 큐레이션 글이며, 상세 기술 스택 및 기능 설명의 원본이 GitHub 레포지토리(링크 1)에 존재",
+    "origin_link_kinds": [
+     "repo"
+    ]
+   },
+   {
+    "item_id": 22,
+    "title": "Claude Code 스킬 패턴 — 반복 작업을 재사용 가능한 스킬로 설계하는 법과 실무에서 쌓으며 배운 것",
+    "source": "geeknews",
+    "relevance": "high",
+    "needs_original_reason": "caveman 75% 수치와 스킬 설계 원칙의 출처가 원문 블로그(링크 1) 및 공식 가이드(링크 2)",
+    "origin_link_kinds": [
+     "other"
+    ]
+   }
+  ],
+  "keywords": [
+   "AI 에이전트",
+   "코딩 에이전트",
+   "MCP · 도구 호출",
+   "오픈웨이트 · 로컬 LLM",
+   "RAG · 검색",
+   "멀티모달",
+   "추론 · 판단 모델",
+   "평가 · 벤치마크",
+   "AI 보안",
+   "프런티어 모델 출시",
+   "AI 산업 · 시장",
+   "개발 실무 · 경험",
+   "AI 일반"
+  ],
+  "budget": {
+   "video_minutes": 90,
+   "slide_videos": 2,
+   "vlm_frames": 40,
+   "frames_per_slide_video": 20,
+   "text_items": 5,
+   "text_tool_calls_per_item": 6,
+   "repo_items": 10,
+   "default_text_depth": 2,
+   "max_text_depth": 3,
+   "plan_share": 0.8,
+   "video_max_minutes": 60
+  },
+  "recent_topics": []
+ },
+ "expect": {},
+ "note": "개발 DB(S1 녹화 응답 재생, 실제 한 주 아님, 클라우드 2차 2026-10-08): 2026-10-06 계획 입력(영상 1, 글 5, 레포 11)"
+}

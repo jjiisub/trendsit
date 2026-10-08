@@ -45,10 +45,10 @@ flowchart LR
 | 역할 | 입력 → 출력 | 형태 | 스펙 |
 |---|---|---|---|
 | 레포 한 줄 설명 (`repo_oneliner`) | README 앞부분 → 레포가 하는 일 한 문장 | LLM 1회 | **S0 완료** |
-| 글 1차 요약 | 원글 본문 → 요약, 핵심 주장, 수치, 원본 확인 필요 여부 | LLM 1회 | S2 |
-| 편집장 · 계획 | 그날 후보 전체 → 항목별 깊게 볼지, 최대 깊이 | 판단 + 코드 분기 | S3 |
-| 글 분석가 | 글 + 링크 → 원본, 추적 경로, 원본과의 차이 | 도구 에이전트 | S3 |
-| 레포 분석가 | 트렌딩 수치 + README → 하는 일, 신호, 과열 신호 | 도구 에이전트 | S3 |
+| 글 1차 요약 (`item_card`) | 원글 본문 → 인용 근거가 달린 요약, 핵심 주장, 수치, 원본 확인 필요 여부 | LLM 1회 | S2 구현, 맥 확인, 리뷰 반영(잠정 채점) |
+| 편집장 · 계획 (`editor_plan`) | 그날 후보 전체 → 항목별 깊게 볼지, 최대 깊이 | 판단 + 코드 분기 | S3 구현, 맥 확인, 리뷰 반영(잠정 채점) |
+| 글 분석가 (`text_analyst`) | 글 + 링크 → 원본, 추적 경로, 원본과의 차이 | 도구 에이전트 | S3 구현, 맥 확인, 리뷰 반영(잠정 채점) |
+| 레포 분석가 (`repo_analyst`) | 트렌딩 수치 + README → 하는 일, 신호, 과열 신호 | 도구 에이전트 | S3 구현, 맥 확인, 리뷰 반영(잠정 채점) |
 | 영상 분석가 (`video_slide`, `video_summary`) | 영상 처리 지시 → 로컬 전사 + 슬라이드 판독 → 슬라이드 전용 수치, 표기 쌍, 타임라인, 요약 | 판단 + 코드 분기 | **S4 완료** |
 | 편집장 · 선별 / 작성자 / 검수자 | 토픽 후보 → 순위 → 토픽 페이지 → 판정 | LLM 1회 | S5 |
 
@@ -62,6 +62,13 @@ uv run python -m trendsit check-config         # 설정과 역할 정의 검증
 uv run python -m trendsit role repo_oneliner --input eval/fixtures/repo_oneliner/ollama__ollama.json
 uv run python -m trendsit collect --since 2026-09-28 --until 2026-10-04   # 기간 수집(RSS가 짧으면 백필)
 uv run python -m trendsit report collection --since 2026-09-28 --until 2026-10-04
+uv run python -m trendsit rematch --since 2026-09-28 --until 2026-10-04   # 바뀐 키워드로 판정만 다시(수집 없음)
+uv sync --extra embed                          # 임베딩 필터용(sentence-transformers, Qwen3-Embedding)
+uv run python -m trendsit filter --since 2026-09-28 --until 2026-10-04 --report   # 관련성 keep/drop + 같은 URL 연결
+uv run python -m trendsit summarize --since 2026-09-28 --until 2026-10-04 --spec S2   # 글 1차 요약 카드
+uv run python -m trendsit repo-analyze --week 2026-W41 --traces   # 레포 분석가(규칙 기반 큐 또는 --queue)
+uv run python -m trendsit plan --day 2026-10-04 --report          # 편집장 계획(plan show --day D --video-queue로 S4 입력)
+uv run python -m trendsit deep text --day 2026-10-04 --traces     # 글 분석가: 계획의 원본 추적 큐
 uv run python -m trendsit cost --spec S0       # 사용액과 남은 예산
 ```
 영상 분석가(맥, Apple Silicon): `uv sync --extra video` 뒤
@@ -85,6 +92,8 @@ uv run python -m trendsit video purge --older-than 7                            
 | S0 | `repo_oneliner` 픽스처 10개(generate) | 코드 채점 10/10, 정확성 평균 4.8 / 5(1점 0개), 구체성 4.9, 표현 5.0 | S0 전체 $0.052 (상한 $0.15) |
 | S0 | `lookup_agent` 도구 루프 5건(smoke) | 5/5. 깊이 상한 밖 문서는 코드가 거부 | $0 |
 | S1 | 수집 9/28~10/4(한 주) | 글 308건(AI타임스 188, GeekNews 83, Simon Willison 18, OpenAI 15, Anthropic 2, DeepMind 2), 영상 17편, 릴리스 18건, 트렌딩 11개(페이지 전부). 6곳 모두 기간을 덮음, 중복 0. 본문 추출 성공 GeekNews 98%(원문 기준, 의도적 건너뜀 제외), 나머지 93~100%. GeekNews는 날짜별 목록 날짜당 1페이지(점수 상위 약 20건, 자기 글 제외 하루 11.9건). 키워드 통과 184건 | LLM 없음 $0 |
+| S2 | 임베딩 필터, `item_card` (클라우드 구현 + 맥 확인 + 리뷰 반영) | 관문 A 전부 통과. 한 주(9/28~10/4) 키워드 재판정 통과 305건, 임베딩 필터(MPS) keep 278 / drop 47(문턱값 잠정 0.30·0.50, 라벨 40건 keep 정밀도 68.4%·재현율 92.9%). 시드 11/13(85% 미달: 임베딩으로 고객 사례를 못 가름). item_card 관문 B 21건: 코드 20/21(미달 1), 인용 일치 108/108. 잠정(labeler opus-5.5): 모델 대 모델 일치율 Q1 47.6%(완화 85.7%)·Q2 100%·Q3 100%. 한 주 요약 264건(high 134 / mid 91 / low 39, 원본 확인 필요 158, 잘린 인용 4.1%) | 클라우드 $0.37 + 맥 $0.69 = $1.06 (상한 $1.50) |
+| S3 | 편집장 계획, 글 분석가, 레포 분석가 (클라우드 구현 + 맥 확인 + 리뷰 반영) | 관문 A 통과. 관문 B 코드 채점: repo_analyst 2026-W41 10개 10/10(평균 도구 호출 3.4, GitHub 도구 오류율 0), editor_plan 3/3(실제 계획: 영상 17편 중 5편 whisper 84분, 글 5, 레포 4), text_analyst 16/16(근거 없는 판정 0, 부분 확인 내림 5 보고용, 원본 확보 14/16). 잠정(labeler opus-5.5): 모델 대 모델 일치율 repo_analyst 90·90·100%, editor_plan 33·100%, text_analyst 94·75·94%, 영상 mode 동의율 88.2% | 클라우드 $0.06 + 맥 $0.50 = $0.56 (상한 $2.00) |
 | S1 | `repo_oneliner` 새 프롬프트 형식 + 예/아니오 채점(generate) | 3회 개선 후 코드 채점 8/10 → README 기호 정리(설계 결정) 뒤 코드 9/10, judge Q1·Q2·Q3 9/9(잠정, 사람 라벨 전). 남은 실패는 README가 한 줄뿐인 레포의 attention | S1 $0.056 (상한 $0.06) |
 | S4 | 영상 분석가, Tech Bridge 10편(슬라이드 발표 7, 대담 3, 맥) | 1차 처리 10/10 성공·계약 검사 전부 통과, 로컬 전사 10~31분 영상당 1~2.5분(M1 Max GPU). 슬라이드 판독 139/140장, 슬라이드 전용 수치 124개. 잠정(labeler opus-5.5): 판독 수치 정확도 98.2%, 포착률 87.9%, 요약 Q1 67%·Q2 42%·Q3 75%(미달, S5에서 개선). 같은 전사에 슬라이드를 더하면 잘못 들은 수치가 화면 값으로 바로잡힘(예: 'Sweebench Pro 88%' → SWE-Bench Pro 80.3%) | S4 $0.52 (상한 $0.80) |
 
@@ -116,7 +125,7 @@ uv run python -m trendsit video purge --older-than 7                            
 config/      설정: 모델 별칭(models), 예산(budget), 소스(sources), 키워드(keywords)
 roles/       역할 정의 = 프롬프트 폴더. 앞부분 실행 설정 + 본문 지시
 skills/      여러 역할이 같이 쓰는 지침(문체 등)
-trendsit/    파이썬 패키지: cli, core(LLM 호출, 캐시, 예산, run_role/run_agent, 실행 기록), tools
+trendsit/    파이썬 패키지: cli, core(LLM 호출, 캐시, 예산, run_role/run_agent, 실행 기록), tools, collect(수집), filter(재판정, 임베딩 필터, 중복 연결), deep(편집장 계획, 글 분석가, 레포 분석가)
              collect/video(영상 받기, 로컬 전사, 프레임), video(대조, 영상 분석가 파이프라인)  # S4
 eval/        평가: 픽스처, 채점표, 채점기, 채점자 역할
 tests/       단위 테스트(LLM은 모의)

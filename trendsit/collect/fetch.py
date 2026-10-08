@@ -5,6 +5,9 @@
 - 예의: User-Agent, 같은 도메인은 1초에 1번, robots.txt(목록, 아카이브, 글 페이지), 429/5xx는 지수 백오프 3회
 - 제한: 연결 5초, 읽기 15초, 크기 5MB, 허용 콘텐츠 형식
 - HTTP 캐시(data/http_cache/): ETag/Last-Modified 조건부 요청
+- DNS 재바인딩 방어(S1 리뷰 M3): 검사에서 통과한 IP로 연결을 고정한다. 전송 계층(httpcore 네트워크 백엔드)에서
+  연결 주소만 바꾸므로 Host 헤더와 TLS SNI·인증서 확인은 원래 호스트 이름 그대로. 리다이렉트마다 다시 풀고 다시 고정.
+  HTTP 프록시를 쓰는 환경(환경 변수)에서는 프록시가 이름을 풀므로 고정이 적용되지 않는다(운영 맥은 직접 연결)
 """
 
 from __future__ import annotations
@@ -19,10 +22,11 @@ from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
 from email.utils import parsedate_to_datetime
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 from urllib.parse import urljoin, urlsplit
 from urllib.robotparser import RobotFileParser
 
+import httpcore
 import httpx
 
 from ..core.db import now_kst
@@ -81,16 +85,72 @@ def check_address(ip_text: str) -> None:
         raise FetchBlocked(f"공인 주소가 아님: {ip}")
 
 
+def _env_proxied() -> bool:
+    from httpx._utils import get_environment_proxies
+
+    return any(v for v in get_environment_proxies().values())
+
+
+class PinnedBackend(httpcore.NetworkBackend):
+    """연결할 때 호스트 이름 대신 검사에서 통과한 IP로 접속한다(TLS는 그 위에서 원래 이름으로)."""
+
+    def __init__(self, pins: dict[str, list[str]], inner: httpcore.NetworkBackend | None = None):
+        self.pins = pins
+        self.inner = inner or httpcore.SyncBackend()
+        self.connected: list[tuple[str, str, int]] = []  # (호스트 이름, 실제 연결 주소, 포트) 기록
+
+    def connect_tcp(self, host: str, port: int, timeout: float | None = None, local_address: str | None = None,
+                    socket_options: Any = None) -> httpcore.NetworkStream:
+        ips = self.pins.get(host.lower())
+        if ips is None:
+            try:
+                ipaddress.ip_address(host.strip("[]"))
+            except ValueError:  # 검사를 거치지 않은 이름으로는 연결하지 않는다
+                raise httpcore.ConnectError(f"검사하지 않은 호스트로 연결 시도: {host}") from None
+            ips = [host]
+        last: Exception | None = None
+        for ip in ips:
+            try:
+                stream = self.inner.connect_tcp(ip, port, timeout=timeout, local_address=local_address,
+                                                socket_options=socket_options)
+                self.connected.append((host, ip, port))
+                return stream
+            except (httpcore.ConnectError, httpcore.ConnectTimeout, OSError) as e:
+                last = e
+        raise httpcore.ConnectError(f"{host}: 고정한 주소 {ips} 모두 연결 실패 ({last})")
+
+    def sleep(self, seconds: float) -> None:
+        self.inner.sleep(seconds)
+
+
+class PinnedTransport(httpx.HTTPTransport):
+    """httpx 기본 전송과 같되 연결 풀의 네트워크 백엔드만 PinnedBackend로."""
+
+    def __init__(self, backend: PinnedBackend):
+        super().__init__()
+        self._pool = httpcore.ConnectionPool(ssl_context=httpx.create_ssl_context(), max_connections=100,
+                                             max_keepalive_connections=20, keepalive_expiry=5.0,
+                                             network_backend=backend)
+
+
 class Fetcher:
     def __init__(self, cache_dir: Path | None, *, use_cache: bool = True,
                  transport: httpx.BaseTransport | None = None,
                  resolver: Callable[[str], list[str]] = _resolve,
-                 sleep: Callable[[float], None] = time.sleep, clock: Callable[[], float] = time.monotonic):
+                 sleep: Callable[[float], None] = time.sleep, clock: Callable[[], float] = time.monotonic,
+                 network_backend: httpcore.NetworkBackend | None = None):
         self.cache_dir = cache_dir
         self.use_cache = use_cache and cache_dir is not None
         self.resolver = resolver
         self.sleep = sleep
         self.clock = clock
+        self.pins: dict[str, list[str]] = {}  # 호스트 이름 → 검사에서 통과한 주소(연결은 이 주소로만)
+        self.backend: PinnedBackend | None = None  # None이면 주소 고정이 꺼진 것(가짜 전송 또는 프록시 환경)
+        # 실제 네트워크: 연결 주소 고정. 테스트의 가짜 전송은 연결이 없으므로 그대로.
+        # 환경 변수 프록시가 있으면 httpx가 프록시로 보내고 프록시가 이름을 푼다(전송을 바꾸면 프록시를 못 씀)
+        if transport is None and (network_backend is not None or not _env_proxied()):
+            self.backend = PinnedBackend(self.pins, network_backend)
+            transport = PinnedTransport(self.backend)
         self.client = httpx.Client(transport=transport, timeout=TIMEOUT, follow_redirects=False,
                                    headers={"User-Agent": USER_AGENT})
         self.last_hit: dict[str, float] = {}
@@ -167,6 +227,7 @@ class Fetcher:
             raise FetchBlocked(f"DNS 결과 없음: {host}")
         for a in addrs:
             check_address(a)
+        self.pins[host.lower()] = list(addrs)  # 이번 요청은 방금 검사한 주소로만 연결(DNS 재바인딩 방어)
 
     def set_interval(self, host: str, seconds: float) -> None:
         """이 도메인은 seconds초에 1번(설정의 request_interval_s)."""
@@ -203,8 +264,12 @@ class Fetcher:
             self._check_url(current)
             resp, body = self._request(current, headers)
             if resp.status_code in (301, 302, 303, 307, 308) and resp.headers.get("location"):
-                current = urljoin(current, resp.headers["location"])
-                headers = {k: v for k, v in headers.items() if k not in ("If-None-Match", "If-Modified-Since")}
+                nxt = urljoin(current, resp.headers["location"])
+                drop = {"if-none-match", "if-modified-since"}
+                if httpx.URL(nxt).host != httpx.URL(current).host:
+                    drop.add("authorization")  # 토큰은 다른 호스트로 넘기지 않는다
+                current = nxt
+                headers = {k: v for k, v in headers.items() if k.lower() not in drop}
                 continue
             break
         else:

@@ -41,6 +41,7 @@ class RoleSpec(Strict):
     tools: list[str] = []
     max_steps: int = Field(default=1, ge=1)
     max_depth: int | None = Field(default=None, ge=1)
+    max_tool_calls: int | None = Field(default=None, ge=1)  # 항목당 도구 호출 상한(finish 제외). 넘으면 거부
     max_tokens: int = Field(gt=0)
     temperature: float = Field(default=0.2, ge=0, le=2)
     includes: list[str] = []

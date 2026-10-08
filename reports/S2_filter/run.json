@@ -1,0 +1,25 @@
+{
+ "run_id": "20261009-000927-filter-e87a",
+ "model": "Qwen/Qwen3-Embedding-0.6B",
+ "device": "mps",
+ "n": 325,
+ "computed": 0,
+ "seconds": 1.56,
+ "decisions": {
+  "keyword_pass": 278,
+  "low_similarity": 9,
+  "no_keyword": 26,
+  "excluded:정치": 4,
+  "excluded:인수": 3,
+  "excluded:주가": 2,
+  "excluded:시가총액": 1,
+  "excluded:채용": 1,
+  "excluded:스포츠": 1
+ },
+ "seed_correct": 11,
+ "seed_found": 13,
+ "seed_total": 13,
+ "drop_below": 0.3,
+ "rescue_above": 0.5,
+ "thresholds_status": "provisional"
+}

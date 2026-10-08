@@ -1,0 +1,155 @@
+{
+ "input": {
+  "item_id": 982,
+  "title": "OpenAI, Jev와 경쟁할 Luna 기반 Decision API 공개",
+  "source_name": "GeekNews",
+  "url": "https://news.hada.io/topic?id=34528",
+  "max_depth": 2,
+  "card_v1": {
+   "log": "큐레이션, 수치 2개, 원본 확인 필요",
+   "attention": false,
+   "quotes": [
+    {
+     "n": 1,
+     "text": "The company’s new Decisions API is based on the company’s Luna model — the smallest and most affordable model in its current lineup."
+    },
+    {
+     "n": 2,
+     "text": "The core idea behind these decision models is that they are explicitly not chat models; instead, they return a set of predefined answers with confidence scores."
+    },
+    {
+     "n": 3,
+     "text": "OpenAI says its model returns results in 150 milliseconds, compared to GPT-6 Luna, which would take 1.6 seconds."
+    },
+    {
+     "n": 4,
+     "text": "This makes this kind of model ideal for classifying content, routing requests, or choosing an agent’s next action from a limited set of choices."
+    },
+    {
+     "n": 5,
+     "text": "For now, the new API is available in limited preview, and the broad release is planned for the coming days."
+    }
+   ],
+   "numbers": [
+    {
+     "quote_n": 3,
+     "value": "150 milliseconds",
+     "unit": "",
+     "what": "Decision API 응답 시간"
+    },
+    {
+     "quote_n": 3,
+     "value": "1.6 seconds",
+     "unit": "",
+     "what": "GPT-6 Luna 응답 시간"
+    }
+   ],
+   "claims": [
+    {
+     "quote_ns": [
+      1
+     ],
+     "text": "OpenAI의 Decision API는 가장 작고 저렴한 Luna 모델을 기반으로 한다"
+    },
+    {
+     "quote_ns": [
+      2,
+      4
+     ],
+     "text": "Decision 모델은 채팅이 아닌 사전 정의된 답변과 신뢰도 점수를 반환하며, 콘텐츠 분류나 에이전트 다음 행동 선택에 적합하다"
+    },
+    {
+     "quote_ns": [
+      3
+     ],
+     "text": "Decision API는 150ms로 응답해 GPT-6 Luna(1.6초)보다 훨씬 빠르다"
+    },
+    {
+     "quote_ns": [
+      5
+     ],
+     "text": "현재 제한된 프리뷰 단계이며, 정식 출시가 며칠 내로 예정되어 있다"
+    }
+   ],
+   "summary": "OpenAI가 Luna 모델을 기반으로 한 Decision API를 공개했다. 이 API는 사전 정의된 답변과 신뢰도 점수를 150ms 만에 반환하며, 콘텐츠 분류나 에이전트 행동 선택에 활용된다. 현재 제한된 프리뷰 단계이며 정식 출시가 임박했다.",
+   "entities": [
+    "OpenAI",
+    "Decision API",
+    "Luna",
+    "TypeSafe",
+    "Jev",
+    "GPT-6 Luna"
+   ],
+   "keywords": [
+    "agent",
+    "reasoning",
+    "frontier-release"
+   ],
+   "is_curation": true,
+   "origin_candidates": [
+    1
+   ],
+   "relevance_reason": "에이전트 행동 선택에 쓰이는 Decision API 출시와 성능 수치가 중심",
+   "relevance": "high",
+   "needs_original_reason": "수치(150ms, 1.6s)와 상세 스펙의 출처가 The New Stack 기사(링크 1)",
+   "needs_original": true
+  },
+  "links": [
+   {
+    "n": 1,
+    "url": "https://thenewstack.io/openai-decision-api-luna",
+    "kind": "other",
+    "anchor": "OpenAI, Jev와 경쟁할 Luna 기반 Decision API 공개",
+    "candidate": true
+   },
+   {
+    "n": 2,
+    "url": "https://youtube.com/thenewstack?sub_confirmation=1",
+    "kind": "social",
+    "anchor": "YOUTUBE.COM/THENEWSTACK Tech moves fast, don't miss an episode. Subscribe to our YouTube channel to stream all our podcasts, interviews, demos, and more.",
+    "candidate": false
+   }
+  ],
+  "checks": [
+   {
+    "n": 1,
+    "kind": "number",
+    "text": "Decision API 응답 시간: 150 milliseconds",
+    "quote": "OpenAI says its model returns results in 150 milliseconds, compared to GPT-6 Luna, which would take 1.6 seconds."
+   },
+   {
+    "n": 2,
+    "kind": "number",
+    "text": "GPT-6 Luna 응답 시간: 1.6 seconds",
+    "quote": "OpenAI says its model returns results in 150 milliseconds, compared to GPT-6 Luna, which would take 1.6 seconds."
+   },
+   {
+    "n": 3,
+    "kind": "claim",
+    "text": "OpenAI의 Decision API는 가장 작고 저렴한 Luna 모델을 기반으로 한다",
+    "quote": "The company’s new Decisions API is based on the company’s Luna model — the smallest and most affordable model in its current lineup."
+   },
+   {
+    "n": 4,
+    "kind": "claim",
+    "text": "Decision 모델은 채팅이 아닌 사전 정의된 답변과 신뢰도 점수를 반환하며, 콘텐츠 분류나 에이전트 다음 행동 선택에 적합하다",
+    "quote": "The core idea behind these decision models is that they are explicitly not chat models; instead, they return a set of predefined answers with confidence scores. / This makes this kind of model ideal for classifying content, routing requests, or choosing an agent’s next action from a limited set of choices."
+   },
+   {
+    "n": 5,
+    "kind": "claim",
+    "text": "Decision API는 150ms로 응답해 GPT-6 Luna(1.6초)보다 훨씬 빠르다",
+    "quote": "OpenAI says its model returns results in 150 milliseconds, compared to GPT-6 Luna, which would take 1.6 seconds."
+   },
+   {
+    "n": 6,
+    "kind": "claim",
+    "text": "현재 제한된 프리뷰 단계이며, 정식 출시가 며칠 내로 예정되어 있다",
+    "quote": "For now, the new API is available in limited preview, and the broad release is planned for the coming days."
+   }
+  ],
+  "tool_calls": null
+ },
+ "expect": {},
+ "note": "2026-10-04 계획 text_queue, OpenAI, Jev와 경쟁할 Luna 기반 Decision API 공개"
+}

@@ -1,0 +1,11 @@
+{
+ "input": {
+  "source": "simonw",
+  "channel": "text",
+  "title": "John Gruber",
+  "keyword_status": "pass",
+  "keyword_reason": null,
+  "text": "John Gruber\nMuse is getting a lot of attention — including mine — because it’s both groundbreaking technically (each user gets their own entire persistent Linux VM running in Meta’s cloud) and because it’s packaged in an easy-to-install easy-to-use way. It’s literally presented as a cute mascot. It’s the first consumer-accessible agentic AI system, and Meta has truly done an amazing job with that. But it’s a genuinely open question whether consumers have any understanding what this means. If you buy a power saw that can cut your fingers off, you are almost certainly aware that you are buying a power saw that can sever your fingers. [...] I don’t think people realize how powerful — and thus dangerous — Muse is, especially if it’s running on your Mac.\n— John Gruber, Muse Looks Cute, but Looks are Deceiving\n# 5:22 pm / john-gruber, ai, generative-ai, llms, meta, general-agents, muse-agent, muse"
+ },
+ "note": "S1 녹화 응답(tests/fixtures/http/window, bf_*)으로 만든 개발 DB에서 뽑음. keyword_status는 새 키워드로 rematch한 판정"
+}

@@ -1,0 +1,220 @@
+{
+ "input": {
+  "item_id": 22,
+  "title": "Claude Code 스킬 패턴 — 반복 작업을 재사용 가능한 스킬로 설계하는 법과 실무에서 쌓으며 배운 것",
+  "source_name": "GeekNews",
+  "url": "https://news.hada.io/topic?id=34752",
+  "max_depth": 2,
+  "card_v1": {
+   "log": "큐레이션, 스킬 설계 원칙 4개 + 실무 경험 5개, 수치 4개, 원본 확인 필요",
+   "attention": false,
+   "quotes": [
+    {
+     "n": 1,
+     "text": "이런 반복 지시를 재사용 가능한 절차로 분리한 것이 AI 에이전트 스킬입니다. Claude Code 스킬은 지침, 메타데이터와 필요에 따라 스크립트·참고자료를 하나의 폴더로 묶고, 관련 작업이 들어왔을 때만 불러오는 구조입니다."
+    },
+    {
+     "n": 2,
+     "text": "중요한 것은 특정 명령을 길게 나열하는 것이 아닙니다. 언제 테스트를 먼저 작성해야 하는지, 무엇을 수정하면 안 되는지, 어떤 상태를 완료로 볼 것인지처럼 반복되는 판단 기준을 외부화하는 것이 핵심입니다."
+    },
+    {
+     "n": 3,
+     "text": "점진적 공개 방식에서는 SKILL.md를 목차처럼 사용하고, 세부 내용은 references/, 실행 코드는 scripts/, 템플릿은 assets/에 나눠둡니다. 에이전트는 시작 시 스킬의 이름과 설명만 확인하고, 실제로 관련 작업이 들어왔을 때 본문과 필요한 참고파일만 읽습니다."
+    },
+    {
+     "n": 4,
+     "text": "description은 사용자가 읽는 소개 문구보다 에이전트가 스킬을 선택하는 기준에 가깝습니다. 에이전트는 시작 단계에서 전체 스킬 본문이 아니라 이름과 description을 먼저 보고, 현재 요청에 해당 스킬이 필요한지 판단합니다."
+    },
+    {
+     "n": 5,
+     "text": "공개 사례에서는 같은 수정 설명의 출력 토큰이 약 75% 줄었다고 보고했지만, 이는 특정 프롬프트와 프로젝트에서 측정된 자체 사례이며 추론 토큰이나 전체 작업 비용이 같은 비율로 감소한다는 뜻은 아닙니다."
+    },
+    {
+     "n": 6,
+     "text": "세션을 시작할 때마다 스킬 설명 전문과 스킬 약 50개, 에이전트 약 20개, 도구 약 60개의 목록이 컨텍스트에 들어왔습니다."
+    }
+   ],
+   "numbers": [
+    {
+     "quote_n": 5,
+     "value": "75%",
+     "unit": "",
+     "what": "caveman 스킬 적용 시 출력 토큰 감소율"
+    },
+    {
+     "quote_n": 6,
+     "value": "50개",
+     "unit": "",
+     "what": "컨텍스트에 로드된 스킬 수"
+    },
+    {
+     "quote_n": 6,
+     "value": "20개",
+     "unit": "",
+     "what": "컨텍스트에 로드된 에이전트 수"
+    },
+    {
+     "quote_n": 6,
+     "value": "60개",
+     "unit": "",
+     "what": "컨텍스트에 로드된 도구 수"
+    }
+   ],
+   "claims": [
+    {
+     "quote_ns": [
+      1,
+      2
+     ],
+     "text": "Claude Code 스킬은 반복 지시를 재사용 가능한 절차로 분리하는 구조이며, 핵심은 명령 나열이 아닌 판단 기준의 외부화다"
+    },
+    {
+     "quote_ns": [
+      3,
+      4
+     ],
+     "text": "스킬 설계 시 점진적 공개로 컨텍스트 소비를 줄이고, description은 에이전트 선택 트리거로 구체적으로 작성해야 한다"
+    },
+    {
+     "quote_ns": [
+      5
+     ],
+     "text": "caveman 스킬은 출력 토큰을 약 75% 줄였으나 이는 특정 프로젝트의 자체 사례이며 전체 비용 감소와 동일하지 않다"
+    },
+    {
+     "quote_ns": [
+      6
+     ],
+     "text": "대형 스킬 카탈로그를 사용할 경우 매 세션 시작 시 스킬·에이전트·도구 목록이 컨텍스트에 로드되어 비용이 증가한다"
+    }
+   ],
+   "summary": "Claude Code 스킬은 반복적인 AI 코딩 에이전트 지시를 재사용 가능한 절차로 분리하는 구조로, 판단 기준 외부화와 점진적 공개가 핵심 설계 원칙이다. caveman 스킬은 출력 토큰을 약 75% 줄였으나 특정 프로젝트의 자체 사례이며, 대형 스킬 카탈로그는 매 세션 컨텍스트 비용 증가라는 관리 부담이 따른다.",
+   "entities": [
+    "Claude Code",
+    "Anthropic",
+    "Superpowers",
+    "GSD",
+    "caveman",
+    "Karpathy"
+   ],
+   "keywords": [
+    "agent",
+    "coding-agent",
+    "dev-practice"
+   ],
+   "is_curation": true,
+   "origin_candidates": [
+    1,
+    2
+   ],
+   "relevance_reason": "코딩 에이전트 스킬 설계 패턴과 실무 운영 경험이 중심",
+   "relevance": "high",
+   "needs_original_reason": "caveman 75% 수치와 스킬 설계 원칙의 출처가 원문 블로그(링크 1) 및 공식 가이드(링크 2)",
+   "needs_original": true
+  },
+  "links": [
+   {
+    "n": 1,
+    "url": "https://stock-engineer.com/claude-code-skill-pattern-reusable-agent-design/",
+    "kind": "other",
+    "anchor": "Claude Code 스킬 패턴 — 반복 작업을 재사용 가능한 스킬로 설계하는 법과 실무에서 쌓으며 배운 것",
+    "candidate": true
+   },
+   {
+    "n": 2,
+    "url": "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices.md",
+    "kind": "other",
+    "anchor": "공식 작성 가이드",
+    "candidate": true
+   },
+   {
+    "n": 3,
+    "url": "https://github.com/multica-ai/andrej-karpathy-skills",
+    "kind": "repo",
+    "anchor": "Karpathy의 AI 코딩 관련 관찰을 바탕으로 만들어진 공개 프로젝트",
+    "candidate": false
+   },
+   {
+    "n": 4,
+    "url": "https://theaxlabs.com/blog/claude-code%EB%A5%BC-%ED%9A%8C%EC%82%AC%EB%A1%9C-%EB%A7%8C%EB%93%9C%EB%8A%94-%EC%8A%A4%ED%82%AC-42%EC%A2%85",
+    "kind": "other",
+    "anchor": "42개 스킬로 나눠 회사 조직도처럼 구성한 사례",
+    "candidate": false
+   },
+   {
+    "n": 5,
+    "url": "https://github.com/obra/superpowers",
+    "kind": "repo",
+    "anchor": "Superpowers",
+    "candidate": false
+   },
+   {
+    "n": 6,
+    "url": "https://github.com/Yalton/get-shit-done-cc",
+    "kind": "repo",
+    "anchor": "GSD",
+    "candidate": false
+   },
+   {
+    "n": 7,
+    "url": "https://github.com/mattpocock/skills",
+    "kind": "repo",
+    "anchor": "caveman 계열 스킬",
+    "candidate": false
+   }
+  ],
+  "checks": [
+   {
+    "n": 1,
+    "kind": "number",
+    "text": "caveman 스킬 적용 시 출력 토큰 감소율: 75%",
+    "quote": "공개 사례에서는 같은 수정 설명의 출력 토큰이 약 75% 줄었다고 보고했지만, 이는 특정 프롬프트와 프로젝트에서 측정된 자체 사례이며 추론 토큰이나 전체 작업 비용이 같은 비율로 감소한다는 뜻은 아닙니다."
+   },
+   {
+    "n": 2,
+    "kind": "number",
+    "text": "컨텍스트에 로드된 스킬 수: 50개",
+    "quote": "세션을 시작할 때마다 스킬 설명 전문과 스킬 약 50개, 에이전트 약 20개, 도구 약 60개의 목록이 컨텍스트에 들어왔습니다."
+   },
+   {
+    "n": 3,
+    "kind": "number",
+    "text": "컨텍스트에 로드된 에이전트 수: 20개",
+    "quote": "세션을 시작할 때마다 스킬 설명 전문과 스킬 약 50개, 에이전트 약 20개, 도구 약 60개의 목록이 컨텍스트에 들어왔습니다."
+   },
+   {
+    "n": 4,
+    "kind": "number",
+    "text": "컨텍스트에 로드된 도구 수: 60개",
+    "quote": "세션을 시작할 때마다 스킬 설명 전문과 스킬 약 50개, 에이전트 약 20개, 도구 약 60개의 목록이 컨텍스트에 들어왔습니다."
+   },
+   {
+    "n": 5,
+    "kind": "claim",
+    "text": "Claude Code 스킬은 반복 지시를 재사용 가능한 절차로 분리하는 구조이며, 핵심은 명령 나열이 아닌 판단 기준의 외부화다",
+    "quote": "이런 반복 지시를 재사용 가능한 절차로 분리한 것이 AI 에이전트 스킬입니다. Claude Code 스킬은 지침, 메타데이터와 필요에 따라 스크립트·참고자료를 하나의 폴더로 묶고, 관련 작업이 들어왔을 때만 불러오는 구조입니다. / 중요한 것은 특정 명령을 길게 나열하는 것이 아닙니다. 언제 테스트를 먼저 작성해야 하는지, 무엇을 수정하면 안 되는지, 어떤 상태를 완료로 볼 것인지처럼 반복되는 판단 기준을 외부화하는 것이 핵심입니다."
+   },
+   {
+    "n": 6,
+    "kind": "claim",
+    "text": "스킬 설계 시 점진적 공개로 컨텍스트 소비를 줄이고, description은 에이전트 선택 트리거로 구체적으로 작성해야 한다",
+    "quote": "점진적 공개 방식에서는 SKILL.md를 목차처럼 사용하고, 세부 내용은 references/, 실행 코드는 scripts/, 템플릿은 assets/에 나눠둡니다. 에이전트는 시작 시 스킬의 이름과 설명만 확인하고, 실제로 관련 작업이 들어왔을 때 본문과 필요한 참고파일만 읽습니다. / description은 사용자가 읽는 소개 문구보다 에이전트가 스킬을 선택하는 기준에 가깝습니다. 에이전트는 시작 단계에서 전체 스킬 본문이 아니라 이름과 description을 먼저 보고, 현재 요청에 해당 스킬이 필요한지 판단합니다."
+   },
+   {
+    "n": 7,
+    "kind": "claim",
+    "text": "caveman 스킬은 출력 토큰을 약 75% 줄였으나 이는 특정 프로젝트의 자체 사례이며 전체 비용 감소와 동일하지 않다",
+    "quote": "공개 사례에서는 같은 수정 설명의 출력 토큰이 약 75% 줄었다고 보고했지만, 이는 특정 프롬프트와 프로젝트에서 측정된 자체 사례이며 추론 토큰이나 전체 작업 비용이 같은 비율로 감소한다는 뜻은 아닙니다."
+   },
+   {
+    "n": 8,
+    "kind": "claim",
+    "text": "대형 스킬 카탈로그를 사용할 경우 매 세션 시작 시 스킬·에이전트·도구 목록이 컨텍스트에 로드되어 비용이 증가한다",
+    "quote": "세션을 시작할 때마다 스킬 설명 전문과 스킬 약 50개, 에이전트 약 20개, 도구 약 60개의 목록이 컨텍스트에 들어왔습니다."
+   }
+  ],
+  "tool_calls": null
+ },
+ "expect": {},
+ "note": "개발 DB(S1 녹화 응답 재생, 실제 한 주 아님, 클라우드 2차 2026-10-08):  계획 text_queue, Claude Code 스킬 패턴 — 반복 작업을 재사용 가능한 스킬로 설"
+}

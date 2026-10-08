@@ -1,0 +1,95 @@
+{
+ "input": {
+  "item_id": 25,
+  "title": "CogSend - 여러 소셜 플랫폼에 글을 예약 발행하는 셀프 호스팅 도구",
+  "source_name": "GeekNews",
+  "source_kind": "curation",
+  "url": "https://news.hada.io/topic?id=34739",
+  "body": {
+   "id": "it:25",
+   "source": "GeekNews",
+   "text": "Self-hosted social scheduler for Mastodon, Bluesky, LinkedIn, Threads and X.\nWrite a draft, customize it per platform, then publish it now or schedule it.\nInstall · Documentation · API · Contributing\ncogsend-trailer.mp4\nSupported by Zernio, which lets you connect X, Threads, LinkedIn and Bluesky without your own developer apps.\nHosted schedulers usually charge per channel and keep your posts and tokens on their servers. CogSend runs on your own Cloudflare account instead: your data stays in your own D1 database and R2 bucket, posts go out through your own API credentials, and there is no subscription to keep paying.\n- Thread editor: one card per post, images with alt text, and a tab per platform for tailored versions\n- Auto-split: paste a long draft and it becomes a thread that fits every platform you picked\n- Publish or schedule: see results per account, then cancel, reschedule or retry from Posts\n- Automatic retries: temporary failures retry on their own, up to five attempts\n- Insights: published against failed over 7, 30 or 90 days, and why posts failed\n- Link previews: cards for URLs in a post\n- Secure by default: encrypted credentials and 2FA on the admin account\n- AI agents (MCP): connect Claude Code, Codex or any MCP client to draft, schedule and publish with your API key\n- API access: a personal key for scripts and Shortcuts, read-only or read-write\nA single-admin instance normally stays within Cloudflare's free plans, though R2 needs a payment method on file. The Workers free plan allows five cron triggers per account, shared with every Worker you run; if none are left, an external pinger drives the schedule instead (Scheduling). On the free plan a backlog of due posts drains a post or two a minute, and a paid Workers plan publishes everything due at once.\nNeeds Node 22.13+, 24 or 26+ (odd-numbered releases such as 25 are not supported) and a Cloudflare account with Workers, D1 and R2 available.\ngit clone --depth 1 https://github.com/deepakness/cogsend.git cogsend\ncd cogsend && npm install && npm run setup\nsetup creates the Cloudflare resources, your admin account and the secrets, deploys, and prints your URL. Sign in there, scan the QR with an authenticator app and save the backup codes. It is safe to re-run; docs/deploy.md lists every step and flag.\nNext, connect your accounts. Mastodon and Bluesky work straight away; LinkedIn, Threads and X need an OAuth app first, or you can connect them through Zernio.\ngit pull && npm ci && npm run deploy:release\ndeploy:release runs the tests, applies migrations, builds and deploys. Your data is in D1 and R2, not in the checkout, so a pull cannot touch it. Settings → Instance and npm run doctor both report the running version and say when a newer release is out; docs/deploy.md → Updating covers release tags and rolling back.\nAlso published, with search, at cogsend.com/docs.\nGet started\n- Deploying: the install and its flags, checking it worked, updating and rolling back\n- OAuth apps: LinkedIn, Threads and X app setup, and what each platform allows\n- Zernio: connecting through Zernio instead of registering your own apps\n- Connecting accounts: connecting, reconnecting and disconnecting accounts\nUse it\n- Writing and publishing: threads, per-platform overrides, images and alt text, scheduling\n- Posts and Insights: the queue, what each post can do, and the delivery stats\n- API: personal API keys, the MCP server, and worked examples (the full reference is in-app at /api)\nRun it\n- Configuration: secrets, the instance name, APP_URL, the login and recovery\n- Scheduling: the cron trigger, the free-plan trigger limit, external pingers, failure emails\n- Domains and URLs: the workers.dev URL, a custom domain, changing the hostname\n- Cloudflare Access: putting an extra gate in front of an instance\n- Backups: D1 Time Travel, exporting the database, copying the bucket\n- Troubleshooting: the errors people actually hit, and what fixes each\n- Development: local setup, the checks that must pass, code expectations\nSvelteKit 2 and Svelte 5 on Cloudflare Workers with Static Assets, D1 (SQLite) via Drizzle, and R2 for media.\ndocs/development.md has local setup and the checks that must pass; CONTRIBUTING.md has the pull-request rules. Report security issues privately, as SECURITY.md describes.\nIf CogSend is useful to you, sponsoring supports my time maintaining it.\nMIT, see LICENSE. Third-party notices are in THIRD-PARTY-NOTICES.md.",
+   "title": "CogSend - 여러 소셜 플랫폼에 글을 예약 발행하는 셀프 호스팅 도구",
+   "url": "https://news.hada.io/topic?id=34739"
+  },
+  "links": [
+   {
+    "n": 1,
+    "url": "https://github.com/deepakness/cogsend",
+    "kind": "repo",
+    "anchor": "CogSend - 여러 소셜 플랫폼에 글을 예약 발행하는 셀프 호스팅 도구",
+    "role": "origin_candidate"
+   },
+   {
+    "n": 2,
+    "url": "https://zernio.link/cogsend?utm_source=cogsend&utm_medium=sponsorship&utm_campaign=cogsend-integration&utm_content=readme-sponsor",
+    "kind": "other",
+    "anchor": "Zernio",
+    "role": "body"
+   },
+   {
+    "n": 3,
+    "url": "https://cogsend.com/docs/",
+    "kind": "other",
+    "anchor": "cogsend.com/docs",
+    "role": "body"
+   }
+  ],
+  "keywords": [
+   {
+    "id": "agent",
+    "name": "AI 에이전트"
+   },
+   {
+    "id": "coding-agent",
+    "name": "코딩 에이전트"
+   },
+   {
+    "id": "mcp-tools",
+    "name": "MCP · 도구 호출"
+   },
+   {
+    "id": "open-weight",
+    "name": "오픈웨이트 · 로컬 LLM"
+   },
+   {
+    "id": "rag-search",
+    "name": "RAG · 검색"
+   },
+   {
+    "id": "multimodal",
+    "name": "멀티모달"
+   },
+   {
+    "id": "reasoning",
+    "name": "추론 · 판단 모델"
+   },
+   {
+    "id": "eval",
+    "name": "평가 · 벤치마크"
+   },
+   {
+    "id": "ai-security",
+    "name": "AI 보안"
+   },
+   {
+    "id": "frontier-release",
+    "name": "프런티어 모델 출시"
+   },
+   {
+    "id": "ai-industry",
+    "name": "AI 산업 · 시장"
+   },
+   {
+    "id": "dev-practice",
+    "name": "개발 실무 · 경험"
+   },
+   {
+    "id": "ai-general",
+    "name": "AI 일반"
+   }
+  ]
+ },
+ "expect": {},
+ "note": "S1 녹화 응답으로 만든 개발 DB(items.id 25). 본문 4437자, 링크 3개, 수치 표현 약 0개"
+}

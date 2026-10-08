@@ -1,0 +1,43 @@
+{
+ "input": {
+  "full_name": "heygen-com/hyperframes",
+  "max_depth": 2,
+  "reason": "이번 주 트렌딩(2026-W41)",
+  "trending": {
+   "week": "2026-W41",
+   "rank": 3,
+   "stars_total": 58678,
+   "stars_this_week": 3908,
+   "forks": 5220,
+   "language": "TypeScript",
+   "description": "Write HTML. Render video. Built for agents."
+  },
+  "oneliner": "HTML과 CSS, 미디어를 MP4 영상으로 렌더링하는 오픈소스 프레임워크",
+  "keywords": [
+   "AI 에이전트",
+   "코딩 에이전트",
+   "MCP · 도구 호출",
+   "오픈웨이트 · 로컬 LLM",
+   "RAG · 검색",
+   "멀티모달",
+   "추론 · 판단 모델",
+   "평가 · 벤치마크",
+   "AI 보안",
+   "프런티어 모델 출시",
+   "AI 산업 · 시장",
+   "개발 실무 · 경험",
+   "AI 일반"
+  ],
+  "week_items": [],
+  "hype": {
+   "flags": [],
+   "force_check": false,
+   "commits_7d": 100,
+   "contributors": 85,
+   "note": "7일 별 +3908, 커밋 100"
+  },
+  "tool_calls": 6
+ },
+ "expect": {},
+ "note": "2026-W41 트렌딩, 이번 주 트렌딩(2026-W41)"
+}

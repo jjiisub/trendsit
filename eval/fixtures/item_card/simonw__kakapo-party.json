@@ -1,0 +1,109 @@
+{
+ "input": {
+  "item_id": 28,
+  "title": "kakapo party",
+  "source_name": "Simon Willison's Weblog",
+  "source_kind": "curation",
+  "url": "https://simonwillison.net/2026/Sep/26/kakapo-party/",
+  "body": {
+   "id": "it:28",
+   "source": "Simon Willison's Weblog",
+   "text": "I presented a closing keynote for the WeAreDevelopers World Congress North America yesterday. As a STAR moment I decided to weave in references to the record breaking kākāpō breeding season we had in 2026.\nFor my closing slide I wanted to celebrate, and I had seen some buzz around how good Claude Opus 5.5 was at creating pixel art animations. So I rounded up three Kakapo photos from Google image search and dropped them into Claude with this prompt:\nHere are some photos of kakapo parrots just to remind you what they look like I need you to make an animation in animated pixel art on HTML 5 canvas of obviously pixel art kakapo jumping up and down having a party with confetti and suchlike - there should be at least 20 of them\nHere are some photos of kakapo parrots just to remind you what they look like\nI need you to make an animation in animated pixel art on HTML 5 canvas of obviously pixel art kakapo jumping up and down having a party with confetti and suchlike - there should be at least 20 of them\nHere's the transcript, and this is the resulting page. It's pretty great!\nI wanted to embed it in a Keynote presentation file, so I downloaded the HTML and told a local Claude Code session:\nMake me a video of file:///Users/simon/Downloads/kakapo-party.html - you need to load it in a browser and click on it a few times to get the confetti effect, the video should be 15s long don't start clicking until 3s in make sure several clicks are spread around the clickable area\nMake me a video of file:///Users/simon/Downloads/kakapo-party.html - you need to load it in a browser and click on it a few times to get the confetti effect, the video should be 15s long\ndon't start clicking until 3s in\nmake sure several clicks are spread around the clickable area\nClaude Code used Playwright (transcript here) and produced this video, which was exactly what I needed for my final slide:\nYour browser does not support HTML5 video.\nHere's the full Playwright script it used, which was pleasingly short:\n# /// script # dependencies = [\"playwright\"] # /// import time from playwright.sync_api import sync_playwright W, H = 1280, 720 # Canvas fills the viewport; spread clicks across corners, edges and centre clicks = [ (3.0, 640, 360), # centre (4.2, 160, 120), # top-left (5.4, 1120, 120), # top-right (6.6, 180, 600), # bottom-left (7.8, 1100, 600), # bottom-right (9.0, 640, 100), # top-centre (10.0, 380, 380), # mid-left (11.0, 900, 380), # mid-right (12.2, 640, 620), # bottom-centre (13.2, 640, 300), # finale centre ] with sync_playwright() as p: b = p.chromium.launch() ctx = b.new_context(viewport={\"width\":W,\"height\":H}, record_video_dir=\"vids\", record_video_size={\"width\":W,\"height\":H}) page = ctx.new_page() t0 = time.time() page.goto(\"file:///Users/simon/Downloads/kakapo-party.html\") for t,x,y in clicks: time.sleep(max(0, t-(time.time()-t0))) page.mouse.click(x,y) time.sleep(max(0, 16.0-(time.time()-t0))) ctx.close(); b.close()",
+   "title": "kakapo party",
+   "url": "https://simonwillison.net/2026/Sep/26/kakapo-party/"
+  },
+  "links": [
+   {
+    "n": 1,
+    "url": "https://tools.simonwillison.net/kakapo-party",
+    "kind": "curation",
+    "anchor": "Kākāpō Party",
+    "role": "body"
+   },
+   {
+    "n": 2,
+    "url": "https://www.wearedevelopers.com/world-congress-north-america",
+    "kind": "other",
+    "anchor": "WeAreDevelopers World Congress North America",
+    "role": "body"
+   },
+   {
+    "n": 3,
+    "url": "https://www.doc.govt.nz/news/media-releases/2026-media-releases/kakapo-population-reaches-new-milestone/",
+    "kind": "other",
+    "anchor": "kākāpō breeding season",
+    "role": "body"
+   },
+   {
+    "n": 4,
+    "url": "https://claude.ai/share/43bec0be-a0a3-4737-bfac-34894af34ddc",
+    "kind": "other",
+    "anchor": "the transcript",
+    "role": "body"
+   },
+   {
+    "n": 5,
+    "url": "https://gisthost.github.io/?368b481fba654c4fb84d90188da77581/page-001.html",
+    "kind": "other",
+    "anchor": "transcript here",
+    "role": "body"
+   }
+  ],
+  "keywords": [
+   {
+    "id": "agent",
+    "name": "AI 에이전트"
+   },
+   {
+    "id": "coding-agent",
+    "name": "코딩 에이전트"
+   },
+   {
+    "id": "mcp-tools",
+    "name": "MCP · 도구 호출"
+   },
+   {
+    "id": "open-weight",
+    "name": "오픈웨이트 · 로컬 LLM"
+   },
+   {
+    "id": "rag-search",
+    "name": "RAG · 검색"
+   },
+   {
+    "id": "multimodal",
+    "name": "멀티모달"
+   },
+   {
+    "id": "reasoning",
+    "name": "추론 · 판단 모델"
+   },
+   {
+    "id": "eval",
+    "name": "평가 · 벤치마크"
+   },
+   {
+    "id": "ai-security",
+    "name": "AI 보안"
+   },
+   {
+    "id": "frontier-release",
+    "name": "프런티어 모델 출시"
+   },
+   {
+    "id": "ai-industry",
+    "name": "AI 산업 · 시장"
+   },
+   {
+    "id": "dev-practice",
+    "name": "개발 실무 · 경험"
+   },
+   {
+    "id": "ai-general",
+    "name": "AI 일반"
+   }
+  ]
+ },
+ "expect": {},
+ "note": "S1 녹화 응답으로 만든 개발 DB(items.id 28). 본문 2943자, 링크 5개, 수치 표현 약 0개"
+}

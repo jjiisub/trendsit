@@ -18,7 +18,7 @@ GITHUB_TOKEN=...             # 선택. 픽스처 README 수집에만
 | `uv run ruff check . && uv run pytest` | 정적 검사 + 단위 테스트(네트워크 없음) |
 | `bash scripts/verify_s0.sh` | S0 관문 A. 항목별 PASS/FAIL, smoke(무료) 모델 실제 호출 포함 |
 | `bash scripts/verify_s1.sh` | S1 관문 A(S0 회귀 + 1a S0 보완 P1~P6, 리뷰 반영 R1~R6 + 1b 수집) |
-| `bash scripts/verify_s2.sh [--stage 0]` | S2 관문 A. `--stage 0`은 0단계(S1 리뷰 M1, M2, M4, M6)만 |
+| `bash scripts/verify_s2.sh [--stage 0]` | S2 관문 A(S0·S1 회귀 + 0단계 M1, M2, M4, M6 + 2a + 2b). `--stage 0`은 0단계만 |
 | `bash scripts/verify_s4.sh` | S4 관문 A(S0·S1 회귀 + A2~A14). 맥이면 `video` 묶음을 넣고 맥 전용 테스트까지 |
 | `uv run python -m trendsit check-config [--root DIR]` | 설정 파일 + 역할 md(`roles/*.md`, `eval/judge.md`) 검증. 틀리면 파일, 경로, 이유 |
 | `uv run python -m trendsit role <이름> --input <json> [--model 별칭] [--no-cache]` | 역할 1회 실행. 출력 JSON, stderr에 run_id, step_id, 비용 |
@@ -31,6 +31,16 @@ GITHUB_TOKEN=...             # 선택. 픽스처 README 수집에만
 | `uv run python -m trendsit collect [--source ID] [--since DATE] [--until DATE] [--no-body] [--no-http-cache] [--max-items N]` | 기간 수집(글 6곳, 유튜브, GitHub 트렌딩, 추적 레포 릴리스). 기본 기간은 최근 1일. RSS가 기간을 못 덮으면 백필 |
 | `uv run python -m trendsit items [--week 2026-W40] [--source ID] [--status pass\|filtered] [--limit N]` | 수집 항목 목록(날짜, 소스, 필터 상태, 본문 상태, 키워드, 제목) |
 | `uv run python -m trendsit report collection [--since DATE] [--until DATE]` | `reports/S1_collection.md`: 소스별 표, 하루 신규 건수, 백필 확인, GitHub, 유튜브, 사람 확인용 샘플, 링크 분포, 문턱값 |
+| `uv run python -m trendsit rematch [--since D] [--until D]` | 바뀐 `keywords.yaml`을 저장된 제목·요약·본문에 다시 적용(items 판정, item_keywords, 트렌딩 판정). 네트워크 없음, 다시 돌려도 같음 |
+| `uv run python -m trendsit filter [--since D] [--until D] [--embedder real\|mock] [--report] [--labels]` | 임베딩 관련성 필터(글·영상 전부, 키워드 판정과 무관) → `item_relevance` keep/drop + 같은 URL 연결(`item_same_as`). `--report`는 `reports/S2_filter/`, `--labels`는 `eval/labels/relevance.csv` 40건(`expected`, `labeler` 칸. labeler가 사람이 아니면 정밀도·재현율과 문턱값은 잠정). real은 `uv sync --extra embed` 필요 |
+| `uv run python -m trendsit filter-fixtures [--embedder real\|mock] [--record]` | 재현 픽스처 `eval/fixtures/filter/` 20건 점수(DB 없음). `--record`는 장치별 점수를 `reports/S2_filter/fixture_scores.json`에, 다른 장치 기록과 차이 0.001 초과면 종료 코드 1 |
+| `uv run python -m trendsit summarize [--since D] [--until D] [--limit N] [--model 별칭] [--redo] --spec S2` | 글 1차 요약(`item_card`): 필터 keep이고 같은 URL 묶음의 기준 항목인 글만. `item_cards` version 1에 저장, 이미 있으면 건너뜀 |
+| `bash scripts/verify_s3.sh` | S3 관문 A(S0·S1 회귀 + M3 + 3c, 3a, 3b) |
+| `uv run python -m trendsit repo-analyze --week W [--top N] [--queue file] [--traces] [--fixtures DIR] --spec S3` | 레포 분석가(`repo_analyst`). 큐는 `--queue`(계획의 repo_queue 또는 목록) 없으면 규칙 기반(키워드에 걸린 트렌딩 이번 주 별 순 + 추적 레포 릴리스). `repo_cards`에 저장, 한 줄 설명은 `repo_oneliner` 결과를 붙임 |
+| `uv run python -m trendsit plan [run] --day D [--report] [--labels] [--fixture file] [--no-hype] --spec S3` | 편집장 계획(`editor_plan`). 모델 실패면 규칙 기반 대체 계획. `plans`에 저장, `--report`는 `reports/S3_plan.md`, `--labels`는 영상 mode 동의 라벨 `eval/labels/editor_plan_mode.csv`(judge 라벨 `eval editor_plan --label`은 `editor_plan.csv`, 설계 결정 Q5) |
+| `uv run python -m trendsit plan show --day D [--video-queue]` | 그날 최신 계획. `--video-queue`는 CONTRACTS 1장 JSON 배열(S4 `video run --queue` 입력) |
+| `uv run python -m trendsit plan agreement --day D` | `editor_plan_mode.csv`의 영상 mode 동의율(`agree`, `labeler` 칸. labeler가 사람이 아니면 잠정) |
+| `uv run python -m trendsit deep text (--day D \| --item ID [--max-depth N]) [--traces] [--fixtures DIR] --spec S3` | 글 분석가(`text_analyst`). `--day`는 그날 계획의 text_queue. `item_cards` version 2에 저장(v1은 그대로), `--traces`는 `reports/S3_traces/text/` |
 | `uv run python scripts/record_http_fixtures.py <이름> --since D --until D [--source ID] [--max-items N] [--today D] [--extend]` | 수집 테스트용 응답 녹화(`tests/fixtures/http/<이름>/`, 피드와 HTML은 줄여서 gzip). `--extend`는 이전 녹화를 쓰고 새 URL만 받음 |
 | `uv run --extra video python -m trendsit video run --video-id ID --mode whisper+slides [--start S --end E] [--reason 이유] [--frames full] [--res N]` | 영상 하나: 받기 → 로컬 전사와 프레임 → 슬라이드 판독 → 대조 → 요약 → VideoDigest 저장. 실행 기록은 영상마다 run 1개(S4, 맥) |
 | `uv run --extra video python -m trendsit video run --queue q.json` (`-`면 표준 입력) | 영상 처리 지시 배열(CONTRACTS 1장). `--from-json data/media/<id>/media_result.json`이면 전사 없이 판독 이후만 |
@@ -78,6 +88,24 @@ GITHUB_TOKEN=...             # 선택. 픽스처 README 수집에만
 - 칠판 테이블(마이그레이션 1번): sources, fetch_log, items, item_texts(본문, 8주 뒤 지움), item_keywords, links, videos, repos, repo_trending
 - 테스트는 `tests/fixtures/http/`의 녹화 응답만 쓴다(녹화에 없는 URL은 연결 실패로 처리해 네트워크가 새지 않게)
 
+## 임베딩 필터와 글 1차 요약 (S2)
+- 키워드(`config/keywords.yaml`, 13개)는 넓은 1차 그물. 정밀한 거르기는 임베딩 필터와 1차 요약의 relevance. 녹화 픽스처를 쓰는 S1 테스트와 녹화 스크립트는 `tests/fixtures/keywords_test.yaml`(S1 키워드)을 쓴다
+- 필터(`trendsit/filter/embed.py`, `config/filter.yaml`): 입력 = 제목 + 요약 + 본문 앞 1,000자(영상은 제목 + 설명). 점수 = 관심사 설명(키워드마다 1~2문장, 쿼리 쪽에만 `Instruct: ...\nQuery: ` 지시문)과의 코사인 최댓값 + 그 키워드 id. 판정은 코드: 키워드 통과 + 점수 ≥ `drop_below` → keep / 미만 → drop(low_similarity) / 키워드 걸러짐(no_keyword) + 점수 ≥ `rescue_above` → keep(rescued) / 제외어로 걸러진 것은 되살리지 않음. S1의 `items.filter_status`는 그대로 둔다
+- 임베딩은 `item_embeddings(item_id, model, dim, vec, text_hash)`에 저장. 같은 모델, 같은 입력 해시면 재사용(두 번째 실행 계산 0)
+- 같은 URL(`trendsit/filter/dedupe.py`): 글의 URL 열쇠 = 자기 URL + 원문 후보 링크. 하나라도 공유하면 한 묶음. 기준 항목은 `origin_rank`(공식 > 개인 블로그 > 언론 > 큐레이션, `source_kind`로 소스별 덮어쓰기) → 게시 시각 → id
+- 글 1차 요약(`roles/item_card.md`, `trendsit/summarize.py`): 본문 6,000자(문단 경계에서 자름), 링크는 `links.id` 순서로 번호, 키워드 13개 목록. enforce(코드): 본문에 없는 인용 삭제 → 그 인용을 가리키는 수치·주장 정리, 인용에 없는 수치 삭제, 목록 밖 키워드·없는 링크 번호 삭제, 인용·수치를 지웠으면 attention. 스키마 3회 실패면 대체 출력(요약 없음, relevance low, attention)
+- 채점(`eval/graders_text.py`, `eval/rubrics/item_card.md`): 코드 = 수치가 그 인용 안, 참조 번호, 목록 안 키워드, 문체(요약·주장·로그만. 인용은 원문 문체), 인젝션 사례에서 지시 미이행 + 전체 인용 본문 일치율 95%(원래 출력 기준). judge = Q1 충실성, Q2 핵심, Q3 원본 판정
+- 스펙별 채점 모듈은 `eval/graders.py` 끝의 `_load` 줄로 불러 `ROLE_CHECKS`, `ROLE_STYLE_FIELDS`, `THRESHOLDS`, `AGGREGATES`에 등록한다
+
+## 깊게 보기 (S3)
+- 도구 에이전트의 입력별 상한(코드): `RoleInput.tool_names`(레포 분석가 max_depth 1이면 `github_repo`, `search_items`만), `depth_limit`(글 분석가는 계획의 max_depth, 전체 4), `depth_seed`(원래 글을 깊이 1로, 그 링크를 깊이 2로). 역할 md의 `max_tool_calls`(6)를 넘는 도구 호출은 실행하지 않고 거부, 결과마다 남은 횟수 표시
+- 도구는 `ctx.resources`(fetcher, GitHub 헤더, 가져온 페이지)를 쓴다. 도구 설명(docstring)은 언제 쓰나 / 언제 쓰지 않나 / 인자 예
+- 레포 분석가(`deep/repo_agent.py`): 과열 규칙은 입력 조립 때 코드가 계산(7일 별 `HYPE_STARS_WEEK`=1000 이상 + 7일 커밋 0 → check 고정, 기여자 1명, awesome 목록)하고 enforce가 고정
+- 편집장 계획(`deep/plan.py`, `config/deep.yaml`): `validate_plan`(enforce)이 없는 id·중복 제거, 깊이 자르기, 예산 합계를 넘는 꼬리를 우선순위 뒤에서 잘라 log에 기록, 예산 80%를 넘으면 attention
+- 글 분석가(`deep/text_agent.py`, `skills/origin_trace.md`): 확인할 것 = v1의 수치·주장(번호). enforce는 이번 실행에서 실제로 연 페이지(`fetch_page`, `arxiv` 초록, `github_repo` README)에 없는 인용을 지우고, 근거 없는 confirmed/differs를 not_found로, trail 밖 origin을 지움. `arxiv`, `github_repo`는 깊이를 세지 않는다(검색·API)
+- safe_fetch 연결 주소 고정(S1 리뷰 M3): 검사에서 통과한 IP로만 연결(httpcore 네트워크 백엔드). Host 헤더와 TLS SNI·인증서 확인은 원래 이름. 환경 변수 프록시가 있으면 프록시가 이름을 풀어 적용하지 않음
+- 오프라인 픽스처: `tests/fixtures/http/repo_tools`(레포 정보·README는 S1 녹화, 커밋·기여자·릴리스는 합성. `meta.json`에 표시), 3b는 S1 window 녹화의 GeekNews 원문 페이지
+
 ## DB 마이그레이션 (S1 리뷰 M1)
 - `trendsit/core/migrations.py`에 번호 → SQL로 등록(`register(번호, sql)`). 적용 기록은 `schema_migrations(version, applied_at)`. 등록된 번호 중 기록에 없는 것을 오름차순으로, 번호마다 한 트랜잭션(문장을 하나씩 실행 → 기록 → COMMIT, 실패하면 ROLLBACK하고 기록하지 않음 → 다음 실행 때 다시 시도). 빈 번호 허용
 - 번호 대역(COMMON 9장): 1~9 S0~S1, 10~19 S2~S3, 20~29 S4. 다른 대역끼리 서로 의존하지 않는다
@@ -100,6 +128,11 @@ trendsit/
   core/      config llm cache budget render(자료 렌더) role(run_role, 역할 md 검사) agent(run_agent) trace db migrations artifacts(스키마) context
   tools/     registry(도구 등록) lookup(테스트용 가짜 도구)
   collect/   fetch(safe_fetch) text(글, 백필) youtube github links keywords report run, sites/(geeknews, aitimes, simonw, anthropic)
+  filter/    rematch(키워드 재판정) embed(임베더, 점수, 판정) dedupe(같은 URL) report(검증 산출물, 라벨)
+  deep/      plan(편집장 계획, validate_plan) repo_agent(레포 분석가) text_agent(글 분석가)
+  tools/     github(github_repo, recent_commits, contributors, releases) items(search_items) web(fetch_page, read_more) arxiv
+  summarize.py  글 1차 요약 입력 조립, 대상, 저장
+  cli_text.py   S2~S3 명령(register)
 eval/        fixtures/<역할>/ rubrics/ judge.md(채점자 역할) labels/(사람 라벨 CSV) graders.py run_eval.py
 tests/       단위 테스트(LLM은 모의 전송)
 scripts/     verify_s<n>.sh, fetch_fixtures.py(픽스처 README 수집)

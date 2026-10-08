@@ -77,6 +77,49 @@ register(2, """
     """)
 
 # ---------- S2~S3 (10~19) ----------
+# 10: S2 2a 임베딩 관련성 필터와 URL 중복 연결. S1 items.filter_status(키워드 판정)는 건드리지 않고 따로 저장
+register(10, """
+    CREATE TABLE IF NOT EXISTS item_embeddings (
+        item_id INTEGER NOT NULL, model TEXT NOT NULL, dim INTEGER NOT NULL, vec BLOB NOT NULL,
+        text_hash TEXT, created_at TEXT, PRIMARY KEY(item_id, model)
+    );
+    CREATE TABLE IF NOT EXISTS item_relevance (
+        item_id INTEGER PRIMARY KEY, model TEXT NOT NULL, score REAL NOT NULL, keyword_id TEXT,
+        decision TEXT NOT NULL CHECK(decision IN ('keep','drop')), reason TEXT, run_id TEXT
+    );
+    CREATE TABLE IF NOT EXISTS item_same_as (
+        item_id INTEGER PRIMARY KEY, canonical_id INTEGER NOT NULL, reason TEXT
+    );
+    """)
+
+# 11: S2 2b 글 카드. version 1 = 1차 요약(item_card), 2 = 글 분석가(S3 3b). v2가 v1을 덮지 않음
+register(11, """
+    CREATE TABLE IF NOT EXISTS item_cards (
+        item_id INTEGER NOT NULL, version INTEGER NOT NULL CHECK(version IN (1, 2)), card_json TEXT NOT NULL,
+        model TEXT, run_id TEXT, created_at TEXT, fallback INTEGER NOT NULL DEFAULT 0,
+        PRIMARY KEY(item_id, version)
+    );
+    """)
+
+# 12: S3 3c 레포 분석가 카드(주차별)와 레포 한 줄(repo_oneliner 결과, 입력 해시가 같으면 재사용)
+register(12, """
+    CREATE TABLE IF NOT EXISTS repo_cards (
+        week TEXT NOT NULL, full_name TEXT NOT NULL, card_json TEXT NOT NULL, model TEXT, run_id TEXT,
+        created_at TEXT, fallback INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(week, full_name)
+    );
+    CREATE TABLE IF NOT EXISTS repo_oneliners (
+        full_name TEXT PRIMARY KEY, input_hash TEXT NOT NULL, output_json TEXT NOT NULL, model TEXT, created_at TEXT
+    );
+    """)
+
+# 13: S3 3a 편집장 계획(날짜별, 모델 계획 또는 규칙 기반 대체 계획)
+register(13, """
+    CREATE TABLE IF NOT EXISTS plans (
+        id INTEGER PRIMARY KEY, day TEXT NOT NULL, run_id TEXT,
+        source TEXT NOT NULL CHECK(source IN ('model','fallback')), plan_json TEXT NOT NULL, created_at TEXT
+    );
+    CREATE INDEX IF NOT EXISTS plans_day ON plans(day, id);
+    """)
 
 # ---------- S4 (20~29) ----------
 # 20: 영상 분석가. 영상마다 처리 기록 1행(다시 처리하면 새 행), 전사 segments(8주 뒤 텍스트 삭제), 프레임 판독(텍스트만),

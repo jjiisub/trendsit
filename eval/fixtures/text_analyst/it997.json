@@ -1,0 +1,299 @@
+{
+ "input": {
+  "item_id": 997,
+  "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+  "source_name": "GeekNews",
+  "url": "https://news.hada.io/topic?id=34588",
+  "max_depth": 2,
+  "card_v1": {
+   "log": "큐레이션, 수치 8개, 원본 확인 필요",
+   "attention": false,
+   "quotes": [
+    {
+     "n": 1,
+     "text": "오늘 구글은 새로운 프론티어 모델인 ‘제미나이 4 아르곤(Gemini 4 Argon)’을 공개합니다."
+    },
+    {
+     "n": 2,
+     "text": "아르곤은 출시 기념 특가1로 입력 토큰 1백만 개당 2달러, 출력 토큰 1백만 개당 10달러에 제공되며, 캐시된 입력 토큰은 입력 토큰 가격 대비 95% 할인된 금액으로 이용할 수 있습니다."
+    },
+    {
+     "n": 3,
+     "text": "구글은 더 길고 복잡한 활용 사례에서도 제미나이 4 아르곤의 역량을 충분히 뒷받침할 수 있도록, 모델의 출력 토큰 한도를 기존 6만 4천개에서 업계 최고 수준인 1백만 개로 대폭 확장했습니다."
+    },
+    {
+     "n": 4,
+     "text": "아르곤은 실제 현장에서의 장기 소프트웨어 엔지니어링 작업 수행 능력을 평가하는 DeepSWE v1.1에서 77.9%를 기록하며 최고 수준(SOTA)을 달성했습니다."
+    },
+    {
+     "n": 5,
+     "text": "핵심 기업 업무 전반의 엔드투엔드(end-to-end) 실행 능력을 측정하는 Zapier의 AutomationBench에서도 51.3%의 점수를 기록하며 1위에 올랐습니다."
+    },
+    {
+     "n": 6,
+     "text": "보안 취약점 해결 능력을 평가하는 CWE-bench v1에서, 아르곤은 CWE-bench v0에서 프론티어급 성능을 입증한 3.8 플래시 사이버(3.8 Flash Cyber)의 성과를 바탕으로 68%라는 최고 점수로 공동 1위를 기록했습니다."
+    }
+   ],
+   "numbers": [
+    {
+     "quote_n": 2,
+     "value": "2달러",
+     "unit": "1백만 개당",
+     "what": "입력 토큰 가격"
+    },
+    {
+     "quote_n": 2,
+     "value": "10달러",
+     "unit": "1백만 개당",
+     "what": "출력 토큰 가격"
+    },
+    {
+     "quote_n": 2,
+     "value": "95%",
+     "unit": "",
+     "what": "캐시된 입력 토큰 할인율"
+    },
+    {
+     "quote_n": 3,
+     "value": "6만 4천개",
+     "unit": "",
+     "what": "기존 출력 토큰 한도"
+    },
+    {
+     "quote_n": 3,
+     "value": "1백만 개",
+     "unit": "",
+     "what": "확장된 출력 토큰 한도"
+    },
+    {
+     "quote_n": 4,
+     "value": "77.9%",
+     "unit": "",
+     "what": "DeepSWE v1.1 평가 점수"
+    },
+    {
+     "quote_n": 5,
+     "value": "51.3%",
+     "unit": "",
+     "what": "Zapier AutomationBench 점수"
+    },
+    {
+     "quote_n": 6,
+     "value": "68%",
+     "unit": "",
+     "what": "CWE-bench v1 점수"
+    }
+   ],
+   "claims": [
+    {
+     "quote_ns": [
+      1
+     ],
+     "text": "구글이 새로운 프론티어 모델 제미나이 4 아르곤을 공개했다."
+    },
+    {
+     "quote_ns": [
+      2
+     ],
+     "text": "출시 기념 특가로 입력 토큰 1M당 2달러, 출력 토큰 1M당 10달러이며 캐시 입력은 95% 할인된다."
+    },
+    {
+     "quote_ns": [
+      3
+     ],
+     "text": "출력 토큰 한도를 기존 64k에서 1M으로 확장해 장기 추론 능력을 강화했다."
+    },
+    {
+     "quote_ns": [
+      4,
+      5,
+      6
+     ],
+     "text": "DeepSWE v1.1(77.9%), AutomationBench(51.3%), CWE-bench v1(68%) 등 코딩, 엔터프라이즈, 보안 벤치마크에서 최상위 성적을 기록했다."
+    }
+   ],
+   "summary": "구글이 새로운 프론티어 모델 제미나이 4 아르곤을 공개하며, 출력 토큰 한도를 1M으로 확장하고 코딩 및 보안 벤치마크에서 최상위 성적을 거두었다고 밝혔다. 출시 기념 특가로 입력 토큰 1M당 2달러, 출력 토큰 1M당 10달러에 제공된다.",
+   "entities": [
+    "구글",
+    "제미나이 4 아르곤",
+    "Gemini 4 Argon",
+    "DeepSWE v1.1",
+    "Zapier",
+    "AutomationBench",
+    "CWE-bench v1",
+    "3.8 Flash Cyber"
+   ],
+   "keywords": [
+    "frontier-release",
+    "coding-agent",
+    "eval",
+    "ai-security",
+    "reasoning"
+   ],
+   "is_curation": true,
+   "origin_candidates": [
+    1
+   ],
+   "relevance_reason": "프런티어 모델 출시 및 주요 벤치마크 수치가 중심",
+   "relevance": "high",
+   "needs_original_reason": "큐레이션 글이 공식 블로그의 수치와 주장을 인용했으므로 원본 대조 필요",
+   "needs_original": true
+  },
+  "links": [
+   {
+    "n": 1,
+    "url": "https://blog.google/intl/ko-kr/products/gemini-4-argon-kr/",
+    "kind": "official",
+    "anchor": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "candidate": true
+   },
+   {
+    "n": 2,
+    "url": "https://deepmind.google/fairwind-program/",
+    "kind": "official",
+    "anchor": "페어윈드 프로그램(Fairwind Program)",
+    "candidate": false
+   },
+   {
+    "n": 3,
+    "url": "https://www.vals.ai/benchmarks/vals_index",
+    "kind": "other",
+    "anchor": "Vals Index",
+    "candidate": false
+   },
+   {
+    "n": 4,
+    "url": "https://www.wiz.io/",
+    "kind": "other",
+    "anchor": "위즈(Wiz)",
+    "candidate": false
+   },
+   {
+    "n": 5,
+    "url": "https://www.wiz.io/scan-for-good",
+    "kind": "other",
+    "anchor": "스캔 포 굿(Scan for Good)",
+    "candidate": false
+   },
+   {
+    "n": 6,
+    "url": "https://cwe-bench.com/",
+    "kind": "other",
+    "anchor": "CWE-bench v1",
+    "candidate": false
+   },
+   {
+    "n": 7,
+    "url": "https://cwe-bench.com/?v=v0",
+    "kind": "other",
+    "anchor": "CWE-bench v0",
+    "candidate": false
+   },
+   {
+    "n": 8,
+    "url": "https://deepmind.google/blog/strengthening-our-frontier-safety-framework/",
+    "kind": "official",
+    "anchor": "프론티어 안전 프레임워크(Frontier Safety Framework)",
+    "candidate": false
+   },
+   {
+    "n": 9,
+    "url": "https://arxiv.org/abs/2601.11516",
+    "kind": "paper",
+    "anchor": "내부 활성화",
+    "candidate": false
+   },
+   {
+    "n": 10,
+    "url": "https://institute.deepmind.com/essays/the-case-for-reasoning-transparency/",
+    "kind": "other",
+    "anchor": "업계 전반이 추론 투명성(reasoning transparency)을 지켜나갈 것 것을 강력히 권고",
+    "candidate": false
+   },
+   {
+    "n": 11,
+    "url": "https://deepmind.google/blog/securing-the-future-of-ai-agents/",
+    "kind": "official",
+    "anchor": "에이전트 제어 로드맵(agent control roadmap)",
+    "candidate": false
+   }
+  ],
+  "checks": [
+   {
+    "n": 1,
+    "kind": "number",
+    "text": "입력 토큰 가격: 2달러1백만 개당",
+    "quote": "아르곤은 출시 기념 특가1로 입력 토큰 1백만 개당 2달러, 출력 토큰 1백만 개당 10달러에 제공되며, 캐시된 입력 토큰은 입력 토큰 가격 대비 95% 할인된 금액으로 이용할 수 있습니다."
+   },
+   {
+    "n": 2,
+    "kind": "number",
+    "text": "출력 토큰 가격: 10달러1백만 개당",
+    "quote": "아르곤은 출시 기념 특가1로 입력 토큰 1백만 개당 2달러, 출력 토큰 1백만 개당 10달러에 제공되며, 캐시된 입력 토큰은 입력 토큰 가격 대비 95% 할인된 금액으로 이용할 수 있습니다."
+   },
+   {
+    "n": 3,
+    "kind": "number",
+    "text": "캐시된 입력 토큰 할인율: 95%",
+    "quote": "아르곤은 출시 기념 특가1로 입력 토큰 1백만 개당 2달러, 출력 토큰 1백만 개당 10달러에 제공되며, 캐시된 입력 토큰은 입력 토큰 가격 대비 95% 할인된 금액으로 이용할 수 있습니다."
+   },
+   {
+    "n": 4,
+    "kind": "number",
+    "text": "기존 출력 토큰 한도: 6만 4천개",
+    "quote": "구글은 더 길고 복잡한 활용 사례에서도 제미나이 4 아르곤의 역량을 충분히 뒷받침할 수 있도록, 모델의 출력 토큰 한도를 기존 6만 4천개에서 업계 최고 수준인 1백만 개로 대폭 확장했습니다."
+   },
+   {
+    "n": 5,
+    "kind": "number",
+    "text": "확장된 출력 토큰 한도: 1백만 개",
+    "quote": "구글은 더 길고 복잡한 활용 사례에서도 제미나이 4 아르곤의 역량을 충분히 뒷받침할 수 있도록, 모델의 출력 토큰 한도를 기존 6만 4천개에서 업계 최고 수준인 1백만 개로 대폭 확장했습니다."
+   },
+   {
+    "n": 6,
+    "kind": "number",
+    "text": "DeepSWE v1.1 평가 점수: 77.9%",
+    "quote": "아르곤은 실제 현장에서의 장기 소프트웨어 엔지니어링 작업 수행 능력을 평가하는 DeepSWE v1.1에서 77.9%를 기록하며 최고 수준(SOTA)을 달성했습니다."
+   },
+   {
+    "n": 7,
+    "kind": "number",
+    "text": "Zapier AutomationBench 점수: 51.3%",
+    "quote": "핵심 기업 업무 전반의 엔드투엔드(end-to-end) 실행 능력을 측정하는 Zapier의 AutomationBench에서도 51.3%의 점수를 기록하며 1위에 올랐습니다."
+   },
+   {
+    "n": 8,
+    "kind": "number",
+    "text": "CWE-bench v1 점수: 68%",
+    "quote": "보안 취약점 해결 능력을 평가하는 CWE-bench v1에서, 아르곤은 CWE-bench v0에서 프론티어급 성능을 입증한 3.8 플래시 사이버(3.8 Flash Cyber)의 성과를 바탕으로 68%라는 최고 점수로 공동 1위를 기록했습니다."
+   },
+   {
+    "n": 9,
+    "kind": "claim",
+    "text": "구글이 새로운 프론티어 모델 제미나이 4 아르곤을 공개했다.",
+    "quote": "오늘 구글은 새로운 프론티어 모델인 ‘제미나이 4 아르곤(Gemini 4 Argon)’을 공개합니다."
+   },
+   {
+    "n": 10,
+    "kind": "claim",
+    "text": "출시 기념 특가로 입력 토큰 1M당 2달러, 출력 토큰 1M당 10달러이며 캐시 입력은 95% 할인된다.",
+    "quote": "아르곤은 출시 기념 특가1로 입력 토큰 1백만 개당 2달러, 출력 토큰 1백만 개당 10달러에 제공되며, 캐시된 입력 토큰은 입력 토큰 가격 대비 95% 할인된 금액으로 이용할 수 있습니다."
+   },
+   {
+    "n": 11,
+    "kind": "claim",
+    "text": "출력 토큰 한도를 기존 64k에서 1M으로 확장해 장기 추론 능력을 강화했다.",
+    "quote": "구글은 더 길고 복잡한 활용 사례에서도 제미나이 4 아르곤의 역량을 충분히 뒷받침할 수 있도록, 모델의 출력 토큰 한도를 기존 6만 4천개에서 업계 최고 수준인 1백만 개로 대폭 확장했습니다."
+   },
+   {
+    "n": 12,
+    "kind": "claim",
+    "text": "DeepSWE v1.1(77.9%), AutomationBench(51.3%), CWE-bench v1(68%) 등 코딩, 엔터프라이즈, 보안 벤치마크에서 최상위 성적을 기록했다.",
+    "quote": "아르곤은 실제 현장에서의 장기 소프트웨어 엔지니어링 작업 수행 능력을 평가하는 DeepSWE v1.1에서 77.9%를 기록하며 최고 수준(SOTA)을 달성했습니다. / 핵심 기업 업무 전반의 엔드투엔드(end-to-end) 실행 능력을 측정하는 Zapier의 AutomationBench에서도 51.3%의 점수를 기록하며 1위에 올랐습니다. / 보안 취약점 해결 능력을 평가하는 CWE-bench v1에서, 아르곤은 CWE-bench v0에서 프론티어급 성능을 입증한 3.8 플래시 사이버(3.8 Flash Cyber)의 성과를 바탕으로 68%라는 최고 점수로 공동 1위를 기록했습니다."
+   }
+  ],
+  "tool_calls": null
+ },
+ "expect": {},
+ "note": "2026-10-04 계획 text_queue, 제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대"
+}

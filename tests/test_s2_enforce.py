@@ -41,7 +41,7 @@ def test_repo_oneliner_thin_readme_forces_attention():
     fixed = apply_enforce(oneliner(attention=False), inp, None)
     assert fixed.attention is True
     assert fixed.enforced == [{"field": "attention", "before": False, "after": True,
-                               "rule": f"README 본문 {README_THIN_CHARS}자 미만"}]
+                               "rule": f"README 본문 {README_THIN_CHARS}자 미만", "owned": True}]
     assert fixed.raw_dump()["attention"] is False  # 원래 출력 보존
     # 이미 true면 바꾼 것이 없음
     assert apply_enforce(oneliner(attention=True), inp, None).enforced == []
@@ -74,12 +74,72 @@ def test_eval_records_raw_and_enforced(tmp_path, monkeypatch):
     monkeypatch.setattr(run_eval, "ROOT", tmp_path)
     raw = oneliner(attention=False).model_dump()
     ctx = make_ctx(tmp_path, FakeTransport([response(json.dumps(raw, ensure_ascii=False))]))
+    monkeypatch.setattr(run_eval.graders, "llm_grade", lambda *a: {"verdicts": {}, "scores": {}, "missing": []})
     report = run_eval._evaluate(ctx, "repo_oneliner", None, None, "test")
     rec = report["results"][0]
     assert rec["output"]["attention"] is False and rec["enforced_output"]["attention"] is True
-    assert rec["code"]["passed"] is False  # 통과 판정은 원래 출력
-    assert rec["code_enforced"]["passed"] is True
-    assert report["summary"]["code_pass"] == 0 and report["summary"]["code_pass_enforced"] == 1
+    # 설계 결정 Q1: attention은 코드 소유 칸. code는 원래 출력(모델 품질), 통과 판정은 code_basis(이 칸만 enforce 후)
+    assert rec["code"]["passed"] is False and rec["code_basis"]["passed"] is True
+    assert rec["code_enforced"]["passed"] is True and rec["judged_output"] == "enforced"
+    s = report["summary"]
+    assert s["code_pass"] == 0 and s["code_pass_basis"] == 1 and s["code_pass_enforced"] == 1
+    assert s["model_agreement"] == {"attention": "0/1"}
+    assert not any("코드 채점" in r for r in s["fail_reasons"])
+
+
+def test_s2_s3_owned_fields_registered_from_output_classes():
+    """칸 목록은 출력 클래스 ClassVar에서 한 번만 정하고 채점기에 등록한다(설계 결정 Q1)."""
+    from eval import graders
+    from trendsit.core.artifacts_repo import RepoCard
+    from trendsit.core.artifacts_text import CollectionPlan, ItemCardV1, ItemCardV2
+
+    assert graders.ENFORCED_FIELDS["repo_oneliner"] == RepoOneliner.ENFORCED_FIELDS == ("attention",)
+    assert graders.ENFORCED_FIELDS["repo_analyst"] == RepoCard.ENFORCED_FIELDS == ("signal", "hype_flags", "attention")
+    for role, cls in (("item_card", ItemCardV1), ("editor_plan", CollectionPlan), ("text_analyst", ItemCardV2)):
+        assert graders.ENFORCED_FIELDS[role] == cls.ENFORCED_FIELDS == ("attention",)
+    raw = {"oneliner": "x", "basis": "", "log": "l", "attention": False}
+    basis = graders.basis_output("repo_oneliner", raw, {**raw, "basis": "b", "attention": True})
+    assert basis == {**raw, "attention": True}  # 품질 정리 칸(basis)은 원래 출력 그대로
+
+
+def test_regrade_saved_report(tmp_path, monkeypatch):
+    """저장된 결과를 다시 채점: 새로 통과한 항목만 judge를 부르고 새 리포트를 쓴다."""
+    from eval import graders, run_eval
+
+    monkeypatch.setattr(run_eval, "FIXTURES", tmp_path / "fixtures")
+    monkeypatch.setattr(run_eval, "REPORTS", tmp_path / "reports")
+    monkeypatch.setattr(run_eval, "ROOT", tmp_path)
+    (tmp_path / "fixtures" / "repo_oneliner").mkdir(parents=True)
+    (tmp_path / "fixtures" / "repo_oneliner" / "Images360.json").write_text("{}", encoding="utf-8")
+    (tmp_path / "reports" / "eval").mkdir(parents=True)
+    expect = {"max_len": 60, "attention": True}
+    raw = oneliner(attention=False).model_dump()
+    old = {"role": "repo_oneliner", "model_alias": "generate", "model_id": "m", "prompt_hash": "h", "spec": "S2",
+           "run_id": 1, "at": "2026-10-08T10:00:00+09:00", "note": None, "stopped": None, "limit": None,
+           "cost_usd": 0.01, "summary": {}, "results": [{
+               "id": "Images360", "input": THIN, "expect": expect, "output": raw, "error": None,
+               "code": {"passed": False}, "enforced_output": {**raw, "attention": True},
+               "enforced": [{"field": "attention", "before": False, "after": True,
+                                                         "rule": "README 본문 200자 미만"}]}]}
+    src = tmp_path / "old.json"
+    src.write_text(json.dumps(old, ensure_ascii=False), encoding="utf-8")
+    calls = []
+
+    def fake_llm(role, inp, out, ctx):
+        calls.append(out["attention"])
+        return {"verdicts": {q: {"verdict": "pass", "critique": "c"} for q in ("Q1", "Q2", "Q3")},
+                "scores": {}, "missing": []}
+
+    monkeypatch.setattr(graders, "llm_grade", fake_llm)
+    monkeypatch.setattr(run_eval, "open_ctx", lambda *a, **k: make_ctx(tmp_path, FakeTransport([])))
+    rep = run_eval.regrade(src)
+    assert calls == [True]  # 원래 출력이 실패해 enforce 후 출력을 judge(D2-4)
+    assert rep["results"][0]["judged_output"] == "enforced"
+    assert rep["summary"]["code_pass"] == 0 and rep["summary"]["code_pass_basis"] == 1 and rep["summary"]["passed"] is True
+    assert rep["summary"]["model_agreement"] == {"attention": "0/1"}
+    assert rep["regraded_from"] and rep["prompt_hash"] == "h"
+    rep2 = run_eval.regrade(src, judge=False)  # --no-judge: judge를 부르지 않음(0원)
+    assert calls == [True] and not rep2["results"][0].get("llm")
 
 
 # ---------- M4 ----------

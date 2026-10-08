@@ -12,7 +12,7 @@ from typing import Any
 from pydantic import ValidationError
 
 from trendsit.core.budget import BudgetExceeded, PriceUnknown
-from trendsit.core.config import ROOT
+from trendsit.core.config import HUMAN_LABELERS, ROOT  # labeler가 사람이 아니면(예: opus-5.5) 잠정 라벨
 from trendsit.core.context import open_ctx
 from trendsit.core.db import KST
 from trendsit.core.llm import LLMError
@@ -55,10 +55,14 @@ def _evaluate(ctx: Any, role_name: str, model: str | None, limit: int | None, no
         before = ctx.budget.session_cost
         out, error, inp = None, None, None
         final = None
+        # 도구 에이전트: 운영(deep/text_agent.py)과 같이 항목마다 새로. 지우기만 하면 github_repo가 첫 호출일 때
+        # README를 가져온 페이지로 등록하지 못하고, 이전 픽스처의 깊이 기록이 남는다
+        ctx.resources["fetched_pages"], ctx.resources["page_depth"] = {}, {}
+        mark = ctx.db.conn.execute("SELECT COALESCE(MAX(id), 0) FROM steps").fetchone()[0]
         try:
             inp = role.input_cls.model_validate(fx["input"])
             final = run(role, inp, ctx)
-            out = final.raw_dump()  # 통과 판정은 enforce 전 원래 출력(모델 품질을 숨기지 않게, S1 리뷰 M2)
+            out = final.raw_dump()  # 원래 출력(모델 품질). 통과 판정은 여기에 코드 소유 칸만 덮은 것(설계 결정 Q1)
             rec["step_id"] = ctx.last_step_id
         except (RoleFailed, ValidationError) as e:  # 출력 검증 실패, 픽스처 입력 형식 오류는 그 항목의 실패
             error = f"{type(e).__name__}: {e}"
@@ -71,16 +75,21 @@ def _evaluate(ctx: Any, role_name: str, model: str | None, limit: int | None, no
             print(f"[eval] 중단: {stopped}", file=sys.stderr)
             break
         rec["output"], rec["error"] = out, error
-        rec["code"] = graders.code_grade(role_name, fx["input"], out, error, fx["expect"])
+        if role.spec.tools:  # 도구 에이전트: 이 픽스처의 도구 호출 경로(도구 효율 채점, 검증 산출물)
+            rec["tool_calls"] = [{"text": r["text"], "error": r["error"], "detail": r["detail"]} for r in ctx.db.conn.execute(
+                "SELECT text, error, detail FROM steps WHERE run_id=? AND kind='tool' AND id>? ORDER BY id",
+                (ctx.tracer.run_id, mark))]
+        tcalls = rec.get("tool_calls")
+        rec["code"] = graders.code_grade(role_name, fx["input"], out, error, fx["expect"], tcalls)
         if final is not None and final.enforced:  # enforce 후 출력(저장되는 것)도 함께 기록
             rec["enforced"] = final.enforced
             rec["enforced_output"] = final.model_dump()
             rec["code_enforced"] = graders.code_grade(role_name, fx["input"], rec["enforced_output"], None,
-                                                      fx["expect"])
+                                                      fx["expect"], tcalls)
         if out is not None and role_name in graders.ENFORCED_FIELDS:  # 통과 판정 기준(코드 소유 칸만 enforce 후)
             basis = graders.basis_output(role_name, out, rec.get("enforced_output"))
             rec["code_basis"] = rec["code"] if basis == out else graders.code_grade(
-                role_name, fx["input"], basis, None, fx["expect"])
+                role_name, fx["input"], basis, None, fx["expect"], tcalls)
         # judge: 원래 출력이 코드 채점을 통과하면 원래 출력을. 코드 소유 칸을 선언한 역할은 원래 출력이 실패해도
         # enforce 후 출력이 통과하면 그 출력을 채점(기록에 표시, S4 설계 결정 D2-4)
         target = None
@@ -118,6 +127,73 @@ def _evaluate(ctx: Any, role_name: str, model: str | None, limit: int | None, no
     path = out_dir / f"{role_name}_{alias}_{now:%Y%m%d-%H%M%S}.json"
     path.write_text(json.dumps(report, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     report["path"] = str(path.relative_to(ROOT))
+    return report
+
+
+def regrade(path: Path, note: str | None = None, judge: bool = True) -> dict[str, Any]:
+    """저장된 eval 결과를 생성 재실행 없이 지금 채점 규칙으로 다시 채점한다(설계 결정 Q1).
+
+    새로 judge 대상이 됐는데 LLM 채점이 없는 항목만 judge를 부른다(judge=False면 부르지 않음, 0원 보장).
+    결과는 새 리포트 파일로.
+    """
+    old = json.loads(path.read_text(encoding="utf-8"))
+    role_name = old["role"]
+    ctx = open_ctx("eval", spec=old["spec"], note=f"regrade {role_name}")
+    status = "failed"
+    try:
+        role = load_role(role_name, ctx.models)
+        with_llm = graders.rubric_path(role_name).exists()
+        results, stopped = [], None
+        for rec in old["results"]:
+            rec = dict(rec)
+            out = rec.get("output")
+            rec.pop("graded_output", None)
+            tcalls = rec.get("tool_calls")
+            if out is not None and role_name in graders.REENFORCE:  # 늘어난 enforce 규칙을 저장된 출력에(0원)
+                enforced, enforced_out = graders.REENFORCE[role_name](rec)
+                if enforced:
+                    rec["enforced"], rec["enforced_output"] = enforced, enforced_out
+                else:
+                    for k in ("enforced", "enforced_output", "code_enforced"):
+                        rec.pop(k, None)
+            # run_eval과 같은 기록: code = 원래 출력, code_basis = 코드 소유 칸만 enforce 후(통과 판정)
+            rec["code"] = graders.code_grade(role_name, rec["input"], out, rec.get("error"), rec["expect"], tcalls)
+            if rec.get("enforced_output") is not None:
+                rec["code_enforced"] = graders.code_grade(role_name, rec["input"], rec["enforced_output"], None,
+                                                          rec["expect"], tcalls)
+            if out is not None and role_name in graders.ENFORCED_FIELDS:
+                basis = graders.basis_output(role_name, out, rec.get("enforced_output"))
+                rec["code_basis"] = rec["code"] if basis == out else graders.code_grade(
+                    role_name, rec["input"], basis, None, rec["expect"], tcalls)
+            target = None  # judge 대상(S4 설계 결정 D2-4). 이미 채점된 항목은 다시 부르지 않음
+            if rec["code"]["passed"]:
+                target, rec["judged_output"] = out, "raw"
+            elif role_name in graders.ENFORCED_FIELDS and rec.get("code_enforced", {}).get("passed"):
+                target, rec["judged_output"] = rec["enforced_output"], "enforced"
+            if judge and with_llm and target is not None and not rec.get("llm") and not stopped:
+                try:
+                    inp = role.input_cls.model_validate(rec["input"])
+                    rec["llm"] = graders.llm_grade(role_name, inp, target, ctx)  # type: ignore[arg-type]
+                except (BudgetExceeded, LLMError, PriceUnknown, RoleFailed) as e:
+                    stopped = f"채점 {type(e).__name__}: {e}"
+            results.append(rec)
+        summary = graders.summarize(role_name, results)
+        if stopped:
+            summary["passed"] = False
+            summary["fail_reasons"].append(f"중단: {stopped}")
+        now = datetime.now(KST)
+        src = str(path.relative_to(ROOT)) if path.is_absolute() and path.is_relative_to(ROOT) else str(path)
+        report = {**old, "at": now.isoformat(timespec="seconds"), "run_id": ctx.tracer.run_id,
+                  "note": note or f"재채점(설계 결정 Q1) {src}", "regraded_from": src, "stopped": stopped,
+                  "cost_usd": round(old["cost_usd"] + ctx.budget.session_cost, 6), "summary": summary,
+                  "results": results}
+        out_path = REPORTS / "eval" / f"{role_name}_{old['model_alias']}_{now:%Y%m%d-%H%M%S}.json"
+        out_path.write_text(json.dumps(report, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+        report["path"] = str(out_path.relative_to(ROOT))
+        status = "stopped" if stopped else "ok"
+    finally:
+        ctx.tracer.finish(status)
+    write_quality(old["spec"])
     return report
 
 
@@ -209,6 +285,11 @@ def write_quality(spec: str) -> Path:
             lines.append("| " + " | ".join(row) + " |")
         lines.append("")
         for alias, r in latest.items():
+            if r["summary"].get("aggregate"):
+                lines.append(f"- {alias} 전체 지표: " + ", ".join(f"{k} {v}" for k, v in r["summary"]["aggregate"].items()))
+            if r["summary"].get("model_agreement"):
+                lines.append(f"- {alias} 모델 일치율(코드 소유 칸, 보고용): "
+                             + ", ".join(f"{k} {v}" for k, v in r["summary"]["model_agreement"].items()))
             s_ = r["summary"]
             if role in graders.ENFORCED_FIELDS and "code_pass_basis" in s_:
                 lines.append(f"- {alias} 통과 판정(코드 소유 칸 {', '.join(graders.ENFORCED_FIELDS[role])}만 enforce 후): "
@@ -308,7 +389,6 @@ def _brief(v: Any) -> Any:
 
 # ---------- judge 맞추기: 사람 라벨 ----------
 LABELS = ROOT / "eval" / "labels"
-HUMAN_LABELERS = {"human", "사람", "user", "사용자"}  # labeler 칸이 이것이 아니면(예: opus-5.5) 잠정 라벨
 TRUE_WORDS = {"pass", "p", "y", "yes", "1", "o", "예", "통과", "true"}
 FALSE_WORDS = {"fail", "f", "n", "no", "0", "x", "아니오", "실패", "false"}
 

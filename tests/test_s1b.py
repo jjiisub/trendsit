@@ -22,6 +22,9 @@ from trendsit.core.config import ROOT
 from trendsit.core.db import DB
 
 FIX = ROOT / "tests" / "fixtures" / "http"
+# 녹화 픽스처는 S1 키워드로 만들었다. 실제 config/keywords.yaml이 넓어져도 녹화가 깨지지 않게 분리(S1 리뷰 M5)
+TEST_KEYWORDS = config.KeywordsConfig.model_validate(
+    yaml.safe_load((ROOT / "tests" / "fixtures" / "keywords_test.yaml").read_text(encoding="utf-8")))
 PUBLIC_IP = "93.184.216.34"
 
 
@@ -78,7 +81,7 @@ def run_window(tmp_path, transport=None, data_dir=None):
     transport = transport or FixtureTransport("window")
     res = collect(date.fromisoformat(meta["since"]), date.fromisoformat(meta["until"]), data_dir=data_dir or tmp_path,
                   fetcher=fetcher_for(transport), ytdlp=fake_ytdlp("window"), max_items=meta["max_items"],
-                  today=date.fromisoformat(meta["today"]))
+                  today=date.fromisoformat(meta["today"]), keywords=TEST_KEYWORDS)
     return res, meta, transport
 
 
@@ -324,7 +327,7 @@ def test_list_pages_stops_before_since(tmp_path):
     t = FixtureTransport(extra={p1: (200, "text/html", html), p2: (200, "text/javascript", ajax),
                                 p3: (200, "text/javascript", ajax),
                                 "https://www.aitimes.com/robots.txt": (200, "text/plain", "User-agent: *\nAllow: /")})
-    c = TextCollector(DB(tmp_path / "t.db"), fetcher_for(t), config.load("keywords.yaml"),
+    c = TextCollector(DB(tmp_path / "t.db"), fetcher_for(t), TEST_KEYWORDS,
                       config.load("link_kinds.yaml"), run_id="r")
     st = SourceStats("aitimes")
     rows = c._list_pages(src, date(2026, 10, 3), date(2026, 10, 4), st)
@@ -348,7 +351,7 @@ def test_date_filtered_list_reads_until_empty_page(tmp_path):
     t = FixtureTransport(extra={p1: (200, "text/html", html), pages[2]: (200, "text/javascript", old),
                                 pages[3]: (200, "text/javascript", old), pages[4]: (200, "text/javascript", empty),
                                 "https://www.aitimes.com/robots.txt": (200, "text/plain", "User-agent: *\nAllow: /")})
-    c = TextCollector(DB(tmp_path / "t.db"), fetcher_for(t), config.load("keywords.yaml"),
+    c = TextCollector(DB(tmp_path / "t.db"), fetcher_for(t), TEST_KEYWORDS,
                       config.load("link_kinds.yaml"), run_id="r")
     st = SourceStats("aitimes")
     c._list_pages(src, since, until, st)
@@ -397,7 +400,7 @@ def test_empty_trending_page_is_failure(tmp_path):
 
 # ---------- A10 키워드 ----------
 def test_keyword_rules():
-    m = KeywordMatcher(config.load("keywords.yaml"))
+    m = KeywordMatcher(TEST_KEYWORDS)
     assert m.match("New eval suite for agents").score == 3 + 3  # 제목 매칭은 3점씩
     assert m.match("We evaluate things").filter_status == "filtered"  # eval이 evaluate에 안 걸림
     assert m.match("제목", "본문에 MCP 서버").score == 1  # 본문 매칭 1점
@@ -446,7 +449,7 @@ def test_collection_report(tmp_path):
 def _collector(tmp_path, handler):
     f = Fetcher(None, use_cache=False, transport=httpx.MockTransport(handler), resolver=lambda h: [PUBLIC_IP],
                 sleep=lambda s: None)
-    return TextCollector(DB(tmp_path / "t.db"), f, config.load("keywords.yaml"), config.load("link_kinds.yaml"), run_id="r")
+    return TextCollector(DB(tmp_path / "t.db"), f, TEST_KEYWORDS, config.load("link_kinds.yaml"), run_id="r")
 
 
 ARTICLE = "<html><body><article><h1>T</h1>" + "<p>원문 본문 문장입니다. " * 40 + "</p></article></body></html>"
@@ -643,7 +646,7 @@ def test_geeknews_days_pages_per_day_and_interval(tmp_path):
         return httpx.Response(200, headers={"content-type": "text/html"}, text=ARTICLE)
     f = Fetcher(None, use_cache=False, transport=httpx.MockTransport(handler), resolver=lambda h: [PUBLIC_IP],
                 sleep=waits.append, clock=lambda: 0.0)
-    c = TextCollector(DB(tmp_path / "t.db"), f, config.load("keywords.yaml"), config.load("link_kinds.yaml"),
+    c = TextCollector(DB(tmp_path / "t.db"), f, TEST_KEYWORDS, config.load("link_kinds.yaml"),
                       run_id="r", today=date(2026, 10, 7), no_body=True)
     src = next(s for s in config.load("sources.yaml").text if s.id == "geeknews")
     assert src.backfill.pages_per_day == 1

@@ -1,0 +1,45 @@
+{
+ "input": {
+  "full_name": "HunxByts/GhostTrack",
+  "max_depth": 2,
+  "reason": "이번 주 트렌딩(2026-W41)",
+  "trending": {
+   "week": "2026-W41",
+   "rank": 11,
+   "stars_total": 17443,
+   "stars_this_week": 1534,
+   "forks": 2358,
+   "language": "Python",
+   "description": "Useful tool to track location or mobile number"
+  },
+  "oneliner": "",
+  "keywords": [
+   "AI 에이전트",
+   "코딩 에이전트",
+   "MCP · 도구 호출",
+   "오픈웨이트 · 로컬 LLM",
+   "RAG · 검색",
+   "멀티모달",
+   "추론 · 판단 모델",
+   "평가 · 벤치마크",
+   "AI 보안",
+   "프런티어 모델 출시",
+   "AI 산업 · 시장",
+   "개발 실무 · 경험",
+   "AI 일반"
+  ],
+  "week_items": [],
+  "hype": {
+   "flags": [
+    "no_commits"
+   ],
+   "force_check": true,
+   "commits_7d": 0,
+   "contributors": 2,
+   "note": "7일 별 +1534, 커밋 0"
+  },
+  "tool_calls": 6
+ },
+ "expect": {},
+ "note": "2026-W41 트렌딩, 이번 주 트렌딩(2026-W41)"
+}

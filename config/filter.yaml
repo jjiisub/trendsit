@@ -1,0 +1,48 @@
+# S2 임베딩 관련성 필터(S2 소유). 판정은 코드(trendsit/filter/embed.py):
+#   키워드 통과 + 점수 >= drop_below → keep / 키워드 통과 + 점수 < drop_below → drop(low_similarity)
+#   키워드 걸러짐(no_keyword) + 점수 >= rescue_above → keep(rescued) / 제외어로 걸러진 것(excluded:*)은 되살리지 않음
+# 점수 = 관심사 설명들과의 코사인 유사도 최댓값(그 키워드 id와 함께 저장)
+model: Qwen/Qwen3-Embedding-0.6B
+# Qwen3-Embedding은 쿼리 쪽에만 "Instruct: ...\nQuery: ..." 지시문을 붙이고 문서 쪽은 그대로(모델 카드)
+instruction: 기술 동향 브리핑에 넣을 글인지 판단
+doc_chars: 1000
+# 잠정값(2026-10-08 클라우드): 실제 임베딩 모델을 받을 수 없어 점수 분포를 보지 못한 채 둔 자리값.
+# 맥에서 점수 분포(0.05 구간별 건수)와 relevance_seed 13건, relevance.csv 40건으로 정하고 근거를 아래와 리포트에 적는다
+drop_below: 0.30
+rescue_above: 0.50
+thresholds_status: provisional
+thresholds_basis: "잠정(labeler opus-5.5, PR #6 리뷰 3장): 2026-09-28~10-04 MPS 점수 + 라벨 40건. drop_below 0.30 유지(0.30~0.32에 관심 글 2건, 시드 keep 0.330), rescue_above 0.50(되살린 3건 모두 관심 밖, 걸러진 0.40 이상 10건에 관심 글 0. 정밀도 61.9→68.4%, 재현율 그대로)"
+# 관심사 설명: 키워드마다 1~2문장(설계 세션 초안을 문장으로 풀어 씀). 고객 사례 홍보 글은 관심 밖이라 설명에 넣지 않음
+interests:
+  - keyword_id: agent
+    text: AI 에이전트가 도구를 호출하고 여러 단계를 스스로 계획해 작업을 수행하는 방식, 에이전트 프레임워크와 설계 사례
+  - keyword_id: coding-agent
+    text: 코딩 에이전트와 AI 개발 도구(Claude Code, Codex, Cursor 등)의 기능, 사용법, 하네스 설계
+  - keyword_id: mcp-tools
+    text: MCP(Model Context Protocol)와 LLM의 도구 호출, 함수 호출 연동 방식
+  - keyword_id: open-weight
+    text: 오픈웨이트 모델과 로컬 LLM 실행(Ollama, llama.cpp, 양자화, GGUF), 공개 가중치 모델 출시
+  - keyword_id: rag-search
+    text: RAG와 검색, 임베딩, 벡터 데이터베이스, 재순위화로 LLM에 지식을 붙이는 방법
+  - keyword_id: multimodal
+    text: 영상, 음성, 이미지를 다루는 멀티모달 모델과 음성 인식, 음성 합성, 비전 모델
+  - keyword_id: reasoning
+    text: 추론 모델과 생각하는 시간을 늘려 답을 개선하는 방법, 추론 성능
+  - keyword_id: eval
+    text: AI 모델 평가와 벤치마크, 리더보드, 평가 방법론과 평가 데이터
+  - keyword_id: ai-security
+    text: AI 보안과 안전, 프롬프트 인젝션, 탈옥, 가드레일, 레드팀, 생성물 워터마크
+  - keyword_id: frontier-release
+    text: GPT, Claude, Gemini 같은 프런티어 모델의 새 버전 출시와 성능, 기능 변화
+  - keyword_id: ai-industry
+    text: AI 산업과 시장 경향, 투자 유치와 기업공개, 데이터센터와 GPU 같은 인프라, AI 칩, AI 회사들의 전략과 동향
+  - keyword_id: dev-practice
+    text: 개발 실무와 경험, 코드 리뷰, 커밋과 풀 리퀘스트, 리팩터링, 개발 생산성, 바이브 코딩 경험담
+  - keyword_id: ai-general
+    text: 인공지능과 대규모 언어 모델, 생성형 AI 서비스와 챗봇의 새 기능, 활용 방법
+# URL 중복 연결의 기준 항목: 원본에 가까운 쪽(공식 > 개인 블로그 > 언론 > 큐레이션)
+origin_rank: [primary, blog, news, curation]
+source_kind:
+  simonw: blog  # sources.yaml에서는 curation이지만 개인 블로그 원글
+similar_pairs: 30
+batch_size: 16

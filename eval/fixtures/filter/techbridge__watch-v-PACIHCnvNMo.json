@@ -1,0 +1,11 @@
+{
+ "input": {
+  "source": "techbridge",
+  "channel": "video",
+  "title": "[한영자막] 젠슨 황과 일론 머스크가 직접 밝히는 슈퍼 인텔리전스와 에너지, 우주 컴퓨팅의 미래",
+  "keyword_status": "pass",
+  "keyword_reason": null,
+  "text": "[한영자막] 젠슨 황과 일론 머스크가 직접 밝히는 슈퍼 인텔리전스와 에너지, 우주 컴퓨팅의 미래\n엔비디아 CEO 젠슨 황과 테슬라·SpaceX CEO 일론 머스크, Anthropic 공동 창업자 톰 브라운이 백악관 패널 토론에서 인공 초지능(Superintelligence)과 에너지, 우주 궤도 컴퓨팅의 미래를 심도 있게 논의했습니다.\n\n📌 주요 내용:\n• 컴퓨팅 스택의 대전환: 기존 정보 검색을 넘어 실질적 경제 가치를 직접 생산하는 '초지능 공장(SI Factories)'과 데이터센터의 본질적 변화\n• 에너지와 전력망의 필수성: AI 성장을 견인할 전력 확보 과제 및 미국 본토 재산업화와 대규모 일자리 창출 효과\n• 우주 궤도 컴퓨팅(Orbital Compute): 지상 대비 5~8배 효율적인 우주 태양광 발전과 스타십(Starship)을 활용한 우주 연산 인프라 비전\n• AI 에이전트 보안 및 상호 검증: 엔비디아의 Open Shell 보안 격리와 실시간 칩 모니터링, 백악관 AI 공동 안전 선언 체결\n• 일상과 산업의 혁신: Claude Opus 등 최신 모델이 가져올 업무 위임과 의료·과학 연구의 비약적 도약\n\n#젠슨황 #일론머스크 #초지능 #엔비디아 #테슬라 #스페이스X #인공지능 #Superintelligence #우주컴퓨팅 #데이터센터"
+ },
+ "note": "S1 녹화 응답(tests/fixtures/http/window, bf_*)으로 만든 개발 DB에서 뽑음. keyword_status는 새 키워드로 rematch한 판정"
+}

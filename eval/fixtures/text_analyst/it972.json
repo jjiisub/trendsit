@@ -1,0 +1,212 @@
+{
+ "input": {
+  "item_id": 972,
+  "title": "Pluto - SOTA 스타크래프트 AI",
+  "source_name": "GeekNews",
+  "url": "https://news.hada.io/topic?id=34474",
+  "max_depth": 2,
+  "card_v1": {
+   "log": "큐레이션, 수치 7개, 원본 확인 필요",
+   "attention": false,
+   "quotes": [
+    {
+     "n": 1,
+     "text": "Pluto is a StarCraft: Brood War AI. A single neural network, trained by self-play reinforcement learning, plays the whole game — macro and micro, all three races; there is no scripted play."
+    },
+    {
+     "n": 2,
+     "text": "The current one is the model that played the CoG 2026 StarCraft AI Competition (md07x02_cog2026_2578600_int8mv), with CPU inference — no GPU needed."
+    },
+    {
+     "n": 3,
+     "text": "The model takes one step every 6 game frames. The DLL gives the engine up to 40 ms in the frame it observed and, if the answer isn't in by then, waits for it at the next frame"
+    },
+    {
+     "n": 4,
+     "text": "A step takes ~20 ms on a current desktop CPU and ~60 ms on a 2021 6-core (i5-12500T) with 200 units on the map, up to ~3x that in big late-game fights."
+    },
+    {
+     "n": 5,
+     "text": "The bot picks its opening with a bandit over the per-opponent win/loss counts; every build is listed with its mask and name, so you can edit the numbers to steer it."
+    }
+   ],
+   "numbers": [
+    {
+     "quote_n": 2,
+     "value": "2026",
+     "unit": "",
+     "what": "CoG 대회 연도"
+    },
+    {
+     "quote_n": 3,
+     "value": "6",
+     "unit": "game frames",
+     "what": "모델 스텝 간격"
+    },
+    {
+     "quote_n": 3,
+     "value": "40 ms",
+     "unit": "",
+     "what": "프레임당 추론 시간 예산"
+    },
+    {
+     "quote_n": 4,
+     "value": "~20 ms",
+     "unit": "",
+     "what": "최신 데스크톱 CPU 기준 스텝 시간"
+    },
+    {
+     "quote_n": 4,
+     "value": "~60 ms",
+     "unit": "",
+     "what": "2021 6-core CPU 기준 스텝 시간"
+    },
+    {
+     "quote_n": 4,
+     "value": "200",
+     "unit": "units",
+     "what": "테스트 시 맵 내 유닛 수"
+    },
+    {
+     "quote_n": 4,
+     "value": "~3x",
+     "unit": "",
+     "what": "후반 대규모 전투 시 최대 지연 배수"
+    }
+   ],
+   "claims": [
+    {
+     "quote_ns": [
+      1
+     ],
+     "text": "Pluto는 스크립트 없이 단일 신경망과 자기 대결 강화학습으로 스타크래프트 브루드 워 전체(매크로/미크로, 3종족)를 플레이한다."
+    },
+    {
+     "quote_ns": [
+      2
+     ],
+     "text": "현재 릴리스 모델은 CoG 2026 스타크래프트 AI 대회에 출전했으며 GPU 없이 CPU 추론으로 동작한다."
+    },
+    {
+     "quote_ns": [
+      3,
+      4
+     ],
+     "text": "모델은 6프레임마다 스텝을 수행하며, 최신 CPU 기준 약 20ms, 구형 CPU 기준 약 60ms의 추론 시간이 소요된다."
+    },
+    {
+     "quote_ns": [
+      5
+     ],
+     "text": "밴딧 알고리즘을 활용해 상대별 승패 기록에 기반하여 오프닝을 선택하며, 사용자가 수치를 편집해 전략을 조정할 수 있다."
+    }
+   ],
+   "summary": "Pluto는 스크립트 없이 단일 신경망과 자기 대결 강화학습으로 스타크래프트 브루드 워를 플레이하는 AI로, CoG 2026 대회에 출전했다. GPU 없이 CPU 추론으로 동작하며, 최신 데스크톱 CPU 기준 스텝당 약 20ms의 지연을 보인다. 상대별 승패 기록을 기반으로 밴딧 알고리즘으로 오프닝을 선택한다.",
+   "entities": [
+    "Pluto",
+    "StarCraft: Brood War",
+    "BWAPI",
+    "CoG 2026"
+   ],
+   "keywords": [
+    "agent",
+    "ai-general"
+   ],
+   "is_curation": true,
+   "origin_candidates": [
+    1
+   ],
+   "relevance_reason": "강화학습 기반 게임 AI의 최신 SOTA 모델 및 기술적 세부 사항(추론 지연, 아키텍처) 소개",
+   "relevance": "mid",
+   "needs_original_reason": "GeekNews 큐레이션 글이며, 기술적 수치와 모델 상세 정보는 GitHub 레포(링크 1)에 원본으로 존재",
+   "needs_original": true
+  },
+  "links": [
+   {
+    "n": 1,
+    "url": "https://github.com/tscmoo/pluto",
+    "kind": "repo",
+    "anchor": "Pluto - SOTA 스타크래프트 AI",
+    "candidate": true
+   },
+   {
+    "n": 2,
+    "url": "https://bwapi.github.io/",
+    "kind": "other",
+    "anchor": "https://bwapi.github.io/",
+    "candidate": false
+   }
+  ],
+  "checks": [
+   {
+    "n": 1,
+    "kind": "number",
+    "text": "CoG 대회 연도: 2026",
+    "quote": "The current one is the model that played the CoG 2026 StarCraft AI Competition (md07x02_cog2026_2578600_int8mv), with CPU inference — no GPU needed."
+   },
+   {
+    "n": 2,
+    "kind": "number",
+    "text": "모델 스텝 간격: 6game frames",
+    "quote": "The model takes one step every 6 game frames. The DLL gives the engine up to 40 ms in the frame it observed and, if the answer isn't in by then, waits for it at the next frame"
+   },
+   {
+    "n": 3,
+    "kind": "number",
+    "text": "프레임당 추론 시간 예산: 40 ms",
+    "quote": "The model takes one step every 6 game frames. The DLL gives the engine up to 40 ms in the frame it observed and, if the answer isn't in by then, waits for it at the next frame"
+   },
+   {
+    "n": 4,
+    "kind": "number",
+    "text": "최신 데스크톱 CPU 기준 스텝 시간: ~20 ms",
+    "quote": "A step takes ~20 ms on a current desktop CPU and ~60 ms on a 2021 6-core (i5-12500T) with 200 units on the map, up to ~3x that in big late-game fights."
+   },
+   {
+    "n": 5,
+    "kind": "number",
+    "text": "2021 6-core CPU 기준 스텝 시간: ~60 ms",
+    "quote": "A step takes ~20 ms on a current desktop CPU and ~60 ms on a 2021 6-core (i5-12500T) with 200 units on the map, up to ~3x that in big late-game fights."
+   },
+   {
+    "n": 6,
+    "kind": "number",
+    "text": "테스트 시 맵 내 유닛 수: 200units",
+    "quote": "A step takes ~20 ms on a current desktop CPU and ~60 ms on a 2021 6-core (i5-12500T) with 200 units on the map, up to ~3x that in big late-game fights."
+   },
+   {
+    "n": 7,
+    "kind": "number",
+    "text": "후반 대규모 전투 시 최대 지연 배수: ~3x",
+    "quote": "A step takes ~20 ms on a current desktop CPU and ~60 ms on a 2021 6-core (i5-12500T) with 200 units on the map, up to ~3x that in big late-game fights."
+   },
+   {
+    "n": 8,
+    "kind": "claim",
+    "text": "Pluto는 스크립트 없이 단일 신경망과 자기 대결 강화학습으로 스타크래프트 브루드 워 전체(매크로/미크로, 3종족)를 플레이한다.",
+    "quote": "Pluto is a StarCraft: Brood War AI. A single neural network, trained by self-play reinforcement learning, plays the whole game — macro and micro, all three races; there is no scripted play."
+   },
+   {
+    "n": 9,
+    "kind": "claim",
+    "text": "현재 릴리스 모델은 CoG 2026 스타크래프트 AI 대회에 출전했으며 GPU 없이 CPU 추론으로 동작한다.",
+    "quote": "The current one is the model that played the CoG 2026 StarCraft AI Competition (md07x02_cog2026_2578600_int8mv), with CPU inference — no GPU needed."
+   },
+   {
+    "n": 10,
+    "kind": "claim",
+    "text": "모델은 6프레임마다 스텝을 수행하며, 최신 CPU 기준 약 20ms, 구형 CPU 기준 약 60ms의 추론 시간이 소요된다.",
+    "quote": "The model takes one step every 6 game frames. The DLL gives the engine up to 40 ms in the frame it observed and, if the answer isn't in by then, waits for it at the next frame / A step takes ~20 ms on a current desktop CPU and ~60 ms on a 2021 6-core (i5-12500T) with 200 units on the map, up to ~3x that in big late-game fights."
+   },
+   {
+    "n": 11,
+    "kind": "claim",
+    "text": "밴딧 알고리즘을 활용해 상대별 승패 기록에 기반하여 오프닝을 선택하며, 사용자가 수치를 편집해 전략을 조정할 수 있다.",
+    "quote": "The bot picks its opening with a bandit over the per-opponent win/loss counts; every build is listed with its mask and name, so you can edit the numbers to steer it."
+   }
+  ],
+  "tool_calls": null
+ },
+ "expect": {},
+ "note": " 계획 text_queue, Pluto - SOTA 스타크래프트 AI"
+}

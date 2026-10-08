@@ -49,6 +49,18 @@ def test_style_check_catches_haeyo_in_log():
     assert not r["passed"] and any("해요체" in f for f in r["failed"])
 
 
+@pytest.mark.parametrize("text, ok", [
+    ("언론 보도, 수치 2개, 원본 확인 필요", True),  # 명사 끝말은 해요체가 아님(2026-10-08 오탐)
+    ("description을 트리거 기준으로 작성하는 것이 중요", True),
+    ("원본 확인이 필요해요", False),
+    ("이 부분이 중요해요.", False),
+    ("원본이 필요요", False),
+])
+def test_style_check_noun_yo_is_not_haeyo(text, ok):
+    c = next(x for x in graders.style_checks({"log": text}) if x["name"] == "해요체 없음(log)")
+    assert c["passed"] is ok
+
+
 def test_schema_failure_is_code_failure():
     r = graders.code_grade("repo_oneliner", {}, None, "RoleFailed", {})
     assert not r["passed"] and r["checks"][0]["name"] == "스키마"

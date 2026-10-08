@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Literal, Self
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Self
 
 from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, model_validator
 
@@ -24,6 +24,23 @@ def _plain(v: Any) -> Any:
 class RoleInput(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
+    # 도구 에이전트의 입력별 상한(코드가 지킴). 기본은 역할 md 설정 그대로
+    def tool_names(self, names: list[str]) -> list[str]:
+        """이 입력에서 허용할 도구(예: 레포 분석가 max_depth 1이면 일부만)."""
+        return names
+
+    def depth_limit(self, default: int | None) -> int | None:
+        """이 입력의 문서 깊이 상한(예: 편집장 계획의 항목별 max_depth)."""
+        return default
+
+    def tool_call_limit(self, default: int | None) -> int | None:
+        """이 입력의 도구 호출 상한(예: deep.yaml의 항목당 상한). 역할 md 값보다 늘리지는 않는다."""
+        return default
+
+    def depth_seed(self) -> list[tuple[str, list[str]]]:
+        """이미 읽은 시작 문서(깊이 1)와 그 문서의 링크. 예: 글 분석가의 원래 글(본문은 1차 요약 때 읽음)."""
+        return []
+
 
 class Document(BaseModel):
     """문서형 자료. user 메시지에서 <document id source title url> 태그로 들어간다. id는 근거 id(rp:, it:, vd:)."""
@@ -43,6 +60,10 @@ class RoleOutput(BaseModel):
     log: str = Field(description="한 줄 기록. 명사형, 화면 문구 규칙")
     attention: bool = Field(default=False, description="사람이 확인해야 하면 true")
 
+    # 코드 소유 칸(설계 결정 Q1): enforce가 값을 정하는 칸. eval/graders.ENFORCED_FIELDS에 등록되어 통과 판정은
+    # 이 칸만 enforce 후 값으로 본다. 나머지 enforce(모델이 틀린 것을 지우는 정리)는 원래 출력으로 채점
+    ENFORCED_FIELDS: ClassVar[tuple[str, ...]] = ()
+
     # enforce가 바꾼 칸 기록과 enforce 전 원래 출력(평가가 모델 품질을 원래 출력으로 재도록)
     _enforced: list[dict[str, Any]] = PrivateAttr(default_factory=list)
     _raw: dict[str, Any] | None = PrivateAttr(default=None)
@@ -59,13 +80,19 @@ class RoleOutput(BaseModel):
         """
         return self
 
-    def fix(self, field: str, value: Any, rule: str) -> Self:
-        """칸 하나를 바꾼 사본. 값이 같으면 그대로. 바꾼 내용은 enforced에 {field, before, after, rule}로 쌓인다."""
+    def fix(self, field: str, value: Any, rule: str, owned: bool | None = None) -> Self:
+        """칸 하나를 바꾼 사본. 값이 같으면 그대로. 바꾼 내용은 enforced에 {field, before, after, rule, owned}로 쌓인다.
+
+        owned: 코드 소유 규칙인지(기록·모델 일치율용). 기본은 field가 ENFORCED_FIELDS에 있는지. 칸 일부만 코드 소유인
+        규칙(예: 긴 인용 자르기)은 True. 통과 판정 보기는 ENFORCED_FIELDS 칸만 enforce 후 값(eval/graders.basis_output).
+        """
         before = getattr(self, field)
         if before == value:
             return self
+        if owned is None:
+            owned = field in self.ENFORCED_FIELDS
         new = self.model_copy(update={field: value})
-        change = {"field": field, "before": _plain(before), "after": _plain(value), "rule": rule}
+        change = {"field": field, "before": _plain(before), "after": _plain(value), "rule": rule, "owned": owned}
         new._enforced = [*self._enforced, change]
         new._raw = self._raw
         return new
@@ -77,7 +104,6 @@ class RoleOutput(BaseModel):
     def raw_dump(self) -> dict[str, Any]:
         """enforce 전 원래 출력. enforce가 바꾼 것이 없으면 지금 출력과 같다."""
         return dict(self._raw) if self._raw is not None else self.model_dump()
-
 
 def apply_enforce(out: RoleOutput, inp: Any, ctx: Ctx | None) -> RoleOutput:
     """원래 출력을 보관한 뒤 역할의 enforce를 적용한다."""
@@ -109,6 +135,7 @@ class RepoOnelinerInput(RoleInput):
 
 
 class RepoOneliner(RoleOutput):
+    ENFORCED_FIELDS = ("attention",)
     basis: str = Field(max_length=120, description="README 본문이나 description에서 근거가 된 구절을 그대로 옮김. 근거가 없으면 빈 문자열")
     oneliner: str = Field(max_length=60, description="무엇을 하는 레포인지 한 문장. 명사형 60자 이내. 근거가 없으면 빈 문자열")
 
@@ -177,20 +204,30 @@ OUTPUTS: dict[str, type[RoleOutput]] = {
 # 스펙마다 자기 파일에 입력·출력 스키마를 두고 INPUTS, OUTPUTS 튜플을 내놓는다. 여기에는 합치는 줄만.
 # 아직 없는 모듈은 건너뛴다(병행 브랜치가 먼저 병합되는 경우). 같은 이름이 다른 클래스로 들어오면 오류.
 # 스키마 모듈은 무거운 선택 의존성(numpy, torch 등)을 import하지 않는다. 안 그러면 그 묶음이 없는 환경에서 모든 명령이 멈춘다.
-def _merge(module: str) -> None:
-    import importlib
-
-    try:
-        mod = importlib.import_module(f"{__package__}.{module}")
-    except ModuleNotFoundError as e:
-        if e.name == f"{__package__}.{module}":
-            return
-        raise
-    for table, classes in ((INPUTS, getattr(mod, "INPUTS", ())), (OUTPUTS, getattr(mod, "OUTPUTS", ()))):
+def register_schemas(module: str, inputs: tuple[type[RoleInput], ...], outputs: tuple[type[RoleOutput], ...]) -> None:
+    """스펙별 모듈이 끝에서 부른다. 같은 이름이 다른 클래스로 들어오면 오류."""
+    for table, classes in ((INPUTS, inputs), (OUTPUTS, outputs)):
         for c in classes:
             if table.get(c.__name__, c) is not c:
                 raise ValueError(f"스키마 이름 '{c.__name__}'이 {module}과 다른 모듈에서 겹침")
             table[c.__name__] = c
+
+
+def _merge(module: str) -> None:
+    """모듈을 읽어 등록되게 한다. 그 모듈이 지금 읽히는 중(순환)이면 끝에서 스스로 register_schemas를 부른다."""
+    import importlib
+    import sys
+
+    name = f"{__package__}.{module}"
+    if name in sys.modules and not hasattr(sys.modules[name], "INPUTS"):
+        return  # 읽히는 중: 모듈 끝의 register_schemas가 등록
+    try:
+        mod = importlib.import_module(name)
+    except ModuleNotFoundError as e:
+        if e.name == name:
+            return
+        raise
+    register_schemas(module, tuple(getattr(mod, "INPUTS", ())), tuple(getattr(mod, "OUTPUTS", ())))
 
 
 _merge("artifacts_text")  # S2~S3

@@ -1,0 +1,43 @@
+{
+ "input": {
+  "full_name": "cursor/plugins",
+  "max_depth": 2,
+  "reason": "이번 주 트렌딩(2026-W41)",
+  "trending": {
+   "week": "2026-W41",
+   "rank": 4,
+   "stars_total": 10281,
+   "stars_this_week": 1109,
+   "forks": 977,
+   "language": "TypeScript",
+   "description": "Cursor plugin specification and official plugins"
+  },
+  "oneliner": "Cursor 공식 플러그인을 모아둔 저장소",
+  "keywords": [
+   "AI 에이전트",
+   "코딩 에이전트",
+   "MCP · 도구 호출",
+   "오픈웨이트 · 로컬 LLM",
+   "RAG · 검색",
+   "멀티모달",
+   "추론 · 판단 모델",
+   "평가 · 벤치마크",
+   "AI 보안",
+   "프런티어 모델 출시",
+   "AI 산업 · 시장",
+   "개발 실무 · 경험",
+   "AI 일반"
+  ],
+  "week_items": [],
+  "hype": {
+   "flags": [],
+   "force_check": false,
+   "commits_7d": 26,
+   "contributors": 23,
+   "note": "7일 별 +1109, 커밋 26"
+  },
+  "tool_calls": 6
+ },
+ "expect": {},
+ "note": "2026-W41 트렌딩, 이번 주 트렌딩(2026-W41)"
+}

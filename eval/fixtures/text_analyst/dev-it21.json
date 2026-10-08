@@ -1,0 +1,170 @@
+{
+ "input": {
+  "item_id": 21,
+  "title": "CogSend - 여러 소셜 플랫폼에 글을 예약 발행하는 셀프 호스팅 도구",
+  "source_name": "GeekNews",
+  "url": "https://news.hada.io/topic?id=34739",
+  "max_depth": 2,
+  "card_v1": {
+   "log": "셀프 호스팅 소셜 스케줄러 도구 소개, MCP 연동 언급, 원본 확인 필요",
+   "attention": false,
+   "quotes": [
+    {
+     "n": 1,
+     "text": "Self-hosted social scheduler for Mastodon, Bluesky, LinkedIn, Threads and X."
+    },
+    {
+     "n": 2,
+     "text": "CogSend runs on your own Cloudflare account instead: your data stays in your own D1 database and R2 bucket, posts go out through your own API credentials, and there is no subscription to keep paying."
+    },
+    {
+     "n": 3,
+     "text": "AI agents (MCP): connect Claude Code, Codex or any MCP client to draft, schedule and publish with your API key"
+    },
+    {
+     "n": 4,
+     "text": "A single-admin instance normally stays within Cloudflare's free plans, though R2 needs a payment method on file."
+    },
+    {
+     "n": 5,
+     "text": "SvelteKit 2 and Svelte 5 on Cloudflare Workers with Static Assets, D1 (SQLite) via Drizzle, and R2 for media."
+    }
+   ],
+   "numbers": [
+    {
+     "quote_n": 4,
+     "value": "single-admin",
+     "unit": "",
+     "what": "무료 플랜 유지 가능 인스턴스 규모"
+    },
+    {
+     "quote_n": 5,
+     "value": "2",
+     "unit": "",
+     "what": "SvelteKit 버전"
+    },
+    {
+     "quote_n": 5,
+     "value": "5",
+     "unit": "",
+     "what": "Svelte 버전"
+    }
+   ],
+   "claims": [
+    {
+     "quote_ns": [
+      1,
+      2
+     ],
+     "text": "Mastodon, Bluesky, LinkedIn, Threads, X 등 여러 소셜 플랫폼에 글을 예약 발행하는 셀프 호스팅 도구이며, Cloudflare 계정 기반으로 데이터와 API 자격 증명을 직접 관리한다."
+    },
+    {
+     "quote_ns": [
+      3
+     ],
+     "text": "MCP 클라이언트(Claude Code, Codex 등)를 연결하여 글 작성, 예약, 발행을 자동화할 수 있다."
+    },
+    {
+     "quote_ns": [
+      4,
+      5
+     ],
+     "text": "단일 관리자 인스턴스는 Cloudflare 무료 플랜 내에서 운영 가능하며, SvelteKit 2, Svelte 5, Cloudflare Workers, D1, R2 기술 스택을 사용한다."
+    }
+   ],
+   "summary": "CogSend는 Mastodon, Bluesky, LinkedIn, Threads, X 등 다양한 소셜 플랫폼에 글을 예약 발행하는 셀프 호스팅 도구다. Cloudflare Workers, D1, R2 기반이며 MCP 클라이언트 연동을 통해 AI 에이전트로 발행을 자동화할 수 있다.",
+   "entities": [
+    "CogSend",
+    "Mastodon",
+    "Bluesky",
+    "LinkedIn",
+    "Threads",
+    "X",
+    "Cloudflare",
+    "D1",
+    "R2",
+    "Zernio",
+    "Claude Code",
+    "Codex",
+    "SvelteKit",
+    "Svelte"
+   ],
+   "keywords": [
+    "mcp-tools",
+    "dev-practice"
+   ],
+   "is_curation": true,
+   "origin_candidates": [
+    1
+   ],
+   "relevance_reason": "MCP 연동 및 셀프 호스팅 개발 도구 소개로 개발 실무 및 MCP 도구 주제와 관련",
+   "relevance": "mid",
+   "needs_original_reason": "GeekNews 큐레이션 글이며, 상세 기술 스택 및 기능 설명의 원본이 GitHub 레포지토리(링크 1)에 존재",
+   "needs_original": true
+  },
+  "links": [
+   {
+    "n": 1,
+    "url": "https://github.com/deepakness/cogsend",
+    "kind": "repo",
+    "anchor": "CogSend - 여러 소셜 플랫폼에 글을 예약 발행하는 셀프 호스팅 도구",
+    "candidate": true
+   },
+   {
+    "n": 2,
+    "url": "https://zernio.link/cogsend?utm_source=cogsend&utm_medium=sponsorship&utm_campaign=cogsend-integration&utm_content=readme-sponsor",
+    "kind": "other",
+    "anchor": "Zernio",
+    "candidate": false
+   },
+   {
+    "n": 3,
+    "url": "https://cogsend.com/docs/",
+    "kind": "other",
+    "anchor": "cogsend.com/docs",
+    "candidate": false
+   }
+  ],
+  "checks": [
+   {
+    "n": 1,
+    "kind": "number",
+    "text": "무료 플랜 유지 가능 인스턴스 규모: single-admin",
+    "quote": "A single-admin instance normally stays within Cloudflare's free plans, though R2 needs a payment method on file."
+   },
+   {
+    "n": 2,
+    "kind": "number",
+    "text": "SvelteKit 버전: 2",
+    "quote": "SvelteKit 2 and Svelte 5 on Cloudflare Workers with Static Assets, D1 (SQLite) via Drizzle, and R2 for media."
+   },
+   {
+    "n": 3,
+    "kind": "number",
+    "text": "Svelte 버전: 5",
+    "quote": "SvelteKit 2 and Svelte 5 on Cloudflare Workers with Static Assets, D1 (SQLite) via Drizzle, and R2 for media."
+   },
+   {
+    "n": 4,
+    "kind": "claim",
+    "text": "Mastodon, Bluesky, LinkedIn, Threads, X 등 여러 소셜 플랫폼에 글을 예약 발행하는 셀프 호스팅 도구이며, Cloudflare 계정 기반으로 데이터와 API 자격 증명을 직접 관리한다.",
+    "quote": "Self-hosted social scheduler for Mastodon, Bluesky, LinkedIn, Threads and X. / CogSend runs on your own Cloudflare account instead: your data stays in your own D1 database and R2 bucket, posts go out through your own API credentials, and there is no subscription to keep paying."
+   },
+   {
+    "n": 5,
+    "kind": "claim",
+    "text": "MCP 클라이언트(Claude Code, Codex 등)를 연결하여 글 작성, 예약, 발행을 자동화할 수 있다.",
+    "quote": "AI agents (MCP): connect Claude Code, Codex or any MCP client to draft, schedule and publish with your API key"
+   },
+   {
+    "n": 6,
+    "kind": "claim",
+    "text": "단일 관리자 인스턴스는 Cloudflare 무료 플랜 내에서 운영 가능하며, SvelteKit 2, Svelte 5, Cloudflare Workers, D1, R2 기술 스택을 사용한다.",
+    "quote": "A single-admin instance normally stays within Cloudflare's free plans, though R2 needs a payment method on file. / SvelteKit 2 and Svelte 5 on Cloudflare Workers with Static Assets, D1 (SQLite) via Drizzle, and R2 for media."
+   }
+  ],
+  "tool_calls": null
+ },
+ "expect": {},
+ "note": "개발 DB(S1 녹화 응답 재생, 실제 한 주 아님, 클라우드 2차 2026-10-08):  계획 text_queue, CogSend - 여러 소셜 플랫폼에 글을 예약 발행하는 셀프 호스팅 도"
+}

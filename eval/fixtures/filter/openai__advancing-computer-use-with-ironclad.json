@@ -1,0 +1,11 @@
+{
+ "input": {
+  "source": "openai",
+  "channel": "text",
+  "title": "Advancing computer use with Ironclad",
+  "keyword_status": "pass",
+  "keyword_reason": null,
+  "text": "Advancing computer use with Ironclad\nLearn how OpenAI and Ironclad are training and evaluating AI agents on complex contracting workflows to advance computer use for professional work.\nAdvancing computer use with Ironclad\nHow a research collaboration in contracting is helping us train and evaluate AI agents on complex professional work.\nWhen we introduced GPT‑6 Astra, we demonstrated how far our models have come in using computers for professional work, from preparing documents to testing websites. Our next goal is to make agents more capable and efficient at using specialized software to solve complex business problems. We’re exploring how to train models to understand a company’s business rules, execute multi-step workflows, and verify that their work meets the original requirements.\nTo accelerate this research, we’re partnering directly with a small number of software companies that understand these workflows best. Together, we’re identifying challenging, high-value tasks and turning them into research problems for training and evaluating our models, ultimately making our models more capable and useful in real-world business applications.\nOur first partner is Iron"
+ },
+ "note": "S1 녹화 응답(tests/fixtures/http/window, bf_*)으로 만든 개발 DB에서 뽑음. keyword_status는 새 키워드로 rematch한 판정"
+}

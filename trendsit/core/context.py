@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Any
 
 from . import config
 from .budget import Budget, PriceBook
@@ -25,6 +26,7 @@ class Ctx:
     model: str | None = None  # 별칭 덮어쓰기(--model)
     last_step_id: int | None = None
     stopped: str | None = None  # 예산 초과 등으로 대체 출력을 내고 멈춘 이유(실행 상태 stopped)
+    resources: dict[str, Any] = field(default_factory=dict)  # 도구가 쓰는 자원(fetcher 등). 파이프라인이 넣는다
 
 
 def open_ctx(kind: str | None, *, spec: str | None = None, no_cache: bool = False, model: str | None = None,

@@ -9,7 +9,7 @@ from typing import Any
 
 from pydantic import BaseModel
 
-from trendsit.core.artifacts import Document, JudgeInput, JudgeResult, RoleInput
+from trendsit.core.artifacts import Document, JudgeInput, JudgeResult, RepoOneliner, RoleInput
 from trendsit.core.config import ROOT
 from trendsit.core.context import Ctx
 from trendsit.core.role import load_role, run_role
@@ -20,6 +20,8 @@ JUDGE_ROLE = "eval/judge.md"
 
 # 공통 문체 검사 (skills/style_ko.md)
 HAEYO = re.compile(r"(요|세요|어요|아요|에요|예요|해요|죠)[.!?…]*$")
+# "요"로 끝나는 명사(명사형 끝말이라 해요체가 아님). "필요해요"처럼 뒤에 어미가 붙으면 HAEYO가 그대로 잡는다
+NOUN_YO = re.compile(r"(필요|중요|주요|개요|수요|강요|소요)[.!?…]*$")
 EVAL_ENDINGS = ("눈에 띈다", "핵심이다", "주목할 만하다", "공통 교훈이다", "주목할 만한", "눈여겨볼")
 # 평가어(근거 없는 수식). 레포 설명, 포인트에서 쓰지 않는다
 EVAL_WORDS = ("혁신적", "강력한", "놀라운", "최고의", "획기적", "뛰어난", "완벽한", "최첨단", "차세대", "혁명적",
@@ -57,7 +59,7 @@ def style_checks(output: dict[str, Any]) -> list[dict[str, Any]]:
     checks = []
     for key, text in _strings(output):
         sentences = [s.strip() for s in re.split(r"(?<=[.!?])\s+|\n", text) if s.strip()]
-        bad = [s for s in sentences if HAEYO.search(s)]
+        bad = [s for s in sentences if HAEYO.search(s) and not NOUN_YO.search(s)]
         checks.append(check(f"해요체 없음({key})", not bad, "; ".join(bad)[:120]))
         ev = [e for e in EVAL_ENDINGS if e in text]
         checks.append(check(f"평가형 마무리 없음({key})", not ev, ", ".join(ev)))
@@ -108,9 +110,16 @@ ROLE_CHECKS = {"repo_oneliner": code_repo_oneliner, "lookup_agent": code_lookup_
 ROLE_STYLE_FIELDS: dict[str, tuple[str, ...]] = {}
 # 픽스처 전체를 모아 보는 기준(예: 인용 일치율 95%). role → results → (지표, 미달 이유 목록)
 AGGREGATES: dict[str, Any] = {}
+# 도구 호출 기록(run_eval의 rec["tool_calls"])을 보는 코드 검사. role → (입력, 출력, 도구 호출) → 검사 목록
+TOOL_CHECKS: dict[str, Any] = {}
+# eval --regrade가 저장된 기록에 enforce를 다시 적용(규칙이 늘었을 때 0원 재계산). role → rec → (enforced, 출력)
+# enforce를 원래 출력에서 다시 돌릴 수 없는 역할(가져온 페이지가 필요한 글 분석가)은 새 규칙만 이어 적용한다
+REENFORCE: dict[str, Any] = {}
 # 코드 소유 칸(S4 설계 결정 D2-1, S2~S3 결정 Q1): 규칙이 문자열로 확정 판정되어 enforce가 고친 값이 곧 정답인 칸.
 # 통과 판정은 이 칸만 enforce 후 값으로 바꾼 출력으로 한다. 원래 출력 점수는 모델 품질로 따로 기록. role → 칸 목록
 ENFORCED_FIELDS: dict[str, tuple[str, ...]] = {}
+# S2~S3 역할은 칸 목록을 출력 클래스의 ENFORCED_FIELDS(ClassVar)에 선언하고 여기에 등록한다(한 곳에서만 정함)
+ENFORCED_FIELDS["repo_oneliner"] = RepoOneliner.ENFORCED_FIELDS
 
 
 def basis_output(role: str, raw: dict[str, Any], enforced: dict[str, Any] | None) -> dict[str, Any]:
@@ -122,13 +131,15 @@ def basis_output(role: str, raw: dict[str, Any], enforced: dict[str, Any] | None
 
 
 def code_grade(role: str, inp: dict[str, Any], out: dict[str, Any] | None, error: str | None,
-               expect: dict[str, Any]) -> dict[str, Any]:
+               expect: dict[str, Any], tool_calls: list[dict[str, Any]] | None = None) -> dict[str, Any]:
     if out is None:
         checks = [check("스키마", False, error or "출력 없음")]
     else:
         fields = ROLE_STYLE_FIELDS.get(role)
         styled = {k: out[k] for k in fields if k in out} if fields else out
         checks = [check("스키마", True)] + ROLE_CHECKS[role](inp, out, expect) + style_checks(styled)
+        if role in TOOL_CHECKS:  # 도구 에이전트: 이 항목의 도구 호출 기록이 필요한 검사
+            checks += TOOL_CHECKS[role](inp, out, tool_calls or [])
     return {"passed": all(c["passed"] for c in checks), "checks": checks,
             "failed": [f"{c['name']}: {c['detail']}" for c in checks if not c["passed"]]}
 
@@ -189,16 +200,32 @@ def llm_grade(role: str, inp: RoleInput, out: dict[str, Any], ctx: Ctx) -> dict[
             "judge_prompt_hash": judge.prompt_hash, "judge_step_id": judge_ctx.last_step_id}
 
 
+def model_agreement(results: list[dict[str, Any]], owned_fields: tuple[str, ...] = ()) -> dict[str, str]:
+    """코드 소유 칸별 모델 일치율(설계 결정 Q1, 보고용): 원래 출력이 코드가 정한 값과 같았던 건수/출력 수.
+
+    칸 일부만 코드 소유인 규칙(fix(owned=True), 예: 긴 인용 자르기)도 그 칸 이름으로 센다.
+    """
+    outs = [r for r in results if r.get("output")]
+    changed: dict[str, int] = dict.fromkeys(owned_fields, 0)
+    for r in outs:
+        fields = {c["field"] for c in r.get("enforced") or [] if c.get("owned", c["field"] in owned_fields)}
+        for f in fields:
+            changed[f] = changed.get(f, 0) + 1
+    return {f: f"{len(outs) - k}/{len(outs)}" for f, k in changed.items()}
+
+
 def summarize(role: str, results: list[dict[str, Any]]) -> dict[str, Any]:
     th = THRESHOLDS.get(role, {"code_pass_all": True})
     n = len(results)
-    code_pass = sum(1 for r in results if r["code"]["passed"])
-    # 보고용: enforce 후 출력 기준 코드 통과(바뀐 것이 없으면 원래 출력 판정). 통과 판정은 code_pass(원래 출력)
+    code_pass = sum(1 for r in results if r["code"]["passed"])  # 원래 출력(모델 품질)
+    # 보고용: enforce 전부 적용한 출력(저장되는 것) 기준 코드 통과
     code_pass_enforced = sum(1 for r in results if r.get("code_enforced", r["code"])["passed"])
     # 통과 판정: 코드 소유 칸(ENFORCED_FIELDS)만 enforce 후 값으로 채점한 결과. 칸 선언이 없으면 원래 출력 판정과 같다
     code_pass_basis = sum(1 for r in results if r.get("code_basis", r["code"])["passed"])
     summary: dict[str, Any] = {"n": n, "code_pass": code_pass, "code_pass_enforced": code_pass_enforced,
-                               "code_pass_basis": code_pass_basis, "questions": {}, "criteria": {}}
+                               "code_pass_basis": code_pass_basis,
+                               "model_agreement": model_agreement(results, ENFORCED_FIELDS.get(role, ())),
+                               "questions": {}, "criteria": {}}
     has_rubric = rubric_path(role).exists()
     questions = rubric_questions(role) if has_rubric else {}
     judged = [r for r in results if r.get("llm")]
@@ -227,6 +254,9 @@ def summarize(role: str, results: list[dict[str, Any]]) -> dict[str, Any]:
             st = summary["questions"].get(q, {})
             if st.get("rate") is None or st["rate"] < need:
                 reasons.append(f"{q} 통과 {st.get('pass')}/{st.get('n')} < {need:.0%}")
+    if role in AGGREGATES:
+        summary["aggregate"], more = AGGREGATES[role](results)
+        reasons += more
     summary["passed"] = not reasons
     summary["fail_reasons"] = reasons
     return summary

@@ -58,6 +58,9 @@ class AgentState:
     depth: DepthTracker
     tool_calls: int = 0
     rejected: list[str] = field(default_factory=list)
+    ctx: Any = None  # 도구가 ctx.resources, ctx.db를 쓴다
+    inp: Any = None
+    extras: dict[str, Any] = field(default_factory=dict)  # 도구끼리 주고받는 실행 중 상태(가져온 페이지 등)
 
 
 def _args_summary(args: dict[str, Any]) -> str:
@@ -179,14 +182,23 @@ def execute_tool(name: str, raw_args: str, allowed: set[str], state: AgentState)
 def run_agent(role: Role, inp: RoleInput, ctx: Ctx) -> RoleOutput:
     """종료: finish로 최종 답 제출 / max_steps 도달 / 예산 초과. 상한에 걸리면 역할의 대체 출력(attention=true)."""
     alias = ctx.model or role.spec.model
-    allowed = set(role.spec.tools)
+    names = [n for n in inp.tool_names(list(role.spec.tools)) if n in role.spec.tools]  # 입력별로 좁히기만
+    allowed = set(names)
+    cap = inp.tool_call_limit(role.spec.max_tool_calls)
+    if role.spec.max_tool_calls is not None and (cap is None or cap > role.spec.max_tool_calls):
+        cap = role.spec.max_tool_calls  # 입력은 좁히기만
     finish_schema = {"type": "function", "function": {
         "name": FINISH,
         "description": "최종 답 제출. 답이 정해졌거나 더 볼 것이 없을 때 마지막에 한 번 호출한다.",
         "parameters": strict_json_schema(role.output_cls)}}
-    tools = [TOOLS[n].schema() for n in role.spec.tools] + [finish_schema]
+    tools = [TOOLS[n].schema() for n in names] + [finish_schema]
     messages = initial_messages(role, inp)
-    state = AgentState(depth=DepthTracker(role.spec.max_depth))
+    state = AgentState(depth=DepthTracker(inp.depth_limit(role.spec.max_depth)), ctx=ctx, inp=inp)
+    # 이번 실행의 도구 결과(이름, 성공 여부). enforce가 "성공한 도구만 근거"를 지키는 데 쓴다(PR #6 리뷰 R1)
+    ctx.resources["tool_results"] = []
+    for doc, links in inp.depth_seed():  # 이미 읽은 시작 문서: 깊이 1, 그 링크는 깊이 2로 이어짐
+        state.depth.roots.add(doc)
+        state.depth.visited(doc, 1, links)
 
     def finish_with(out: RoleOutput, how: str) -> RoleOutput:
         out = apply_enforce(out, inp, ctx)  # 코드 규칙은 스키마 검증 뒤, 저장 전(대체 출력에도)
@@ -231,8 +243,18 @@ def run_agent(role: Role, inp: RoleInput, ctx: Ctx) -> RoleOutput:
                                 error=None if final else content)
                 messages.append(_tool_message(tc["id"], content))
                 continue
+            if cap is not None and state.tool_calls >= cap:  # 항목당 도구 호출 상한(코드)
+                content = f"오류: 도구 호출 상한 {cap}회 도달. 지금까지 본 것으로 {FINISH}를 호출할 것"
+                state.rejected.append(content)
+                ctx.tracer.step(kind="tool", role=role.name, text=f"{tc['name']}: 상한으로 거부", error=content,
+                                attention=True, detail={"cap": cap})
+                messages.append(_tool_message(tc["id"], content))
+                continue
             state.tool_calls += 1
             content, info = execute_tool(tc["name"] or "", tc["arguments"], allowed, state)
+            ctx.resources["tool_results"].append({"name": tc["name"] or "", "ok": info["error"] is None})
+            if cap is not None:  # 남은 횟수를 알려 일찍 멈출 수 있게
+                content += f"\n[남은 도구 호출 {cap - state.tool_calls}회]"
             ctx.tracer.step(kind="tool", role=role.name,
                             text=f"{tc['name']}: {_args_summary(info['args'] or {})}",
                             error=info["error"], attention=bool(info["error"]),

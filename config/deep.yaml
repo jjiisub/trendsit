@@ -1,0 +1,15 @@
+# S3 밤 깊게 보기 예산과 상한(S3 소유, S2S3_TASK 5.4 초안). 편집장 계획은 이 예산의 plan_share(80%)까지만 계획하고,
+# validate_plan(코드)이 넘는 꼬리를 우선순위 뒤에서부터 자른다. 전체 깊이 상한 4는 코드 상수(MAX_DEPTH_ALL)
+video_minutes: 90
+slide_videos: 2
+vlm_frames: 40
+frames_per_slide_video: 20
+text_items: 5
+text_tool_calls_per_item: 6
+repo_items: 10
+repo_tool_calls_per_item: 6
+default_text_depth: 2
+max_text_depth: 3   # 처음 몇 주. 원본 깊이 분포를 보고 4를 열지 정함
+plan_share: 0.8
+video_max_minutes: 60
+lookback_days: 7
