@@ -9,9 +9,9 @@ doc_chars: 1000
 # 잠정값(2026-10-08 클라우드): 실제 임베딩 모델을 받을 수 없어 점수 분포를 보지 못한 채 둔 자리값.
 # 맥에서 점수 분포(0.05 구간별 건수)와 relevance_seed 13건, relevance.csv 40건으로 정하고 근거를 아래와 리포트에 적는다
 drop_below: 0.30
-rescue_above: 0.45
+rescue_above: 0.50
 thresholds_status: provisional
-thresholds_basis: "자리값. 실제 모델 점수 분포를 보기 전(맥 확인 목록)"
+thresholds_basis: "잠정(labeler opus-5.5, PR #6 리뷰 3장): 2026-09-28~10-04 MPS 점수 + 라벨 40건. drop_below 0.30 유지(0.30~0.32에 관심 글 2건, 시드 keep 0.330), rescue_above 0.50(되살린 3건 모두 관심 밖, 걸러진 0.40 이상 10건에 관심 글 0. 정밀도 61.9→68.4%, 재현율 그대로)"
 # 관심사 설명: 키워드마다 1~2문장(설계 세션 초안을 문장으로 풀어 씀). 고객 사례 홍보 글은 관심 밖이라 설명에 넣지 않음
 interests:
   - keyword_id: agent

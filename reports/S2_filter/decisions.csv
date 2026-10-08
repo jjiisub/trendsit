@@ -138,7 +138,7 @@ id,source,channel,title,keyword_status,keyword_reason,score,keyword_id,decision,
 205,aitimes,text,"텐센트, 오라클서 AI 칩 10만개 임대…규제 피하려 동남아로",pass,,0.489645,open-weight,keep,keyword_pass
 941,aitimes,text,"'정부망 침투' 여파…호주 상원, 오픈AI·앤트로픽 CEO 소환",pass,,0.489609,ai-security,keep,keyword_pass
 973,geeknews,text,"문제는 AI 코드가 아니라, 이제 아무도 아무것도 모른다는 것이다",pass,,0.488567,coding-agent,keep,keyword_pass
-961,geeknews,text,계속 승진하는 것이 좋은 커리어일까? 엔지니어 Philip Su의 경험 [동영상],filtered,no_keyword,0.488066,dev-practice,keep,rescued
+961,geeknews,text,계속 승진하는 것이 좋은 커리어일까? 엔지니어 Philip Su의 경험 [동영상],filtered,no_keyword,0.488066,dev-practice,drop,no_keyword
 161,simonw,text,llm-anthropic 0.30,pass,,0.488027,open-weight,keep,keyword_pass
 169,aitimes,text,"화면 안 보고 게임한다…GPT-6 아스트라, 'WoW' 40분 만에 클리어",pass,,0.485982,agent,keep,keyword_pass
 247,techbridge,video,AI로 무엇이든 효과적으로 학습하는 방법,pass,,0.485442,agent,keep,keyword_pass
@@ -147,7 +147,7 @@ id,source,channel,title,keyword_status,keyword_reason,score,keyword_id,decision,
 894,aitimes,text,[9월29일] AI가 수학 문제를 풀었다…수학자들이 진짜 걱정하는 것은 ‘정답 이후’,pass,,0.483932,reasoning,keep,keyword_pass
 932,aitimes,text,"""GPU인 줄 알고 훔쳤는데 모래만 18톤""...엔비디아 로고 트럭 절도 해프닝",pass,,0.482843,ai-security,keep,keyword_pass
 171,aitimes,text,"구글, 제미나이 요금제 개편..무료·저가 요금제서 '프로' 모델 뺀다",pass,,0.482012,frontier-release,keep,keyword_pass
-966,geeknews,text,글 쓰다가 막혔을 때 대처법,filtered,no_keyword,0.481487,dev-practice,keep,rescued
+966,geeknews,text,글 쓰다가 막혔을 때 대처법,filtered,no_keyword,0.481487,dev-practice,drop,no_keyword
 188,aitimes,text,"애플, AI 에이전트 공격 대비해 맥OS '전체 디스크 접근' 제어 강화",pass,,0.480469,ai-security,keep,keyword_pass
 152,simonw,text,September sponsors-only newsletter,pass,,0.478602,open-weight,keep,keyword_pass
 888,aitimes,text,오픈AI 추가 투자 유치 목표는 '1900조 가치'...연 매출은 95조 육박,pass,,0.478266,ai-industry,keep,keyword_pass
@@ -166,7 +166,7 @@ id,source,channel,title,keyword_status,keyword_reason,score,keyword_id,decision,
 852,aitimes,text,"오픈AI, 반도체 설계 전용 'GPT-시놉시스' 개발 합의…'수익 공유' 적용",pass,,0.471085,agent,keep,keyword_pass
 957,geeknews,text,AI 시대를 여행하는 히치하이커를 위한 안내서 – 수학과 코드 없이 LLM의 발전 흐름 이해하기,pass,,0.469472,mcp-tools,keep,keyword_pass
 243,aitimes,text,"영국 MI5, 중국 학술 침투에 ‘간첩 경보’…대학에 협력 중단 요구",pass,,0.468766,ai-security,keep,keyword_pass
-965,geeknews,text,서버 모니터링 분석 가이드,filtered,no_keyword,0.466792,dev-practice,keep,rescued
+965,geeknews,text,서버 모니터링 분석 가이드,filtered,no_keyword,0.466792,dev-practice,drop,no_keyword
 999,geeknews,text,바이브 코딩한 웹사이트를 디자이너가 만든 것처럼 보이게 한 방법,pass,,0.466787,dev-practice,keep,keyword_pass
 162,simonw,text,Claude Sonnet 5.5,pass,,0.466707,frontier-release,keep,keyword_pass
 946,aitimes,text,"포지큐브, 하나은행에 AI 에이전트 서비스 구축...""금융 AX 가속""",pass,,0.466403,agent,keep,keyword_pass

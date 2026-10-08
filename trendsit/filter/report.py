@@ -57,7 +57,7 @@ def distribution(rows: list[dict[str, Any]]) -> list[tuple[str, int, int]]:
 
 
 def write_report(db: DB, cfg: FilterConfig, res: FilterResult, out_dir: Path, seed_csv: Path,
-                 command: str) -> Path:
+                 command: str, labels_csv: Path | None = None) -> Path:
     out_dir.mkdir(parents=True, exist_ok=True)
     rows = res.rows
     with (out_dir / "decisions.csv").open("w", encoding="utf-8", newline="") as f:
@@ -100,7 +100,16 @@ def write_report(db: DB, cfg: FilterConfig, res: FilterResult, out_dir: Path, se
         mark = "-" if not s["found"] else ("○" if s["correct"] else "×")
         L.append(f"| {s['source']} | {_cell(s['title'][:60])} | {s['expected']} | "
                  f"{s['score'] if s['found'] else '못 찾음'} | {s['decision'] or '-'} | {mark} |")
-    L += ["", "- 못 찾은 행은 분모에서 뺀다(S2S3_TASK 7장)", "",
+    L += ["", "- 못 찾은 행은 분모에서 뺀다(S2S3_TASK 7장)", ""]
+    lab = label_metrics(labels_csv, rows) if labels_csv else None
+    if lab:
+        who = f"labeler {', '.join(lab['labelers']) or '?'}" + (", 잠정" if lab["provisional"] else "")
+        L += [f"## 라벨 결과 (`{labels_csv.name}`, {lab['n']}건, {who})", "",
+              "| keep 정밀도 | keep 재현율 | keep·keep | keep·drop(오판) | drop·keep(놓침) | drop·drop |",
+              "|---|---|---|---|---|---|",
+              f"| {lab['precision']} | {lab['recall']} | {lab['tp']} | {lab['fp']} | {lab['fn']} | {lab['tn']} |", "",
+              "- 칸 순서: 판정·라벨. 문턱값을 바꾸면 같은 라벨로 다시 잰다", ""]
+    L += [
           "## 문턱값 근처 20건 (±0.05 안팎, 사람 확인용)", "",
           "| 확인 | id | 소스 | 제목 | 키워드 | 점수 | 판정 |", "|---|---|---|---|---|---|---|"]
     L += [f"| [ ] | {r['id']} | {r['source']} | {_cell(r['title'][:60])} | {r['keyword_status']} | {r['score']} | "

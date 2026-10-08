@@ -216,3 +216,15 @@ def test_real_embedder_scores_fixtures_in_range():
     fx = load_filter_fixtures()
     scores = [best_interest(v, interests)[0] for v in e.embed_docs([f["input"]["text"] for _, f in fx])]
     assert len(scores) == 20 and all(-1 <= s <= 1 for s in scores)
+
+
+def test_label_metrics_with_labeler(tmp_path):
+    """relevance 라벨의 keep 정밀도·재현율과 labeler(사람이 아니면 잠정). filter --report 라벨 결과 절의 원천."""
+    from trendsit.filter.report import label_metrics
+
+    rows = [{"id": i, "decision": d} for i, d in ((1, "keep"), (2, "keep"), (3, "drop"), (4, "drop"))]
+    path = tmp_path / "relevance.csv"
+    path.write_text("id,expected,labeler\n1,keep,opus-5.5\n2,drop,opus-5.5\n3,keep,opus-5.5\n4,,\n", encoding="utf-8")
+    m = label_metrics(path, rows)
+    assert (m["n"], m["precision"], m["recall"]) == (3, 0.5, 0.5)
+    assert m["labelers"] == ["opus-5.5"] and m["provisional"] is True

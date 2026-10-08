@@ -9,14 +9,14 @@
 | 모델 | `Qwen/Qwen3-Embedding-0.6B` |
 | 장치 | mps |
 | 라이브러리 | sentence-transformers 6.1.0, torch 2.14.1, transformers 5.19.0, 파이썬 3.12.14 |
-| 처리 건수 | 325건(글 308, 영상 17), 새 임베딩 325 |
-| 걸린 시간 | 155.4초 |
-| run_id | `20261008-150730-filter-e3e1` |
+| 처리 건수 | 325건(글 308, 영상 17), 새 임베딩 0 |
+| 걸린 시간 | 1.6초 |
+| run_id | `20261009-000927-filter-e87a` |
 
 ## 문턱값(잠정)
 
-- drop_below 0.3, rescue_above 0.45
-- 근거: 자리값. 실제 모델 점수 분포를 보기 전(맥 확인 목록)
+- drop_below 0.3, rescue_above 0.5
+- 근거: 잠정(labeler opus-5.5, PR #6 리뷰 3장): 2026-09-28~10-04 MPS 점수 + 라벨 40건. drop_below 0.30 유지(0.30~0.32에 관심 글 2건, 시드 keep 0.330), rescue_above 0.50(되살린 3건 모두 관심 밖, 걸러진 0.40 이상 10건에 관심 글 0. 정밀도 61.9→68.4%, 재현율 그대로)
 
 ## 판정 요약
 
@@ -30,8 +30,7 @@
 | excluded:채용 | 1 |
 | keyword_pass | 278 |
 | low_similarity | 9 |
-| no_keyword | 23 |
-| rescued | 3 |
+| no_keyword | 26 |
 
 ## 점수 분포 (0.05 구간)
 
@@ -69,38 +68,43 @@
 
 - 못 찾은 행은 분모에서 뺀다(S2S3_TASK 7장)
 
+## 라벨 결과 (`relevance.csv`, 40건, labeler opus-5.5, 잠정)
+
+| keep 정밀도 | keep 재현율 | keep·keep | keep·drop(오판) | drop·keep(놓침) | drop·drop |
+|---|---|---|---|---|---|
+| 0.684 | 0.929 | 13 | 6 | 1 | 20 |
+
+- 칸 순서: 판정·라벨. 문턱값을 바꾸면 같은 라벨로 다시 잰다
+
 ## 문턱값 근처 20건 (±0.05 안팎, 사람 확인용)
 
 | 확인 | id | 소스 | 제목 | 키워드 | 점수 | 판정 |
 |---|---|---|---|---|---|---|
-| [ ] | 191 | aitimes | [내면 지도 그리기] 36 Inner Mapping: 나를 찾는 지도 | filtered | 0.449758 | drop(no_keyword) |
-| [ ] | 908 | aitimes | 과기부, AI중심대학 18개교·AX대학원 15개교 출범 | pass | 0.450665 | keep(keyword_pass) |
-| [ ] | 184 | aitimes | '나만의 클로드 코드' 만든다...앤트로픽, 커스텀 확장 기능 '모드' 출시 | pass | 0.450754 | keep(keyword_pass) |
-| [ ] | 928 | aitimes | 앤트로픽, 클로드로 이론물리학 난제 ‘9루프 산란 진폭’ 계산 성공 | pass | 0.450783 | keep(keyword_pass) |
+| [ ] | 215 | aitimes | 오픈AI, '불량 에이전트' 무단 활동 100여곳 조직에 통보 | pass | 0.500108 | keep(keyword_pass) |
+| [ ] | 897 | aitimes | 일관성·제어력 강화한 '클링 4.0' 공개... '시댄스' 추격 나서 | pass | 0.499632 | keep(keyword_pass) |
+| [ ] | 854 | aitimes | 오픈AI, 자체 에이전트에 ‘디시전스 API’ 적용...아키텍처 판도 바뀐다 | pass | 0.499617 | keep(keyword_pass) |
+| [ ] | 901 | aitimes | 알트먼·아모데이, 호주 의회 AI 청문회 불참...오픈AI는 CSO 파견 | pass | 0.500519 | keep(keyword_pass) |
+| [ ] | 861 | aitimes | "앤트로픽 몸값 1.5조 달러로 하향해야"…월가의 AI IPO '거품' 경고 | pass | 0.500601 | keep(keyword_pass) |
 | [ ] | 848 | aitimes | 오스트리아, 개인 간 전력 공유 허용…태양광 잉여전력 직접 판매 | pass | 0.300925 | keep(keyword_pass) |
-| [ ] | 157 | simonw | Quoting Anthropic Frontier Red Team | pass | 0.448953 | keep(keyword_pass) |
-| [ ] | 186 | aitimes | 메타, 오픈소스 '뮤즈 가젯' 공개...AI 에이전트 하드웨어 이식 본격화 | pass | 0.451129 | keep(keyword_pass) |
-| [ ] | 950 | aitimes | 'AI 칩 부족' 중국, 엔비디아 PC용 GPU 구매 허용하나 | pass | 0.451383 | keep(keyword_pass) |
-| [ ] | 930 | aitimes | AI 불안 확산에 '인간 과학자 vs AI' 연구 맞대결서 '협력'으로 선회 | pass | 0.45145 | keep(keyword_pass) |
-| [ ] | 949 | aitimes | 메타, 스마트폰으로 AI 게임 만드는 '호라이즌 크리에이트' 공개 | pass | 0.448431 | keep(keyword_pass) |
+| [ ] | 211 | aitimes | 백악관에 모인 AI 수장들…젠슨 황·저커버그, 아모데이에 '질문 세례' | pass | 0.49874 | keep(keyword_pass) |
+| [ ] | 214 | aitimes | “반도체 성능 지표 ‘K-Perf’, 실험실 벗어나 실제 현장서 실증” | pass | 0.498495 | keep(keyword_pass) |
+| [ ] | 944 | aitimes | 마키나락스, 'AI 참모' 군 지휘통제체계 적용...을지연습서 실증 나서 | pass | 0.501686 | keep(keyword_pass) |
 | [ ] | 891 | aitimes | 스페인 연구진, 태양광발전소 맹금류 행동 추적…사냥·휴식 공간 활용 | pass | 0.298313 | drop(low_similarity) |
-| [ ] | 1003 | geeknews | 벡터 데이터베이스여, 안녕 | pass | 0.451698 | keep(keyword_pass) |
-| [ ] | 189 | aitimes | 엔비디아, 4999달러짜리 ‘DGX 스파크’ 출시...메모리 대란에 가격 낮췄다 | pass | 0.448274 | keep(keyword_pass) |
-| [ ] | 177 | aitimes | 태양광 발전량·전력가격 예측하는 AI…일본 ESS 충·방전 자동화 | pass | 0.452 | keep(keyword_pass) |
-| [ ] | 1022 | geeknews | Muse Gadgets - Meta의 AI 에이전트를 직접 만든 기기에 연결하기 | pass | 0.452747 | keep(keyword_pass) |
+| [ ] | 279 | techbridge | [한영자막] Claude Code와 Codex를 인간 연구자들과 경쟁시켰습니다 — Elie Bakouch,  | pass | 0.502863 | keep(keyword_pass) |
 | [ ] | 176 | aitimes | 아일랜드, 주택용 태양광·배터리 지원 확대…국내는 마을 단위 실증 | pass | 0.302915 | keep(keyword_pass) |
-| [ ] | 1029 | geeknews | Claude와 Claude Code에서 Opus 5.5를 최대한 활용하는 방법 | pass | 0.446866 | keep(keyword_pass) |
-| [ ] | 1026 | geeknews | 하네스가 곧 회사다 | pass | 0.446696 | keep(keyword_pass) |
-| [ ] | 224 | aitimes | 엔비디아·소프트뱅크, 오픈AI 투자 잔여분 27조 최종 집행 | pass | 0.453368 | keep(keyword_pass) |
-| [ ] | 913 | aitimes | 삼성 6개사, 미국 AI 인프라 기업 헬릭스에 1.4조 투자 | pass | 0.453384 | keep(keyword_pass) |
+| [ ] | 915 | aitimes | 교황 "AI 멸망론, 가짜 뉴스 아니다"...트럼프 입장과 대립각 | pass | 0.503123 | keep(keyword_pass) |
+| [ ] | 4 | openai | How Albertsons Companies is reimagining retail from the insi | pass | 0.296578 | drop(low_similarity) |
+| [ ] | 239 | aitimes | 네이버, 웨일 브라우저 내 'AI 챗' 탑재..."타 서비스 도입도 검토" | pass | 0.50347 | keep(keyword_pass) |
+| [ ] | 198 | aitimes | [10월2일] "뜻밖의 주인공은 로그인과 플러그인"…알트먼이 보여준 챗GPT의 다음 무대 | pass | 0.503735 | keep(keyword_pass) |
+| [ ] | 179 | aitimes | 루마니아 태양광, 최대 8600억원 금융약정…2028년 가동 목표 | pass | 0.296131 | drop(low_similarity) |
+| [ ] | 903 | aitimes | 일레븐랩스, 감정 표현·지연 시간 혁신한 '일레븐 v4' 공개…TTS 아레나 1위 | pass | 0.504623 | keep(keyword_pass) |
+| [ ] | 245 | aitimes | 메타, AI 데이터센터 '실험 시설' 지정...수십억달러 세액공제 논란 | pass | 0.494998 | keep(keyword_pass) |
+| [ ] | 185 | aitimes | 딥시크, 데스크톱 앱 '딥시크 하네스' 출시..."챗·코딩·문서 통합" | pass | 0.494657 | keep(keyword_pass) |
 
-## 되살린 글(rescued) 3건
+## 되살린 글(rescued) 0건
 
 | id | 소스 | 제목 | 점수 | 가까운 관심사 |
 |---|---|---|---|---|
-| 961 | geeknews | 계속 승진하는 것이 좋은 커리어일까? 엔지니어 Philip Su의 경험 [동영상] | 0.488066 | dev-practice |
-| 966 | geeknews | 글 쓰다가 막혔을 때 대처법 | 0.481487 | dev-practice |
-| 965 | geeknews | 서버 모니터링 분석 가이드 | 0.466792 | dev-practice |
 
 ## 떨어뜨린 글(low_similarity) 9건
 

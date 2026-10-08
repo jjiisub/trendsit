@@ -71,7 +71,7 @@ def cmd_filter(args: argparse.Namespace) -> int:
             from .filter.report import write_report
 
             cmd = f"uv run python -m trendsit filter {_period(args)} --report".replace("  ", " ")
-            path = write_report(db, cfg, res, FILTER_REPORT, SEED, cmd)
+            path = write_report(db, cfg, res, FILTER_REPORT, SEED, cmd, RELEVANCE_LABELS)
             print(f"검증 산출물: {path.relative_to(ROOT)}")
         if args.labels:
             from .filter.report import make_relevance_labels
