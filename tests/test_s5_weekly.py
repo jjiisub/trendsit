@@ -173,3 +173,23 @@ def test_single_topic_rerun_carries_other_topics(tmp_path):
     assert c.execute("SELECT COUNT(*) FROM topic_pages WHERE run_id='new'").fetchone()[0] == 1  # a는 다시 쓴 것만
     assert c.execute("SELECT COUNT(*) FROM topic_evidence WHERE run_id='new' AND topic_id='b'").fetchone()[0] == 1
     assert c.execute("SELECT COUNT(*) FROM topic_pages WHERE run_id='old'").fetchone()[0] == 2  # 원본 보존
+
+
+def test_unresolved_diagram_issue_drops_the_group(week):
+    """도식 위치의 이슈가 두 번 남으면 그 그룹을 빼고(포인트 문장은 남김) 토픽은 checked."""
+    ctx, cids = week
+    p1 = json.loads(page(1, "Argon이 DeepSWE에서 77.9% 기록"))
+    p1["numbers"] = [{"anchor": 1, "group": "g", "title": "점수", "context": "같은 벤치 [it:1#q1]", "unit": "ms",
+                      "items": [{"label": l, "value": "77.9", "ref": "it:1#q1", "baseline": False, "emphasis": False}
+                                for l in ("a", "b", "c")]}]
+    responses = [plan(cids), json.dumps(p1, ensure_ascii=False), revision([])]
+    for i in (2, 3, 4):
+        responses += [page(i, f"{TITLES[i]} 근거 문장 요약 정리"), verdict([])]
+    ctx.llm.transport.responses = [response(r) for r in responses]
+    ctx.tracer = Tracer(ctx.db, "weekly", "S0")
+    pipeline.run_weekly("2026-W41", ctx, from_step="select", embedder=HashEmbedder(), cfg=CFG)
+    run_id = ctx.tracer.run_id
+    t1 = ctx.db.conn.execute("SELECT status FROM topics WHERE run_id=? AND rank=1", (run_id,)).fetchone()
+    final = json.loads(ctx.db.conn.execute("SELECT page_json FROM topic_pages WHERE run_id=? AND topic_id='w41-model-1' "
+                                           "ORDER BY round DESC, id DESC", (run_id,)).fetchone()[0])
+    assert t1["status"] == "checked" and final["numbers"] == [] and "77.9%" in final["points"][0]["text"]

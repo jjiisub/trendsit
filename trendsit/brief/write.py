@@ -355,7 +355,16 @@ def write_topic(ctx: Ctx, topic: Applied, members: dict[str, Member], table: Ali
     final = res.page or page
     if check_locs:
         pts = [p.model_copy(update={"check": True}) if f"points[{i}]" in check_locs else p for i, p in enumerate(final.points)]
-        final = final.model_copy(update={"points": pts})
+        # 도식 그룹에 남은 이슈는 그 그룹을 뺀다(포인트 문장은 그림 없이도 읽힘, skills/diagrams.md). check를 달 자리가 없어
+        # 틀린 막대가 그대로 발행되던 문제(W40 gpt-6-1-sol, decision-api: 단위 섞인 막대)
+        drop = {(m.group(1), int(m.group(2))) for loc in check_locs if (m := re.match(r"^(numbers|events)\[(\d+)\]", loc))}
+        upd: dict[str, Any] = {"points": pts}
+        for name in ("numbers", "events"):
+            keep = [g for i, g in enumerate(getattr(final, name)) if (name, i) not in drop]
+            if len(keep) != len(getattr(final, name)):
+                upd[name] = keep
+                res.attention.append(f"이슈가 남은 {name} 도식 {len(getattr(final, name)) - len(keep)}개 뺌")
+        final = final.model_copy(update=upd)
         res.status = "checked"
     elif res.status != "passed":
         res.status = "checked"

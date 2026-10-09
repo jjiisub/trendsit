@@ -58,7 +58,7 @@ def style_violations(page: TopicPage) -> list[str]:
     return out
 
 
-def judge_final(weeks: list[str]) -> dict:
+def judge_final(weeks: list[str], only: set[str] | None = None, prev: dict | None = None) -> dict:
     """두 주 현재판 최종 페이지를 judge(질문 Q1~Q4) + 원자 사실 judge로 채점. 작성자가 받은 입력을 같은 코드로 다시 조립."""
     from eval import graders
     from scripts.s5_eval_fixtures import week_topics
@@ -69,13 +69,15 @@ def judge_final(weeks: list[str]) -> dict:
 
     cfg = config.load("brief.yaml")
     ctx = open_ctx("eval", spec="S5", note="관문 B 최종판 judge(W40 + W41)")
-    out = {}
+    out = dict(prev or {})
     try:
         for w in weeks:
             for t in week_topics(ctx.db, w, cfg):
                 if t["page"] is None or t["status"] not in ("passed", "checked"):
                     continue
                 tp = t["topic"]
+                if only and tp.topic_id not in only:
+                    continue
                 inp = WriterInput(plan=PlanBrief(rank=tp.rank, angle=tp.angle,
                                                  relation=Relation(type=tp.relation_type, topic_id=tp.relation_topic_id)),
                                   evidence=evidence_docs(t["pack"]), previous=previous_topic(ctx.db, tp.relation_topic_id),
@@ -96,10 +98,13 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--weeks", nargs="+", required=True)
     ap.add_argument("--judge", action="store_true", help="최종판 judge를 새로 돌림(없으면 저장된 결과 사용)")
+    ap.add_argument("--topics", nargs="*", help="--judge를 이 토픽만(나머지는 저장된 결과, E2 실패 건만 재실행)")
     args = ap.parse_args()
     db = DB(ROOT / "data" / "trendsit.db")
     jpath = ROOT / "reports" / "S5_brief" / "gate_b_final_judge.json"
-    final = judge_final(args.weeks) if args.judge else (json.loads(jpath.read_text()) if jpath.exists() else {})
+    saved = json.loads(jpath.read_text()) if jpath.exists() else {}
+    final = judge_final(args.weeks, set(args.topics) if args.topics else None, saved if args.topics else None) \
+        if args.judge else saved
     lines = ["", "## 실제 실행(" + " + ".join(args.weeks) + ", 관문 B 대상 주)", "",
              "> `scripts/s5_gate_b.py`가 붙인 절. 라벨이 필요한 항목은 2차 라벨(D1-3, 리뷰 세션 opus-5.5) 전 잠정.", ""]
     sel_rows, crit_rows, diag = [], [], {}
