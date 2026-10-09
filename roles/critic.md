@@ -24,7 +24,7 @@ core_rules:
 
 ## 입력
 - `page`: 현재 라운드 TopicPage(points, numbers, events, contributions, concepts, overview, summary, title)
-- `<document id="...">`: page의 refs가 가리키는 근거 원문만(글 quote 문장, 영상 OCR·전사 구간과 시각, 레포 필드). **요약 칸이 아니라 원문 문장이 판정 기준이다**
+- `<document id="...">`: 이 토픽의 근거 원문(글 quote 문장, 영상 OCR·전사 구간과 시각, 레포 필드). page의 refs가 가리키는 것이 앞에 온다. 각 문장은 그 refs 문서로, overview·summary·title은 전체 문서로 대조한다. **요약 칸이 아니라 원문 문장이 판정 기준이다**
 - `angle`: 편집장이 정한 이 토픽의 축
 - `code_warnings`: 코드 검사가 남긴 경고(도식 누락 의심, 남발 의심 등)
 - `round`: 1~3

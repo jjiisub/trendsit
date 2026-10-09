@@ -131,8 +131,9 @@ def main() -> int:
             break
 
         def crit_inp(page: TopicPage, t=t) -> dict:
+            order = [e for e in refs_of(page) if e in t["pack"]] + [e for e in t["pack"] if e not in refs_of(page)]
             ev = [Document(id=e, source=t["pack"][e][0].source.get("site") or "", title=t["pack"][e][0].source.get("title"),
-                           text=raw_evidence(db, e, t["pack"][e])) for e in refs_of(page) if e in t["pack"]]
+                           text=raw_evidence(db, e, t["pack"][e])) for e in order]
             return CriticInput(page=page, evidence=ev, angle=t["topic"].angle, code_warnings=[], round=1).model_dump()
 
         if t["status"] == "passed":

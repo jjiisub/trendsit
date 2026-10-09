@@ -293,9 +293,12 @@ def write_topic(ctx: Ctx, topic: Applied, members: dict[str, Member], table: Ali
         log = RoundLog(rnd, "code", "reject" if issues else "pass", [i.model_dump() for i in issues], cr.autofix,
                        cr.warnings, sid)
         if not issues and review:
+            # refs 근거를 앞에, 나머지 토픽 근거를 뒤에. overview·summary·title은 refs가 없어 토픽 근거 전체가 기준이다
+            # (refs만 주면 자동 수정으로 빠진 칸의 근거가 사라져 맞는 문장을 근거 없음으로 반려했다, W40 deepseek)
+            order = [e for e in refs_of(page) if e in pack] + [e for e in pack if e not in refs_of(page)]
             evid = [Document(id=e, source=pack[e][0].source.get("site") or pack[e][0].channel,
                              title=pack[e][0].source.get("title"), text=raw_evidence(ctx.db, e, pack[e]))
-                    for e in refs_of(page) if e in pack]
+                    for e in order]
             verdict, err, vsid = _call(critic, CriticInput(page=page, evidence=evid, angle=topic.angle,
                                                            code_warnings=cr.warnings, round=rnd), ctx, res.costs, "critic")
             res.rounds.append(log)
