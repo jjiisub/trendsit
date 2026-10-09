@@ -221,17 +221,19 @@ def aggregate_text_analyst(results: list[dict[str, Any]]) -> tuple[dict[str, Any
                    if e["field"] == "verified" and (e["rule"] == PARTIAL_RULE) == rule_is_partial
                    for b, a in zip(e["before"], e["after"], strict=False) if b["status"] != a["status"])
 
-    mis = demoted(False)
-    # 설계 결정 N2: 부분 확인 내림(리뷰 R3)은 이번에는 보고용 지표. S5부터 근거 없는 판정 문턱값에 포함
-    partial = demoted(True)
+    # 설계 결정 N2 → S5 P4-7: 부분 확인 내림(리뷰 R3)도 근거 없는 판정 문턱값(0~1건)에 포함
+    unsupported, partial = demoted(False), demoted(True)
+    mis = unsupported + partial
     outs = [r["output"] for r in results if r.get("output")]
     found = [o for o in outs if o.get("origin")]
     depths: dict[int, int] = {}
     for o in found:
         d = next((t["depth"] for t in o["trail"] if t["url"] == o["origin"]["url"]), 0)
         depths[d] = depths.get(d, 0) + 1
-    reasons = [] if mis <= MISJUDGED_MAX else [f"근거 없는 confirmed/differs {mis}건 > {MISJUDGED_MAX}"]
-    return {"근거 없는 판정(enforce 전)": mis, "부분 확인 내림(보고용, N2)": partial, "원본 확보": f"{len(found)}/{len(outs)}",
+    reasons = [] if mis <= MISJUDGED_MAX else [
+        f"근거 없는 판정 {mis}건(근거 없는 confirmed/differs {unsupported} + 부분 확인 내림 {partial}) > {MISJUDGED_MAX}"]
+    return {"근거 없는 판정(enforce 전, 부분 확인 포함)": mis, "그중 부분 확인 내림": partial,
+            "원본 확보": f"{len(found)}/{len(outs)}",
             "깊이 분포": ", ".join(f"{k}:{v}" for k, v in sorted(depths.items())) or "-"}, reasons
 
 

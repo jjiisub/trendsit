@@ -5,7 +5,7 @@ from __future__ import annotations
 import re
 from typing import Any
 
-from trendsit.core.artifacts_video import MAX_EVIDENCE, VideoSummary, same_spelling
+from trendsit.core.artifacts_video import VideoSummary, same_spelling
 
 from . import graders
 from .graders import EVAL_ENDINGS, check, ends_as_sentence
@@ -36,7 +36,8 @@ def code_video_summary(inp: dict[str, Any], out: dict[str, Any], expect: dict[st
     bad_ev = [e for e in evidence if not in_span(e)]
     checks = [
         check("근거 id 형식과 구간", not bad_ev, ", ".join(bad_ev[:5])),
-        check(f"포인트마다 근거 1~{MAX_EVIDENCE}개", all(1 <= len(kp["evidence"]) <= MAX_EVIDENCE for kp in points),
+        # 근거 상한(MAX_EVIDENCE)은 enforce가 자르는 코드 소유 규칙(S5 P4-6). 넘친 건수는 모델 일치율(key_points)로 기록
+        check("포인트마다 근거 1개 이상", all(len(kp["evidence"]) >= 1 for kp in points),
               str([len(kp["evidence"]) for kp in points])),
         check("타임라인 초가 구간 안", all(lo <= t["sec"] <= hi for t in out["timeline"]),
               str([t["sec"] for t in out["timeline"] if not lo <= t["sec"] <= hi])),

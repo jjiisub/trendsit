@@ -168,7 +168,7 @@ def test_text_analyst_graders():
                "after": [{"check_n": 1, "quote_n": None, "status": "not_found"}], "rule": "x"}
     rec = {"output": good, "enforced": [changed]}
     m, reasons = aggregate_text_analyst([rec, {"output": good}])
-    assert m["근거 없는 판정(enforce 전)"] == 1 and not reasons and m["깊이 분포"] == "2:2"
+    assert m["근거 없는 판정(enforce 전, 부분 확인 포함)"] == 1 and not reasons and m["깊이 분포"] == "2:2"
     _, reasons = aggregate_text_analyst([rec, rec])
     assert reasons
 
@@ -258,7 +258,7 @@ def test_r3_partial_confirmation_demoted():
 
 
 def test_r3_n2_regrade_saved_text_analyst():
-    """저장된 맥 평가에 R3을 이어 적용: it201·it933·it997이 내려가고, N2대로 별도 지표(근거 없는 판정 문턱값 밖)."""
+    """저장된 맥 평가에 R3을 이어 적용: it201·it933·it997이 내려가고, S5부터 근거 없는 판정 문턱값에 들어감(P4-7)."""
     from pathlib import Path
 
     from eval.graders_text import aggregate_text_analyst, reenforce_text_analyst
@@ -273,7 +273,9 @@ def test_r3_n2_regrade_saved_text_analyst():
         x["enforced"], x["enforced_output"] = enforced, out
     assert changed == ["it201", "it933", "it997"]
     metrics, reasons = aggregate_text_analyst(results)
-    assert metrics["부분 확인 내림(보고용, N2)"] == 5 and metrics["근거 없는 판정(enforce 전)"] == 0 and reasons == []
+    # S5 P4-7: 부분 확인 내림도 근거 없는 판정 문턱값(0~1건)에 들어가 이 저장 평가는 미달이 된다
+    assert metrics["그중 부분 확인 내림"] == 5 and metrics["근거 없는 판정(enforce 전, 부분 확인 포함)"] == 5
+    assert reasons and "부분 확인 내림 5" in reasons[0]
 
 
 def test_r3_differs_kept():
