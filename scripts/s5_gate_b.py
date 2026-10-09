@@ -58,11 +58,48 @@ def style_violations(page: TopicPage) -> list[str]:
     return out
 
 
+def judge_final(weeks: list[str]) -> dict:
+    """두 주 현재판 최종 페이지를 judge(질문 Q1~Q4) + 원자 사실 judge로 채점. 작성자가 받은 입력을 같은 코드로 다시 조립."""
+    from eval import graders
+    from scripts.s5_eval_fixtures import week_topics
+    from trendsit.brief.write import evidence_docs, previous_topic
+    from trendsit.core import config
+    from trendsit.core.artifacts_brief import PlanBrief, Relation, WriterInput
+    from trendsit.core.context import open_ctx
+
+    cfg = config.load("brief.yaml")
+    ctx = open_ctx("eval", spec="S5", note="관문 B 최종판 judge(W40 + W41)")
+    out = {}
+    try:
+        for w in weeks:
+            for t in week_topics(ctx.db, w, cfg):
+                if t["page"] is None or t["status"] not in ("passed", "checked"):
+                    continue
+                tp = t["topic"]
+                inp = WriterInput(plan=PlanBrief(rank=tp.rank, angle=tp.angle,
+                                                 relation=Relation(type=tp.relation_type, topic_id=tp.relation_topic_id)),
+                                  evidence=evidence_docs(t["pack"]), previous=previous_topic(ctx.db, tp.relation_topic_id),
+                                  aliases=t["aliases"])
+                r = graders.llm_grade("writer", inp, t["page"].model_dump(), ctx)
+                out[tp.topic_id] = {"week": w, "status": t["status"], "verdicts": r["verdicts"], "scores": r["scores"],
+                                    "facts": r.get("facts")}
+                print(tp.topic_id, {q: v["verdict"] for q, v in r["verdicts"].items()},
+                      f"{r['facts']['supported']}/{r['facts']['total']}" if r.get("facts") else "", file=sys.stderr)
+    finally:
+        ctx.tracer.finish("ok")
+    path = ROOT / "reports" / "S5_brief" / "gate_b_final_judge.json"
+    path.write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding="utf-8")
+    return out
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--weeks", nargs="+", required=True)
+    ap.add_argument("--judge", action="store_true", help="최종판 judge를 새로 돌림(없으면 저장된 결과 사용)")
     args = ap.parse_args()
     db = DB(ROOT / "data" / "trendsit.db")
+    jpath = ROOT / "reports" / "S5_brief" / "gate_b_final_judge.json"
+    final = judge_final(args.weeks) if args.judge else (json.loads(jpath.read_text()) if jpath.exists() else {})
     lines = ["", "## 실제 실행(" + " + ".join(args.weeks) + ", 관문 B 대상 주)", "",
              "> `scripts/s5_gate_b.py`가 붙인 절. 라벨이 필요한 항목은 2차 라벨(D1-3, 리뷰 세션 opus-5.5) 전 잠정.", ""]
     sel_rows, crit_rows, diag = [], [], {}
@@ -123,8 +160,30 @@ def main() -> int:
     n = len(topics_all)
     multi = sum(1 for _, _, _, c, _ in topics_all if len(c) >= 2)
     style = sum(len(sv) for *_, sv in topics_all)
-    lines += ["### 관문 B 항목(실제 실행)", "",
+    qs = ("Q1", "Q2", "Q3", "Q4")
+    qrate = {q: (sum(1 for v in final.values() if v["verdicts"].get(q, {}).get("verdict") == "pass"),
+                 sum(1 for v in final.values() if q in v["verdicts"])) for q in qs}
+    facts = [(k, v["facts"]) for k, v in final.items() if v.get("facts")]
+    full = sum(1 for _, f in facts if f["supported"] == f["total"])
+    lines += ["### 최종판 judge(관문 B, `reports/S5_brief/gate_b_final_judge.json`)", "",
+              "| 토픽 | 상태 | Q1 | Q2 | Q3 | Q4 | 원자 사실 | 비지지 |", "|---|---|---|---|---|---|---|---|"]
+    for k, v in final.items():
+        f = v.get("facts") or {}
+        un = "; ".join(f"{u['loc']} {u['fact'][:40]}" for u in (f.get("unsupported") or [])[:2])
+        lines.append(f"| {k} | {v['status']} | " + " | ".join(v["verdicts"].get(q, {}).get("verdict", "-") for q in qs)
+                     + f" | {f.get('supported')}/{f.get('total')} | {un} |")
+    for k, v in final.items():
+        for q in qs:
+            if v["verdicts"].get(q, {}).get("verdict") == "fail":
+                lines.append(f"- {k} {q}: {v['verdicts'][q]['critique'][:200]}")
+    lines += ["", "### 관문 B 항목(실제 실행)", "",
               "| 항목 | 결과 | 문턱값 | 판정 |", "|---|---|---|---|",
+              f"| 근거 충실성(원자 사실, 토픽별) | {full}/{len(facts)} 토픽 100% | 모든 토픽 100% | "
+              f"{'통과(잠정)' if facts and full == len(facts) else '미달(잠정)'} |"]
+    for q, name, need in (("Q1", "핵심 포착", .9), ("Q2", "군더더기 없음", .9), ("Q3", "읽기 쉬움", .9), ("Q4", "문체(번역투)", .9)):
+        p_, n_ = qrate[q]
+        lines.append(f"| {name}({q}) | {p_}/{n_} | {need:.0%} | {'통과(잠정)' if n_ and p_ / n_ >= need else '미달(잠정)'} |")
+    lines += [
               f"| 문체(코드 정규식, 최종판) | 위반 {style}건 | 0 | {'통과' if style == 0 else '미달'} |",
               f"| 묶기: 2채널 이상 토픽 비율 | {multi}/{n} | 기록 | - |",
               "| 묶기 오병합 | 라벨 대기(`eval/labels/decide.csv`) | 0 | 잠정 |",

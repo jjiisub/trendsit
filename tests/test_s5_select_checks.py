@@ -268,3 +268,18 @@ def test_number_item_value_accepts_numbers():
     assert NumberItem.model_validate({"label": "a", "value": 77.9, "ref": "x"}).value == "77.9"
     assert NumberItem.model_validate({"label": "a", "value": 38, "ref": "x"}).value == "38"
     assert NumberItem.model_validate({"label": "a", "value": "1.36달러", "ref": "x"}).value == "1.36달러"
+
+
+def test_bar_value_unit_checked_against_evidence():
+    """W40 judge: ms 그룹에 1.6초, $ 그룹에 % 값. 근거에서 그 값 뒤 단위가 그룹 단위와 다르면 반려."""
+    src = {"site": "s", "title": "t"}
+    pk = {"it:2#q1": [EvidenceItem("it:2#q1", "it:2", "text", "quote",
+                                   "Decision API 150ms, 120ms, Luna는 1.6초", src)]}
+    g = NumberGroup(anchor=1, group="g", title="응답 시간", context="c [it:2#q1]", unit="ms",
+                    items=[NumberItem(label="A", value="150", ref="it:2#q1"), NumberItem(label="B", value="120", ref="it:2#q1"),
+                           NumberItem(label="Luna", value="1.6", ref="it:2#q1")])
+    p = page(points=[Point(text="Decision API 응답 150ms, Luna 1.6초보다 빠름", refs=["it:2#q1"]),
+                     Point(text="두 번째 근거 문장 요약 정리", refs=["it:2#q1"])], numbers=[g])
+    issues = checks.run_checks(p, pk, 1, CFG, {}).issues
+    assert any("numbers[0].items[2]" == i.loc and "근거 단위는 s" in i.comment for i in issues)
+    assert not any(i.loc in ("numbers[0].items[0]", "numbers[0].items[1]") for i in issues)

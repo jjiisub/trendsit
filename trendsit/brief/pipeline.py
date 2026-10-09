@@ -123,6 +123,8 @@ def run_weekly(week: str, ctx: Ctx, from_step: str = "cluster", only_topic: str 
                             {"round": lg.round, "checker": lg.checker, "status": lg.status, "issues": lg.issues,
                              "reverts": lg.reverts, "autofix": len(lg.autofix)} for lg in res.rounds]})
     dur["write_review"] = round(time.monotonic() - t2, 1)
+    if only_topic and src:
+        carry_over(db, src, run_id, keep={only_topic})
     save_topic_embeddings(db, run_id, embedder, results)
     if until == "select":
         status = "selected"
@@ -138,6 +140,24 @@ def run_weekly(week: str, ctx: Ctx, from_step: str = "cluster", only_topic: str 
     with db.conn:
         db.conn.execute("UPDATE runs SET summary_json=? WHERE id=?", (json.dumps(summary, ensure_ascii=False), run_id))
     return summary
+
+
+def carry_over(db: DB, src: str, run_id: str, keep: set[str]) -> None:
+    """토픽 하나만 다시 돌린 run에 나머지 토픽의 결과(상태, 최종판, 판정, 근거 연결, 임베딩)를 원본 run에서 복사한다.
+    그래야 그 run이 그 주 현재판이 되어도 토픽이 빠지지 않는다. 복사한 행도 이 run_id로 쌓인다(원본은 그대로)."""
+    rows = db.conn.execute("SELECT topic_id, status, final_round, title, summary FROM topics WHERE run_id=?", (src,)).fetchall()
+    with db.conn:
+        for r in rows:
+            if r["topic_id"] in keep:
+                continue
+            db.conn.execute("UPDATE topics SET status=?, final_round=?, title=?, summary=? WHERE run_id=? AND topic_id=?",
+                            (r["status"], r["final_round"], r["title"], r["summary"], run_id, r["topic_id"]))
+            for tbl, cols in (("topic_pages", "topic_id, round, page_json, raw_json, step_id"),
+                              ("verdicts", "topic_id, round, checker, status, issues_json, autofix_json, step_id"),
+                              ("topic_evidence", "topic_id, evidence_id, member, field, idx"),
+                              ("topic_embeddings", "topic_id, model, dim, vec, text_hash")):
+                db.conn.execute(f"INSERT INTO {tbl}(run_id, {cols}) SELECT ?, {cols} FROM {tbl} WHERE run_id=? AND topic_id=?",
+                                (run_id, src, r["topic_id"]))
 
 
 def save_topic_embeddings(db: DB, run_id: str, embedder: Any, results: list[wr.TopicResult]) -> None:

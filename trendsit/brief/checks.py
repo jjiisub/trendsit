@@ -28,6 +28,39 @@ REF = re.compile(r"(?:it|og|vd|rp):[\w./#@:-]+")
 _SENT = re.compile(r"(?<=[.!?다])\s+")
 
 
+UNIT_KINDS = (("%", ("%", "퍼센트", "%p", "포인트")), ("ms", ("ms", "밀리초")), ("s", ("초", "s", "sec")),
+              ("$", ("$", "달러", "usd")), ("원", ("원",)), ("배", ("배", "x", "×")), ("tok/s", ("tok/s", "토큰/초")))
+
+
+def unit_kind(text: str) -> str | None:
+    """단위 표기의 종류. 앞에서부터 본다('$/1M tokens' → $, '초' → s). 한 글자 영문 단위(s, x)는 단독일 때만."""
+    t = (text or "").strip().lower()
+    if not t:
+        return None
+    for kind, words in UNIT_KINDS:
+        for w in words:
+            if len(w) == 1 and w.isascii() and w.isalpha():
+                if t == w:
+                    return kind
+            elif t.startswith(w):
+                return kind
+    return None
+
+
+def evidence_unit(value: str, src: str) -> str | None:
+    """근거 글에서 값(숫자) 바로 앞뒤에 붙은 단위 종류. 못 찾으면 None(대조하지 않음)."""
+    num = re.sub(r"[^\d.]", "", value or "")
+    if not num:
+        return None
+    for m in re.finditer(rf"(\$?)(?<![\d.]){re.escape(num)}(?![\d])\s?([%a-zA-Z가-힣/×]{{0,6}})", src):
+        if m.group(1):
+            return "$"
+        k = unit_kind(m.group(2))
+        if k:
+            return k
+    return None
+
+
 def sentences(text: str) -> list[str]:
     return [s for s in _SENT.split((text or "").strip()) if s.strip()]
 
@@ -236,6 +269,15 @@ def check(page: TopicPage, pack: dict[str, list[EvidenceItem]], n_sources: int, 
                 issues.append(_issue(loc, "format", f"{loc} 항목 {len(g.items)}개(2~6)", ""))
     if len(anchors) != len(set(anchors)):
         issues.append(_issue("numbers", "format", f"한 포인트에 도식 둘 이상(anchor {anchors})", "한 포인트에 도식 하나"))
+    # 막대 값의 단위를 근거 표기와 대조: 근거에서 그 값 바로 뒤 단위가 그룹 단위와 다르면 반려(W40 judge: ms 그룹에 1.6초, $ 그룹에 %)
+    for g_i, g in enumerate(page.numbers):
+        gu = unit_kind(g.unit)
+        for it_i, it in enumerate(g.items):
+            ev_unit = evidence_unit(it.value, _ev_text([it.ref], pack))
+            if gu and ev_unit and ev_unit != gu:
+                issues.append(_issue(f"numbers[{g_i}].items[{it_i}]", "number_mismatch",
+                                     f"numbers[{g_i}].items[{it_i}] 값 {it.value}의 근거 단위는 {ev_unit}인데 그룹 단위는 {g.unit}",
+                                     "같은 단위 값만 한 그룹에(다르면 그룹을 나누거나 문장으로)", evidence_id=it.ref))
     for g_i, g in enumerate(page.numbers):
         mixed = {re.sub(r"[\d.,\s]", "", it.value) for it in g.items} - {"", g.unit}
         if len(mixed) > 1:

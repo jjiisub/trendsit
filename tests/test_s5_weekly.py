@@ -151,3 +151,25 @@ def test_editor_select_retries_then_falls_back(week):
     assert row["source"] == "fallback" and summary["select"]["selected"] == 4
     sent = [b["messages"][-1]["content"] for b in ctx.llm.transport.bodies[1:3]]
     assert all("lead가 2개" in s for s in sent)  # 재시도 입력에 거부 이유
+
+
+def test_single_topic_rerun_carries_other_topics(tmp_path):
+    """토픽 하나만 다시 돌린 run도 그 주 현재판이 될 수 있게 나머지 토픽 결과를 원본 run에서 복사."""
+    from trendsit.core.db import DB
+
+    db = DB(tmp_path / "t.db")
+    c = db.conn
+    for run in ("old", "new"):
+        for tid in ("a", "b"):
+            c.execute("INSERT INTO topics(run_id, topic_id, week, cluster_ids_json, rank, lead, status) VALUES (?,?,?,?,?,?,?)",
+                      (run, tid, "2026-W41", "[1]", 1, 0, "selected"))
+    c.execute("UPDATE topics SET status='passed', final_round=2, title='B 제목' WHERE run_id='old' AND topic_id='b'")
+    c.execute("INSERT INTO topic_pages(run_id, topic_id, round, page_json) VALUES ('old','b',2,'{}'), ('old','a',1,'{}')")
+    c.execute("INSERT INTO topic_evidence(run_id, topic_id, evidence_id, member, field, idx) VALUES ('old','b','it:1#q1','it:1','point',0)")
+    c.commit()
+    pipeline.carry_over(db, "old", "new", keep={"a"})
+    b = c.execute("SELECT status, final_round, title FROM topics WHERE run_id='new' AND topic_id='b'").fetchone()
+    assert tuple(b) == ("passed", 2, "B 제목")
+    assert c.execute("SELECT COUNT(*) FROM topic_pages WHERE run_id='new'").fetchone()[0] == 1  # a는 다시 쓴 것만
+    assert c.execute("SELECT COUNT(*) FROM topic_evidence WHERE run_id='new' AND topic_id='b'").fetchone()[0] == 1
+    assert c.execute("SELECT COUNT(*) FROM topic_pages WHERE run_id='old'").fetchone()[0] == 2  # 원본 보존
