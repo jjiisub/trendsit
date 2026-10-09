@@ -20,6 +20,7 @@ from .evidence import RELEVANCE_RANK
 from .weekly import ClusterStage
 
 OUT = ROOT / "reports" / "S5_brief"
+LABELS = ROOT / "eval" / "labels"
 NEAR_TOP = 20
 EDITOR_TOP = 20
 
@@ -207,3 +208,37 @@ def write_cluster_report(stage: ClusterStage, cfg: BriefConfig, note: str = "") 
             w.writerow([p.a, p.b, int(p.cross), p.sim, p.route, int(p.decided),
                         "" if p.same is None else int(p.same), p.confidence or "", int(owner[p.a] == owner[p.b]), p.reason])
     return path
+
+
+def _merge_csv(path: Path, key: tuple[str, ...], cols: list[str], rows: list[dict[str, Any]], keep: tuple[str, ...]) -> None:
+    """라벨 시트를 다시 만들 때 이미 채운 라벨 칸(keep)은 같은 열쇠의 행에 보존한다."""
+    old: dict[tuple[str, ...], dict[str, str]] = {}
+    if path.exists():
+        with path.open(encoding="utf-8") as f:
+            for r in csv.DictReader(f):
+                old[tuple(r.get(k, "") for k in key)] = r
+    with path.open("w", newline="", encoding="utf-8") as f:
+        w = csv.DictWriter(f, fieldnames=cols)
+        w.writeheader()
+        for r in rows:
+            prev = old.get(tuple(str(r[k]) for k in key), {})
+            w.writerow(r | {k: prev.get(k, "") for k in keep})
+
+
+def write_label_sheets(stage: ClusterStage) -> list[Path]:
+    """2차 라벨 시트(D1-3, 리뷰 세션이 채움): decide 판정 쌍(eval/labels/decide.csv), 별칭 표(eval/labels/aliases.csv).
+    label 칸: same / diff(decide), ok / wrong(별칭). 이미 채운 칸은 보존."""
+    res = stage.result
+    LABELS.mkdir(parents=True, exist_ok=True)
+    keep = ("label", "critique", "labeler")
+    dec_cols = ["week", "a", "b", "a_title", "b_title", "cross_channel", "sim", "answer", "confidence", "reason", *keep]
+    dec = [{"week": res.week, "a": p.a, "b": p.b, "a_title": res.members[p.a].title[:80], "b_title": res.members[p.b].title[:80],
+            "cross_channel": int(p.cross), "sim": p.sim, "answer": "same" if p.same else "diff", "confidence": p.confidence,
+            "reason": p.reason} for p in res.pairs if p.decided]
+    al_cols = ["canonical", "alias", "status", "reason", "evidence", *keep]
+    als = [{"canonical": r.canonical, "alias": r.alias, "status": r.status, "reason": r.reason,
+            "evidence": " ".join(r.evidence[:5])} for r in stage.aliases.rows if r.keyword_id is None]
+    out = [LABELS / "decide.csv", LABELS / "aliases.csv"]
+    _merge_csv(out[0], ("week", "a", "b"), dec_cols, dec, keep)
+    _merge_csv(out[1], ("canonical", "alias"), al_cols, als, keep)
+    return out

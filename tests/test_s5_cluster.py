@@ -149,3 +149,29 @@ def test_stage_cluster_saves_rows_and_report(tmp_path, monkeypatch):
     stage2 = stage_cluster("2026-W41", ctx, embedder=HashEmbedder())
     assert c.execute("SELECT COUNT(DISTINCT run_id) FROM clusters").fetchone()[0] == 2
     assert c.execute("SELECT current_run_id FROM weeks").fetchone()[0] == stage2.run_id
+
+
+def test_label_sheets_keep_filled_labels(tmp_path, monkeypatch):
+    import csv
+
+    from trendsit.brief import report as rp
+    from trendsit.brief.aliases import AliasRow, AliasTable
+    from trendsit.brief.cluster import ClusterResult, Pair
+    from trendsit.brief.weekly import ClusterStage
+
+    monkeypatch.setattr(rp, "LABELS", tmp_path)
+    ms = {"it:1": m("it:1"), "it:2": m("it:2")}
+    p = Pair("it:1", "it:2", 0.7, False, route="decide", decided=True, same=True, confidence=0.9, reason="같음")
+    res = ClusterResult("2026-W41", [], [p], {}, [], 1, 0, 0, ms)
+    stage = ClusterStage("r", None, AliasTable([AliasRow("Claude", "클로드", "candidate", "x")]), res, {}, [])  # type: ignore[arg-type]
+    rp.write_label_sheets(stage)
+    rows = list(csv.DictReader((tmp_path / "decide.csv").open()))
+    rows[0]["label"], rows[0]["labeler"] = "same", "opus-5.5"
+    with (tmp_path / "decide.csv").open("w", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=list(rows[0]))
+        w.writeheader()
+        w.writerows(rows)
+    rp.write_label_sheets(stage)
+    again = list(csv.DictReader((tmp_path / "decide.csv").open()))
+    assert (again[0]["label"], again[0]["labeler"]) == ("same", "opus-5.5")
+    assert list(csv.DictReader((tmp_path / "aliases.csv").open()))[0]["alias"] == "클로드"

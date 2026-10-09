@@ -267,3 +267,4 @@ def _load(module: str) -> None:
 
 _load("graders_text")  # S2~S3
 _load("graders_video")  # S4
+_load("graders_brief")  # S5

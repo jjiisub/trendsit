@@ -16,7 +16,7 @@ def _week(v: str) -> str:
 
 
 def cmd_cluster(args: argparse.Namespace) -> int:
-    from .brief.report import write_cluster_report
+    from .brief.report import write_cluster_report, write_label_sheets
     from .brief.weekly import stage_cluster
     from .core import config
     from .core.context import open_ctx
@@ -27,6 +27,7 @@ def cmd_cluster(args: argparse.Namespace) -> int:
         stage = stage_cluster(args.week, ctx, use_llm=not args.no_llm)
         path = write_cluster_report(stage, config.load("brief.yaml"),
                                     note=args.note or "")
+        write_label_sheets(stage)
     except Exception:
         status = "failed"
         raise

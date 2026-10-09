@@ -1,0 +1,31 @@
+{
+ "input": {
+  "a": {
+   "id": "vd:yNPS1Z64wQM",
+   "source": "video",
+   "text": "요약: Hornet.dev CEO Joel Bergum이 에이전트 검색에서 BM25가 다시 강력해지는 이유를 설명하는 발표다. LLM 에이전트가 일반 지식을 활용해 구체적이고 긴 쿼리를 작성하면서, 정확한 문자열 매칭이 가능한 BM25의 가치가 높아졌다. BrowseComp-Plus 벤치마크에서 BM25 파라미터 튜닝만으로 정답률이 64%에서 82%로 올랐으며, BM25와 grep을 결합한 동적 워크스페이스 확장 방식이 73.3%의 성능을 보였다.\n등장 이름: agentic search, BrowseComp-Plus, hornet.dev\n키워드: ",
+   "title": "[한영자막] 에이전트 검색에서 30년 된 BM25가 놀랍도록 강력한 이유입니다",
+   "url": null
+  },
+  "b": {
+   "id": "it:9002",
+   "source": "text",
+   "text": "요약: Joel Bergum이 발표에서 에이전트가 긴 쿼리를 쓰면서 BM25 정확 매칭의 가치가 커졌다고 설명했다.\n등장 이름: Hornet.dev, Joel Bergum, BM25, BrowseComp-Plus\n키워드: rag-search, agent",
+   "title": "에이전트 검색에서 BM25가 다시 강해진 이유(Hornet.dev 발표 정리)",
+   "url": null
+  },
+  "shared": {
+   "keywords": [
+    "rag-search"
+   ],
+   "aliases": [
+    "bm25"
+   ],
+   "similarity": 0.68
+  }
+ },
+ "expect": {
+  "same": true
+ },
+ "note": "같은 발표의 영상 ↔ 정리 글(글은 합성)"
+}

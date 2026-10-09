@@ -69,6 +69,7 @@ uv run python -m trendsit summarize --since 2026-09-28 --until 2026-10-04 --spec
 uv run python -m trendsit repo-analyze --week 2026-W41 --traces   # 레포 분석가(규칙 기반 큐 또는 --queue)
 uv run python -m trendsit plan --day 2026-10-04 --report          # 편집장 계획(plan show --day D --video-queue로 S4 입력)
 uv run python -m trendsit deep text --day 2026-10-04 --traces     # 글 분석가: 계획의 원본 추적 큐
+uv run python -m trendsit cluster --week 2026-W41 --spec S5      # 주간 묶기 + 과거 대조 → reports/S5_brief/cluster_<주>.md(S5 진행 중)
 uv run python -m trendsit cost --spec S0       # 사용액과 남은 예산
 ```
 영상 분석가(맥, Apple Silicon): `uv sync --extra video` 뒤
