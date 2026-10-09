@@ -46,7 +46,8 @@ def main() -> int:
         cfg.cluster.embed_text = mode
         ev = week_evidence(ctx.db, args.week)
         table = al.load_decided(ctx.db, al.build(list(ev.members.values()), config.load("keywords.yaml"),
-                                                 cfg.aliases.fuzz_min_score))
+                                                 cfg.aliases.fuzz_min_score,
+                                             cfg.aliases.transliteration))
         cl.score_video_relevance(list(ev.members.values()), embedder, [(x.keyword_id, x.text) for x in flt.interests],
                                  cfg.evidence.video_relevance_high)
         res = cl.cluster_week(ctx.db, ev, table, cfg, embedder, make_decider(ctx))

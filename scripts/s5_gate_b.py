@@ -16,6 +16,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -27,7 +28,7 @@ from trendsit.core.artifacts_brief import TopicPage  # noqa: E402
 from trendsit.core.db import DB  # noqa: E402
 from trendsit.core.style import EVAL_ENDINGS, ends_as_sentence, is_haeyo  # noqa: E402
 
-LABELS = ROOT / "eval" / "labels"
+LABELS = ROOT / os.environ.get("S5_LABELS", "eval/labels")  # 1차 라벨 스냅숏: eval/labels/s5_r1
 KEEP = ("label", "critique", "labeler")
 
 
@@ -149,13 +150,40 @@ def agreement(judge: dict) -> list[str]:
     return ["", f"라벨: {', '.join(labelers)}(잠정, D1-3). 일치율은 \"모델 대 모델\"", "", *lines]
 
 
+DECODE_TPS, PREFILL_TPS = 8.0, 15600 / 101  # 로컬 qwen3.8-27b q4 실측(S5_report 실행 시간 절)
+
+
+def runtime(db: DB, runs: list[str]) -> list[str]:
+    """실행 시간 분해(리뷰 R18): 역할별 호출·토큰과 로컬 추정(디코딩 8 tok/s, 프리필 15.6k 토큰 101초).
+    캐시 적중 호출도 센다(새 주 실행에는 캐시가 없음). OpenRouter 실측 초는 캐시 적중이면 0에 가깝다."""
+    rows = db.conn.execute(
+        f"SELECT role, COUNT(*) n, SUM(tokens_in) ti, SUM(tokens_out) tout, SUM(latency_ms) lat FROM steps WHERE kind='llm' "
+        f"AND run_id IN ({','.join('?' * len(runs))}) GROUP BY role ORDER BY role", runs).fetchall()
+    lines = ["| 역할 | 호출 | 입력 토큰 | 출력 토큰 | OpenRouter 실측(초) | 로컬 프리필(분) | 로컬 디코딩(분) | 로컬 합(분) |",
+             "|---|---|---|---|---|---|---|---|"]
+    tot = [0, 0, 0, 0, 0.0, 0.0]
+    for r in rows:
+        pre, dec = (r["ti"] or 0) / PREFILL_TPS / 60, (r["tout"] or 0) / DECODE_TPS / 60
+        lines.append(f"| {r['role']} | {r['n']} | {r['ti']:,} | {r['tout']:,} | {(r['lat'] or 0) / 1000:.0f} | {pre:.1f} | "
+                     f"{dec:.1f} | {pre + dec:.1f} |")
+        for i, v in enumerate((r["n"], r["ti"] or 0, r["tout"] or 0, (r["lat"] or 0) / 1000, pre, dec)):
+            tot[i] += v
+    lines.append(f"| 합계 | {tot[0]} | {tot[1]:,} | {tot[2]:,} | {tot[3]:.0f} | {tot[4]:.1f} | {tot[5]:.1f} | "
+                 f"**{tot[4] + tot[5]:.0f}** |")
+    return lines
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--weeks", nargs="+", required=True)
     ap.add_argument("--judge", action="store_true", help="최종판 judge를 새로 돌림(없으면 저장된 결과 사용)")
     ap.add_argument("--topics", nargs="*", help="--judge를 이 토픽만(나머지는 저장된 결과, E2 실패 건만 재실행)")
     ap.add_argument("--agreement", metavar="JUDGE_JSON", help="라벨 기준 관문 B와 judge ↔ 라벨 일치율만 출력")
+    ap.add_argument("--runtime", nargs="+", metavar="RUN_ID", help="이 run들(묶기 run 포함)의 실행 시간 분해만 출력")
     args = ap.parse_args()
+    if args.runtime:
+        print("\n".join(runtime(DB(ROOT / "data" / "trendsit.db"), args.runtime)))
+        return 0
     if args.agreement:
         print("\n".join(agreement(json.loads(Path(args.agreement).read_text(encoding="utf-8")))))
         return 0

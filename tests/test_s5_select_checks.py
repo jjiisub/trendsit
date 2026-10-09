@@ -10,6 +10,7 @@ from trendsit.brief.evidence import EvidenceItem, Member, WeekEvidence
 from trendsit.core import config
 from trendsit.core.artifacts_brief import (
     BriefingPlan,
+    Contribution,
     Decision,
     EventGroup,
     EventItem,
@@ -56,7 +57,6 @@ def test_valid_plan_passes():
 @pytest.mark.parametrize("p,needle", [
     (plan([topic([1], 1, True), topic([2], 2, True), topic([3], 3), topic([4], 4)]), "lead가 2개"),
     (plan([topic([1], 1, True), topic([2], 2)]), "topics 개수 2개"),
-    (plan([topic([1], 1, True), topic([2], 3), topic([3], 4), topic([4], 5)]), "rank"),
     (plan([topic([1, 9], 1, True), topic([2], 2), topic([3], 3), topic([4], 4)]), "cluster_id 9"),
     (plan([topic([1], 1, True), topic([1, 2], 2), topic([3], 3), topic([4], 4)]), "토픽 2개에"),
     (plan([topic([1], 1, True), topic([3], 2, rel="follow_up", tid="w40-x"), topic([2], 3), topic([4], 4)]),
@@ -137,7 +137,9 @@ def page(**over) -> TopicPage:
     base = dict(points=[Point(text="입력 100만 토큰당 $2로 이전보다 15% 저렴함", refs=["it:1#q1"]),
                         Point(text="정확도 B 93.5%로 세 모델 중 가장 높음", refs=["it:1#q2"]),
                         Point(text="발표 슬라이드 기준 p50 지연 150ms", refs=["vd:5@30"])],
-                numbers=[], events=[], contributions=[], concepts=[],
+                numbers=[], events=[], concepts=[],
+                contributions=[Contribution(channel="text", text="가격과 정확도 수치", refs=["it:1#q1"]),
+                               Contribution(channel="video", text="발표 슬라이드의 지연 수치", refs=["vd:5@30"])],
                 overview="OpenAI가 새 가격을 발표했다. 정확도 비교도 함께 나왔다.", summary="OpenAI가 가격을 15% 내렸다.",
                 title="새 가격과 정확도", log="l", attention=False)
     return TopicPage(**(base | over))
@@ -197,7 +199,9 @@ def test_unknown_ref_and_single_source_contributions():
                                    Contribution(channel="text", text="글 설명", refs=["it:1#q1"]),
                                    Contribution(channel="text", text="또 글 설명", refs=["it:1#q1"])])
     r2 = checks.run_checks(wrong_ch, pack(), 2, CFG, {})
-    assert [c.text for c in r2.page.contributions] == ["글 설명"] and r2.passed  # 없는 채널·겹친 채널 뺌
+    assert [c.text for c in r2.page.contributions] == ["글 설명"]  # 없는 채널·겹친 채널 뺌
+    # 근거 채널 2개(text, video)인데 video 문장이 없으면 반려(리뷰 R12)
+    assert [i.loc for i in r2.issues] == ["contributions"] and "video" in r2.issues[0].comment
 
 
 def test_points_must_be_noun_form_and_summary_da():
@@ -287,3 +291,114 @@ def test_bar_value_unit_checked_against_evidence():
     issues = checks.run_checks(p, pk, 1, CFG, {}).issues
     assert any("numbers[0].items[2]" == i.loc and "근거 단위는 s" in i.comment for i in issues)
     assert not any(i.loc in ("numbers[0].items[0]", "numbers[0].items[1]") for i in issues)
+
+
+def _pack_r3() -> dict[str, list[EvidenceItem]]:
+    src = {"site": "SIFT", "title": "t", "date": "2026-10-06"}
+    return pack() | {"it:2#q1": [EvidenceItem("it:2#q1", "it:2", "text", "quote",
+                                              "Accuracy 35.1% with judge, 29.8% without. Took 5 시간 and 42 CPU hours.", src),
+                                 EvidenceItem("it:2#q1", "it:2", "text", "claim", "정확도가 3.7%p 올랐다고 주장", src)]}
+
+
+def test_r3_unit_kinds_label_unit_and_empty_unit():
+    mixed = NumberGroup(anchor=1, group="g", title="SIFT 결과", context="같은 실험 [it:2#q1]", unit="%",
+                        items=[NumberItem(label="정확도", value="35.1", ref="it:2#q1"),
+                               NumberItem(label="소요", value="5", ref="it:2#q1"),
+                               NumberItem(label="CPU(시간)", value="42", ref="it:2#q1")])
+    issues = checks.run_checks(page(numbers=[mixed]), _pack_r3(), 2, CFG, {}).issues
+    locs = {i.loc for i in issues if i.type == "number_mismatch"}
+    assert "numbers[0].items[1]" in locs  # 근거 단위 '시간'(h) ≠ %
+    assert "numbers[0].items[2]" in locs  # 라벨 끝 괄호 단위
+    empty = mixed.model_copy(update={"unit": "()", "items": mixed.items[:1] * 3})
+    assert any(i.loc == "numbers[0]" and "단위가 비어" in i.comment
+               for i in checks.run_checks(page(numbers=[empty]), _pack_r3(), 2, CFG, {}).issues)
+
+
+def test_r3_numbers_checked_in_titles_and_by_value_not_substring():
+    g = NumberGroup(anchor=2, group="g", title="B가 6.9%p 높음", context="같은 벤치 [it:1#q2]", unit="%",
+                    items=[NumberItem(label="A", value="86.6%", ref="it:1#q2"), NumberItem(label="B", value="93.5%", ref="it:1#q2"),
+                           NumberItem(label="C", value="81.2%", ref="it:1#q2")])
+    issues = checks.run_checks(page(numbers=[g], title="정확도 3.5% 차이"), pack(), 2, CFG, {}).issues
+    msgs = {i.loc: i.comment for i in issues if i.type == "number_mismatch"}
+    assert "numbers[0].title" in msgs and "6.9" in msgs["numbers[0].title"]  # 근거 값끼리 뺀 파생 수치
+    assert "title" in msgs  # '3.5'는 '93.5' 안에 글자로 있지만 값이 아님
+    # 카드 주장 줄의 수치는 근거로 치지 않음(리뷰 R2)
+    p = page(summary="SIFT 정확도가 3.7% 올랐다.")
+    assert any(i.loc == "summary" for i in checks.run_checks(p, _pack_r3(), 2, CFG, {}).issues)
+
+
+def test_r3_speculative_endings_and_eval_words_in_points():
+    p = page(overview="OpenAI가 새 가격을 발표했다. 시장 재편을 가속화할 것으로 보인다.",
+             points=[Point(text="혁신적인 가격 정책으로 100만 토큰당 $2", refs=["it:1#q1"]), *page().points[1:]])
+    bad = {i.loc for i in checks.run_checks(p, pack(), 2, CFG, {}).issues if "금지 표현" in i.comment}
+    assert bad == {"overview", "points[0]"}
+
+
+def test_r4_points_over_cap_are_truncated_from_the_back():
+    extra = [Point(text=f"추가 포인트 {k} 입력 100만 토큰당 $2", refs=["it:1#q1"]) for k in range(2)]
+    g = NumberGroup(anchor=4, group="g", title="B가 가장 높음", context="같은 벤치 [it:1#q2]", unit="%",
+                    items=[NumberItem(label="A", value="86.6%", ref="it:1#q2"), NumberItem(label="B", value="93.5%", ref="it:1#q2"),
+                           NumberItem(label="C", value="81.2%", ref="it:1#q2")])
+    text_only = {k: v for k, v in pack().items() if not k.startswith("vd:")}
+    p = page(points=[*page().points[:2], *extra], numbers=[g], contributions=[])
+    r = checks.run_checks(p, text_only, 1, CFG, {})
+    assert len(r.page.points) == 3 and r.page.numbers == [] and any(f["loc"] == "points" for f in r.autofix)
+    assert not any(i.loc == "points" for i in r.issues)
+
+
+def _ordered(sims: dict[int, float], video: dict[int, float] | None = None) -> list[sel.Candidate]:
+    """C-21 순서 정보를 채운 후보(1~5). video: 영상 관련성이 있는 후보."""
+    out = []
+    for c in CANDS:
+        x = sel.Candidate(c.cluster_id, c.label, c.members, dict(c.channels), c.score, c.past, c.n_evidence,
+                          sim=sims.get(c.cluster_id, 0.5), video_sim=(video or {}).get(c.cluster_id))
+        if x.video_sim is not None:
+            x.channels = {"video": 1}
+        out.append(x)
+    for i, c in enumerate(sorted(out, key=lambda c: sel.order_key(c, CFG.select.order.sim_band)), 1):
+        c.order = i
+    return out
+
+
+def test_c21_order_key_band_then_sources():
+    a = sel.Candidate(1, "", ["it:1"], {}, 0, [], sim=0.74)
+    b = sel.Candidate(2, "", ["it:2", "it:3", "vd:A"], {}, 0, [], sim=0.71)  # 같은 구간(0.70~0.75), 출처 많음 → 앞
+    c = sel.Candidate(3, "", ["it:4"], {}, 0, [], sim=0.79)  # 더 높은 구간
+    d = sel.Candidate(4, "", ["it:5"], {}, 0, [], sim=0.95, low_only=True)  # low뿐 → 맨 아래
+    got = sorted([a, b, c, d], key=lambda x: sel.order_key(x, 0.05))
+    assert [x.cluster_id for x in got] == [3, 2, 1, 4]
+
+
+def test_c21_ranks_are_assigned_by_code_and_lead_reason(tmp_path):
+    from trendsit.core.db import DB
+
+    cands = _ordered({1: 0.6, 2: 0.9, 3: 0.7, 4: 0.8})
+    p = good()  # 리드 c1은 코드 순서 1위(c2)가 아님
+    assert any("lead_reason" in e for e in sel.validate(p, cands, CFG))
+    p = p.model_copy(update={"lead_reason": "글 2건, 이번 주 가장 큰 발표"})
+    assert sel.validate(p, cands, CFG) == []
+    applied = sel.apply(p, cands, "2026-W42", DB(tmp_path / "t.db"))
+    assert [(a.cluster_ids[0], a.rank) for a in applied] == [(1, 1), (2, 2), (4, 3), (3, 4)]  # 리드 1, 나머지 코드 순서
+
+
+def test_c20_video_slot_required_and_fallback_keeps_it():
+    cands = _ordered({1: 0.9, 2: 0.85, 3: 0.8, 4: 0.75, 5: 0.6}, video={5: 0.6})
+    p = plan([topic([1], 1, True), topic([2], 2, rel="follow_up", tid="w40-x"), topic([3], 3), topic([4], 4)])
+    assert any("영상 묶음 토픽 0개" in e and "c5" in e for e in sel.validate(p, cands, CFG))
+    ok = plan([topic([1], 1, True), topic([2], 2, rel="follow_up", tid="w40-x"), topic([3], 3), topic([5], 4)])
+    assert sel.validate(ok, cands, CFG) == []
+    low = _ordered({1: 0.9, 2: 0.85, 3: 0.8, 4: 0.75, 5: 0.5}, video={5: 0.5})  # relevance_min 0.55 미만이면 자리 없음
+    assert sel.validate(p, low, CFG) == []
+    fb = sel.fallback_plan(cands, CFG, "x")
+    assert 5 in {cid for t in fb.topics for cid in t.cluster_ids}
+
+
+def test_r14_reason_channel_count_checked():
+    m = {k: Member(k, "text", "제목", "줄", "", "high", [], [], {}) for k in ("it:1", "it:2", "it:3")}
+    c = sel.Candidate(1, "후보", list(m), {"text": 3}, 0, [], 3)
+    inp = sel.EditorSelectInput(candidates=[sel.candidate_doc(c, m)], recent_topics=[], keyword_trend=[], repo_cards=[],
+                                limits=sel.SelectLimits(min_topics=4, max_topics=10))
+    assert "채널 1개: text(글 3건)" in inp.candidates[0].text
+    p = plan([topic([1], 1, True)], decisions=[Decision(cluster_id=1, reason="근거 3건, 채널 3", action="select",
+                                                        drop_reason=None)])
+    assert any("채널 수 3" in x for x in sel.reason_mismatches(p, inp, []))

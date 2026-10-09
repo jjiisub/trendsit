@@ -35,6 +35,7 @@ core_rules:
 | 같은 분야의 다른 대상(두 회사의 각자 코딩 에이전트) | false |
 | 한쪽이 다른 쪽을 짧게 언급만 함(주제는 다름) | false |
 | 레포가 글·영상이 소개한 바로 그 구현체(README나 요약에 같은 이름) | true |
+| 한쪽은 출시 발표, 다른 쪽은 같은 제품을 직접 써 보거나 시험한 글(같은 이름·같은 버전) | true |
 
 - 대상을 판단하는 단서는 제목과 요약 속 **고유명사**다. 유사도 수치나 같은 키워드만으로 정하지 않는다. 고객 사례 글과 제품 발표 글은 유사도가 비슷하게 나와도 다른 대상이다
 - 한글 음차와 영문 표기(클로드 ↔ Claude)는 같은 이름으로 본다
@@ -60,6 +61,11 @@ core_rules:
 함정: 같은 회사, 다른 제품
 입력: a = it:901 "GPT-5 mini 가격 인하", b = it:915 "GPT-5 추론 벤치 결과"
 출력: `{"reason": "a는 GPT-5 mini 가격, b는 GPT-5 벤치 → 다른 모델", "same": false, "confidence": 0.85, "log": "같은 회사 다른 모델", "attention": false}`
+</example>
+<example>
+함정: 발표 글과 시험 글(같은 모델)
+입력: a = it:1046 "Introducing Mistral Large 4"(출시 발표, 벤치 수치), b = it:1048 "Mistral Large 4"(개인 블로그, 같은 모델을 직접 돌려 본 결과)
+출력: `{"reason": "a는 Mistral Large 4 출시, b는 같은 Mistral Large 4를 시험한 글 → 같은 대상", "same": true, "confidence": 0.85, "log": "같은 모델 발표와 시험", "attention": false}`
 </example>
 <example>
 함정: 숫자가 다른 이름

@@ -63,7 +63,8 @@ def week_topics(db: DB, week: str, cfg) -> list[dict]:
     run = db.conn.execute("SELECT current_run_id FROM weeks WHERE week=?", (week,)).fetchone()[0]
     src = json.loads(db.conn.execute("SELECT summary_json FROM runs WHERE id=?", (run,)).fetchone()[0] or "{}")
     ev = week_evidence(db, week)
-    table = al.load_decided(db, al.build(list(ev.members.values()), config.load("keywords.yaml"), cfg.aliases.fuzz_min_score))
+    table = al.load_decided(db, al.build(list(ev.members.values()), config.load("keywords.yaml"), cfg.aliases.fuzz_min_score,
+                                             cfg.aliases.transliteration))
     cands = sel.load_candidates(db, src.get("cluster_run") or run, ev, cfg.select.max_candidates)
     plan = BriefingPlan.model_validate_json(db.conn.execute(
         "SELECT plan_json FROM briefing_plans WHERE run_id=? ORDER BY id DESC LIMIT 1", (run,)).fetchone()[0])

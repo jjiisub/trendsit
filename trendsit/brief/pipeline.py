@@ -63,7 +63,8 @@ def run_weekly(week: str, ctx: Ctx, from_step: str = "cluster", only_topic: str 
     else:
         ev = week_evidence(db, week)
         table = al.load_decided(db, al.build(list(ev.members.values()), config.load("keywords.yaml"),
-                                             cfg.aliases.fuzz_min_score))
+                                             cfg.aliases.fuzz_min_score,
+                                             cfg.aliases.transliteration))
         cl.score_video_relevance(list(ev.members.values()), embedder, [(x.keyword_id, x.text) for x in flt.interests],
                                  cfg.evidence.video_relevance_high)
         cluster_run = _summary_src(db, src).get("cluster_run") or src
@@ -71,7 +72,8 @@ def run_weekly(week: str, ctx: Ctx, from_step: str = "cluster", only_topic: str 
         "from_step": from_step, "source_run": src, "cluster_run": cluster_run})
     # ---------- select ----------
     t1 = time.monotonic()
-    cands = sel.load_candidates(db, cluster_run, ev, cfg.select.max_candidates)
+    sims = cl.interest_similarity(db, list(ev.members.values()), embedder, [(x.keyword_id, x.text) for x in flt.interests])
+    cands = sel.load_candidates(db, cluster_run, ev, cfg.select.max_candidates, sims, cfg)
     sites = [r["name"] for r in db.conn.execute("SELECT name FROM sources") if r["name"]]
     if from_step in ("cluster", "select"):
         sres = sel.select(ctx, cands, ev, cfg, sites)
@@ -148,13 +150,15 @@ def run_weekly(week: str, ctx: Ctx, from_step: str = "cluster", only_topic: str 
 def carry_over(db: DB, src: str, run_id: str, keep: set[str]) -> None:
     """토픽 하나만 다시 돌린 run에 나머지 토픽의 결과(상태, 최종판, 판정, 근거 연결, 임베딩)를 원본 run에서 복사한다.
     그래야 그 run이 그 주 현재판이 되어도 토픽이 빠지지 않는다. 복사한 행도 이 run_id로 쌓인다(원본은 그대로)."""
-    rows = db.conn.execute("SELECT topic_id, status, final_round, title, summary FROM topics WHERE run_id=?", (src,)).fetchall()
+    rows = db.conn.execute("SELECT topic_id, status, final_round, title, summary, checks_json FROM topics WHERE run_id=?",
+                           (src,)).fetchall()
     with db.conn:
         for r in rows:
             if r["topic_id"] in keep:
                 continue
-            db.conn.execute("UPDATE topics SET status=?, final_round=?, title=?, summary=? WHERE run_id=? AND topic_id=?",
-                            (r["status"], r["final_round"], r["title"], r["summary"], run_id, r["topic_id"]))
+            db.conn.execute("UPDATE topics SET status=?, final_round=?, title=?, summary=?, checks_json=? "
+                            "WHERE run_id=? AND topic_id=?",
+                            (r["status"], r["final_round"], r["title"], r["summary"], r["checks_json"], run_id, r["topic_id"]))
             for tbl, cols in (("topic_pages", "topic_id, round, page_json, raw_json, step_id"),
                               ("verdicts", "topic_id, round, checker, status, issues_json, autofix_json, step_id"),
                               ("topic_evidence", "topic_id, evidence_id, member, field, idx"),
@@ -196,16 +200,21 @@ def compute_summary(db: DB, run_id: str) -> dict[str, Any]:
     cands = [c for c in clusters if not json.loads(c["body_json"] or "{}").get("repo_only")]
     chans = [json.loads(c["channels_json"]) for c in cands]
     pairs = db.conn.execute("SELECT decided, answer, confidence FROM cluster_pairs WHERE run_id=?", (cluster_run,)).fetchall()
-    plan_row = db.conn.execute("SELECT plan_json FROM briefing_plans WHERE run_id=? ORDER BY id DESC LIMIT 1",
+    plan_row = db.conn.execute("SELECT plan_json, source FROM briefing_plans WHERE run_id=? ORDER BY id DESC LIMIT 1",
                                (run_id,)).fetchone()
     plan = json.loads(plan_row["plan_json"]) if plan_row else {"decisions": [], "topics": [], "splits": []}
-    topics = db.conn.execute("SELECT topic_id, status, final_round FROM topics WHERE run_id=?", (run_id,)).fetchall()
+    topics = db.conn.execute("SELECT topic_id, status, final_round, checks_json FROM topics WHERE run_id=?", (run_id,)).fetchall()
     verdicts = db.conn.execute("SELECT checker, status, issues_json, autofix_json FROM verdicts WHERE run_id=?",
                                (run_id,)).fetchall()
     drops = {k: 0 for k in ("duplicate", "low_relevance", "thin", "other")}
+    # 누가 뺐나(리뷰 R8): 모델이 직접 / 코드 정리(reconcile: topics에 없는 select를 drop으로) / 대체 계획(점수 순)
+    drops_by = {"model": 0, "code": 0, "fallback": 0}
+    fallback = bool(plan_row) and plan_row["source"] == "fallback"
     for d in plan.get("decisions", []):
         if d.get("action") == "drop":
             drops[d.get("drop_reason") or "other"] = drops.get(d.get("drop_reason") or "other", 0) + 1
+            by = "fallback" if fallback else "code" if sel.RECONCILE_MARK in (d.get("reason") or "") else "model"
+            drops_by[by] += 1
     issue_types = {k: 0 for k in ("unsupported", "number_mismatch", "overclaim", "missing_key", "wrong_ref", "overuse",
                                   "missing_diagram")}
     autofixes = reverts = 0
@@ -249,12 +258,13 @@ def compute_summary(db: DB, run_id: str) -> dict[str, Any]:
                              "duplicate": drops["duplicate"]}},
         "select": {"candidates": len(plan.get("decisions", [])), "selected": len(plan.get("topics", [])),
                    "merges": sum(1 for t in plan.get("topics", []) if len(t.get("cluster_ids", [])) > 1),
-                   "splits": len(plan.get("splits", [])), "drops": drops},
+                   "splits": len(plan.get("splits", [])), "drops": drops, "drops_by": drops_by},
         "write": {"topics": len(topics), "failed": sum(t["status"] == "failed" for t in topics)},
         "review": {"rounds": {str(k): sum(1 for t in topics if t["final_round"] == k) for k in (1, 2, 3)},
                    "code_rejects": sum(1 for v in verdicts if v["checker"] == "code" and v["status"] == "reject"),
                    "critic_rejects": sum(1 for v in verdicts if v["checker"] == "critic" and v["status"] == "reject"),
-                   "autofixes": autofixes, "reverts": reverts, "issues": issue_types, "check_points": check_points},
+                   "autofixes": autofixes, "reverts": reverts, "issues": issue_types, "check_points": check_points,
+                   "check_topics": sum(1 for t in topics if json.loads(t["checks_json"] or "[]"))},
         "cost_usd": cost,
         "duration_sec": {k: end.get("duration_sec", {}).get(k, 0) for k in ("evidence", "cluster", "select", "write_review",
                                                                             "total")},

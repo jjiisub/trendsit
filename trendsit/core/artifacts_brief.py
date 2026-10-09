@@ -118,7 +118,7 @@ class Relation(_Strict):
 
 class PlannedTopic(_Strict):
     cluster_ids: list[int] = Field(min_length=1)
-    rank: int = Field(ge=1)
+    rank: int = Field(ge=1, description="참고용. 코드가 리드 1, 나머지 코드 순서로 다시 매김")
     lead: bool
     relation: Relation
     relation_reason: str
@@ -130,6 +130,7 @@ class BriefingPlan(RoleOutput):
     decisions: list[Decision] = Field(description="모든 후보마다 하나. 가장 먼저 채움")
     splits: list[Split]
     topics: list[PlannedTopic]
+    lead_reason: str = Field(default="", description="리드가 코드 순서 1위 토픽이 아니면 그 이유(입력 값만), 1위면 빈 문자열")
     featured_repos: list[str] = Field(description="홈에 올릴 레포 이름(최대 5)")
 
     @classmethod
@@ -307,7 +308,7 @@ class TopicPageRevision(RoleOutput):
 class CriticInput(RoleInput):
     loc_lines: list[str] = Field(default=[], description="page를 위치 이름(loc)이 붙은 줄로 펼친 것. 이슈 loc은 이 이름 그대로")
     page: TopicPage
-    evidence: list[Document] = Field(description="page의 refs가 가리키는 근거 원문만")
+    evidence: list[Document] = Field(description="이 토픽의 근거 원문(refs가 가리키는 것 먼저, 카드 요약 id 제외)")
     angle: str
     code_warnings: list[str]
     round: int = Field(ge=1, le=3)

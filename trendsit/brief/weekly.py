@@ -88,7 +88,8 @@ def stage_cluster(week: str, ctx: Ctx, cfg: BriefConfig | None = None, embedder:
                  f"digest 없음 {ev.excluded['no_digest']}, 관련 없는 레포 {ev.excluded['irrelevant_repo']}",
             detail={"counts": n, "excluded": ev.excluded})
     t1 = time.monotonic()
-    table = al.load_decided(db, al.build(list(ev.members.values()), keywords, cfg.aliases.fuzz_min_score))
+    table = al.load_decided(db, al.build(list(ev.members.values()), keywords, cfg.aliases.fuzz_min_score,
+                                         cfg.aliases.transliteration))
     decider = make_decider(ctx) if use_llm else None
     try:
         alias_dec = decide_aliases(table, ev, decider, cfg.cluster.decide.min_confidence, cfg.cluster.alias_decide_max)

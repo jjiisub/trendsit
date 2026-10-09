@@ -1,9 +1,13 @@
 """편집장 선별(S5_TASK 5.5, roles/editor_select.md, LLM 1회 + 코드 검증·재시도 2회·대체).
 
-입력: 묶음(토픽 후보, 레포만 묶음 제외) 중 점수 상위 max_candidates를 cluster_id 순서로(위치 편향 방지).
-검증(어기면 오류 메시지로 재시도): 리드 정확히 1, 토픽 수 min~max(후보가 min보다 적으면 후보 수까지), rank 1부터 연속,
-cluster_ids·splits는 입력 후보와 그 항목 안, 한 후보는 한 토픽에만, relation.topic_id는 그 후보의 과거 대조 후보 안,
-decisions가 모든 후보를 덮음. reason 속 숫자·출처 이름은 입력과 대조해 어긋나면 attention(거부하지 않음).
+입력: 묶음(토픽 후보, 레포만 묶음 제외) 중 코드 순서 상위 max_candidates를 cluster_id 순서로(위치 편향 방지).
+코드 순서(설계 결정 C-21): 관심 키워드 유사도 구간(모든 채널 "제목 + 요약" 임베딩과 관심사 쿼리의 코사인 최댓값,
+select.order.sim_band 폭) → 같은 구간이면 출처(구성원) 수 → 수치 유무 → 키워드 추세. relevance low뿐인 후보는 맨 아래 구간.
+토픽 순서(rank)도 코드가 정한다: 리드가 1, 나머지는 코드 순서. 편집장은 넣을지·리드·합치기·관계만 판단한다.
+검증(어기면 오류 메시지로 재시도): 리드 정확히 1(코드 순서 1위가 아니면 lead_reason), 토픽 수 min~max(후보가 min보다
+적으면 후보 수까지), cluster_ids·splits는 입력 후보와 그 항목 안, 한 후보는 한 토픽에만, relation.topic_id는 그 후보의
+과거 대조 후보 안, decisions가 모든 후보를 덮음, 영상 자리(C-20: 관련성 relevance_min 이상 영상 묶음이 입력에 있으면
+영상 묶음 토픽 min개 이상). reason 속 숫자·출처 이름·채널 수는 입력과 대조해 어긋나면 attention(거부하지 않음).
 """
 
 from __future__ import annotations
@@ -34,6 +38,7 @@ from ..core.role import RoleFailed, load_role, run_role
 from .evidence import Member, WeekEvidence
 
 SELECT_RETRIES = 2
+RECONCILE_MARK = "코드 정리: topics에 없음"  # reconcile이 drop으로 바꾼 결정의 reason 끝(실행 요약 drops_by가 셈)
 _NUM = re.compile(r"\d+(?:\.\d+)?")
 
 
@@ -46,6 +51,24 @@ class Candidate:
     score: float
     past: list[dict[str, Any]]
     n_evidence: int = 0
+    sim: float | None = None  # 관심 키워드 유사도(구성원 최댓값, C-21). None이면 순서 정보 없음(점수 순)
+    has_numbers: bool = False
+    trend_up: int = 0  # 지난주보다 언급이 는 키워드 수
+    low_only: bool = False  # 구성원 relevance가 모두 low(맨 아래 구간)
+    video_sim: float | None = None  # 영상 구성원의 관련성 최댓값(C-20 영상 자리)
+    order: int = 0  # 코드 순서(1부터, 이 주 모든 후보 중)
+
+
+def order_key(c: Candidate, band: float) -> tuple[Any, ...]:
+    """C-21 순서: 유사도 구간 → 출처 수 → 수치 유무 → 키워드 추세. low뿐이면 맨 아래 구간."""
+    b = -1 if c.low_only else int((c.sim or 0) / band + 1e-9)
+    return (-b, -len(c.members), -int(c.has_numbers), -c.trend_up, c.cluster_id)
+
+
+def video_slot_ids(cands: list[Candidate], cfg: BriefConfig) -> list[int]:
+    """영상 자리(C-20)에 들 수 있는 후보: 영상 구성원의 관련성이 relevance_min 이상."""
+    vs = cfg.select.video_slot
+    return [c.cluster_id for c in cands if c.video_sim is not None and c.video_sim >= vs.relevance_min]
 
 
 @dataclass
@@ -76,8 +99,10 @@ class SelectResult:
 
 
 # ---------- 입력 ----------
-def load_candidates(db: DB, run_id: str, ev: WeekEvidence, limit: int) -> list[Candidate]:
-    """그 run의 묶음 중 토픽 후보(레포만 묶음 제외), 점수 상위 limit개를 cluster_id 순서로."""
+def load_candidates(db: DB, run_id: str, ev: WeekEvidence, limit: int, sims: dict[str, float] | None = None,
+                    cfg: BriefConfig | None = None) -> list[Candidate]:
+    """그 run의 묶음 중 토픽 후보(레포만 묶음 제외), 상위 limit개를 cluster_id 순서로. sims(구성원 → 관심 유사도)와
+    cfg가 있으면 C-21 코드 순서로 고르고 order를 매긴다. 없으면 묶기 점수 순(이전 방식)."""
     rows = db.conn.execute("SELECT id, label, channels_json, score, body_json FROM clusters WHERE run_id=? ORDER BY id",
                            (run_id,)).fetchall()
     cands = []
@@ -91,17 +116,46 @@ def load_candidates(db: DB, run_id: str, ev: WeekEvidence, limit: int) -> list[C
         n_ev = len({it.id for k in members for it in ev.members[k].items})
         cands.append(Candidate(r["id"], r["label"] or "", members, json.loads(r["channels_json"] or "{}"), r["score"] or 0,
                                body.get("past") or [], n_ev))
-    top = sorted(cands, key=lambda c: (-c.score, c.cluster_id))[:limit]
-    return sorted(top, key=lambda c: c.cluster_id)
+    if sims is None or cfg is None:
+        top = sorted(cands, key=lambda c: (-c.score, c.cluster_id))[:limit]
+        return sorted(top, key=lambda c: c.cluster_id)
+    up = {k.keyword for k in keyword_trend(db, ev.week) if k.this_week > k.last_week}
+    for c in cands:
+        ms = [ev.members[k] for k in c.members]
+        c.sim = round(max((sims.get(m.key, 0.0) for m in ms), default=0.0), 4)
+        c.has_numbers = any(it.kind in ("number", "slide_fact") for m in ms for it in m.items)
+        c.trend_up = len({k for m in ms for k in m.keywords} & up)
+        c.low_only = all(m.relevance == "low" for m in ms)
+        vids = [sims.get(m.key, 0.0) for m in ms if m.channel == "video"]
+        c.video_sim = round(max(vids), 4) if vids else None
+    ranked = sorted(cands, key=lambda c: order_key(c, cfg.select.order.sim_band))
+    for i, c in enumerate(ranked, 1):
+        c.order = i
+    return sorted(ranked[:limit], key=lambda c: c.cluster_id)
+
+
+CH_NOUN = {"text": "글", "video": "영상", "github": "레포"}
 
 
 def candidate_doc(c: Candidate, members: dict[str, Member]) -> Document:
+    # 채널은 text·video·github 세 종류. 글 수를 채널 수로 읽지 않게 따로 적는다(리뷰 R14: "채널 3·4"는 글 3·4건이었음)
     lines = [f"임시 이름: {c.label}",
-             "채널별 수: " + ", ".join(f"{k} {v}" for k, v in c.channels.items()),
-             f"근거 수: {c.n_evidence}", f"점수: {c.score}", "항목:"]
+             f"채널 {len(c.channels)}개: " + ", ".join(f"{k}({CH_NOUN.get(k, k)} {v}건)" for k, v in c.channels.items()),
+             f"출처(구성원) 수: {len(c.members)}", f"근거 수: {c.n_evidence}"]
+    if c.order:
+        lines.append(f"관심 유사도: {c.sim} · 코드 순서: {c.order}위 · 수치 {'있음' if c.has_numbers else '없음'}"
+                     + (f" · 영상 관련성 {c.video_sim}" if c.video_sim is not None else ""))
+    else:
+        lines.append(f"점수: {c.score}")
+    lines.append("항목:")
     for k in c.members:
         m = members[k]
-        lines.append(f"- {k} [{m.channel}] {m.title} | {m.line} | relevance {m.relevance}")
+        extra = ""
+        if m.channel == "video":  # C-20: 영상 후보의 읽을 거리
+            kp = sum(1 for it in m.items if it.kind == "claim")
+            sf = sum(1 for it in m.items if it.kind == "slide_fact")
+            extra = f" | 핵심 포인트 {kp}, 슬라이드 전용 수치 {sf}"
+        lines.append(f"- {k} [{m.channel}] {m.title} | {m.line} | relevance {m.relevance}{extra}")
     if c.past:
         lines.append("과거 대조 후보: " + "; ".join(f"{p['topic_id']} '{p['title']}' {p['similarity']}" for p in c.past))
     else:
@@ -169,11 +223,18 @@ def validate(plan: BriefingPlan, cands: list[Candidate], cfg: BriefConfig) -> li
     leads = [t for t in plan.topics if t.lead]
     if n and len(leads) != 1:
         errs.append(f"lead가 {len(leads)}개: 정확히 1개여야 함")
-    ranks = sorted(t.rank for t in plan.topics)
-    if ranks != list(range(1, n + 1)):
-        errs.append(f"rank {ranks}: 1부터 빠짐없이 연속이어야 함")
-    if leads and leads[0].rank != 1:
-        errs.append("lead 토픽의 rank가 1이 아님")
+    # rank는 코드가 다시 매긴다(C-21). 리드가 고른 토픽 중 코드 순서 1위가 아니면 lead_reason 필수
+    if len(leads) == 1 and all(by_id[cid].order for t in plan.topics for cid in t.cluster_ids if cid in by_id):
+        first = min(plan.topics, key=lambda t: _topic_order(t, by_id))
+        if first is not leads[0] and not plan.lead_reason.strip():
+            errs.append(f"lead가 코드 순서 1위 토픽(c{first.cluster_ids[0]})이 아님: lead_reason에 이유 필요")
+    # 영상 자리(C-20): 관련성 relevance_min 이상 영상 묶음이 입력에 있으면 영상 묶음 토픽을 min개 이상
+    slot = video_slot_ids(cands, cfg)
+    need = min(cfg.select.video_slot.min, len(slot))
+    has = sum(1 for t in plan.topics if any(cid in by_id and "video" in by_id[cid].channels for cid in t.cluster_ids))
+    if has < need:
+        errs.append(f"영상 묶음 토픽 {has}개: 관련성 {cfg.select.video_slot.relevance_min} 이상 영상 후보"
+                    f"({', '.join(f'c{i}' for i in slot)})가 있으면 영상 묶음 토픽을 {need}개 이상(영상 자리)")
     used: dict[int, int] = {}
     for t in plan.topics:
         for cid in t.cluster_ids:
@@ -219,8 +280,12 @@ def reason_mismatches(plan: BriefingPlan, inp: EditorSelectInput, site_names: li
     shared = " ".join([json.dumps([k.model_dump() for k in inp.keyword_trend]), inp.limits.model_dump_json(),
                        " ".join(t.title + " " + t.topic_id for t in inp.recent_topics), " ".join(d.id for d in inp.candidates)])
     out = []
+    n_ch = {d.id: int(m.group(1)) for d in inp.candidates if (m := re.search(r"^채널 (\d)개", d.text, re.M))}
     for d in plan.decisions:
         doc = docs.get(f"c{d.cluster_id}", "")
+        for n in re.findall(r"채널\s*(\d)", d.reason):  # 글 수를 채널 수로 부름(리뷰 R14)
+            if f"c{d.cluster_id}" in n_ch and int(n) != n_ch[f"c{d.cluster_id}"]:
+                out.append(f"c{d.cluster_id} reason의 채널 수 {n}이 입력({n_ch[f'c{d.cluster_id}']}개)과 다름: {d.reason[:80]}")
         for n in _NUM.findall(d.reason):
             pat = rf"(?<![\d.]){re.escape(n)}(?![\d])"
             if not re.search(pat, doc) and not re.search(pat, shared):
@@ -229,6 +294,12 @@ def reason_mismatches(plan: BriefingPlan, inp: EditorSelectInput, site_names: li
             if s and s in d.reason and s not in doc:
                 out.append(f"c{d.cluster_id} reason의 출처 '{s}'가 그 후보에 없음: {d.reason[:80]}")
     return out
+
+
+def _topic_order(t: PlannedTopic, by_id: dict[int, Candidate]) -> tuple[int, int]:
+    """토픽의 코드 순서 = 그 토픽 후보들의 가장 앞 순서(순서 정보가 없으면 편집장 rank)."""
+    orders = [by_id[cid].order for cid in t.cluster_ids if cid in by_id and by_id[cid].order]
+    return (min(orders), 0) if orders else (10**6, t.rank)
 
 
 # ---------- 적용 ----------
@@ -259,7 +330,10 @@ def apply(plan: BriefingPlan, cands: list[Candidate], week: str, db: DB) -> list
     first_group = {sp.cluster_id: sp.groups[0] for sp in plan.splits if sp.groups}
     used: set[str] = set()
     out = []
-    for t in sorted(plan.topics, key=lambda t: t.rank):
+    # rank는 코드가 정한다(C-21): 리드가 1, 나머지는 코드 순서(순서 정보가 없으면 편집장 rank)
+    ordered = sorted(plan.topics, key=lambda t: (not t.lead, _topic_order(t, by_id)))
+    plan_topics = [t.model_copy(update={"rank": i}) for i, t in enumerate(ordered, 1)]
+    for t in plan_topics:
         base = f"w{week_num(week)}-{slugify(t.slug_hint)}"
         tid, k = base, 2
         while tid in used:
@@ -276,9 +350,13 @@ def apply(plan: BriefingPlan, cands: list[Candidate], week: str, db: DB) -> list
 
 
 def fallback_plan(cands: list[Candidate], cfg: BriefConfig, reason: str) -> BriefingPlan:
-    """점수 순 상위 N(min과 후보 수 중 작은 값), 1위 리드."""
+    """코드 순서(없으면 점수 순) 상위 N(min과 후보 수 중 작은 값), 1위 리드. 영상 자리(C-20)도 지킨다."""
     n = min(cfg.select.topics.min, len(cands))
-    top = sorted(cands, key=lambda c: (-c.score, c.cluster_id))[:n]
+    ranked = sorted(cands, key=lambda c: (c.order or 10**6, -c.score, c.cluster_id))
+    top = ranked[:n]
+    slot = [c for c in ranked if c.cluster_id in set(video_slot_ids(cands, cfg))]
+    if slot and n and not any("video" in c.channels for c in top):
+        top = [*top[:-1], slot[0]] if n > 1 else top
     from ..core.artifacts_brief import Decision
 
     chosen = {c.cluster_id for c in top}
@@ -304,7 +382,7 @@ def reconcile(plan: BriefingPlan) -> tuple[BriefingPlan, list[str]]:
             notes.append(f"c{d.cluster_id} drop → select(topics에 있음)")
         elif d.cluster_id not in in_topics and d.action == "select":
             fixed.append(d.model_copy(update={"action": "drop", "drop_reason": "other",
-                                              "reason": d.reason + " / 코드 정리: topics에 없음(토픽 수 상한)"}))
+                                              "reason": d.reason + f" / {RECONCILE_MARK}(토픽 수 상한)"}))
             notes.append(f"c{d.cluster_id} select → drop(other)")
         else:
             fixed.append(d)

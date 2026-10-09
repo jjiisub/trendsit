@@ -45,13 +45,16 @@ graders.THRESHOLDS["decide"] = {"code_pass_all": False}
 
 # ---------- writer(관문 B: 근거 충실성은 원자 사실 judge, 나머지 Q1~Q4 judge + 코드 검사) ----------
 def _pack_from_docs(inp: dict[str, Any]) -> dict[str, list[Any]]:
-    """작성자 입력의 근거 문서 → 코드 검사용 근거 목록(문서 글 전체를 그 id의 근거로)."""
+    """작성자 입력의 근거 문서 → 코드 검사용 근거 목록. 원문 기준(리뷰 R2): 글 카드의 주장·요약 줄은 빼고 quote·수치 줄만."""
     from trendsit.brief.evidence import EvidenceItem
 
     out = {}
     for d in inp["evidence"]:
         ch = "video" if d["id"].startswith("vd:") else "github" if d["id"].startswith("rp:") else "text"
-        out[d["id"]] = [EvidenceItem(d["id"], d["id"].split("#")[0].split("@")[0], ch, "quote", d["text"],
+        text = d["text"]
+        if ch == "text":  # 줄 머리: 지금 "(카드 주장 요약, 원문 아님)", 이전 픽스처 "주장: "·"요약: "
+            text = "\n".join(ln for ln in text.splitlines() if not ln.startswith(("(카드 주장", "주장: ", "요약: ")))
+        out[d["id"]] = [EvidenceItem(d["id"], d["id"].split("#")[0].split("@")[0], ch, "quote", text,
                                      {"site": d.get("source"), "title": d.get("title")})]
     return out
 

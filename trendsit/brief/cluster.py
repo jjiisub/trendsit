@@ -130,6 +130,17 @@ def score_video_relevance(members: Sequence[Member], embedder: Embedder, interes
     return out
 
 
+def interest_similarity(db: DB, members: Sequence[Member], embedder: Embedder,
+                        interests: Sequence[tuple[str, str]]) -> dict[str, float]:
+    """선별 순서(C-21): 모든 채널을 같은 재료("제목 + 요약": 글 카드 summary, 영상 digest 요약, 레포 oneliner)로 임베딩해
+    관심사 쿼리와의 코사인 최댓값(S2 관련성 필터 방식). 임베딩은 member_embeddings 캐시(card 모드)를 쓴다."""
+    if not members:
+        return {}
+    vecs = member_vectors(db, members, embedder, mode="card")
+    queries = embedder.embed_queries([t for _k, t in interests])
+    return {k: round(max(cosine(v, q) for q in queries), 4) for k, v in vecs.items()}
+
+
 # ---------- 쌍 ----------
 def build_pairs(members: dict[str, Member], vecs: dict[str, list[float]], aliases: AliasTable,
                 cfg: BriefConfig) -> tuple[list[Pair], dict[tuple[str, str], float]]:

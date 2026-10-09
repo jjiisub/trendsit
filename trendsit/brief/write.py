@@ -43,7 +43,7 @@ from ..core.db import DB
 from ..core.errors import LLMError
 from ..core.role import RoleFailed, load_role, run_role
 from . import checks
-from .aliases import AliasTable
+from .aliases import AliasTable, translit_variants
 from .evidence import EvidenceItem, Member, cap_pack
 from .select import Applied
 
@@ -81,6 +81,7 @@ class TopicResult:
     final_round: int = 0
     costs: dict[str, float] = field(default_factory=dict)
     member_by_id: dict[str, str] = field(default_factory=dict)
+    checks: list[str] = field(default_factory=list)  # 이슈가 남은 채 발행된 위치(토픽 수준 확인 필요, 리뷰 R4)
 
 
 # ---------- 입력 조립 ----------
@@ -93,7 +94,9 @@ def pack_index(items: list[EvidenceItem]) -> dict[str, list[EvidenceItem]]:
 
 def evidence_docs(pack: dict[str, list[EvidenceItem]]) -> list[Document]:
     """근거 id마다 문서 하나. 글은 quote 문장 + 그 quote의 수치·주장, 영상은 시각의 수치·포인트·라벨, 레포는 필드.
-    요약 id(it:{n}, vd:{n})는 CONTRACTS 근거 id가 아니고 원문도 아니라 작성자에게 주지 않는다(리뷰 지적 8)."""
+    요약 id(it:{n}, vd:{n})는 CONTRACTS 근거 id가 아니고 원문도 아니라 작성자에게 주지 않는다(리뷰 지적 8).
+    글 카드의 주장·수치 줄은 quote와 같은 id에 붙지만 원문이 아니라 카드 요약이다. 줄 머리에 그렇게 적는다(PR #9 리뷰 R2:
+    Haiku "토크나이저 → 숨겨진 가격 인상"이 주장 줄에서 나옴)."""
     docs = []
     for eid, items in pack.items():
         if all(it.kind == "summary" for it in items):
@@ -101,8 +104,12 @@ def evidence_docs(pack: dict[str, list[EvidenceItem]]) -> list[Document]:
         lines = []
         for it in items:
             v = f" [{it.value}{(' ' + it.unit) if it.unit else ''}]" if it.value else ""
-            label = {"quote": "", "number": "수치: ", "claim": "주장: ", "slide_fact": "발표 슬라이드 수치: ",
-                     "timeline": "구간: ", "summary": "요약: ", "repo_field": ""}.get(it.kind, "")
+            if it.channel == "text":
+                label = {"quote": "원문: ", "number": "(카드 수치, 위 원문에서 뽑음) ",
+                         "claim": "(카드 주장 요약, 원문 아님) "}.get(it.kind, "")
+            else:
+                label = {"claim": "핵심 포인트: ", "slide_fact": "발표 슬라이드 수치: ", "timeline": "구간: ",
+                         "repo_field": ""}.get(it.kind, "")
             lines.append(f"{label}{it.text}{v}")
         src = items[0].source
         docs.append(Document(id=eid, source=src.get("site") or items[0].channel, title=src.get("title"),
@@ -155,7 +162,8 @@ def raw_evidence(db: DB, eid: str, items: list[EvidenceItem]) -> str:
     quotes = [it.text for it in items if it.kind in ("quote", "repo_field")]
     if quotes:
         return "\n".join(quotes + [f"{it.text}: {it.value}{it.unit or ''}" for it in items if it.kind == "repo_field" and it.value])
-    return "\n".join(it.text for it in items)  # 요약 id(it:{n}, vd:{n})는 요약 문장 자체가 원문
+    # 요약 id(it:{n}, vd:{n})는 원문이 아니다(리뷰 R1). 그 밖(영상 구간 등 원문 없는 칸)은 그 글자
+    return "\n".join(it.text for it in items if it.kind != "summary")
 
 
 def refs_of(page: TopicPage) -> list[str]:
@@ -276,6 +284,11 @@ def write_topic(ctx: Ctx, topic: Applied, members: dict[str, Member], table: Ali
     pack = pack_index(kept)
     n_sources = len({it.member for it in kept})
     canon = {a: c.canonical for c in alias_lines(table, ms) for a in c.aliases}
+    # 이 토픽 이름의 한글 음차 표기(GPT-6 루나, 딥시크-V4.1 플래시)도 정본으로 고친다(리뷰 R11)
+    for name in sorted({n for m in ms for n in m.entities if n.strip()}):
+        target = table.canonical(name)
+        for v in translit_variants(target, cfg.aliases.transliteration):
+            canon.setdefault(v, target)
     res = TopicResult(topic, "failed", None, [], [], list(pack), dropped, n_sources, costs={},
                       member_by_id={i: v[0].member for i, v in pack.items()})
     if not pack:
@@ -303,7 +316,9 @@ def write_topic(ctx: Ctx, topic: Applied, members: dict[str, Member], table: Ali
     def run_critic(pg: TopicPage, rnd: int, warns: list[str]) -> tuple[Any, str | None, int | None]:
         """refs 근거를 앞에, 나머지 토픽 근거를 뒤에(근거 원문). overview·summary·title은 토픽 근거 전체가 기준이다."""
         nonlocal critic_seen
-        order = [e for e in refs_of(pg) if e in pack] + [e for e in pack if e not in refs_of(pg)]
+        # 요약만 있는 id(카드 summary)는 원문이 아니라 빼고 준다(리뷰 R1: 요약·개요가 요약과 대조되던 문제)
+        raw_ids = [e for e in pack if not all(it.kind == "summary" for it in pack[e])]
+        order = [e for e in refs_of(pg) if e in raw_ids] + [e for e in raw_ids if e not in refs_of(pg)]
         evid = [Document(id=e, source=pack[e][0].source.get("site") or pack[e][0].channel,
                          title=pack[e][0].source.get("title"), text=raw_evidence(ctx.db, e, pack[e])) for e in order]
         out = _call(critic, CriticInput(loc_lines=loc_lines(pg), page=pg, evidence=evid, angle=topic.angle,
@@ -398,6 +413,7 @@ def write_topic(ctx: Ctx, topic: Applied, members: dict[str, Member], table: Ali
                 upd[name] = keep
                 res.attention.append(f"이슈가 남은 {name} 도식 {len(getattr(final, name)) - len(keep)}개 뺌")
         final = final.model_copy(update=upd)
+        res.checks = sorted(check_locs)
         res.status = "checked"
     elif res.status != "passed":
         res.status = "checked"
@@ -460,7 +476,8 @@ def save(db: DB, res: TopicResult, run_id: str) -> None:
             db.conn.executemany(
                 "INSERT INTO topic_evidence(run_id, topic_id, evidence_id, member, field, idx) VALUES (?,?,?,?,?,?)",
                 [(run_id, t.topic_id, eid, res.member_by_id.get(eid, eid), f, i) for eid, f, i in rows])
-        db.conn.execute("UPDATE topics SET status=?, final_round=?, title=?, summary=? WHERE run_id=? AND topic_id=?",
+        db.conn.execute("UPDATE topics SET status=?, final_round=?, title=?, summary=?, checks_json=? "
+                        "WHERE run_id=? AND topic_id=?",
                         (res.status, res.final_round, page.title if page else None, page.summary if page else None,
-                         run_id, t.topic_id))
+                         json.dumps(res.checks, ensure_ascii=False), run_id, t.topic_id))
 

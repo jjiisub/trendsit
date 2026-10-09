@@ -9,6 +9,11 @@ evidence:
 aliases:
   auto_approve: [case, space, hyphen, dot]   # 표기 차이만 자동 승인
   fuzz_min_score: 90                # rapidfuzz 후보 최소 점수(숫자·버전이 다르면 점수와 무관하게 후보 아님)
+  # 음차·약어 사전(PR #9 리뷰 R11: 한 주 안 "GPT-6 루나 / GPT-6 Luna", "딥시크-V4.1 플래시"). 낱말 단위로만 바꾼다.
+  # 이 낱말만 다른 이름은 같은 이름(자동 approved, 정본은 영문), 작성자 출력의 음차 표기는 코드가 정본으로 고친다
+  transliteration: {Luna: 루나, Sol: 솔, Astra: 아스트라, Argon: 아르곤, Flash: 플래시, DeepSeek: 딥시크, Claude: 클로드,
+                    Gemini: 제미나이, Gemma: 젬마, Opus: 오퍼스, Sonnet: 소넷, Haiku: 하이쿠, Mistral: 미스트랄, Llama: 라마,
+                    Qwen: 큐웬, Codex: 코덱스, Grok: 그록, Kimi: 키미, Solar: 솔라, Exaone: 엑사원, HyperCLOVA: 하이퍼클로바}
 
 cluster:
   thresholds:
@@ -38,7 +43,14 @@ cluster:
     weeks_back: 4
 
 select:
-  max_candidates: 20                # 편집장 입력 상한(관련성 우선 점수)
+  max_candidates: 20                # 편집장 입력 상한(코드 순서 상위)
+  # 설계 결정 C-21(PR #9 리뷰): 순서 = 관심 키워드 유사도 구간 → 출처 수 → 수치 유무 → 키워드 추세. 토픽 순서도 코드가 정함
+  order:
+    sim_band: 0.05                  # 유사도 구간 폭(모든 채널 "제목 + 요약" 임베딩 ↔ 관심사 쿼리 코사인 최댓값)
+  # 설계 결정 C-20: 관련성 relevance_min 이상 영상 묶음이 입력에 있으면 영상 묶음 토픽 최소 min개
+  video_slot:
+    min: 1
+    relevance_min: 0.55
   topics:
     min: 4
     max: 10                         # 채울 목표가 아니라 상한. 멈춤 지점에서 10으로 확정(2026-10-09)

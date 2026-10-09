@@ -23,6 +23,7 @@ class EvidenceCfg(_Strict):
 class AliasesCfg(_Strict):
     auto_approve: list[Literal["case", "space", "hyphen", "dot"]]
     fuzz_min_score: float = Field(ge=50, le=100)
+    transliteration: dict[str, str] = {}  # 영문 낱말 → 한글 음차(작성자 출력·묶기 이름 신호의 표기 맞춤, 리뷰 R11)
 
 
 class Thresholds(_Strict):
@@ -65,9 +66,20 @@ class TopicsCfg(_Strict):
     max: int = Field(ge=1)
 
 
+class VideoSlotCfg(_Strict):
+    min: int = Field(ge=0)
+    relevance_min: float = Field(ge=0, le=1)
+
+
+class OrderCfg(_Strict):
+    sim_band: float = Field(gt=0, le=1)
+
+
 class SelectCfg(_Strict):
     max_candidates: int = Field(ge=1)
     topics: TopicsCfg
+    video_slot: VideoSlotCfg
+    order: OrderCfg
     lead: Literal[1]
     featured_repos_max: int = Field(ge=0)
 

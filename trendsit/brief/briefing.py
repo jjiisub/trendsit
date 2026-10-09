@@ -46,7 +46,9 @@ def export_topic(db: DB, run_id: str, topic_id: str, sources_by_id: dict[str, di
         counters[ch] += 1
         sid[mkey] = f"{prefix[ch]}{counters[ch]}"
         sources.append({"id": sid[mkey], "channel": ch, "site": src.get("site"), "title": src.get("title"),
-                        "date": src.get("date"), "url": src.get("url")})
+                        "date": src.get("date"), "url": src.get("url")}
+                       | ({"origin": o.get("url") if isinstance(o := src["origin"], dict) else o}
+                          if src.get("origin") else {}))  # og: 근거의 원본 URL(리뷰 R10)
     by_eid = {r["evidence_id"]: sid[r["member"]] for r in ev_rows}
 
     def refs(ids: list[str]) -> list[str]:
@@ -59,6 +61,7 @@ def export_topic(db: DB, run_id: str, topic_id: str, sources_by_id: dict[str, di
     events = [{"type": "events", "anchor": g.anchor, "title": g.title, "context": g.context,
                "items": [{"date": it.date, "text": it.text} | ({"ref": by_eid.get(it.ref)} if it.ref else {"topic_id": it.topic_id})
                          for it in g.items]} for g in page.events]
+    checks = json.loads(t["checks_json"] or "[]") if "checks_json" in t.keys() else []
     rel: dict[str, Any] = {"type": t["relation_type"] or "new"}
     if t["relation_topic_id"]:
         rel["topic_id"] = t["relation_topic_id"]
@@ -71,7 +74,7 @@ def export_topic(db: DB, run_id: str, topic_id: str, sources_by_id: dict[str, di
             "concepts": [c.model_dump() for c in page.concepts],
             "contributions": [{"channel": c.channel, "text": c.text} for c in page.contributions],
             "sources": sources, "channels": sorted({s["channel"] for s in sources}),
-            "has_check": any(p.check for p in page.points) or t["status"] == "checked"}
+            "has_check": any(p.check for p in page.points) or bool(checks), "checks": checks}
 
 
 def sources_index(db: DB, week: str) -> tuple[dict[str, dict[str, Any]], dict[str, list[EvidenceItem]]]:
@@ -106,6 +109,8 @@ def write_briefing_md(db: DB, week: str, run_id: str | None = None) -> Path:
         lines += [f"## {t['rank']}. {mark}{page.title}", "",
                   f"`{t['topic_id']}` · 상태 {t['status']} · {t['final_round']}라운드 · 축: {t['angle']}"
                   + (f" · 후속: {t['relation_topic_id']}" if t["relation_topic_id"] else ""), "",
+                  *([f"> ⚠ 확인 필요: {', '.join(checks)}(이슈가 남은 채 발행된 위치)", ""]
+                    if (checks := json.loads(t["checks_json"] or "[]")) else []),
                   f"**요약(홈)** {page.summary}", "", f"**개요** {page.overview}", "", "**핵심 포인트**", ""]
         for i, p in enumerate(page.points, 1):
             refs = "; ".join(f"`{r}` {(srcs.get(r) or {}).get('title', '?')[:50]}" for r in p.refs)
@@ -138,7 +143,8 @@ def write_briefing_md(db: DB, week: str, run_id: str | None = None) -> Path:
         card, stars = info.get(name, ({}, None))
         if not card.get("relevant"):
             continue
-        lines.append(f"- {'★ ' if name in repos else ''}{name} · 신호 {card.get('signal')} · 이번 주 별 {stars} · "
+        star_text = f"이번 주 별 {stars:,}" if stars is not None else "별 정보 없음"
+        lines.append(f"- {'★ ' if name in repos else ''}{name} · 신호 {card.get('signal')} · {star_text} · "
                      f"{card.get('why_trending') or ''}")
     if not rows:
         lines.append("- 없음(이 주 트렌딩 없음)")

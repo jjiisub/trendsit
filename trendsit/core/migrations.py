@@ -227,6 +227,10 @@ register(33, """
 register(34, """
     ALTER TABLE topics ADD COLUMN relation_label TEXT;
     """)
+# 35: 토픽 수준 "확인 필요" 위치 목록(PR #9 리뷰 R4: summary·overview·concepts·numbers에 남은 이슈가 화면에 안 보였음)
+register(35, """
+    ALTER TABLE topics ADD COLUMN checks_json TEXT;
+    """)
 
 
 # ---------- 적용 ----------

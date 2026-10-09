@@ -17,7 +17,7 @@ from ..core.artifacts_brief import Issue, TopicPage
 from ..core.artifacts_text import figures
 from ..core.config_brief import BriefConfig
 from ..core.numbers import number_values, same
-from ..core.style import EVAL_ENDINGS, ends_as_sentence, is_haeyo
+from ..core.style import EVAL_ENDINGS, EVAL_WORDS, ends_as_sentence, is_haeyo
 from .evidence import EvidenceItem
 
 HL = re.compile(r"==(.+?)==")
@@ -28,8 +28,14 @@ REF = re.compile(r"(?:it|og|vd|rp):[\w./#@:-]+")
 _SENT = re.compile(r"(?<=[.!?다])\s+")
 
 
+# 앞에서부터 맞춰 보므로 긴 낱말(분기, 개월)을 짧은 낱말(분, 개)보다 먼저 둔다
 UNIT_KINDS = (("%", ("%", "퍼센트", "%p", "포인트")), ("ms", ("ms", "밀리초")), ("s", ("초", "s", "sec")),
-              ("$", ("$", "달러", "usd")), ("원", ("원",)), ("배", ("배", "x", "×")), ("tok/s", ("tok/s", "토큰/초")))
+              ("$", ("$", "달러", "usd")), ("원", ("원",)), ("배", ("배", "x", "×")), ("tok/s", ("tok/s", "토큰/초")),
+              ("분기", ("분기",)), ("h", ("시간", "hours", "hour", "h")), ("min", ("분", "min", "minutes")),
+              ("개월", ("개월",)), ("개", ("개",)), ("명", ("명",)), ("회", ("회",)), ("건", ("건",)))
+# 근거에 없는 전망·평가형 마무리(리뷰 R3-d, W40 Decision API "주목된다", "것으로 보인다")
+SPECULATIVE = ("주목된다", "것으로 보인다", "것으로 전망된다", "지 주목")
+LABEL_UNIT = re.compile(r"\(([^()]+)\)\s*$")
 
 
 def unit_kind(text: str) -> str | None:
@@ -103,9 +109,18 @@ def _set(page: TopicPage, loc: str, text: str) -> TopicPage:
 
 
 def autofix(page: TopicPage, cfg: BriefConfig, canon: dict[str, str],
-            channels: set[str] | None = None) -> tuple[TopicPage, list[dict[str, Any]]]:
+            channels: set[str] | None = None, n_sources: int | None = None) -> tuple[TopicPage, list[dict[str, Any]]]:
     hl = cfg.write.highlights
     fixes: list[dict[str, Any]] = []
+    # 00) points 개수 초과: 중요도 순이라 뒤에서 자른다. 잘린 포인트에 붙은 도식도 뺌(리뷰 R4, SIFT 소스 1개에 4개)
+    if n_sources is not None:
+        hi = cfg.write.points["multi_source" if n_sources > 1 else "single_source"][1]
+        if len(page.points) > hi:
+            fixes.append({"loc": "points", "rule": f"points {len(page.points)}개 → {hi}개(근거 소스 {n_sources}개, 뒤에서 자름)",
+                          "before": [p.text for p in page.points[hi:]], "after": []})
+            page = page.model_copy(update={"points": page.points[:hi],
+                                           "numbers": [g for g in page.numbers if g.anchor <= hi],
+                                           "events": [g for g in page.events if g.anchor <= hi]})
     # 0) contributions: 근거 채널이 2개 이상일 때만, 그 채널만, 채널마다 1문장(넘치는 것은 뺌)
     if channels is not None and page.contributions:
         keep, seen = [], set()
@@ -170,15 +185,19 @@ def autofix(page: TopicPage, cfg: BriefConfig, canon: dict[str, str],
 
 # ---------- 반려 ----------
 def _ev_text(ids: list[str], pack: dict[str, list[EvidenceItem]]) -> str:
+    """대조용 근거 글. 글 카드의 주장 줄과 요약은 원문이 아니라 빼고(리뷰 R2), quote·수치·영상·레포 칸만."""
     out = []
     for i in ids:
         for it in pack.get(i, []):
+            if it.kind == "summary" or (it.kind == "claim" and it.channel == "text"):
+                continue
             out.append(f"{it.text} {it.value or ''}{it.unit or ''}")
     return " ".join(out)
 
 
 def _numbers_ok(text: str, ids: list[str], pack: dict[str, list[EvidenceItem]]) -> list[tuple[str, str]]:
-    """본문 수치(figures 규칙) 중 근거에 같은 값이 없는 것과 근거의 비슷한 값(힌트)."""
+    """본문 수치(figures 규칙) 중 근거에 같은 값이 없는 것과 근거의 비슷한 값(힌트). 부분 문자열이 아니라 값으로 비교
+    ('3.7'이 '13.75' 안에 있다고 통과하지 않게, 리뷰 R3-c)."""
     src = _ev_text(ids, pack)
     vals = number_values(src)
     out = []
@@ -187,7 +206,7 @@ def _numbers_ok(text: str, ids: list[str], pack: dict[str, list[EvidenceItem]]) 
             v = float(f.replace(",", ""))
         except ValueError:
             continue
-        if f in src.replace(",", "") or any(same(v, w) for w in vals):
+        if any(same(v, w) for w in vals):
             continue
         near = sorted(set(vals), key=lambda w: abs(w - v))[:3]
         out.append((f, ", ".join(f"{x:g}" for x in near)))
@@ -234,22 +253,40 @@ def check(page: TopicPage, pack: dict[str, list[EvidenceItem]], n_sources: int, 
         refs_exist(f"events[{g_i}].context", REF.findall(g.context))
     for c_i, c in enumerate(page.contributions):
         refs_exist(f"contributions[{c_i}]", c.refs)
+    # 근거 채널이 2개 이상이면 채널마다 1문장(리뷰 R12, OpenRig: github 한 줄뿐이고 text 빠짐)
+    channels = {it.channel for items in pack.values() for it in items}
+    missing = sorted(channels - {c.channel for c in page.contributions}) if len(channels) >= 2 else []
+    if missing:
+        issues.append(_issue("contributions", "format", f"근거 채널 {sorted(channels)} 중 {missing}의 contributions 문장이 없음",
+                             "채널마다 그 채널 근거가 더한 것 1문장(근거 id 포함)"))
     # 수치 대조(단위 환산 없이 값 비교)
     for i, p in enumerate(page.points):
         for f, near in _numbers_ok(p.text, p.refs, pack):
             issues.append(_issue(f"points[{i}]", "number_mismatch",
                                  f"points[{i}]의 '{f}'가 {', '.join(p.refs)}에 없음" + (f". 근거의 가까운 값은 {near}" if near else ""),
                                  "근거 표기 그대로", evidence_id=p.refs[0] if p.refs else None))
+    # refs가 없는 칸(제목, 요약, 개요, 개념)은 토픽 근거 전체, 도식 제목·context·사건 글과 기여는 그 칸의 근거로(리뷰 R3-c:
+    # 도식 제목 "3.7%p 높음" 같은 파생 수치가 대조 밖이었음)
     all_ids = list(pack)
-    for name in ("summary", "overview"):
-        for f, near in _numbers_ok(getattr(page, name), all_ids, pack):
-            issues.append(_issue(name, "number_mismatch", f"{name}의 '{f}'가 이 토픽 근거에 없음"
-                                 + (f". 근거의 가까운 값은 {near}" if near else ""), "근거 표기 그대로"))
+    slots: list[tuple[str, str, list[str]]] = [(n, getattr(page, n), all_ids) for n in ("title", "summary", "overview")]
+    slots += [(f"concepts[{i}]", c.desc, all_ids) for i, c in enumerate(page.concepts)]
+    for g_i, g in enumerate(page.numbers):
+        ids = [it.ref for it in g.items] + REF.findall(g.context)
+        slots += [(f"numbers[{g_i}].title", g.title, ids), (f"numbers[{g_i}].context", REF.sub("", g.context), ids)]
+    for g_i, g in enumerate(page.events):
+        ids = [it.ref for it in g.items if it.ref] + REF.findall(g.context)
+        slots += [(f"events[{g_i}].title", g.title, ids), (f"events[{g_i}].context", REF.sub("", g.context), ids)]
+        slots += [(f"events[{g_i}].items[{j}]", it.text, [it.ref]) for j, it in enumerate(g.items) if it.ref]
+    slots += [(f"contributions[{i}]", c.text, c.refs) for i, c in enumerate(page.contributions)]
+    for loc, text, ids in slots:
+        for f, near in _numbers_ok(text, ids, pack):
+            issues.append(_issue(loc, "number_mismatch", f"{loc}의 '{f}'가 {'이 토픽 근거' if ids is all_ids else ', '.join(ids)}에 없음"
+                                 + (f". 근거의 가까운 값은 {near}" if near else ""),
+                                 "근거 표기 그대로(근거 값끼리 빼거나 나눈 값을 새로 만들지 않음)"))
     for g_i, g in enumerate(page.numbers):
         for it_i, it in enumerate(g.items):
             vals = number_values(_ev_text([it.ref], pack))
-            if it.ref in pack and not any(same(v, w_) for v in number_values(it.value) for w_ in vals) \
-                    and it.value.replace(",", "") not in _ev_text([it.ref], pack).replace(",", ""):
+            if it.ref in pack and not any(same(v, w_) for v in number_values(it.value) for w_ in vals):
                 issues.append(_issue(f"numbers[{g_i}].items[{it_i}]", "number_mismatch",
                                      f"numbers[{g_i}].items[{it_i}] 값 '{it.value}'가 {it.ref}에 없음", "근거 표기 그대로",
                                      evidence_id=it.ref))
@@ -273,8 +310,18 @@ def check(page: TopicPage, pack: dict[str, list[EvidenceItem]], n_sources: int, 
         issues.append(_issue("numbers", "format", f"한 포인트에 도식 둘 이상(anchor {anchors})", "한 포인트에 도식 하나"))
     # 막대 값의 단위를 근거 표기와 대조: 근거에서 그 값 바로 뒤 단위가 그룹 단위와 다르면 반려(W40 judge: ms 그룹에 1.6초, $ 그룹에 %)
     for g_i, g in enumerate(page.numbers):
+        if not g.unit.strip("() \t"):  # 빈 단위(Jeff·Jeeves 정확도 "()", 리뷰 R3-b)
+            issues.append(_issue(f"numbers[{g_i}]", "format", f"numbers[{g_i}] 단위가 비어 있음",
+                                 "근거의 단위 그대로(단위 없는 비율·점수면 '점수', '비율'처럼 무엇인지)"))
         gu = unit_kind(g.unit)
         for it_i, it in enumerate(g.items):
+            m = LABEL_UNIT.search(it.label)  # 라벨 끝 괄호 단위("CPU 시간(시간)")도 그룹 단위와 대조
+            lu = unit_kind(m.group(1)) if m else None
+            if gu and lu and lu != gu:
+                issues.append(_issue(f"numbers[{g_i}].items[{it_i}]", "number_mismatch",
+                                     f"numbers[{g_i}].items[{it_i}] 라벨 단위 '{m.group(1)}'가 그룹 단위 {g.unit}와 다름",  # type: ignore[union-attr]
+                                     "같은 단위 값만 한 그룹에(다르면 그룹을 나누거나 문장으로)", evidence_id=it.ref))
+                continue
             ev_unit = evidence_unit(it.value, _ev_text([it.ref], pack))
             if gu and ev_unit and ev_unit != gu:
                 issues.append(_issue(f"numbers[{g_i}].items[{it_i}]", "number_mismatch",
@@ -312,7 +359,9 @@ def check(page: TopicPage, pack: dict[str, list[EvidenceItem]], n_sources: int, 
         bad = []
         if any(is_haeyo(s) for s in sentences(t)):
             bad.append("해요체")
-        bad += [e for e in EVAL_ENDINGS if e in t]
+        bad += [e for e in (*EVAL_ENDINGS, *SPECULATIVE) if e in t]
+        if loc.startswith("points"):
+            bad += [e for e in EVAL_WORDS if e in t]
         if GENERIC_START.search(t):
             bad.append("일반론 시작")
         if "!" in t:
@@ -323,7 +372,10 @@ def check(page: TopicPage, pack: dict[str, list[EvidenceItem]], n_sources: int, 
             bad.append("이모지")
         if bad:
             hint = "담백한 서술로"
-            if any(e in t for e in EVAL_ENDINGS):
+            if any(e in t for e in SPECULATIVE):
+                hint = ("근거 밖 전망·평가 마무리를 빼고 근거의 사실로 끝맺음(예: '…가속화할 것으로 보인다' → 그 문장 삭제, "
+                        "'…자리잡을지 주목된다' → '…를 공개했다'). 그 문장만 고친 새 값을 낸다")
+            elif any(e in t for e in EVAL_ENDINGS) or any(e in t for e in EVAL_WORDS):
                 hint = ("평가어를 빼고 사실로 끝맺음(예: '…확장하는 것이 핵심이다' → '…확장하는 구조다', "
                         "'…가 눈에 띈다' → '…를 기록했다'). 그 문장만 고친 새 값을 낸다")
             elif "해요체" in bad:
@@ -349,6 +401,11 @@ def warnings(page: TopicPage, pack: dict[str, list[EvidenceItem]], cfg: BriefCon
     if not page.events and len(dates) >= 3:
         out.append(f"누락 의심: events가 비었는데 근거에 날짜 다른 사건 후보 {len(dates)}개")
     for g_i, g in enumerate(page.numbers):
+        if unit_kind(g.unit):
+            for it_i, it in enumerate(g.items):
+                if it.ref in pack and evidence_unit(it.value, _ev_text([it.ref], pack)) is None:
+                    out.append(f"단위 확인 필요: numbers[{g_i}].items[{it_i}] 값 {it.value}의 근거 단위를 찾지 못함"
+                               f"(그룹 단위 {g.unit})")
         if len(g.items) == 2 and not any(it.baseline for it in g.items):
             out.append(f"남발 의심: numbers[{g_i}] 값 2개인데 baseline 없음")
     for g_i, g in enumerate(page.events):
@@ -364,5 +421,5 @@ def warnings(page: TopicPage, pack: dict[str, list[EvidenceItem]], cfg: BriefCon
 
 def run_checks(page: TopicPage, pack: dict[str, list[EvidenceItem]], n_sources: int, cfg: BriefConfig,
                canon: dict[str, str]) -> CheckResult:
-    fixed, fixes = autofix(page, cfg, canon, {it.channel for items in pack.values() for it in items})
+    fixed, fixes = autofix(page, cfg, canon, {it.channel for items in pack.values() for it in items}, n_sources)
     return CheckResult(fixed, fixes, check(fixed, pack, n_sources, cfg), warnings(fixed, pack, cfg))

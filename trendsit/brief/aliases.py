@@ -3,6 +3,7 @@
 | 후보 | status |
 | keywords.yaml 별칭 | approved(keyword_id 붙음. 주제어라 묶기의 '같은 대상' 신호로는 쓰지 않음) |
 | 표기 차이만(대소문자·띄어쓰기·하이픈·점) | 자동 approved |
+| 음차·약어 사전(brief.yaml aliases.transliteration)으로 바꾸면 같은 이름(GPT-6 루나 ↔ GPT-6 Luna) | 자동 approved, 정본은 원문 표기(영문) |
 | 이름 속 숫자·버전·크기가 다름 | 후보로도 만들지 않음(rapidfuzz 점수와 무관) |
 | 그 밖에 rapidfuzz 점수가 높은 쌍 | candidate. 묶기 신호로만, decide가 같다고 하면 approved |
 | 영상 name_pairs | 그 영상 안에서만 교정(EvidencePack Member.corrections), 전역으로 올리지 않음 |
@@ -32,6 +33,27 @@ def norm_key(name: str) -> str:
     s = re.sub(r"(?<=\d)\.(?=\d)", "․", s)  # 소수점 보호
     s = re.sub(r"[\s\-._·]+", "", s)
     return s.replace("․", ".")
+
+
+def _swap_tokens(name: str, table: dict[str, str]) -> list[str]:
+    """이름의 낱말 중 사전에 있는 것을 하나씩 바꿔 본 모든 표기(원래 표기 제외). 낱말 단위만(솔루션의 솔은 아님)."""
+    parts = re.split(r"([\s\-_/]+)", name)
+    opts = [[p] + ([table[p.lower()]] if p.lower() in table else []) for p in parts]
+    out = [""]
+    for o in opts:
+        out = [a + b for a in out for b in o]
+    return [v for v in out if v != name]
+
+
+def translit_variants(name: str, translit: dict[str, str]) -> list[str]:
+    """영문 이름 → 한글 음차가 섞인 표기들('DeepSeek-V4.1 Flash' → '딥시크-V4.1 플래시' 등). 작성자 출력 자동 수정용."""
+    return _swap_tokens(name, {k.lower(): v for k, v in translit.items()})
+
+
+def to_original(name: str, translit: dict[str, str]) -> str:
+    """한글 음차 낱말을 영문으로 되돌린 표기(사전에 있는 낱말만)."""
+    inv = {v.lower(): k for k, v in translit.items()}
+    return "".join(inv.get(p.lower(), p) for p in re.split(r"([\s\-_/]+)", name))
 
 
 def numbers_of(name: str) -> tuple[str, ...]:
@@ -85,7 +107,8 @@ class AliasTable:
                 "rejected": sum(r.status == "rejected" for r in ent)}
 
 
-def build(members: list[Member], keywords: KeywordsConfig, fuzz_min: float = 90) -> AliasTable:
+def build(members: list[Member], keywords: KeywordsConfig, fuzz_min: float = 90,
+          translit: dict[str, str] | None = None) -> AliasTable:
     """구성원의 이름(글 카드 entities, 영상 판독 표기, 레포 이름)에서 별칭 후보를 만든다(LLM 없음)."""
     from rapidfuzz import fuzz
 
@@ -112,6 +135,20 @@ def build(members: list[Member], keywords: KeywordsConfig, fuzz_min: float = 90)
             if f != best and numbers_of(f) == numbers_of(best):  # 'Llama 3 8B' ↔ 'Llama 38B'는 표기 차이가 아님
                 rows.append(AliasRow(best, f, "approved", "표기 차이만(대소문자·띄어쓰기·하이픈·점)",
                                      evidence=sorted(where[f])))
+    # 음차·약어 사전: 한글 음차 낱말을 영문으로 되돌려 같은 열쇠가 되면 같은 이름(PR #9 리뷰 R11, 음차 후보 원천이 없어 0건)
+    if translit:
+        groups: dict[str, list[str]] = {}
+        for best in canon.values():
+            groups.setdefault(norm_key(to_original(best, translit)), []).append(best)
+        for forms in groups.values():
+            if len(forms) < 2:
+                continue
+            # 정본: 원문 표기(한글이 적은 쪽), 같으면 많이 나온 쪽
+            forms.sort(key=lambda f: (sum("가" <= c <= "힣" for c in f), -sum(seen[norm_key(f)].values()), f))
+            for f in forms[1:]:
+                if numbers_of(f) == numbers_of(forms[0]):
+                    rows.append(AliasRow(forms[0], f, "approved", "음차·약어 사전(brief.yaml aliases.transliteration)",
+                                         evidence=sorted(where.get(f, set()))))
     keys = sorted(canon)
     for i, a in enumerate(keys):
         for b in keys[i + 1:]:

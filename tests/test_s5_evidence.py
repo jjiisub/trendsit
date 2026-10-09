@@ -137,3 +137,23 @@ def test_alias_replacement_respects_word_boundaries():
                   concepts=[], overview="o다.", summary="s다.", title="t", log="l")
     fixed, _ = checks.autofix(p, config.load("brief.yaml"), {"AI": "인공지능"})
     assert fixed.points[0].text == "Aider와 인공지능 도구 비교 정리 내용"
+
+
+def test_r11_transliteration_aliases_and_autofix():
+    from trendsit.brief import checks
+    from trendsit.core.artifacts_brief import Point, TopicPage
+
+    tr = {"Luna": "루나", "Flash": "플래시", "DeepSeek": "딥시크"}
+    ms = [Member(f"it:{i}", "text", "", "", "", "high", [n], [], {})
+          for i, n in enumerate(("GPT-6 Luna", "GPT-6 루나", "GPT-7 루나"))]
+    rows = al.build(ms, config.KeywordsConfig(keywords=[], exclude=[]), translit=tr).rows
+    got = {(r.canonical, r.alias, r.status) for r in rows if r.reason.startswith("음차")}
+    assert got == {("GPT-6 Luna", "GPT-6 루나", "approved")}  # 숫자가 다른 GPT-7 루나는 아님
+    assert set(al.translit_variants("DeepSeek-V4.1 Flash", tr)) == {
+        "딥시크-V4.1 Flash", "DeepSeek-V4.1 플래시", "딥시크-V4.1 플래시"}
+    canon = {v: "DeepSeek-V4.1 Flash" for v in al.translit_variants("DeepSeek-V4.1 Flash", tr)}
+    page = TopicPage(points=[Point(text="딥시크-V4.1 플래시 공개, 가격 인하함", refs=["it:1#q1"])], numbers=[], events=[],
+                     contributions=[], concepts=[], overview="a다. b다.", summary="딥시크-V4.1 플래시가 나왔다.", title="t",
+                     log="l", attention=False)
+    fixed, _ = checks.autofix(page, config.load("brief.yaml"), canon)
+    assert fixed.summary == "DeepSeek-V4.1 Flash가 나왔다." and fixed.points[0].text.startswith("DeepSeek-V4.1 Flash")

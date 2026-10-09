@@ -96,7 +96,7 @@ PR 설명 맨 위에 "공통 코어 수정"으로 표시.
 **EvidencePack**(표로 저장하지 않음: DB에서 매번 같게 조립, 작성자에게 실제로 준 입력은 llm_calls에 남음)
 - 항목 = `{id, member, channel, kind, text, value?, unit?, sec?, source{site, title, date, url}}`
 - kind: quote / number / claim / slide_fact / timeline / summary / repo_field
-- 근거 id는 기존 규칙 그대로(CONTRACTS): 글 `it:{item_id}#q{n}`, 영상 `vd:{item_id}@{sec}`, 레포 `rp:{owner/name}`
+- 근거 id는 기존 규칙 그대로(CONTRACTS): 글 `it:{item_id}#q{n}`, 원본 문서 `og:{item_id}#q{n}`(ItemCard v2가 있으면 원본 문장, 글 자체 인용 `it:`과 함께), 영상 `vd:{item_id}@{sec}`, 레포 `rp:{owner/name}`. export sources는 `og:` 근거의 원본 URL을 `origin`으로 보존(PR #9 리뷰 R10)
 - 영상은 digest의 거른 slide_only_facts(P4-1 뒤 claim만), timeline, summary 문장. 레포는 oneliner, signal, stars_this_week, release
 - **토픽당 입력 상한 약 8,000토큰**(`brief.yaml`). 넘치면 관련성 → 채널 다양성 → 출처당 균형 순으로 고르고, 뺀 근거 id는 clusters.body_json과 실행 요약 `evidence.truncated_topics`에 기록
 

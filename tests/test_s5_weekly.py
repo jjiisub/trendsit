@@ -40,6 +40,8 @@ def revision(changes: list[dict]) -> str:
 @pytest.fixture
 def week(tmp_path, monkeypatch):
     monkeypatch.setattr(briefing, "OUT", tmp_path / "out")
+    # 관심 유사도를 모두 같게: 코드 순서가 cluster_id 순(it:1~4)이 되어 모의 응답 순서와 맞음
+    monkeypatch.setattr(pipeline.cl, "interest_similarity", lambda *a, **k: {})
     ctx = make_ctx(tmp_path, FakeTransport([]), spec_cap=1.0)
     c = ctx.db.conn
     c.execute("INSERT INTO sources(id, channel, name) VALUES ('openai','text','OpenAI')")
@@ -65,7 +67,8 @@ def plan(cids: dict[str, int]) -> str:
                        "splits": [], "topics": [{"cluster_ids": [x], "rank": r, "lead": r == 1,
                                                  "relation": {"type": "new", "topic_id": None}, "relation_reason": "새",
                                                  "angle": "출시", "slug_hint": f"model {r}"} for r, x in enumerate(ids, 1)],
-                       "featured_repos": [], "log": "후보 4개 중 4개 선정", "attention": False}, ensure_ascii=False)
+                       "lead_reason": "테스트: 첫 후보를 리드로", "featured_repos": [], "log": "후보 4개 중 4개 선정",
+                       "attention": False}, ensure_ascii=False)
 
 
 def test_weekly_rounds_storage_summary_export(week):
@@ -106,7 +109,8 @@ def test_weekly_rounds_storage_summary_export(week):
     # A11: 마이그레이션 대역, topic_evidence = 최종판 refs
     from trendsit.core.migrations import MIGRATIONS
 
-    assert {30, 31, 32, 33, 34} <= set(MIGRATIONS)
+    assert {30, 31, 32, 33, 34, 35} <= set(MIGRATIONS)
+    assert json.loads(t1["checks_json"]) == ["points[1]"] and summary["review"]["check_topics"] == 1  # 토픽 수준 확인 필요(R4)
     refs = {(r["evidence_id"], r["field"]) for r in db.execute(
         "SELECT evidence_id, field FROM topic_evidence WHERE run_id=? AND topic_id=?", (run_id, t1["topic_id"]))}
     assert refs == {("it:1#q1", "point")}
@@ -119,14 +123,16 @@ def test_weekly_rounds_storage_summary_export(week):
     stored = json.loads(db.execute("SELECT summary_json FROM runs WHERE id=?", (run_id,)).fetchone()[0])
     assert stored == pipeline.compute_summary(ctx.db, run_id) == summary
     assert summary["select"] == {"candidates": 4, "selected": 4, "merges": 0, "splits": 0,
-                                 "drops": {"duplicate": 0, "low_relevance": 0, "thin": 0, "other": 0}}
+                                 "drops": {"duplicate": 0, "low_relevance": 0, "thin": 0, "other": 0},
+                                 "drops_by": {"model": 0, "code": 0, "fallback": 0}}
     assert summary["write"] == {"topics": 4, "failed": 0}
     # A13: 저장값만으로 예시 JSON 토픽 칸
     srcs, _ = briefing.sources_index(ctx.db, "2026-W41")
     ex = briefing.export_topic(ctx.db, run_id, t1["topic_id"], srcs)
     assert set(ex) >= {"id", "week", "rank", "lead", "title", "summary", "relation", "overview", "points", "diagrams",
                        "concepts", "contributions", "sources", "channels", "has_check"}
-    assert ex["week"] == "2026-w41" and ex["has_check"] and ex["points"][0]["refs"] == ["s1"]
+    assert ex["week"] == "2026-w41" and ex["has_check"] and ex["checks"] == ["points[1]"]
+    assert ex["points"][0]["refs"] == ["s1"]
     assert ex["sources"][0]["title"] == TITLES[1]
     # 재실행: 새 run, 이전 행 보존, current_run_id 갱신
     ctx.llm.transport.responses = [response(r) for r in [plan(cids)] + [x for i in TITLES for x in
@@ -240,3 +246,35 @@ def test_revision_with_wrong_sub_value_keeps_previous():
     assert new.numbers[0].items[1].value == "1" and notes
     whole = TopicPageRevision(changed=[Change(issue_idx=0, loc="points", action="delete", value=None)], log="l")
     assert apply_revision(p, whole, {"points"})[0].points  # 포인트 전체 삭제는 받지 않음
+
+
+def test_export_numbers_events_og_and_checks(tmp_path):
+    """A13: 도식(수치·사건), og: 근거의 원본 URL, 토픽 수준 확인 필요가 예시 JSON 칸으로."""
+    ctx = make_ctx(tmp_path, FakeTransport([]), spec_cap=1.0)
+    db = ctx.db.conn
+    page = {"points": [{"text": "정확도 B 93.5%로 가장 높음", "refs": ["og:5#q1"], "check": False},
+                       {"text": "발표 일정 정리", "refs": ["it:5#q1"], "check": False}],
+            "numbers": [{"anchor": 1, "group": "g", "title": "B 정확도 93.5%로 최고", "context": "같은 벤치 [og:5#q1]",
+                         "unit": "%", "items": [{"label": x, "value": v, "ref": "og:5#q1", "baseline": False,
+                                                 "emphasis": x == "B"} for x, v in (("A", "86.6"), ("B", "93.5"), ("C", "81.2"))]}],
+            "events": [{"anchor": 2, "title": "공개 흐름", "context": "발표 순서", "flow_is_point": False,
+                        "items": [{"date": f"2026-10-0{d}", "text": f"사건 {d}", "ref": "it:5#q1", "topic_id": None}
+                                  for d in (5, 6, 7)]}],
+            "contributions": [], "concepts": [], "overview": "a다. b다.", "summary": "요약이다.", "title": "제목",
+            "log": "l", "attention": False}
+    db.execute("INSERT INTO topics(run_id, topic_id, week, cluster_ids_json, rank, lead, relation_type, status, final_round,"
+               " angle, checks_json) VALUES ('r','w41-x','2026-W41','[]',1,1,'new','checked',2,'a','[\"summary\"]')")
+    db.execute("INSERT INTO topic_pages(run_id, topic_id, round, page_json) VALUES ('r','w41-x',2,?)", (json.dumps(page),))
+    db.executemany("INSERT INTO topic_evidence(run_id, topic_id, evidence_id, member, field, idx) VALUES ('r','w41-x',?,?,?,?)",
+                   [("og:5#q1", "it:5", "point", 0), ("it:5#q1", "it:5", "point", 1), ("og:5#q1", "it:5", "number", 0)])
+    db.commit()
+    srcs = {"og:5#q1": {"channel": "text", "site": "S", "title": "T", "date": "2026-10-06", "url": "https://s/5",
+                        "origin": {"url": "https://origin/5", "kind": "blog"}},
+            "it:5#q1": {"channel": "text", "site": "S", "title": "T", "date": "2026-10-06", "url": "https://s/5"}}
+    ex = briefing.export_topic(ctx.db, "r", "w41-x", srcs)
+    bars, events = ex["diagrams"]
+    assert bars["type"] == "bars" and bars["anchor"] == 1 and bars["ref"] == "s1" and bars["items"][1]["emphasis"]
+    assert events["type"] == "events" and [i["ref"] for i in events["items"]] == ["s1"] * 3
+    assert ex["sources"] == [{"id": "s1", "channel": "text", "site": "S", "title": "T", "date": "2026-10-06",
+                              "url": "https://s/5", "origin": "https://origin/5"}]
+    assert ex["checks"] == ["summary"] and ex["has_check"]
