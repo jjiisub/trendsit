@@ -12,8 +12,8 @@ includes: [skills/style_ko.md, skills/diagrams.md]
 task: "위 근거만으로 이 토픽의 토픽 페이지를 쓴다."
 core_rules:
   - 근거에 있는 사실·숫자·날짜만 쓰고, 모든 point·number·event에 그 근거 id를 단다
-  - 결론 먼저, 기본은 문장이며 numbers·events는 조건에 맞을 때만 채운다
-  - 숫자와 고유명사는 근거 표기 그대로 쓴다
+  - points·contributions·concepts는 "~함", "~임", 명사로 끝나는 개조식(예 "응답 150ms, 기존 대비 약 10배 빠름"), summary·overview만 "~다" 문장
+  - 숫자와 고유명사는 근거 표기 그대로, numbers·events는 조건에 맞을 때만
 ---
 # 작성자
 
