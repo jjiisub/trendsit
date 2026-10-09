@@ -3,7 +3,7 @@
 번호 → SQL. 적용 기록은 schema_migrations 표에 남기고, 등록된 번호 중 기록에 없는 것을 오름차순으로 하나씩 적용한다.
 빈 번호를 허용하므로 두 브랜치가 각자 대역에 추가해도 병합 때 겹치지 않는다.
 
-번호 대역(COMMON 9장): 1~9 = S0~S1, 10~19 = S2~S3, 20~29 = S4. 다른 대역끼리는 서로 의존하지 않는다.
+번호 대역(COMMON 9장): 1~9 = S0~S1, 10~19 = S2~S3, 20~29 = S4, 30~39 = S5. 다른 대역끼리는 서로 의존하지 않는다.
 대역별 등록은 아래 각 묶음 자리에. S4 몫은 S4 브랜치가 자기 자리에 추가한다.
 """
 
@@ -144,6 +144,84 @@ register(20, """
     CREATE TABLE IF NOT EXISTS video_digests (
         video_id TEXT PRIMARY KEY, item_id INTEGER, digest_json TEXT NOT NULL, model TEXT, run_id TEXT, created_at TEXT
     );
+    """)
+
+
+# ---------- S5 (30~39) ----------
+# 원칙(S5_TASK 5.9): weekly가 만드는 모든 행에 run_id. 그 주 현재판은 weeks.current_run_id, 지우는 행 없음
+# 30: 표기 정규화 별칭 표
+register(30, """
+    CREATE TABLE IF NOT EXISTS aliases (
+        id INTEGER PRIMARY KEY, canonical TEXT NOT NULL, alias TEXT NOT NULL, keyword_id TEXT, reason TEXT,
+        evidence_json TEXT, origin TEXT NOT NULL CHECK(origin IN ('normalizer','editor')),
+        status TEXT NOT NULL CHECK(status IN ('candidate','approved','rejected')), seen INTEGER NOT NULL DEFAULT 1,
+        run_id TEXT, updated_at TEXT, UNIQUE(canonical, alias)
+    );
+    """)
+# 31: 주차, 묶음, 묶음 구성원, 판정한 쌍. member_embeddings는 영상(digest 요약)·레포(oneliner + description)처럼
+# item_embeddings(글 본문)에 없는 구성원의 묶기용 임베딩
+register(31, """
+    CREATE TABLE IF NOT EXISTS weeks (
+        week TEXT PRIMARY KEY, start_day TEXT NOT NULL, end_day TEXT NOT NULL,
+        status TEXT NOT NULL CHECK(status IN ('open','clustered','selected','written','done','failed')),
+        current_run_id TEXT
+    );
+    CREATE TABLE IF NOT EXISTS clusters (
+        id INTEGER PRIMARY KEY, run_id TEXT NOT NULL, week TEXT NOT NULL, label TEXT, channels_json TEXT,
+        n_items INTEGER NOT NULL, score REAL, body_json TEXT
+    );
+    CREATE INDEX IF NOT EXISTS clusters_run ON clusters(run_id);
+    CREATE TABLE IF NOT EXISTS cluster_items (
+        cluster_id INTEGER NOT NULL, member TEXT NOT NULL, channel TEXT NOT NULL,
+        joined_by TEXT NOT NULL CHECK(joined_by IN ('seed','embed','keyword','alias','decide','same_url')),
+        sim REAL, PRIMARY KEY(cluster_id, member)
+    );
+    CREATE TABLE IF NOT EXISTS cluster_pairs (
+        id INTEGER PRIMARY KEY, run_id TEXT NOT NULL, a TEXT NOT NULL, b TEXT NOT NULL, sim REAL,
+        cross_channel INTEGER NOT NULL, decided INTEGER NOT NULL DEFAULT 0, answer INTEGER, confidence REAL,
+        reason TEXT, step_id INTEGER
+    );
+    CREATE INDEX IF NOT EXISTS cluster_pairs_run ON cluster_pairs(run_id);
+    CREATE TABLE IF NOT EXISTS member_embeddings (
+        member TEXT NOT NULL, model TEXT NOT NULL, dim INTEGER NOT NULL, vec BLOB NOT NULL, text_hash TEXT,
+        created_at TEXT, PRIMARY KEY(member, model)
+    );
+    """)
+# 32: 선별 계획, 토픽, 토픽 페이지(라운드별), 판정, 토픽 ↔ 근거
+register(32, """
+    CREATE TABLE IF NOT EXISTS briefing_plans (
+        id INTEGER PRIMARY KEY, run_id TEXT NOT NULL, week TEXT NOT NULL,
+        source TEXT NOT NULL CHECK(source IN ('model','fallback')), plan_json TEXT NOT NULL, created_at TEXT
+    );
+    CREATE TABLE IF NOT EXISTS topics (
+        run_id TEXT NOT NULL, topic_id TEXT NOT NULL, week TEXT NOT NULL, cluster_ids_json TEXT NOT NULL,
+        rank INTEGER NOT NULL, lead INTEGER NOT NULL, relation_type TEXT, relation_topic_id TEXT,
+        status TEXT NOT NULL CHECK(status IN ('selected','passed','checked','failed')), final_round INTEGER,
+        title TEXT, summary TEXT, angle TEXT, PRIMARY KEY(run_id, topic_id)
+    );
+    CREATE TABLE IF NOT EXISTS topic_pages (
+        id INTEGER PRIMARY KEY, run_id TEXT NOT NULL, topic_id TEXT NOT NULL, round INTEGER NOT NULL,
+        page_json TEXT NOT NULL, raw_json TEXT, step_id INTEGER, UNIQUE(run_id, topic_id, round)
+    );
+    CREATE TABLE IF NOT EXISTS verdicts (
+        id INTEGER PRIMARY KEY, run_id TEXT NOT NULL, topic_id TEXT NOT NULL, round INTEGER NOT NULL,
+        checker TEXT NOT NULL CHECK(checker IN ('code','critic')), status TEXT NOT NULL CHECK(status IN ('pass','reject')),
+        issues_json TEXT, autofix_json TEXT, step_id INTEGER
+    );
+    CREATE TABLE IF NOT EXISTS topic_evidence (
+        run_id TEXT NOT NULL, topic_id TEXT NOT NULL, evidence_id TEXT NOT NULL, member TEXT NOT NULL,
+        field TEXT NOT NULL CHECK(field IN ('point','number','event','context','contribution')), idx INTEGER NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS topic_evidence_topic ON topic_evidence(run_id, topic_id);
+    """)
+# 33: 과거 대조용 토픽 임베딩, 실행 요약
+register(33, """
+    CREATE TABLE IF NOT EXISTS topic_embeddings (
+        topic_id TEXT NOT NULL, run_id TEXT NOT NULL, model TEXT NOT NULL, dim INTEGER NOT NULL, vec BLOB NOT NULL,
+        text_hash TEXT, PRIMARY KEY(topic_id, run_id, model)
+    );
+    ALTER TABLE runs ADD COLUMN week TEXT;
+    ALTER TABLE runs ADD COLUMN summary_json TEXT;
     """)
 
 

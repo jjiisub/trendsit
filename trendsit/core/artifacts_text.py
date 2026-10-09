@@ -39,6 +39,17 @@ def number_in(n: str, text: str, words: bool = False) -> bool:
     return bool(w and re.search(rf"\b{w}\b", text or "", re.I))
 
 
+def scaled_in(n: str, text: str, src: str) -> bool:
+    """한국어 큰 단위가 붙은 수('100만')를 값으로 비교: 인용이 'per million'이면 같은 수(S5 1단계 오탐 수정)."""
+    from .numbers import number_values, same
+
+    m = re.search(rf"(?<![\d.]){re.escape(n)}(?=\s*(천만|백만|천억|[천만억조]))", (text or "").replace(",", ""))
+    if not m:
+        return False
+    vals = [v for v in number_values(m.group() + m.group(1)) if v != float(n)]
+    return any(same(v, w) for v in vals for w in number_values(src))
+
+
 def numbers(text: str) -> list[str]:
     """글 속 숫자 전부(쉼표 없앰). item_card 요약·주장 대조(PR #6 리뷰 R2)."""
     return [m.group().replace(",", "") for m in _NUM.finditer(text or "")]
@@ -203,7 +214,7 @@ class ItemCardV1(RoleOutput):
         """summary·claims의 숫자 중 quotes와 제목에 없는 것(영어 수 단어 one~ten 허용). PR #6 리뷰 R2."""
         src = " ".join([title, *(q.text for q in self.quotes)])
         return [n for t in [self.summary, *(c.text for c in self.claims)] for n in numbers(t)
-                if not number_in(n, src, words=True)]
+                if not number_in(n, src, words=True) and not scaled_in(n, t, src)]
 
     def clip_quotes(self, body: str) -> Self:
         """본문에 있는 QUOTE_CHARS자 초과 인용을 자르고, 잘려 나간 수치를 지운다(설계 결정 Q6, 코드 소유. attention 없음)."""

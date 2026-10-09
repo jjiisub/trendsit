@@ -92,4 +92,4 @@ def test_split_sql_keeps_semicolons_in_strings():
 
 
 def test_registered_numbers_are_unique_and_banded():
-    assert all(1 <= n <= 29 for n in MIGRATIONS)
+    assert all(1 <= n <= 39 for n in MIGRATIONS)  # S5 대역 30~39(COMMON 9장)
