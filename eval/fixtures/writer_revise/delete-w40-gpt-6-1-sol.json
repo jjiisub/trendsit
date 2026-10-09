@@ -1,0 +1,168 @@
+{
+ "input": {
+  "loc_lines": [
+   "title: GPT-6.1 Sol: Astra급 지능 5분의 1 가격",
+   "summary: OpenAI가 GPT-6 Astra급 지능을 ==5분의 1 가격==에 제공하는 GPT-6.1 Sol을 공개했다. 캐시 입력 $0.10/1M 토큰으로 에이전트 워크로드 비용을 최대 95% 절감한다.",
+   "overview: OpenAI가 GPT-6 Sol의 업그레이드 모델 GPT-6.1 Sol을 공개했다. 에이전틱 코딩, 컴퓨터 사용, 전문 업무에서 GPT-6 Astra에 근접한 지능을 표준 토큰 가격의 5분의 1 수준으로 제공하며, 캐시된 입력 가격은 100만 토큰당 $0.10으로 표준 대비 95% 절감된다. DeepSWE v1.1, OSWorld 2.0, Terminal-Bench Science 0.1에서 GPT-6 Sol 대비 성능 향상과 비용 절감을 동시에 달성했다.",
+   "points[0]: GPT-6.1 Sol은 에이전틱 코딩, 컴퓨터 사용, 전문 업무에서 GPT-6 Astra와 유사한 지능을 Astra 표준 입력·출력 토큰 가격의 ==5분의 1== 수준으로 제공함 (refs it:8#q1, og:981#q1)",
+   "points[1]: DeepSWE v1.1에서 GPT-6 Astra와 동등한 성능을 약 5분의 1 비용으로 달성하고, GPT-6 Sol 최고 점수보다 6.4%p 높음 (refs it:8#q3, og:981#q3)",
+   "points[2]: OSWorld 2.0 오프라인 세트에서 최대 추론 강도로 GPT-6 Sol보다 7%p 높은 성능을 절반 미만 비용으로 기록함 (refs it:8#q4, og:981#q4)",
+   "points[3]: 캐시된 입력 가격은 100만 토큰당 $0.10으로, 표준 입력 가격보다 95%, GPT-6 Sol 캐시 입력 가격보다 50% 저렴함 (refs it:8#q2, og:981#q2)",
+   "points[4]: Terminal-Bench Science 0.1에서 GPT-6 Sol 점수의 2배 이상을 절반 이하 비용으로 달성함 (refs it:8#q5)",
+   "points[5]: Plus, Pro, Business, Enterprise, Edu 사용자에게 ChatGPT Work와 Codex에서 즉시 제공됨, 이용약관 조항에 따른 조치로 미국 사용자부터 적용 (refs it:8#q6)"
+  ],
+  "previous": {
+   "log": "포인트 6개, 수치 그룹 1개, 근거 id 15개",
+   "attention": false,
+   "points": [
+    {
+     "text": "GPT-6.1 Sol은 에이전틱 코딩, 컴퓨터 사용, 전문 업무에서 GPT-6 Astra와 유사한 지능을 Astra 표준 입력·출력 토큰 가격의 ==5분의 1== 수준으로 제공함",
+     "refs": [
+      "it:8#q1",
+      "og:981#q1"
+     ],
+     "check": false
+    },
+    {
+     "text": "DeepSWE v1.1에서 GPT-6 Astra와 동등한 성능을 약 5분의 1 비용으로 달성하고, GPT-6 Sol 최고 점수보다 6.4%p 높음",
+     "refs": [
+      "it:8#q3",
+      "og:981#q3"
+     ],
+     "check": false
+    },
+    {
+     "text": "OSWorld 2.0 오프라인 세트에서 최대 추론 강도로 GPT-6 Sol보다 7%p 높은 성능을 절반 미만 비용으로 기록함",
+     "refs": [
+      "it:8#q4",
+      "og:981#q4"
+     ],
+     "check": false
+    },
+    {
+     "text": "캐시된 입력 가격은 100만 토큰당 $0.10으로, 표준 입력 가격보다 95%, GPT-6 Sol 캐시 입력 가격보다 50% 저렴함",
+     "refs": [
+      "it:8#q2",
+      "og:981#q2"
+     ],
+     "check": false
+    },
+    {
+     "text": "Terminal-Bench Science 0.1에서 GPT-6 Sol 점수의 2배 이상을 절반 이하 비용으로 달성함",
+     "refs": [
+      "it:8#q5"
+     ],
+     "check": false
+    },
+    {
+     "text": "Plus, Pro, Business, Enterprise, Edu 사용자에게 ChatGPT Work와 Codex에서 즉시 제공됨, 이용약관 조항에 따른 조치로 미국 사용자부터 적용",
+     "refs": [
+      "it:8#q6"
+     ],
+     "check": false
+    }
+   ],
+   "numbers": [],
+   "events": [],
+   "contributions": [],
+   "concepts": [],
+   "overview": "OpenAI가 GPT-6 Sol의 업그레이드 모델 GPT-6.1 Sol을 공개했다. 에이전틱 코딩, 컴퓨터 사용, 전문 업무에서 GPT-6 Astra에 근접한 지능을 표준 토큰 가격의 5분의 1 수준으로 제공하며, 캐시된 입력 가격은 100만 토큰당 $0.10으로 표준 대비 95% 절감된다. DeepSWE v1.1, OSWorld 2.0, Terminal-Bench Science 0.1에서 GPT-6 Sol 대비 성능 향상과 비용 절감을 동시에 달성했다.",
+   "summary": "OpenAI가 GPT-6 Astra급 지능을 ==5분의 1 가격==에 제공하는 GPT-6.1 Sol을 공개했다. 캐시 입력 $0.10/1M 토큰으로 에이전트 워크로드 비용을 최대 95% 절감한다.",
+   "title": "GPT-6.1 Sol: Astra급 지능 5분의 1 가격"
+  },
+  "issues": [
+   {
+    "loc": "points[5]",
+    "type": "unsupported",
+    "evidence_id": null,
+    "comment": "points[5]의 '이용약관 조항에 따른 조치로 미국 사용자부터 적용'이 근거 원문에 없음",
+    "hint": "근거에 있는 내용만 남기거나 삭제",
+    "idx": 0
+   }
+  ],
+  "evidence": [
+   {
+    "id": "it:8#q1",
+    "source": "OpenAI News",
+    "text": "We’re introducing GPT-6.1 Sol, an upgrade to GPT-6 Sol that nearly matches GPT-6 Astra’s intelligence on agentic coding, computer use, and professional work at one-fifth of Astra’s standard input and\n주장: GPT-6.1 Sol은 에이전틱 코딩, 컴퓨터 사용, 전문 업무에서 GPT-6 Astra와 유사한 지능을 5분의 1 가격에 제공하며, 캐시 입력 비용은 $0.10/백만 토큰이다.",
+    "title": "Introducing GPT-6.1 Sol",
+    "url": "https://openai.com/index/introducing-gpt-6-1-sol"
+   },
+   {
+    "id": "og:981#q1",
+    "source": "GeekNews",
+    "text": "GPT-6 Sol의 업그레이드 모델인 GPT-6.1 Sol을 소개합니다. 에이전틱 코딩, 컴퓨터 사용 및 전문 업무에서 GPT-6 Astra에 가까운 지능을 제공하면서도 Astra의 표준 입력 및 출력 토큰 가격의 5분의 1 수준으로 이용할 수 있습니다.\n수치: Astra 대비 표준 입력·출력 토큰 가격 수준 [5분의 1]\n주장: GPT-6.1 Sol은 Astra에 가까운 지능을 표준 토큰 가격 5분의 1, 캐시된 입력 가격 95% 절감으로 제공",
+    "title": "OpenAI, GPT-6.1 Sol 공개",
+    "url": "https://openai.com/ko-KR/index/introducing-gpt-6-1-sol/"
+   },
+   {
+    "id": "it:8#q2",
+    "source": "OpenAI News",
+    "text": "Cached input costs just $0.10 per million tokens—95% less than standard input pricing and 50% less than GPT-6 Sol’s cached input pricing—giving developers more room to build and run capable agents\n수치: 캐시된 입력 가격 [$0.10 per million tokens]\n수치: 표준 입력 가격 대비 절감률 [95%]\n수치: GPT-6 Sol 캐시 입력 가격 대비 절감률 [50%]",
+    "title": "Introducing GPT-6.1 Sol",
+    "url": "https://openai.com/index/introducing-gpt-6-1-sol"
+   },
+   {
+    "id": "og:981#q2",
+    "source": "GeekNews",
+    "text": "캐시된 입력은 100만 토큰당 $0.10에 불과해 표준 입력 가격보다 95%, GPT-6 Sol의 캐시된 입력 가격보다 50% 저렴합니다.\n수치: 캐시된 입력 가격 [$0.10 100만 토큰당]\n수치: 표준 입력 가격 대비 절감률 [95%]\n수치: GPT-6 Sol 캐시된 입력 가격 대비 절감률 [50%]",
+    "title": "OpenAI, GPT-6.1 Sol 공개",
+    "url": "https://openai.com/ko-KR/index/introducing-gpt-6-1-sol/"
+   },
+   {
+    "id": "it:8#q3",
+    "source": "OpenAI News",
+    "text": "On DeepSWE v1.1, which evaluates complex software-engineering tasks in real codebases, GPT-6.1 Sol matches GPT-6 Astra at roughly one-fifth of the cost, while eclipsing GPT-6 Sol’s best score by 6.4\n수치: GPT-6 Sol 최고 점수 대비 DeepSWE v1.1 향상폭 [6.4 percentage points]\n주장: DeepSWE v1.1 벤치마크에서 GPT-6.1 Sol은 GPT-6 Astra와 동등한 성능을 5분의 1 비용으로 달성하고, GPT-6 Sol보다 6.4%p 높다.",
+    "title": "Introducing GPT-6.1 Sol",
+    "url": "https://openai.com/index/introducing-gpt-6-1-sol"
+   },
+   {
+    "id": "og:981#q3",
+    "source": "GeekNews",
+    "text": "실제 코드베이스에서 복잡한 소프트웨어 엔지니어링 작업을 평가하는 DeepSWE v1.1에서 GPT-6.1 Sol은 약 5분의 1 비용으로 GPT-6 Astra와 대등한 성능을 보입니다.\n수치: DeepSWE v1.1에서 Astra 대비 비용 수준 [5분의 1]\n주장: DeepSWE v1.1에서 GPT-6 Astra와 대등한 성능을 약 5분의 1 비용으로 달성",
+    "title": "OpenAI, GPT-6.1 Sol 공개",
+    "url": "https://openai.com/ko-KR/index/introducing-gpt-6-1-sol/"
+   },
+   {
+    "id": "it:8#q4",
+    "source": "OpenAI News",
+    "text": "On OSWorld 2.0’s offline set, which evaluates agents on demanding computer-use workflows, GPT-6.1 Sol outperforms GPT-6 Sol by seven percentage points at maximum reasoning effort at less than half the\n수치: GPT-6 Sol 대비 OSWorld 2.0 향상폭 [seven percentage points]\n주장: OSWorld 2.0에서 GPT-6.1 Sol은 GPT-6 Sol보다 7%p 높은 성능을 절반 이하의 비용으로 달성했다.",
+    "title": "Introducing GPT-6.1 Sol",
+    "url": "https://openai.com/index/introducing-gpt-6-1-sol"
+   },
+   {
+    "id": "og:981#q4",
+    "source": "GeekNews",
+    "text": "고난도 컴퓨터 사용 워크플로에서 에이전트를 평가하는 OSWorld 2.0의 오프라인 세트에서 GPT-6.1 Sol은 최대 추론 강도 설정으로 GPT-6 Sol보다 7%포인트 높은 성능을 보이면서도 비용은 절반 미만입니다.\n수치: OSWorld 2.0에서 GPT-6 Sol 대비 성능 향상 [7%포인트]\n주장: OSWorld 2.0에서 GPT-6 Sol보다 7%포인트 높은 성능을 절반 미만 비용으로 기록",
+    "title": "OpenAI, GPT-6.1 Sol 공개",
+    "url": "https://openai.com/ko-KR/index/introducing-gpt-6-1-sol/"
+   },
+   {
+    "id": "it:8#q5",
+    "source": "OpenAI News",
+    "text": "On Terminal-Bench Science 0.1, which evaluates scientific workflows including data analysis, simulation, and theorem proving, GPT-6.1 Sol more than doubles GPT-6 Sol’s score at maximum reasoning\n주장: Terminal-Bench Science 0.1에서 GPT-6.1 Sol은 GPT-6 Sol 점수의 2배 이상을 절반 이하의 비용으로 달성했다.",
+    "title": "Introducing GPT-6.1 Sol",
+    "url": "https://openai.com/index/introducing-gpt-6-1-sol"
+   },
+   {
+    "id": "it:8#q6",
+    "source": "OpenAI News",
+    "text": "GPT-6.1 Sol is available starting today to all Plus, Pro, Business, Enterprise, and Edu users in ChatGPT Work and Codex.",
+    "title": "Introducing GPT-6.1 Sol",
+    "url": "https://openai.com/index/introducing-gpt-6-1-sol"
+   }
+  ],
+  "aliases": [
+   {
+    "canonical": "GPT-6.1 Sol",
+    "aliases": [
+     "GPT-6.1-Sol"
+    ]
+   }
+  ]
+ },
+ "expect": {
+  "action": "edit"
+ },
+ "note": "이슈 delete(오류를 심음)"
+}

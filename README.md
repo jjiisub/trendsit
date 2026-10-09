@@ -5,7 +5,7 @@
 [![CI](https://github.com/jjiisub/trendsit/actions/workflows/ci.yml/badge.svg)](https://github.com/jjiisub/trendsit/actions/workflows/ci.yml)
 [예시 사이트](https://trendsit.jiseop.com) · 위키(준비 중) · [프로젝트 맥락](docs/CONTEXT.md)
 
-> 현재 상태(2026-10-09): **S0~S4 완료, S5(주간 브리핑) 진행 중.** 글 6곳·유튜브·GitHub 트렌딩 수집, 글 1차 요약과 원본 추적, 레포 분석, 영상 전사와 슬라이드 판독까지 동작한다. 매일 02:00 수집이 돌고 있다. 주간 브리핑(묶기 → 편집장 선별 → 작성자 ⇄ 코드 검사·검수자 → 저장)은 `weekly` 명령으로 돌고, W40·W41로 관문 B를 확인하는 중이다. 예시 사이트는 예시 데이터로 만든 화면이다.
+> 현재 상태(2026-10-09): **S0~S5 구현 완료(S5 PR 리뷰 대기).** 글 6곳·유튜브·GitHub 트렌딩 수집, 글 1차 요약과 원본 추적, 레포 분석, 영상 전사와 슬라이드 판독까지 동작한다. 매일 02:00 수집이 돌고 있다. 주간 브리핑(묶기 → 편집장 선별 → 작성자 ⇄ 코드 검사·검수자 → 저장)은 `weekly` 명령으로 돈다. W40·W41 결과는 `reports/S5_brief/briefing_<주>.md`(읽기본)에서 볼 수 있고, 사이트 연결은 S6. 예시 사이트는 예시 데이터로 만든 화면이다.
 
 ## 1. 왜 만들었나
 - 개발자로 일하며 새 기술을 따라가려면 블로그, 뉴스, 발표 영상, GitHub를 매주 따로 돌아야 했다(주 3시간 안팎)
@@ -17,8 +17,8 @@
 |---|---|---|
 | 멀티모달 수집 ★ | 글 6곳 + 유튜브 발표 영상(음성 전사 + 슬라이드 판독) + GitHub 주간 트렌딩 | 수집·백필 **S1 완료**, 영상 분석가 **S4 완료**(로컬 전사, 슬라이드 전용 수치, 시각 링크 타임라인) |
 | 원본 추적 ★ | 큐레이션 글이 가리키는 1차 자료(논문, 공식 글, 레포)까지 링크를 따라가 대조 | **S3 완료**(원본 확보 14/16) |
-| 소스 간 교차 연계 ★ | 같은 주제의 글, 영상, 레포를 한 토픽으로 묶어 연결 서술 | S5 진행 중 |
-| 근거 검수 | 작성자 ⇄ 검수자 루프. 근거와 맞지 않는 문장은 반려하거나 '확인 필요'로 표시 | S5 진행 중 |
+| 소스 간 교차 연계 ★ | 같은 주제의 글, 영상, 레포를 한 토픽으로 묶어 연결 서술 | **S5 완료**(리뷰 대기, 2채널 이상 토픽 1/20) |
+| 근거 검수 | 작성자 ⇄ 검수자 루프. 근거와 맞지 않는 문장은 반려하거나 '확인 필요'로 표시 | **S5 완료**(리뷰 대기) |
 | 비용·품질 관리 | 호출마다 실제 청구액 기록, 예산 상한, 응답 캐시, 역할별 자동 평가 | **S0 완료** |
 
 ★ 차별점. 상세는 [docs/CONTEXT.md](docs/CONTEXT.md) 5장.
@@ -50,7 +50,7 @@ flowchart LR
 | 글 분석가 (`text_analyst`) | 글 + 링크 → 원본, 추적 경로, 원본과의 차이 | 도구 에이전트 | **S2~S3 완료**(관문 B 잠정) |
 | 레포 분석가 (`repo_analyst`) | 트렌딩 수치 + README → 하는 일, 신호, 과열 신호 | 도구 에이전트 | **S2~S3 완료**(관문 B 잠정) |
 | 영상 분석가 (`video_slide`, `video_summary`) | 영상 처리 지시 → 로컬 전사 + 슬라이드 판독 → 슬라이드 전용 수치, 표기 쌍, 타임라인, 요약 | 판단 + 코드 분기 | **S4 완료** |
-| 편집장 · 선별 / 작성자 / 검수자 | 토픽 후보 → 순위 → 토픽 페이지 → 판정 | LLM 1회 | S5 진행 중 |
+| 편집장 · 선별 / 작성자 / 검수자 | 토픽 후보 → 순위 → 토픽 페이지 → 판정 | LLM 1회 | **S5 완료**(관문 B 잠정) |
 
 모델 별칭은 `config/models.yaml`: 생성 `generate`(qwen3.8-27b, 오픈웨이트), 채점 `judge`(gemini-3.8-flash, 다른 계열), 배관 확인 `smoke`(무료 모델). 9주차 이후 로컬(Ollama)로 옮길 때 설정만 바꾼다.
 
@@ -69,7 +69,7 @@ uv run python -m trendsit summarize --since 2026-09-28 --until 2026-10-04 --spec
 uv run python -m trendsit repo-analyze --week 2026-W41 --traces   # 레포 분석가(규칙 기반 큐 또는 --queue)
 uv run python -m trendsit plan --day 2026-10-04 --report          # 편집장 계획(plan show --day D --video-queue로 S4 입력)
 uv run python -m trendsit deep text --day 2026-10-04 --traces     # 글 분석가: 계획의 원본 추적 큐
-uv run python -m trendsit cluster --week 2026-W41 --spec S5      # 주간 묶기 + 과거 대조 → reports/S5_brief/cluster_<주>.md(S5 진행 중)
+uv run python -m trendsit cluster --week 2026-W41 --spec S5      # 주간 묶기 + 과거 대조 → reports/S5_brief/cluster_<주>.md
 uv run python -m trendsit weekly --week 2026-W41 --spec S5       # 주간 브리핑 끝까지 → 칠판 저장 + reports/S5_brief/briefing_<주>.md(읽기본)
 uv run python -m trendsit weekly --week 2026-W41 --from-step write --topic w41-mistral-large-4   # 단계·토픽만 다시(새 run)
 uv run python -m trendsit cost --spec S0       # 사용액과 남은 예산
@@ -99,6 +99,7 @@ uv run python -m trendsit video purge --older-than 7                            
 | S3 | 편집장 계획, 글 분석가, 레포 분석가 (클라우드 구현 + 맥 확인 + 리뷰 반영) | 관문 A 통과. 관문 B 코드 채점: repo_analyst 2026-W41 10개 10/10(평균 도구 호출 3.4, GitHub 도구 오류율 0), editor_plan 3/3(실제 계획: 영상 17편 중 5편 whisper 84분, 글 5, 레포 4), text_analyst 16/16(근거 없는 판정 0, 부분 확인 내림 5 보고용, 원본 확보 14/16). 잠정(labeler opus-5.5): 모델 대 모델 일치율 repo_analyst 90·90·100%, editor_plan 33·100%, text_analyst 94·75·94%, 영상 mode 동의율 88.2% | 클라우드 $0.06 + 맥 $0.50 = $0.56 (상한 $2.00) |
 | S1 | `repo_oneliner` 새 프롬프트 형식 + 예/아니오 채점(generate) | 3회 개선 후 코드 채점 8/10 → README 기호 정리(설계 결정) 뒤 코드 9/10, judge Q1·Q2·Q3 9/9(잠정, 사람 라벨 전). 남은 실패는 README가 한 줄뿐인 레포의 attention | S1 $0.056 (상한 $0.06) |
 | S4 | 영상 분석가, Tech Bridge 10편(슬라이드 발표 7, 대담 3, 맥) | 1차 처리 10/10 성공·계약 검사 전부 통과, 로컬 전사 10~31분 영상당 1~2.5분(M1 Max GPU). 슬라이드 판독 139/140장, 슬라이드 전용 수치 124개. 잠정(labeler opus-5.5): 판독 수치 정확도 98.2%, 포착률 87.9%, 요약 Q1 67%·Q2 42%·Q3 75%(미달, S5에서 개선). 같은 전사에 슬라이드를 더하면 잘못 들은 수치가 화면 값으로 바로잡힘(예: 'Sweebench Pro 88%' → SWE-Bench Pro 80.3%) | S4 $0.52 (상한 $0.80) |
+| S5 | 주간 브리핑: 근거 목록·별칭 → 묶기(decide)·과거 대조 → 편집장 선별 → 작성자 ⇄ 코드 검사·검수자(최대 3라운드), W40 + W41 실제 실행 | 관문 A A1~A14. 두 주 20토픽 작성 실패 0, 최종판 judge(잠정): 원자 사실 지지 20/20 토픽 100%, 핵심 포착 95%, 군더더기 90%, 읽기 쉬움·번역투 100%, 코드 문체 위반 1건(미달). 검수자 심은 오류 픽스처 판정 일치 95%(심은 오류 12/12 반려), 편집장 선별 검증 8/8, decide 10/10·오병합 0. 2채널 이상 토픽 1/20. 실행 시간 OpenRouter 약 8분/주, 로컬 추정 약 105분 | S5 $2.57 (상한 $3.00) |
 
 - 같은 입력 재실행은 캐시로 0원. 채점 기준은 S1부터 예/아니오 질문 + 사람 라벨 일치율로 바뀐다
 - 상세: [reports/S0_quality.md](reports/S0_quality.md), [reports/S0_report.md](reports/S0_report.md), [reports/S1_collection.md](reports/S1_collection.md), [reports/S1_report.md](reports/S1_report.md), [reports/S4_report.md](reports/S4_report.md), [reports/S4_video/](reports/S4_video/README.md)
@@ -145,7 +146,7 @@ data/        실행 기록 DB, 캐시(git 제외), 예시 사이트 데이터(�
 - [x] S2 글 1차 요약 + 임베딩 필터
 - [x] S3 깊게 보기: 편집장 계획, 글 분석가(원본 추적), 레포 분석가
 - [x] S4 영상 분석가(로컬 전사 + 슬라이드 판독, 맥)
-- [ ] S5 주간 브리핑: 묶기, 선별, 작성 ⇄ 검수 (진행 중)
+- [x] S5 주간 브리핑: 묶기, 선별, 작성 ⇄ 검수(관문 B 잠정, 문체 1건 미달)
 - [ ] S6 공개와 자동화: 사이트 연결, 매일·매주 자동 실행
 - [ ] 9주차 이후: 로컬 모델 전환, 자연어 추적 관리, 쌓인 브리핑 Q&A
 

@@ -1,0 +1,176 @@
+{
+ "input": {
+  "loc_lines": [
+   "title: 업스테이지, Solar Mini 4 출시: 활성 3B MoE 모델의 로컬 실행 최적화",
+   "summary: 기술 역사상 가장 빠른 행보다. 업스테이지가 MoE 구조 소형 언어 모델 Solar Mini 4를 출시했다. ==활성 3B 모델 중 AAII 최고 점수(24.1)와 GPU 1장 온프레미스 구동==을 제공한다.",
+   "overview: 업스테이지가 1일 소형 언어 모델 Solar Mini 4를 출시하며, 솔라 LLM을 '프로'와 '미니'로 나누는 투트랙 전략을 본격화했다. 총 35B 파라미터 중 3B만 활성화하는 MoE 구조로, Artificial Analysis Intelligence Index v4.3.2에서 활성 3B 모델 중 가장 높은 24.1점을 기록했다. 양자화 적용 시 H100 80GB 한 장에서 온프레미스 배포가 가능하고, 100만 토큰당 입력 $0.10, 출력 $0.40의 API 가격으로 제공된다.",
+   "points[0]: 업스테이지가 MoE 구조 소형 언어 모델 Solar Mini 4를 출시하며, 솔라 LLM을 '프로'와 '미니'로 나누는 투트랙 전략을 본격화함 (refs it:860#q1)",
+   "points[1]: 총 35B 파라미터 중 토큰당 3B만 활성화하는 구조로, ==Artificial Analysis Intelligence Index v4.3.2에서 활성 3B 모델 중 가장 높은 24.1점== 기록 (refs it:1034#q1, it:1034#q2)",
+   "points[2]: 에이전트 작업 성능 지표 AutomationBench-AA에서 22.3%, τ³-Banking에서 47.2점 기록 (refs it:1034#q3)",
+   "points[3]: 100만 토큰당 입력 $0.10, 출력 $0.40의 API 가격으로, 동일 에이전트 작업 1,000세트 완료 비용이 MiMo-V2.5($2.20) 대비 약 43% 낮음($1.25) (refs it:1034#q4, it:1034#q5)",
+   "points[4]: 양자화 적용 시 H100 80GB 한 장에서 온프레미스 배포 가능 (refs it:1034#q6, it:860#q5)",
+   "numbers[0] (anchor 4): Solar Mini 4가 MiMo-V2.5보다 에이전트 작업 완료 비용 약 43% 낮음 / context: 정가 기준으로 계산한 동일 에이전트 작업 1,000세트 완료 비용 비교 [it:1034#q5]",
+   "numbers[0].items[0]: Solar Mini 4 = 1.25 (it:1034#q5)",
+   "numbers[0].items[1]: MiMo-V2.5 = 2.2 (it:1034#q5)",
+   "concepts[0]: MoE (Mixture of Experts) - 전체 파라미터 중 추론 시 일부만 활성화하는 구조. Solar Mini 4는 총 35B 중 3B만 활성화해 속도와 비용 효율을 높임",
+   "concepts[1]: 양자화 (Quantization) - 모델 파라미터의 정밀도를 낮춰 메모리 사용량을 줄이는 기법. Solar Mini 4는 양자화 시 H100 80GB 한 장에서 구동 가능"
+  ],
+  "previous": {
+   "log": "포인트 5개, 수치 그룹 1개, 근거 id 11개",
+   "attention": false,
+   "points": [
+    {
+     "text": "업스테이지가 MoE 구조 소형 언어 모델 Solar Mini 4를 출시하며, 솔라 LLM을 '프로'와 '미니'로 나누는 투트랙 전략을 본격화함",
+     "refs": [
+      "it:860#q1"
+     ],
+     "check": false
+    },
+    {
+     "text": "총 35B 파라미터 중 토큰당 3B만 활성화하는 구조로, ==Artificial Analysis Intelligence Index v4.3.2에서 활성 3B 모델 중 가장 높은 24.1점== 기록",
+     "refs": [
+      "it:1034#q1",
+      "it:1034#q2"
+     ],
+     "check": false
+    },
+    {
+     "text": "에이전트 작업 성능 지표 AutomationBench-AA에서 22.3%, τ³-Banking에서 47.2점 기록",
+     "refs": [
+      "it:1034#q3"
+     ],
+     "check": false
+    },
+    {
+     "text": "100만 토큰당 입력 $0.10, 출력 $0.40의 API 가격으로, 동일 에이전트 작업 1,000세트 완료 비용이 MiMo-V2.5($2.20) 대비 약 43% 낮음($1.25)",
+     "refs": [
+      "it:1034#q4",
+      "it:1034#q5"
+     ],
+     "check": false
+    },
+    {
+     "text": "양자화 적용 시 H100 80GB 한 장에서 온프레미스 배포 가능",
+     "refs": [
+      "it:1034#q6",
+      "it:860#q5"
+     ],
+     "check": false
+    }
+   ],
+   "numbers": [
+    {
+     "anchor": 4,
+     "group": "cost_comparison",
+     "title": "Solar Mini 4가 MiMo-V2.5보다 에이전트 작업 완료 비용 약 43% 낮음",
+     "context": "정가 기준으로 계산한 동일 에이전트 작업 1,000세트 완료 비용 비교 [it:1034#q5]",
+     "unit": "$",
+     "items": [
+      {
+       "label": "Solar Mini 4",
+       "value": "1.25",
+       "ref": "it:1034#q5",
+       "baseline": false,
+       "emphasis": true
+      },
+      {
+       "label": "MiMo-V2.5",
+       "value": "2.2",
+       "ref": "it:1034#q5",
+       "baseline": true,
+       "emphasis": false
+      }
+     ]
+    }
+   ],
+   "events": [],
+   "contributions": [],
+   "concepts": [
+    {
+     "term": "MoE (Mixture of Experts)",
+     "desc": "전체 파라미터 중 추론 시 일부만 활성화하는 구조. Solar Mini 4는 총 35B 중 3B만 활성화해 속도와 비용 효율을 높임"
+    },
+    {
+     "term": "양자화 (Quantization)",
+     "desc": "모델 파라미터의 정밀도를 낮춰 메모리 사용량을 줄이는 기법. Solar Mini 4는 양자화 시 H100 80GB 한 장에서 구동 가능"
+    }
+   ],
+   "overview": "업스테이지가 1일 소형 언어 모델 Solar Mini 4를 출시하며, 솔라 LLM을 '프로'와 '미니'로 나누는 투트랙 전략을 본격화했다. 총 35B 파라미터 중 3B만 활성화하는 MoE 구조로, Artificial Analysis Intelligence Index v4.3.2에서 활성 3B 모델 중 가장 높은 24.1점을 기록했다. 양자화 적용 시 H100 80GB 한 장에서 온프레미스 배포가 가능하고, 100만 토큰당 입력 $0.10, 출력 $0.40의 API 가격으로 제공된다.",
+   "summary": "기술 역사상 가장 빠른 행보다. 업스테이지가 MoE 구조 소형 언어 모델 Solar Mini 4를 출시했다. ==활성 3B 모델 중 AAII 최고 점수(24.1)와 GPU 1장 온프레미스 구동==을 제공한다.",
+   "title": "업스테이지, Solar Mini 4 출시: 활성 3B MoE 모델의 로컬 실행 최적화"
+  },
+  "issues": [
+   {
+    "loc": "summary",
+    "type": "overclaim",
+    "evidence_id": null,
+    "comment": "summary의 '기술 역사상 가장 빠른 행보'가 근거에 없는 평가",
+    "hint": "근거가 말한 정도로",
+    "idx": 0
+   }
+  ],
+  "evidence": [
+   {
+    "id": "it:1034#q1",
+    "source": "GeekNews",
+    "text": "Solar Mini 4는 업스테이지가 독자적으로 사전학습하고 에이전트 작업에 최적화한 모델입니다. 총 35B 파라미터 중 토큰당 3B만 활성화하는 MoE 구조로 높은 효율성을 제공합니다.\n수치: 총 파라미터 수 [35B]\n수치: 토큰당 활성화 파라미터 수 [3B]\n주장: Solar Mini 4는 총 35B 파라미터 중 3B만 활성화하는 MoE 구조로, Artificial Analysis Intelligence Index v4.3.2에서 활성 3B 모델 중 가장 높은 24.1점을 기록했다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": "https://news.hada.io/topic?id=34738"
+   },
+   {
+    "id": "it:860#q1",
+    "source": "AI타임스",
+    "text": "업스테이지가 1일 소형언어모델(sLM) '솔라 미니 4'를 출시하고, 솔라 LLM을 '프로'와 '미니'로 나누는 투트랙 전략을 본격화한다.\n주장: 업스테이지가 MoE 구조의 소형 언어 모델 '솔라 미니 4'를 출시하며 프로·미니 투트랙 전략을 시작했다.",
+    "title": "업스테이지, sLM '솔라 미니 4' 출시... '프로·미니' 투트랙 본격화",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=215826"
+   },
+   {
+    "id": "it:1034#q2",
+    "source": "GeekNews",
+    "text": "Artificial Analysis Intelligence Index v4.3.2에서 24.1점을 기록해, 비교 대상인 활성 3B 모델 가운데 가장 높은 결과를 보였습니다.\n수치: Artificial Analysis Intelligence Index v4.3.2 점수 [24.1점]",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": "https://news.hada.io/topic?id=34738"
+   },
+   {
+    "id": "it:1034#q3",
+    "source": "GeekNews",
+    "text": "실제 SaaS 도구를 활용해 업무를 수행하는 AutomationBench-AA에서 22.3%를 기록했으며, 별도의 τ³-Banking 평가에서는 47.2점을 기록했습니다.\n수치: AutomationBench-AA 점수 [22.3%]\n수치: τ³-Banking 점수 [47.2점]\n주장: 에이전트 작업 성능 지표인 AutomationBench-AA에서 22.3%, τ³-Banking에서 47.2점을 기록했다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": "https://news.hada.io/topic?id=34738"
+   },
+   {
+    "id": "it:1034#q4",
+    "source": "GeekNews",
+    "text": "정가 기준 100만 토큰당 입력 $0.10, 캐시 입력 $0.01, 출력 $0.40에 제공합니다.\n수치: 입력 가격 [$0.10 100만 토큰당]\n수치: 캐시 입력 가격 [$0.01 100만 토큰당]\n수치: 출력 가격 [$0.40 100만 토큰당]\n주장: 100만 토큰당 입력 $0.10, 출력 $0.40의 API 가격으로 제공되며, 동일 에이전트 작업 1,000세트 완료 비용은 MiMo-V2.5보다 약 43% 낮다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": "https://news.hada.io/topic?id=34738"
+   },
+   {
+    "id": "it:1034#q5",
+    "source": "GeekNews",
+    "text": "정가로 계산한 1,000세트의 완료 비용은 Solar Mini 4가 $1.25, MiMo-V2.5가 $2.20으로, Solar Mini 4가 약 43% 낮았습니다.\n수치: Solar Mini 4 에이전트 작업 완료 비용 [$1.25 1,000세트]\n수치: MiMo-V2.5 에이전트 작업 완료 비용 [$2.20 1,000세트]\n수치: MiMo-V2.5 대비 비용 절감률 [43%]",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": "https://news.hada.io/topic?id=34738"
+   },
+   {
+    "id": "it:860#q5",
+    "source": "AI타임스",
+    "text": "특히 양자화를 적용하면 GPU 1장으로 구동할 수 있어 온프레미스 환경에서도 사용 가능하다고 덧붙였다.\n수치: 양자화 적용 시 구동 가능 GPU 수 [1장 GPU]\n주장: 양자화 적용 시 GPU 1장으로 구동되어 온프레미스 환경 사용이 가능하다.",
+    "title": "업스테이지, sLM '솔라 미니 4' 출시... '프로·미니' 투트랙 본격화",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=215826"
+   },
+   {
+    "id": "it:1034#q6",
+    "source": "GeekNews",
+    "text": "온프레미스에서는 양자화 모델을 기준으로 H100 80GB 한 장부터 배포할 수 있습니다.\n수치: 최소 배포 사양 [H100 80GB]\n주장: 양자화 모델 기준 H100 80GB 한 장에서 온프레미스 배포가 가능하다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": "https://news.hada.io/topic?id=34738"
+   }
+  ],
+  "aliases": []
+ },
+ "expect": {
+  "action": "edit"
+ },
+ "note": "이슈 overclaim-summary(오류를 심음)"
+}

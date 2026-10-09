@@ -1,0 +1,179 @@
+{
+ "input": {
+  "plan": {
+   "rank": 1,
+   "angle": "상시 작동 에이전트의 아키텍처와 B2B 포지셔닝",
+   "relation": {
+    "type": "new",
+    "topic_id": null
+   }
+  },
+  "evidence": [
+   {
+    "id": "it:10#q1",
+    "source": "OpenAI News",
+    "text": "Dots are remarkably capable, always-on agents built to handle everything.\n주장: GPT-6 Astra 기반의 상시 작동 에이전트 'Dots'를 출시하며, 자체 클라우드 컴퓨터를 통해 24/7 작업을 수행한다.",
+    "title": "Introducing dots",
+    "url": "https://openai.com/index/introducing-dots"
+   },
+   {
+    "id": "it:893#q1",
+    "source": "AI타임스",
+    "text": "오픈AI가 24시간 백그라운드에서 상시 가동되는 자율형 AI 에이전트 서비스 '닷츠(dots)'를 공개했다.\n주장: 오픈AI가 데브데이 2026에서 24시간 상시 가동되는 자율형 AI 에이전트 서비스 '닷츠'를 공개했다.",
+    "title": "오픈AI, 24시간 자율 에이전트 '닷츠' 공개…소비자용 아닌 B2B 승부수",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=215779"
+   },
+   {
+    "id": "og:986#q1",
+    "source": "GeekNews",
+    "text": "dots는 모든 일을 처리하도록 설계된, 뛰어난 역량을 갖춘 상시 작동 에이전트입니다.\n주장: OpenAI가 GPT-6 Astra 기반 상시 작동 AI 에이전트 dots를 공개",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": "https://openai.com/ko-KR/index/introducing-dots/"
+   },
+   {
+    "id": "it:10#q2",
+    "source": "OpenAI News",
+    "text": "Powered by GPT‑6 Astra, they have their own cloud computer, learn from feedback over time, and can work towards your goals 24/7.",
+    "title": "Introducing dots",
+    "url": "https://openai.com/index/introducing-dots"
+   },
+   {
+    "id": "it:893#q2",
+    "source": "AI타임스",
+    "text": "오픈AI는 29일(현지시간) 연례 개발자 행사 '데브데이 2026'에서 20여개의 신규 업데이트 항목 가운데 핵심 카드인 닷츠를 선보였다.\n수치: 데브데이 2026 신규 업데이트 항목 수 [20여개]",
+    "title": "오픈AI, 24시간 자율 에이전트 '닷츠' 공개…소비자용 아닌 B2B 승부수",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=215779"
+   },
+   {
+    "id": "og:986#q2",
+    "source": "GeekNews",
+    "text": "GPT‑6 Astra를 기반으로 구동되며 자체 클라우드 컴퓨터를 갖추고, 시간이 지나면서 피드백을 통해 학습하며 24시간 내내 사용자의 목표를 향해 일할 수 있습니다.\n수치: 상시 작동 시간 [24시간]",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": "https://openai.com/ko-KR/index/introducing-dots/"
+   },
+   {
+    "id": "it:10#q3",
+    "source": "OpenAI News",
+    "text": "Through our ecosystem of plugins, they can readily connect to over 4,000 apps, giving them the tools to help wherever you need them.\n수치: 연결 가능한 앱 수 [4,000]\n주장: 플러그인 생태계를 통해 4,000개 이상의 앱과 연결되어 다양한 작업을 수행할 수 있다.",
+    "title": "Introducing dots",
+    "url": "https://openai.com/index/introducing-dots"
+   },
+   {
+    "id": "it:893#q3",
+    "source": "AI타임스",
+    "text": "닷츠는 플래그십 모델인 'GPT-6 아스트라'를 기반으로 구동된다.\n주장: 닷츠는 플래그십 모델 'GPT-6 아스트라'를 기반으로 구동된다.",
+    "title": "오픈AI, 24시간 자율 에이전트 '닷츠' 공개…소비자용 아닌 B2B 승부수",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=215779"
+   },
+   {
+    "id": "og:986#q3",
+    "source": "GeekNews",
+    "text": "OpenAI의 플러그인 생태계를 통해 4,000개가 넘는 앱에 손쉽게 연결하여 필요한 곳에서 도움을 제공하는 데 필요한 도구를 갖출 수 있습니다.\n수치: 연결 가능한 앱 수 [4,000개]\n주장: dots는 OpenAI 플러그인 생태계를 통해 4,000개 이상의 앱에 연결",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": "https://openai.com/ko-KR/index/introducing-dots/"
+   },
+   {
+    "id": "it:10#q4",
+    "source": "OpenAI News",
+    "text": "We’re beginning to roll out dots across Pro, Business Premium, and Enterprise plans in eligible markets.\n주장: Pro, Business Premium, Enterprise 플랜 대상 시장에 순차적으로 배포를 시작한다.",
+    "title": "Introducing dots",
+    "url": "https://openai.com/index/introducing-dots"
+   },
+   {
+    "id": "it:893#q4",
+    "source": "AI타임스",
+    "text": "또 오픈AI 플러그인 생태계를 통해 4000개가 넘는 사내외 응용 프로그램과 연결되며, 챗GPT 웹·앱은 물론 슬랙, 마이크로소프트 팀즈, 문자 메시지 등 기존 업무 채널 전반에서 단일한 대화 맥락을 유지한다.\n수치: 연결되는 사내외 응용 프로그램 수 [4000개]\n주장: 닷츠는 4000개 이상의 응용 프로그램과 연결되어 다양한 업무 채널에서 단일 대화 맥락을 유지한다.",
+    "title": "오픈AI, 24시간 자율 에이전트 '닷츠' 공개…소비자용 아닌 B2B 승부수",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=215779"
+   },
+   {
+    "id": "og:986#q4",
+    "source": "GeekNews",
+    "text": "첫 번째 dot은 추가 비용 없이 Pro 또는 Business Premium 요금제에 포함됩니다.\n주장: 첫 dot은 추가 비용 없이 Pro 또는 Business Premium 요금제에 포함",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": "https://openai.com/ko-KR/index/introducing-dots/"
+   },
+   {
+    "id": "it:10#q5",
+    "source": "OpenAI News",
+    "text": "When you aren’t actively working with it, your dot looks for ways to help in the background. We call this “proactive research”.\n주장: 사용자가 직접 지시하지 않아도 백그라운드에서 'proactive research'를 수행하여 도움을 제공한다.",
+    "title": "Introducing dots",
+    "url": "https://openai.com/index/introducing-dots"
+   },
+   {
+    "id": "it:893#q5",
+    "source": "AI타임스",
+    "text": "오픈AI는 닷츠 도입에 맞춰 초당 최대 300토큰의 응답 속도를 내는 '울트라패스트(Ultrafast)' 티어가 탑재된 '챗GPT 프로 500(월 500달러)' 플랜을 신설했다.\n수치: 울트라패스트 티어 최대 응답 속도 [300토큰 초당]\n수치: 챗GPT 프로 500 플랜 가격 [500달러 월]\n주장: 초당 최대 300토큰 속도의 '울트라패스트' 티어가 포함된 월 500달러 '챗GPT 프로 500' 플랜이 신설되었으며, 해당 플랜 구독자에게 닷츠 에이전트 1개가 기본 제공된다.",
+    "title": "오픈AI, 24시간 자율 에이전트 '닷츠' 공개…소비자용 아닌 B2B 승부수",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=215779"
+   },
+   {
+    "id": "it:986",
+    "source": "GeekNews",
+    "text": "요약: OpenAI 공식 블로그 원문에 따르면 dots는 GPT‑6 Astra 기반 상시 작동 에이전트로, 자체 클라우드 컴퓨터를 갖추고 24시간 내내 사용자의 목표를 향해 일한다. OpenAI 플러그인 생태계를 통해 4,000개가 넘는 앱에 연결되며, 첫 번째 dot은 추가 비용 없이 Pro 또는 Business Premium 요금제에 포함된다.\n요약: OpenAI가 GPT-6 Astra 기반의 상시 작동 AI 에이전트 dots를 공개했다. dots는 자체 클라우드 컴퓨터를 갖추고 4,000개 이상의 앱에 연결되며, Pro 및 Business Premium 요금제에 순차적으로 제공을 시작했다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": "https://news.hada.io/topic?id=34501"
+   },
+   {
+    "id": "it:10",
+    "source": "OpenAI News",
+    "text": "요약: OpenAI는 GPT-6 Astra 기반의 상시 작동 에이전트 'Dots'를 공개했다. Dots는 자체 클라우드 컴퓨터를 갖추고 4,000개 이상의 앱과 연결되어 24/7 작업을 수행하며, 백그라운드에서 능동적으로 연구를 수행한다. 현재 Pro, Business Premium, Enterprise 플랜 대상 시장에 배포를 시작하고 있다.",
+    "title": "Introducing dots",
+    "url": "https://openai.com/index/introducing-dots"
+   },
+   {
+    "id": "it:893#q6",
+    "source": "AI타임스",
+    "text": "닷츠 에이전트는 프로 및 비즈니스 프리미엄 구독자에게 기본 1개가 포함돼 제공된다.\n수치: 프로 및 비즈니스 프리미엄 구독자 기본 제공 닷츠 에이전트 수 [1개]",
+    "title": "오픈AI, 24시간 자율 에이전트 '닷츠' 공개…소비자용 아닌 B2B 승부수",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=215779"
+   },
+   {
+    "id": "it:986#q1",
+    "source": "GeekNews",
+    "text": "dots는 모든 일을 처리하도록 설계된, 뛰어난 역량을 갖춘 상시 작동 에이전트입니다.\n주장: OpenAI가 GPT-6 Astra 기반의 상시 작동 AI 에이전트 dots를 공개했다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": "https://news.hada.io/topic?id=34501"
+   },
+   {
+    "id": "it:893",
+    "source": "AI타임스",
+    "text": "요약: 오픈AI가 데브데이 2026에서 24시간 상시 가동되는 자율형 AI 에이전트 서비스 '닷츠'를 공개했다. 닷츠는 'GPT-6 아스트라' 모델을 기반으로 하며, 4000개 이상의 응용 프로그램과 연결되어 다양한 업무 채널에서 작동한다. 초당 최대 300토큰 속도의 '울트라패스트' 티어가 포함된 월 500달러 '챗GPT 프로 500' 플랜이 신설되었고, 해당 플랜 구독자에게 닷츠 에이전트 1개가 기본 제공된다.",
+    "title": "오픈AI, 24시간 자율 에이전트 '닷츠' 공개…소비자용 아닌 B2B 승부수",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=215779"
+   },
+   {
+    "id": "it:986#q2",
+    "source": "GeekNews",
+    "text": "GPT‑6 Astra를 기반으로 구동되며 자체 클라우드 컴퓨터를 갖추고, 시간이 지나면서 피드백을 통해 학습하며 24시간 내내 사용자의 목표를 향해 일할 수 있습니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": "https://news.hada.io/topic?id=34501"
+   },
+   {
+    "id": "it:986#q3",
+    "source": "GeekNews",
+    "text": "OpenAI의 플러그인 생태계를 통해 4,000개가 넘는 앱에 손쉽게 연결하여 필요한 곳에서 도움을 제공하는 데 필요한 도구를 갖출 수 있습니다.\n수치: 연결 가능한 앱 수 [4,000개]\n주장: dots는 OpenAI 플러그인 생태계를 통해 4,000개 이상의 앱에 연결할 수 있다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": "https://news.hada.io/topic?id=34501"
+   },
+   {
+    "id": "it:986#q5",
+    "source": "GeekNews",
+    "text": "현재 적격 시장의 Pro, Business Premium 및 Enterprise 요금제에 dots를 순차적으로 제공하기 시작했으며, 곧 더 많은 사용자에게 dots를 확대 제공할 예정입니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": "https://news.hada.io/topic?id=34501"
+   }
+  ],
+  "previous": null,
+  "aliases": [
+   {
+    "canonical": "Dots",
+    "aliases": [
+     "dots"
+    ]
+   }
+  ]
+ },
+ "expect": {},
+ "note": "2026-W40 실제 토픽 입력(run 20261009-192905-weekly-3ecc)"
+}

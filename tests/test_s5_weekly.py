@@ -180,8 +180,8 @@ def test_unresolved_diagram_issue_drops_the_group(week):
     ctx, cids = week
     p1 = json.loads(page(1, "Argon이 DeepSWE에서 77.9% 기록"))
     p1["numbers"] = [{"anchor": 1, "group": "g", "title": "점수", "context": "같은 벤치 [it:1#q1]", "unit": "ms",
-                      "items": [{"label": l, "value": "77.9", "ref": "it:1#q1", "baseline": False, "emphasis": False}
-                                for l in ("a", "b", "c")]}]
+                      "items": [{"label": lab, "value": "77.9", "ref": "it:1#q1", "baseline": False, "emphasis": False}
+                                for lab in ("a", "b", "c")]}]
     responses = [plan(cids), json.dumps(p1, ensure_ascii=False), revision([])]
     for i in (2, 3, 4):
         responses += [page(i, f"{TITLES[i]} 근거 문장 요약 정리"), verdict([])]

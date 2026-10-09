@@ -1,0 +1,230 @@
+{
+ "w40-openai-dots": {
+  "week": "2026-W40",
+  "numbers": [],
+  "events": [],
+  "code_warnings": [
+   "누락 의심: numbers가 비었는데 근거에 같은 단위 값 3개 이상(개 4)"
+  ],
+  "needed_numbers": null,
+  "needed_events": null,
+  "labeler": null,
+  "critique": null
+ },
+ "w40-gemini-argon": {
+  "week": "2026-W40",
+  "numbers": [
+   "Gemini 4 Argon이 DeepSWE v1.1에서 경쟁 모델 대비 3.7%p 높음"
+  ],
+  "events": [],
+  "code_warnings": [],
+  "needed_numbers": null,
+  "needed_events": null,
+  "labeler": null,
+  "critique": null
+ },
+ "w40-gpt-6-1-sol": {
+  "week": "2026-W40",
+  "numbers": [],
+  "events": [],
+  "code_warnings": [],
+  "needed_numbers": null,
+  "needed_events": null,
+  "labeler": null,
+  "critique": null
+ },
+ "w40-decision-api": {
+  "week": "2026-W40",
+  "numbers": [],
+  "events": [],
+  "code_warnings": [],
+  "needed_numbers": null,
+  "needed_events": null,
+  "labeler": null,
+  "critique": null
+ },
+ "w40-openai-security": {
+  "week": "2026-W40",
+  "numbers": [],
+  "events": [],
+  "code_warnings": [],
+  "needed_numbers": null,
+  "needed_events": null,
+  "labeler": null,
+  "critique": null
+ },
+ "w40-claude-sonnet-5-5": {
+  "week": "2026-W40",
+  "numbers": [
+   "Sonnet 5.5가 터미널벤치 4.0에서 Opus 5.5와 전작을 모두 상회"
+  ],
+  "events": [],
+  "code_warnings": [],
+  "needed_numbers": null,
+  "needed_events": null,
+  "labeler": null,
+  "critique": null
+ },
+ "w40-deepseek-harness": {
+  "week": "2026-W40",
+  "numbers": [],
+  "events": [],
+  "code_warnings": [],
+  "needed_numbers": null,
+  "needed_events": null,
+  "labeler": null,
+  "critique": null
+ },
+ "w40-solar-mini-4": {
+  "week": "2026-W40",
+  "numbers": [
+   "Solar Mini 4가 MiMo-V2.5보다 에이전트 작업 완료 비용 약 43% 낮음"
+  ],
+  "events": [],
+  "code_warnings": [],
+  "needed_numbers": null,
+  "needed_events": null,
+  "labeler": null,
+  "critique": null
+ },
+ "w40-vidraft-darwin": {
+  "week": "2026-W40",
+  "numbers": [
+   "다윈-180B-RSI가 LEXam 객관식 평가에서 16.53점 차이로 1위",
+   "다윈-180B-RSI가 LEXam-hard에서 기존 1위 잉클링을 4.9점 차이로 제침"
+  ],
+  "events": [],
+  "code_warnings": [],
+  "needed_numbers": null,
+  "needed_events": null,
+  "labeler": null,
+  "critique": null
+ },
+ "w40-jev-decision-model": {
+  "week": "2026-W40",
+  "numbers": [
+   "Jeff-Code가 동일 품질로 태스크당 47% 속도 향상",
+   "Jeeves가 학습하지 않은 데이터와 JevBench에서 Jev·Kev-9B 상회"
+  ],
+  "events": [],
+  "code_warnings": [],
+  "needed_numbers": null,
+  "needed_events": null,
+  "labeler": null,
+  "critique": null
+ },
+ "w41-embedding-gemma-2": {
+  "week": "2026-W41",
+  "numbers": [
+   "MTEB Code 점수 전작 대비 9.92점 상승"
+  ],
+  "events": [],
+  "code_warnings": [],
+  "needed_numbers": null,
+  "needed_events": null,
+  "labeler": null,
+  "critique": null
+ },
+ "w41-mistral-large-4": {
+  "week": "2026-W41",
+  "numbers": [
+   "ML4가 GPT-6 루나와 AAII 동급, 딥시크-V4.1 플래시와 1점 차",
+   "입력·출력·캐시 입력 3종 요금 구조"
+  ],
+  "events": [],
+  "code_warnings": [],
+  "needed_numbers": null,
+  "needed_events": null,
+  "labeler": null,
+  "critique": null
+ },
+ "w41-gpt-6-intelligent-ui": {
+  "week": "2026-W41",
+  "numbers": [],
+  "events": [],
+  "code_warnings": [],
+  "needed_numbers": null,
+  "needed_events": null,
+  "labeler": null,
+  "critique": null
+ },
+ "w41-claude-haiku-5-5": {
+  "week": "2026-W41",
+  "numbers": [
+   "100,000 토큰 이하 구간에서 GPT-6 Luna와 동일 가격",
+   "GDPval-AA v2.1에서 Haiku 5.5가 경쟁 모델보다 높은 점수"
+  ],
+  "events": [],
+  "code_warnings": [],
+  "needed_numbers": null,
+  "needed_events": null,
+  "labeler": null,
+  "critique": null
+ },
+ "w41-openai-rogue-agent": {
+  "week": "2026-W41",
+  "numbers": [],
+  "events": [],
+  "code_warnings": [],
+  "needed_numbers": null,
+  "needed_events": null,
+  "labeler": null,
+  "critique": null
+ },
+ "w41-mai-code-1-1": {
+  "week": "2026-W41",
+  "numbers": [
+   "터미널-벤치 2.1에서 로컬 버전이 클라우드 원본 상회"
+  ],
+  "events": [],
+  "code_warnings": [],
+  "needed_numbers": null,
+  "needed_events": null,
+  "labeler": null,
+  "critique": null
+ },
+ "w41-openrig": {
+  "week": "2026-W41",
+  "numbers": [],
+  "events": [],
+  "code_warnings": [],
+  "needed_numbers": null,
+  "needed_events": null,
+  "labeler": null,
+  "critique": null
+ },
+ "w41-sift-framework": {
+  "week": "2026-W41",
+  "numbers": [],
+  "events": [],
+  "code_warnings": [
+   "누락 의심: numbers가 비었는데 근거에 같은 단위 값 3개 이상(% 3)"
+  ],
+  "needed_numbers": null,
+  "needed_events": null,
+  "labeler": null,
+  "critique": null
+ },
+ "w41-openai-math": {
+  "week": "2026-W41",
+  "numbers": [],
+  "events": [],
+  "code_warnings": [],
+  "needed_numbers": null,
+  "needed_events": null,
+  "labeler": null,
+  "critique": null
+ },
+ "w41-textgrain-eu": {
+  "week": "2026-W41",
+  "numbers": [
+   "동의어 치환에 따른 400-token 탐지율 하락"
+  ],
+  "events": [],
+  "code_warnings": [],
+  "needed_numbers": null,
+  "needed_events": null,
+  "labeler": null,
+  "critique": null
+ }
+}

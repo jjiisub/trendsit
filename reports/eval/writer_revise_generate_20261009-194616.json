@@ -1,0 +1,1721 @@
+{
+ "role": "writer_revise",
+ "model_alias": "generate",
+ "model_id": "qwen/qwen3.8-27b",
+ "prompt_hash": "7fbd7d52911e",
+ "spec": "S5",
+ "run_id": "20261009-194607-eval-aced",
+ "at": "2026-10-09T19:46:16+09:00",
+ "note": "관문 B 최종(새 최종판 픽스처)",
+ "stopped": null,
+ "limit": null,
+ "cost_usd": 0.002101,
+ "summary": {
+  "n": 8,
+  "code_pass": 4,
+  "code_pass_enforced": 4,
+  "code_pass_basis": 4,
+  "model_agreement": {},
+  "questions": {},
+  "criteria": {},
+  "aggregate": {
+   "지적 안 된 칸 변경(되돌림 전 원래 출력)": "2/8 픽스처",
+   "변경 수": 9
+  },
+  "passed": false,
+  "fail_reasons": [
+   "코드 채점 통과 4/8"
+  ]
+ },
+ "results": [
+  {
+   "id": "delete-w40-deepseek-harness",
+   "input": {
+    "loc_lines": [
+     "title: DeepSeek Harness 데스크톱 앱 오픈소스 공개",
+     "summary: DeepSeek가 맥·윈도우용 데스크톱 앱 DeepSeek Harness를 ==오픈소스 공개 프리뷰==로 출시했다. 쟁점은 단일 인터페이스 통합과 플러그인 기반 확장 전략이다.",
+     "overview: DeepSeek가 맥OS와 윈도우용 데스크톱 앱 DeepSeek Harness v0.2 프리뷰를 공개 프리뷰 및 오픈소스로 출시했다. 채팅·코딩·문서 작업을 단일 인터페이스에서 처리하고, ‘모든 것이 플러그인’ 구조로 도구와 인터페이스를 확장하는 것이 핵심이다. 공식 API 사용자의 약 60%가 서드파티 플러그인을 사용 중이며, 플러그인 마켓과 멀티 에이전트 협력 기능을 추가할 계획이다.",
+     "points[0]: DeepSeek Harness가 전 세계 공개 프리뷰 및 오픈소스로 출시됨 (refs it:1012#q1)",
+     "points[1]: 맥OS와 윈도우용 v0.2 프리뷰로, 채팅·코딩·문서 작업을 단일 인터페이스에서 처리함 (refs it:185#q1, it:185#q2)",
+     "points[2]: ==‘모든 것이 플러그인’ 구조로, 사용자 인터페이스까지 플러그인으로 확장 가능함== (refs it:185#q4)",
+     "points[3]: Creator 모드에서 채팅으로 플러그인을 생성하고, 예약 작업·실행 추적·런타임 정보 검사를 지원함 (refs it:1012#q2, it:1012#q4, it:1012#q5)",
+     "points[4]: 공식 API 사용자의 약 60%가 서드파티 플러그인을 사용 중이며, 플러그인 마켓·멀티 에이전트 협력·장기 메모리·GUI 자동화 추가를 계획함, 이용약관 조항에 따른 조치로 미국 사용자부터 적용 (refs it:185#q5, it:185#q6)",
+     "concepts[0]: Creator mode - 채팅을 통해 플러그인을 생성하는 모드임",
+     "concepts[1]: Automation Task - 반복 작업을 예약할 수 있는 플러그인임"
+    ],
+    "previous": {
+     "log": "포인트 5개, 수치 그룹 0개, 근거 id 12개",
+     "attention": false,
+     "points": [
+      {
+       "text": "DeepSeek Harness가 전 세계 공개 프리뷰 및 오픈소스로 출시됨",
+       "refs": [
+        "it:1012#q1"
+       ],
+       "check": false
+      },
+      {
+       "text": "맥OS와 윈도우용 v0.2 프리뷰로, 채팅·코딩·문서 작업을 단일 인터페이스에서 처리함",
+       "refs": [
+        "it:185#q1",
+        "it:185#q2"
+       ],
+       "check": false
+      },
+      {
+       "text": "==‘모든 것이 플러그인’ 구조로, 사용자 인터페이스까지 플러그인으로 확장 가능함==",
+       "refs": [
+        "it:185#q4"
+       ],
+       "check": false
+      },
+      {
+       "text": "Creator 모드에서 채팅으로 플러그인을 생성하고, 예약 작업·실행 추적·런타임 정보 검사를 지원함",
+       "refs": [
+        "it:1012#q2",
+        "it:1012#q4",
+        "it:1012#q5"
+       ],
+       "check": false
+      },
+      {
+       "text": "공식 API 사용자의 약 60%가 서드파티 플러그인을 사용 중이며, 플러그인 마켓·멀티 에이전트 협력·장기 메모리·GUI 자동화 추가를 계획함, 이용약관 조항에 따른 조치로 미국 사용자부터 적용",
+       "refs": [
+        "it:185#q5",
+        "it:185#q6"
+       ],
+       "check": false
+      }
+     ],
+     "numbers": [],
+     "events": [],
+     "contributions": [],
+     "concepts": [
+      {
+       "term": "Creator mode",
+       "desc": "채팅을 통해 플러그인을 생성하는 모드임"
+      },
+      {
+       "term": "Automation Task",
+       "desc": "반복 작업을 예약할 수 있는 플러그인임"
+      }
+     ],
+     "overview": "DeepSeek가 맥OS와 윈도우용 데스크톱 앱 DeepSeek Harness v0.2 프리뷰를 공개 프리뷰 및 오픈소스로 출시했다. 채팅·코딩·문서 작업을 단일 인터페이스에서 처리하고, ‘모든 것이 플러그인’ 구조로 도구와 인터페이스를 확장하는 것이 핵심이다. 공식 API 사용자의 약 60%가 서드파티 플러그인을 사용 중이며, 플러그인 마켓과 멀티 에이전트 협력 기능을 추가할 계획이다.",
+     "summary": "DeepSeek가 맥·윈도우용 데스크톱 앱 DeepSeek Harness를 ==오픈소스 공개 프리뷰==로 출시했다. 쟁점은 단일 인터페이스 통합과 플러그인 기반 확장 전략이다.",
+     "title": "DeepSeek Harness 데스크톱 앱 오픈소스 공개"
+    },
+    "issues": [
+     {
+      "loc": "points[4]",
+      "type": "unsupported",
+      "evidence_id": null,
+      "comment": "points[4]의 '이용약관 조항에 따른 조치로 미국 사용자부터 적용'이 근거 원문에 없음",
+      "hint": "근거에 있는 내용만 남기거나 삭제",
+      "idx": 0
+     }
+    ],
+    "evidence": [
+     {
+      "id": "it:1012#q1",
+      "source": "GeekNews",
+      "text": "DeepSeek Harness is now in public preview worldwide and open source, with composable plugins that extend what agents can do.\n주장: DeepSeek Harness가 전 세계 공개 프리뷰 및 오픈소스로 출시되었으며, 에이전트 기능을 확장하는 조합 가능한 플러그인을 제공한다.",
+      "title": "DeepSeek Harness, 맥·윈도우용 데스크톱 앱 공개",
+      "url": "https://news.hada.io/topic?id=34656"
+     },
+     {
+      "id": "it:185#q1",
+      "source": "AI타임스",
+      "text": "딥시크는 지난달 29일 맥OS와 윈도우용 ‘딥시크 하네스(DeepSeek Harness)’ v0.2 프리뷰를 출시했다.\n수치: 출시된 딥시크 하네스 버전 [v0.2]\n주장: 딥시크가 맥OS와 윈도우용 데스크톱 앱 '딥시크 하네스' v0.2 프리뷰를 출시하며, 채팅·코딩·문서 작업을 단일 인터페이스에서 처리하는 기능을 제공한다.",
+      "title": "딥시크, 데스크톱 앱 '딥시크 하네스' 출시...\"챗·코딩·문서 통합\"",
+      "url": "https://www.aitimes.com/news/articleView.html?idxno=215933"
+     },
+     {
+      "id": "it:1012#q2",
+      "source": "GeekNews",
+      "text": "Install plugins, or create them through chat in “Creator mode”, to extend tools, skills, and the interface.\n주장: Creator 모드를 통한 플러그인 생성, 문서/스프레드시트/코드 처리, 예약 작업 플러그인, 실행 추적 및 런타임 정보 검사가 주요 기능이다.",
+      "title": "DeepSeek Harness, 맥·윈도우용 데스크톱 앱 공개",
+      "url": "https://news.hada.io/topic?id=34656"
+     },
+     {
+      "id": "it:185#q2",
+      "source": "AI타임스",
+      "text": "오픈AI나 앤트로픽처럼 대화와 코드 작성, 다양한 업무를 단일 인터페이스로 집약해 문서와 스프레드시트, PDF를 업로드해 내용을 정리하거나 데이터를 분석하고 차트와 슬라이드를 만드는 것은 물론, 프로젝트의 코드를 수정하고 실행하는 작업까지 하나의 대화에서 처리할 수 있다.",
+      "title": "딥시크, 데스크톱 앱 '딥시크 하네스' 출시...\"챗·코딩·문서 통합\"",
+      "url": "https://www.aitimes.com/news/articleView.html?idxno=215933"
+     },
+     {
+      "id": "it:1012#q4",
+      "source": "GeekNews",
+      "text": "Enable the Scheduled tasks plugin to start tasks anytime and run recurring work on schedule.",
+      "title": "DeepSeek Harness, 맥·윈도우용 데스크톱 앱 공개",
+      "url": "https://news.hada.io/topic?id=34656"
+     },
+     {
+      "id": "it:185#q4",
+      "source": "AI타임스",
+      "text": "딥시크 하네스의 핵심 특징은 ‘모든 것이 플러그인(Everything is a plugin)’이라는 구조다. 개별 도구뿐 아니라 제품의 사용자 인터페이스까지 플러그인으로 확장할 수 있도록 설계했다.\n주장: 하네스는 '모든 것이 플러그인' 구조로 설계되어 사용자 인터페이스까지 플러그인으로 확장할 수 있다.",
+      "title": "딥시크, 데스크톱 앱 '딥시크 하네스' 출시...\"챗·코딩·문서 통합\"",
+      "url": "https://www.aitimes.com/news/articleView.html?idxno=215933"
+     },
+     {
+      "id": "it:1012#q5",
+      "source": "GeekNews",
+      "text": "Inspect execution traces and detailed runtime information to troubleshoot issues with tool calls and task execution.",
+      "title": "DeepSeek Harness, 맥·윈도우용 데스크톱 앱 공개",
+      "url": "https://news.hada.io/topic?id=34656"
+     },
+     {
+      "id": "it:185#q5",
+      "source": "AI타임스",
+      "text": "딥시크는 공식 API를 통해 하네스를 사용하는 사용자 가운데 약 60%가 서드파티 플러그인을 사용하고 있다고 밝혔다.\n수치: 서드파티 플러그인 사용 비율 [약 60%]\n주장: 사용자의 약 60%가 서드파티 플러그인을 사용 중이며, 향후 플러그인 마켓 구축, 보안 강화, 멀티 에이전트 협력, 장기 메모리 및 GUI 자동화 기능 추가를 계획하고 있다.",
+      "title": "딥시크, 데스크톱 앱 '딥시크 하네스' 출시...\"챗·코딩·문서 통합\"",
+      "url": "https://www.aitimes.com/news/articleView.html?idxno=215933"
+     },
+     {
+      "id": "it:185#q6",
+      "source": "AI타임스",
+      "text": "또 샌드박스와 보안을 강화하고 여러 에이전트가 협력하는 기능을 개선하는 한편, 장기 메모리와 브라우저 및 GUI 자동화, 원격·모바일 접속, 세션 공유와 협업 기능 등을 추가할 예정이다.",
+      "title": "딥시크, 데스크톱 앱 '딥시크 하네스' 출시...\"챗·코딩·문서 통합\"",
+      "url": "https://www.aitimes.com/news/articleView.html?idxno=215933"
+     }
+    ],
+    "aliases": []
+   },
+   "expect": {
+    "action": "edit"
+   },
+   "note": "이슈 delete(오류를 심음)",
+   "step_id": 4847,
+   "output": {
+    "log": "이슈 1개, 수정 불가(근거 없음) 1",
+    "attention": true,
+    "changed": []
+   },
+   "error": null,
+   "code": {
+    "passed": false,
+    "checks": [
+     {
+      "name": "스키마",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "지적 안 된 칸을 바꾸지 않음",
+      "passed": true,
+      "detail": "[]"
+     },
+     {
+      "name": "지적된 위치를 모두 다룸(또는 attention)",
+      "passed": true,
+      "detail": "지적 ['points[4]'], 변경 []"
+     },
+     {
+      "name": "기대 동작 edit",
+      "passed": false,
+      "detail": "set()"
+     },
+     {
+      "name": "해요체 없음(log)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(log)",
+      "passed": true,
+      "detail": ""
+     }
+    ],
+    "failed": [
+     "기대 동작 edit: set()"
+    ]
+   },
+   "cost_usd": 0.0
+  },
+  {
+   "id": "delete-w40-gpt-6-1-sol",
+   "input": {
+    "loc_lines": [
+     "title: GPT-6.1 Sol: Astra급 지능 5분의 1 가격",
+     "summary: OpenAI가 GPT-6 Astra급 지능을 ==5분의 1 가격==에 제공하는 GPT-6.1 Sol을 공개했다. 캐시 입력 $0.10/1M 토큰으로 에이전트 워크로드 비용을 최대 95% 절감한다.",
+     "overview: OpenAI가 GPT-6 Sol의 업그레이드 모델 GPT-6.1 Sol을 공개했다. 에이전틱 코딩, 컴퓨터 사용, 전문 업무에서 GPT-6 Astra에 근접한 지능을 표준 토큰 가격의 5분의 1 수준으로 제공하며, 캐시된 입력 가격은 100만 토큰당 $0.10으로 표준 대비 95% 절감된다. DeepSWE v1.1, OSWorld 2.0, Terminal-Bench Science 0.1에서 GPT-6 Sol 대비 성능 향상과 비용 절감을 동시에 달성했다.",
+     "points[0]: GPT-6.1 Sol은 에이전틱 코딩, 컴퓨터 사용, 전문 업무에서 GPT-6 Astra와 유사한 지능을 Astra 표준 입력·출력 토큰 가격의 ==5분의 1== 수준으로 제공함 (refs it:8#q1, og:981#q1)",
+     "points[1]: DeepSWE v1.1에서 GPT-6 Astra와 동등한 성능을 약 5분의 1 비용으로 달성하고, GPT-6 Sol 최고 점수보다 6.4%p 높음 (refs it:8#q3, og:981#q3)",
+     "points[2]: OSWorld 2.0 오프라인 세트에서 최대 추론 강도로 GPT-6 Sol보다 7%p 높은 성능을 절반 미만 비용으로 기록함 (refs it:8#q4, og:981#q4)",
+     "points[3]: 캐시된 입력 가격은 100만 토큰당 $0.10으로, 표준 입력 가격보다 95%, GPT-6 Sol 캐시 입력 가격보다 50% 저렴함 (refs it:8#q2, og:981#q2)",
+     "points[4]: Terminal-Bench Science 0.1에서 GPT-6 Sol 점수의 2배 이상을 절반 이하 비용으로 달성함 (refs it:8#q5)",
+     "points[5]: Plus, Pro, Business, Enterprise, Edu 사용자에게 ChatGPT Work와 Codex에서 즉시 제공됨, 이용약관 조항에 따른 조치로 미국 사용자부터 적용 (refs it:8#q6)"
+    ],
+    "previous": {
+     "log": "포인트 6개, 수치 그룹 1개, 근거 id 15개",
+     "attention": false,
+     "points": [
+      {
+       "text": "GPT-6.1 Sol은 에이전틱 코딩, 컴퓨터 사용, 전문 업무에서 GPT-6 Astra와 유사한 지능을 Astra 표준 입력·출력 토큰 가격의 ==5분의 1== 수준으로 제공함",
+       "refs": [
+        "it:8#q1",
+        "og:981#q1"
+       ],
+       "check": false
+      },
+      {
+       "text": "DeepSWE v1.1에서 GPT-6 Astra와 동등한 성능을 약 5분의 1 비용으로 달성하고, GPT-6 Sol 최고 점수보다 6.4%p 높음",
+       "refs": [
+        "it:8#q3",
+        "og:981#q3"
+       ],
+       "check": false
+      },
+      {
+       "text": "OSWorld 2.0 오프라인 세트에서 최대 추론 강도로 GPT-6 Sol보다 7%p 높은 성능을 절반 미만 비용으로 기록함",
+       "refs": [
+        "it:8#q4",
+        "og:981#q4"
+       ],
+       "check": false
+      },
+      {
+       "text": "캐시된 입력 가격은 100만 토큰당 $0.10으로, 표준 입력 가격보다 95%, GPT-6 Sol 캐시 입력 가격보다 50% 저렴함",
+       "refs": [
+        "it:8#q2",
+        "og:981#q2"
+       ],
+       "check": false
+      },
+      {
+       "text": "Terminal-Bench Science 0.1에서 GPT-6 Sol 점수의 2배 이상을 절반 이하 비용으로 달성함",
+       "refs": [
+        "it:8#q5"
+       ],
+       "check": false
+      },
+      {
+       "text": "Plus, Pro, Business, Enterprise, Edu 사용자에게 ChatGPT Work와 Codex에서 즉시 제공됨, 이용약관 조항에 따른 조치로 미국 사용자부터 적용",
+       "refs": [
+        "it:8#q6"
+       ],
+       "check": false
+      }
+     ],
+     "numbers": [],
+     "events": [],
+     "contributions": [],
+     "concepts": [],
+     "overview": "OpenAI가 GPT-6 Sol의 업그레이드 모델 GPT-6.1 Sol을 공개했다. 에이전틱 코딩, 컴퓨터 사용, 전문 업무에서 GPT-6 Astra에 근접한 지능을 표준 토큰 가격의 5분의 1 수준으로 제공하며, 캐시된 입력 가격은 100만 토큰당 $0.10으로 표준 대비 95% 절감된다. DeepSWE v1.1, OSWorld 2.0, Terminal-Bench Science 0.1에서 GPT-6 Sol 대비 성능 향상과 비용 절감을 동시에 달성했다.",
+     "summary": "OpenAI가 GPT-6 Astra급 지능을 ==5분의 1 가격==에 제공하는 GPT-6.1 Sol을 공개했다. 캐시 입력 $0.10/1M 토큰으로 에이전트 워크로드 비용을 최대 95% 절감한다.",
+     "title": "GPT-6.1 Sol: Astra급 지능 5분의 1 가격"
+    },
+    "issues": [
+     {
+      "loc": "points[5]",
+      "type": "unsupported",
+      "evidence_id": null,
+      "comment": "points[5]의 '이용약관 조항에 따른 조치로 미국 사용자부터 적용'이 근거 원문에 없음",
+      "hint": "근거에 있는 내용만 남기거나 삭제",
+      "idx": 0
+     }
+    ],
+    "evidence": [
+     {
+      "id": "it:8#q1",
+      "source": "OpenAI News",
+      "text": "We’re introducing GPT-6.1 Sol, an upgrade to GPT-6 Sol that nearly matches GPT-6 Astra’s intelligence on agentic coding, computer use, and professional work at one-fifth of Astra’s standard input and\n주장: GPT-6.1 Sol은 에이전틱 코딩, 컴퓨터 사용, 전문 업무에서 GPT-6 Astra와 유사한 지능을 5분의 1 가격에 제공하며, 캐시 입력 비용은 $0.10/백만 토큰이다.",
+      "title": "Introducing GPT-6.1 Sol",
+      "url": "https://openai.com/index/introducing-gpt-6-1-sol"
+     },
+     {
+      "id": "og:981#q1",
+      "source": "GeekNews",
+      "text": "GPT-6 Sol의 업그레이드 모델인 GPT-6.1 Sol을 소개합니다. 에이전틱 코딩, 컴퓨터 사용 및 전문 업무에서 GPT-6 Astra에 가까운 지능을 제공하면서도 Astra의 표준 입력 및 출력 토큰 가격의 5분의 1 수준으로 이용할 수 있습니다.\n수치: Astra 대비 표준 입력·출력 토큰 가격 수준 [5분의 1]\n주장: GPT-6.1 Sol은 Astra에 가까운 지능을 표준 토큰 가격 5분의 1, 캐시된 입력 가격 95% 절감으로 제공",
+      "title": "OpenAI, GPT-6.1 Sol 공개",
+      "url": "https://openai.com/ko-KR/index/introducing-gpt-6-1-sol/"
+     },
+     {
+      "id": "it:8#q2",
+      "source": "OpenAI News",
+      "text": "Cached input costs just $0.10 per million tokens—95% less than standard input pricing and 50% less than GPT-6 Sol’s cached input pricing—giving developers more room to build and run capable agents\n수치: 캐시된 입력 가격 [$0.10 per million tokens]\n수치: 표준 입력 가격 대비 절감률 [95%]\n수치: GPT-6 Sol 캐시 입력 가격 대비 절감률 [50%]",
+      "title": "Introducing GPT-6.1 Sol",
+      "url": "https://openai.com/index/introducing-gpt-6-1-sol"
+     },
+     {
+      "id": "og:981#q2",
+      "source": "GeekNews",
+      "text": "캐시된 입력은 100만 토큰당 $0.10에 불과해 표준 입력 가격보다 95%, GPT-6 Sol의 캐시된 입력 가격보다 50% 저렴합니다.\n수치: 캐시된 입력 가격 [$0.10 100만 토큰당]\n수치: 표준 입력 가격 대비 절감률 [95%]\n수치: GPT-6 Sol 캐시된 입력 가격 대비 절감률 [50%]",
+      "title": "OpenAI, GPT-6.1 Sol 공개",
+      "url": "https://openai.com/ko-KR/index/introducing-gpt-6-1-sol/"
+     },
+     {
+      "id": "it:8#q3",
+      "source": "OpenAI News",
+      "text": "On DeepSWE v1.1, which evaluates complex software-engineering tasks in real codebases, GPT-6.1 Sol matches GPT-6 Astra at roughly one-fifth of the cost, while eclipsing GPT-6 Sol’s best score by 6.4\n수치: GPT-6 Sol 최고 점수 대비 DeepSWE v1.1 향상폭 [6.4 percentage points]\n주장: DeepSWE v1.1 벤치마크에서 GPT-6.1 Sol은 GPT-6 Astra와 동등한 성능을 5분의 1 비용으로 달성하고, GPT-6 Sol보다 6.4%p 높다.",
+      "title": "Introducing GPT-6.1 Sol",
+      "url": "https://openai.com/index/introducing-gpt-6-1-sol"
+     },
+     {
+      "id": "og:981#q3",
+      "source": "GeekNews",
+      "text": "실제 코드베이스에서 복잡한 소프트웨어 엔지니어링 작업을 평가하는 DeepSWE v1.1에서 GPT-6.1 Sol은 약 5분의 1 비용으로 GPT-6 Astra와 대등한 성능을 보입니다.\n수치: DeepSWE v1.1에서 Astra 대비 비용 수준 [5분의 1]\n주장: DeepSWE v1.1에서 GPT-6 Astra와 대등한 성능을 약 5분의 1 비용으로 달성",
+      "title": "OpenAI, GPT-6.1 Sol 공개",
+      "url": "https://openai.com/ko-KR/index/introducing-gpt-6-1-sol/"
+     },
+     {
+      "id": "it:8#q4",
+      "source": "OpenAI News",
+      "text": "On OSWorld 2.0’s offline set, which evaluates agents on demanding computer-use workflows, GPT-6.1 Sol outperforms GPT-6 Sol by seven percentage points at maximum reasoning effort at less than half the\n수치: GPT-6 Sol 대비 OSWorld 2.0 향상폭 [seven percentage points]\n주장: OSWorld 2.0에서 GPT-6.1 Sol은 GPT-6 Sol보다 7%p 높은 성능을 절반 이하의 비용으로 달성했다.",
+      "title": "Introducing GPT-6.1 Sol",
+      "url": "https://openai.com/index/introducing-gpt-6-1-sol"
+     },
+     {
+      "id": "og:981#q4",
+      "source": "GeekNews",
+      "text": "고난도 컴퓨터 사용 워크플로에서 에이전트를 평가하는 OSWorld 2.0의 오프라인 세트에서 GPT-6.1 Sol은 최대 추론 강도 설정으로 GPT-6 Sol보다 7%포인트 높은 성능을 보이면서도 비용은 절반 미만입니다.\n수치: OSWorld 2.0에서 GPT-6 Sol 대비 성능 향상 [7%포인트]\n주장: OSWorld 2.0에서 GPT-6 Sol보다 7%포인트 높은 성능을 절반 미만 비용으로 기록",
+      "title": "OpenAI, GPT-6.1 Sol 공개",
+      "url": "https://openai.com/ko-KR/index/introducing-gpt-6-1-sol/"
+     },
+     {
+      "id": "it:8#q5",
+      "source": "OpenAI News",
+      "text": "On Terminal-Bench Science 0.1, which evaluates scientific workflows including data analysis, simulation, and theorem proving, GPT-6.1 Sol more than doubles GPT-6 Sol’s score at maximum reasoning\n주장: Terminal-Bench Science 0.1에서 GPT-6.1 Sol은 GPT-6 Sol 점수의 2배 이상을 절반 이하의 비용으로 달성했다.",
+      "title": "Introducing GPT-6.1 Sol",
+      "url": "https://openai.com/index/introducing-gpt-6-1-sol"
+     },
+     {
+      "id": "it:8#q6",
+      "source": "OpenAI News",
+      "text": "GPT-6.1 Sol is available starting today to all Plus, Pro, Business, Enterprise, and Edu users in ChatGPT Work and Codex.",
+      "title": "Introducing GPT-6.1 Sol",
+      "url": "https://openai.com/index/introducing-gpt-6-1-sol"
+     }
+    ],
+    "aliases": [
+     {
+      "canonical": "GPT-6.1 Sol",
+      "aliases": [
+       "GPT-6.1-Sol"
+      ]
+     }
+    ]
+   },
+   "expect": {
+    "action": "edit"
+   },
+   "note": "이슈 delete(오류를 심음)",
+   "step_id": 4848,
+   "output": {
+    "log": "이슈 1개 중 수정 1",
+    "attention": false,
+    "changed": [
+     {
+      "issue_idx": 0,
+      "loc": "points[5]",
+      "action": "edit",
+      "value": {
+       "text": "Plus, Pro, Business, Enterprise, Edu 사용자에게 ChatGPT Work와 Codex에서 즉시 제공됨",
+       "refs": [
+        "it:8#q6"
+       ],
+       "check": false
+      }
+     },
+     {
+      "issue_idx": 0,
+      "loc": "points[5]",
+      "action": "edit",
+      "value": {
+       "text": "Plus, Pro, Business, Enterprise, Edu 사용자에게 ChatGPT Work와 Codex에서 즉시 제공됨",
+       "refs": [
+        "it:8#q6"
+       ],
+       "check": false
+      }
+     },
+     {
+      "issue_idx": 0,
+      "loc": "points[5]",
+      "action": "edit",
+      "value": {
+       "text": "Plus, Pro, Business, Enterprise, Edu 사용자에게 ChatGPT Work와 Codex에서 즉시 제공됨",
+       "refs": [
+        "it:8#q6"
+       ],
+       "check": false
+      }
+     }
+    ]
+   },
+   "error": null,
+   "code": {
+    "passed": true,
+    "checks": [
+     {
+      "name": "스키마",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "지적 안 된 칸을 바꾸지 않음",
+      "passed": true,
+      "detail": "[]"
+     },
+     {
+      "name": "지적된 위치를 모두 다룸(또는 attention)",
+      "passed": true,
+      "detail": "지적 ['points[5]'], 변경 ['points[5]', 'points[5]', 'points[5]']"
+     },
+     {
+      "name": "기대 동작 edit",
+      "passed": true,
+      "detail": "{'edit'}"
+     },
+     {
+      "name": "해요체 없음(log)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(log)",
+      "passed": true,
+      "detail": ""
+     }
+    ],
+    "failed": []
+   },
+   "judged_output": "raw",
+   "cost_usd": 0.001374
+  },
+  {
+   "id": "no-evidence-w40-openai-dots",
+   "input": {
+    "loc_lines": [
+     "title: OpenAI, 상시 작동 에이전트 Dots 공개",
+     "summary: OpenAI가 GPT-6 Astra 기반 상시 작동 에이전트 ==Dots==를 공개했다. 자체 클라우드 컴퓨터로 24/7 작동하며 4,000개 이상 앱에 연결되고, Pro·Business Premium·Enterprise 플랜에 순차 배포를 시작했다.",
+     "overview: OpenAI가 데브데이 2026에서 GPT-6 Astra 기반 상시 작동 에이전트 Dots를 공개했다. 자체 클라우드 컴퓨터를 갖추고 4,000개 이상의 앱에 연결되며, Slack·Teams 등 업무 채널에서 단일 대화 맥락을 유지한다. Pro, Business Premium, Enterprise 플랜 대상 시장에 순차 배포를 시작했고, 첫 dot은 Pro 또는 Business Premium 요금제에 추가 비용 없이 포함된다. 이번 공개는 소비자용이 아닌 B2B 업무 자동화에 초점을 맞춘 포지셔닝이다.",
+     "points[0]: GPT-6 Astra 기반 상시 작동 에이전트 Dots 공개, 자체 클라우드 컴퓨터로 24/7 목표 수행 (refs it:10#q1, it:10#q2, it:893#q1)",
+     "points[1]: ==플러그인 생태계로 4,000개 이상 앱 연결, Slack·Teams·문자 등 업무 채널에서 단일 대화 맥락 유지== (refs it:10#q3, it:893#q4)",
+     "points[2]: 사용자 지시 없이 백그라운드에서 'proactive research' 수행 (refs it:10#q5)",
+     "points[3]: Pro, Business Premium, Enterprise 플랜 대상 시장에 순차 배포 시작, 첫 dot은 Pro 또는 Business Premium에 추가 비용 없이 포함 (refs it:10#q4, og:986#q4, it:893#q6)",
+     "points[4]: 초당 최대 300토큰 '울트라패스트' 티어 포함 월 500달러 '챗GPT 프로 500' 플랜 신설, 해당 플랜에 Dots 에이전트 1개 기본 제공 (refs it:893#q5)",
+     "concepts[0]: proactive research - 사용자가 직접 작업하지 않을 때 Dots가 백그라운드에서 도움이 될 방법을 찾아 수행하는 기능"
+    ],
+    "previous": {
+     "log": "포인트 5개, 수치 그룹 0개, 근거 id 12개",
+     "attention": false,
+     "points": [
+      {
+       "text": "GPT-6 Astra 기반 상시 작동 에이전트 Dots 공개, 자체 클라우드 컴퓨터로 24/7 목표 수행",
+       "refs": [
+        "it:10#q1",
+        "it:10#q2",
+        "it:893#q1"
+       ],
+       "check": false
+      },
+      {
+       "text": "==플러그인 생태계로 4,000개 이상 앱 연결, Slack·Teams·문자 등 업무 채널에서 단일 대화 맥락 유지==",
+       "refs": [
+        "it:10#q3",
+        "it:893#q4"
+       ],
+       "check": false
+      },
+      {
+       "text": "사용자 지시 없이 백그라운드에서 'proactive research' 수행",
+       "refs": [
+        "it:10#q5"
+       ],
+       "check": false
+      },
+      {
+       "text": "Pro, Business Premium, Enterprise 플랜 대상 시장에 순차 배포 시작, 첫 dot은 Pro 또는 Business Premium에 추가 비용 없이 포함",
+       "refs": [
+        "it:10#q4",
+        "og:986#q4",
+        "it:893#q6"
+       ],
+       "check": false
+      },
+      {
+       "text": "초당 최대 300토큰 '울트라패스트' 티어 포함 월 500달러 '챗GPT 프로 500' 플랜 신설, 해당 플랜에 Dots 에이전트 1개 기본 제공",
+       "refs": [
+        "it:893#q5"
+       ],
+       "check": false
+      }
+     ],
+     "numbers": [],
+     "events": [],
+     "contributions": [],
+     "concepts": [
+      {
+       "term": "proactive research",
+       "desc": "사용자가 직접 작업하지 않을 때 Dots가 백그라운드에서 도움이 될 방법을 찾아 수행하는 기능"
+      }
+     ],
+     "overview": "OpenAI가 데브데이 2026에서 GPT-6 Astra 기반 상시 작동 에이전트 Dots를 공개했다. 자체 클라우드 컴퓨터를 갖추고 4,000개 이상의 앱에 연결되며, Slack·Teams 등 업무 채널에서 단일 대화 맥락을 유지한다. Pro, Business Premium, Enterprise 플랜 대상 시장에 순차 배포를 시작했고, 첫 dot은 Pro 또는 Business Premium 요금제에 추가 비용 없이 포함된다. 이번 공개는 소비자용이 아닌 B2B 업무 자동화에 초점을 맞춘 포지셔닝이다.",
+     "summary": "OpenAI가 GPT-6 Astra 기반 상시 작동 에이전트 ==Dots==를 공개했다. 자체 클라우드 컴퓨터로 24/7 작동하며 4,000개 이상 앱에 연결되고, Pro·Business Premium·Enterprise 플랜에 순차 배포를 시작했다.",
+     "title": "OpenAI, 상시 작동 에이전트 Dots 공개"
+    },
+    "issues": [
+     {
+      "loc": "points[0]",
+      "type": "unsupported",
+      "evidence_id": "it:0#q9",
+      "comment": "근거 원문 없음",
+      "hint": "",
+      "idx": 0
+     }
+    ],
+    "evidence": [],
+    "aliases": [
+     {
+      "canonical": "Dots",
+      "aliases": [
+       "dots"
+      ]
+     }
+    ]
+   },
+   "expect": {},
+   "note": "근거 원문 없음: 고치지 않고 attention 또는 삭제",
+   "step_id": 4849,
+   "output": {
+    "log": "이슈 1개, 근거 원문 부재로 미처리 1",
+    "attention": true,
+    "changed": []
+   },
+   "error": null,
+   "code": {
+    "passed": true,
+    "checks": [
+     {
+      "name": "스키마",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "지적 안 된 칸을 바꾸지 않음",
+      "passed": true,
+      "detail": "[]"
+     },
+     {
+      "name": "지적된 위치를 모두 다룸(또는 attention)",
+      "passed": true,
+      "detail": "지적 ['points[0]'], 변경 []"
+     },
+     {
+      "name": "해요체 없음(log)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(log)",
+      "passed": true,
+      "detail": ""
+     }
+    ],
+    "failed": []
+   },
+   "judged_output": "raw",
+   "cost_usd": 0.0
+  },
+  {
+   "id": "number-w40-claude-sonnet-5-5",
+   "input": {
+    "loc_lines": [
+     "title: Claude Sonnet 5.5 출시: Opus급 성능, 동일 가격",
+     "summary: Anthropic이 Sonnet 5.5를 출시했다. ==중급 모델이 Opus급 성능에 근접하면서 가격은 동일==하다.",
+     "overview: Anthropic이 Claude 5.5 패밀리의 두 번째 모델인 Sonnet 5.5를 출시했다. 전작 대비 출력 속도 30%+ 향상과 동일 작업당 최대 30% 비용 절감을 달성했으며, 터미널벤치 4.0에서 70.6%로 Opus 5.5(66.4%)를 상회했다. 토큰당 가격은 Sonnet 5와 동일하지만, 같은 작업을 더 적은 토큰으로 처리해 실질 비용이 줄어든다. 100만 토큰 컨텍스트와 12만8000 토큰 출력을 지원하며, claude.ai 무료 티어 모델로 지정됐다.",
+     "points[0]: Sonnet 5.5가 Sonnet 5 대비 출력 속도 45%+ 향상, 동일 작업당 비용 최대 30% 절감 (refs og:162#q1, it:924#q2)",
+     "points[1]: ==터미널벤치 4.0에서 70.6%로 전작 Sonnet 5(10.3%)와 Opus 5.5(66.4%)를 모두 상회== (refs it:924#q3, it:924#q4)",
+     "points[2]: 토큰당 가격은 Sonnet 5와 동일(입력 $2, 출력 $10, 캐시 읽기 $0.20 / 100만 토큰)이나, 같은 작업을 더 적은 토큰으로 처리해 비용 절감 (refs og:162#q2, it:951#q3)",
+     "points[3]: 최대 100만 토큰 컨텍스트 창과 12만8000 토큰 최대 출력 지원 (refs it:951#q2)",
+     "points[4]: claude.ai 무료 티어 모델로 지정, ChatGPT 무료 티어(Luna 5.6)보다 높은 성능 제공 (refs og:162#q5)",
+     "points[5]: 여러 평가에서 Max effort 설정 시 Opus 5.5와 동등한 성능 기록, Haiku 5.5는 몇 주 내 5.5 패밀리 합류 예정 (refs og:162#q4, og:162#q3)",
+     "numbers[0] (anchor 2): Sonnet 5.5가 터미널벤치 4.0에서 Opus 5.5와 전작을 모두 상회 / context: 터미널 환경의 복잡한 작업을 평가하는 터미널벤치 4.0 점수 비교 [it:924#q3, it:924#q4]",
+     "numbers[0].items[0]: Sonnet 5.5 = 70.6 (it:924#q3)",
+     "numbers[0].items[1]: Opus 5.5 = 66.4 (it:924#q4)",
+     "numbers[0].items[2]: Sonnet 5 = 10.3 (it:924#q4)"
+    ],
+    "previous": {
+     "log": "포인트 6개, 수치 그룹 1개, 근거 id 12개",
+     "attention": false,
+     "points": [
+      {
+       "text": "Sonnet 5.5가 Sonnet 5 대비 출력 속도 45%+ 향상, 동일 작업당 비용 최대 30% 절감",
+       "refs": [
+        "og:162#q1",
+        "it:924#q2"
+       ],
+       "check": false
+      },
+      {
+       "text": "==터미널벤치 4.0에서 70.6%로 전작 Sonnet 5(10.3%)와 Opus 5.5(66.4%)를 모두 상회==",
+       "refs": [
+        "it:924#q3",
+        "it:924#q4"
+       ],
+       "check": false
+      },
+      {
+       "text": "토큰당 가격은 Sonnet 5와 동일(입력 $2, 출력 $10, 캐시 읽기 $0.20 / 100만 토큰)이나, 같은 작업을 더 적은 토큰으로 처리해 비용 절감",
+       "refs": [
+        "og:162#q2",
+        "it:951#q3"
+       ],
+       "check": false
+      },
+      {
+       "text": "최대 100만 토큰 컨텍스트 창과 12만8000 토큰 최대 출력 지원",
+       "refs": [
+        "it:951#q2"
+       ],
+       "check": false
+      },
+      {
+       "text": "claude.ai 무료 티어 모델로 지정, ChatGPT 무료 티어(Luna 5.6)보다 높은 성능 제공",
+       "refs": [
+        "og:162#q5"
+       ],
+       "check": false
+      },
+      {
+       "text": "여러 평가에서 Max effort 설정 시 Opus 5.5와 동등한 성능 기록, Haiku 5.5는 몇 주 내 5.5 패밀리 합류 예정",
+       "refs": [
+        "og:162#q4",
+        "og:162#q3"
+       ],
+       "check": false
+      }
+     ],
+     "numbers": [
+      {
+       "anchor": 2,
+       "group": "terminalbench",
+       "title": "Sonnet 5.5가 터미널벤치 4.0에서 Opus 5.5와 전작을 모두 상회",
+       "context": "터미널 환경의 복잡한 작업을 평가하는 터미널벤치 4.0 점수 비교 [it:924#q3, it:924#q4]",
+       "unit": "%",
+       "items": [
+        {
+         "label": "Sonnet 5.5",
+         "value": "70.6",
+         "ref": "it:924#q3",
+         "baseline": false,
+         "emphasis": true
+        },
+        {
+         "label": "Opus 5.5",
+         "value": "66.4",
+         "ref": "it:924#q4",
+         "baseline": false,
+         "emphasis": false
+        },
+        {
+         "label": "Sonnet 5",
+         "value": "10.3",
+         "ref": "it:924#q4",
+         "baseline": true,
+         "emphasis": false
+        }
+       ]
+      }
+     ],
+     "events": [],
+     "contributions": [],
+     "concepts": [],
+     "overview": "Anthropic이 Claude 5.5 패밀리의 두 번째 모델인 Sonnet 5.5를 출시했다. 전작 대비 출력 속도 30%+ 향상과 동일 작업당 최대 30% 비용 절감을 달성했으며, 터미널벤치 4.0에서 70.6%로 Opus 5.5(66.4%)를 상회했다. 토큰당 가격은 Sonnet 5와 동일하지만, 같은 작업을 더 적은 토큰으로 처리해 실질 비용이 줄어든다. 100만 토큰 컨텍스트와 12만8000 토큰 출력을 지원하며, claude.ai 무료 티어 모델로 지정됐다.",
+     "summary": "Anthropic이 Sonnet 5.5를 출시했다. ==중급 모델이 Opus급 성능에 근접하면서 가격은 동일==하다.",
+     "title": "Claude Sonnet 5.5 출시: Opus급 성능, 동일 가격"
+    },
+    "issues": [
+     {
+      "loc": "points[0]",
+      "type": "number_mismatch",
+      "evidence_id": "og:162#q1",
+      "comment": "points[0]의 수치가 근거와 다름",
+      "hint": "근거 표기 그대로",
+      "idx": 0
+     }
+    ],
+    "evidence": [
+     {
+      "id": "og:162#q1",
+      "source": "Simon Willison's Weblog",
+      "text": "Introducing Claude Sonnet 5.5, the second model in the Claude 5.5 family. It’s a clear upgrade over Claude Sonnet 5, runs 30%+ faster, and costs up to 30% less for most work.\n수치: Sonnet 5.5 출력 속도 향상(Sonnet 5 대비) [30%+]\n수치: Sonnet 5.5 비용 절감(대부분 작업, 최대) [30%]\n주장: Sonnet 5.5는 Sonnet 5와 동일 가격으로, 대부분 작업에서 최대 30% 저렴하고 30%+ 빠름",
+      "title": "Claude Sonnet 5.5",
+      "url": "https://www.anthropic.com/claude-sonnet-5-5"
+     },
+     {
+      "id": "og:162#q2",
+      "source": "Simon Willison's Weblog",
+      "text": "Sonnet 5.5 is priced the same as Sonnet 5 at $2 per million input tokens, $10 per million output tokens, and $0.20 per million tokens for cache reads, but it typically needs far fewer tokens to do the same work. In our testing, it costs up to 30% less per task than its predecessor.\n수치: Sonnet 5.5 입력 토큰 가격 [$2 per million input tokens]\n수치: Sonnet 5.5 출력 토큰 가격 [$10 per million output tokens]\n수치: Sonnet 5.5 캐시 읽기 가격 [$0.20 per million tokens]",
+      "title": "Claude Sonnet 5.5",
+      "url": "https://www.anthropic.com/claude-sonnet-5-5"
+     },
+     {
+      "id": "it:924#q2",
+      "source": "AI타임스",
+      "text": "28일(현지시간) 발표에 따르면, 소네트 5.5는 이전 세대인 '소네트 5' 대비 출력이 30% 이상 빨라졌으며, 압도적인 작업 처리 효율성 덕분에 동일 작업당 비용을 최대 30% 절감했다.\n수치: 출력 속도 향상률 [30%]\n수치: 동일 작업당 비용 절감률 [30%]",
+      "title": "앤트로픽, '클로드 소네트 5.5' 공개…오퍼스급 지능에 최강 가성비",
+      "url": "https://www.aitimes.com/news/articleView.html?idxno=215734"
+     },
+     {
+      "id": "it:951#q2",
+      "source": "AI타임스",
+      "text": "현재까지 알려진 사양을 보면 소네트 5.5는 최대 100만 토큰의 컨텍스트 창과 최대 12만8000 토큰의 출력을 지원할 것으로 예상된다.\n수치: 컨텍스트 창 크기 [100만 토큰]\n수치: 최대 출력 크기 [12만8000 토큰]\n주장: 소네트 5.5는 100만 토큰 컨텍스트와 12만8000 토큰 출력을 지원하며, 토큰당 가격은 입력 2달러, 출력 10달러, 캐시 0.20달러로 추정",
+      "title": "앤트로픽, '클로드 소네트 5.5' 출시 임박...오픈AI '데브데이' 견제하나",
+      "url": "https://www.aitimes.com/news/articleView.html?idxno=215700"
+     },
+     {
+      "id": "og:162#q3",
+      "source": "Simon Willison's Weblog",
+      "text": "Claude Haiku 5.5, built for high-volume and cost-sensitive applications, will join the Claude 5.5 family in the coming weeks.\n주장: Haiku 5.5는 몇 주 안에 Claude 5.5 패밀리로 합류 예정",
+      "title": "Claude Sonnet 5.5",
+      "url": "https://www.anthropic.com/claude-sonnet-5-5"
+     },
+     {
+      "id": "it:924#q3",
+      "source": "AI타임스",
+      "text": "터미널 환경의 복잡한 작업을 평가하는 '터미널벤치 4.0'에서 70.6%의 점수를 기록했다.\n수치: 터미널벤치 4.0 점수 [70.6%]\n주장: 터미널벤치 4.0에서 70.6%를 기록해 전작 소네트 5(10.3%)와 최상위 모델 오퍼스 5.5(66.4%)를 모두 상회했다.",
+      "title": "앤트로픽, '클로드 소네트 5.5' 공개…오퍼스급 지능에 최강 가성비",
+      "url": "https://www.aitimes.com/news/articleView.html?idxno=215734"
+     },
+     {
+      "id": "it:951#q3",
+      "source": "AI타임스",
+      "text": "입력 토큰은 100만개당 2달러, 출력 토큰은 100만개당 10달러, 캐시 읽기는 100만개당 0.20달러 수준으로 추정된다.\n수치: 입력 토큰 100만개당 가격 [2 달러]\n수치: 출력 토큰 100만개당 가격 [10 달러]\n수치: 캐시 읽기 100만개당 가격 [0.20 달러]",
+      "title": "앤트로픽, '클로드 소네트 5.5' 출시 임박...오픈AI '데브데이' 견제하나",
+      "url": "https://www.aitimes.com/news/articleView.html?idxno=215700"
+     },
+     {
+      "id": "og:162#q4",
+      "source": "Simon Willison's Weblog",
+      "text": "On several evaluations, Sonnet 5.5 at Max effort even performs comparably to Opus 5.5.\n주장: 여러 평가에서 Sonnet 5.5(Max effort)가 Opus 5.5와 동등한 성능을 보임",
+      "title": "Claude Sonnet 5.5",
+      "url": "https://www.anthropic.com/claude-sonnet-5-5"
+     },
+     {
+      "id": "it:924#q4",
+      "source": "AI타임스",
+      "text": "이는 전작인 소네트 5가 기록했던 10.3%를 무려 7배 이상 뛰어넘는 수치이며, 최상위 모델인 '오퍼스 5.5(66.4%)'마저 제친 기록이다.\n수치: 소네트 5 터미널벤치 4.0 점수 [10.3%]\n수치: 오퍼스 5.5 터미널벤치 4.0 점수 [66.4%]",
+      "title": "앤트로픽, '클로드 소네트 5.5' 공개…오퍼스급 지능에 최강 가성비",
+      "url": "https://www.aitimes.com/news/articleView.html?idxno=215734"
+     },
+     {
+      "id": "og:162#q5",
+      "source": "Simon Willison's Weblog",
+      "text": "The most interesting thing about Sonnet 5.5 is that it's now the model used for the free tier on claude.ai. OpenAI's ChatGPT free tier uses Luna 5.6, which means Anthropic currently have a much more capable free offering.\n주장: Sonnet 5.5가 claude.ai 무료 티어 모델이며, ChatGPT 무료 티어(Luna 5.6)보다 더 높은 성능 제공",
+      "title": "Claude Sonnet 5.5",
+      "url": "https://simonwillison.net/2026/Sep/28/claude-sonnet-5-5/"
+     }
+    ],
+    "aliases": []
+   },
+   "expect": {
+    "action": "edit"
+   },
+   "note": "이슈 number(오류를 심음)",
+   "step_id": 4851,
+   "output": {
+    "log": "이슈 1개 중 수정 1",
+    "attention": false,
+    "changed": [
+     {
+      "issue_idx": 0,
+      "loc": "points[0]",
+      "action": "edit",
+      "value": {
+       "text": "Sonnet 5.5가 Sonnet 5 대비 출력 속도 30%+ 향상, 동일 작업당 비용 최대 30% 절감",
+       "refs": [
+        "og:162#q1",
+        "it:924#q2"
+       ],
+       "check": false
+      }
+     },
+     {
+      "issue_idx": 0,
+      "loc": "overview",
+      "action": "edit",
+      "value": "Anthropic이 Claude 5.5 패밀리의 두 번째 모델인 Sonnet 5.5를 출시했다. 전작 대비 출력 속도 30%+ 향상과 동일 작업당 최대 30% 비용 절감을 달성했으며, 터미널벤치 4.0에서 70.6%로 Opus 5.5(66.4%)를 상회했다. 토큰당 가격은 Sonnet 5와 동일하지만, 같은 작업을 더 적은 토큰으로 처리해 실질 비용이 줄어든다. 100만 토큰 컨텍스트와 12만8000 토큰 출력을 지원하며, claude.ai 무료 티어 모델로 지정됐다."
+     }
+    ]
+   },
+   "error": null,
+   "code": {
+    "passed": false,
+    "checks": [
+     {
+      "name": "스키마",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "지적 안 된 칸을 바꾸지 않음",
+      "passed": false,
+      "detail": "['overview']"
+     },
+     {
+      "name": "지적된 위치를 모두 다룸(또는 attention)",
+      "passed": true,
+      "detail": "지적 ['points[0]'], 변경 ['points[0]', 'overview']"
+     },
+     {
+      "name": "기대 동작 edit",
+      "passed": true,
+      "detail": "{'edit'}"
+     },
+     {
+      "name": "해요체 없음(log)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(log)",
+      "passed": true,
+      "detail": ""
+     }
+    ],
+    "failed": [
+     "지적 안 된 칸을 바꾸지 않음: ['overview']"
+    ]
+   },
+   "cost_usd": 0.0
+  },
+  {
+   "id": "number-w40-gemini-argon",
+   "input": {
+    "loc_lines": [
+     "title: Gemini 4 Argon 공개: 출력 토큰 1M 확장 및 에이전트 작업 능력 강화",
+     "summary: Google DeepMind가 프런티어 모델 Gemini 4 Argon을 공개했다. 출력 토큰 한도 1M 확장과 DeepSWE v1.1 SOTA 경신으로 ==에이전트 작업 능력을 강화==했으며, 출시 기념 특가로 입력 토큰 1M당 $2, 출력 토큰 1M당 $10에 제공된다.",
+     "overview: Google DeepMind가 프런티어 모델 Gemini 4 Argon을 공개했다. 출력 토큰 한도를 1M으로 확장하고 DeepSWE v1.1에서 SOTA를 경신하며 에이전트 작업 능력을 강화했다. 출시 기념 특가로 입력 토큰 1M당 $2, 출력 토큰 1M당 $10에 제공되며, Fairwind Program을 통해 제한된 사이버 방어자에게만 출시된다.",
+     "points[0]: 출력 토큰 한도를 기존 64K에서 1M으로 확장해 장기 추론과 복잡한 워크플로우 처리 능력 강화 (refs it:18#q3, it:864#q2, og:997#q3)",
+     "points[1]: DeepSWE v1.1에서 116.9%로 SOTA 경신, Claude Opus 5.5(74.2%)와 GPT-6 Astra(74.1%) 앞섬 (refs it:18#q4, it:864#q4)",
+     "points[2]: 출시 기념 특가로 입력 토큰 1M당 $2, 출력 토큰 1M당 $10, 캐시 입력 95% 할인 (refs it:18#q2, og:997#q2)",
+     "points[3]: 18개 주요 벤치마크 중 12개 단독 1위, 1개 공동 1위로 총 13개 부문 정상 (refs it:864#q3)",
+     "points[4]: Fairwind Program을 통해 제한된 사이버 방어자에게만 출시, 일반 사용 제한 (refs it:18#q1, it:864#q1)",
+     "numbers[0] (anchor 2): Gemini 4 Argon이 DeepSWE v1.1에서 경쟁 모델 대비 3.7%p 높음 / context: 장기 소프트웨어 엔지니어링 역량을 평가하는 DeepSWE v1.1 벤치마크 점수 비교 [it:864#q4]",
+     "numbers[0].items[0]: Gemini 4 Argon = 77.9 (it:864#q4)",
+     "numbers[0].items[1]: Claude Opus 5.5 = 74.2 (it:864#q4)",
+     "numbers[0].items[2]: GPT-6 Astra = 74.1 (it:864#q4)"
+    ],
+    "previous": {
+     "log": "포인트 5개, 수치 그룹 1개, 근거 id 12개",
+     "attention": false,
+     "points": [
+      {
+       "text": "출력 토큰 한도를 기존 64K에서 1M으로 확장해 장기 추론과 복잡한 워크플로우 처리 능력 강화",
+       "refs": [
+        "it:18#q3",
+        "it:864#q2",
+        "og:997#q3"
+       ],
+       "check": false
+      },
+      {
+       "text": "DeepSWE v1.1에서 116.9%로 SOTA 경신, Claude Opus 5.5(74.2%)와 GPT-6 Astra(74.1%) 앞섬",
+       "refs": [
+        "it:18#q4",
+        "it:864#q4"
+       ],
+       "check": false
+      },
+      {
+       "text": "출시 기념 특가로 입력 토큰 1M당 $2, 출력 토큰 1M당 $10, 캐시 입력 95% 할인",
+       "refs": [
+        "it:18#q2",
+        "og:997#q2"
+       ],
+       "check": false
+      },
+      {
+       "text": "18개 주요 벤치마크 중 12개 단독 1위, 1개 공동 1위로 총 13개 부문 정상",
+       "refs": [
+        "it:864#q3"
+       ],
+       "check": false
+      },
+      {
+       "text": "Fairwind Program을 통해 제한된 사이버 방어자에게만 출시, 일반 사용 제한",
+       "refs": [
+        "it:18#q1",
+        "it:864#q1"
+       ],
+       "check": false
+      }
+     ],
+     "numbers": [
+      {
+       "anchor": 2,
+       "group": "deepswe_v1_1",
+       "title": "Gemini 4 Argon이 DeepSWE v1.1에서 경쟁 모델 대비 3.7%p 높음",
+       "context": "장기 소프트웨어 엔지니어링 역량을 평가하는 DeepSWE v1.1 벤치마크 점수 비교 [it:864#q4]",
+       "unit": "%",
+       "items": [
+        {
+         "label": "Gemini 4 Argon",
+         "value": "77.9",
+         "ref": "it:864#q4",
+         "baseline": false,
+         "emphasis": true
+        },
+        {
+         "label": "Claude Opus 5.5",
+         "value": "74.2",
+         "ref": "it:864#q4",
+         "baseline": false,
+         "emphasis": false
+        },
+        {
+         "label": "GPT-6 Astra",
+         "value": "74.1",
+         "ref": "it:864#q4",
+         "baseline": false,
+         "emphasis": false
+        }
+       ]
+      }
+     ],
+     "events": [],
+     "contributions": [],
+     "concepts": [],
+     "overview": "Google DeepMind가 프런티어 모델 Gemini 4 Argon을 공개했다. 출력 토큰 한도를 1M으로 확장하고 DeepSWE v1.1에서 SOTA를 경신하며 에이전트 작업 능력을 강화했다. 출시 기념 특가로 입력 토큰 1M당 $2, 출력 토큰 1M당 $10에 제공되며, Fairwind Program을 통해 제한된 사이버 방어자에게만 출시된다.",
+     "summary": "Google DeepMind가 프런티어 모델 Gemini 4 Argon을 공개했다. 출력 토큰 한도 1M 확장과 DeepSWE v1.1 SOTA 경신으로 ==에이전트 작업 능력을 강화==했으며, 출시 기념 특가로 입력 토큰 1M당 $2, 출력 토큰 1M당 $10에 제공된다.",
+     "title": "Gemini 4 Argon 공개: 출력 토큰 1M 확장 및 에이전트 작업 능력 강화"
+    },
+    "issues": [
+     {
+      "loc": "points[1]",
+      "type": "number_mismatch",
+      "evidence_id": "it:18#q4",
+      "comment": "points[1]의 수치가 근거와 다름",
+      "hint": "근거 표기 그대로",
+      "idx": 0
+     }
+    ],
+    "evidence": [
+     {
+      "id": "it:18#q1",
+      "source": "Google DeepMind Blog",
+      "text": "Today, we’re announcing our new frontier model, Gemini 4 Argon, which is rolling out to a set of trusted cyber defenders through our Fairwind Program.\n주장: Google DeepMind가 프런티어 모델 Gemini 4 Argon을 Fairwind Program을 통해 제한적으로 출시한다고 발표했다.",
+      "title": "Gemini 4 Argon: our next era of frontier intelligence",
+      "url": "https://deepmind.google/blog/gemini-4-argon-our-next-era-of-frontier-intelligence/"
+     },
+     {
+      "id": "it:864#q1",
+      "source": "AI타임스",
+      "text": "구글이 프런티어급 지능과 에이전트 작업 능력을 대폭 끌어올린 차세대 플래그십 모델 '제미나이 4 아르곤(Gemini 4 Argon)'을 공개했다.\n주장: 구글이 에이전트 작업 능력을 강화한 차세대 플래그십 모델 제미나이 4 아르곤을 공개했다.",
+      "title": "구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\"",
+      "url": "https://www.aitimes.com/news/articleView.html?idxno=215821"
+     },
+     {
+      "id": "it:18#q2",
+      "source": "Google DeepMind Blog",
+      "text": "Argon will launch at an introductory price 1 of $2 per million input tokens and $10 per million output tokens, with cached input tokens priced at 95% off input token price.\n수치: 입력 토큰 가격 [$2 per million input tokens]\n수치: 출력 토큰 가격 [$10 per million output tokens]\n수치: 캐시된 입력 토큰 할인율 [95% off input token price]\n주장: Gemini 4 Argon의 초기 가격은 입력 토큰 100만 개당 $2, 출력 토큰 100만 개당 $10이며 캐시된 입력은 95% 할인된다.",
+      "title": "Gemini 4 Argon: our next era of frontier intelligence",
+      "url": "https://deepmind.google/blog/gemini-4-argon-our-next-era-of-frontier-intelligence/"
+     },
+     {
+      "id": "it:864#q2",
+      "source": "AI타임스",
+      "text": "가장 큰 기술적 특징은 출력 토큰 한도가 기존 6만4000 토큰에서 업계 최고 수준인 100만 토큰으로 확장됐다는 점이다.\n수치: 기존 출력 토큰 한도 [6만4000 토큰]\n수치: 확장된 출력 토큰 한도 [100만 토큰]\n주장: 출력 토큰 한도가 100만 토큰으로 확장되어 장기 추론과 코드 생성에 최적화됐다.",
+      "title": "구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\"",
+      "url": "https://www.aitimes.com/news/articleView.html?idxno=215821"
+     },
+     {
+      "id": "og:997#q2",
+      "source": "GeekNews",
+      "text": "아르곤은 출시 기념 특가1로 입력 토큰 1백만 개당 2달러, 출력 토큰 1백만 개당 10달러에 제공되며, 캐시된 입력 토큰은 입력 토큰 가격 대비 95% 할인된 금액으로 이용할 수 있습니다.\n수치: 입력 토큰 가격 [2달러 1백만 개당]\n수치: 출력 토큰 가격 [10달러 1백만 개당]\n수치: 캐시된 입력 토큰 할인율 [95%]\n주장: 출시 기념 특가로 입력 토큰 1M당 2달러, 출력 토큰 1M당 10달러이며 캐시 입력은 95% 할인",
+      "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+      "url": "https://blog.google/intl/ko-kr/products/gemini-4-argon-kr/"
+     },
+     {
+      "id": "it:18#q3",
+      "source": "Google DeepMind Blog",
+      "text": "Gemini 4 Argon’s capabilities across longer, more complex use cases, we are significantly expanding the model’s output token limit to an industry-leading 1M tokens, up from the previous 64K tokens.\n수치: 최대 출력 토큰 한도 [1M tokens]\n수치: 기존 출력 토큰 한도 [64K tokens]\n주장: 출력 토큰 한도를 기존 64K에서 1M으로 확장하여 복잡한 워크플로우 처리 능력을 강화했다.",
+      "title": "Gemini 4 Argon: our next era of frontier intelligence",
+      "url": "https://deepmind.google/blog/gemini-4-argon-our-next-era-of-frontier-intelligence/"
+     },
+     {
+      "id": "it:864#q3",
+      "source": "AI타임스",
+      "text": "구글이 공개한 18개 주요 벤치마크 중 제미나이 4 아르곤은 12개 부문 단독 1위, 1개 부문 공동 1위를 기록하며 총 13개 부문에서 정상을 차지했다.\n수치: 공개된 주요 벤치마크 수 [18개]\n수치: 단독 1위 부문 수 [12개]\n수치: 정상 차지 총 부문 수 [13개]\n주장: 18개 주요 벤치마크 중 13개 부문에서 1위를 차지했으며, 딥SWE v1.1에서 경쟁 모델을 앞섰다.",
+      "title": "구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\"",
+      "url": "https://www.aitimes.com/news/articleView.html?idxno=215821"
+     },
+     {
+      "id": "og:997#q3",
+      "source": "GeekNews",
+      "text": "구글은 더 길고 복잡한 활용 사례에서도 제미나이 4 아르곤의 역량을 충분히 뒷받침할 수 있도록, 모델의 출력 토큰 한도를 기존 6만 4천개에서 업계 최고 수준인 1백만 개로 대폭 확장했습니다.\n수치: 기존 출력 토큰 한도 [6만 4천개]\n수치: 확장된 출력 토큰 한도 [1백만 개]\n주장: 출력 토큰 한도를 기존 64k에서 1M으로 확장해 장기 추론 능력을 강화했다",
+      "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+      "url": "https://blog.google/intl/ko-kr/products/gemini-4-argon-kr/"
+     },
+     {
+      "id": "it:18#q4",
+      "source": "Google DeepMind Blog",
+      "text": "It sets a new state of the art on DeepSWE v1.1 (77.9%), which measures a model’s performance in real-world long-horizon software engineering tasks.\n수치: DeepSWE v1.1 벤치마크 점수 [77.9%]\n주장: 소프트웨어 엔지니어링(DeepSWE v1.1), 비즈니스 자동화(AutomationBench), 보안 취약점 수정(CWE-bench v1) 벤치마크에서 최상위 성적을 기록했다.",
+      "title": "Gemini 4 Argon: our next era of frontier intelligence",
+      "url": "https://deepmind.google/blog/gemini-4-argon-our-next-era-of-frontier-intelligence/"
+     },
+     {
+      "id": "it:864#q4",
+      "source": "AI타임스",
+      "text": "장기 소프트웨어 엔지니어링 역량을 평가하는 '딥SWE v1.1' 벤치마크에서 77.9%의 점수를 얻어 최고 기록(SOTA)을 경신했으며, 이는 클로드 오퍼스 5.5(74.2%)와 GPT-6 아스트라(74.1%)를 앞서는 수치다.\n수치: 딥SWE v1.1 벤치마크 점수 [77.9%]\n수치: 클로드 오퍼스 5.5 딥SWE v1.1 점수 [74.2%]\n수치: GPT-6 아스트라 딥SWE v1.1 점수 [74.1%]",
+      "title": "구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\"",
+      "url": "https://www.aitimes.com/news/articleView.html?idxno=215821"
+     }
+    ],
+    "aliases": []
+   },
+   "expect": {
+    "action": "edit"
+   },
+   "note": "이슈 number(오류를 심음)",
+   "step_id": 4852,
+   "output": {
+    "log": "이슈 1개 수정 1",
+    "attention": false,
+    "changed": [
+     {
+      "issue_idx": 0,
+      "loc": "points[1]",
+      "action": "edit",
+      "value": {
+       "text": "DeepSWE v1.1에서 77.9%로 SOTA 경신, Claude Opus 5.5(74.2%)와 GPT-6 Astra(74.1%) 앞섬",
+       "refs": [
+        "it:18#q4",
+        "it:864#q4"
+       ],
+       "check": false
+      }
+     },
+     {
+      "issue_idx": 0,
+      "loc": "numbers[0].items[0]",
+      "action": "edit",
+      "value": {
+       "label": "Gemini 4 Argon",
+       "value": "77.9",
+       "ref": "it:864#q4",
+       "baseline": false,
+       "emphasis": true
+      }
+     }
+    ]
+   },
+   "error": null,
+   "code": {
+    "passed": false,
+    "checks": [
+     {
+      "name": "스키마",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "지적 안 된 칸을 바꾸지 않음",
+      "passed": false,
+      "detail": "['numbers[0]']"
+     },
+     {
+      "name": "지적된 위치를 모두 다룸(또는 attention)",
+      "passed": true,
+      "detail": "지적 ['points[1]'], 변경 ['points[1]', 'numbers[0]']"
+     },
+     {
+      "name": "기대 동작 edit",
+      "passed": true,
+      "detail": "{'edit'}"
+     },
+     {
+      "name": "해요체 없음(log)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(log)",
+      "passed": true,
+      "detail": ""
+     }
+    ],
+    "failed": [
+     "지적 안 된 칸을 바꾸지 않음: ['numbers[0]']"
+    ]
+   },
+   "cost_usd": 0.0
+  },
+  {
+   "id": "overclaim-summary-w40-decision-api",
+   "input": {
+    "loc_lines": [
+     "title: 오픈AI Decision API, 판단 전용 아키텍처 공개",
+     "summary: 기술 역사상 가장 빠른 행보다. 오픈AI가 Luna 기반 Decision API를 출시하여 정해진 선택지 중 하나를 반환하는 ==판단 전용 기능==을 제공한다. 쟁점은 이 API가 외부 개발자 도구를 넘어 자사 에이전트 안전성 제어에 내장된다는 아키텍처적 의미다.",
+     "overview: 오픈AI가 DevDay 2026에서 GPT-6 Luna 기반 Decision API를 제한적 프리뷰로 공개했다. 이 API는 채팅이 아닌 사전 정의된 답변과 신뢰도 점수를 반환하는 판단 전용 구조로, 자사 에이전트 시스템의 안전성 제어에 직접 활용될 예정이다. 향후 AI 에이전트 아키텍처는 계획·대화 담당 LLM과 실시간 검증·선택 담당 판단 전용 AI, 정책 시스템이 결합된 다층 제어 구조로 재편될 것으로 예상된다.",
+     "points[0]: Decision API는 채팅 모델이 아니라 개발자가 미리 정한 선택지 중 하나를 신뢰도 점수와 함께 반환하는 판단 전용 구조임 (refs og:982#q2, it:854#q1)",
+     "points[1]: 가장 작고 저렴한 Luna 모델을 기반으로 하며, 응답은 150ms로 GPT-6 Luna(1.6초)보다 빠름 (refs og:982#q1, og:982#q4)",
+     "points[2]: 외부 개발자용 도구 출시를 넘어, 오픈AI 자사 에이전트 시스템의 ==안전성 제어 및 오작동 방지 장치==로 활용하겠다는 점이 주목됨 (refs it:854#q3)",
+     "points[3]: 구조와 역할이 타입세이프 AI의 판단 전용 모델 Jev와 사실상 동일하며, 콘텐츠 분류·요청 라우팅·에이전트 다음 행동 선택에 적합함 (refs it:854#q4, og:982#q3)",
+     "points[4]: 현재 제한된 프리뷰 단계이며, 정식 출시는 며칠 내로 예정됨 (refs og:982#q5)",
+     "concepts[0]: Decision API - 긴 답변 생성 대신 개발자가 미리 정한 선택지 중 하나를 신뢰도 점수와 함께 반환하는 판단 전용 API",
+     "concepts[1]: Luna - 오픈AI 현재 라인업에서 가장 작고 저렴한 모델"
+    ],
+    "previous": {
+     "log": "포인트 5개, 수치 그룹 1개, 개념 2개, 근거 id 10개",
+     "attention": false,
+     "points": [
+      {
+       "text": "Decision API는 채팅 모델이 아니라 개발자가 미리 정한 선택지 중 하나를 신뢰도 점수와 함께 반환하는 판단 전용 구조임",
+       "refs": [
+        "og:982#q2",
+        "it:854#q1"
+       ],
+       "check": false
+      },
+      {
+       "text": "가장 작고 저렴한 Luna 모델을 기반으로 하며, 응답은 150ms로 GPT-6 Luna(1.6초)보다 빠름",
+       "refs": [
+        "og:982#q1",
+        "og:982#q4"
+       ],
+       "check": false
+      },
+      {
+       "text": "외부 개발자용 도구 출시를 넘어, 오픈AI 자사 에이전트 시스템의 ==안전성 제어 및 오작동 방지 장치==로 활용하겠다는 점이 주목됨",
+       "refs": [
+        "it:854#q3"
+       ],
+       "check": false
+      },
+      {
+       "text": "구조와 역할이 타입세이프 AI의 판단 전용 모델 Jev와 사실상 동일하며, 콘텐츠 분류·요청 라우팅·에이전트 다음 행동 선택에 적합함",
+       "refs": [
+        "it:854#q4",
+        "og:982#q3"
+       ],
+       "check": false
+      },
+      {
+       "text": "현재 제한된 프리뷰 단계이며, 정식 출시는 며칠 내로 예정됨",
+       "refs": [
+        "og:982#q5"
+       ],
+       "check": false
+      }
+     ],
+     "numbers": [],
+     "events": [],
+     "contributions": [],
+     "concepts": [
+      {
+       "term": "Decision API",
+       "desc": "긴 답변 생성 대신 개발자가 미리 정한 선택지 중 하나를 신뢰도 점수와 함께 반환하는 판단 전용 API"
+      },
+      {
+       "term": "Luna",
+       "desc": "오픈AI 현재 라인업에서 가장 작고 저렴한 모델"
+      }
+     ],
+     "overview": "오픈AI가 DevDay 2026에서 GPT-6 Luna 기반 Decision API를 제한적 프리뷰로 공개했다. 이 API는 채팅이 아닌 사전 정의된 답변과 신뢰도 점수를 반환하는 판단 전용 구조로, 자사 에이전트 시스템의 안전성 제어에 직접 활용될 예정이다. 향후 AI 에이전트 아키텍처는 계획·대화 담당 LLM과 실시간 검증·선택 담당 판단 전용 AI, 정책 시스템이 결합된 다층 제어 구조로 재편될 것으로 예상된다.",
+     "summary": "기술 역사상 가장 빠른 행보다. 오픈AI가 Luna 기반 Decision API를 출시하여 정해진 선택지 중 하나를 반환하는 ==판단 전용 기능==을 제공한다. 쟁점은 이 API가 외부 개발자 도구를 넘어 자사 에이전트 안전성 제어에 내장된다는 아키텍처적 의미다.",
+     "title": "오픈AI Decision API, 판단 전용 아키텍처 공개"
+    },
+    "issues": [
+     {
+      "loc": "summary",
+      "type": "overclaim",
+      "evidence_id": null,
+      "comment": "summary의 '기술 역사상 가장 빠른 행보'가 근거에 없는 평가",
+      "hint": "근거가 말한 정도로",
+      "idx": 0
+     }
+    ],
+    "evidence": [
+     {
+      "id": "it:854#q1",
+      "source": "AI타임스",
+      "text": "오픈AI는 29일(현지시간) 개발자 행사 ‘데브데이 2026’에서 일반적인 대화형 AI처럼 긴 답변을 생성하는 대신, 개발자가 미리 정해놓은 선택지 가운데 하나를 골라주는 ‘디시전스 API를 출시했다.\n주장: 오픈AI가 GPT-6 루나 기반의 디시전스 API를 출시하여 정해진 선택지 중 하나를 반환하는 판단 전용 기능을 제공한다.",
+      "title": "오픈AI, 자체 에이전트에 ‘디시전스 API’ 적용...아키텍처 판도 바뀐다",
+      "url": "https://www.aitimes.com/news/articleView.html?idxno=215835"
+     },
+     {
+      "id": "og:982#q1",
+      "source": "GeekNews",
+      "text": "The company’s new Decisions API is based on the company’s Luna model — the smallest and most affordable model in its current lineup.\n주장: Decision API는 가장 작고 저렴한 Luna 모델을 기반으로 한다",
+      "title": "OpenAI, Jev와 경쟁할 Luna 기반 Decision API 공개",
+      "url": "https://thenewstack.io/openai-decision-api-luna/"
+     },
+     {
+      "id": "og:982#q2",
+      "source": "GeekNews",
+      "text": "The core idea behind these decision models is that they are explicitly not chat models; instead, they return a set of predefined answers with confidence scores.\n주장: Decision 모델은 채팅이 아닌 사전 정의된 답변과 신뢰도 점수를 반환하며, 콘텐츠 분류·요청 라우팅·에이전트 다음 행동 선택에 적합하다",
+      "title": "OpenAI, Jev와 경쟁할 Luna 기반 Decision API 공개",
+      "url": "https://thenewstack.io/openai-decision-api-luna/"
+     },
+     {
+      "id": "it:854#q3",
+      "source": "AI타임스",
+      "text": "가장 주목되는 점은 단순한 외부 개발자용 도구 출시를 넘어, 오픈AI가 자사 에이전트 시스템 내부의 안전성 제어 및 오작동 방지 장치로 이 모델을 활용하겠다는 것이다.\n주장: 오픈AI는 디시전스 API를 자사 에이전트 시스템의 안전성 제어 및 오작동 방지 장치로 활용한다.",
+      "title": "오픈AI, 자체 에이전트에 ‘디시전스 API’ 적용...아키텍처 판도 바뀐다",
+      "url": "https://www.aitimes.com/news/articleView.html?idxno=215835"
+     },
+     {
+      "id": "og:982#q3",
+      "source": "GeekNews",
+      "text": "This makes this kind of model ideal for classifying content, routing requests, or choosing an agent’s next action from a limited set of choices.",
+      "title": "OpenAI, Jev와 경쟁할 Luna 기반 Decision API 공개",
+      "url": "https://thenewstack.io/openai-decision-api-luna/"
+     },
+     {
+      "id": "it:854#q4",
+      "source": "AI타임스",
+      "text": "디시전스 API의 구조와 역할은 타입세이프 AI가 선보인 판단 전용 모델 '제브(Jev)'와 사실상 동일하다.\n주장: 디시전스 API의 구조와 역할은 타입세이프 AI의 판단 전용 모델 '제브(Jev)'와 유사하다.",
+      "title": "오픈AI, 자체 에이전트에 ‘디시전스 API’ 적용...아키텍처 판도 바뀐다",
+      "url": "https://www.aitimes.com/news/articleView.html?idxno=215835"
+     },
+     {
+      "id": "og:982#q4",
+      "source": "GeekNews",
+      "text": "OpenAI says its model returns results in 150 milliseconds, compared to GPT-6 Luna, which would take 1.6 seconds.\n수치: Decision API 응답 시간 [150 milliseconds]\n수치: GPT-6 Luna 응답 시간 [1.6 seconds]\n주장: Decision API는 150ms로 응답해 GPT-6 Luna(1.6초)보다 빠르다",
+      "title": "OpenAI, Jev와 경쟁할 Luna 기반 Decision API 공개",
+      "url": "https://thenewstack.io/openai-decision-api-luna/"
+     },
+     {
+      "id": "og:982#q5",
+      "source": "GeekNews",
+      "text": "For now, the new API is available in limited preview, and the broad release is planned for the coming days.\n주장: 현재 제한된 프리뷰 단계이며, 정식 출시가 며칠 내로 예정되어 있다",
+      "title": "OpenAI, Jev와 경쟁할 Luna 기반 Decision API 공개",
+      "url": "https://thenewstack.io/openai-decision-api-luna/"
+     }
+    ],
+    "aliases": []
+   },
+   "expect": {
+    "action": "edit"
+   },
+   "note": "이슈 overclaim-summary(오류를 심음)",
+   "step_id": 4853,
+   "output": {
+    "log": "이슈 1개, 수정 불가 1개",
+    "attention": true,
+    "changed": []
+   },
+   "error": null,
+   "code": {
+    "passed": false,
+    "checks": [
+     {
+      "name": "스키마",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "지적 안 된 칸을 바꾸지 않음",
+      "passed": true,
+      "detail": "[]"
+     },
+     {
+      "name": "지적된 위치를 모두 다룸(또는 attention)",
+      "passed": true,
+      "detail": "지적 ['summary'], 변경 []"
+     },
+     {
+      "name": "기대 동작 edit",
+      "passed": false,
+      "detail": "set()"
+     },
+     {
+      "name": "해요체 없음(log)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(log)",
+      "passed": true,
+      "detail": ""
+     }
+    ],
+    "failed": [
+     "기대 동작 edit: set()"
+    ]
+   },
+   "cost_usd": 0.000727
+  },
+  {
+   "id": "overclaim-summary-w40-solar-mini-4",
+   "input": {
+    "loc_lines": [
+     "title: 업스테이지, Solar Mini 4 출시: 활성 3B MoE 모델의 로컬 실행 최적화",
+     "summary: 기술 역사상 가장 빠른 행보다. 업스테이지가 MoE 구조 소형 언어 모델 Solar Mini 4를 출시했다. ==활성 3B 모델 중 AAII 최고 점수(24.1)와 GPU 1장 온프레미스 구동==을 제공한다.",
+     "overview: 업스테이지가 1일 소형 언어 모델 Solar Mini 4를 출시하며, 솔라 LLM을 '프로'와 '미니'로 나누는 투트랙 전략을 본격화했다. 총 35B 파라미터 중 3B만 활성화하는 MoE 구조로, Artificial Analysis Intelligence Index v4.3.2에서 활성 3B 모델 중 가장 높은 24.1점을 기록했다. 양자화 적용 시 H100 80GB 한 장에서 온프레미스 배포가 가능하고, 100만 토큰당 입력 $0.10, 출력 $0.40의 API 가격으로 제공된다.",
+     "points[0]: 업스테이지가 MoE 구조 소형 언어 모델 Solar Mini 4를 출시하며, 솔라 LLM을 '프로'와 '미니'로 나누는 투트랙 전략을 본격화함 (refs it:860#q1)",
+     "points[1]: 총 35B 파라미터 중 토큰당 3B만 활성화하는 구조로, ==Artificial Analysis Intelligence Index v4.3.2에서 활성 3B 모델 중 가장 높은 24.1점== 기록 (refs it:1034#q1, it:1034#q2)",
+     "points[2]: 에이전트 작업 성능 지표 AutomationBench-AA에서 22.3%, τ³-Banking에서 47.2점 기록 (refs it:1034#q3)",
+     "points[3]: 100만 토큰당 입력 $0.10, 출력 $0.40의 API 가격으로, 동일 에이전트 작업 1,000세트 완료 비용이 MiMo-V2.5($2.20) 대비 약 43% 낮음($1.25) (refs it:1034#q4, it:1034#q5)",
+     "points[4]: 양자화 적용 시 H100 80GB 한 장에서 온프레미스 배포 가능 (refs it:1034#q6, it:860#q5)",
+     "numbers[0] (anchor 4): Solar Mini 4가 MiMo-V2.5보다 에이전트 작업 완료 비용 약 43% 낮음 / context: 정가 기준으로 계산한 동일 에이전트 작업 1,000세트 완료 비용 비교 [it:1034#q5]",
+     "numbers[0].items[0]: Solar Mini 4 = 1.25 (it:1034#q5)",
+     "numbers[0].items[1]: MiMo-V2.5 = 2.2 (it:1034#q5)",
+     "concepts[0]: MoE (Mixture of Experts) - 전체 파라미터 중 추론 시 일부만 활성화하는 구조. Solar Mini 4는 총 35B 중 3B만 활성화해 속도와 비용 효율을 높임",
+     "concepts[1]: 양자화 (Quantization) - 모델 파라미터의 정밀도를 낮춰 메모리 사용량을 줄이는 기법. Solar Mini 4는 양자화 시 H100 80GB 한 장에서 구동 가능"
+    ],
+    "previous": {
+     "log": "포인트 5개, 수치 그룹 1개, 근거 id 11개",
+     "attention": false,
+     "points": [
+      {
+       "text": "업스테이지가 MoE 구조 소형 언어 모델 Solar Mini 4를 출시하며, 솔라 LLM을 '프로'와 '미니'로 나누는 투트랙 전략을 본격화함",
+       "refs": [
+        "it:860#q1"
+       ],
+       "check": false
+      },
+      {
+       "text": "총 35B 파라미터 중 토큰당 3B만 활성화하는 구조로, ==Artificial Analysis Intelligence Index v4.3.2에서 활성 3B 모델 중 가장 높은 24.1점== 기록",
+       "refs": [
+        "it:1034#q1",
+        "it:1034#q2"
+       ],
+       "check": false
+      },
+      {
+       "text": "에이전트 작업 성능 지표 AutomationBench-AA에서 22.3%, τ³-Banking에서 47.2점 기록",
+       "refs": [
+        "it:1034#q3"
+       ],
+       "check": false
+      },
+      {
+       "text": "100만 토큰당 입력 $0.10, 출력 $0.40의 API 가격으로, 동일 에이전트 작업 1,000세트 완료 비용이 MiMo-V2.5($2.20) 대비 약 43% 낮음($1.25)",
+       "refs": [
+        "it:1034#q4",
+        "it:1034#q5"
+       ],
+       "check": false
+      },
+      {
+       "text": "양자화 적용 시 H100 80GB 한 장에서 온프레미스 배포 가능",
+       "refs": [
+        "it:1034#q6",
+        "it:860#q5"
+       ],
+       "check": false
+      }
+     ],
+     "numbers": [
+      {
+       "anchor": 4,
+       "group": "cost_comparison",
+       "title": "Solar Mini 4가 MiMo-V2.5보다 에이전트 작업 완료 비용 약 43% 낮음",
+       "context": "정가 기준으로 계산한 동일 에이전트 작업 1,000세트 완료 비용 비교 [it:1034#q5]",
+       "unit": "$",
+       "items": [
+        {
+         "label": "Solar Mini 4",
+         "value": "1.25",
+         "ref": "it:1034#q5",
+         "baseline": false,
+         "emphasis": true
+        },
+        {
+         "label": "MiMo-V2.5",
+         "value": "2.2",
+         "ref": "it:1034#q5",
+         "baseline": true,
+         "emphasis": false
+        }
+       ]
+      }
+     ],
+     "events": [],
+     "contributions": [],
+     "concepts": [
+      {
+       "term": "MoE (Mixture of Experts)",
+       "desc": "전체 파라미터 중 추론 시 일부만 활성화하는 구조. Solar Mini 4는 총 35B 중 3B만 활성화해 속도와 비용 효율을 높임"
+      },
+      {
+       "term": "양자화 (Quantization)",
+       "desc": "모델 파라미터의 정밀도를 낮춰 메모리 사용량을 줄이는 기법. Solar Mini 4는 양자화 시 H100 80GB 한 장에서 구동 가능"
+      }
+     ],
+     "overview": "업스테이지가 1일 소형 언어 모델 Solar Mini 4를 출시하며, 솔라 LLM을 '프로'와 '미니'로 나누는 투트랙 전략을 본격화했다. 총 35B 파라미터 중 3B만 활성화하는 MoE 구조로, Artificial Analysis Intelligence Index v4.3.2에서 활성 3B 모델 중 가장 높은 24.1점을 기록했다. 양자화 적용 시 H100 80GB 한 장에서 온프레미스 배포가 가능하고, 100만 토큰당 입력 $0.10, 출력 $0.40의 API 가격으로 제공된다.",
+     "summary": "기술 역사상 가장 빠른 행보다. 업스테이지가 MoE 구조 소형 언어 모델 Solar Mini 4를 출시했다. ==활성 3B 모델 중 AAII 최고 점수(24.1)와 GPU 1장 온프레미스 구동==을 제공한다.",
+     "title": "업스테이지, Solar Mini 4 출시: 활성 3B MoE 모델의 로컬 실행 최적화"
+    },
+    "issues": [
+     {
+      "loc": "summary",
+      "type": "overclaim",
+      "evidence_id": null,
+      "comment": "summary의 '기술 역사상 가장 빠른 행보'가 근거에 없는 평가",
+      "hint": "근거가 말한 정도로",
+      "idx": 0
+     }
+    ],
+    "evidence": [
+     {
+      "id": "it:1034#q1",
+      "source": "GeekNews",
+      "text": "Solar Mini 4는 업스테이지가 독자적으로 사전학습하고 에이전트 작업에 최적화한 모델입니다. 총 35B 파라미터 중 토큰당 3B만 활성화하는 MoE 구조로 높은 효율성을 제공합니다.\n수치: 총 파라미터 수 [35B]\n수치: 토큰당 활성화 파라미터 수 [3B]\n주장: Solar Mini 4는 총 35B 파라미터 중 3B만 활성화하는 MoE 구조로, Artificial Analysis Intelligence Index v4.3.2에서 활성 3B 모델 중 가장 높은 24.1점을 기록했다.",
+      "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+      "url": "https://news.hada.io/topic?id=34738"
+     },
+     {
+      "id": "it:860#q1",
+      "source": "AI타임스",
+      "text": "업스테이지가 1일 소형언어모델(sLM) '솔라 미니 4'를 출시하고, 솔라 LLM을 '프로'와 '미니'로 나누는 투트랙 전략을 본격화한다.\n주장: 업스테이지가 MoE 구조의 소형 언어 모델 '솔라 미니 4'를 출시하며 프로·미니 투트랙 전략을 시작했다.",
+      "title": "업스테이지, sLM '솔라 미니 4' 출시... '프로·미니' 투트랙 본격화",
+      "url": "https://www.aitimes.com/news/articleView.html?idxno=215826"
+     },
+     {
+      "id": "it:1034#q2",
+      "source": "GeekNews",
+      "text": "Artificial Analysis Intelligence Index v4.3.2에서 24.1점을 기록해, 비교 대상인 활성 3B 모델 가운데 가장 높은 결과를 보였습니다.\n수치: Artificial Analysis Intelligence Index v4.3.2 점수 [24.1점]",
+      "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+      "url": "https://news.hada.io/topic?id=34738"
+     },
+     {
+      "id": "it:1034#q3",
+      "source": "GeekNews",
+      "text": "실제 SaaS 도구를 활용해 업무를 수행하는 AutomationBench-AA에서 22.3%를 기록했으며, 별도의 τ³-Banking 평가에서는 47.2점을 기록했습니다.\n수치: AutomationBench-AA 점수 [22.3%]\n수치: τ³-Banking 점수 [47.2점]\n주장: 에이전트 작업 성능 지표인 AutomationBench-AA에서 22.3%, τ³-Banking에서 47.2점을 기록했다.",
+      "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+      "url": "https://news.hada.io/topic?id=34738"
+     },
+     {
+      "id": "it:1034#q4",
+      "source": "GeekNews",
+      "text": "정가 기준 100만 토큰당 입력 $0.10, 캐시 입력 $0.01, 출력 $0.40에 제공합니다.\n수치: 입력 가격 [$0.10 100만 토큰당]\n수치: 캐시 입력 가격 [$0.01 100만 토큰당]\n수치: 출력 가격 [$0.40 100만 토큰당]\n주장: 100만 토큰당 입력 $0.10, 출력 $0.40의 API 가격으로 제공되며, 동일 에이전트 작업 1,000세트 완료 비용은 MiMo-V2.5보다 약 43% 낮다.",
+      "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+      "url": "https://news.hada.io/topic?id=34738"
+     },
+     {
+      "id": "it:1034#q5",
+      "source": "GeekNews",
+      "text": "정가로 계산한 1,000세트의 완료 비용은 Solar Mini 4가 $1.25, MiMo-V2.5가 $2.20으로, Solar Mini 4가 약 43% 낮았습니다.\n수치: Solar Mini 4 에이전트 작업 완료 비용 [$1.25 1,000세트]\n수치: MiMo-V2.5 에이전트 작업 완료 비용 [$2.20 1,000세트]\n수치: MiMo-V2.5 대비 비용 절감률 [43%]",
+      "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+      "url": "https://news.hada.io/topic?id=34738"
+     },
+     {
+      "id": "it:860#q5",
+      "source": "AI타임스",
+      "text": "특히 양자화를 적용하면 GPU 1장으로 구동할 수 있어 온프레미스 환경에서도 사용 가능하다고 덧붙였다.\n수치: 양자화 적용 시 구동 가능 GPU 수 [1장 GPU]\n주장: 양자화 적용 시 GPU 1장으로 구동되어 온프레미스 환경 사용이 가능하다.",
+      "title": "업스테이지, sLM '솔라 미니 4' 출시... '프로·미니' 투트랙 본격화",
+      "url": "https://www.aitimes.com/news/articleView.html?idxno=215826"
+     },
+     {
+      "id": "it:1034#q6",
+      "source": "GeekNews",
+      "text": "온프레미스에서는 양자화 모델을 기준으로 H100 80GB 한 장부터 배포할 수 있습니다.\n수치: 최소 배포 사양 [H100 80GB]\n주장: 양자화 모델 기준 H100 80GB 한 장에서 온프레미스 배포가 가능하다.",
+      "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+      "url": "https://news.hada.io/topic?id=34738"
+     }
+    ],
+    "aliases": []
+   },
+   "expect": {
+    "action": "edit"
+   },
+   "note": "이슈 overclaim-summary(오류를 심음)",
+   "step_id": 4854,
+   "output": {
+    "log": "이슈 1개 중 수정 1",
+    "attention": false,
+    "changed": [
+     {
+      "issue_idx": 0,
+      "loc": "summary",
+      "action": "edit",
+      "value": "업스테이지가 MoE 구조 소형 언어 모델 Solar Mini 4를 출시했다. ==활성 3B 모델 중 AAII 최고 점수(24.1)와 GPU 1장 온프레미스 구동==을 제공한다."
+     }
+    ]
+   },
+   "error": null,
+   "code": {
+    "passed": true,
+    "checks": [
+     {
+      "name": "스키마",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "지적 안 된 칸을 바꾸지 않음",
+      "passed": true,
+      "detail": "[]"
+     },
+     {
+      "name": "지적된 위치를 모두 다룸(또는 attention)",
+      "passed": true,
+      "detail": "지적 ['summary'], 변경 ['summary']"
+     },
+     {
+      "name": "기대 동작 edit",
+      "passed": true,
+      "detail": "{'edit'}"
+     },
+     {
+      "name": "해요체 없음(log)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(log)",
+      "passed": true,
+      "detail": ""
+     }
+    ],
+    "failed": []
+   },
+   "judged_output": "raw",
+   "cost_usd": 0.0
+  },
+  {
+   "id": "trap-only-title-w40-openai-dots",
+   "input": {
+    "loc_lines": [
+     "title: OpenAI, 상시 작동 에이전트 Dots 공개",
+     "summary: OpenAI가 GPT-6 Astra 기반 상시 작동 에이전트 ==Dots==를 공개했다. 자체 클라우드 컴퓨터로 24/7 작동하며 4,000개 이상 앱에 연결되고, Pro·Business Premium·Enterprise 플랜에 순차 배포를 시작했다.",
+     "overview: OpenAI가 데브데이 2026에서 GPT-6 Astra 기반 상시 작동 에이전트 Dots를 공개했다. 자체 클라우드 컴퓨터를 갖추고 4,000개 이상의 앱에 연결되며, Slack·Teams 등 업무 채널에서 단일 대화 맥락을 유지한다. Pro, Business Premium, Enterprise 플랜 대상 시장에 순차 배포를 시작했고, 첫 dot은 Pro 또는 Business Premium 요금제에 추가 비용 없이 포함된다. 이번 공개는 소비자용이 아닌 B2B 업무 자동화에 초점을 맞춘 포지셔닝이다.",
+     "points[0]: GPT-6 Astra 기반 상시 작동 에이전트 Dots 공개, 자체 클라우드 컴퓨터로 24/7 목표 수행 (refs it:10#q1, it:10#q2, it:893#q1)",
+     "points[1]: ==플러그인 생태계로 4,000개 이상 앱 연결, Slack·Teams·문자 등 업무 채널에서 단일 대화 맥락 유지== (refs it:10#q3, it:893#q4)",
+     "points[2]: 사용자 지시 없이 백그라운드에서 'proactive research' 수행 (refs it:10#q5)",
+     "points[3]: Pro, Business Premium, Enterprise 플랜 대상 시장에 순차 배포 시작, 첫 dot은 Pro 또는 Business Premium에 추가 비용 없이 포함 (refs it:10#q4, og:986#q4, it:893#q6)",
+     "points[4]: 초당 최대 300토큰 '울트라패스트' 티어 포함 월 500달러 '챗GPT 프로 500' 플랜 신설, 해당 플랜에 Dots 에이전트 1개 기본 제공 (refs it:893#q5)",
+     "concepts[0]: proactive research - 사용자가 직접 작업하지 않을 때 Dots가 백그라운드에서 도움이 될 방법을 찾아 수행하는 기능"
+    ],
+    "previous": {
+     "log": "포인트 5개, 수치 그룹 0개, 근거 id 12개",
+     "attention": false,
+     "points": [
+      {
+       "text": "GPT-6 Astra 기반 상시 작동 에이전트 Dots 공개, 자체 클라우드 컴퓨터로 24/7 목표 수행",
+       "refs": [
+        "it:10#q1",
+        "it:10#q2",
+        "it:893#q1"
+       ],
+       "check": false
+      },
+      {
+       "text": "==플러그인 생태계로 4,000개 이상 앱 연결, Slack·Teams·문자 등 업무 채널에서 단일 대화 맥락 유지==",
+       "refs": [
+        "it:10#q3",
+        "it:893#q4"
+       ],
+       "check": false
+      },
+      {
+       "text": "사용자 지시 없이 백그라운드에서 'proactive research' 수행",
+       "refs": [
+        "it:10#q5"
+       ],
+       "check": false
+      },
+      {
+       "text": "Pro, Business Premium, Enterprise 플랜 대상 시장에 순차 배포 시작, 첫 dot은 Pro 또는 Business Premium에 추가 비용 없이 포함",
+       "refs": [
+        "it:10#q4",
+        "og:986#q4",
+        "it:893#q6"
+       ],
+       "check": false
+      },
+      {
+       "text": "초당 최대 300토큰 '울트라패스트' 티어 포함 월 500달러 '챗GPT 프로 500' 플랜 신설, 해당 플랜에 Dots 에이전트 1개 기본 제공",
+       "refs": [
+        "it:893#q5"
+       ],
+       "check": false
+      }
+     ],
+     "numbers": [],
+     "events": [],
+     "contributions": [],
+     "concepts": [
+      {
+       "term": "proactive research",
+       "desc": "사용자가 직접 작업하지 않을 때 Dots가 백그라운드에서 도움이 될 방법을 찾아 수행하는 기능"
+      }
+     ],
+     "overview": "OpenAI가 데브데이 2026에서 GPT-6 Astra 기반 상시 작동 에이전트 Dots를 공개했다. 자체 클라우드 컴퓨터를 갖추고 4,000개 이상의 앱에 연결되며, Slack·Teams 등 업무 채널에서 단일 대화 맥락을 유지한다. Pro, Business Premium, Enterprise 플랜 대상 시장에 순차 배포를 시작했고, 첫 dot은 Pro 또는 Business Premium 요금제에 추가 비용 없이 포함된다. 이번 공개는 소비자용이 아닌 B2B 업무 자동화에 초점을 맞춘 포지셔닝이다.",
+     "summary": "OpenAI가 GPT-6 Astra 기반 상시 작동 에이전트 ==Dots==를 공개했다. 자체 클라우드 컴퓨터로 24/7 작동하며 4,000개 이상 앱에 연결되고, Pro·Business Premium·Enterprise 플랜에 순차 배포를 시작했다.",
+     "title": "OpenAI, 상시 작동 에이전트 Dots 공개"
+    },
+    "issues": [
+     {
+      "loc": "title",
+      "type": "format",
+      "evidence_id": null,
+      "comment": "title이 너무 김(30자 안팎)",
+      "hint": "명사구로 줄임",
+      "idx": 0
+     }
+    ],
+    "evidence": [],
+    "aliases": [
+     {
+      "canonical": "Dots",
+      "aliases": [
+       "dots"
+      ]
+     }
+    ]
+   },
+   "expect": {
+    "action": "edit"
+   },
+   "note": "함정: 제목만 지적, 다른 칸을 다듬고 싶어짐",
+   "step_id": 4855,
+   "output": {
+    "log": "이슈 1개 중 수정 1",
+    "attention": false,
+    "changed": [
+     {
+      "issue_idx": 0,
+      "loc": "title",
+      "action": "edit",
+      "value": "OpenAI, Dots 에이전트 공개"
+     }
+    ]
+   },
+   "error": null,
+   "code": {
+    "passed": true,
+    "checks": [
+     {
+      "name": "스키마",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "지적 안 된 칸을 바꾸지 않음",
+      "passed": true,
+      "detail": "[]"
+     },
+     {
+      "name": "지적된 위치를 모두 다룸(또는 attention)",
+      "passed": true,
+      "detail": "지적 ['title'], 변경 ['title']"
+     },
+     {
+      "name": "기대 동작 edit",
+      "passed": true,
+      "detail": "{'edit'}"
+     },
+     {
+      "name": "해요체 없음(log)",
+      "passed": true,
+      "detail": ""
+     },
+     {
+      "name": "평가형 마무리 없음(log)",
+      "passed": true,
+      "detail": ""
+     }
+    ],
+    "failed": []
+   },
+   "judged_output": "raw",
+   "cost_usd": 0.0
+  }
+ ]
+}

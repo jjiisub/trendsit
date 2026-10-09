@@ -1,0 +1,123 @@
+{
+ "input": {
+  "plan": {
+   "rank": 4,
+   "angle": "소형 모델의 가격 구조 변화",
+   "relation": {
+    "type": "new",
+    "topic_id": null
+   }
+  },
+  "evidence": [
+   {
+    "id": "it:1144#q1",
+    "source": "Simon Willison's Weblog",
+    "text": "As previously promised, here’s Anthropic’s new fast, low cost model: Introducing Claude Haiku 5.5.\n주장: Anthropic이 새로운 저비용 모델 Claude Haiku 5.5를 출시했다.",
+    "title": "Claude Haiku 5.5",
+    "url": "https://simonwillison.net/2026/Oct/7/claude-haiku-5-5/"
+   },
+   {
+    "id": "it:1180#q1",
+    "source": "AI타임스",
+    "text": "앤트로픽이 가격을 대폭 내리고 성능을 최고 수준으로 끌어올린 소형 모델 '클로드 하이쿠 5.5(Claude Haiku 5.5)'를 출시했다.\n주장: 앤트로픽이 소형 모델 '클로드 하이쿠 5.5'를 출시했으며, 10만 토큰 이하 요청 시 토큰 가격이 전작 대비 90% 인하됐다.",
+    "title": "앤트로픽, API 비용 최대 90% 낮춘 '클로드 하이쿠 5.5' 공개",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=216044"
+   },
+   {
+    "id": "it:1144#q2",
+    "source": "Simon Willison's Weblog",
+    "text": "The new Haiku exactly matches the price of GPT-6 Luna—$0.10/$0.50—up to 100,000 tokens.\n수치: 100,000 토큰 이하 입력/출력 가격 [$0.10/$0.50]\n수치: 기본 가격 적용 토큰 한도 [100,000 tokens]\n주장: 100,000 토큰 이하 구간에서 GPT-6 Luna와 동일한 가격($0.10/$0.50)을 적용하지만, 토크나이저 변경으로 인해 실제 토큰 사용량이 1.25배 증가하여 숨겨진 가격 인상이 발생한다.",
+    "title": "Claude Haiku 5.5",
+    "url": "https://simonwillison.net/2026/Oct/7/claude-haiku-5-5/"
+   },
+   {
+    "id": "it:1180#q2",
+    "source": "AI타임스",
+    "text": "특히 10만 토큰 이하 요청 시 입력/출력 토큰 가격이 100만 토큰당 각각 0.10달러, 0.50달러로 책정되어 전작 대비 무려 90% 인하됐다.\n수치: 입력 토큰 가격 [0.10달러 100만 토큰당]\n수치: 출력 토큰 가격 [0.50달러 100만 토큰당]\n수치: 전작 대비 가격 인하율 [90%]",
+    "title": "앤트로픽, API 비용 최대 90% 낮춘 '클로드 하이쿠 5.5' 공개",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=216044"
+   },
+   {
+    "id": "it:1144#q3",
+    "source": "Simon Willison's Weblog",
+    "text": "Beyond 100,000 tokens the price increases 5x to $0.50/$2.50.\n수치: 100,000 토큰 초과 시 가격 증가 배수 [5x]\n수치: 100,000 토큰 초과 시 입력/출력 가격 [$0.50/$2.50]",
+    "title": "Claude Haiku 5.5",
+    "url": "https://simonwillison.net/2026/Oct/7/claude-haiku-5-5/"
+   },
+   {
+    "id": "it:1180#q3",
+    "source": "AI타임스",
+    "text": "동시에 하이쿠 모델 최초로 조정 가능한 '작업량 설정(Workload settings)' 기능이 탑재됐다.\n주장: 하이쿠 모델 최초로 '작업량 설정(Workload settings)' 기능이 도입되었다.",
+    "title": "앤트로픽, API 비용 최대 90% 낮춘 '클로드 하이쿠 5.5' 공개",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=216044"
+   },
+   {
+    "id": "it:1144#q4",
+    "source": "Simon Willison's Weblog",
+    "text": "My Claude Token Counter tool shows that the same long prompt uses around 1.25x as many tokens with Haiku 5.5 compared to Haiku 4.5, so there’s a hidden price increase there.\n수치: Haiku 4.5 대비 토큰 수 증가 배수 [1.25x]",
+    "title": "Claude Haiku 5.5",
+    "url": "https://simonwillison.net/2026/Oct/7/claude-haiku-5-5/"
+   },
+   {
+    "id": "it:1180#q4",
+    "source": "AI타임스",
+    "text": "우선 지식 노동 역량을 평가하는 'GDPval-AA v2.1'에서 1620점을 기록해 전작인 하이쿠 4.5(735점)는 물론 GPT-6 루나(1437점)를 크게 넘어섰다.\n수치: GDPval-AA v2.1 점수 [1620점]\n수치: 전작 하이쿠 4.5 GDPval-AA v2.1 점수 [735점]\n수치: GPT-6 루나 GDPval-AA v2.1 점수 [1437점]\n주장: GDPval-AA v2.1, OS월드 2.1, AAII 등 주요 벤치마크에서 전작 및 경쟁 모델 대비 높은 점수를 기록했다.",
+    "title": "앤트로픽, API 비용 최대 90% 낮춘 '클로드 하이쿠 5.5' 공개",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=216044"
+   },
+   {
+    "id": "it:1144#q5",
+    "source": "Simon Willison's Weblog",
+    "text": "If your workloads fit in 100,000 tokens, Haiku is the same price as Luna and reports higher benchmark scores.\n주장: 100,000 토큰 이하 워크로드에서는 GPT-6 Luna와 가격이 동일하며 벤치마크 점수가 더 높다.",
+    "title": "Claude Haiku 5.5",
+    "url": "https://simonwillison.net/2026/Oct/7/claude-haiku-5-5/"
+   },
+   {
+    "id": "it:1180#q5",
+    "source": "AI타임스",
+    "text": "컴퓨터 및 OS 조작 능력을 측정하는 'OS월드 2.1' 벤치마크에서는 정확도 72.4%를 달성했다.\n수치: OS월드 2.1 정확도 [72.4%]",
+    "title": "앤트로픽, API 비용 최대 90% 낮춘 '클로드 하이쿠 5.5' 공개",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=216044"
+   },
+   {
+    "id": "it:1144#q6",
+    "source": "Simon Willison's Weblog",
+    "text": "Max 5x users will get $100 in credits per month, Max 20x users will get $200, and Team subscribers will receive up to $500, pooled across their users.\n수치: Max 5x 구독자 월별 API 크레딧 [$100]\n수치: Max 20x 구독자 월별 API 크레딧 [$200]\n수치: Team 구독자 월별 API 크레딧 상한 [$500]\n주장: Anthropic은 Max 및 Team 구독자에게 월별 API 크레딧($100~$500)을 제공하기 시작했다.",
+    "title": "Claude Haiku 5.5",
+    "url": "https://simonwillison.net/2026/Oct/7/claude-haiku-5-5/"
+   },
+   {
+    "id": "it:1180#q6",
+    "source": "AI타임스",
+    "text": "독립 AI 분석 기관인 아티피셜 애널리시스의 AI 지수(AAII)에서 43점을 기록했다.\n수치: AAII 점수 [43점]",
+    "title": "앤트로픽, API 비용 최대 90% 낮춘 '클로드 하이쿠 5.5' 공개",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=216044"
+   },
+   {
+    "id": "it:1144",
+    "source": "Simon Willison's Weblog",
+    "text": "요약: Simon Willison은 Anthropic의 신규 모델 Claude Haiku 5.5의 가격 구조와 토크나이저 변경에 따른 실질 비용 변화를 분석했다. 100,000 토큰 이하에서는 GPT-6 Luna와 동일한 가격에 벤치마크 점수가 높지만, 토큰 사용량 증가로 인해 숨겨진 가격 인상이 존재한다. 또한 구독자를 위한 월별 API 크레딧 제공 정책도 함께 소개했다.",
+    "title": "Claude Haiku 5.5",
+    "url": "https://simonwillison.net/2026/Oct/7/claude-haiku-5-5/"
+   },
+   {
+    "id": "it:1180",
+    "source": "AI타임스",
+    "text": "요약: 앤트로픽은 소형 모델 '클로드 하이쿠 5.5'를 출시하며 10만 토큰 이하 요청 시 토큰 가격을 전작 대비 90% 인하했다. 해당 모델은 하이쿠 라인업 최초로 '작업량 설정' 기능을 지원하며, GDPval-AA v2.1과 OS월드 2.1 등 벤치마크에서 경쟁 모델보다 높은 성능을 보였다.",
+    "title": "앤트로픽, API 비용 최대 90% 낮춘 '클로드 하이쿠 5.5' 공개",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=216044"
+   }
+  ],
+  "previous": null,
+  "aliases": [
+   {
+    "canonical": "GPT-6 Luna",
+    "aliases": [
+     "gpt-6-luna"
+    ]
+   }
+  ]
+ },
+ "expect": {},
+ "note": "2026-W41 실제 토픽 입력(run 20261009-193346-weekly-b3fc)"
+}

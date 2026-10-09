@@ -207,6 +207,12 @@ def main() -> int:
               ["week", "cluster_id", "action", "drop_reason", "reason", *KEEP], sel_rows)
     merge_csv(LABELS / "critic.csv", ("week", "topic_id", "round"),
               ["week", "topic_id", "round", "status", "issues", *KEEP], crit_rows)
+    wrows = [{"topic_id": k, "week": v["week"], "status": v["status"],
+              **{f"judge_{q}": v["verdicts"].get(q, {}).get("verdict", "") for q in ("Q1", "Q2", "Q3", "Q4")},
+              "judge_facts": f"{(v.get('facts') or {}).get('supported')}/{(v.get('facts') or {}).get('total')}",
+              **{f"{q}_pass": "" for q in ("Q0", "Q1", "Q2", "Q3", "Q4")}} for k, v in final.items()]
+    if wrows:  # 최종판 라벨(Q0 = 근거 충실성: 모든 문장이 근거로 받쳐지나). 2차 라벨(D1-3)이 채움
+        merge_csv(LABELS / "writer.csv", ("topic_id",), list(wrows[0]) + list(KEEP), wrows)
     dpath = LABELS / "diagram_labels.json"
     old = json.loads(dpath.read_text(encoding="utf-8")) if dpath.exists() else {}
     for k, v in diag.items():

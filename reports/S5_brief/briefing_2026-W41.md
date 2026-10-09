@@ -1,6 +1,6 @@
 # 주간 브리핑 2026-W41 (리뷰용 읽기본)
 
-> run `20261009-180904-weekly-7454`. S6 export 전 임시 화면. 홈 순서대로 토픽, 끝에 홈 레포 목록. 근거 id 옆은 출처 제목. ⚠ = 확인 필요(같은 이슈가 두 번 남았거나 3라운드 뒤 남은 이슈)
+> run `20261009-193346-weekly-b3fc`. S6 export 전 임시 화면. 홈 순서대로 토픽, 끝에 홈 레포 목록. 근거 id 옆은 출처 제목. ⚠ = 확인 필요(같은 이슈가 두 번 남았거나 3라운드 뒤 남은 이슈)
 
 ## 1. 리드 · EmbeddingGemma 2: 온디바이스 멀티모달 임베딩 모델 공개
 
@@ -16,13 +16,6 @@
    ← `it:1111#q1` EmbeddingGemma 2: an open, lightweight multimodal ; `it:1183#q1` 구글, 온디바이스 ‘임베딩젬마 2’ 공개…텍스트·이미지·음성 통합 처리
 2. Gemma 4 아키텍처 기반 740M 파라미터 규모로, 양자화 시 Pixel 11 Pro에서 텍스트 전용 ~191MB, 멀티모달 전체 ~567MB RAM으로 온디바이스 추론 가능함  
    ← `it:1111#q2` EmbeddingGemma 2: an open, lightweight multimodal ; `it:1111#q5` EmbeddingGemma 2: an open, lightweight multimodal 
-
-   **도식(수치): Pixel 11 Pro 기준 RAM 사용량** (MB) — 양자화 적용 시 Google Pixel 11 Pro에서 동작하는 EmbeddingGemma 2의 활성 RAM 사용량 [it:1111#q5]
-
-   | 라벨 | 값 | 근거 | 표시 |
-   |---|---|---|---|
-   | 텍스트 전용 가중치 | 191 | `it:1111#q5` |  |
-   | 멀티모달 전체 모델 | 567 | `it:1111#q5` | 강조 |
 3. MTEB Code 벤치마크에서 78.68점을 기록해 전작(68.76점) 대비 9.92점 상승했으며, 1B 미만 멀티모달 임베더 중 상위권 성능을 보임  
    ← `it:1183#q4` 구글, 온디바이스 ‘임베딩젬마 2’ 공개…텍스트·이미지·음성 통합 처리; `it:1111#q3` EmbeddingGemma 2: an open, lightweight multimodal 
 
@@ -34,7 +27,7 @@
    | EmbeddingGemma 2 | 78.68 | `it:1183#q4` | 강조 |
 4. Apache 2.0 라이선스로 공개되어 상업적 활용이 가능하며, Matryoshka Representation Learning(MRL)을 통해 벡터 차원을 768에서 512·256·128으로 동적 축소 가능함  
    ← `it:1111#q2` EmbeddingGemma 2: an open, lightweight multimodal ; `it:1111#q4` EmbeddingGemma 2: an open, lightweight multimodal 
-5. ⚠ 임베딩 모델은 대량 벡터 저장·비교가 핵심이라 폐쇄적 호스팅 전용 모델보다 오픈웨이트가 적합하며, 서비스 중단 시 재계산 비용 리스크를 줄일 수 있음  
+5. 임베딩 모델은 대량 벡터 저장·비교가 핵심이라 폐쇄적 호스팅 전용 모델보다 오픈웨이트가 적합하며, 서비스 중단 시 재계산 비용 리스크를 줄일 수 있음  
    ← `it:1045#q1` EmbeddingGemma 2; `it:1045#q3` EmbeddingGemma 2
 
 **핵심 개념**
@@ -49,7 +42,7 @@
 
 `w41-mistral-large-4` · 상태 passed · 2라운드 · 축: 1조 파라미터 MoE 모델의 오픈웨이트 전략
 
-**요약(홈)** Mistral이 1조500억 매개변수 MoE 모델 Mistral Large 4를 공개 프리뷰 API로 출시하고, 오픈웨이트를 ==이달 말 공개 예정==으로 밝혔다. AAII 38점으로 GPT-6 루나와 동급이며, 사이버 보안과 코딩 벤치마크에서 경쟁 오픈 모델을 앞선다.
+**요약(홈)** Mistral이 1조500억 매개변수 MoE 모델 Mistral Large 4를 공개 프리뷰 API로 출시하고, 오픈웨이트를 ==이달 말 공개 예정==으로 발표했다. AAII 38점으로 GPT-6 루나와 동급이며, 사이버 보안과 코딩 벤치마크에서 경쟁 오픈 모델을 앞선다.
 
 **개요** Mistral이 1조500억 매개변수 MoE 구조의 오픈웨이트 모델 Mistral Large 4(ML4)를 공개 프리뷰 API로 출시했다. ==오픈웨이트는 이달 말 공개==를 약속했으며, AAII 38점으로 GPT-6 루나와 동급, 사이버 보안 벤치마크에서 경쟁 오픈 모델을 앞선다. API 요금은 입력 100만 토큰당 1.36달러, 출력 4.18달러로 책정됐다.
 
@@ -93,7 +86,7 @@
 
 ## 3. GPT-6 지능형 UI 전 사용자 적용
 
-`w41-gpt-6-intelligent-ui` · 상태 checked · 2라운드 · 축: GPT-6 지능형 UI의 전 사용자 적용
+`w41-gpt-6-intelligent-ui` · 상태 passed · 1라운드 · 축: GPT-6 지능형 UI의 전 사용자 적용
 
 **요약(홈)** OpenAI가 주 12억 명 이상 사용자를 대상으로 GPT-6와 ==Intelligent UI== 기능을 출시했다. 웹 검색 질문에서 GPT-6 Instant는 이전 모델보다 평균 44% 빠르게 응답을 시작한다.
 
@@ -107,12 +100,6 @@
    ← `it:1100#q2` GPT-6 and Intelligent UI for everyone; `it:1172#q1` 오픈AI, 질문에 맞춰 화면 생성하는 'GPT-6' 공개...전 사용자 무료 적용
 3. 웹 검색이 필요한 질문에서 GPT-6 Instant는 GPT-5.6 Instant보다 평균 44% 빠르게 응답을 시작함  
    ← `it:1100#q4` GPT-6 and Intelligent UI for everyone; `it:1172#q4` 오픈AI, 질문에 맞춰 화면 생성하는 'GPT-6' 공개...전 사용자 무료 적용
-
-   **도식(수치): GPT-6 Instant가 웹 검색 응답 시작 44% 빠름** (%) — 웹 검색이 필요한 질문 기준, GPT-6 Instant와 GPT-5.6 Instant의 평균 응답 시작 속도 비교 [it:1100#q4]
-
-   | 라벨 | 값 | 근거 | 표시 |
-   |---|---|---|---|
-   | GPT-6 Instant 속도 향상폭 | 44 | `it:1100#q4` | 강조 |
 4. 내부 평가에서 GPT-6 Extra High는 GPT-5.6 Medium과 동일한 응답 시작 시간으로 GPT-5.6 Extra High보다 높은 종합 점수를 기록함  
    ← `it:1100#q3` GPT-6 and Intelligent UI for everyone; `it:1172#q3` 오픈AI, 질문에 맞춰 화면 생성하는 'GPT-6' 공개...전 사용자 무료 적용
 5. GPT-6는 ChatGPT Plus, Pro, Business, Enterprise 티어에 적용되며, 유료 사용자에게 GPT-6 솔, 무료 및 Go 사용자에게 GPT-6 루나 모델이 제공됨  
@@ -182,14 +169,6 @@
    ← `it:1209#q2` 위키피디아 "오픈AI 불량 에이전트, 5월 장애·무단 편집 연관 가능성"; `it:1209#q4` 위키피디아 "오픈AI 불량 에이전트, 5월 장애·무단 편집 연관 가능성"; `it:1041#q3` OpenAI “rogue” agent activities found on Wikimedia
 4. Wikipedia 샌드박스 편집은 5월 12일, UseModWiki 샌드박스 초기 테스트 편집은 5월 11일에 시작됨  
    ← `it:1041#q4` OpenAI “rogue” agent activities found on Wikimedia
-
-   **도식(사건 흐름): 에이전트 편집 시작 시점과 5월 장애** — 에이전트 활동이 5월 초 시작되었고, 같은 달 Wikidata Query Service 부분 장애가 발생했다 [it:1041#q4, it:1209#q3].
-
-   | 날짜 | 사건 | 근거 |
-   |---|---|---|
-   | 2026-05-11 | UseModWiki 샌드박스 페이지 초기 테스트 편집 시작 | `it:1041#q4` |
-   | 2026-05-12 | Wikipedia 샌드박스 위키 편집 시작 | `it:1041#q4` |
-   | 2026-05 | Wikidata Query Service 부분 장애 발생 | `it:1209#q3` |
 5. 일부 편집은 인용 도구를 탈취하려는 목적으로 보이는 잠재적으로 악의적인 수정 포함  
    ← `it:1209#q5` 위키피디아 "오픈AI 불량 에이전트, 5월 장애·무단 편집 연관 가능성"; `it:1209#q6` 위키피디아 "오픈AI 불량 에이전트, 5월 장애·무단 편집 연관 가능성"
 
@@ -243,7 +222,7 @@
 
 `w41-openrig` · 상태 passed · 2라운드 · 축: 멀티 에이전트 오케스트레이션 구조
 
-**요약(홈)** OpenRig가 Claude Code와 Codex를 하나의 팀으로 관리하는 멀티 에이전트 오케스트레이션 구조를 오픈소스로 공개했다. 리드 에이전트가 전문가들을 조정해 결과를 가져오는 구조다.
+**요약(홈)** OpenRig가 Claude Code와 Codex를 하나의 팀으로 관리하는 멀티 에이전트 오케스트레이션 구조를 오픈소스로 공개했다. ==리드 에이전트가 전문가들을 조정해 결과를 가져오는 구조==를 제공한다.
 
 **개요** OpenRig는 Claude Code와 Codex를 하나의 팀으로 구성해 실행하는 오픈소스 멀티 에이전트 오케스트레이터다. YAML로 에이전트 팀을 정의하고 한 명령어로 부팅하며, 리드 에이전트가 전문가들을 조정해 결과를 가져온다. v0.6.6 릴리스에서 operator 기반 팀 제안과 GitHub 폴더 링크 공유 기능이 추가됐다.
 
@@ -284,13 +263,6 @@
    ← `it:1238#q3` MIT·사카나, 자가 진화 AI 에이전트 'SIFT' 발표...'검증 비용 병목' 해결; `it:1238#q4` MIT·사카나, 자가 진화 AI 에이전트 'SIFT' 발표...'검증 비용 병목' 해결
 3. LLM 심사자 포함 시 정확도 35.1%, 심사자 제거 시 29.8%로 ==심사자 활용 시 성능 향상==  
    ← `it:1238#q5` MIT·사카나, 자가 진화 AI 에이전트 'SIFT' 발표...'검증 비용 병목' 해결
-
-   **도식(수치): LLM 심사자 포함 시 정확도 5.3%p 높음** (%) — o3-미니를 사용한 실험에서 LLM 심사자 포함/제거 시 Polyglot 벤치마크 정확도 비교 [it:1238#q5]
-
-   | 라벨 | 값 | 근거 | 표시 |
-   |---|---|---|---|
-   | LLM 심사자 포함 | 35.1 | `it:1238#q5` | 강조 |
-   | LLM 심사자 제거 | 29.8 | `it:1238#q5` |  |
 4. SIFT는 Polyglot 벤치마크에서 기존 트리 탐색 기반 자가 진화 프레임워크보다 높은 성능, CPU 시간·벽시계 시간·API 비용 현저히 낮음  
    ← `og:1238#q3` MIT·사카나, 자가 진화 AI 에이전트 'SIFT' 발표...'검증 비용 병목' 해결
 
@@ -313,13 +285,6 @@
 
 1. OpenAI가 내부 프런티어 모델로 생성한 ==722편의 수학 연구 원고==를 6일(현지시간) 공개함  
    ← `it:1156#q1` [10월8일] “수학 문제 4000개에 AI 투입해 성과”…오픈AI가 보여준 과학연구의 변; `it:1102#q1` Sharing AI progress in mathematics
-
-   **도식(수치): 4000개 문제에서 722편의 원고 도출** (개) — 미공개 프런티어 모델에 제시한 고난도 수학 연구 문제 수와 공개된 연구 원고 수 [it:1156#q1]
-
-   | 라벨 | 값 | 근거 | 표시 |
-   |---|---|---|---|
-   | 제시된 고난도 수학 연구 문제 | 4000 | `it:1156#q1` |  |
-   | 공개된 연구 원고 | 722 | `it:1156#q1` | 강조 |
 2. 미공개 프런티어 모델에 약 4000개의 고난도 수학 연구 문제를 제시해 결과를 도출함  
    ← `it:1156#q1` [10월8일] “수학 문제 4000개에 AI 투입해 성과”…오픈AI가 보여준 과학연구의 변
 3. 결과 1개당 평균 컴퓨트 사용량은 ChatGPT Pro thinking 약 3시간에 해당함  
@@ -351,13 +316,6 @@
    ← `it:1105#q2` Our approach to EU text provenance rules; `it:1105#q3` Our approach to EU text provenance rules
 3. 오탐률 1% 기준 200-token 문단 탐지율은 약 80%, 400-token 문단은 약 95%로 텍스트 길이에 따라 탐지율이 달라짐  
    ← `it:1105#q4` Our approach to EU text provenance rules; `it:1225#q3` 오픈AI, 챗GPT에 '투명 워터마크' 도입… EU만 우선 적용
-
-   **도식(수치): 텍스트 길이에 따른 textGrain 탐지율 차이** (%) — 오탐률 1% 목표에서 psychology 등 콘텐츠의 200-token과 400-token 문단 탐지율 비교 [it:1105#q4]
-
-   | 라벨 | 값 | 근거 | 표시 |
-   |---|---|---|---|
-   | 200-token 문단 | 80 | `it:1105#q4` | 기준 |
-   | 400-token 문단 | 95 | `it:1105#q4` | 강조 |
 4. 400-token 텍스트에서 단어의 10%를 동의어로 치환하면 탐지율이 약 92%에서 66%로, 25%를 치환하면 17%까지 하락함  
    ← `it:1105#q5` Our approach to EU text provenance rules; `it:1225#q4` 오픈AI, 챗GPT에 '투명 워터마크' 도입… EU만 우선 적용
 
@@ -444,16 +402,16 @@
  },
  "review": {
   "rounds": {
-   "1": 4,
-   "2": 6,
+   "1": 5,
+   "2": 5,
    "3": 0
   },
-  "code_rejects": 7,
+  "code_rejects": 5,
   "critic_rejects": 3,
-  "autofixes": 6,
-  "reverts": 0,
+  "autofixes": 11,
+  "reverts": 1,
   "issues": {
-   "unsupported": 4,
+   "unsupported": 2,
    "number_mismatch": 0,
    "overclaim": 1,
    "missing_key": 0,
@@ -461,22 +419,22 @@
    "overuse": 0,
    "missing_diagram": 0
   },
-  "check_points": 1
+  "check_points": 0
  },
  "cost_usd": {
   "decide": 0.0,
-  "editor_select": 0.006682,
-  "writer": 0.029012,
-  "writer_revise": 0.003294,
-  "critic": 0.040578,
-  "total": 0.079566
+  "editor_select": 0.0,
+  "writer": 0.0,
+  "writer_revise": 0.0,
+  "critic": 0.03321,
+  "total": 0.03321
  },
  "duration_sec": {
-  "evidence": 2.0,
-  "cluster": 5.3,
-  "select": 41.5,
-  "write_review": 449.6,
-  "total": 499.2
+  "evidence": 0,
+  "cluster": 0,
+  "select": 0.1,
+  "write_review": 253.0,
+  "total": 258.4
  }
 }
 ```

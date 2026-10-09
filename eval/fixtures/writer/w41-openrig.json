@@ -1,0 +1,67 @@
+{
+ "input": {
+  "plan": {
+   "rank": 7,
+   "angle": "멀티 에이전트 오케스트레이션 구조",
+   "relation": {
+    "type": "new",
+    "topic_id": null
+   }
+  },
+  "evidence": [
+   {
+    "id": "rp:mvschwarz/openrig",
+    "source": "GitHub",
+    "text": "하는 일: Claude Code, Codex 에이전트를 팀으로 구성해 실행하는 오픈소스 CLI\n신호: release\n이번 주 별 [2,693 개]\n뜨는 이유: v0.6.6 릴리스(2026-10-07), 7일 커밋 100+로 개발 활발\n릴리스 v0.6.6 (2026-10-07): 설치 후 operator가 팀을 제안해 즉시 실행, 팀을 GitHub 폴더 링크로 공유·설치",
+    "title": "mvschwarz/openrig",
+    "url": "https://github.com/mvschwarz/openrig"
+   },
+   {
+    "id": "it:1122#q1",
+    "source": "GeekNews",
+    "text": "A harness wraps a model. A rig wraps your harnesses. Define your agent team in YAML, boot it with one command. Claude Code and Codex in the same rig, managed as one system.\n주장: OpenRig는 Claude Code와 Codex를 하나의 시스템으로 관리하는 오픈소스 멀티 에이전트 오케스트레이터다.",
+    "title": "OpenRig - Claude Code와 Codex를 팀으로 운영하는 멀티 에이전트 오케스트레이터",
+    "url": "https://news.hada.io/topic?id=34854"
+   },
+   {
+    "id": "it:1122#q2",
+    "source": "GeekNews",
+    "text": "OpenRig is open-source software for building and running your own network of agents. It turns AI coding agents from a pile of terminal sessions into a persistent, organized team.",
+    "title": "OpenRig - Claude Code와 Codex를 팀으로 운영하는 멀티 에이전트 오케스트레이터",
+    "url": "https://news.hada.io/topic?id=34854"
+   },
+   {
+    "id": "it:1122#q3",
+    "source": "GeekNews",
+    "text": "Talk to a lead agent about the outcome you want; it can coordinate specialists across teams and bring you results and decisions that need your attention.\n주장: 리드 에이전트에게 원하는 결과를 말하면, 팀 내 전문가 에이전트들을 조정해 결과를 가져온다.",
+    "title": "OpenRig - Claude Code와 Codex를 팀으로 운영하는 멀티 에이전트 오케스트레이터",
+    "url": "https://news.hada.io/topic?id=34854"
+   },
+   {
+    "id": "it:1122#q4",
+    "source": "GeekNews",
+    "text": "Requires Node.js 22 or 24 and tmux, on macOS or Linux.\n수치: 필요한 Node.js 버전 [22]\n수치: 필요한 Node.js 버전 [24]",
+    "title": "OpenRig - Claude Code와 Codex를 팀으로 운영하는 멀티 에이전트 오케스트레이터",
+    "url": "https://news.hada.io/topic?id=34854"
+   },
+   {
+    "id": "it:1122",
+    "source": "GeekNews",
+    "text": "요약: OpenRig는 Claude Code와 Codex를 하나의 팀으로 구성하고 관리하는 오픈소스 멀티 에이전트 오케스트레이터다. YAML로 에이전트 팀을 정의하고 한 명령어로 실행하며, 리드 에이전트가 전문가들을 조정해 작업을 수행한다.",
+    "title": "OpenRig - Claude Code와 Codex를 팀으로 운영하는 멀티 에이전트 오케스트레이터",
+    "url": "https://news.hada.io/topic?id=34854"
+   }
+  ],
+  "previous": null,
+  "aliases": [
+   {
+    "canonical": "OpenRig",
+    "aliases": [
+     "openrig"
+    ]
+   }
+  ]
+ },
+ "expect": {},
+ "note": "2026-W41 실제 토픽 입력(run 20261009-193346-weekly-b3fc)"
+}
