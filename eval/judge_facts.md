@@ -44,7 +44,7 @@ core_rules:
 - 문체와 형광 표시(`==`)는 판정하지 않는다
 
 ## 출력
-1. `atoms[]`: {loc(예: points[0], summary), fact(원자 사실 한 줄), evidence_id(대조한 근거 id, 없으면 null), supported}
+1. `atoms[]`: {loc(예: points[0], summary), fact(원자 사실 한 줄), evidence_id(대조한 근거 id, 없으면 null), supported}. **title → summary → overview를 먼저**, 그다음 points·numbers·events·contributions·concepts. 요약·개요의 사실은 points가 아니라 문서와 대조한다(범위, 비교 표현 "앞선다/동률", 확정도)
 2. `log`: 한 줄(예: "원자 사실 24개 중 23개 지지"), `attention`: 근거 문서가 비어 판정할 수 없으면 true
 
 ## 막혔을 때

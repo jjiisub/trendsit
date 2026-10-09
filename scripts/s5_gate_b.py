@@ -59,7 +59,8 @@ def style_violations(page: TopicPage) -> list[str]:
     return out
 
 
-def judge_final(weeks: list[str], only: set[str] | None = None, prev: dict | None = None) -> dict:
+def judge_final(weeks: list[str], only: set[str] | None = None, prev: dict | None = None,
+                out_path: Path | None = None) -> dict:
     """두 주 현재판 최종 페이지를 judge(질문 Q1~Q4) + 원자 사실 judge로 채점. 작성자가 받은 입력을 같은 코드로 다시 조립."""
     from eval import graders
     from scripts.s5_eval_fixtures import week_topics
@@ -94,7 +95,7 @@ def judge_final(weeks: list[str], only: set[str] | None = None, prev: dict | Non
                       f"{r['facts']['supported']}/{r['facts']['total']}" if r.get("facts") else "", file=sys.stderr)
     finally:
         ctx.tracer.finish("ok")
-    path = ROOT / "reports" / "S5_brief" / "gate_b_final_judge.json"
+    path = out_path or ROOT / "reports" / "S5_brief" / "gate_b_final_judge.json"
     path.write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding="utf-8")
     return out
 
@@ -180,7 +181,14 @@ def main() -> int:
     ap.add_argument("--topics", nargs="*", help="--judge를 이 토픽만(나머지는 저장된 결과, E2 실패 건만 재실행)")
     ap.add_argument("--agreement", metavar="JUDGE_JSON", help="라벨 기준 관문 B와 judge ↔ 라벨 일치율만 출력")
     ap.add_argument("--runtime", nargs="+", metavar="RUN_ID", help="이 run들(묶기 run 포함)의 실행 시간 분해만 출력")
+    ap.add_argument("--judge-out", metavar="JSON", help="현재판 최종판 judge만 돌려 이 파일에 쓰고 라벨 일치율 출력")
+    ap.add_argument("--judge-prev", metavar="JSON", help="--topics 밖 토픽은 이 결과를 그대로(E2)")
     args = ap.parse_args()
+    if args.judge_out:  # judge만(R5 보정: 라벨 단 출력을 다시 채점, 리포트·라벨 시트는 그대로)
+        prev = json.loads(Path(args.judge_prev).read_text(encoding="utf-8")) if args.judge_prev else None
+        judge_final(args.weeks, set(args.topics) if args.topics else None, prev, out_path=Path(args.judge_out))
+        print("\n".join(agreement(json.loads(Path(args.judge_out).read_text(encoding="utf-8")))))
+        return 0
     if args.runtime:
         print("\n".join(runtime(DB(ROOT / "data" / "trendsit.db"), args.runtime)))
         return 0
