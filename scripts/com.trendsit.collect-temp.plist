@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- 임시 매일 수집(P1). 설치: reports/P1_env.md. 잠든 사이 놓친 02:00 실행은 깨어날 때 한 번 돈다(꺼져 있던 동안은 안 돎) -->
+<plist version="1.0"><dict>
+  <key>Label</key><string>com.trendsit.collect-temp</string>
+  <key>ProgramArguments</key><array>
+    <string>/bin/bash</string><string>/Users/jiseop/Claude/projects/trendsit/scripts/collect_temp.sh</string>
+  </array>
+  <key>StartCalendarInterval</key><dict>
+    <key>Hour</key><integer>2</integer><key>Minute</key><integer>0</integer>
+  </dict>
+  <key>StandardOutPath</key><string>/Users/jiseop/Claude/projects/trendsit/data/logs/collect-temp/launchd.log</string>
+  <key>StandardErrorPath</key><string>/Users/jiseop/Claude/projects/trendsit/data/logs/collect-temp/launchd.log</string>
+</dict></plist>
