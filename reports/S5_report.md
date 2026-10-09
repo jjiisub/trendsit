@@ -294,3 +294,22 @@ pytest 실패 5건(0단계 시점, 모두 handoff 묶음이 원인): 새 역할 
 | 9 | reason 숫자 대조가 입력 전체 부분 문자열이라 사실상 꺼짐(중간) | 그 후보 문서 + 짧은 공통 칸에서만, 숫자 경계 |
 | 10 | 묶기 테스트가 경로 규칙을 다시 구현 / A14 예외(중간) | 실제 build_pairs 테스트 추가(이름 경로·회사 이름 제외). A14 예외(라벨이 가리키는 실행)는 일치율 재현에 필요해 유지 |
 | 11 | relation_label 미저장, 별칭 부분 치환, critic 실패를 pass로 기록, 묶기부터 다시 돌릴 때 이어 오기, 미사용 설정·코드 상수, ENFORCED_FIELDS 선언, 숫자 다른 표기 자동 승인(낮음) | relation_label 저장(마이그레이션 34), 단어 경계 치환, 검수 실패는 판정 기록 안 함(attention), 묶기부터면 이어 오지 않음, broad_keywords·alias_decide_max를 brief.yaml로, ReviewVerdict ENFORCED_FIELDS에 status·attention, 숫자 다른 표기는 자동 승인 안 함. 미사용 설정(linkage, auto_approve, per_point_max, runtime)은 스펙 초안 칸이라 남김 |
+
+## 관문 A (`bash scripts/verify_s5.sh`, 2026-10-09 21:03)
+```
+PASS A1 verify_s0~s4 전부 PASS(73개)
+PASS A2 ruff 0, pytest 507 passed in 212.41s (0:03:32), 건너뜀 0
+PASS A3 check-config OK 설정 9개, 역할 15개, budget S5 있음, 역할 md 5개(decide, editor_select, writer, writer_revise, critic) 섹션 검사 포함
+PASS A4 공통 수정 5.1(명사 예외, ImageError 계열, 중첩 ImageFile 거부, ClassVar, 예산 기준값 위치, 수치 모듈) + 출력 잘림 감지 (18 passed in 0.54s)
+PASS A5 근거 목록(자격, 근거 id 형식, 입력 상한과 뺀 근거) (3 passed, 9 deselected in 0.13s)
+PASS A6 정규화(표기 차이만 자동 승인, 숫자·버전 다른 쌍 후보 아님, name_pairs 전역 미반영) (8 passed, 4 deselected in 1.33s)
+PASS A7 묶기(채널 넘는 조건, confidence 미달, 평균 연결, 레포만 묶음, 1개짜리, 재실행 run 보존) (15 passed in 0.65s)
+PASS A8 선별 검증(리드 1, 개수 범위, 범위 밖 합치기·나누기 거부, relation은 과거 대조 후보 안, 입력 순서 cluster_id, reason 값 대조, 재시도·대체) (17 passed, 17 deselected in 1.05s)
+PASS A9 코드 검사(수치 대조·단위 환산 미허용, anchor, 도식 상한, 금지어, 자동 수정은 반려 아님, 경고) (10 passed, 18 deselected in 0.53s)
+PASS A10 라운드(상한 3, 코드 반려도 셈, 같은 이슈 2회 check, 지적 안 된 칸 되돌림, 1부터 센 위치 바로잡기) (2 passed, 32 deselected in 1.39s)
+PASS A11 저장(마이그레이션 30~34, 재실행 run 보존·current_run_id, topic_evidence = 최종판 refs) (2 passed, 19 deselected in 1.53s)
+PASS A12 실행 요약 JSON 형식과 표에서 다시 계산한 값 일치 (1 passed, 5 deselected in 1.32s)
+PASS A13 저장값만으로 예시 JSON 토픽 칸(매핑 함수 초안) (1 passed, 5 deselected in 1.31s)
+FAIL A14 README/리포트/eval 정리 확인: item_card_generate(2)
+```
+- A14 FAIL: `reports/eval/item_card_generate_20261009-001822.json`(S2 때 실행, S5 실행 `140559`가 최신)이 남아 E10 "역할별 최신 1개"에 걸림. 읽는 곳 없음. 추적 파일 삭제는 자동 모드가 막아 사용자 몫: `git rm reports/eval/item_card_generate_20261009-001822.json`
