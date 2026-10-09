@@ -5,7 +5,7 @@
 [![CI](https://github.com/jjiisub/trendsit/actions/workflows/ci.yml/badge.svg)](https://github.com/jjiisub/trendsit/actions/workflows/ci.yml)
 [예시 사이트](https://trendsit.jiseop.com) · 위키(준비 중) · [프로젝트 맥락](docs/CONTEXT.md)
 
-> 현재 상태(2026-10-09): **S0~S4 완료, S5(주간 브리핑) 진행 중.** 글 6곳·유튜브·GitHub 트렌딩 수집, 글 1차 요약과 원본 추적, 레포 분석, 영상 전사와 슬라이드 판독까지 동작한다. 매일 02:00 수집이 돌고 있다. 묶기·선별·작성 ⇄ 검수(주간 브리핑)는 S5에서 붙인다. 예시 사이트는 예시 데이터로 만든 화면이다.
+> 현재 상태(2026-10-09): **S0~S4 완료, S5(주간 브리핑) 진행 중.** 글 6곳·유튜브·GitHub 트렌딩 수집, 글 1차 요약과 원본 추적, 레포 분석, 영상 전사와 슬라이드 판독까지 동작한다. 매일 02:00 수집이 돌고 있다. 주간 브리핑(묶기 → 편집장 선별 → 작성자 ⇄ 코드 검사·검수자 → 저장)은 `weekly` 명령으로 돌고, W40·W41로 관문 B를 확인하는 중이다. 예시 사이트는 예시 데이터로 만든 화면이다.
 
 ## 1. 왜 만들었나
 - 개발자로 일하며 새 기술을 따라가려면 블로그, 뉴스, 발표 영상, GitHub를 매주 따로 돌아야 했다(주 3시간 안팎)
@@ -70,6 +70,8 @@ uv run python -m trendsit repo-analyze --week 2026-W41 --traces   # 레포 분�
 uv run python -m trendsit plan --day 2026-10-04 --report          # 편집장 계획(plan show --day D --video-queue로 S4 입력)
 uv run python -m trendsit deep text --day 2026-10-04 --traces     # 글 분석가: 계획의 원본 추적 큐
 uv run python -m trendsit cluster --week 2026-W41 --spec S5      # 주간 묶기 + 과거 대조 → reports/S5_brief/cluster_<주>.md(S5 진행 중)
+uv run python -m trendsit weekly --week 2026-W41 --spec S5       # 주간 브리핑 끝까지 → 칠판 저장 + reports/S5_brief/briefing_<주>.md(읽기본)
+uv run python -m trendsit weekly --week 2026-W41 --from-step write --topic w41-mistral-large-4   # 단계·토픽만 다시(새 run)
 uv run python -m trendsit cost --spec S0       # 사용액과 남은 예산
 ```
 영상 분석가(맥, Apple Silicon): `uv sync --extra video` 뒤

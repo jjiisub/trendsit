@@ -150,3 +150,36 @@ pytest 실패 5건(0단계 시점, 모두 handoff 묶음이 원인): 새 역할 
 | 8-1 | 주마다 브리핑 읽기본 `reports/S5_brief/briefing_<week>.md` | 7단계에서 | |
 
 - decide 라벨 31쌍은 비어 있어(D1-3 리뷰 세션 몫) 비교 기준으로 코드 세션이 잠정 라벨을 달았다(labeler `opus-5.5-code(잠정)`, 30쌍 모델 판정 동의, it:1046↔1048만 same). 리뷰 세션이 덮어쓴다
+
+## 4~7단계: 편집장 선별, 작성자 + 코드 검사, 검수자 ⇄ 수정, weekly·저장·실행 요약
+코드: `trendsit/brief/select.py`, `checks.py`, `write.py`, `pipeline.py`, `briefing.py`, `cli_brief.py`(weekly, select, write, review). 테스트: `tests/test_s5_select_checks.py`, `tests/test_s5_weekly.py`(모의 LLM으로 weekly 끝까지).
+
+### 결정한 것
+- 선별 재시도: 코드 검증 오류를 `EditorSelectInput.previous_errors`로 넣어 다시 부른다(최대 2회). 그래도 실패면 점수 순 상위 min개 대체 계획(`briefing_plans.source=fallback`)
+- 선별 검증에 "select인데 topics에 없음"을 더했다. W41 첫 실행에서 18개를 select하고 10개만 토픽에 넣었다. 상한을 넘겨 못 넣은 후보는 drop(other) + reason "토픽 수 상한"(md에도)
+- 나누기(splits): 토픽에 넣을 무리를 groups 첫 번째에 둔다. 그 후보를 토픽에 넣으면 첫 무리만 쓰고, 나머지 무리는 그 주 브리핑에서 빠진다(md에 명시). 나눈 무리마다 따로 토픽을 만들려면 새 cluster id가 필요해 이번에는 하지 않았다
+- relation.label: "N월 N주차" = 그 주 월요일이 든 달력 줄(1일이 든 주가 1주차). W40(9/28 월) → "9월 5주차"
+- 코드 검사 반려 유형으로 `format`을 더했다(분량, 빈 필수 칸, 금지 표현, 명사형, 도식 칸 규칙). 검수자 7유형과 구분
+- 코드가 직접 고치는 것(반려 아님)
+  - 형광 개수: 칸별 상한, 페이지 최대 4개, 넘치면 뒤쪽부터 제거
+  - 공백·문장부호
+  - 승인 별칭을 정본으로 치환
+  - contributions: 근거 채널이 2개 이상일 때만, 그 채널만, 채널마다 1문장. 넘치는 것은 뺌
+- 명사형 검사(points·contributions·concepts가 문장으로 끝나면 반려)와 "summary·overview는 '~다'"는 스펙 반려 목록에 없지만 넣었다. 관문 B 문체 항목이 "코드 정규식 위반 0"을 요구해, 이걸 잡지 않으면 W41 첫 실행 포인트가 거의 다 "~했다."로 끝난 채 통과했다
+- `points[].check`는 코드 소유(`TopicPage.enforce`가 작성자 출력의 check를 false로). 같은 위치·같은 유형 이슈가 두 번 남으면 그 포인트를 check로 확정한다. 포인트가 아닌 위치(summary 등)면 토픽 status만 checked
+- 검수자·수정이 위치를 1부터 센 경우(항목 2개인데 `contributions[2]`) 마지막 다음 번호를 0부터로 바로잡는다(`normalize_loc`). critic·writer_revise md에도 "번호는 0부터"를 적었다
+- 수정 합치기: 지적된 최상위 칸만 반영하고 나머지 변경은 되돌린 뒤 횟수를 센다. 되돌림 전 원래 출력은 `topic_pages.raw_json`에 둔다. 칸 전체 삭제(`contributions`, `numbers`)도 받는다
+- 단계 명령: `select`(선별까지), `write`(초안 + 코드 검사, 검수자 없음), `review`(현재판 초안부터 검사 ⇄ 검수 ⇄ 수정), `weekly --from-step`. 앞 단계 결과는 그 주 현재판 run에서 읽고 새 run에 쓴다. 묶기 run은 `runs.summary_json.cluster_run`으로 이어진다
+- 토픽 근거 상한을 넘겨 뺀 근거 id는 토픽마다 steps.detail.truncated(실행 요약 `evidence.truncated_topics`)에 둔다. clusters.body_json에는 넣지 않았다. 근거 목록은 토픽 단위라 묶음 행보다 토픽 쪽이 맞다고 봤다
+- 실행 요약은 표와 steps.detail에서 다시 계산한다(`pipeline.compute_summary`, 관문 A12)
+
+### E1 첫 실행(W41 토픽 2개)에서 고친 버그
+| 증상 | 원인 | 수정 |
+|---|---|---|
+| 같이 돌던 W40 summarize가 "database is locked"로 83/247에서 멈춤 | weekly·cluster가 `UPDATE runs SET week`를 커밋 없이 실행해 쓰기 트랜잭션을 LLM 호출 내내 잡음 | 바로 커밋(`with db.conn`), W40 summarize 다시 실행(이미 만든 83건은 캐시라 0원) |
+| 작성자가 points에 check true를 달아 냄 | check가 출력 스키마에 있고 코드 소유 표시가 없었음 | `TopicPage.enforce`가 false로 |
+| 글뿐인 토픽에 contributions channel github, 같은 채널 3개 | 규칙이 md에만 있었음 | 코드 자동 수정 |
+| 검수 이슈 `contributions[2]`(실제로는 두 번째)를 수정이 새 항목으로 덧붙임 → 같은 이슈 두 번으로 check | 위치를 1부터 셈 | `normalize_loc` + md |
+| 포인트가 "~했다."로 끝나도 통과 | 명사형 검사가 코드에 없었음 | 반려 추가 |
+| 칸 전체(`contributions`) 삭제 수정이 반영되지 않음 | 위치 형식이 번호 있는 칸만 받음 | 받게 고침(이후 contributions는 자동 수정이라 반려 자체가 없어짐) |
+- 고친 뒤: Mistral Large 4는 명사형 반려 1회 → 2라운드 통과, Claude Haiku 5.5는 1라운드 통과. 토픽당 1~2.5분, 약 $0.01~0.02
