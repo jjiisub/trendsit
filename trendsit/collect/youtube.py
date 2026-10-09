@@ -80,9 +80,12 @@ class YoutubeCollector:
         st = SourceStats(src.id)
         self._range = (since, until)
         res = self.fetcher.fetch(src.feed, kind="feed")
-        if not res.ok:
-            raise SourceFailed(f"채널 RSS 실패: {res.error}")
-        videos = {v["video_id"]: v | {"via": "rss"} for v in parse_channel_rss(res.text or "")}
+        rss_failed = not res.ok
+        if rss_failed:  # RSS가 404를 이어 낸 적이 있다(2026-10-09). 채널 목록이 있으면 그것으로 대체
+            if src.backfill.method != "channel_listing":
+                raise SourceFailed(f"채널 RSS 실패: {res.error}")
+            st.notes.append(f"채널 RSS 실패({res.error}): 채널 목록으로 대체")
+        videos = {} if rss_failed else {v["video_id"]: v | {"via": "rss"} for v in parse_channel_rss(res.text or "")}
         dated = [to_kst(v["published"]).date() for v in videos.values() if v["published"]]
         oldest = min(dated) if dated else None
         st.rss_oldest = oldest.isoformat() if oldest else None
@@ -93,6 +96,8 @@ class YoutubeCollector:
                                       f"https://www.youtube.com/channel/{src.channel_id}/videos"])
                 st.backfill_pages += 1
                 if listing is None:
+                    if rss_failed:
+                        raise SourceFailed(f"채널 RSS 실패: {res.error}, 채널 목록도 실패")
                     st.covered = False
                     st.notes.append("yt-dlp 채널 목록 실패(설치 안 됨 또는 차단). RSS 범위만")
                 else:
