@@ -80,3 +80,8 @@ pytest 실패 5건(0단계 시점, 모두 handoff 묶음이 원인): 새 역할 
   - judge Q1 17/19(judge는 너그럽다). 2차 라벨은 이전 출력에 달린 것이라 새 출력과 일치율을 잴 수 없음
 - 판단: 방향은 맞지만 Jump Trading과 METR이 같은 출력으로 남았다. E1에 따라 item_card 쪽 반복은 여기서 끝낸다. 고객 사례의 두 번째 거름망은 편집장 선별(low_relevance)이다
 - 사용액 $0.089
+
+#### 영상 digest 11개 재판독(P4-1) + 요약 재생성
+- 첫 실행(14:22~14:26)은 판독 0장: `data/media/<id>/media_result.json`의 work_dir가 P1에서 지운 worktree(`../trendsit-s4`) 절대 경로라 프레임을 못 찾았고, 판독 없이 요약만 다시 만들어 digest를 덮어썼다. `video run --reuse-media`가 작업 폴더를 지금 위치로 바꿔 읽도록 고친 뒤(`cli_video.py`) 다시 실행해 복구했다
+- 결과: whisper+slides 8편 판독 159장, 슬라이드 전용 수치 124 → 74개. kind로 뺀 것은 example 17, version 17, ui 6개이고, 이름에 붙은 버전 1개는 기존 규칙으로 뺐다. 31XD1O74pks는 표·대시보드 프레임 수치 31개가 dense로 뒤로 갔다
+- 교정 후보(spoken_value): -TeOEuplMrQ에서 SWE-Bench Pro 화면 80.3% ↔ 발화 88%를 잡았다(S4 리포트 사례). 같은 영상 29.3% ↔ 88%, 31XD1O74pks의 $ 값들처럼 가까운 다른 숫자를 고른 오탐도 있다. 교정 후보는 묶기·작성에 쓰지 않는 기록 칸이라 그대로 두고 S6 제안으로 넘긴다(발화 쪽 숫자 위치를 이름 바로 뒤로 좁히기)

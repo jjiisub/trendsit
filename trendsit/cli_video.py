@@ -68,6 +68,8 @@ def cmd_run(args: argparse.Namespace) -> int:
         this_media = media
         if this_media is None and args.reuse_media and reuse.exists():
             saved = MediaResult.model_validate_json(reuse.read_text(encoding="utf-8"))
+            # 작업 폴더는 지금 위치로(P1에서 worktree를 지워 옛 절대 경로가 남은 결과가 있음. 프레임 경로는 work_dir 기준 상대)
+            saved = saved.model_copy(update={"work_dir": str(reuse.parent)})
             this_media = saved if saved.mode == item.mode else None  # mode가 다르면 처음부터
         try:
             out = analyze(item, ctx, cfg, MEDIA_ROOT, overrides=overrides, media=this_media)
