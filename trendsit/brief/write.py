@@ -95,18 +95,19 @@ def pack_index(items: list[EvidenceItem]) -> dict[str, list[EvidenceItem]]:
 def evidence_docs(pack: dict[str, list[EvidenceItem]]) -> list[Document]:
     """근거 id마다 문서 하나. 글은 quote 문장 + 그 quote의 수치·주장, 영상은 시각의 수치·포인트·라벨, 레포는 필드.
     요약 id(it:{n}, vd:{n})는 CONTRACTS 근거 id가 아니고 원문도 아니라 작성자에게 주지 않는다(리뷰 지적 8).
-    글 카드의 주장·수치 줄은 quote와 같은 id에 붙지만 원문이 아니라 카드 요약이다. 줄 머리에 그렇게 적는다(PR #9 리뷰 R2:
-    Haiku "토크나이저 → 숨겨진 가격 인상"이 주장 줄에서 나옴)."""
+    글 카드의 주장 줄은 quote와 같은 id에 붙지만 원문이 아니라 카드 요약이라 넣지 않는다(PR #9 리뷰 R2: Haiku "토크나이저 →
+    숨겨진 가격 인상"이 주장 줄에서 나옴. "원문 아님" 표시만으로는 재실행에서도 개요에 남음). 수치 줄은 원문에서 뽑은 값이라 둔다."""
     docs = []
     for eid, items in pack.items():
         if all(it.kind == "summary" for it in items):
             continue
         lines = []
         for it in items:
+            if it.channel == "text" and it.kind in ("claim", "summary"):
+                continue
             v = f" [{it.value}{(' ' + it.unit) if it.unit else ''}]" if it.value else ""
             if it.channel == "text":
-                label = {"quote": "원문: ", "number": "(카드 수치, 위 원문에서 뽑음) ",
-                         "claim": "(카드 주장 요약, 원문 아님) "}.get(it.kind, "")
+                label = {"quote": "원문: ", "number": "(카드 수치, 위 원문에서 뽑음) "}.get(it.kind, "")
             else:
                 label = {"claim": "핵심 포인트: ", "slide_fact": "발표 슬라이드 수치: ", "timeline": "구간: ",
                          "repo_field": ""}.get(it.kind, "")

@@ -52,7 +52,7 @@ def _pack_from_docs(inp: dict[str, Any]) -> dict[str, list[Any]]:
     for d in inp["evidence"]:
         ch = "video" if d["id"].startswith("vd:") else "github" if d["id"].startswith("rp:") else "text"
         text = d["text"]
-        if ch == "text":  # 줄 머리: 지금 "(카드 주장 요약, 원문 아님)", 이전 픽스처 "주장: "·"요약: "
+        if ch == "text":  # 지금 작성자 입력에는 주장·요약 줄이 없음. 이전 픽스처의 "주장: "·"요약: " 줄을 뺌
             text = "\n".join(ln for ln in text.splitlines() if not ln.startswith(("(카드 주장", "주장: ", "요약: ")))
         out[d["id"]] = [EvidenceItem(d["id"], d["id"].split("#")[0].split("@")[0], ch, "quote", text,
                                      {"site": d.get("source"), "title": d.get("title")})]

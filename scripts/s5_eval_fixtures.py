@@ -65,7 +65,14 @@ def week_topics(db: DB, week: str, cfg) -> list[dict]:
     ev = week_evidence(db, week)
     table = al.load_decided(db, al.build(list(ev.members.values()), config.load("keywords.yaml"), cfg.aliases.fuzz_min_score,
                                              cfg.aliases.transliteration))
-    cands = sel.load_candidates(db, src.get("cluster_run") or run, ev, cfg.select.max_candidates)
+    # pipeline과 같은 후보(점수 동점은 관심 유사도로 끊으므로 유사도도 같게 계산)
+    from trendsit.brief.cluster import interest_similarity
+    from trendsit.filter.embed import make_embedder
+
+    flt = config.load("filter.yaml")
+    sims = interest_similarity(db, list(ev.members.values()), make_embedder("real", flt),
+                               [(x.keyword_id, x.text) for x in flt.interests])
+    cands = sel.load_candidates(db, src.get("cluster_run") or run, ev, cfg.select.max_candidates, sims)
     plan = BriefingPlan.model_validate_json(db.conn.execute(
         "SELECT plan_json FROM briefing_plans WHERE run_id=? ORDER BY id DESC LIMIT 1", (run,)).fetchone()[0])
     out = []

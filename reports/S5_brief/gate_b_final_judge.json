@@ -1,128 +1,183 @@
 {
- "w40-openai-dots": {
+ "w40-gpt-6-1-sol": {
   "week": "2026-W40",
   "status": "checked",
   "verdicts": {
    "Q1": {
     "verdict": "pass",
-    "critique": "summary 첫 문장에서 결론(OpenAI가 GPT-6 Astra 기반 상시 작동 에이전트 Dots 공개)을 제시하고, 첫 번째 point에 angle(상시 작동 에이전트의 아키텍처)의 핵심이 적절히 배치됨"
+    "critique": "summary 첫 문장에 핵심 결론(OpenAI 출시, Astra급 지능 1/5 가격)이 명시되어 있고 angle에 부합하는 내용이 첫 번째 point에 배치됨"
    },
    "Q2": {
     "verdict": "pass",
-    "critique": "불필요한 numbers, events, contributions를 비워두었고 포인트 간 중복이나 개요의 단순 반복 없이 깔끔하게 구성됨"
+    "critique": "조건에 맞지 않는 불필요한 도식이나 빈칸 채우기가 없으며, overview가 포인트를 무작정 단순 반복하지 않고 개괄함"
    },
    "Q3": {
     "verdict": "pass",
-    "critique": "3분 내에 개념(상시 작동 에이전트 Dots의 출시와 B2B 기능)을 파악할 수 있도록 핵심 포인트와 concepts가 맥락을 명확히 설명함"
+    "critique": "Astra급 지능 대비 가격 절감 및 캐시 비용 측면의 중요성이 명확히 드러나 독자가 핵심을 빠르게 파악할 수 있음"
    },
    "Q4": {
     "verdict": "pass",
-    "critique": "번역투나 어색한 표현 없이 명확하고 간결한 문장으로 기술됨"
+    "critique": "번역투나 어색한 문장 없이 간결하고 담백한 문체로 서술됨"
    }
   },
   "scores": {
    "정확성": {
     "score": 5,
-    "reason": "모든 문장과 수치(4,000개 앱, 월 500달러, 초당 300토큰 등)가 제공된 근거 문서와 정확히 일치함"
+    "reason": "모든 포인트와 요약 내용이 제공된 근거 문서의 내용 및 수치와 정확히 일치함"
    },
    "구성": {
     "score": 5,
-    "reason": "결론 중심의 요약 및 angle에 부합하는 포인트 순서 배열이 논리적으로 잘 구성됨"
+    "reason": "결론 우선 배치 및 angle에 맞는 포인트 우선순위가 잘 구성됨"
    },
    "표현": {
     "score": 5,
-    "reason": "군더더기 없는 담백한 개조식 및 서술형 문체로 번역투 없이 자연스러움"
+    "reason": "번역투 없이 간결하고 명확하게 작성됨"
    }
   },
   "facts": {
-   "total": 25,
-   "supported": 25,
+   "total": 22,
+   "supported": 22,
    "unsupported": [],
-   "step_id": 4996
+   "step_id": 5391
   }
  },
- "w40-gemini-argon": {
+ "w40-gemini-4-argon": {
+  "week": "2026-W40",
+  "status": "checked",
+  "verdicts": {
+   "Q1": {
+    "verdict": "pass",
+    "critique": "summary 첫 문장에 결론(Google DeepMind의 출시)이 명시되어 있고, plan의 angle인 '출시 조건과 가격 구조' 중 제한적 출시 조건이 첫 point에 배치되어 핵심을 포착함"
+   },
+   "Q2": {
+    "verdict": "pass",
+    "critique": "numbers에 3개 비교 항목 및 context가 온전히 제공되고 불필요한 빈 칸이나 point 간 중복 없이 overview도 적절히 요약됨"
+   },
+   "Q3": {
+    "verdict": "pass",
+    "critique": "도식의 context에 평가 대상과 출처가 명확히 서술되어 있으며, 전체적인 구성이 3분 내에 핵심과 중요성을 파악하기 쉽게 작성됨"
+   },
+   "Q4": {
+    "verdict": "pass",
+    "critique": "번역투나 어색한 표현 없이 명확하고 간결한 문체로 서술됨"
+   }
+  },
+  "scores": {
+   "정확성": {
+    "score": 5,
+    "reason": "모든 수치와 서술 내용이 제공된 근거 문서와 정확히 일치함"
+   },
+   "구성": {
+    "score": 5,
+    "reason": "결론 우선 구성과 angle에 맞춘 포인트 배치, 도식의 맥락 설명이 충실함"
+   },
+   "표현": {
+    "score": 5,
+    "reason": "번역투 없이 담백하고 정제된 문장으로 작성됨"
+   }
+  },
+  "facts": {
+   "total": 27,
+   "supported": 27,
+   "unsupported": [],
+   "step_id": 5393
+  }
+ },
+ "w40-openai-dots": {
   "week": "2026-W40",
   "status": "passed",
   "verdicts": {
    "Q1": {
     "verdict": "pass",
-    "critique": "summary 첫 문장에 구글 딥마인드의 제미나이 4 아르곤 공개 사실이 결론으로 제시되고, angle(에이전트 작업 능력과 가격 구조)에 부합하게 첫 포인트에서 출력 토큰 확장 및 장기 추론 능력을 다룸"
+    "critique": "summary 첫 문장에서 OpenAI의 Dots 공개 결론을 명확히 제시하고, 첫 point가 angle인 GPT-6 Astra 기반 상시 작동 에이전트를 정확히 다룸"
    },
    "Q2": {
     "verdict": "pass",
-    "critique": "numbers는 3개 항목으로 적절하며, 불필요한 도식 생성 없이 overview와 points가 중복 나열되지 않고 균형 있게 요약됨"
+    "critique": "도식 칸이 조건에 맞지 않아 자연스럽게 생략되었으며, 개요와 포인트 간 군더더기 없는 구성을 유지함"
    },
    "Q3": {
     "verdict": "pass",
-    "critique": "도식의 context에 평가 항목과 출처가 명시되어 있고 핵심 내용(출력 토큰 확장, 벤치마크, 가격)이 명확히 전달됨"
+    "critique": "문서 근거 기반으로 핵심 스펙(클라우드 컴퓨터, 4,000개 앱 연결, 요금제)을 3분 내 이해하기 쉽게 기술함"
    },
    "Q4": {
     "verdict": "pass",
-    "critique": "번역투나 어색한 표현 없이 간결하고 자연스러운 평서문 문체로 작성됨"
+    "critique": "번역투나 불필요한 군더더기 표현 없이 담백한 문체로 서술됨"
    }
   },
   "scores": {
    "정확성": {
     "score": 5,
-    "reason": "모든 수치(1M, $2, $10, 77.9% 등)와 내용이 제공된 문서의 원문과 일치함"
+    "reason": "출력의 모든 사실 및 수치가 근거 문서와 완벽하게 일치함"
    },
    "구성": {
     "score": 5,
-    "reason": "결론 우선 배치와 angle에 맞춘 중요도 순 정렬 및 도식 context 구성이 우수함"
+    "reason": "핵심 결론이 서두에 오고 포인트 및 개요의 위계가 명확함"
    },
    "표현": {
     "score": 5,
-    "reason": "군더더기 없는 담백한 문체로 번역투 없이 매끄럽게 작성됨"
+    "reason": "군더더기 없는 담백한 어조와 명확한 문장 구조를 갖춤"
    }
   },
   "facts": {
-   "total": 29,
-   "supported": 29,
+   "total": 24,
+   "supported": 24,
    "unsupported": [],
-   "step_id": 4998
+   "step_id": 5395
   }
  },
- "w40-gpt-6-1-sol": {
+ "w40-claude-sonnet-5-5": {
   "week": "2026-W40",
   "status": "passed",
   "verdicts": {
    "Q1": {
-    "verdict": "pass",
-    "critique": "summary 첫 문장에서 누가(OpenAI), 무엇을(Astra급 지능 모델), 얼마나(5분의 1 가격) 결론을 제시했고, plan.angle(고성능 모델의 가격 효율화와 코딩 특화)의 핵심이 첫 번째 point에 잘 담겨 있음"
+    "verdict": "fail",
+    "critique": "summary 첫 문장에 출시 주체와 핵심 성능/비용 성과가 포함되어 있으나, 지정된 angle('오퍼스급 지능과 가성비 사이의 컨텍스트·출력 토큰 설계')의 핵심인 토큰 설계 내용이 첫 point가 아닌 터미널벤치 성능으로 시작함"
    },
    "Q2": {
     "verdict": "pass",
-    "critique": "조건에 맞지 않는 numbers/events/contributions를 억지로 채우지 않았고, 개요와 포인트 간 불필요한 중복이나 point 간 겹침이 없음"
+    "critique": "numbers 도식은 3개 모델 비교로 구성되어 있고 군더더기 없으며, overview가 포인트를 불필요하게 단순 반복하지 않음"
    },
    "Q3": {
     "verdict": "pass",
-    "critique": "3분 내 핵심 모델 변화와 가격 및 벤치마크 결과를 명확히 파악할 수 있도록 체계적으로 정리됨"
+    "critique": "numbers 도식마다 측정 조건(터미널 환경, 44개 직종 업무 수행 능력)을 context로 명확히 명시하고 주요 수치와 비교 맥락을 파악하기 쉽게 기술함"
    },
    "Q4": {
     "verdict": "pass",
-    "critique": "어색한 번역투 없이 간결하고 자연스러운 명사형/개조식 문체로 작성됨"
+    "critique": "번역투나 어색한 어순 없이 자연스럽고 명확한 문장으로 기술됨"
    }
   },
   "scores": {
    "정확성": {
     "score": 5,
-    "reason": "출력의 모든 수치와 내용이 제공된 문서의 내용과 정확히 일치함"
+    "reason": "모든 문장과 수치가 근거 문서의 내용과 정확히 부합함"
    },
    "구성": {
-    "score": 5,
-    "reason": "결론 중심 요약 후 핵심 지표 순서대로 포인트가 잘 배치됨"
+    "score": 3,
+    "reason": "angle에 지정된 토큰 설계 측면이 첫 번째 포인트로 배치되지 않고 벤치마크 점수 뒤에 위치함"
    },
    "표현": {
     "score": 5,
-    "reason": "군더더기 없는 담백한 표현과 문장을 사용함"
+    "reason": "담백하고 읽기 쉬우며 번역투 없는 문체로 일관됨"
    }
   },
   "facts": {
-   "total": 20,
-   "supported": 20,
-   "unsupported": [],
-   "step_id": 5000
+   "total": 35,
+   "supported": 33,
+   "unsupported": [
+    {
+     "loc": "points[4]",
+     "fact": "컨텍스트 창 최대 100만 토큰을 지원할 것으로 예상된다",
+     "evidence_id": "it:951#q2",
+     "supported": false
+    },
+    {
+     "loc": "points[4]",
+     "fact": "최대 출력 12만8000 토큰을 지원할 것으로 예상된다",
+     "evidence_id": "it:951#q2",
+     "supported": false
+    }
+   ],
+   "step_id": 5397
   }
  },
  "w40-decision-api": {
@@ -131,166 +186,40 @@
   "verdicts": {
    "Q1": {
     "verdict": "pass",
-    "critique": "summary 첫 문장에 결론(오픈AI, Decision API 출시 등)이 명확히 제시되고, angle(판단 전용 API의 아키텍처적 의미)의 핵심이 첫 번째 point에 잘 드러남"
+    "critique": "summary 첫 문장에 결론(오픈AI의 GPT-6 Luna 기반 디시전스 API 출시)이 명시되어 있고, 첫 point에도 API 출시 및 핵심 기능이 잘 반영되어 angle을 충실히 포착함"
    },
    "Q2": {
     "verdict": "pass",
-    "critique": "조건에 맞지 않는 불필요한 도식(numbers, events 등) 생성을 배제했고, overview와 points 간 과도한 중복 없이 깔끔하게 구성됨"
+    "critique": "조건에 맞지 않는 불필요한 도식(numbers, events, contributions) 생성을 배제하였고, overview가 포인트를 단순 나열/되풀이하지 않고 잘 종합함"
    },
    "Q3": {
     "verdict": "pass",
-    "critique": "무슨 일인지(판단 전용 API 공개), 왜 중요한지(에이전트 안전성 제어 및 속도 개선) 파악하기 쉬우며 concepts 정의도 명확함"
+    "critique": "핵심 개념, 속도 차이, 활용 목적 등이 일목요연하게 정리되어 있어 3분 안에 맥락과 중요도를 파악하기 쉬움"
    },
    "Q4": {
     "verdict": "pass",
-    "critique": "번역투나 어색한 문장 없이 자연스럽고 간결한 개조식 및 평서문으로 작성됨"
+    "critique": "번역투나 부자연스러운 문장 없이 매끄럽고 담백한 명사형/서술형 문체로 작성됨"
    }
   },
   "scores": {
    "정확성": {
     "score": 5,
-    "reason": "응답 속도(150ms vs 1.6s) 및 기능 설명 등 문서 내용과 정확히 일치함"
+    "reason": "모든 문장과 수치(150ms, 1.6초 등)가 근거 문서와 완벽히 일치함"
    },
    "구성": {
     "score": 5,
-    "reason": "결론 중심 요약, angle에 맞춘 포인트 배열, 불필요한 도식 생략 등 구성이 깔끔함"
+    "reason": "결론 중심 요약과 중요도 순 포인트 배치가 적절함"
    },
    "표현": {
     "score": 5,
-    "reason": "군더더기 없는 문체와 자연스러운 한국어 서술이 돋보임"
+    "reason": "번역투 없이 간결하고 명확한 문장으로 서술됨"
    }
   },
   "facts": {
-   "total": 24,
-   "supported": 24,
+   "total": 30,
+   "supported": 30,
    "unsupported": [],
-   "step_id": 5002
-  }
- },
- "w40-openai-security": {
-  "week": "2026-W40",
-  "status": "passed",
-  "verdicts": {
-   "Q1": {
-    "verdict": "pass",
-    "critique": "summary 첫 문장에서 오픈AI의 GPT-6.1 아스트라 출시 취소 결론을 명확히 제시했고, angle(내부 보안 경고와 출시 철회 인과)에 맞게 첫 포인트와 이어지는 포인트들이 체계적으로 배치됨"
-   },
-   "Q2": {
-    "verdict": "pass",
-    "critique": "조건에 맞지 않는 numbers/events/contributions를 억지로 채우지 않았고, overview와 points 간 단순 중복 없이 유기적으로 요약됨"
-   },
-   "Q3": {
-    "verdict": "pass",
-    "critique": "도식 없이 텍스트 중심으로 명확히 작성되었으며 concepts를 통해 정렬과 범위 승인 맥락을 처음 읽는 사람도 3분 내 이해하기 쉽게 정리함"
-   },
-   "Q4": {
-    "verdict": "pass",
-    "critique": "번역투나 부자연스러운 문장 없이 담백하고 정제된 문체로 서술됨"
-   }
-  },
-  "scores": {
-   "정확성": {
-    "score": 5,
-    "reason": "모든 포인트와 개요 문장이 제공된 기사 원문 근거와 정확히 부합함"
-   },
-   "구성": {
-    "score": 5,
-    "reason": "핵심 결론이 먼저 제시되고 지정된 관점(angle)에 맞게 논리적으로 전개됨"
-   },
-   "표현": {
-    "score": 5,
-    "reason": "군더더기 없는 담백한 서술과 매끄러운 한국어 문장 사용"
-   }
-  },
-  "facts": {
-   "total": 19,
-   "supported": 19,
-   "unsupported": [],
-   "step_id": 5004
-  }
- },
- "w40-claude-sonnet-5-5": {
-  "week": "2026-W40",
-  "status": "passed",
-  "verdicts": {
-   "Q1": {
-    "verdict": "pass",
-    "critique": "summary 첫 문장에서 Sonnet 5.5 출시와 속도 30% 향상·비용 30% 절감을 결론으로 제시하고, angle의 핵심인 성능-비용 균형이 첫 point에 잘 반영됨"
-   },
-   "Q2": {
-    "verdict": "pass",
-    "critique": "numbers는 3개 비교 항목으로 규격을 충족하며, 불필요한 빈 칸이나 points와 overview 간의 과도한 되풀이 없이 핵심 정보가 잘 정돈됨"
-   },
-   "Q3": {
-    "verdict": "pass",
-    "critique": "3분 안에 모델 출시 의의와 주요 성능 변화를 파악할 수 있으며, numbers 도식의 context에 평가 기준과 맥락이 명확히 설명됨"
-   },
-   "Q4": {
-    "verdict": "pass",
-    "critique": "번역투나 어색한 표현 없이 명확하고 간결한 한국어 서술어로 작성됨"
-   }
-  },
-  "scores": {
-   "정확성": {
-    "score": 5,
-    "reason": "모든 포인트와 수치가 제공된 문서(og:162, it:924, it:951)와 정확히 일치함"
-   },
-   "구성": {
-    "score": 5,
-    "reason": "결론 우선 배치, 중요도순 포인트 정렬, 도식과 본문 포인트의 적절한 연계가 우수함"
-   },
-   "표현": {
-    "score": 5,
-    "reason": "담백하고 군더더기 없는 문체로 가독성이 높음"
-   }
-  },
-  "facts": {
-   "total": 25,
-   "supported": 25,
-   "unsupported": [],
-   "step_id": 5006
-  }
- },
- "w40-deepseek-harness": {
-  "week": "2026-W40",
-  "status": "passed",
-  "verdicts": {
-   "Q1": {
-    "verdict": "pass",
-    "critique": "summary 첫 문장에 출시 주체와 대상, 오픈소스 공개 내용이 명시되었고 point 1에 angle인 통합 인터페이스 출시 내용이 명확히 담김"
-   },
-   "Q2": {
-    "verdict": "pass",
-    "critique": "무리한 도식(numbers/events/contributions)을 넣지 않고 비워두었으며, points와 overview 간의 불필요한 중복 복제가 적절히 절제됨"
-   },
-   "Q3": {
-    "verdict": "pass",
-    "critique": "3분 안에 파악 가능한 명확한 구조이며, 개념 설명(concepts)도 직관적으로 정리되어 맥락 이해가 쉬움"
-   },
-   "Q4": {
-    "verdict": "pass",
-    "critique": "번역투나 어색한 문장 없이 간결하고 자연스러운 개조식 및 평서문으로 작성됨"
-   }
-  },
-  "scores": {
-   "정확성": {
-    "score": 5,
-    "reason": "문서에 명시된 플러그인 구조, v0.2 기능, 60% 통계 등 모든 내용이 근거 문서와 정확히 일치함"
-   },
-   "구성": {
-    "score": 5,
-    "reason": "결론과 핵심 angle이 우선 배치되고 부가 도식 남발 없이 concepts로 핵심 용어를 깔끔하게 정리함"
-   },
-   "표현": {
-    "score": 5,
-    "reason": "번역투 없이 명확하고 군더더기 없는 문체로 일관됨"
-   }
-  },
-  "facts": {
-   "total": 25,
-   "supported": 25,
-   "unsupported": [],
-   "step_id": 5008
+   "step_id": 5399
   }
  },
  "w40-solar-mini-4": {
@@ -299,173 +228,221 @@
   "verdicts": {
    "Q1": {
     "verdict": "fail",
-    "critique": "summary 첫 문장은 '업스테이지가 MoE 구조의 Solar Mini 4를 출시했다'로 결론을 담고 있으나, 주어진 angle이 '소형 MoE 모델의 로컬 실행 최적화'인데 첫 point는 투트랙 전략 출시 소식에 치중되어 로컬 실행 최적화 핵심이 바로 드러나지 않음."
+    "critique": "summary 첫 문장에 결론이 제시되었으나, plan.angle이 'GPU 한 장 실행 가능한 MoE 소형 모델의 에이전트 최적화'임에도 첫 point는 회사의 투트랙 전략으로 시작해 실패 예시(angle이 최적화인데 첫 point가 회사의 투트랙 전략)에 해당함"
    },
    "Q2": {
     "verdict": "fail",
-    "critique": "numbers[1]에 값이 2개(Solar Mini 4 1.25, MiMo-V2.5 2.2)뿐인 막대 그룹이 포함되어 있어 '조건에 맞지 않는데 채운 칸(값 2개 막대)' 규칙을 위반함."
+    "critique": "overview에서 points의 수치(24.1점, 43%)를 그대로 반복하고 있으며 도식 및 points 내용과 강하게 중복됨"
    },
    "Q3": {
     "verdict": "pass",
-    "critique": "도식의 context에 비교 기준(정가 기준 1,000세트 완료 비용)이 명확히 기재되어 있고 전체 구성이 명확하여 3분 내 이해 가능함."
+    "critique": "numbers 도식에 명확한 context가 있고 summary와 points를 통해 사건의 중요성과 내용을 쉽게 파악할 수 있음"
    },
    "Q4": {
     "verdict": "pass",
-    "critique": "번역투나 어색한 문장 없이 자연스러운 명사형/평서문으로 작성됨."
+    "critique": "번역투나 어색한 문장 없이 자연스러운 개조식 및 줄글로 작성됨"
    }
   },
   "scores": {
    "정확성": {
     "score": 5,
-    "reason": "모든 세부 수치와 내용이 제시된 근거 문서와 정확히 일치함."
+    "reason": "문서에 제시된 수치와 사실관계를 왜곡 없이 정확하게 인용함"
    },
    "구성": {
     "score": 3,
-    "reason": "angle 초점 배치와 2개 값만 있는 막대 도식 구성이 규칙에 미흡함."
+    "reason": "angle의 핵심이 첫 번째 포인트가 아닌 두 번째 포인트에 배치되고 개요에서 수치가 중복 반복됨"
    },
    "표현": {
     "score": 5,
-    "reason": "번역투 없이 간결하고 자연스러운 문체로 작성됨."
+    "reason": "군더더기 없는 담백한 문체로 번역투 없이 매끄럽게 작성됨"
    }
   },
   "facts": {
-   "total": 34,
-   "supported": 33,
-   "unsupported": [
-    {
-     "loc": "points[1]",
-     "fact": "Solar Mini 4는 MoE 구조임",
-     "evidence_id": "it:860#q1",
-     "supported": false
-    }
-   ],
-   "step_id": 5010
+   "total": 28,
+   "supported": 28,
+   "unsupported": [],
+   "step_id": 5401
   }
  },
- "w40-vidraft-darwin": {
+ "w40-deepseek-harness": {
   "week": "2026-W40",
   "status": "passed",
   "verdicts": {
    "Q1": {
     "verdict": "pass",
-    "critique": "summary 첫 문장에 결론이 제시되었으나, plan.angle이 '재귀적 자기개선 방식의 벤치마크 성과'임에도 첫 번째 포인트는 RSI 설명이나 핵심 성과보다 법률 추론 벤치마크 1위 사실만 다루고 RSI는 두 번째 포인트에 위치함"
+    "critique": "summary 첫 문장에 DeepSeek가 데스크톱 앱을 출시했다는 핵심 결론이 제시되었고, 첫 포인트와 두 번째 포인트에서 통합 앱 출시와 '챗·코딩·문서 통합'이라는 angle 핵심이 잘 드러남"
    },
    "Q2": {
     "verdict": "pass",
-    "critique": "값 2개짜리 막대나 사건 2개 흐름 등 불필요한 서식이 없고, points와 overview 간의 내용 중복도 적절한 수준으로 정리됨"
+    "critique": "조건에 맞지 않는 불필요한 도식 칸을 억지로 채우지 않고 비워두었으며, 개요와 포인트 간 군더더기 중복 없이 잘 정리됨"
    },
    "Q3": {
     "verdict": "pass",
-    "critique": "처음 읽는 사람이 3분 내에 핵심 성과와 RSI 개념을 파악할 수 있으며, numbers 그룹에 맥락(법률 추론 벤치마크 점수 비교)과 출처가 명확히 기재됨"
+    "critique": "3분 안에 제품 출시 내용과 통합 구조의 핵심 가치를 파악하기 쉽도록 명료하게 작성됨"
    },
    "Q4": {
     "verdict": "pass",
-    "critique": "번역투나 어색한 표현 없이 명확하고 자연스러운 한국어 문장으로 작성됨"
+    "critique": "번역투나 어색한 표현 없이 자연스럽고 명확한 개조식 문체로 작성됨"
    }
   },
   "scores": {
    "정확성": {
     "score": 5,
-    "reason": "출력된 모든 수치와 모델명, 설명이 근거 문서와 정확히 일치함"
+    "reason": "모든 포인트와 요약 내용이 근거 문서의 서술과 정확히 일치함"
    },
    "구성": {
     "score": 5,
-    "reason": "summary와 overview, points 전반의 결론 우선 배치가 우수하며 도식도 적절한 포인트에 앵커링됨"
+    "reason": "핵심 결론을 먼저 제시하고 주요 특징 및 확장 기능을 논리적 순서로 배치함"
    },
    "표현": {
     "score": 5,
-    "reason": "군더더기 없는 담백한 문체로 가독성이 높음"
+    "reason": "담백하고 군더더기 없는 문체로 가독성이 높음"
    }
   },
   "facts": {
-   "total": 37,
-   "supported": 37,
+   "total": 22,
+   "supported": 22,
    "unsupported": [],
-   "step_id": 5012
+   "step_id": 5403
   }
  },
- "w40-jev-decision-model": {
+ "w40-muse-gadgets": {
   "week": "2026-W40",
   "status": "passed",
   "verdicts": {
    "Q1": {
     "verdict": "pass",
-    "critique": "summary 첫 문장에서 Jeff와 Jeeves가 결론을 명시하고 angle인 '경량 의사결정 모델의 로컬 활용'이 첫 point에 잘 반영됨"
+    "critique": "summary 첫 문장에서 메타가 뮤즈 가젯과 뮤즈 홈 링크를 공개했다는 핵심 결론을 제시하고, point 1에 angle의 핵심인 플랫폼 공개 사실이 잘 드러나 있음"
    },
    "Q2": {
     "verdict": "pass",
-    "critique": "numbers는 5개 항목으로 구성되어 있고 events나 contributions 등 불필요한 칸이 없으며, overview가 points를 불필요하게 장황히 되풀이하지 않음"
+    "critique": "조건에 맞지 않는 numbers, events, contributions 도식을 억지로 채우지 않았고, concepts와 overview도 points를 불필요하게 반복하지 않고 정돈됨"
    },
    "Q3": {
     "verdict": "pass",
-    "critique": "3분 내 핵심 모델들의 성능과 구조를 파악하기 쉽고 numbers 항목에 명확한 context와 비교 대상이 설명됨"
+    "critique": "문서의 내용(플랫폼 공개, 지원 하드웨어, 스마트홈 링크 배포 계획, 향후 로드맵)이 명확하고 논리적으로 설명되어 있어 3분 내에 파악 가능함"
    },
    "Q4": {
     "verdict": "pass",
-    "critique": "번역투 없이 간결하고 자연스러운 개조식/문장체로 작성됨"
+    "critique": "번역투나 어색한 문장 없이 자연스럽고 간결한 한국어 평서문으로 서술됨"
    }
   },
   "scores": {
    "정확성": {
     "score": 5,
-    "reason": "모든 수치와 모델 설명이 it:979 및 it:984 원문과 정확히 일치함"
+    "reason": "제공된 문서(it:186, it:1022)의 모든 사실 관계와 정확하게 일치함"
    },
    "구성": {
     "score": 5,
-    "reason": "결론 우선 배치와 포인트 순서, numbers 도식의 배치가 논리적임"
+    "reason": "결론 우선 배치 및 중요도에 따른 포인트 구성이 안정적임"
    },
    "표현": {
     "score": 5,
-    "reason": "번역투나 군더더기 없이 깔끔하고 담백하게 서술됨"
+    "reason": "군더더기 없고 담백하며 번역투가 없는 문체임"
    }
   },
   "facts": {
-   "total": 29,
-   "supported": 29,
+   "total": 25,
+   "supported": 25,
    "unsupported": [],
-   "step_id": 5014
+   "step_id": 5405
   }
  },
- "w41-embedding-gemma-2": {
-  "week": "2026-W41",
+ "w40-claude-code-skills": {
+  "week": "2026-W40",
   "status": "checked",
   "verdicts": {
    "Q1": {
     "verdict": "pass",
-    "critique": "summary 첫 문장이 공개 주체(Google DeepMind), 모델명(EmbeddingGemma 2), 멀티모달 통합 내용을 명시하고 angle인 오픈웨이트 멀티모달 임베딩의 온디바이스 적용이 첫 point와 summary에 잘 담김"
+    "critique": "summary 첫 문장이 핵심 결론을 제시하고 첫 point가 스킬의 폴더 묶음 구조와 angle의 핵심을 잘 다룸"
    },
    "Q2": {
     "verdict": "pass",
-    "critique": "numbers는 2개 비교 막대로 허용 범위이며 events/contributions 빈칸 적절하고 overview가 포인트를 무의미하게 그대로 중복하지 않고 정제됨"
+    "critique": "도식이 무리하게 추가되지 않았고 overview와 points의 중복 서술이 최소화되어 군더더기가 없음"
    },
    "Q3": {
     "verdict": "pass",
-    "critique": "주요 내용이 3분 내 파악 가능하게 구조화되어 있고 numbers의 context에 측정 대상 및 출처가 명시됨"
+    "critique": "스킬 구조와 점진적 공개의 의미를 3분 안에 명확히 파악할 수 있도록 간결하게 정리됨"
    },
    "Q4": {
     "verdict": "pass",
-    "critique": "번역투나 불필요한 피동·어색한 연결 표현 없이 명확한 평서문으로 작성됨"
+    "critique": "번역투나 어색한 표현 없이 명확한 개조식 문체로 작성됨"
    }
   },
   "scores": {
    "정확성": {
     "score": 5,
-    "reason": "모든 문장과 수치(740M, 78.68점, 191MB/567MB 등)가 제공된 근거 문서와 정확히 일치함"
+    "reason": "문서 it:1025의 주요 스킬 구조 및 폴더 분리 내용을 충실히 반영함"
    },
    "구성": {
     "score": 5,
-    "reason": "결론과 핵심 angle이 서두에 오며 포인트 구성과 도식 연결이 일관됨"
+    "reason": "핵심 개념 정의부터 구조적 구현 방식까지 논리적으로 잘 배열됨"
    },
    "표현": {
     "score": 5,
-    "reason": "번역투 없이 간결하고 명확한 문체로 서술됨"
+    "reason": "번역투 없이 담백하고 일관된 문체로 서술됨"
    }
   },
   "facts": {
-   "total": 30,
-   "supported": 30,
+   "total": 18,
+   "supported": 18,
    "unsupported": [],
-   "step_id": 5016
+   "step_id": 5407
+  }
+ },
+ "w40-llamaindex-context": {
+  "week": "2026-W40",
+  "status": "passed",
+  "verdicts": {
+   "Q1": {
+    "verdict": "pass",
+    "critique": "summary 첫 문장에서 Jerry Liu가 RAG를 에이전트 하네스와 문서 컨텍스트 레이어로 분리하는 구조를 제시했다고 결론을 제시하고, plan.angle이 첫 point에 정확히 반영됨"
+   },
+   "Q2": {
+    "verdict": "pass",
+    "critique": "numbers, events, contributions 등 조건에 맞지 않는 불필요한 필드는 비워두었으며, points와 overview 간 무의미한 중복 서술이 없음"
+   },
+   "Q3": {
+    "verdict": "pass",
+    "critique": "RAG 진화 방향과 3개 계층 구조를 명확하게 전달하여 처음 읽는 독자가 핵심 맥락을 3분 내에 파악할 수 있음"
+   },
+   "Q4": {
+    "verdict": "pass",
+    "critique": "번역투나 어색한 문장 없이 단정하고 자연스러운 보고서 문체로 서술됨"
+   }
+  },
+  "scores": {
+   "정확성": {
+    "score": 5,
+    "reason": "문서에 언급된 에이전트 하네스, MCP 상향, 3층 구조 등 핵심 내용이 완벽히 일치함"
+   },
+   "구성": {
+    "score": 5,
+    "reason": "요약-핵심 포인트-개요의 흐름이 체계적이며 각 층위 구분이 명확함"
+   },
+   "표현": {
+    "score": 5,
+    "reason": "간결하고 담백한 문체로 군더더기 없이 핵심 정보를 요약함"
+   }
+  },
+  "facts": {
+   "total": 15,
+   "supported": 13,
+   "unsupported": [
+    {
+     "loc": "summary",
+     "fact": "ParseBench 기반 처리 영역 구분이 포함됨",
+     "evidence_id": "vd:274@816",
+     "supported": false
+    },
+    {
+     "loc": "concepts[2]",
+     "fact": "ParseBench는 문서 파싱 성능을 고정확도·저비용·초저지연 3가지 영역으로 구분하는 벤치마크임",
+     "evidence_id": "vd:274@816",
+     "supported": false
+    }
+   ],
+   "step_id": 5409
   }
  },
  "w41-mistral-large-4": {
@@ -474,82 +451,131 @@
   "verdicts": {
    "Q1": {
     "verdict": "pass",
-    "critique": "summary 첫 문장에서 Mistral의 1조 파라미터 MoE 모델 ML4 공개 및 오픈웨이트 출시를 결론으로 제시하고, angle인 '1조 파라미터 MoE 모델의 오픈웨이트 전략' 핵심이 point 1에 잘 반영됨"
+    "critique": "요약 첫 문장에 Mistral이 1조500억개 MoE 모델을 공개하고 이달 말 오픈웨이트를 공개한다는 결론을 담았고, plan.angle(1조 파라미터 MoE 구조와 오픈웨이트 일정)의 핵심이 첫 두 포인트에 잘 배치됨"
    },
    "Q2": {
     "verdict": "pass",
-    "critique": "numbers 그룹은 각 3개, 4개 항목으로 2개 초과 조건을 만족하며, events와 contributions는 근거 부족에 맞춰 비워두었고 overview와 points 간 불필요한 단순 중복이 없음"
+    "critique": "도식과 타임라인 등 불필요한 칸을 억지로 채우지 않았고, concepts의 용어도 본문에 등장하며 개요와 포인트 간 군더더기 없는 구성을 유지함"
    },
    "Q3": {
     "verdict": "pass",
-    "critique": "각 numbers 그룹에 지표와 출처 맥락을 설명하는 context가 명확히 기재되어 있고 전체 구성이 신속한 파악에 적합함"
+    "critique": "핵심 사양, 공개 일정, 성능 지표가 명확하여 처음 읽는 사람도 3분 내에 파악 가능함"
    },
    "Q4": {
     "verdict": "pass",
-    "critique": "어색한 번역투 문장이나 불필요한 피동 표현 없이 간결하고 담백한 문체로 서술됨"
+    "critique": "번역투나 어색한 문장 없이 간결하고 자연스러운 명사형 종결 및 평서문으로 작성됨"
    }
   },
   "scores": {
    "정확성": {
     "score": 5,
-    "reason": "문서에 제시된 수치(52B vs 49B 차이, 벤치마크 및 가격)를 오류 없이 정확히 반영함"
+    "reason": "모든 문장과 수치(1조500억개, 490억개 활성화, 이달 말 공개, 요금 등)가 근거 문서와 정확히 일치함"
    },
    "구성": {
     "score": 5,
-    "reason": "결론 우선 제시, 중요도 순 정렬, 도식과 포인트의 유기적 배치가 잘 이루어짐"
+    "reason": "결론 중심 요약, angle에 맞춘 포인트 순서 및 군더더기 없는 구조임"
    },
    "표현": {
     "score": 5,
-    "reason": "번역투 없이 명확하고 간결한 문장 구조를 유지함"
+    "reason": "담백하고 번역투 없는 깔끔한 문체임"
    }
   },
   "facts": {
-   "total": 39,
-   "supported": 39,
+   "total": 29,
+   "supported": 29,
    "unsupported": [],
-   "step_id": 5018
+   "step_id": 5411
   }
  },
- "w41-gpt-6-intelligent-ui": {
+ "w41-gpt6-intelligent-ui": {
+  "week": "2026-W41",
+  "status": "passed",
+  "verdicts": {
+   "Q1": {
+    "verdict": "pass",
+    "critique": "summary 첫 문장에서 OpenAI의 GPT-6 지능형 UI 12억 명 대상 확대를 명확히 결론으로 제시하고 angle의 핵심이 points[1]에 정확히 반영됨"
+   },
+   "Q2": {
+    "verdict": "pass",
+    "critique": "조건에 맞지 않는 불필요한 도식 칸을 비워두었고 포인트 간 중복이 없으며 개요와 요약의 역할 분담이 적절함"
+   },
+   "Q3": {
+    "verdict": "pass",
+    "critique": "핵심 내용(지능형 UI 도입, 12억 명 확대, 속도 향상 수치)이 일목요연하여 3분 내에 쉽게 파악 가능함"
+   },
+   "Q4": {
+    "verdict": "pass",
+    "critique": "번역투나 어색한 문장 없이 자연스럽고 명확한 어조로 서술됨"
+   }
+  },
+  "scores": {
+   "정확성": {
+    "score": 5,
+    "reason": "모든 수치와 모델명, 설명이 제시된 근거 문서와 정확히 일치함"
+   },
+   "구성": {
+    "score": 5,
+    "reason": "결론 우선 구성이며 핵심 포인트 순서와 요약/개요 배치가 매우 체계적임"
+   },
+   "표현": {
+    "score": 5,
+    "reason": "군더더기 없는 담백한 문체로 가독성이 높음"
+   }
+  },
+  "facts": {
+   "total": 20,
+   "supported": 20,
+   "unsupported": [],
+   "step_id": 5413
+  }
+ },
+ "w41-embeddinggemma-2": {
   "week": "2026-W41",
   "status": "checked",
   "verdicts": {
    "Q1": {
     "verdict": "pass",
-    "critique": "summary 첫 문장에서 주간 12억 명 대상 확대 적용 결론을 명시하고 angle(GPT-6 지능형 UI의 전 사용자 적용) 핵심이 point 1에 잘 반영됨"
+    "critique": "summary 첫 문장에서 구글 딥마인드의 740M 멀티모달 임베딩 모델 공개 결론을 명확히 제시했고, angle(740M 오픈웨이트 멀티모달 임베딩)의 핵심 내용이 points 첫 문단 및 둘째 문단에 잘 포착됨"
    },
    "Q2": {
     "verdict": "pass",
-    "critique": "도식 항목(numbers, events, contributions)이 조건 미충족에 따라 비어 있고 불필요한 반복이나 군더더기가 없음"
+    "critique": "numbers에 전작 baseline과 EmbeddingGemma 2 비교치가 명확하고 문맥과 일치하며, 불필요한 이벤트/기여 목록이 없고 concepts 및 overview의 중복이나 어긋남이 없음"
    },
    "Q3": {
     "verdict": "pass",
-    "critique": "3분 내 핵심 변화(지능형 UI, 응답 속도, 티어별 적용) 파악이 용이하며 concepts 정의도 명확함"
+    "critique": "numbers context에 비교 조건 및 출처가 명확히 기재되어 있고 전체 흐름이 읽기 쉬우며 핵심 성능 및 라이선스 특징이 잘 전달됨"
    },
    "Q4": {
     "verdict": "pass",
-    "critique": "어색한 번역투 없이 간결하고 자연스러운 개조식 및 서술문으로 작성됨"
+    "critique": "번역투나 어색한 표현 없이 담백하고 자연스러운 문체로 작성됨"
    }
   },
   "scores": {
    "정확성": {
     "score": 5,
-    "reason": "문서에 명시된 지능형 UI, 12억 명, 44% 속도 개선 등 사실관계와 정확히 일치함"
+    "reason": "제시된 모든 수치(740M, 191MB, 567MB, 78.68점 등)와 설명이 근거 문서와 정확히 일치함"
    },
    "구성": {
     "score": 5,
-    "reason": "결론 우선 배치 및 중요도 순 포인트 구성, 불필요한 도식 배제가 적절함"
+    "reason": "결론 중심의 요약과 포인트 배치, 적절한 차트 구성으로 구조가 매우 탄탄함"
    },
    "표현": {
     "score": 5,
-    "reason": "번역투 없이 명확하고 간결한 문체로 작성됨"
+    "reason": "어색한 번역투 없이 간결하고 명확한 문체 유지"
    }
   },
   "facts": {
-   "total": 17,
-   "supported": 17,
-   "unsupported": [],
-   "step_id": 5020
+   "total": 38,
+   "supported": 37,
+   "unsupported": [
+    {
+     "loc": "concepts[1]",
+     "fact": "Matryoshka Representation Learning (MRL)을 통해 저장 공간을 절감함",
+     "evidence_id": null,
+     "supported": false
+    }
+   ],
+   "step_id": 5415
   }
  },
  "w41-claude-haiku-5-5": {
@@ -558,59 +584,89 @@
   "verdicts": {
    "Q1": {
     "verdict": "pass",
-    "critique": "summary 첫 문장에서 앤트로픽의 하이쿠 5.5 출시 및 90% 가격 인하 결론을 명시했고, 첫 point도 angle(가격 구조 변화)에 맞춰 10만 토큰 이하 구간 가격 인하를 다룸"
+    "critique": "summary 첫 문장에서 앤트로픽의 가격 90% 인하 결론을 명확히 제시했고, angle(10만 토큰 이하 요청 90% 가격 인하)이 첫 번째 point에 정확히 반영됨"
    },
    "Q2": {
     "verdict": "pass",
-    "critique": "도식 요소를 억지로 채우지 않고 빈칸으로 두었으며 overview가 points의 단순 반복에 그치지 않고 맥락을 연결함"
+    "critique": "조건에 맞지 않는 무리한 도식 생성 없이 빈칸으로 깔끔하게 비웠으며, overview가 points를 불필요하게 기계적으로 되풀이하지 않고 잘 요약함"
    },
    "Q3": {
     "verdict": "pass",
-    "critique": "소형 모델의 가격 인하 및 조건별(10만 토큰 전후) 가격 구조, 실질적 토큰 수 증가 요인을 명확히 파악할 수 있음"
+    "critique": "가격 체계(10만 토큰 기준 및 초과 시 인상)와 실질 토큰 사용량 증가 요인을 명확히 대조하여 직관적으로 핵심 맥락을 이해하기 쉬움"
    },
    "Q4": {
     "verdict": "pass",
-    "critique": "번역투나 어색한 문장 없이 간결하고 명확한 문체로 서술됨"
+    "critique": "어색한 번역투나 군더더기 없이 자연스러운 간결체 서술로 작성됨"
    }
   },
   "scores": {
    "정확성": {
     "score": 5,
-    "reason": "근거 문서의 수치(90% 인하, 1.25배 토큰 증가, 5배 인상 등)와 완전히 일치함"
+    "reason": "가격 인하율, 기준 토큰 구간, 벤치마크 점수 및 토큰 증가율 등 근거 문서 수치와 정확히 일치함"
    },
    "구성": {
     "score": 5,
-    "reason": "결론 중심 요약과 angle에 부합하는 포인트 순서 배치가 우수함"
+    "reason": "핵심 결론을 서두에 배치하고 중요도 순으로 포인트를 정렬하였으며 불필요한 도식을 억지로 넣지 않음"
    },
    "표현": {
     "score": 5,
-    "reason": "담백하고 가독성 높은 한국어 문장으로 작성됨"
+    "reason": "번역투 없이 간결하고 담백한 문체로 핵심을 서술함"
    }
   },
   "facts": {
-   "total": 21,
-   "supported": 18,
+   "total": 24,
+   "supported": 23,
    "unsupported": [
     {
-     "loc": "points[3]",
-     "fact": "토크나이저 변경으로 인한 결과이다",
-     "evidence_id": "it:1144#q4",
-     "supported": false
-    },
-    {
      "loc": "overview",
-     "fact": "토크나이저 변경이 있었다",
-     "evidence_id": null,
-     "supported": false
-    },
-    {
-     "loc": "summary",
-     "fact": "토크나이저 변경이 원인이다",
+     "fact": "토크나이저 변경으로 토큰 사용량이 증가했다",
      "evidence_id": null,
      "supported": false
     }
    ],
-   "step_id": 5022
+   "step_id": 5417
+  }
+ },
+ "w41-decision-api-spec": {
+  "week": "2026-W41",
+  "status": "checked",
+  "verdicts": {
+   "Q1": {
+    "verdict": "pass",
+    "critique": "요약 첫 문장이 3개 출력 유형 지원 결론을 제시하고 첫 포인트도 angle인 출력 유형 스펙을 정확히 다룸"
+   },
+   "Q2": {
+    "verdict": "pass",
+    "critique": "도식 없이 빈칸 규칙을 준수했으며 포인트를 개요에서 과도하게 반복하지 않고 concepts도 본문 용어로 채움"
+   },
+   "Q3": {
+    "verdict": "pass",
+    "critique": "이전 토픽과의 맥락 및 세 가지 출력 유형과 과금 체계를 3분 안에 명확히 파악할 수 있음"
+   },
+   "Q4": {
+    "verdict": "pass",
+    "critique": "번역투나 어색한 문장 없이 간결하고 담백한 문체로 서술됨"
+   }
+  },
+  "scores": {
+   "정확성": {
+    "score": 5,
+    "reason": "제시된 모든 스펙 및 과금 수치가 근거 문서 내용과 완전히 일치함"
+   },
+   "구성": {
+    "score": 5,
+    "reason": "angle에 맞춘 핵심 출력 유형부터 비교 및 가격 구조로 논리적 흐름이 매끄러움"
+   },
+   "표현": {
+    "score": 5,
+    "reason": "번역투 없이 명확하고 군더더기 없는 문장을 구사함"
+   }
+  },
+  "facts": {
+   "total": 23,
+   "supported": 23,
+   "unsupported": [],
+   "step_id": 5419
   }
  },
  "w41-openai-rogue-agent": {
@@ -619,257 +675,208 @@
   "verdicts": {
    "Q1": {
     "verdict": "pass",
-    "critique": "summary 첫 문장에 위키미디어 재단이 OpenAI rogue 에이전트의 무단 편집 및 장애 연관 가능성을 밝혔다는 결론이 명시되어 있고, 첫 point 역시 장애 연관성을 다루어 angle(무단 편집과 인프라 장애 연관성) 핵심을 반영함"
+    "critique": "summary 첫 문장에서 위키미디어 재단이 OpenAI 에이전트의 무단 활동 및 5월 장애 연관성을 밝혔음을 핵심 결론으로 명시하고 첫 point 역시 angle 핵심을 포착함"
    },
    "Q2": {
     "verdict": "pass",
-    "critique": "무리하게 numbers나 events를 채우지 않고 빈칸으로 두었으며, points 간 중복이 없고 overview가 points를 그대로 나열해 되풀이하지 않음"
+    "critique": "도식 칸을 무리하게 채우지 않고 비워두었으며 overview와 points 간 과도한 수치 복제나 중복이 없음"
    },
    "Q3": {
     "verdict": "pass",
-    "critique": "3분 안에 상황과 쟁점(인프라 장애 연관성 및 인과관계)을 명확히 파악할 수 있도록 개념과 개요가 정리되어 있음"
+    "critique": "3분 안에 장애와 무단 편집 사건의 맥락을 쉽게 파악할 수 있도록 명료하게 정리됨"
    },
    "Q4": {
     "verdict": "pass",
-    "critique": "어색한 번역투나 반복적인 피동/불필요 표현 없이 간결하고 자연스러운 문체로 작성됨"
+    "critique": "번역투나 어색한 문장 없이 자연스러운 명사형/개조식 문체로 작성됨"
    }
   },
   "scores": {
    "정확성": {
     "score": 5,
-    "reason": "문서에 명시된 에이전트 활동과 날짜, 쿼리 장애 연관성 등의 세부 사실이 오차 없이 정확히 반영됨"
+    "reason": "모든 문장이 근거 문서의 내용과 정확히 일치함"
    },
    "구성": {
     "score": 5,
-    "reason": "결론과 장애 연관성을 최우선 배치하고 핵심 세부사항을 논리적 순서로 정리함"
+    "reason": "결론 중심 요약과 중요도 순 포인트 배치가 적절함"
    },
    "표현": {
     "score": 5,
-    "reason": "군더더기 없는 담백한 문장으로 의미가 막힘없이 전달됨"
+    "reason": "담백하고 군더더기 없는 문체로 읽기 쉬움"
    }
   },
   "facts": {
-   "total": 18,
-   "supported": 18,
+   "total": 17,
+   "supported": 17,
    "unsupported": [],
-   "step_id": 5024
+   "step_id": 5421
   }
  },
- "w41-mai-code-1-1": {
+ "w41-openai-math-results": {
   "week": "2026-W41",
   "status": "passed",
   "verdicts": {
    "Q1": {
     "verdict": "pass",
-    "critique": "summary 첫 문장에서 MS의 온디바이스 최적화 버전 공개를 명시하고 point 1 및 전체 구성이 plan.angle인 '온디바이스 코딩 모델 최적화'를 정확히 반영함"
+    "critique": "summary 첫 문장에서 OpenAI가 4000개 문제로 722편 원고를 냈다는 결론을 제시했고, plan.angle 내용이 첫 번째 point에 핵심으로 배치됨"
    },
    "Q2": {
     "verdict": "pass",
-    "critique": "numbers는 4개 항목을 비교해 적절하고, 불필요한 events/contributions가 없으며 overview와 points의 중복 되풀이 없이 자연스럽게 구성됨"
+    "critique": "무리하게 수치 막대나 타임라인을 채우지 않고 비워두었으며, concepts의 Lean도 본문에 등장하고 point와 overview의 과도한 중복 없이 요약됨"
    },
    "Q3": {
     "verdict": "pass",
-    "critique": "온디바이스 최적화의 의미와 수치가 명확히 드러나고 numbers의 context에 비교 기준과 출처가 명시되어 이해하기 쉬움"
+    "critique": "오픈AI의 연구 성과와 공개 맥락(Lean 검증, 연산량 규모, 한계점)이 명확히 전달되어 3분 내 이해 가능함"
    },
    "Q4": {
     "verdict": "pass",
-    "critique": "어색한 번역투나 불필요한 피동·문장 지연 표현 없이 명확하고 간결한 문체로 서술됨"
+    "critique": "번역투나 부자연스러운 문장 없이 매끄럽게 서술됨"
    }
   },
   "scores": {
    "정확성": {
     "score": 5,
-    "reason": "제공된 모든 수치 및 서술이 근거 문서와 정확히 일치함"
+    "reason": "문서에 기재된 4000개 문제, 722편 원고, Lean 형식화, 3시간 연산량 등 주요 사실과 정확히 일치함"
    },
    "구성": {
     "score": 5,
-    "reason": "핵심 결론이 먼저 제시되고 도식이 포인트와 잘 연계됨"
+    "reason": "결론 중심 요약과 중요도 순의 포인트 배치, 군더더기 없는 도식 생략이 잘 이루어짐"
    },
    "표현": {
     "score": 5,
-    "reason": "번역투 없이 명확하고 군더더기 없는 문장으로 작성됨"
-   }
-  },
-  "facts": {
-   "total": 26,
-   "supported": 26,
-   "unsupported": [],
-   "step_id": 5026
-  }
- },
- "w41-openrig": {
-  "week": "2026-W41",
-  "status": "passed",
-  "verdicts": {
-   "Q1": {
-    "verdict": "pass",
-    "critique": "summary 첫 문장에 핵심 결론(OpenRig 공개 및 기능)이 제시되고 angle인 멀티 에이전트 오케스트레이션 구조가 point 1 및 summary에 명확히 반영됨"
-   },
-   "Q2": {
-    "verdict": "pass",
-    "critique": "numbers, events 등의 억지 채움이 없고 overview와 points 간 군더더기 반복 없이 구성됨"
-   },
-   "Q3": {
-    "verdict": "pass",
-    "critique": "어떤 도구인지, 리드-전문가 에이전트 구조와 요구사항이 명확히 파악되며 불필요한 도식 낭비 없음"
-   },
-   "Q4": {
-    "verdict": "pass",
-    "critique": "번역투나 어색한 문장 없이 자연스럽고 명확한 서술임"
-   }
-  },
-  "scores": {
-   "정확성": {
-    "score": 5,
-    "reason": "모든 문장이 제공된 GitHub 및 GeekNews 문서 내용과 정확히 일치함"
-   },
-   "구성": {
-    "score": 5,
-    "reason": "결론 우선 배치, 오케스트레이션 핵심 구조 설명 순으로 매끄럽게 연결됨"
-   },
-   "표현": {
-    "score": 5,
-    "reason": "간결하고 명확한 문체로 번역투 없이 작성됨"
-   }
-  },
-  "facts": {
-   "total": 18,
-   "supported": 18,
-   "unsupported": [],
-   "step_id": 5028
-  }
- },
- "w41-sift-framework": {
-  "week": "2026-W41",
-  "status": "checked",
-  "verdicts": {
-   "Q1": {
-    "verdict": "pass",
-    "critique": "summary 첫 문장에서 MIT·사카나의 SIFT 공개 결론을 명확히 제시하고 첫 point에서 angle인 '하네스 진화와 검증 비용'을 정확히 포착함"
-   },
-   "Q2": {
-    "verdict": "fail",
-    "critique": "numbers 차트의 단위가 '%'로 지정되어 있으나 항목에 시간(5)과 CPU 시간(42)이 섞여 서로 다른 단위를 부적절하게 한 막대 그룹에 묶음"
-   },
-   "Q3": {
-    "verdict": "fail",
-    "critique": "numbers 차트가 서로 다른 단위의 수치를 '%' 그룹으로 묶어 맥락 파악 및 가독성을 저해함"
-   },
-   "Q4": {
-    "verdict": "pass",
-    "critique": "번역투나 어색한 문장 없이 자연스러운 한국어 평서문으로 작성됨"
-   }
-  },
-  "scores": {
-   "정확성": {
-    "score": 5,
-    "reason": "문서의 핵심 수치와 사실관계를 왜곡 없이 정확하게 인용함"
-   },
-   "구성": {
-    "score": 3,
-    "reason": "수치 도식에 서로 다른 단위(정확도, 시간, CPU 시간)를 무리하게 하나로 묶어 도식 구성이 어긋남"
-   },
-   "표현": {
-    "score": 5,
-    "reason": "군더더기 없고 명확하며 번역투가 없는 깔끔한 문체"
-   }
-  },
-  "facts": {
-   "total": 22,
-   "supported": 21,
-   "unsupported": [
-    {
-     "loc": "concepts[1]",
-     "fact": "LLM-as-a-judge 신호로 후보 패치 비교 및 탐색을 유도함",
-     "evidence_id": null,
-     "supported": false
-    }
-   ],
-   "step_id": 5030
-  }
- },
- "w41-openai-math": {
-  "week": "2026-W41",
-  "status": "passed",
-  "verdicts": {
-   "Q1": {
-    "verdict": "pass",
-    "critique": "summary 첫 문장에 주체(OpenAI), 대상 및 수치(722편 수학 연구 원고)가 명시되어 있고, 첫 번째 point에 angle인 프런티어 모델의 수학 연구 성과가 잘 배치됨"
-   },
-   "Q2": {
-    "verdict": "pass",
-    "critique": "조건에 맞지 않는 numbers나 events를 억지로 채우지 않았고, points 간 중복 없이 overview도 핵심을 요약함"
-   },
-   "Q3": {
-    "verdict": "pass",
-    "critique": "Lean 개념 설명이 concepts에 명확히 제공되고, 핵심 내용과 중요성을 3분 내에 파악하기 용이하게 구성됨"
-   },
-   "Q4": {
-    "verdict": "pass",
-    "critique": "ChatGPT Pro thinking 등 고유 용어 외에 번역투 없이 한국어 문장이 매끄럽고 명확함"
-   }
-  },
-  "scores": {
-   "정확성": {
-    "score": 5,
-    "reason": "모든 문장의 내용과 수치가 제시된 근거 문서와 정확히 일치함"
-   },
-   "구성": {
-    "score": 5,
-    "reason": "결론 우선 구성이며 불필요한 도식 없이 포인트와 개념 설명이 체계적으로 배치됨"
-   },
-   "표현": {
-    "score": 5,
-    "reason": "번역투나 군더더기 없이 간결하고 명확한 문체로 서술됨"
+    "reason": "간결하고 담백한 문체로 번역투 없이 정리됨"
    }
   },
   "facts": {
    "total": 21,
    "supported": 21,
    "unsupported": [],
-   "step_id": 5032
+   "step_id": 5423
   }
  },
- "w41-textgrain-eu": {
+ "w41-openai-textgrain": {
   "week": "2026-W41",
-  "status": "passed",
+  "status": "checked",
   "verdicts": {
    "Q1": {
     "verdict": "pass",
-    "critique": "summary 첫 문장에서 OpenAI의 textGrain 도입 및 적용 계획을 명시했고, 첫 point도 EU AI Act 대응과 textGrain 도입을 angle에 맞춰 제시함"
+    "critique": "summary 첫 문장에 오픈AI의 EU 내 textGrain 적용 결론이 명시되어 있고, 첫 point가 angle인 'EU AI Act 대응 textGrain 워터마크 적용'을 정확히 반영함"
    },
    "Q2": {
     "verdict": "pass",
-    "critique": "numbers는 3개 항목으로 구성되어 2개 제한에 걸리지 않으며 events/contributions 빈칸 적절하고 overview와 points 간 과도한 수치 반복 없음"
+    "critique": "도식 없이 필수 요소만 간결히 채웠으며, overview와 points 간의 불필요한 단순 수치 복제가 없고 내용 구분이 명확함"
    },
    "Q3": {
     "verdict": "pass",
-    "critique": "3분 안에 파악 가능한 구조이며 numbers의 context에 측정 조건(400-token 문단 동의어 치환)과 출처가 명확히 기재됨"
+    "critique": "배경과 핵심(적용 대상, 기술 특성, 한계점)이 명료하게 정리되어 3분 내 파악이 가능함"
    },
    "Q4": {
     "verdict": "pass",
-    "critique": "번역투나 어색한 표현 없이 간결하고 자연스러운 개조식/평서문 문체 유지"
+    "critique": "어색한 번역투 없이 개조식 종결과 서술이 자연스럽고 명확함"
    }
   },
   "scores": {
    "정확성": {
     "score": 5,
-    "reason": "모든 수치와 주장이 근거 문서 it:1105, it:1225와 정확히 일치함"
+    "reason": "모든 포인트와 수치가 근거 문서 내용과 완전히 일치함"
    },
    "구성": {
     "score": 5,
-    "reason": "결론 우선 제시, 중요도 순 정렬, numbers 도식의 맥락과 연결이 우수함"
+    "reason": "핵심 발표 결론부터 세부 성능 및 한계 순으로 논리 정연하게 배열됨"
    },
    "표현": {
     "score": 5,
-    "reason": "불필요한 군더더기 및 번역투 없이 담백하게 작성됨"
+    "reason": "군더더기 없는 담백한 문체로 번역투 없이 작성됨"
    }
   },
   "facts": {
-   "total": 25,
-   "supported": 25,
+   "total": 18,
+   "supported": 18,
    "unsupported": [],
-   "step_id": 5034
+   "step_id": 5425
+  }
+ },
+ "w41-openrig-orchestrator": {
+  "week": "2026-W41",
+  "status": "checked",
+  "verdicts": {
+   "Q1": {
+    "verdict": "pass",
+    "critique": "summary 첫 문장에 OpenRig의 핵심 역할과 v0.6.6 업데이트 내용이 결론으로 제시되고 첫 point에 angle 핵심이 반영됨"
+   },
+   "Q2": {
+    "verdict": "fail",
+    "critique": "근거 소스가 GitHub과 GeekNews 2곳이 있으나 contributions에 github 단일 채널만 작성되어 채널 요건 미충족"
+   },
+   "Q3": {
+    "verdict": "pass",
+    "critique": "무슨 일이고 왜 중요한지 명확하며 필요한 시스템 요구 사항과 핵심 구조를 알기 쉽게 설명함"
+   },
+   "Q4": {
+    "verdict": "pass",
+    "critique": "번역투나 어색한 표현 없이 명료하고 자연스러운 문체로 작성됨"
+   }
+  },
+  "scores": {
+   "정확성": {
+    "score": 5,
+    "reason": "모든 문장이 근거 문서의 내용과 정확히 일치함"
+   },
+   "구성": {
+    "score": 3,
+    "reason": "근거 채널이 2개인데 contributions에 1개 채널만 작성됨"
+   },
+   "표현": {
+    "score": 5,
+    "reason": "간결하고 자연스러운 기술 브리핑 문체 유지"
+   }
+  },
+  "facts": {
+   "total": 22,
+   "supported": 22,
+   "unsupported": [],
+   "step_id": 5427
+  }
+ },
+ "w41-agent-coding-talks": {
+  "week": "2026-W41",
+  "status": "checked",
+  "verdicts": {
+   "Q1": {
+    "verdict": "pass",
+    "critique": "summary 첫 문장에 결론과 angle의 핵심 주제(코드베이스 부패, 상태 머신 등)가 담겨 있고 point 1에 angle의 첫 핵심인 Slop과 상태 머신이 잘 드러남"
+   },
+   "Q2": {
+    "verdict": "pass",
+    "critique": "numbers, events, contributions를 무리하게 채우지 않았고 points 간 중복이 없으며 overview가 단순 반복에 그치지 않고 핵심을 잘 아우름"
+   },
+   "Q3": {
+    "verdict": "pass",
+    "critique": "문제 상황(Slop, 코드베이스 부패)부터 해결책 및 워크플로우 변화까지 3분 안에 파악 가능하도록 명확하게 서술됨"
+   },
+   "Q4": {
+    "verdict": "pass",
+    "critique": "번역투나 어색한 표현 없이 간결하고 명확한 문체로 작성됨"
+   }
+  },
+  "scores": {
+   "정확성": {
+    "score": 5,
+    "reason": "문서에 나타난 수치(72%, 80개 등)와 개념이 근거와 정확히 부합함"
+   },
+   "구성": {
+    "score": 5,
+    "reason": "angle에 맞추어 문제 정의에서 구체적 해법 및 사례 순으로 체계적으로 구성됨"
+   },
+   "표현": {
+    "score": 5,
+    "reason": "군더더기 없는 담백한 문장과 명확한 용어 사용이 돋보임"
+   }
+  },
+  "facts": {
+   "total": 23,
+   "supported": 23,
+   "unsupported": [],
+   "step_id": 5429
   }
  }
 }

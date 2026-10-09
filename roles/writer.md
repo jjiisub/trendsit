@@ -23,7 +23,7 @@ core_rules:
 ## 입력
 - `plan`: 순위, 다룰 축(angle) 한 줄, 관계(new / follow_up + 지난 토픽 id)
 - `<document id="...">`: 이 토픽의 근거만. id가 곧 근거 id다
-  - 글 문장 `it:<번호>#q<n>`: "원문:" 줄이 원문 문장(quote)이다. 같은 id 아래 "(카드 수치…)" 줄은 그 원문에서 뽑은 값, "(카드 주장 요약, 원문 아님)" 줄은 카드 작성자의 요약이라 근거 문장이 아니다. 원문 줄에 없는 내용은 주장 줄에 있어도 쓰지 않는다
+  - 글 문장 `it:<번호>#q<n>`: "원문:" 줄이 원문 문장(quote)이다. 같은 id 아래 "(카드 수치…)" 줄은 그 원문에서 뽑은 값이다. 원문 줄에 없는 해석(원인, 효과, 평가)은 쓰지 않는다
   - 원본 문서 문장 `og:<번호>#q<n>`: 글이 인용한 원본(공식 블로그, 논문 등)의 문장. 같은 글의 `it:` 문장과 함께 올 수 있다
   - 영상 `vd:<영상id>@<초>`: 슬라이드 전용 수치, 타임라인 구간, 요약 문장
   - 레포 `rp:<owner/name>`: 하는 일 한 문장, 신호, 이번 주 별, 릴리스
@@ -50,7 +50,7 @@ core_rules:
 | 날짜가 다른 사건 3개 이상 | events |
 | 날짜가 다른 사건 2개이고 그 흐름이 쟁점 | events + flow_is_point |
 | 하나의 수치나 사실, 방법·절차 | points 문장 |
-| 처음 보는 용어 | concepts |
+| 처음 보는 용어 | concepts(풀이는 근거 원문에 있는 설명만. 근거에 풀이가 없으면 그 용어는 넣지 않는다) |
 | 소스마다 다른 기여(근거 채널이 2개 이상) | contributions(채널마다 1문장, 빠진 채널 없이) |
 
 애매하면 "이 비교나 흐름을 문장으로 읽는 것보다 그림으로 보는 게 빠른가?"로 정한다. 비슷하면 문장으로 쓴다.
@@ -78,7 +78,7 @@ core_rules:
 | `numbers[]` {anchor, group, title, context, unit, items[{label, value, ref, baseline?, emphasis?}]} | 선택 | 최대 2그룹, 그룹당 2~6개. title은 근거 값 그대로의 발견("Jeeves 정확도 93.5%로 4개 중 최고"), 한 그룹 한 단위(unit은 비우지 않음), context 1~2문장 |
 | `events[]` {anchor, title, context, flow_is_point?, items[{date, text, ref 또는 topic_id}]} | 선택 | 최대 1그룹, 항목 2~6개, 날짜는 근거에 있는 YYYY-MM-DD, context 1~2문장 |
 | `contributions[]` {channel, text, refs} | 선택 | 소스 2개 이상일 때, 채널마다 1문장 |
-| `concepts[]` {term, desc} | 선택 | 0~3개 |
+| `concepts[]` {term, desc} | 선택 | 0~3개. desc는 근거 원문의 설명 그대로의 범위(배경 지식으로 효과·정의를 덧붙이지 않음) |
 | `overview` | 필수 | 2~4문장 |
 | `summary` | 필수 | 1~2문장, 최대 3 |
 | `title` | 필수 | 무엇이 일어났는지 명사구, 30자 안팎 |

@@ -1,6 +1,6 @@
 # 주간 브리핑 2026-W40 (리뷰용 읽기본)
 
-> run `20261010-073230-weekly-d33d`. S6 export 전 임시 화면. 홈 순서대로 토픽, 끝에 홈 레포 목록. 근거 id 옆은 출처 제목. ⚠ = 확인 필요(같은 이슈가 두 번 남았거나 3라운드 뒤 남은 이슈)
+> run `20261010-075240-weekly-566b`. S6 export 전 임시 화면. 홈 순서대로 토픽, 끝에 홈 레포 목록. 근거 id 옆은 출처 제목. ⚠ = 확인 필요(같은 이슈가 두 번 남았거나 3라운드 뒤 남은 이슈)
 
 ## 1. 리드 · GPT-6.1 Sol 출시: Astra급 지능, 5분의 1 가격
 
@@ -264,11 +264,13 @@
 
 ## 9. Claude Code 스킬: 반복 작업을 재사용 가능한 스킬로 분리하는 설계 패턴
 
-`w40-claude-code-skills` · 상태 passed · 1라운드 · 축: 반복 작업을 재사용 가능한 스킬로 분리하는 설계 패턴
+`w40-claude-code-skills` · 상태 checked · 3라운드 · 축: 반복 작업을 재사용 가능한 스킬로 분리하는 설계 패턴
+
+> ⚠ 확인 필요: numbers(이슈가 남은 채 발행된 위치)
 
 **요약(홈)** Claude Code 스킬은 반복되는 판단 기준을 외부화하는 것이 핵심이며, SKILL.md를 목차로 쓰고 세부 내용을 폴더로 분리하는 점진적 공개 방식을 사용한다. 세션 시작 시 스킬 약 50개, 에이전트 약 20개, 도구 약 60개 목록이 컨텍스트에 들어온다.
 
-**개요** Claude Code 스킬은 반복 작업을 재사용 가능한 절차로 분리하는 설계 패턴이다. 핵심은 특정 명령을 길게 나열하는 것이 아니라, 반복되는 판단 기준을 외부화하는 것이다. 세션 시작 시 스킬·에이전트·도구 목록이 컨텍스트에 함께 들어오므로, 스킬이 많아질수록 컨텍스트 부담이 커지는 문제가 있다.
+**개요** Claude Code 스킬은 반복 작업을 재사용 가능한 절차로 분리하는 설계 패턴이다. 핵심은 특정 명령을 길게 나열하는 것이 아니라, 반복되는 판단 기준을 외부화하는 것이다. 세션 시작 시 스킬·에이전트·도구 목록이 컨텍스트에 함께 들어온다.
 
 **핵심 포인트**
 
@@ -319,7 +321,7 @@
 ```json
 {
  "week": "2026-W40",
- "model": "qwen/qwen3.8-27b",
+ "model": "",
  "status": "ok",
  "cluster_run": "20261010-073230-weekly-d33d",
  "evidence": {
@@ -333,7 +335,7 @@
    "no_digest": 13,
    "irrelevant_repo": 0
   },
-  "truncated_topics": 3
+  "truncated_topics": 0
  },
  "aliases": {
   "candidates": 0,
@@ -376,40 +378,40 @@
  },
  "review": {
   "rounds": {
-   "1": 4,
+   "1": 3,
    "2": 6,
-   "3": 0
+   "3": 1
   },
   "code_rejects": 9,
-  "critic_rejects": 0,
-  "autofixes": 9,
-  "reverts": 0,
+  "critic_rejects": 3,
+  "autofixes": 7,
+  "reverts": 1,
   "issues": {
    "unsupported": 0,
    "number_mismatch": 0,
-   "overclaim": 0,
+   "overclaim": 1,
    "missing_key": 0,
    "wrong_ref": 0,
    "overuse": 0,
-   "missing_diagram": 0
+   "missing_diagram": 3
   },
   "check_points": 1,
-  "check_topics": 3
+  "check_topics": 4
  },
  "cost_usd": {
-  "decide": 0.008665,
-  "editor_select": 0.005952,
-  "writer": 0.029839,
-  "writer_revise": 0.005868,
-  "critic": 0.03027,
-  "total": 0.080594
+  "decide": 0.0,
+  "editor_select": 0.0,
+  "writer": 0.0,
+  "writer_revise": 0.004269,
+  "critic": 0.008548,
+  "total": 0.012817
  },
  "duration_sec": {
-  "evidence": 6.1,
-  "cluster": 98.1,
-  "select": 65.9,
-  "write_review": 748.6,
-  "total": 919.7
+  "evidence": 0,
+  "cluster": 0,
+  "select": 1.1,
+  "write_review": 131.5,
+  "total": 140.0
  }
 }
 ```

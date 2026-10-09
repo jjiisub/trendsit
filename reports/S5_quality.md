@@ -232,79 +232,79 @@ judge 판정: **잠정**(사람 라벨 없음. `eval/labels/writer.csv`를 채�
 
 > `scripts/s5_gate_b.py`가 붙인 절. 라벨이 필요한 항목은 2차 라벨(D1-3, 리뷰 세션 opus-5.5) 전 잠정.
 
-### 2026-W40 (run `20261009-200528-weekly-eafd`, 묶기 run `20261009-171627-weekly-50b5`)
+### 2026-W40 (run `20261010-075240-weekly-566b`, 묶기 run `20261010-073230-weekly-d33d`)
 
-- 실행 요약: 토픽 10, 실패 0, 라운드 {'1': 5, '2': 3, '3': 2}, 코드 반려 4, 검수 반려 5, 되돌림 0, check 포인트 1, 사용액 $0.084278, 시간 474.5초
+- 실행 요약: 토픽 10, 실패 0, 라운드 {'1': 3, '2': 6, '3': 1}, 코드 반려 9, 검수 반려 3, 되돌림 1, check 포인트 1, 사용액 $0.012817, 시간 140.0초
 - 선별: 첫 시도 코드 검증 실패(1회 시도, 계획 model), reason 입력 대조 위반 0
 
 | 순위 | 토픽 | 상태 | 라운드 | 채널 | 도식(수치·사건) | 코드 경고 | 문체 위반 | check |
 |---|---|---|---|---|---|---|---|---|
-| 1 | w40-openai-dots | checked | 2 | text | 0·0 | 1 | 0 | 0 |
-| 2 | w40-gemini-argon | passed | 1 | text | 1·0 | 0 | 0 | 0 |
-| 3 | w40-gpt-6-1-sol | passed | 3 | text | 0·0 | 1 | 0 | 0 |
-| 4 | w40-decision-api | checked | 2 | text | 0·0 | 0 | 0 | 1 |
-| 5 | w40-openai-security | passed | 1 | text | 0·0 | 0 | 0 | 0 |
-| 6 | w40-claude-sonnet-5-5 | passed | 1 | text | 1·0 | 0 | 0 | 0 |
+| 1 | w40-gpt-6-1-sol | checked | 2 | text | 0·0 | 1 | 0 | 1 |
+| 2 | w40-gemini-4-argon | checked | 2 | text | 1·0 | 0 | 0 | 0 |
+| 3 | w40-openai-dots | passed | 1 | text | 0·0 | 1 | 0 | 0 |
+| 4 | w40-claude-sonnet-5-5 | passed | 1 | text | 2·0 | 0 | 0 | 0 |
+| 5 | w40-decision-api | checked | 2 | text | 0·0 | 2 | 0 | 0 |
+| 6 | w40-solar-mini-4 | passed | 2 | text | 1·0 | 1 | 0 | 0 |
 | 7 | w40-deepseek-harness | passed | 2 | text | 0·0 | 0 | 0 | 0 |
-| 8 | w40-solar-mini-4 | passed | 1 | text | 1·0 | 0 | 0 | 0 |
-| 9 | w40-vidraft-darwin | passed | 1 | text | 1·0 | 0 | 0 | 0 |
-| 10 | w40-jev-decision-model | passed | 3 | text | 1·0 | 0 | 0 | 0 |
+| 8 | w40-muse-gadgets | passed | 1 | text | 0·0 | 0 | 0 | 0 |
+| 9 | w40-claude-code-skills | checked | 3 | text | 0·0 | 1 | 0 | 0 |
+| 10 | w40-llamaindex-context | passed | 2 | video | 0·0 | 0 | 0 | 0 |
 
-### 2026-W41 (run `20261009-201517-weekly-2101`, 묶기 run `20261009-180904-weekly-7454`)
+### 2026-W41 (run `20261010-075543-weekly-fd8a`, 묶기 run `20261010-075543-weekly-fd8a`)
 
-- 실행 요약: 토픽 10, 실패 0, 라운드 {'1': 5, '2': 5, '3': 0}, 코드 반려 5, 검수 반려 4, 되돌림 0, check 포인트 0, 사용액 $0.061785, 시간 403.9초
-- 선별: 첫 시도 코드 검증 실패(1회 시도, 계획 model), reason 입력 대조 위반 0
+- 실행 요약: 토픽 10, 실패 0, 라운드 {'1': 3, '2': 7, '3': 0}, 코드 반려 7, 검수 반려 7, 되돌림 0, check 포인트 2, 사용액 $0.110779, 시간 1007.4초
+- 선별: 첫 시도 코드 검증 통과(1회 시도, 계획 model), reason 입력 대조 위반 3
 
 | 순위 | 토픽 | 상태 | 라운드 | 채널 | 도식(수치·사건) | 코드 경고 | 문체 위반 | check |
 |---|---|---|---|---|---|---|---|---|
-| 1 | w41-embedding-gemma-2 | checked | 2 | text | 1·0 | 0 | 0 | 0 |
-| 2 | w41-mistral-large-4 | passed | 1 | text | 2·0 | 0 | 0 | 0 |
-| 3 | w41-gpt-6-intelligent-ui | checked | 2 | text | 0·0 | 0 | 0 | 0 |
-| 4 | w41-claude-haiku-5-5 | checked | 2 | text | 0·0 | 1 | 0 | 0 |
-| 5 | w41-openai-rogue-agent | passed | 1 | text | 0·0 | 0 | 0 | 0 |
-| 6 | w41-mai-code-1-1 | passed | 1 | text | 1·0 | 0 | 0 | 0 |
-| 7 | w41-openrig | passed | 2 | github+text | 0·0 | 0 | 0 | 0 |
-| 8 | w41-sift-framework | checked | 2 | text | 1·0 | 0 | 0 | 0 |
-| 9 | w41-openai-math | passed | 1 | text | 0·0 | 0 | 0 | 0 |
-| 10 | w41-textgrain-eu | passed | 1 | text | 1·0 | 0 | 0 | 0 |
+| 1 | w41-mistral-large-4 | passed | 2 | text | 0·0 | 1 | 0 | 0 |
+| 2 | w41-gpt6-intelligent-ui | passed | 1 | text | 0·0 | 0 | 0 | 0 |
+| 3 | w41-embeddinggemma-2 | checked | 2 | text | 1·0 | 0 | 0 | 0 |
+| 4 | w41-claude-haiku-5-5 | checked | 2 | text | 0·0 | 0 | 0 | 0 |
+| 5 | w41-decision-api-spec | checked | 2 | text | 0·0 | 0 | 0 | 0 |
+| 6 | w41-openai-rogue-agent | passed | 1 | text | 0·0 | 0 | 0 | 0 |
+| 7 | w41-openai-math-results | passed | 1 | text | 0·0 | 0 | 0 | 0 |
+| 8 | w41-openai-textgrain | checked | 2 | text | 0·0 | 0 | 0 | 1 |
+| 9 | w41-openrig-orchestrator | checked | 2 | github+text | 0·0 | 0 | 0 | 0 |
+| 10 | w41-agent-coding-talks | checked | 2 | video | 0·0 | 1 | 0 | 1 |
 
 ### 최종판 judge(관문 B, `reports/S5_brief/gate_b_final_judge.json`)
 
 | 토픽 | 상태 | Q1 | Q2 | Q3 | Q4 | 원자 사실 | 비지지 |
 |---|---|---|---|---|---|---|---|
-| w40-openai-dots | checked | pass | pass | pass | pass | 25/25 |  |
-| w40-gemini-argon | passed | pass | pass | pass | pass | 29/29 |  |
-| w40-gpt-6-1-sol | passed | pass | pass | pass | pass | 20/20 |  |
-| w40-decision-api | checked | pass | pass | pass | pass | 24/24 |  |
-| w40-openai-security | passed | pass | pass | pass | pass | 19/19 |  |
-| w40-claude-sonnet-5-5 | passed | pass | pass | pass | pass | 25/25 |  |
-| w40-deepseek-harness | passed | pass | pass | pass | pass | 25/25 |  |
-| w40-solar-mini-4 | passed | fail | fail | pass | pass | 33/34 | points[1] Solar Mini 4는 MoE 구조임 |
-| w40-vidraft-darwin | passed | pass | pass | pass | pass | 37/37 |  |
-| w40-jev-decision-model | passed | pass | pass | pass | pass | 29/29 |  |
-| w41-embedding-gemma-2 | checked | pass | pass | pass | pass | 30/30 |  |
-| w41-mistral-large-4 | passed | pass | pass | pass | pass | 39/39 |  |
-| w41-gpt-6-intelligent-ui | checked | pass | pass | pass | pass | 17/17 |  |
-| w41-claude-haiku-5-5 | checked | pass | pass | pass | pass | 18/21 | points[3] 토크나이저 변경으로 인한 결과이다; overview 토크나이저 변경이 있었다 |
-| w41-openai-rogue-agent | passed | pass | pass | pass | pass | 18/18 |  |
-| w41-mai-code-1-1 | passed | pass | pass | pass | pass | 26/26 |  |
-| w41-openrig | passed | pass | pass | pass | pass | 18/18 |  |
-| w41-sift-framework | checked | pass | fail | fail | pass | 21/22 | concepts[1] LLM-as-a-judge 신호로 후보 패치 비교 및 탐색을 유도함 |
-| w41-openai-math | passed | pass | pass | pass | pass | 21/21 |  |
-| w41-textgrain-eu | passed | pass | pass | pass | pass | 25/25 |  |
-- w40-solar-mini-4 Q1: summary 첫 문장은 '업스테이지가 MoE 구조의 Solar Mini 4를 출시했다'로 결론을 담고 있으나, 주어진 angle이 '소형 MoE 모델의 로컬 실행 최적화'인데 첫 point는 투트랙 전략 출시 소식에 치중되어 로컬 실행 최적화 핵심이 바로 드러나지 않음.
-- w40-solar-mini-4 Q2: numbers[1]에 값이 2개(Solar Mini 4 1.25, MiMo-V2.5 2.2)뿐인 막대 그룹이 포함되어 있어 '조건에 맞지 않는데 채운 칸(값 2개 막대)' 규칙을 위반함.
-- w41-sift-framework Q2: numbers 차트의 단위가 '%'로 지정되어 있으나 항목에 시간(5)과 CPU 시간(42)이 섞여 서로 다른 단위를 부적절하게 한 막대 그룹에 묶음
-- w41-sift-framework Q3: numbers 차트가 서로 다른 단위의 수치를 '%' 그룹으로 묶어 맥락 파악 및 가독성을 저해함
+| w40-gpt-6-1-sol | checked | pass | pass | pass | pass | 22/22 |  |
+| w40-gemini-4-argon | checked | pass | pass | pass | pass | 27/27 |  |
+| w40-openai-dots | passed | pass | pass | pass | pass | 24/24 |  |
+| w40-claude-sonnet-5-5 | passed | fail | pass | pass | pass | 33/35 | points[4] 컨텍스트 창 최대 100만 토큰을 지원할 것으로 예상된다; points[4] 최대 출력 12만8000 토큰을 지원할 것으로 예상된다 |
+| w40-decision-api | checked | pass | pass | pass | pass | 30/30 |  |
+| w40-solar-mini-4 | passed | fail | fail | pass | pass | 28/28 |  |
+| w40-deepseek-harness | passed | pass | pass | pass | pass | 22/22 |  |
+| w40-muse-gadgets | passed | pass | pass | pass | pass | 25/25 |  |
+| w40-claude-code-skills | checked | pass | pass | pass | pass | 18/18 |  |
+| w40-llamaindex-context | passed | pass | pass | pass | pass | 13/15 | summary ParseBench 기반 처리 영역 구분이 포함됨; concepts[2] ParseBench는 문서 파싱 성능을 고정확도·저비용·초저지연 3가지  |
+| w41-mistral-large-4 | passed | pass | pass | pass | pass | 29/29 |  |
+| w41-gpt6-intelligent-ui | passed | pass | pass | pass | pass | 20/20 |  |
+| w41-embeddinggemma-2 | checked | pass | pass | pass | pass | 37/38 | concepts[1] Matryoshka Representation Learning (MRL) |
+| w41-claude-haiku-5-5 | checked | pass | pass | pass | pass | 23/24 | overview 토크나이저 변경으로 토큰 사용량이 증가했다 |
+| w41-decision-api-spec | checked | pass | pass | pass | pass | 23/23 |  |
+| w41-openai-rogue-agent | passed | pass | pass | pass | pass | 17/17 |  |
+| w41-openai-math-results | passed | pass | pass | pass | pass | 21/21 |  |
+| w41-openai-textgrain | checked | pass | pass | pass | pass | 18/18 |  |
+| w41-openrig-orchestrator | checked | pass | fail | pass | pass | 22/22 |  |
+| w41-agent-coding-talks | checked | pass | pass | pass | pass | 23/23 |  |
+- w40-claude-sonnet-5-5 Q1: summary 첫 문장에 출시 주체와 핵심 성능/비용 성과가 포함되어 있으나, 지정된 angle('오퍼스급 지능과 가성비 사이의 컨텍스트·출력 토큰 설계')의 핵심인 토큰 설계 내용이 첫 point가 아닌 터미널벤치 성능으로 시작함
+- w40-solar-mini-4 Q1: summary 첫 문장에 결론이 제시되었으나, plan.angle이 'GPU 한 장 실행 가능한 MoE 소형 모델의 에이전트 최적화'임에도 첫 point는 회사의 투트랙 전략으로 시작해 실패 예시(angle이 최적화인데 첫 point가 회사의 투트랙 전략)에 해당함
+- w40-solar-mini-4 Q2: overview에서 points의 수치(24.1점, 43%)를 그대로 반복하고 있으며 도식 및 points 내용과 강하게 중복됨
+- w41-openrig-orchestrator Q2: 근거 소스가 GitHub과 GeekNews 2곳이 있으나 contributions에 github 단일 채널만 작성되어 채널 요건 미충족
 
 ### 관문 B 항목(실제 실행)
 
 | 항목 | 결과 | 문턱값 | 판정 |
 |---|---|---|---|
-| 근거 충실성(원자 사실, 토픽별) | 17/20 토픽 100% | 모든 토픽 100% | 미달(잠정) |
-| 핵심 포착(Q1) | 19/20 | 90% | 통과(잠정) |
+| 근거 충실성(원자 사실, 토픽별) | 16/20 토픽 100% | 모든 토픽 100% | 미달(잠정) |
+| 핵심 포착(Q1) | 18/20 | 90% | 통과(잠정) |
 | 군더더기 없음(Q2) | 18/20 | 90% | 통과(잠정) |
-| 읽기 쉬움(Q3) | 19/20 | 90% | 통과(잠정) |
+| 읽기 쉬움(Q3) | 20/20 | 90% | 통과(잠정) |
 | 문체(번역투)(Q4) | 20/20 | 90% | 통과(잠정) |
 | 문체(코드 정규식, 최종판) | 위반 0건 | 0 | 통과 |
 | 묶기: 2채널 이상 토픽 비율 | 1/20 | 기록 | - |

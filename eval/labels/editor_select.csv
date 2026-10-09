@@ -1,41 +1,41 @@
 week,cluster_id,action,drop_reason,reason,label,critique,labeler
-2026-W40,288,select,,"근거 24건, 채널 3, relevance high, GPT-6 Astra 기반 상시 에이전트 공개",select,"reason의 ""채널 3·4""는 글 수를 채널로 잘못 부름(실제 text 1채널)",opus-5.5
-2026-W40,289,select,,"근거 26건, 채널 3, relevance high, Gemini 4 Argon 공개 및 가격 수치 포함",select,"reason의 ""채널 3·4""는 글 수를 채널로 잘못 부름(실제 text 1채널)",opus-5.5
-2026-W40,290,select,,"근거 26건, 채널 4, relevance high, GPT-6.1 Sol 공개 및 가격 수치 포함",select,"reason의 ""채널 3·4""는 글 수를 채널로 잘못 부름(실제 text 1채널)",opus-5.5
-2026-W40,291,select,,"근거 13건, 채널 2, relevance high, DeepSeek Harness 데스크톱 앱 공개",select,,opus-5.5
-2026-W40,292,select,,"근거 13건, 채널 2, relevance high, Solar Mini 4 MoE 모델 발표",select,,opus-5.5
-2026-W40,293,select,,"근거 14건, 채널 2, relevance high, 법률 벤치마크 1위 달성 수치 포함",select,,opus-5.5
-2026-W40,294,select,,"근거 17건, 채널 2, relevance high, Decision API 아키텍처 변경",select,,opus-5.5
-2026-W40,295,select,,"근거 13건, 채널 2, relevance high, 보안 경고 묵살 및 모델 출시 철회",select,,opus-5.5
-2026-W40,296,select,,"근거 13건, 채널 2, relevance high, Claude Sonnet 5.5 공개",select,,opus-5.5
-2026-W40,297,select,,"근거 13건, 채널 2, relevance high, Jev 호환 의사결정 모델 공개",select,,opus-5.5
-2026-W40,298,drop,other,"근거 11건, 채널 2, relevance high/mid, Muse Gadgets 오픈소스 공개 / 코드 정리: topics에 없음(토픽 수 상한)",other,,opus-5.5
-2026-W40,299,drop,other,"근거 9건, 채널 1, relevance high, Claude Code 스킬 패턴 실무 경험 / 코드 정리: topics에 없음(토픽 수 상한)",other,drop 이유(상한)는 맞으나 실무 경험담(C-13 넣을 거리)이 홍보성 다윈 토픽보다 뒤로 밀림,opus-5.5
-2026-W40,300,drop,other,"근거 11건, 채널 2, relevance high/mid, DevDay 2026 라이브 블로그",duplicate,DevDay 라이브 블로그는 같은 주 Dots·Decision API 토픽과 겹침 → duplicate,opus-5.5
-2026-W40,301,select,,"근거 10건, 채널 1, relevance high, Claude Sonnet 5.5",select,,opus-5.5
-2026-W40,302,drop,low_relevance,"근거 12건, 채널 2, relevance high/mid, AI 거품 경고",low_relevance,,opus-5.5
-2026-W40,303,drop,other,"근거 9건, 채널 1, relevance high, ChatGPT 로그인·플러그인",other,,opus-5.5
-2026-W40,304,drop,low_relevance,"근거 13건, 채널 2, relevance high/mid, 앤트로픽 IPO 및 적자",low_relevance,,opus-5.5
-2026-W40,305,drop,low_relevance,"근거 13건, 채널 2, relevance high/mid, 호주 상원 청문회",low_relevance,,opus-5.5
-2026-W40,306,drop,other,"근거 9건, 채널 1, relevance high, NobodyWho 온디바이스 추론 엔진",other,,opus-5.5
-2026-W40,307,drop,other,"근거 20건, 채널 1(video), relevance high, 코드 리뷰 병목 문제",other,,opus-5.5
-2026-W41,533,select,,"글 4건, 근거 27건, relevance high, Apache 2.0 오픈웨이트 멀티모달 임베딩 모델 공개",select,,opus-5.5
-2026-W41,534,select,,"글 2건, relevance high, OpenAI 에이전트의 위키미디어 무단 편집 및 장애 연관성 보도",select,,opus-5.5
-2026-W41,535,select,,"글 2건, relevance high, 1조 파라미터 Mistral Large 4 공개 및 오픈웨이트 예정",select,,opus-5.5
-2026-W41,536,select,,"글 2건, relevance high, GPT-6 Intelligent UI 전 사용자 적용, 지난주 GPT-6.1 Sol과 다른 기능",select,,opus-5.5
-2026-W41,537,select,,"글 2건, relevance high, OpenAI 수학 연구 결과 722편 공개",select,,opus-5.5
-2026-W41,538,select,,"글 2건, relevance high, EU AI Act 대응 textGrain 워터마크 도입",select,,opus-5.5
-2026-W41,539,select,,"글 2건, relevance high, Claude Haiku 5.5 출시 및 가격 90% 인하",select,,opus-5.5
-2026-W41,540,select,,"글 2건, relevance high, MAI-코드-1.1 온디바이스 최적화 및 서피스 랩톱 울트라 공개",select,,opus-5.5
-2026-W41,541,select,,"글 1건 + 레포 1건, relevance high, Claude Code·Codex 멀티 에이전트 오케스트레이터",select,,opus-5.5
-2026-W41,542,drop,duplicate,"과거 대조 w40-decision-api 0.6871, Decision API 문서 재소개, 새 버전·수치 없음",duplicate,,opus-5.5
-2026-W41,543,drop,low_relevance,"글 2건, relevance mid/high, AI 규제 청문회, 개발 실무·도구 동향이 아님",low_relevance,,opus-5.5
-2026-W41,544,drop,other,"글 1건, relevance high, Claude 과학 연구 사례, 개발 실무 경험담 / 코드 정리: topics에 없음(토픽 수 상한)",other,,opus-5.5
-2026-W41,545,select,,"글 1건, relevance high, 코딩 에이전트 하네스 진화 프레임워크 SIFT",select,,opus-5.5
-2026-W41,546,drop,other,"영상 1건, relevance high, Kim치 코딩 에이전트 플랫폼, 토픽 수 상한",other,이유(상한)는 맞음. 출처 1개 실무 발표가 순서 규칙에서 모두 밀림 → C-20·C-21,opus-5.5
-2026-W41,547,drop,other,"영상 1건, relevance high, 에이전트 Slop 제거 상태 머신 설계, 토픽 수 상한",other,이유(상한)는 맞음. 출처 1개 실무 발표가 순서 규칙에서 모두 밀림 → C-20·C-21,opus-5.5
-2026-W41,548,drop,other,"영상 1건, relevance high, AgentCraft 오케스트레이터, 토픽 수 상한",other,이유(상한)는 맞음. 출처 1개 실무 발표가 순서 규칙에서 모두 밀림 → C-20·C-21,opus-5.5
-2026-W41,549,drop,other,"영상 1건, relevance high, AI 코드 워크플로우, 토픽 수 상한",other,이유(상한)는 맞음. 출처 1개 실무 발표가 순서 규칙에서 모두 밀림 → C-20·C-21,opus-5.5
-2026-W41,550,drop,other,"영상 1건, relevance high, AI 코딩 에이전트 코드베이스 부패, 토픽 수 상한",other,이유(상한)는 맞음. 출처 1개 실무 발표가 순서 규칙에서 모두 밀림 → C-20·C-21,opus-5.5
-2026-W41,551,drop,other,"영상 1건, relevance high, Sam Altman DevDay, 토픽 수 상한",other,이유(상한)는 맞음. 출처 1개 실무 발표가 순서 규칙에서 모두 밀림 → C-20·C-21,opus-5.5
-2026-W41,552,drop,low_relevance,"글 1건, relevance high, Ironclad 계약 업무 AI 에이전트, 고객 사례 홍보",low_relevance,,opus-5.5
+2026-W40,677,select,,"채널 1개(글 3건), 근거 24건, GPT-6 Astra 기반 상시 에이전트 공개",,,
+2026-W40,688,select,,"채널 1개(글 2건), 근거 13건, 데스크톱 앱 프리뷰 출시",,,
+2026-W40,698,select,,"채널 1개(글 2건), 근거 11건, 오픈소스 하드웨어 연결 플랫폼 공개",,,
+2026-W40,700,select,,"채널 1개(글 1건), 근거 9건, 스킬 설계 패턴과 실무 경험",,,
+2026-W40,706,select,,"채널 1개(글 2건), 근거 13건, MoE 소형 모델 발표",,,
+2026-W40,718,select,,"채널 1개(글 4건), 근거 26건, 가격·토큰 수치 포함",,,
+2026-W40,721,drop,other,"채널 1개(글 2건), 근거 11건, DevDay 20개 발표 요약 / 코드 정리: topics에 없음(토픽 수 상한)",,,
+2026-W40,739,select,,"채널 1개(글 3건), 근거 26건, 가격 수치 포함",,,
+2026-W40,740,drop,other,"채널 1개(글 2건), 근거 12건, 투자 규모 수치 포함 / 코드 정리: topics에 없음(토픽 수 상한)",,,
+2026-W40,755,drop,other,"채널 1개(글 1건), 근거 9건, 로그인·플러그인 기능 발표 / 코드 정리: topics에 없음(토픽 수 상한)",,,
+2026-W40,772,drop,other,"채널 1개(글 2건), 근거 13건, 보안 통보·소환장 / 코드 정리: topics에 없음(토픽 수 상한)",,,
+2026-W40,806,drop,other,"채널 1개(글 2건), 근거 14건, 벤치마크 1위 수치 / 코드 정리: topics에 없음(토픽 수 상한)",,,
+2026-W40,809,select,,"채널 1개(글 2건), 근거 17건, Luna 기반 Decision API",,,
+2026-W40,822,drop,other,"채널 1개(글 2건), 근거 13건, 보안 경고 묵살·출시 철회 / 코드 정리: topics에 없음(토픽 수 상한)",,,
+2026-W40,863,select,,"채널 1개(글 2건), 근거 13건, 컨텍스트·출력 토큰 수치",,,
+2026-W40,896,drop,other,"채널 1개(글 1건), 근거 9건, 온디바이스 추론 엔진 소개 / 코드 정리: topics에 없음(토픽 수 상한)",,,
+2026-W40,906,drop,other,"채널 1개(글 2건), 근거 13건, Jev 호환 의사결정 모델 / 코드 정리: topics에 없음(토픽 수 상한)",,,
+2026-W40,917,drop,other,"채널 1개(영상 1건), 영상 관련성 0.5723, 핵심 포인트 6·수치 3 / 코드 정리: topics에 없음(토픽 수 상한)",,,
+2026-W40,918,select,,"채널 1개(영상 1건), 영상 관련성 0.5843, 핵심 포인트 6·수치 6",,,
+2026-W40,919,drop,other,"채널 1개(영상 1건), 영상 관련성 0.508, 핵심 포인트 6·수치 12 / 코드 정리: topics에 없음(토픽 수 상한)",,,
+2026-W41,921,select,,"채널 1개(글 2건), 근거 12건, OpenAI 에이전트의 위키미디어 무단 편집과 5월 장애 연관성이라는 구체적 사건",,,
+2026-W41,923,select,,"과거 대조 w40-decision-api 0.5628, 0.1a0 버전 문서 공개로 API 스펙(입력·출력 유형) 구체화",,,
+2026-W41,925,select,,"채널 1개(글 4건), 출처 4개, 740M 파라미터·Apache 2.0·온디바이스 수치 포함",,,
+2026-W41,926,select,,"채널 1개(글 3건), 1조 파라미터 MoE 구조와 오픈웨이트 공개 일정 등 수치 포함",,,
+2026-W41,936,select,,"채널 1개(글 2건), 주 12억 명 대상 GPT-6 Intelligent UI 출시라는 구체적 수치와 기능",,,
+2026-W41,938,select,,"채널 1개(글 2건), 4000개 문제·722편 원고 공개라는 구체적 수치 포함",,,
+2026-W41,941,select,,"채널 1개(글 2건), EU AI Act 대응 textGrain 워터마크 도입과 단계적 적용 범위 명시",,,
+2026-W41,954,select,,"채널 2개(글 1·레포 1), Claude Code와 Codex를 팀으로 오케스트레이션하는 도구",,,
+2026-W41,970,select,,"채널 1개(글 2건), 10만 토큰 이하 요청 시 90% 가격 인하 수치 포함",,,
+2026-W41,980,drop,other,"채널 1개(글 1건), COLM 2026 발표로 MoE 학습 최적화·경량화 연구 성과",,,
+2026-W41,982,drop,other,"채널 1개(글 2건), 서피스 랩톱 울트라와 MAI-코드-1.1 온디바이스 최적화",,,
+2026-W41,1021,drop,low_relevance,"채널 1개(글 2건), AI 규제·위험 청문회로 관심 주제(AI 모델·도구 동향, 개발 실무) 밖",,,
+2026-W41,1029,drop,other,"채널 1개(글 1건), 클로드가 3개월간 논문 36편 작성 사례",,,
+2026-W41,1035,drop,other,"채널 1개(글 1건), 코딩 에이전트 하네스 진화 프레임워크 SIFT",,,
+2026-W41,1054,drop,other,"채널 1개(영상 1건), 영상 관련성 0.5352로 0.55 미만",,,
+2026-W41,1056,select,,"채널 1개(영상 1건), 영상 관련성 0.5553, 핵심 포인트 6",,,
+2026-W41,1058,drop,other,"채널 1개(영상 1건), 영상 관련성 0.5386로 0.55 미만",,,
+2026-W41,1059,select,,"채널 1개(영상 1건), 영상 관련성 0.6396, 핵심 포인트 6",,,
+2026-W41,1060,select,,"채널 1개(영상 1건), 영상 관련성 0.5827, 핵심 포인트 6",,,
+2026-W41,1061,drop,other,"채널 1개(영상 1건), 영상 관련성 0.527로 0.55 미만",,,

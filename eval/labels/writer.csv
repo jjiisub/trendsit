@@ -1,21 +1,21 @@
 topic_id,week,status,judge_Q1,judge_Q2,judge_Q3,judge_Q4,judge_facts,Q0_pass,Q1_pass,Q2_pass,Q3_pass,Q4_pass,label,critique,labeler
-w40-openai-dots,2026-W40,checked,pass,pass,pass,pass,25/25,pass,pass,pass,pass,pass,pass,"통과. 검수 missing_diagram 반려 2회는 오탐(4,000개 앱·300토큰/초·월 500달러·1개는 단위가 달라 같은 단위 3개 아님) → checked가 됐으나 화면에 표시 없음",opus-5.5
-w40-gemini-argon,2026-W40,passed,pass,pass,pass,pass,29/29,fail,pass,pass,pass,pass,fail,"도식 제목 ""3.7%p 높음""은 근거에 없는 파생 수치(77.9−74.2). 코드 검사가 numbers title을 대조하지 않음",opus-5.5
-w40-gpt-6-1-sol,2026-W40,passed,pass,pass,pass,pass,20/20,fail,pass,pass,pass,pass,fail,"요약 ""에이전트 워크로드 비용을 최대 95% 절감""은 범위 부풀림. 근거는 캐시 입력 가격이 표준 입력보다 95% 저렴(points[3])",opus-5.5
-w40-decision-api,2026-W40,checked,pass,pass,pass,pass,24/24,fail,pass,pass,pass,fail,fail,"개요 ""다층 제어 재편을 가속화할 것으로 보인다""는 근거 밖 전망, 요약 ""자리잡을지 주목된다""는 평가형 마무리. 요약은 ""출시"", points[4]는 ""제한된 프리뷰""로 서로 다름",opus-5.5
-w40-openai-security,2026-W40,passed,pass,pass,pass,pass,19/19,fail,pass,pass,pass,pass,fail,"서로 다른 두 기사(it:912 출시 철회, it:874 NYT 경고 묵살)를 ""묵살한 결과가 보안 사고로 확인""으로 인과 연결. points[3] ""해당 모델들""이 6.1 Astra인지 근거 불명. 개념 ""정렬"" 정의가 반대(정렬 실패를 설명)",opus-5.5
-w40-claude-sonnet-5-5,2026-W40,passed,pass,pass,pass,pass,25/25,pass,pass,pass,pass,pass,pass,"통과. 개요 끝 ""가격-성능 균형이 재편되는 지점이다""는 평가형에 가까우나 근거 제목(""오퍼스급 지능에 최강 가성비"")이 받침",opus-5.5
-w40-deepseek-harness,2026-W40,passed,pass,pass,pass,pass,25/25,pass,pass,pass,pass,pass,pass,통과,opus-5.5
-w40-solar-mini-4,2026-W40,passed,fail,fail,pass,pass,33/34,pass,fail,pass,pass,pass,fail,angle(로컬 실행 최적화)의 핵심이 첫 point가 아니라 투트랙 전략. 값 2개 막대는 baseline이 있어 허용(judge Q2 실패는 채점표 문구 오류 탓),opus-5.5
-w40-vidraft-darwin,2026-W40,passed,pass,pass,pass,pass,37/37,pass,pass,pass,fail,pass,fail,"요약 ""5개 리더보드 1위""와 points[5] ""47개 부문 중 7개 부문 1위""가 출처별로 달라 처음 읽는 사람이 헷갈림(두 수치의 관계 설명 없음). points[0]·[5]가 ""1위·법률 데이터 없이""로 겹침",opus-5.5
-w40-jev-decision-model,2026-W40,passed,pass,pass,pass,pass,29/29,pass,pass,fail,fail,pass,fail,"도식 단위가 빈칸(""()""), 정확도 0~1 값인데 단위 표기 없음. 코드 검사가 빈 unit을 반려하지 않음",opus-5.5
-w41-embedding-gemma-2,2026-W41,checked,pass,pass,pass,pass,30/30,fail,pass,fail,pass,pass,fail,"concepts[0] MRL ""저장 공간을 절감""은 근거 밖(검수자가 2회 지적, 남은 채 checked인데 표시 없음). 개념 MAEB는 본문에 안 나옴",opus-5.5
-w41-mistral-large-4,2026-W41,passed,pass,pass,pass,pass,39/39,fail,pass,pass,pass,pass,fail,"개요 ""AA 사이버 지수 50%로 경쟁 오픈 모델을 앞선다""는 points[3](GLM-5.3-플래시와 동률)과 어긋남. Simon Willison 벤치 글(it:1048)이 decide diff로 빠짐",opus-5.5
-w41-gpt-6-intelligent-ui,2026-W41,checked,pass,pass,pass,pass,17/17,fail,pass,pass,fail,pass,fail,"요약 ""웹 검색 응답 속도 44% 향상""은 근거(""44% 빠르게 답변을 시작"")의 의미 왜곡. points[3] 문장이 비교 대상을 알기 어려움",opus-5.5
-w41-claude-haiku-5-5,2026-W41,checked,pass,pass,pass,pass,18/21,fail,pass,pass,pass,pass,fail,"""토크나이저 변경 → 1.25배 → 숨겨진 가격 인상""이 카드 주장 줄 기반(원문 아님). 요약 둘째 문장이 이 비지지 서술. 구간별 가격 도식 누락",opus-5.5
-w41-openai-rogue-agent,2026-W41,passed,pass,pass,pass,pass,18/18,fail,pass,pass,pass,pass,fail,"제목 ""연관성 확인""은 근거(""연관 가능성"")보다 셈. 본문은 가능성으로 맞게 씀",opus-5.5
-w41-mai-code-1-1,2026-W41,passed,pass,pass,pass,pass,26/26,pass,pass,pass,pass,pass,pass,"통과. 개념 ""추측 디코딩"" 설명(모델 크기를 줄이는 기법)은 기술적으로 부정확하나 근거 기사 표현을 따름",opus-5.5
-w41-openrig,2026-W41,passed,pass,pass,pass,pass,18/18,pass,pass,fail,pass,pass,fail,"contributions가 github 한 줄뿐(근거 소스 2개면 채널마다 1문장, text 누락). 개요 셋째 문장은 레포 릴리스 줄 그대로",opus-5.5
-w41-sift-framework,2026-W41,checked,pass,fail,fail,pass,21/22,pass,pass,fail,fail,pass,fail,"단위 ""%"" 막대에 정확도 35.1·시간 5·CPU 시간 42가 섞임. 소스 1개인데 points 4개(상한 3). 개념 설명 일부 근거 밖(judge 지적)",opus-5.5
-w41-openai-math,2026-W41,passed,pass,pass,pass,pass,21/21,pass,pass,pass,pass,pass,pass,통과. points[0]과 [1]이 약간 겹침,opus-5.5
-w41-textgrain-eu,2026-W41,passed,pass,pass,pass,pass,25/25,pass,pass,pass,pass,pass,pass,통과,opus-5.5
+w40-gpt-6-1-sol,2026-W40,checked,pass,pass,pass,pass,22/22,,,,,,,,
+w40-gemini-4-argon,2026-W40,checked,pass,pass,pass,pass,27/27,,,,,,,,
+w40-openai-dots,2026-W40,passed,pass,pass,pass,pass,24/24,,,,,,,,
+w40-claude-sonnet-5-5,2026-W40,passed,fail,pass,pass,pass,33/35,,,,,,,,
+w40-decision-api,2026-W40,checked,pass,pass,pass,pass,30/30,,,,,,,,
+w40-solar-mini-4,2026-W40,passed,fail,fail,pass,pass,28/28,,,,,,,,
+w40-deepseek-harness,2026-W40,passed,pass,pass,pass,pass,22/22,,,,,,,,
+w40-muse-gadgets,2026-W40,passed,pass,pass,pass,pass,25/25,,,,,,,,
+w40-claude-code-skills,2026-W40,checked,pass,pass,pass,pass,18/18,,,,,,,,
+w40-llamaindex-context,2026-W40,passed,pass,pass,pass,pass,13/15,,,,,,,,
+w41-mistral-large-4,2026-W41,passed,pass,pass,pass,pass,29/29,,,,,,,,
+w41-gpt6-intelligent-ui,2026-W41,passed,pass,pass,pass,pass,20/20,,,,,,,,
+w41-embeddinggemma-2,2026-W41,checked,pass,pass,pass,pass,37/38,,,,,,,,
+w41-claude-haiku-5-5,2026-W41,checked,pass,pass,pass,pass,23/24,,,,,,,,
+w41-decision-api-spec,2026-W41,checked,pass,pass,pass,pass,23/23,,,,,,,,
+w41-openai-rogue-agent,2026-W41,passed,pass,pass,pass,pass,17/17,,,,,,,,
+w41-openai-math-results,2026-W41,passed,pass,pass,pass,pass,21/21,,,,,,,,
+w41-openai-textgrain,2026-W41,checked,pass,pass,pass,pass,18/18,,,,,,,,
+w41-openrig-orchestrator,2026-W41,checked,pass,fail,pass,pass,22/22,,,,,,,,
+w41-agent-coding-talks,2026-W41,checked,pass,pass,pass,pass,23/23,,,,,,,,
