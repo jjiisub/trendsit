@@ -232,9 +232,9 @@ judge 판정: **잠정**(사람 라벨 없음. `eval/labels/writer.csv`를 채�
 
 > `scripts/s5_gate_b.py`가 붙인 절. 라벨이 필요한 항목은 2차 라벨(D1-3, 리뷰 세션 opus-5.5) 전 잠정.
 
-### 2026-W40 (run `20261010-075240-weekly-566b`, 묶기 run `20261010-073230-weekly-d33d`)
+### 2026-W40 (run `20261010-082349-weekly-8cdc`, 묶기 run `20261010-073230-weekly-d33d`)
 
-- 실행 요약: 토픽 10, 실패 0, 라운드 {'1': 3, '2': 6, '3': 1}, 코드 반려 9, 검수 반려 3, 되돌림 1, check 포인트 1, 사용액 $0.012817, 시간 140.0초
+- 실행 요약: 토픽 10, 실패 0, 라운드 {'1': 3, '2': 6, '3': 1}, 코드 반려 9, 검수 반려 3, 되돌림 1, check 포인트 1, 사용액 $0.007325, 시간 55.8초
 - 선별: 첫 시도 코드 검증 실패(1회 시도, 계획 model), reason 입력 대조 위반 0
 
 | 순위 | 토픽 | 상태 | 라운드 | 채널 | 도식(수치·사건) | 코드 경고 | 문체 위반 | check |
@@ -242,24 +242,24 @@ judge 판정: **잠정**(사람 라벨 없음. `eval/labels/writer.csv`를 채�
 | 1 | w40-gpt-6-1-sol | checked | 2 | text | 0·0 | 1 | 0 | 1 |
 | 2 | w40-gemini-4-argon | checked | 2 | text | 1·0 | 0 | 0 | 0 |
 | 3 | w40-openai-dots | passed | 1 | text | 0·0 | 1 | 0 | 0 |
-| 4 | w40-claude-sonnet-5-5 | passed | 1 | text | 2·0 | 0 | 0 | 0 |
+| 4 | w40-claude-sonnet-5-5 | passed | 2 | text | 2·0 | 0 | 0 | 0 |
 | 5 | w40-decision-api | checked | 2 | text | 0·0 | 2 | 0 | 0 |
 | 6 | w40-solar-mini-4 | passed | 2 | text | 1·0 | 1 | 0 | 0 |
 | 7 | w40-deepseek-harness | passed | 2 | text | 0·0 | 0 | 0 | 0 |
 | 8 | w40-muse-gadgets | passed | 1 | text | 0·0 | 0 | 0 | 0 |
 | 9 | w40-claude-code-skills | checked | 3 | text | 0·0 | 1 | 0 | 0 |
-| 10 | w40-llamaindex-context | passed | 2 | video | 0·0 | 0 | 0 | 0 |
+| 10 | w40-llamaindex-context | passed | 1 | video | 0·0 | 0 | 0 | 0 |
 
-### 2026-W41 (run `20261010-075543-weekly-fd8a`, 묶기 run `20261010-075543-weekly-fd8a`)
+### 2026-W41 (run `20261010-082802-weekly-b543`, 묶기 run `20261010-075543-weekly-fd8a`)
 
-- 실행 요약: 토픽 10, 실패 0, 라운드 {'1': 3, '2': 7, '3': 0}, 코드 반려 7, 검수 반려 7, 되돌림 0, check 포인트 2, 사용액 $0.110779, 시간 1007.4초
+- 실행 요약: 토픽 10, 실패 0, 라운드 {'1': 3, '2': 7, '3': 0}, 코드 반려 7, 검수 반려 5, 되돌림 0, check 포인트 2, 사용액 $0.007754, 시간 65.3초
 - 선별: 첫 시도 코드 검증 통과(1회 시도, 계획 model), reason 입력 대조 위반 3
 
 | 순위 | 토픽 | 상태 | 라운드 | 채널 | 도식(수치·사건) | 코드 경고 | 문체 위반 | check |
 |---|---|---|---|---|---|---|---|---|
 | 1 | w41-mistral-large-4 | passed | 2 | text | 0·0 | 1 | 0 | 0 |
 | 2 | w41-gpt6-intelligent-ui | passed | 1 | text | 0·0 | 0 | 0 | 0 |
-| 3 | w41-embeddinggemma-2 | checked | 2 | text | 1·0 | 0 | 0 | 0 |
+| 3 | w41-embeddinggemma-2 | passed | 2 | text | 0·0 | 1 | 0 | 0 |
 | 4 | w41-claude-haiku-5-5 | checked | 2 | text | 0·0 | 0 | 0 | 0 |
 | 5 | w41-decision-api-spec | checked | 2 | text | 0·0 | 0 | 0 | 0 |
 | 6 | w41-openai-rogue-agent | passed | 1 | text | 0·0 | 0 | 0 | 0 |
@@ -275,24 +275,23 @@ judge 판정: **잠정**(사람 라벨 없음. `eval/labels/writer.csv`를 채�
 | w40-gpt-6-1-sol | checked | pass | pass | pass | pass | 22/22 |  |
 | w40-gemini-4-argon | checked | pass | pass | pass | pass | 27/27 |  |
 | w40-openai-dots | passed | pass | pass | pass | pass | 24/24 |  |
-| w40-claude-sonnet-5-5 | passed | fail | pass | pass | pass | 33/35 | points[4] 컨텍스트 창 최대 100만 토큰을 지원할 것으로 예상된다; points[4] 최대 출력 12만8000 토큰을 지원할 것으로 예상된다 |
+| w40-claude-sonnet-5-5 | passed | pass | pass | pass | pass | 44/45 | overview 컨텍스트·출력 토큰 설계에 반영됐다는 인과/평가 |
 | w40-decision-api | checked | pass | pass | pass | pass | 30/30 |  |
 | w40-solar-mini-4 | passed | fail | fail | pass | pass | 28/28 |  |
 | w40-deepseek-harness | passed | pass | pass | pass | pass | 22/22 |  |
 | w40-muse-gadgets | passed | pass | pass | pass | pass | 25/25 |  |
 | w40-claude-code-skills | checked | pass | pass | pass | pass | 18/18 |  |
-| w40-llamaindex-context | passed | pass | pass | pass | pass | 13/15 | summary ParseBench 기반 처리 영역 구분이 포함됨; concepts[2] ParseBench는 문서 파싱 성능을 고정확도·저비용·초저지연 3가지  |
+| w40-llamaindex-context | passed | pass | pass | pass | pass | 13/15 | overview ParseBench 벤치마크를 통해 고정확도·저비용·초저지연 3가지 처리; concepts[1] 에이전트 하네스는 검색 복잡도 처리를 담당하는 레이어다 |
 | w41-mistral-large-4 | passed | pass | pass | pass | pass | 29/29 |  |
 | w41-gpt6-intelligent-ui | passed | pass | pass | pass | pass | 20/20 |  |
-| w41-embeddinggemma-2 | checked | pass | pass | pass | pass | 37/38 | concepts[1] Matryoshka Representation Learning (MRL) |
-| w41-claude-haiku-5-5 | checked | pass | pass | pass | pass | 23/24 | overview 토크나이저 변경으로 토큰 사용량이 증가했다 |
+| w41-embeddinggemma-2 | passed | pass | pass | pass | pass | 28/28 |  |
+| w41-claude-haiku-5-5 | checked | pass | pass | pass | pass | 23/23 |  |
 | w41-decision-api-spec | checked | pass | pass | pass | pass | 23/23 |  |
 | w41-openai-rogue-agent | passed | pass | pass | pass | pass | 17/17 |  |
 | w41-openai-math-results | passed | pass | pass | pass | pass | 21/21 |  |
 | w41-openai-textgrain | checked | pass | pass | pass | pass | 18/18 |  |
 | w41-openrig-orchestrator | checked | pass | fail | pass | pass | 22/22 |  |
 | w41-agent-coding-talks | checked | pass | pass | pass | pass | 23/23 |  |
-- w40-claude-sonnet-5-5 Q1: summary 첫 문장에 출시 주체와 핵심 성능/비용 성과가 포함되어 있으나, 지정된 angle('오퍼스급 지능과 가성비 사이의 컨텍스트·출력 토큰 설계')의 핵심인 토큰 설계 내용이 첫 point가 아닌 터미널벤치 성능으로 시작함
 - w40-solar-mini-4 Q1: summary 첫 문장에 결론이 제시되었으나, plan.angle이 'GPU 한 장 실행 가능한 MoE 소형 모델의 에이전트 최적화'임에도 첫 point는 회사의 투트랙 전략으로 시작해 실패 예시(angle이 최적화인데 첫 point가 회사의 투트랙 전략)에 해당함
 - w40-solar-mini-4 Q2: overview에서 points의 수치(24.1점, 43%)를 그대로 반복하고 있으며 도식 및 points 내용과 강하게 중복됨
 - w41-openrig-orchestrator Q2: 근거 소스가 GitHub과 GeekNews 2곳이 있으나 contributions에 github 단일 채널만 작성되어 채널 요건 미충족
@@ -301,8 +300,8 @@ judge 판정: **잠정**(사람 라벨 없음. `eval/labels/writer.csv`를 채�
 
 | 항목 | 결과 | 문턱값 | 판정 |
 |---|---|---|---|
-| 근거 충실성(원자 사실, 토픽별) | 16/20 토픽 100% | 모든 토픽 100% | 미달(잠정) |
-| 핵심 포착(Q1) | 18/20 | 90% | 통과(잠정) |
+| 근거 충실성(원자 사실, 토픽별) | 18/20 토픽 100% | 모든 토픽 100% | 미달(잠정) |
+| 핵심 포착(Q1) | 19/20 | 90% | 통과(잠정) |
 | 군더더기 없음(Q2) | 18/20 | 90% | 통과(잠정) |
 | 읽기 쉬움(Q3) | 20/20 | 90% | 통과(잠정) |
 | 문체(번역투)(Q4) | 20/20 | 90% | 통과(잠정) |

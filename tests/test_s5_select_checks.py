@@ -388,3 +388,13 @@ def test_r14_reason_channel_count_checked():
     p = plan([topic([1], 1, True)], decisions=[Decision(cluster_id=1, reason="근거 3건, 채널 3", action="select",
                                                         drop_reason=None)])
     assert any("채널 수 3" in x for x in sel.reason_mismatches(p, inp, []))
+
+
+def test_c20_threshold_in_input_limits_is_not_a_reason_mismatch():
+    m = {"vd:A": Member("vd:A", "video", "영상", "줄", "", "high", [], [], {})}
+    c = sel.Candidate(5, "영상", ["vd:A"], {"video": 1}, 0, [], 1, video_sim=0.53)
+    inp = sel.EditorSelectInput(candidates=[sel.candidate_doc(c, m)], recent_topics=[], keyword_trend=[], repo_cards=[],
+                                limits=sel.SelectLimits(min_topics=4, max_topics=10, video_relevance_min=0.55))
+    p = plan([topic([5], 1, True)], decisions=[Decision(cluster_id=5, reason="영상 관련성 0.53로 0.55 미만", action="select",
+                                                        drop_reason=None)])
+    assert sel.reason_mismatches(p, inp, []) == []

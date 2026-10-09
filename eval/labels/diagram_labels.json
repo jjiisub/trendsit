@@ -38,8 +38,8 @@
  "w40-claude-sonnet-5-5": {
   "week": "2026-W40",
   "numbers": [
-   "터미널벤치 4.0에서 소네트 5.5가 70.6%로 3개 모델 중 최고",
-   "GDPval-AA에서 소네트 5.5가 1844점으로 Opus 5.5와 대등"
+   "소네트 5.5 터미널벤치 4.0 점수 70.6%로 3개 모델 중 최고",
+   "소네트 5.5 GDPval-AA 1844점으로 Opus 5.5와 대등"
   ],
   "events": [],
   "code_warnings": [],
@@ -141,11 +141,11 @@
  },
  "w41-embeddinggemma-2": {
   "week": "2026-W41",
-  "numbers": [
-   "MTEB Code 점수 78.68로 전작 대비 9.92점 상승"
-  ],
+  "numbers": [],
   "events": [],
-  "code_warnings": [],
+  "code_warnings": [
+   "누락 의심: numbers가 비었는데 근거에 같은 단위 값 3개 이상(dimensions 4, 점 3)"
+  ],
   "needed_numbers": null,
   "needed_events": null,
   "labeler": null,

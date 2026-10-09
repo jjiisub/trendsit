@@ -1,6 +1,6 @@
 # 주간 브리핑 2026-W41 (리뷰용 읽기본)
 
-> run `20261010-075543-weekly-fd8a`. S6 export 전 임시 화면. 홈 순서대로 토픽, 끝에 홈 레포 목록. 근거 id 옆은 출처 제목. ⚠ = 확인 필요(같은 이슈가 두 번 남았거나 3라운드 뒤 남은 이슈)
+> run `20261010-082802-weekly-b543`. S6 export 전 임시 화면. 홈 순서대로 토픽, 끝에 홈 레포 목록. 근거 id 옆은 출처 제목. ⚠ = 확인 필요(같은 이슈가 두 번 남았거나 3라운드 뒤 남은 이슈)
 
 ## 1. 리드 · Mistral Large 4: 1조500억개 MoE 모델 공개 및 오픈웨이트 일정
 
@@ -60,64 +60,55 @@
 
 ## 3. EmbeddingGemma 2: 740M 오픈웨이트 멀티모달 임베딩 모델 공개
 
-`w41-embeddinggemma-2` · 상태 checked · 2라운드 · 축: 740M 파라미터 오픈웨이트 멀티모달 임베딩
+`w41-embeddinggemma-2` · 상태 passed · 2라운드 · 축: 740M 파라미터 오픈웨이트 멀티모달 임베딩
 
-> ⚠ 확인 필요: concepts[0](이슈가 남은 채 발행된 위치)
+**요약(홈)** Google DeepMind가 740M 파라미터 오픈웨이트 멀티모달 임베딩 모델 ==EmbeddingGemma 2==를 Apache 2.0 라이선스로 공개했다. 텍스트·코드·이미지·영상·오디오를 통합 처리하며 온디바이스 추론에 최적화되어 있다.
 
-**요약(홈)** Google DeepMind가 740M 파라미터 오픈웨이트 멀티모달 임베딩 모델 ==EmbeddingGemma 2==를 공개했다. 텍스트·코드·이미지·비디오·오디오를 통합 처리하며, 온디바이스 추론에 최적화되어 있다.
-
-**개요** Google DeepMind가 텍스트를 넘어 코드·이미지·비디오·오디오를 단일 임베딩 공간에 통합하는 오픈웨이트 멀티모달 임베딩 모델 EmbeddingGemma 2를 공개했다. Gemma 4 아키텍처 기반 740M 파라미터 규모로, 양자화 시 스마트폰에서 ~191MB~567MB RAM으로 동작해 온디바이스 추론에 최적화되어 있다. Apache 2.0 라이선스로 상업적 활용이 가능하며, MTEB Code 벤치마크에서 전작 대비 9.92점 상승한 78.68점을 기록했다.
+**개요** Google DeepMind가 Gemma 4 아키텍처 기반 740M 파라미터 오픈웨이트 멀티모달 임베딩 모델 EmbeddingGemma 2를 공개했다. 텍스트뿐 아니라 코드·이미지·영상·오디오를 단일 임베딩 공간으로 통합하며, Apache 2.0 라이선스로 상업적 활용을 허용한다. 양자화 시 스마트폰에서 ~191MB~567MB RAM으로 동작해 온디바이스 추론에 최적화되어 있다.
 
 **핵심 포인트**
 
-1. Google DeepMind가 텍스트·코드·이미지·비디오·오디오를 단일 임베딩 공간에 통합하는 ==EmbeddingGemma 2==를 공개함  
-   ← `it:1111#q1` EmbeddingGemma 2: an open, lightweight multimodal ; `it:1183#q1` 구글, 온디바이스 ‘임베딩젬마 2’ 공개…텍스트·이미지·음성 통합 처리
-2. Gemma 4 아키텍처 기반 740M 파라미터 규모로, 양자화 시 Pixel 11 Pro에서 텍스트 전용 ~191MB, 멀티모달 전체 ~567MB RAM으로 온디바이스 추론에 최적화됨  
-   ← `it:1111#q2` EmbeddingGemma 2: an open, lightweight multimodal ; `it:1111#q5` EmbeddingGemma 2: an open, lightweight multimodal 
-3. MTEB Code 벤치마크 78.68점으로 전작 68.76점 대비 9.92점 상승, 1B 미만 멀티모달 임베더 중 상위권 점수 기록  
+1. Google DeepMind가 텍스트·코드·이미지·영상·오디오를 하나의 임베딩 공간으로 통합하는 ==EmbeddingGemma 2==를 공개함  
+   ← `it:1111#q1` EmbeddingGemma 2: an open, lightweight multimodal ; `it:1132#q1` EmbeddingGemma 2 - 개방형 경량 멀티모달 임베딩 모델
+2. Gemma 4 아키텍처 기반 740M 파라미터 모델로, Apache 2.0 라이선스에 따라 상업적 활용이 가능함  
+   ← `it:1111#q2` EmbeddingGemma 2: an open, lightweight multimodal ; `it:1183#q2` 구글, 온디바이스 ‘임베딩젬마 2’ 공개…텍스트·이미지·음성 통합 처리; `it:1045#q1` EmbeddingGemma 2
+3. 양자화 적용 시 Google Pixel 11 Pro에서 텍스트 전용 가중치 활성 RAM ~191MB, 멀티모달 전체 모델 ~567MB로 온디바이스 추론에 적합함  
+   ← `it:1111#q5` EmbeddingGemma 2: an open, lightweight multimodal 
+4. MTEB Code 벤치마크 78.68점으로 전작 68.76점 대비 9.92점 상승, sub-1B 멀티모달 임베더 중 선두 점수 기록  
    ← `it:1183#q4` 구글, 온디바이스 ‘임베딩젬마 2’ 공개…텍스트·이미지·음성 통합 처리; `it:1111#q3` EmbeddingGemma 2: an open, lightweight multimodal 
-
-   **도식(수치): MTEB Code 점수 78.68로 전작 대비 9.92점 상승** (점) — EmbeddingGemma 2와 전작의 MTEB Code 벤치마크 점수 비교 [it:1183#q4]
-
-   | 라벨 | 값 | 근거 | 표시 |
-   |---|---|---|---|
-   | EmbeddingGemma 2 | 78.68 | `it:1183#q4` | 강조 |
-   | 전작 | 68.76 | `it:1183#q4` | 기준 |
-4. Apache 2.0 라이선스로 상업적 활용 가능, Matryoshka Representation Learning(MRL)으로 벡터 차원을 768에서 512·256·128으로 동적 축소 가능  
-   ← `it:1111#q2` EmbeddingGemma 2: an open, lightweight multimodal ; `it:1111#q4` EmbeddingGemma 2: an open, lightweight multimodal 
-5. 최대 8192토큰 컨텍스트 지원으로 전작 대비 4배 확장, Simon Willison은 임베딩 모델 특성상 오픈웨이트가 폐쇄적 호스팅 전용 모델보다 적합하다고 평가  
-   ← `it:1183#q3` 구글, 온디바이스 ‘임베딩젬마 2’ 공개…텍스트·이미지·음성 통합 처리; `it:1045#q1` EmbeddingGemma 2; `it:1045#q2` EmbeddingGemma 2
+5. Matryoshka Representation Learning(MRL)을 통해 출력 벡터를 768차원에서 512·256·128차원으로 동적으로 축소 가능  
+   ← `it:1111#q4` EmbeddingGemma 2: an open, lightweight multimodal 
+6. 최대 8192토큰 컨텍스트 지원으로 전작 대비 4배 확장  
+   ← `it:1183#q3` 구글, 온디바이스 ‘임베딩젬마 2’ 공개…텍스트·이미지·음성 통합 처리
 
 **핵심 개념**
 
-- Matryoshka Representation Learning (MRL): 출력 벡터 차원을 768에서 512·256·128으로 동적으로 축소하여 저장 공간을 절감하는 기법
-- MTEB (Massive Text Embedding Benchmark): 텍스트 임베딩 모델 성능을 평가하는 벤치마크
-- MAEB (Massive Audio Embedding Benchmark): 오디오 임베딩 모델 성능을 평가하는 벤치마크
+- Matryoshka Representation Learning (MRL): 출력 벡터를 768차원에서 512, 256, 128차원으로 동적으로 축소할 수 있는 기술
 
-출처 3곳: `it:1111`, `it:1183`, `it:1045`
+출처 4곳: `it:1111`, `it:1132`, `it:1183`, `it:1045`
 
-## 4. Claude Haiku 5.5 출시, 10만 토큰 이하 90% 가격 인하
+## 4. Claude Haiku 5.5 출시, 10만 토큰 이하 요청 90% 가격 인하
 
 `w41-claude-haiku-5-5` · 상태 checked · 2라운드 · 축: 10만 토큰 이하 요청 90% 가격 인하
 
-> ⚠ 확인 필요: numbers[0], overview(이슈가 남은 채 발행된 위치)
+> ⚠ 확인 필요: numbers[0](이슈가 남은 채 발행된 위치)
 
-**요약(홈)** Anthropic이 Claude Haiku 5.5를 공개하며 10만 토큰 이하 요청 가격을 ==전작 대비 90% 인하==했다. 100,000 토큰 이하에서 GPT-6 Luna와 동일 가격이지만, 토큰 수 증가로 실질 비용이 표기보다 높을 수 있다.
+**요약(홈)** Anthropic이 Claude Haiku 5.5를 출시하며 100,000 토큰 이하 요청 가격을 전작 대비 90% 낮췄다. ==GPT-6 Luna와 동가격에 벤치마크 우위==를 확보한 것이 쟁점이다.
 
-**개요** Anthropic이 소형 모델 Claude Haiku 5.5를 출시하며 10만 토큰 이하 요청의 API 가격을 전작 대비 90% 인하했다. 100,000 토큰 이하 구간에서 GPT-6 Luna와 동일한 가격($0.10/$0.50)을 적용하되, 초과 시 5배로 상승하는 구조다. GDPval-AA v2.1에서 1620점을 기록해 GPT-6 Luna(1437점)를 상회하지만, 토크나이저 변경으로 같은 프롬프트의 토큰 사용량이 1.25배 증가해 실질 비용이 표기 가격보다 높을 수 있다.
+**개요** Anthropic이 소형 모델 Claude Haiku 5.5를 공개하며 100,000 토큰 이하 요청의 API 가격을 전작 대비 90% 인하했다. ==GPT-6 Luna와 동일한 가격 구간에서 벤치마크 점수를 상회==하는 것이 핵심 변화다. 다만 토큰화 효율 저하로 실제 비용 절감 폭은 제한적일 수 있다는 지적도 나온다.
 
 **핵심 포인트**
 
-1. 10만 토큰 이하 요청 시 입력/출력 토큰 가격이 100만 토큰당 각각 0.10달러, 0.50달러로, ==전작 대비 90% 인하==  
+1. 100,000 토큰 이하 요청 시 입력/출력 토큰 가격이 100만 토큰당 각각 $0.10, $0.50으로 책정되어 ==전작 대비 90% 인하==  
    ← `it:1180#q2` 앤트로픽, API 비용 최대 90% 낮춘 '클로드 하이쿠 5.5' 공개
-2. 100,000 토큰 이하 구간에서 GPT-6 Luna와 동일한 가격($0.10/$0.50) 적용, 초과 시 5배로 상승($0.50/$2.50)  
-   ← `it:1144#q2` Claude Haiku 5.5; `it:1144#q3` Claude Haiku 5.5
+2. 100,000 토큰 초과 시 가격은 5배로 올라 $0.50/$2.50 적용  
+   ← `it:1144#q3` Claude Haiku 5.5
 3. GDPval-AA v2.1에서 1620점 기록, 전작 Haiku 4.5(735점)와 GPT-6 Luna(1437점)를 상회  
    ← `it:1180#q4` 앤트로픽, API 비용 최대 90% 낮춘 '클로드 하이쿠 5.5' 공개
-4. 같은 프롬프트 기준 Haiku 4.5 대비 토큰 사용량 약 1.25배 증가, 숨겨진 가격 인상 요인 존재  
+4. 같은 긴 프롬프트 기준 Haiku 4.5 대비 토큰 사용량이 약 1.25배 많아 숨겨진 가격 상승 요인 존재  
    ← `it:1144#q4` Claude Haiku 5.5
-5. 하이쿠 모델 최초로 '작업량 설정(Workload settings)' 기능 탑재  
-   ← `it:1180#q3` 앤트로픽, API 비용 최대 90% 낮춘 '클로드 하이쿠 5.5' 공개
+5. 100,000 토큰 이하 워크로드에서는 GPT-6 Luna와 동일 가격($0.10/$0.50)에 벤치마크 점수가 더 높음  
+   ← `it:1144#q5` Claude Haiku 5.5; `it:1144#q2` Claude Haiku 5.5
 
 출처 2곳: `it:1180`, `it:1144`
 
@@ -317,7 +308,7 @@
    "no_digest": 8,
    "irrelevant_repo": 0
   },
-  "truncated_topics": 3
+  "truncated_topics": 0
  },
  "aliases": {
   "candidates": 0,
@@ -365,35 +356,35 @@
    "3": 0
   },
   "code_rejects": 7,
-  "critic_rejects": 7,
-  "autofixes": 15,
+  "critic_rejects": 5,
+  "autofixes": 14,
   "reverts": 0,
   "issues": {
-   "unsupported": 7,
+   "unsupported": 4,
    "number_mismatch": 0,
    "overclaim": 0,
    "missing_key": 0,
    "wrong_ref": 0,
    "overuse": 0,
-   "missing_diagram": 0
+   "missing_diagram": 1
   },
   "check_points": 2,
-  "check_topics": 6
+  "check_topics": 5
  },
  "cost_usd": {
-  "decide": 0.018784,
-  "editor_select": 0.006979,
-  "writer": 0.028017,
-  "writer_revise": 0.005281,
-  "critic": 0.051718,
-  "total": 0.110779
+  "decide": 0.0,
+  "editor_select": 0.0,
+  "writer": 0.002798,
+  "writer_revise": 0.00073,
+  "critic": 0.004226,
+  "total": 0.007754
  },
  "duration_sec": {
-  "evidence": 2.1,
-  "cluster": 182.4,
-  "select": 47.4,
-  "write_review": 774.6,
-  "total": 1007.4
+  "evidence": 0,
+  "cluster": 0,
+  "select": 0.7,
+  "write_review": 60.8,
+  "total": 65.3
  }
 }
 ```

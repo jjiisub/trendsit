@@ -190,6 +190,7 @@ def build_input(cands: list[Candidate], ev: WeekEvidence, db: DB, cfg: BriefConf
                              recent_topics=recent_topics(db, ev.week, cfg.cluster.past.weeks_back),
                              keyword_trend=keyword_trend(db, ev.week), repo_cards=repo_lines(ev),
                              limits=SelectLimits(min_topics=cfg.select.topics.min, max_topics=cfg.select.topics.max,
+                                                 video_relevance_min=cfg.select.video_slot.relevance_min,
                                                  lead=cfg.select.lead))
 
 

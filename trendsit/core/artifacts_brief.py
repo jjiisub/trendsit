@@ -86,6 +86,7 @@ class SelectLimits(_Strict):
     min_topics: int
     max_topics: int
     lead: int = 1
+    video_relevance_min: float = Field(default=0.0, description="영상 자리(C-20): 이 관련성 이상 영상 묶음이 있으면 영상 토픽 1개 이상")
 
 
 class EditorSelectInput(RoleInput):
