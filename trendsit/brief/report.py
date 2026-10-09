@@ -169,7 +169,12 @@ def write_cluster_report(stage: ClusterStage, cfg: BriefConfig, note: str = "") 
     sus = [(c, suspicious(c, res)) for c in cands if len(c.members) > 1]
     sus = [(c, s) for c, s in sus if s]
     lines += ["## 6. 의심 병합 (숫자·버전·크기만 다른 이름이 한 묶음)", ""]
-    lines += [f"- c{c.id} {_cell(c.label, 50)}: {', '.join(s)}" for c, s in sus] or ["- 없음"]
+    ok = set(cfg.cluster.reviewed_suspicious)
+
+    def mark(items: list[str]) -> str:
+        return ", ".join(f"{x}(확인 완료: 비교 대상으로 언급된 이전 버전)" if x in ok else x for x in items)
+
+    lines += [f"- c{c.id} {_cell(c.label, 50)}: {mark(s)}" for c, s in sus] or ["- 없음"]
     lines.append("")
 
     # 과거 대조
@@ -203,7 +208,16 @@ def write_cluster_report(stage: ClusterStage, cfg: BriefConfig, note: str = "") 
               f"- 편집장 입력: 점수 상위 {len(top)}개(상한 {cfg.select.max_candidates}). 입력 순서는 cluster_id 고정",
               f"- 관심 주제 후보(relevance high 항목이 있는 묶음): {len(high)}개",
               f"- 2채널 이상 묶음: {len(multi)}개",
-              f"- 지금 토픽 수 설정: min {cfg.select.topics.min} / max {cfg.select.topics.max}(설계 초안: 7·10·12 중 확정)", "",
+              f"- 토픽 수 설정: min {cfg.select.topics.min} / max {cfg.select.topics.max}(멈춤 지점에서 max 10 확정)", ""]
+    top_ch = Counter(ch for c in top for ch in c.channels)
+    over = [f"{ch} {n}/{len(top)}" for ch, n in top_ch.items() if n > len(top) / 2 and len(top) >= 2]
+    lines += [f"- **한 채널이 입력의 절반을 넘음**: {', '.join(over)}" if over else
+              f"- 입력 채널 분포: {', '.join(f'{ch} {n}' for ch, n in top_ch.items())}(절반 넘는 채널 없음)"]
+    if stage.video_relevance:
+        hi = cfg.evidence.video_relevance_high
+        lines.append("- 영상 relevance(digest 요약의 관련성 점수, " + f"{hi} 이상 high): " + ", ".join(
+            f"{k} {v}" for k, v in sorted(stage.video_relevance.items(), key=lambda x: -x[1])))
+    lines += ["",
               "| 순위 | 묶음 | 이름 | 조합 | 점수 |", "|---|---|---|---|---|"]
     for i, c in enumerate(top, 1):
         lines.append(f"| {i} | c{c.id} | {_cell(c.label, 60)} | {_combo(c)} | {c.score} |")

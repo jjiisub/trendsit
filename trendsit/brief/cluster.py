@@ -23,7 +23,7 @@ from ..core.artifacts_brief import DecideAnswer, DecideInput, PairShared
 from ..core.config_brief import BriefConfig
 from ..core.db import DB, now_kst
 from ..filter.embed import Embedder, cosine, from_blob, to_blob
-from .aliases import AliasTable
+from .aliases import AliasTable, norm_key
 from .evidence import RELEVANCE_RANK, Member, WeekEvidence
 
 # 넓은 1차 그물 키워드(keywords.yaml 2026-10-08): 거의 모든 글이 가져 같은 대상 신호가 되지 않는다
@@ -40,7 +40,9 @@ class Pair:
     cross: bool
     shared_kw: list[str] = field(default_factory=list)
     shared_names: list[str] = field(default_factory=list)
+    specific_names: list[str] = field(default_factory=list)  # 회사·기관 이름을 뺀 공유 이름(제품·모델·프로젝트)
     route: str = "none"  # auto / decide / none
+    via: str = ""  # decide로 간 경로: border(유사도) / name(구체적 이름 공유 + name_border)
     decided: bool = False
     same: bool | None = None
     confidence: float | None = None
@@ -82,12 +84,13 @@ def member_text(m: Member) -> str:
     return "\n".join(x for x in (m.title, m.summary) if x).strip()
 
 
-def member_vectors(db: DB, members: Sequence[Member], embedder: Embedder) -> dict[str, list[float]]:
-    """글은 기존 item_embeddings(관련성 필터가 만든 것), 영상(digest 요약)·레포(oneliner + description)는 새로 임베딩해
-    member_embeddings에 저장(같은 모델·같은 입력 해시면 재사용). 글 임베딩이 없으면 카드 요약으로 같은 방식."""
+def member_vectors(db: DB, members: Sequence[Member], embedder: Embedder, mode: str = "card") -> dict[str, list[float]]:
+    """mode card(멈춤 지점 결정): 모든 채널을 "제목 + 요약"(글은 카드 summary, 영상은 digest 요약, 레포는 oneliner)으로
+    임베딩해 member_embeddings에 저장(같은 모델·같은 입력 해시면 재사용). mode body: 글은 관련성 필터의 본문 임베딩
+    (item_embeddings)을 재사용하고 나머지만 새로."""
     vecs: dict[str, list[float]] = {}
     text_ids = {m.item_id: m.key for m in members if m.channel == "text" and m.item_id is not None}
-    if text_ids:
+    if text_ids and mode == "body":
         marks = ",".join("?" * len(text_ids))
         for r in db.conn.execute(f"SELECT item_id, vec FROM item_embeddings WHERE model=? AND item_id IN ({marks})",
                                  (embedder.model_id, *text_ids)):
@@ -113,12 +116,30 @@ def member_vectors(db: DB, members: Sequence[Member], embedder: Embedder) -> dic
     return vecs
 
 
+def score_video_relevance(members: Sequence[Member], embedder: Embedder, interests: Sequence[tuple[str, str]],
+                          high: float) -> dict[str, float]:
+    """영상 relevance(멈춤 지점 결정 4): digest 요약을 S2 관련성 필터와 같은 방식(관심사 설명 쿼리와의 코사인 최댓값)으로
+    점수 매겨 high 이상이면 high, 아래면 mid. Member.relevance를 바꾸고 점수를 돌려준다."""
+    vids = [m for m in members if m.channel == "video"]
+    if not vids:
+        return {}
+    queries = embedder.embed_queries([t for _k, t in interests])
+    docs = embedder.embed_docs([member_text(m) for m in vids])
+    out = {}
+    for m, v in zip(vids, docs, strict=True):
+        s = round(max(cosine(v, q) for q in queries), 4)
+        m.relevance = "high" if s >= high else "mid"
+        out[m.key] = s
+    return out
+
+
 # ---------- 쌍 ----------
 def build_pairs(members: dict[str, Member], vecs: dict[str, list[float]], aliases: AliasTable,
                 cfg: BriefConfig) -> tuple[list[Pair], dict[tuple[str, str], float]]:
     th = cfg.cluster.thresholds
     keys = sorted(members)
     names = {k: aliases.entity_keys(members[k].entities) for k in keys}
+    generic = {norm_key(n) for n in cfg.cluster.generic_names}
     kws = {k: set(members[k].keywords) - BROAD_KEYWORDS for k in keys}
     sims: dict[tuple[str, str], float] = {}
     pairs = []
@@ -128,16 +149,20 @@ def build_pairs(members: dict[str, Member], vecs: dict[str, list[float]], aliase
             sims[(a, b)] = sims[(b, a)] = s
             ma, mb = members[a], members[b]
             cross = ma.channel != mb.channel
-            p = Pair(a, b, s, cross, sorted(kws[a] & kws[b]), sorted(names[a] & names[b]))
+            shared = sorted(names[a] & names[b])
+            p = Pair(a, b, s, cross, sorted(kws[a] & kws[b]), shared, [n for n in shared if n not in generic])
             if ma.channel == mb.channel == "github":
                 p.route = "none"  # 레포끼리는 묶지 않음(agglomerate의 cannot-link와 같은 규칙)
             elif cross:
-                if (p.shared_kw or p.shared_names) and s >= th.border:
-                    p.route = "decide"
+                if (p.shared_kw or p.specific_names) and s >= th.border:
+                    p.route, p.via = "decide", "border"
             elif s >= th.auto:
                 p.route = "auto"
             elif s >= th.border:
-                p.route = "decide"
+                p.route, p.via = "decide", "border"
+            if p.route == "none" and p.specific_names and s >= cfg.cluster.name_border and not (
+                    ma.channel == mb.channel == "github"):
+                p.route, p.via = "decide", "name"
             pairs.append(p)
     return pairs, sims
 
@@ -266,7 +291,7 @@ def match_past(clusters: list[Cluster], members: dict[str, Member], vecs: dict[s
 def cluster_week(db: DB, ev: WeekEvidence, aliases: AliasTable, cfg: BriefConfig, embedder: Embedder,
                  decider: Decider | None, alias_decide_calls: int = 0) -> ClusterResult:
     members = ev.members
-    vecs = member_vectors(db, list(members.values()), embedder)
+    vecs = member_vectors(db, list(members.values()), embedder, cfg.cluster.embed_text)
     pairs, sims = build_pairs(members, vecs, aliases, cfg)
     cap = max(0, cfg.cluster.decide.max_calls_per_week - alias_decide_calls)
     calls, capped = run_decides(pairs, members, decider, cap)

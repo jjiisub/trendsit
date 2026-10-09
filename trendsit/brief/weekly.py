@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any
 
 from ..core import config
@@ -29,6 +29,7 @@ class ClusterStage:
     result: cl.ClusterResult
     seconds: dict[str, float]
     alias_decisions: list[dict[str, Any]]
+    video_relevance: dict[str, float] = field(default_factory=dict)
 
 
 def make_decider(ctx: Ctx) -> cl.Decider:
@@ -99,7 +100,14 @@ def stage_cluster(week: str, ctx: Ctx, cfg: BriefConfig | None = None, embedder:
             text=f"별칭 자동 승인 {c['auto_approved']}, 후보 {c['candidates']}, decide {len(alias_dec)}",
             detail={"counts": c, "decide": alias_dec})
     t2 = time.monotonic()
-    embedder = embedder or make_embedder("real", config.load("filter.yaml"))
+    flt = config.load("filter.yaml")
+    embedder = embedder or make_embedder("real", flt)
+    vrel = cl.score_video_relevance(list(ev.members.values()), embedder,
+                                    [(x.keyword_id, x.text) for x in flt.interests], cfg.evidence.video_relevance_high)
+    if vrel:
+        tr.step(kind="code", role="evidence",
+                text=f"영상 관련성 점수: high {sum(v >= cfg.evidence.video_relevance_high for v in vrel.values())}, "
+                     f"mid {sum(v < cfg.evidence.video_relevance_high for v in vrel.values())}", detail=vrel)
     try:
         res = cl.cluster_week(db, ev, table, cfg, embedder, decider, alias_decide_calls=len(alias_dec))
     except BudgetExceeded as e:
@@ -122,4 +130,4 @@ def stage_cluster(week: str, ctx: Ctx, cfg: BriefConfig | None = None, embedder:
             (week, start.isoformat(), end.isoformat(), "clustered", run_id))
     t3 = time.monotonic()
     return ClusterStage(run_id, ev, table, res, {"evidence": round(t1 - t0, 1), "normalize": round(t2 - t1, 1),
-                                                 "cluster": round(t3 - t2, 1)}, alias_dec)
+                                                 "cluster": round(t3 - t2, 1)}, alias_dec, vrel)

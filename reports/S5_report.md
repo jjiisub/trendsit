@@ -136,3 +136,17 @@ pytest 실패 5건(0단계 시점, 모두 handoff 묶음이 원인): 새 역할 
 ### 자동 모드가 막은 것: 처리 완료(사용자 실행, 2026-10-09)
 - `reports/eval/` 정리(5.1-7, E10): 사용자가 34개를 `git rm`, 커밋 `chore(s5): reports/eval 역할별 최신 1개만 남김(E10)`. 남은 것은 남길 목록 12개 + 그 뒤 S5 실행 2개(item_card `140559`, decide `141903`)
 - 원격 `docs-s2s4-handoff` 삭제(사용자)
+
+### 멈춤 지점 결정 (2026-10-09 16:06 사용자 "진행", 리뷰 확인 결과)
+| # | 결정 | 반영 | 근거·확인 |
+|---|---|---|---|
+| 1 | auto 0.80 / border 0.65 그대로. 구체적 이름(제품·모델·프로젝트) 공유 + 유사도 0.55 이상이면 같은 채널·다른 채널 모두 decide | `brief.yaml` `cluster.name_border: 0.55`, `cluster.generic_names`(회사·기관 이름, 표기 차이 무시), `Pair.specific_names`·`via`(border/name) | W41: decide 58회 중 name 경로 27회. EmbeddingGemma 2 Simon Willison 글(it:1045, 0.61~0.63)이 name 경로로 묶임 |
+| 2 | 묶기 임베딩 body vs card(모든 채널 제목 + 요약) 비교 후 나은 쪽 | `cluster.embed_text: body` | `reports/S5_brief/embed_compare_2026-W41.md`. 라벨 31쌍 일치 30/31 동률, 오병합 0 동률, EmbeddingGemma 3건 모두 모임. card는 5쌍을 decide 없이 임베딩만으로 자동 병합하고 decide 상한에 걸려 11개 후보를 못 부름. body는 58회로 상한 안, 모든 병합을 decide가 확인 → body. 놓친 1쌍(it:1046 ↔ 1048, Mistral Large 4)은 두 방식 모두 decide가 diff |
+| 3 | 토픽 수 max 10 | `select.topics.max: 10` | |
+| 4 | 영상 relevance = digest 요약의 S2 관련성 점수(0.50 이상 high, 아래 mid). 편집장 입력 상위 20에서 한 채널이 절반을 넘으면 표시 | `evidence.video_relevance_high: 0.50`, `cluster.score_video_relevance`, 묶기 리포트 9장 | |
+| 5 | 의심 병합 3건(Mistral Large 3↔4, GPT-5.6↔6, Haiku 4.5↔5.5)은 비교 대상으로 언급된 이전 버전이라 오탐. 표시 규칙 그대로 | `cluster.reviewed_suspicious`, 리포트에 "확인 완료" | |
+| 7 | 관문 B 대상 주 W42 + W41 → **W40 + W41**(설계 결정). W42는 10/18 수집 뒤 시연 준비로 weekly만 | W40 글 카드 새 md로 재생성(`summarize --redo`), W40 영상은 기존 digest, W40 weekly(과거 대조 없음) → W41 weekly(W40과 대조) | |
+| 8 | W40 트렌딩 재구성(stargazers 기준) | **접음**: GitHub API가 stargazer 시각을 주지 않음(REST 403·404·401, GraphQL FORBIDDEN·빈 목록). W40은 레포 없이 | `reports/S5_brief/trending_reconstructed_2026-W40.md`, `scripts/reconstruct_trending.py` |
+| 8-1 | 주마다 브리핑 읽기본 `reports/S5_brief/briefing_<week>.md` | 7단계에서 | |
+
+- decide 라벨 31쌍은 비어 있어(D1-3 리뷰 세션 몫) 비교 기준으로 코드 세션이 잠정 라벨을 달았다(labeler `opus-5.5-code(잠정)`, 30쌍 모델 판정 동의, it:1046↔1048만 same). 리뷰 세션이 덮어쓴다

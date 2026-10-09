@@ -17,6 +17,7 @@ class _Strict(BaseModel):
 class EvidenceCfg(_Strict):
     max_tokens_per_topic: int = Field(ge=1000)
     max_refs_per_point: int = Field(ge=1, le=5)
+    video_relevance_high: float = Field(gt=0, le=1)
 
 
 class AliasesCfg(_Strict):
@@ -47,6 +48,10 @@ class PastCfg(_Strict):
 
 class ClusterCfg(_Strict):
     thresholds: Thresholds
+    name_border: float = Field(gt=0, le=1)
+    generic_names: list[str]
+    embed_text: Literal["card", "body"]
+    reviewed_suspicious: list[str] = []
     linkage: Literal["average"]
     max_cluster_size: int = Field(ge=2)
     decide: DecideCfg
