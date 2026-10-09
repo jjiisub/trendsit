@@ -27,7 +27,9 @@
   "week": "2026-W40",
   "numbers": [],
   "events": [],
-  "code_warnings": [],
+  "code_warnings": [
+   "누락 의심: numbers가 비었는데 근거에 같은 단위 값 3개 이상(% 5, 100만 토큰당 4)"
+  ],
   "needed_numbers": null,
   "needed_events": null,
   "labeler": null,
@@ -56,7 +58,7 @@
  "w40-claude-sonnet-5-5": {
   "week": "2026-W40",
   "numbers": [
-   "Sonnet 5.5가 터미널벤치 4.0에서 Opus 5.5와 전작을 모두 상회"
+   "Sonnet 5.5가 터미널벤치 4.0에서 Opus 5.5 상회"
   ],
   "events": [],
   "code_warnings": [],
@@ -78,7 +80,7 @@
  "w40-solar-mini-4": {
   "week": "2026-W40",
   "numbers": [
-   "Solar Mini 4가 MiMo-V2.5보다 에이전트 작업 완료 비용 약 43% 낮음"
+   "Solar Mini 4가 MiMo-V2.5보다 에이전트 작업 완료 비용 43% 낮음"
   ],
   "events": [],
   "code_warnings": [],
@@ -90,8 +92,7 @@
  "w40-vidraft-darwin": {
   "week": "2026-W40",
   "numbers": [
-   "다윈-180B-RSI가 LEXam 객관식 평가에서 16.53점 차이로 1위",
-   "다윈-180B-RSI가 LEXam-hard에서 기존 1위 잉클링을 4.9점 차이로 제침"
+   "다윈-180B-RSI가 LEXam·LEXam-hard에서 경쟁 모델 대비 우위"
   ],
   "events": [],
   "code_warnings": [],
@@ -103,8 +104,7 @@
  "w40-jev-decision-model": {
   "week": "2026-W40",
   "numbers": [
-   "Jeff-Code가 동일 품질로 태스크당 47% 속도 향상",
-   "Jeeves가 학습하지 않은 데이터와 JevBench에서 Jev·Kev-9B 상회"
+   "Jeeves가 Kev-9B, Jev보다 높은 정확도 기록"
   ],
   "events": [],
   "code_warnings": [],
@@ -128,8 +128,8 @@
  "w41-mistral-large-4": {
   "week": "2026-W41",
   "numbers": [
-   "ML4가 GPT-6 루나와 AAII 동급, 딥시크-V4.1 플래시와 1점 차",
-   "입력·출력·캐시 입력 3종 요금 구조"
+   "ML4가 GPT-6 루나와 AAII 동급",
+   "코딩 에이전트 벤치마크별 점수"
   ],
   "events": [],
   "code_warnings": [],
@@ -150,12 +150,11 @@
  },
  "w41-claude-haiku-5-5": {
   "week": "2026-W41",
-  "numbers": [
-   "100,000 토큰 이하 구간에서 GPT-6 Luna와 동일 가격",
-   "GDPval-AA v2.1에서 Haiku 5.5가 경쟁 모델보다 높은 점수"
-  ],
+  "numbers": [],
   "events": [],
-  "code_warnings": [],
+  "code_warnings": [
+   "누락 의심: numbers가 비었는데 근거에 같은 단위 값 3개 이상(점 4, $ 3)"
+  ],
   "needed_numbers": null,
   "needed_events": null,
   "labeler": null,
@@ -195,11 +194,11 @@
  },
  "w41-sift-framework": {
   "week": "2026-W41",
-  "numbers": [],
-  "events": [],
-  "code_warnings": [
-   "누락 의심: numbers가 비었는데 근거에 같은 단위 값 3개 이상(% 3)"
+  "numbers": [
+   "SIFT가 Polyglot 벤치마크에서 35.1% 정확도 달성"
   ],
+  "events": [],
+  "code_warnings": [],
   "needed_numbers": null,
   "needed_events": null,
   "labeler": null,
@@ -218,7 +217,7 @@
  "w41-textgrain-eu": {
   "week": "2026-W41",
   "numbers": [
-   "동의어 치환에 따른 400-token 탐지율 하락"
+   "동의어 치환에 따른 textGrain 탐지율 하락"
   ],
   "events": [],
   "code_warnings": [],

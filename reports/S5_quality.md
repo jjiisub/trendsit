@@ -232,39 +232,39 @@ judge 판정: **잠정**(사람 라벨 없음. `eval/labels/writer.csv`를 채�
 
 > `scripts/s5_gate_b.py`가 붙인 절. 라벨이 필요한 항목은 2차 라벨(D1-3, 리뷰 세션 opus-5.5) 전 잠정.
 
-### 2026-W40 (run `20261009-194817-weekly-11c5`, 묶기 run `20261009-171627-weekly-50b5`)
+### 2026-W40 (run `20261009-200528-weekly-eafd`, 묶기 run `20261009-171627-weekly-50b5`)
 
-- 실행 요약: 토픽 10, 실패 0, 라운드 {'1': 1, '2': 9, '3': 0}, 코드 반려 11, 검수 반려 3, 되돌림 0, check 포인트 0, 사용액 $0.000742, 시간 15.4초
+- 실행 요약: 토픽 10, 실패 0, 라운드 {'1': 5, '2': 3, '3': 2}, 코드 반려 4, 검수 반려 5, 되돌림 0, check 포인트 1, 사용액 $0.084278, 시간 474.5초
 - 선별: 첫 시도 코드 검증 실패(1회 시도, 계획 model), reason 입력 대조 위반 0
 
 | 순위 | 토픽 | 상태 | 라운드 | 채널 | 도식(수치·사건) | 코드 경고 | 문체 위반 | check |
 |---|---|---|---|---|---|---|---|---|
 | 1 | w40-openai-dots | checked | 2 | text | 0·0 | 1 | 0 | 0 |
 | 2 | w40-gemini-argon | passed | 1 | text | 1·0 | 0 | 0 | 0 |
-| 3 | w40-gpt-6-1-sol | checked | 2 | text | 0·0 | 0 | 0 | 0 |
-| 4 | w40-decision-api | checked | 2 | text | 0·0 | 0 | 0 | 0 |
-| 5 | w40-openai-security | passed | 2 | text | 0·0 | 0 | 0 | 0 |
-| 6 | w40-claude-sonnet-5-5 | passed | 2 | text | 1·0 | 0 | 0 | 0 |
-| 7 | w40-deepseek-harness | checked | 2 | text | 0·0 | 0 | 1 | 0 |
-| 8 | w40-solar-mini-4 | passed | 2 | text | 1·0 | 0 | 0 | 0 |
-| 9 | w40-vidraft-darwin | checked | 2 | text | 2·0 | 0 | 0 | 0 |
-| 10 | w40-jev-decision-model | passed | 2 | text | 2·0 | 0 | 0 | 0 |
+| 3 | w40-gpt-6-1-sol | passed | 3 | text | 0·0 | 1 | 0 | 0 |
+| 4 | w40-decision-api | checked | 2 | text | 0·0 | 0 | 0 | 1 |
+| 5 | w40-openai-security | passed | 1 | text | 0·0 | 0 | 0 | 0 |
+| 6 | w40-claude-sonnet-5-5 | passed | 1 | text | 1·0 | 0 | 0 | 0 |
+| 7 | w40-deepseek-harness | passed | 2 | text | 0·0 | 0 | 0 | 0 |
+| 8 | w40-solar-mini-4 | passed | 1 | text | 1·0 | 0 | 0 | 0 |
+| 9 | w40-vidraft-darwin | passed | 1 | text | 1·0 | 0 | 0 | 0 |
+| 10 | w40-jev-decision-model | passed | 3 | text | 1·0 | 0 | 0 | 0 |
 
-### 2026-W41 (run `20261009-193346-weekly-b3fc`, 묶기 run `20261009-180904-weekly-7454`)
+### 2026-W41 (run `20261009-201517-weekly-2101`, 묶기 run `20261009-180904-weekly-7454`)
 
-- 실행 요약: 토픽 10, 실패 0, 라운드 {'1': 5, '2': 5, '3': 0}, 코드 반려 5, 검수 반려 3, 되돌림 1, check 포인트 0, 사용액 $0.03321, 시간 258.4초
+- 실행 요약: 토픽 10, 실패 0, 라운드 {'1': 5, '2': 5, '3': 0}, 코드 반려 5, 검수 반려 4, 되돌림 0, check 포인트 0, 사용액 $0.061785, 시간 403.9초
 - 선별: 첫 시도 코드 검증 실패(1회 시도, 계획 model), reason 입력 대조 위반 0
 
 | 순위 | 토픽 | 상태 | 라운드 | 채널 | 도식(수치·사건) | 코드 경고 | 문체 위반 | check |
 |---|---|---|---|---|---|---|---|---|
 | 1 | w41-embedding-gemma-2 | checked | 2 | text | 1·0 | 0 | 0 | 0 |
-| 2 | w41-mistral-large-4 | passed | 2 | text | 2·0 | 0 | 0 | 0 |
-| 3 | w41-gpt-6-intelligent-ui | passed | 1 | text | 0·0 | 0 | 0 | 0 |
-| 4 | w41-claude-haiku-5-5 | passed | 1 | text | 2·0 | 0 | 0 | 0 |
-| 5 | w41-openai-rogue-agent | checked | 2 | text | 0·0 | 0 | 0 | 0 |
+| 2 | w41-mistral-large-4 | passed | 1 | text | 2·0 | 0 | 0 | 0 |
+| 3 | w41-gpt-6-intelligent-ui | checked | 2 | text | 0·0 | 0 | 0 | 0 |
+| 4 | w41-claude-haiku-5-5 | checked | 2 | text | 0·0 | 1 | 0 | 0 |
+| 5 | w41-openai-rogue-agent | passed | 1 | text | 0·0 | 0 | 0 | 0 |
 | 6 | w41-mai-code-1-1 | passed | 1 | text | 1·0 | 0 | 0 | 0 |
 | 7 | w41-openrig | passed | 2 | github+text | 0·0 | 0 | 0 | 0 |
-| 8 | w41-sift-framework | checked | 2 | text | 0·0 | 1 | 0 | 0 |
+| 8 | w41-sift-framework | checked | 2 | text | 1·0 | 0 | 0 | 0 |
 | 9 | w41-openai-math | passed | 1 | text | 0·0 | 0 | 0 | 0 |
 | 10 | w41-textgrain-eu | passed | 1 | text | 1·0 | 0 | 0 | 0 |
 
@@ -272,40 +272,41 @@ judge 판정: **잠정**(사람 라벨 없음. `eval/labels/writer.csv`를 채�
 
 | 토픽 | 상태 | Q1 | Q2 | Q3 | Q4 | 원자 사실 | 비지지 |
 |---|---|---|---|---|---|---|---|
-| w40-openai-dots | checked | pass | pass | pass | pass | 20/20 |  |
-| w40-gemini-argon | passed | pass | pass | pass | pass | 30/30 |  |
-| w40-gpt-6-1-sol | checked | pass | pass | pass | pass | 23/23 |  |
-| w40-decision-api | checked | pass | pass | pass | pass | 21/21 |  |
-| w40-openai-security | passed | pass | pass | pass | pass | 16/16 |  |
-| w40-claude-sonnet-5-5 | passed | pass | pass | pass | pass | 34/34 |  |
-| w40-deepseek-harness | checked | pass | pass | pass | pass | 21/21 |  |
-| w40-solar-mini-4 | passed | fail | fail | pass | pass | 29/29 |  |
-| w40-vidraft-darwin | checked | pass | fail | pass | pass | 37/37 |  |
-| w40-jev-decision-model | passed | pass | pass | pass | pass | 34/34 |  |
-| w41-embedding-gemma-2 | checked | pass | pass | pass | pass | 36/36 |  |
-| w41-mistral-large-4 | passed | pass | pass | pass | pass | 36/36 |  |
-| w41-gpt-6-intelligent-ui | passed | pass | pass | pass | pass | 14/14 |  |
-| w41-claude-haiku-5-5 | passed | pass | pass | pass | pass | 26/26 |  |
-| w41-openai-rogue-agent | checked | pass | pass | pass | pass | 21/21 |  |
-| w41-mai-code-1-1 | passed | pass | pass | pass | pass | 28/28 |  |
-| w41-openrig | passed | pass | pass | pass | pass | 21/21 |  |
-| w41-sift-framework | checked | pass | pass | pass | pass | 23/23 |  |
-| w41-openai-math | passed | pass | pass | pass | pass | 18/18 |  |
-| w41-textgrain-eu | passed | pass | pass | pass | pass | 24/24 |  |
-- w40-solar-mini-4 Q1: summary 첫 문장에서 업스테이지가 Solar Mini 4를 출시했음을 명확히 제시하고 있으나, plan.angle이 '소형 MoE 모델의 로컬 실행 최적화'임에도 첫 point는 '프로/미니 투트랙 전략' 출시 소식에 머물러 있어 핵심 각도가 후순위로 밀림
-- w40-solar-mini-4 Q2: numbers[1]에 비교 항목이 2개(Solar Mini 4, MiMo-V2.5)뿐으로 값 2개 막대 조건 위반이며, overview가 points 1, 2, 4, 5의 문장과 수치를 그대로 반복 서술함
-- w40-vidraft-darwin Q2: numbers[2]에 값 2개만 있는 막대 그룹('2개 모델의 점수 비교')이 포함되어 있어 군더더기 없음 기준(값 2개 막대 금지)을 위반함
+| w40-openai-dots | checked | pass | pass | pass | pass | 25/25 |  |
+| w40-gemini-argon | passed | pass | pass | pass | pass | 29/29 |  |
+| w40-gpt-6-1-sol | passed | pass | pass | pass | pass | 20/20 |  |
+| w40-decision-api | checked | pass | pass | pass | pass | 24/24 |  |
+| w40-openai-security | passed | pass | pass | pass | pass | 19/19 |  |
+| w40-claude-sonnet-5-5 | passed | pass | pass | pass | pass | 25/25 |  |
+| w40-deepseek-harness | passed | pass | pass | pass | pass | 25/25 |  |
+| w40-solar-mini-4 | passed | fail | fail | pass | pass | 33/34 | points[1] Solar Mini 4는 MoE 구조임 |
+| w40-vidraft-darwin | passed | pass | pass | pass | pass | 37/37 |  |
+| w40-jev-decision-model | passed | pass | pass | pass | pass | 29/29 |  |
+| w41-embedding-gemma-2 | checked | pass | pass | pass | pass | 30/30 |  |
+| w41-mistral-large-4 | passed | pass | pass | pass | pass | 39/39 |  |
+| w41-gpt-6-intelligent-ui | checked | pass | pass | pass | pass | 17/17 |  |
+| w41-claude-haiku-5-5 | checked | pass | pass | pass | pass | 18/21 | points[3] 토크나이저 변경으로 인한 결과이다; overview 토크나이저 변경이 있었다 |
+| w41-openai-rogue-agent | passed | pass | pass | pass | pass | 18/18 |  |
+| w41-mai-code-1-1 | passed | pass | pass | pass | pass | 26/26 |  |
+| w41-openrig | passed | pass | pass | pass | pass | 18/18 |  |
+| w41-sift-framework | checked | pass | fail | fail | pass | 21/22 | concepts[1] LLM-as-a-judge 신호로 후보 패치 비교 및 탐색을 유도함 |
+| w41-openai-math | passed | pass | pass | pass | pass | 21/21 |  |
+| w41-textgrain-eu | passed | pass | pass | pass | pass | 25/25 |  |
+- w40-solar-mini-4 Q1: summary 첫 문장은 '업스테이지가 MoE 구조의 Solar Mini 4를 출시했다'로 결론을 담고 있으나, 주어진 angle이 '소형 MoE 모델의 로컬 실행 최적화'인데 첫 point는 투트랙 전략 출시 소식에 치중되어 로컬 실행 최적화 핵심이 바로 드러나지 않음.
+- w40-solar-mini-4 Q2: numbers[1]에 값이 2개(Solar Mini 4 1.25, MiMo-V2.5 2.2)뿐인 막대 그룹이 포함되어 있어 '조건에 맞지 않는데 채운 칸(값 2개 막대)' 규칙을 위반함.
+- w41-sift-framework Q2: numbers 차트의 단위가 '%'로 지정되어 있으나 항목에 시간(5)과 CPU 시간(42)이 섞여 서로 다른 단위를 부적절하게 한 막대 그룹에 묶음
+- w41-sift-framework Q3: numbers 차트가 서로 다른 단위의 수치를 '%' 그룹으로 묶어 맥락 파악 및 가독성을 저해함
 
 ### 관문 B 항목(실제 실행)
 
 | 항목 | 결과 | 문턱값 | 판정 |
 |---|---|---|---|
-| 근거 충실성(원자 사실, 토픽별) | 20/20 토픽 100% | 모든 토픽 100% | 통과(잠정) |
+| 근거 충실성(원자 사실, 토픽별) | 17/20 토픽 100% | 모든 토픽 100% | 미달(잠정) |
 | 핵심 포착(Q1) | 19/20 | 90% | 통과(잠정) |
 | 군더더기 없음(Q2) | 18/20 | 90% | 통과(잠정) |
-| 읽기 쉬움(Q3) | 20/20 | 90% | 통과(잠정) |
+| 읽기 쉬움(Q3) | 19/20 | 90% | 통과(잠정) |
 | 문체(번역투)(Q4) | 20/20 | 90% | 통과(잠정) |
-| 문체(코드 정규식, 최종판) | 위반 1건 | 0 | 미달 |
+| 문체(코드 정규식, 최종판) | 위반 0건 | 0 | 통과 |
 | 묶기: 2채널 이상 토픽 비율 | 1/20 | 기록 | - |
 | 묶기 오병합 | 라벨 대기(`eval/labels/decide.csv`) | 0 | 잠정 |
 | 정규화 | 라벨 대기(`eval/labels/aliases.csv`) | 정확도 90%, 오병합 0 | 잠정 |
