@@ -1,6 +1,7 @@
 """예산 장치. 단계 상한(budget.yaml phase_total_usd)과 스펙별 상한은 코드가 지킨다.
 
-- 단계 기준값: 처음 실행할 때 /api/v1/key 의 usage(누적)를 data/budget_state.json에 저장
+- 단계 기준값: 처음 실행할 때 /api/v1/key 의 usage(누적)를 ~/.config/trendsit/budget_state.json에 저장
+  (작업 폴더 밖 공용 위치, 테스트처럼 data 폴더를 따로 주면 그 안. core/context.budget_state_path)
 - 단계 사용액 = 현재 key usage - 기준값. 실행 시작마다 refresh()로 다시 조회
 - 키 usage는 늦게 반영될 수 있어 실행 기록 합(전체 스펙)과 비교해 큰 쪽을 쓴다
 - 그 사이에는 이번 프로세스에서 기록한 비용(add)을 더해 추적

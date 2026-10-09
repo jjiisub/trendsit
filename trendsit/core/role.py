@@ -164,6 +164,21 @@ def role_files(root: Path = ROOT) -> list[Path]:
     return sorted((root / "roles").glob("*.md")) + [p for p in [root / "eval" / "judge.md"] if p.exists()]
 
 
+def nested_image_fields(cls: type[BaseModel], prefix: str = "", top: bool = True) -> list[str]:
+    """최상위가 아닌 자리의 ImageFile 칸(목록 안, 하위 모델 안). 메시지 조립은 최상위 칸만 이미지로 보낸다."""
+    out = []
+    for name, f in cls.model_fields.items():
+        path = f"{prefix}{name}"
+        ann = f.annotation
+        args = [ann, *getattr(ann, "__args__", ())]
+        for a in args:
+            if a is ImageFile and (not top or a is not ann):
+                out.append(path)
+            elif isinstance(a, type) and issubclass(a, BaseModel) and a is not ImageFile:
+                out += nested_image_fields(a, f"{path}.", top=False)
+    return out
+
+
 def check_roles(models: ModelsConfig, root: Path = ROOT) -> list[ConfigError]:
     errors = []
     for path in role_files(root):
@@ -173,6 +188,9 @@ def check_roles(models: ModelsConfig, root: Path = ROOT) -> list[ConfigError]:
             errors.append(e)
             continue
         errors += lint_body(_rel(path, root), role.body)
+        for f in nested_image_fields(role.input_cls):
+            errors.append(ConfigError(_rel(path, root), "input",
+                                      f"이미지 칸 '{f}'이 최상위가 아님(최상위 ImageFile만 이미지로 전달됨)"))
     return errors
 
 

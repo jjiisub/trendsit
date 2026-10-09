@@ -231,6 +231,9 @@ def _norm(text: str) -> str:
 
 
 class VideoSummary(RoleOutput):
+    # 표기 쌍은 코드 소유 칸(S4 설계 결정 D2-1): 규칙이 문자열로 확정되어 enforce 후 값이 정답. 채점기 등록은 graders_video
+    ENFORCED_FIELDS = ("name_pairs",)
+
     name_pairs: list[NamePair]
     key_points: list[KeyPoint]
     timeline: list[TimelineEntry]

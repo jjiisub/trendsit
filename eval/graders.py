@@ -13,21 +13,13 @@ from trendsit.core.artifacts import Document, JudgeInput, JudgeResult, RepoOneli
 from trendsit.core.config import ROOT
 from trendsit.core.context import Ctx
 from trendsit.core.role import load_role, run_role
+from trendsit.core.style import EVAL_ENDINGS, EVAL_WORDS, ends_as_sentence, is_haeyo
 from trendsit.core.textclean import clean_markdown
 
 RUBRICS = ROOT / "eval" / "rubrics"
 JUDGE_ROLE = "eval/judge.md"
 
-# 공통 문체 검사 (skills/style_ko.md)
-HAEYO = re.compile(r"(요|세요|어요|아요|에요|예요|해요|죠)[.!?…]*$")
-# "요"로 끝나는 명사(명사형 끝말이라 해요체가 아님). "필요해요"처럼 뒤에 어미가 붙으면 HAEYO가 그대로 잡는다
-NOUN_YO = re.compile(r"(필요|중요|주요|개요|수요|강요|소요)[.!?…]*$")
-EVAL_ENDINGS = ("눈에 띈다", "핵심이다", "주목할 만하다", "공통 교훈이다", "주목할 만한", "눈여겨볼")
-# 평가어(근거 없는 수식). 레포 설명, 포인트에서 쓰지 않는다
-EVAL_WORDS = ("혁신적", "강력한", "놀라운", "최고의", "획기적", "뛰어난", "완벽한", "최첨단", "차세대", "혁명적",
-              "압도적", "탁월한", "손쉬운", "쉽고 빠르게", "간편한", "똑똑한")
-# 명사형이 아닌 문장 끝: "~다", "~요", "~까", 마침표 등
-SENTENCE_END = re.compile(r"(다|요|까|죠|니다|네)[.!?…]*$|[.!?]$")
+# 공통 문체 검사 (skills/style_ko.md): 정규식은 trendsit/core/style.py 한 곳에서(위에서 가져옴)
 
 # 관문 B 문턱값 (S0_TASK 7장). 채점표 항목 이름 기준
 # 관문 B 문턱값. 질문별 통과율(코드 채점 통과분 중). repo_oneliner: S0_ADDENDUM 1.7 (Q1 10/10, Q2·Q3 9/10 이상)
@@ -59,7 +51,7 @@ def style_checks(output: dict[str, Any]) -> list[dict[str, Any]]:
     checks = []
     for key, text in _strings(output):
         sentences = [s.strip() for s in re.split(r"(?<=[.!?])\s+|\n", text) if s.strip()]
-        bad = [s for s in sentences if HAEYO.search(s) and not NOUN_YO.search(s)]
+        bad = [s for s in sentences if is_haeyo(s)]
         checks.append(check(f"해요체 없음({key})", not bad, "; ".join(bad)[:120]))
         ev = [e for e in EVAL_ENDINGS if e in text]
         checks.append(check(f"평가형 마무리 없음({key})", not ev, ", ".join(ev)))
@@ -79,7 +71,7 @@ def code_repo_oneliner(inp: dict[str, Any], out: dict[str, Any], expect: dict[st
     in_source = _norm(basis) in _norm(readme) or _norm(basis) in _norm(inp.get("description") or "")
     checks = [
         check("길이 상한", len(line) <= expect.get("max_len", 60), f"{len(line)}자"),
-        check("명사형 끝", not SENTENCE_END.search(line), line[-8:]),
+        check("명사형 끝", not ends_as_sentence(line), line[-8:]),
         check("평가어 없음", not [w for w in EVAL_WORDS if w in line],
               ", ".join(w for w in EVAL_WORDS if w in line)),
         # basis는 README에 있는 구절 그대로여야 한다(공백 정규화 후 부분 문자열)

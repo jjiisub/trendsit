@@ -83,9 +83,14 @@ def test_rematch_period_and_trending(db):
     assert res.repos_changed == 1 and row["filter_status"] == "pass" and '"rag-search"' in row["keywords"]
 
 
+# S5 handoff(2026-10-09)가 더한 제외어. 그 밖에는 S2 초안과 같아야 한다
+S5_EXCLUDES = ["태양광", "재생에너지", "송전망", "전력망"]
+
+
 def test_real_keywords_file_is_the_handoff_draft():
     real = yaml.safe_load((ROOT / "config/keywords.yaml").read_text(encoding="utf-8"))
     draft = yaml.safe_load((ROOT / "docs/handoff/keywords_next.yaml").read_text(encoding="utf-8"))
+    draft["exclude"] = draft["exclude"] + S5_EXCLUDES
     assert real == draft and len(real["keywords"]) == 13
 
 

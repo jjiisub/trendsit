@@ -241,7 +241,10 @@ def _tag(x: dict[str, Any]) -> str:
 def write_quality(spec: str) -> Path:
     reps = _all_reports(spec)
     lines = [f"# {spec} 품질 리포트 (관문 B)", "",
-             "> `python -m trendsit eval`이 자동 생성한다. 원자료는 `reports/eval/*.json`.", ""]
+             "> `python -m trendsit eval`이 자동 생성한다. 원자료는 `reports/eval/*.json`.",
+             "> 점수는 원래 출력 / 통과 판정(코드 소유 칸만 enforce 후) / enforce 후(전체)를 나란히 적는다. "
+             "judge는 원래 출력이 코드 채점을 통과하면 원래 출력을, 아니면 enforce 후 전체를 채점하므로 "
+             "judge 대상이 통과 판정 출력과 다를 수 있다(`judged_output`).", ""]
     for role in dict.fromkeys(r["role"] for r in reps):
         rr = [r for r in reps if r["role"] == role]
         latest: dict[str, dict[str, Any]] = {}  # 모델별 가장 최근의 전체 실행
@@ -381,9 +384,15 @@ def write_quality(spec: str) -> Path:
     return path
 
 
+NESTED_BRIEF = 500  # 품질 리포트에서 중첩 입력(목록, 객체)은 JSON 앞 500자만(S5 5.1-2)
+
+
 def _brief(v: Any) -> Any:
     if isinstance(v, str) and len(v) > 300:
         return v[:300] + "…"
+    if isinstance(v, dict | list):
+        text = json.dumps(v, ensure_ascii=False)
+        return v if len(text) <= NESTED_BRIEF else text[:NESTED_BRIEF] + "…"
     return v
 
 

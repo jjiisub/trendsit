@@ -5,14 +5,12 @@ from __future__ import annotations
 import re
 from typing import Any
 
-from trendsit.core.artifacts_video import MAX_EVIDENCE, same_spelling
+from trendsit.core.artifacts_video import MAX_EVIDENCE, VideoSummary, same_spelling
 
 from . import graders
-from .graders import EVAL_ENDINGS, check
+from .graders import EVAL_ENDINGS, check, ends_as_sentence
 
 NO_CONTENT = "내용 없음"
-# 문장으로 끝남(명사형 아님). 공통 SENTENCE_END는 '필요', '개요'처럼 요로 끝나는 명사도 잡아서 쓰지 않는다
-SENTENCE_END = re.compile(r"(다|니다|까|까요|나요|죠|네요|어요|아요|에요|예요|해요|세요|지요|군요)[.!?…]*$|[.!?]$")
 _VD = re.compile(r"^vd:(\d+)@(\d+)$")
 
 
@@ -44,9 +42,9 @@ def code_video_summary(inp: dict[str, Any], out: dict[str, Any], expect: dict[st
               str([t["sec"] for t in out["timeline"] if not lo <= t["sec"] <= hi])),
         check("포인트·타임라인 라벨 명사형",
               not [x for x in [kp["text"] for kp in points] + [t["label"] for t in out["timeline"]]
-                   if SENTENCE_END.search(x.strip())],
+                   if ends_as_sentence(x)],
               "; ".join(x for x in [kp["text"] for kp in points] + [t["label"] for t in out["timeline"]]
-                        if SENTENCE_END.search(x.strip()))[:120]),
+                        if ends_as_sentence(x))[:120]),
         check("포인트·라벨 평가형 마무리 없음",
               not [x for x in [kp["text"] for kp in points] + [t["label"] for t in out["timeline"]]
                    if any(e in x for e in EVAL_ENDINGS)], ""),
@@ -72,9 +70,9 @@ def code_video_summary(inp: dict[str, Any], out: dict[str, Any], expect: dict[st
 
 graders.ROLE_CHECKS["video_summary"] = code_video_summary
 # 문체(해요체, 평가형 마무리)는 요약 칸만. chapters와 name_pairs는 업로더·화면 표기를 그대로 옮긴 칸이고,
-# 포인트·라벨은 위의 명사형·평가형 검사가 본다(공통 해요체 정규식은 '개요', '필요'처럼 요로 끝나는 명사도 잡음)
+# 포인트·라벨은 위의 명사형·평가형 검사가 본다
 graders.ROLE_STYLE_FIELDS["video_summary"] = ("summary",)
 # 표기 쌍은 코드 소유 칸(S4 설계 결정 D2-1): 규칙(spoken은 전사에, screen은 판독에, 둘이 다름)이 문자열로 확정되므로
 # 통과 판정은 enforce 후 값으로. 원래 출력 점수는 모델 품질로 따로 기록
-graders.ENFORCED_FIELDS["video_summary"] = ("name_pairs",)
+graders.ENFORCED_FIELDS["video_summary"] = VideoSummary.ENFORCED_FIELDS
 graders.THRESHOLDS["video_summary"] = {"questions": {"Q1": 0.8, "Q2": 0.8, "Q3": 0.8}, "code_pass_all": True}
