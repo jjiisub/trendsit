@@ -137,8 +137,10 @@ def autofix(page: TopicPage, cfg: BriefConfig, canon: dict[str, str],
     for loc, text in [*_text_slots(page), ("title", page.title)]:
         new = text
         for alias in sorted(canon, key=len, reverse=True):
-            if alias and alias in new and canon[alias] not in new:
-                new = new.replace(alias, canon[alias])
+            # 단어 경계(영문·숫자가 앞뒤에 붙으면 다른 낱말: 'Aider'의 'AI' 같은 오치환 방지, 리뷰 지적 11)
+            pat = rf"(?<![A-Za-z0-9]){re.escape(alias)}(?![A-Za-z0-9])"
+            if alias and re.search(pat, new) and canon[alias] not in new:
+                new = re.sub(pat, canon[alias], new)
         if new != text:
             fixes.append({"loc": loc, "rule": "별칭 표기를 정본으로", "before": text, "after": new})
             page = _set(page, loc, new)

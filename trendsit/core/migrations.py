@@ -223,6 +223,10 @@ register(33, """
     ALTER TABLE runs ADD COLUMN week TEXT;
     ALTER TABLE runs ADD COLUMN summary_json TEXT;
     """)
+# 34: 토픽의 관계 문장(코드 문장틀 "N월 N주차 '제목' 토픽의 후속", S5_TASK 5.5 "topics에 저장")
+register(34, """
+    ALTER TABLE topics ADD COLUMN relation_label TEXT;
+    """)
 
 
 # ---------- 적용 ----------

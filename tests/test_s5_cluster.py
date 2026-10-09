@@ -180,3 +180,40 @@ def test_label_sheets_keep_filled_labels(tmp_path, monkeypatch):
 def test_two_repos_never_merge():
     cl, asked, _ = run([m("rp:a/x", "github"), m("rp:b/y", "github")], {("rp:a/x", "rp:b/y"): 0.95})
     assert groups(cl) == [["rp:a/x"], ["rp:b/y"]] and not asked
+
+
+def test_cross_channel_member_cannot_join_through_same_channel_link():
+    """리뷰 지적 6: it:1 ↔ vd:A가 decide same이어도, it:2가 it:1과 자동으로 붙으면 it:2 ↔ vd:A는 decide 없이 묶이면 안 됨."""
+    a, b, v = m("it:1", entities=["X"]), m("it:2"), m("vd:A", "video", entities=["X"])
+    cl, asked, _ = run([a, b, v], {("it:1", "vd:A"): 0.9, ("it:1", "it:2"): 0.95, ("it:2", "vd:A"): 0.7},
+                       {("it:1", "vd:A"): (True, 0.9)})
+    assert not any({"it:2", "vd:A"} <= set(c.members) for c in cl)
+
+
+def test_cluster_ids_are_not_in_score_order():
+    """리뷰 지적 7: 저장(= cluster_id) 순서는 점수가 아니라 첫 구성원 키."""
+    hi, lo = m("it:9", relevance="high"), m("it:1", relevance="low")
+    cl, _, _ = run([hi, lo], {})
+    assert [c.members[0] for c in cl] == ["it:1", "it:9"]
+
+
+def test_build_pairs_real_routes_including_name_path():
+    """리뷰 지적 10: 테스트 안에서 경로를 다시 만들지 않고 실제 build_pairs로(이름 경로 포함)."""
+    import math
+
+    from trendsit.brief.cluster import build_pairs
+
+    def vec(cos: float) -> list[float]:
+        return [cos, math.sqrt(1 - cos * cos)]
+
+    ms = {k: x for k, x in {
+        "it:1": m("it:1", entities=["Gemini 4 Argon", "OpenAI"]), "it:2": m("it:2", entities=["Gemini 4 Argon"]),
+        "it:3": m("it:3", entities=["OpenAI"]), "vd:A": m("vd:A", "video", entities=["Gemini 4 Argon"]),
+        "it:4": m("it:4")}.items()}
+    vecs = {"it:1": [1.0, 0.0], "it:2": vec(0.60), "it:3": vec(0.60), "vd:A": vec(0.58), "it:4": vec(0.85)}
+    pairs, _ = build_pairs(ms, vecs, AliasTable([]), CFG)
+    route = {(p.a, p.b): (p.route, p.via) for p in pairs}
+    assert route[("it:1", "it:2")] == ("decide", "name")  # 구체 이름 공유 + 0.55 이상
+    assert route[("it:1", "it:3")][0] == "none"  # 회사 이름(OpenAI)만 공유는 generic, 이름 공유 없음
+    assert route[("it:1", "vd:A")] == ("decide", "name")  # 채널 넘음도 이름 경로
+    assert route[("it:1", "it:4")][0] == "auto"

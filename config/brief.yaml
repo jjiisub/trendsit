@@ -25,6 +25,8 @@ cluster:
   # 리뷰에서 확인한 의심 병합 표시(오탐: 비교 대상으로 언급된 이전 버전). 표시 규칙은 그대로, 리포트에 "확인 완료"로
   reviewed_suspicious: ["Mistral Large 3 ↔ Mistral Large 4", "GPT-5.6 ↔ GPT-6", "GPT-5.6 ↔ GPT-6 루나", "GPT-5.6 ↔ GPT-6 솔",
                         "Claude Haiku 4.5 ↔ Claude Haiku 5.5"]
+  broad_keywords: [ai-general, ai-industry, dev-practice]   # 넓은 1차 그물 키워드: 같은 대상 신호에서 뺌
+  alias_decide_max: 10              # 주당 별칭 후보 decide 상한(묶기 decide 상한 안에서 먼저 씀)
   embed_text: body                  # 묶기용 임베딩: body(글은 관련성 필터 본문 임베딩) / card(모든 채널 제목 + 요약). W41 비교로 body(reports/S5_brief/embed_compare_2026-W41.md)
   linkage: average
   max_cluster_size: 12

@@ -26,9 +26,6 @@ from ..filter.embed import Embedder, cosine, from_blob, to_blob
 from .aliases import AliasTable, norm_key
 from .evidence import RELEVANCE_RANK, Member, WeekEvidence
 
-# 넓은 1차 그물 키워드(keywords.yaml 2026-10-08): 거의 모든 글이 가져 같은 대상 신호가 되지 않는다
-BROAD_KEYWORDS = {"ai-general", "ai-industry", "dev-practice"}
-
 Decider = Callable[[DecideInput], tuple[DecideAnswer, int | None]]  # (판정, step_id)
 
 
@@ -140,7 +137,8 @@ def build_pairs(members: dict[str, Member], vecs: dict[str, list[float]], aliase
     keys = sorted(members)
     names = {k: aliases.entity_keys(members[k].entities) for k in keys}
     generic = {norm_key(n) for n in cfg.cluster.generic_names}
-    kws = {k: set(members[k].keywords) - BROAD_KEYWORDS for k in keys}
+    broad = set(cfg.cluster.broad_keywords)  # 넓은 1차 그물 키워드: 거의 모든 글이 가져 같은 대상 신호가 되지 않음
+    kws = {k: set(members[k].keywords) - broad for k in keys}
     sims: dict[tuple[str, str], float] = {}
     pairs = []
     for i, a in enumerate(keys):
@@ -217,6 +215,9 @@ def agglomerate(members: dict[str, Member], pairs: list[Pair], sims: dict[tuple[
         A, B = groups[ga], groups[gb]
         if any((x, y) in cannot for x in A.members for y in B.members):
             continue
+        # 채널을 넘는 구성원 쌍은 모두 decide가 같다고 한 것이어야 한다(자동·전이 묶음 금지, 리뷰 지적 6)
+        if any(members[x].channel != members[y].channel and (x, y) not in same for x in A.members for y in B.members):
+            continue
         avg = sum(link(x, y) for x in A.members for y in B.members) / (len(A.members) * len(B.members))
         if avg < th.border:
             continue
@@ -245,20 +246,21 @@ def score(c: Cluster, members: dict[str, Member], trend: dict[str, int] | None =
     return round((3 - best) * 1000 + min(n_best, 9) * 100 + channels * 10 + min(evidence, 9) + min(up, 9) / 10, 2)
 
 
-def finalize(clusters: list[Cluster], members: dict[str, Member], aliases: AliasTable) -> list[Cluster]:
+def finalize(clusters: list[Cluster], members: dict[str, Member], aliases: AliasTable,
+             broad: set[str] | None = None) -> list[Cluster]:
     for c in clusters:
         ms = [members[k] for k in c.members]
         c.channels = {ch: sum(m.channel == ch for m in ms) for ch in ("text", "video", "github") if any(m.channel == ch for m in ms)}
         c.repo_only = set(c.channels) == {"github"}
         lead = sorted(ms, key=lambda m: (RELEVANCE_RANK.get(m.relevance, 3), m.channel != "text", m.key))[0]
         c.label = lead.title[:80]
-        kw = [set(m.keywords) - BROAD_KEYWORDS for m in ms]
+        kw = [set(m.keywords) - (broad or set()) for m in ms]
         names = [aliases.entity_keys(m.entities) for m in ms]
         c.shared = {"keywords": sorted(set.intersection(*kw)) if len(ms) > 1 else [],
                     "names": sorted(set.intersection(*names)) if len(ms) > 1 else []}
         c.score = score(c, members)
-    # 순서: 점수 높은 순 → 같은 점수면 구성원 키. cluster_id는 저장 순서(편집장 입력은 이 id 순서로 고정)
-    clusters.sort(key=lambda c: (-c.score, c.members[0]))
+    # 저장 순서 = cluster_id 순서는 점수와 무관하게 첫 구성원 키 순(편집장 입력이 id 순서라 위치 편향 방지, 리뷰 지적 7)
+    clusters.sort(key=lambda c: sorted(c.members)[0])
     return clusters
 
 
@@ -296,7 +298,7 @@ def cluster_week(db: DB, ev: WeekEvidence, aliases: AliasTable, cfg: BriefConfig
     cap = max(0, cfg.cluster.decide.max_calls_per_week - alias_decide_calls)
     calls, capped = run_decides(pairs, members, decider, cap)
     clusters, blocked = agglomerate(members, pairs, sims, cfg)
-    clusters = finalize(clusters, members, aliases)
+    clusters = finalize(clusters, members, aliases, set(cfg.cluster.broad_keywords))
     match_past(clusters, members, vecs, past_topics(db, ev.week, cfg.cluster.past.weeks_back, embedder.model_id),
                cfg.cluster.past.top_k)
     return ClusterResult(ev.week, clusters, pairs, sims, blocked, calls, alias_decide_calls, capped, members)

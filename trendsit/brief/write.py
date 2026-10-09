@@ -22,8 +22,10 @@ from ..core.artifacts_brief import (
     Contribution,
     CriticInput,
     EventGroup,
+    EventItem,
     IndexedIssue,
     NumberGroup,
+    NumberItem,
     PlanBrief,
     Point,
     PreviousTopic,
@@ -90,9 +92,12 @@ def pack_index(items: list[EvidenceItem]) -> dict[str, list[EvidenceItem]]:
 
 
 def evidence_docs(pack: dict[str, list[EvidenceItem]]) -> list[Document]:
-    """근거 id마다 문서 하나. 글은 quote 문장 + 그 quote의 수치·주장, 영상은 시각의 수치·포인트·라벨, 레포는 필드."""
+    """근거 id마다 문서 하나. 글은 quote 문장 + 그 quote의 수치·주장, 영상은 시각의 수치·포인트·라벨, 레포는 필드.
+    요약 id(it:{n}, vd:{n})는 CONTRACTS 근거 id가 아니고 원문도 아니라 작성자에게 주지 않는다(리뷰 지적 8)."""
     docs = []
     for eid, items in pack.items():
+        if all(it.kind == "summary" for it in items):
+            continue
         lines = []
         for it in items:
             v = f" [{it.value}{(' ' + it.unit) if it.unit else ''}]" if it.value else ""
@@ -188,12 +193,17 @@ def apply_revision(prev: TopicPage, rev: TopicPageRevision, allowed: set[str]) -
     reverts, notes, deletes = 0, [], []
     for ch in rev.changed:
         loc = top_loc(ch.loc if ch.action == "add" else normalize_loc(prev, ch.loc))
-        if loc not in allowed and not (ch.action == "add" and loc.split("[")[0] in {a.split("[")[0] for a in allowed}):
+        whole = {a for a in allowed if LIST_LOC.match(a)}  # 목록 전체가 지적되면 그 목록의 항목 변경은 허용
+        if loc not in allowed and loc.split("[")[0] not in whole and not (
+                ch.action == "add" and loc.split("[")[0] in {a.split("[")[0] for a in allowed}):
             reverts += 1
             notes.append(f"지적 안 된 위치 {ch.loc} 변경 되돌림")
             continue
         m = LOC.match(loc)
         if not m and LIST_LOC.match(loc) and ch.action == "delete":
+            if loc == "points":  # 포인트 전체 삭제는 받지 않음(필수 칸)
+                notes.append("points 전체 삭제는 받지 않음")
+                continue
             data[loc] = []  # 칸 전체 비우기(예: numbers 그룹을 문장으로 옮길 때)
             continue
         if not m:
@@ -210,7 +220,7 @@ def apply_revision(prev: TopicPage, rev: TopicPageRevision, allowed: set[str]) -
                 k = int(j)
                 if ch.action == "delete" and k < len(group["items"]):
                     group["items"].pop(k)
-                elif hasattr(ch.value, "model_dump") and k < len(group["items"]):
+                elif isinstance(ch.value, NumberItem if name == "numbers" else EventItem) and k < len(group["items"]):
                     group["items"][k] = ch.value.model_dump()
                 else:
                     notes.append(f"{ch.loc}: 값 형식이 항목이 아님")
@@ -240,7 +250,10 @@ def apply_revision(prev: TopicPage, rev: TopicPageRevision, allowed: set[str]) -
     for name, idx in sorted(deletes, key=lambda x: -x[1]):
         if idx < len(data[name]):
             data[name].pop(idx)
-    return TopicPage.model_validate(data), reverts, notes
+    try:
+        return TopicPage.model_validate(data), reverts, notes
+    except ValueError as e:  # 하위 위치에 형식이 다른 값: 이 수정은 버림
+        return prev, reverts, [*notes, f"합친 판이 스키마에 맞지 않아 이 수정 버림: {str(e)[:100]}"]
 
 
 # ---------- 루프 ----------
@@ -285,6 +298,18 @@ def write_topic(ctx: Ctx, topic: Applied, members: dict[str, Member], table: Ali
     reviser = load_role("writer_revise", ctx.models)
     seen: dict[tuple[str, str], int] = {}
     check_locs: set[str] = set()
+    critic_seen = False
+
+    def run_critic(pg: TopicPage, rnd: int, warns: list[str]) -> tuple[Any, str | None, int | None]:
+        """refs 근거를 앞에, 나머지 토픽 근거를 뒤에(근거 원문). overview·summary·title은 토픽 근거 전체가 기준이다."""
+        nonlocal critic_seen
+        order = [e for e in refs_of(pg) if e in pack] + [e for e in pack if e not in refs_of(pg)]
+        evid = [Document(id=e, source=pack[e][0].source.get("site") or pack[e][0].channel,
+                         title=pack[e][0].source.get("title"), text=raw_evidence(ctx.db, e, pack[e])) for e in order]
+        out = _call(critic, CriticInput(loc_lines=loc_lines(pg), page=pg, evidence=evid, angle=topic.angle,
+                                        code_warnings=warns, round=rnd), ctx, res.costs, "critic")
+        critic_seen = critic_seen or out[0] is not None
+        return out
     raw_page: dict[str, Any] | None = page.raw_dump() if hasattr(page, "raw_dump") else None
     for rnd in range(1, cfg.review.max_rounds + 1):
         cr = checks.run_checks(page, pack, n_sources, cfg, canon)
@@ -294,19 +319,10 @@ def write_topic(ctx: Ctx, topic: Applied, members: dict[str, Member], table: Ali
         log = RoundLog(rnd, "code", "reject" if issues else "pass", [i.model_dump() for i in issues], cr.autofix,
                        cr.warnings, sid)
         if not issues and review:
-            # refs 근거를 앞에, 나머지 토픽 근거를 뒤에. overview·summary·title은 refs가 없어 토픽 근거 전체가 기준이다
-            # (refs만 주면 자동 수정으로 빠진 칸의 근거가 사라져 맞는 문장을 근거 없음으로 반려했다, W40 deepseek)
-            order = [e for e in refs_of(page) if e in pack] + [e for e in pack if e not in refs_of(page)]
-            evid = [Document(id=e, source=pack[e][0].source.get("site") or pack[e][0].channel,
-                             title=pack[e][0].source.get("title"), text=raw_evidence(ctx.db, e, pack[e]))
-                    for e in order]
-            verdict, err, vsid = _call(critic, CriticInput(loc_lines=loc_lines(page), page=page, evidence=evid,
-                                                           angle=topic.angle,
-                                                           code_warnings=cr.warnings, round=rnd), ctx, res.costs, "critic")
             res.rounds.append(log)
-            if verdict is None:
+            verdict, err, vsid = run_critic(page, rnd, cr.warnings)
+            if verdict is None:  # 검수 실패: 코드 검사만 통과한 판 + attention(검수 판정은 기록하지 않음)
                 res.attention.append(f"검수 실패: {err}")
-                res.rounds.append(RoundLog(rnd, "critic", "pass", [], step_id=vsid))
                 res.status, res.page, res.final_round = "passed", page, rnd
                 break
             v: ReviewVerdict = verdict
@@ -320,10 +336,12 @@ def write_topic(ctx: Ctx, topic: Applied, members: dict[str, Member], table: Ali
         # 위치 번호를 1부터 센 이슈는 0부터로(검수자가 contributions[2]로 두 번째 항목을 가리킨 사례)
         issues = [i.model_copy(update={"loc": normalize_loc(page, i.loc)}) for i in issues]
         # 같은 위치·같은 유형이 두 번 남으면 확정(check) 후 제외
+        # 라운드 사이 반복만 센다(같은 라운드 안의 중복 이슈는 한 번으로, 리뷰 지적 1)
         live = []
+        for key in dict.fromkeys((top_loc(it.loc), it.type) for it in issues):
+            seen[key] = seen.get(key, 0) + 1
         for it in issues:
             key = (top_loc(it.loc), it.type)
-            seen[key] = seen.get(key, 0) + 1
             if seen[key] >= cfg.review.same_issue_repeat_to_check:
                 check_locs.add(key[0])
             else:
@@ -345,7 +363,13 @@ def write_topic(ctx: Ctx, topic: Applied, members: dict[str, Member], table: Ali
             res.final_round = rnd
             break
         raw_page = rev.model_dump()
-        page, reverts, notes = apply_revision(page, rev, flagged)
+        try:
+            page, reverts, notes = apply_revision(page, rev, flagged)
+        except ValueError as e:  # 형식이 다른 값(ValidationError)은 이전 판 유지 + 남은 이슈 check(리뷰 지적 4)
+            res.attention.append(f"수정 합치기 실패: {str(e)[:120]}")
+            check_locs |= flagged
+            res.final_round = rnd
+            break
         res.rounds[-1].reverts = reverts
         if notes:
             res.attention += notes[:3]
@@ -353,6 +377,15 @@ def write_topic(ctx: Ctx, topic: Applied, members: dict[str, Member], table: Ali
     else:
         res.final_round = cfg.review.max_rounds
     final = res.page or page
+    if review and not critic_seen and res.status != "passed":
+        # 코드 반려만 이어져 검수자가 한 번도 보지 않고 끝난 판(리뷰 지적 2): 발행 전 한 번 검수, 이슈 위치는 check
+        verdict, _err, vsid = run_critic(final, res.final_round or cfg.review.max_rounds, [])
+        if verdict is not None:
+            res.rounds.append(RoundLog(res.final_round or cfg.review.max_rounds, "critic", verdict.status,
+                                       [i.model_dump() for i in verdict.issues], step_id=vsid,
+                                       fact_support=verdict.fact_support.model_dump()))
+            if verdict.status == "reject":
+                check_locs |= {top_loc(normalize_loc(final, i.loc)) for i in verdict.issues}
     if check_locs:
         pts = [p.model_copy(update={"check": True}) if f"points[{i}]" in check_locs else p for i, p in enumerate(final.points)]
         # 도식 그룹에 남은 이슈는 그 그룹을 뺀다(포인트 문장은 그림 없이도 읽힘, skills/diagrams.md). check를 달 자리가 없어

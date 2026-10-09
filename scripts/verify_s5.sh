@@ -53,7 +53,7 @@ pt A8 "선별 검증(리드 1, 개수 범위, 범위 밖 합치기·나누기 �
 pt A9 "코드 검사(수치 대조·단위 환산 미허용, anchor, 도식 상한, 금지어, 자동 수정은 반려 아님, 경고)" \
   tests/test_s5_select_checks.py -k "clean or number or anchor or forbidden or alias or unknown or warnings or noun or reset"
 pt A10 "라운드(상한 3, 코드 반려도 셈, 같은 이슈 2회 check, 지적 안 된 칸 되돌림, 1부터 센 위치 바로잡기)" tests/test_s5_weekly.py tests/test_s5_select_checks.py -k "rounds or one_based"
-pt A11 "저장(마이그레이션 30~33, 재실행 run 보존·current_run_id, topic_evidence = 최종판 refs)" \
+pt A11 "저장(마이그레이션 30~34, 재실행 run 보존·current_run_id, topic_evidence = 최종판 refs)" \
   tests/test_s5_weekly.py tests/test_s5_cluster.py -k "rounds or stage_cluster"
 pt A12 "실행 요약 JSON 형식과 표에서 다시 계산한 값 일치" tests/test_s5_weekly.py -k rounds
 pt A13 "저장값만으로 예시 JSON 토픽 칸(매핑 함수 초안)" tests/test_s5_weekly.py -k rounds

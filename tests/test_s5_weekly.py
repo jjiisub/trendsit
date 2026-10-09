@@ -106,7 +106,7 @@ def test_weekly_rounds_storage_summary_export(week):
     # A11: 마이그레이션 대역, topic_evidence = 최종판 refs
     from trendsit.core.migrations import MIGRATIONS
 
-    assert {30, 31, 32, 33} <= set(MIGRATIONS)
+    assert {30, 31, 32, 33, 34} <= set(MIGRATIONS)
     refs = {(r["evidence_id"], r["field"]) for r in db.execute(
         "SELECT evidence_id, field FROM topic_evidence WHERE run_id=? AND topic_id=?", (run_id, t1["topic_id"]))}
     assert refs == {("it:1#q1", "point")}
@@ -182,7 +182,8 @@ def test_unresolved_diagram_issue_drops_the_group(week):
     p1["numbers"] = [{"anchor": 1, "group": "g", "title": "점수", "context": "같은 벤치 [it:1#q1]", "unit": "ms",
                       "items": [{"label": lab, "value": "77.9", "ref": "it:1#q1", "baseline": False, "emphasis": False}
                                 for lab in ("a", "b", "c")]}]
-    responses = [plan(cids), json.dumps(p1, ensure_ascii=False), revision([])]
+    # 코드 반려만 이어지면 끝에서 검수자가 한 번 봄(리뷰 지적 2) → verdict 응답 하나
+    responses = [plan(cids), json.dumps(p1, ensure_ascii=False), revision([]), verdict([])]
     for i in (2, 3, 4):
         responses += [page(i, f"{TITLES[i]} 근거 문장 요약 정리"), verdict([])]
     ctx.llm.transport.responses = [response(r) for r in responses]
@@ -193,3 +194,49 @@ def test_unresolved_diagram_issue_drops_the_group(week):
     final = json.loads(ctx.db.conn.execute("SELECT page_json FROM topic_pages WHERE run_id=? AND topic_id='w41-model-1' "
                                            "ORDER BY round DESC, id DESC", (run_id,)).fetchone()[0])
     assert t1["status"] == "checked" and final["numbers"] == [] and "77.9%" in final["points"][0]["text"]
+    checkers = [r[0] for r in ctx.db.conn.execute("SELECT checker FROM verdicts WHERE run_id=? AND topic_id='w41-model-1' "
+                                                  "ORDER BY id", (run_id,))]
+    assert checkers == ["code", "code", "critic"]
+
+
+
+def test_same_issue_twice_within_one_round_is_not_repeat(week):
+    """같은 라운드에 같은 (위치, 유형) 이슈가 2건이어도 한 번으로 센다(리뷰 지적 1): 고친 뒤 통과하면 passed."""
+    ctx, cids = week
+    two = [{"loc": "points[1]", "type": "unsupported", "evidence_id": "it:1#q1", "comment": c, "hint": "h"}
+           for c in ("근거 없음 1", "근거 없음 2")]
+    responses = [plan(cids), page(1, "Argon이 DeepSWE에서 77.9% 기록"), verdict(two),
+                 revision([{"issue_idx": 0, "loc": "points[1]", "action": "edit",
+                            "value": {"text": "Gemini 4 Argon 근거 문장 요약 정리", "refs": ["it:1#q1"], "check": False}}]),
+                 verdict([])]
+    for i in (2, 3, 4):
+        responses += [page(i, f"{TITLES[i]} 근거 문장 요약 정리"), verdict([])]
+    ctx.llm.transport.responses = [response(r) for r in responses]
+    ctx.tracer = Tracer(ctx.db, "weekly", "S0")
+    pipeline.run_weekly("2026-W41", ctx, from_step="select", embedder=HashEmbedder(), cfg=CFG)
+    t1 = ctx.db.conn.execute("SELECT status, final_round FROM topics WHERE run_id=? AND rank=1",
+                             (ctx.tracer.run_id,)).fetchone()
+    assert tuple(t1) == ("passed", 2)
+
+
+def test_revision_with_wrong_sub_value_keeps_previous():
+    from trendsit.brief.write import apply_revision
+    from trendsit.core.artifacts_brief import (
+        Change,
+        NumberGroup,
+        NumberItem,
+        Point,
+        TopicPage,
+        TopicPageRevision,
+    )
+
+    g = NumberGroup(anchor=1, group="g", title="t", context="c", unit="%",
+                    items=[NumberItem(label=x, value="1", ref="r") for x in "abc"])
+    p = TopicPage(points=[Point(text="문장 하나 둘 셋 넷", refs=["r"])], numbers=[g], events=[], contributions=[],
+                  concepts=[], overview="o다.", summary="s다.", title="t", log="l")
+    rev = TopicPageRevision(changed=[Change(issue_idx=0, loc="numbers[0].items[1]", action="edit",
+                                            value=Point(text="x", refs=[]))], log="l")
+    new, _, notes = apply_revision(p, rev, {"numbers[0]"})
+    assert new.numbers[0].items[1].value == "1" and notes
+    whole = TopicPageRevision(changed=[Change(issue_idx=0, loc="points", action="delete", value=None)], log="l")
+    assert apply_revision(p, whole, {"points"})[0].points  # 포인트 전체 삭제는 받지 않음

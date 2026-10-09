@@ -108,7 +108,7 @@ def write_cluster_report(stage: ClusterStage, cfg: BriefConfig, note: str = "") 
     lines += ["## 3. 묶음 목록 (토픽 후보, 점수 순)", "",
               "점수 = 관련성 먼저(최고 relevance, 그 등급 항목 수) → 채널 수 → 근거 수. 묶인 이유: seed(첫 항목), "
               "embed(같은 채널 auto 이상), decide(판정 same). sim은 묶음 나머지와의 평균 유사도.", ""]
-    for c in [x for x in cands if len(x.members) > 1]:
+    for c in sorted([x for x in cands if len(x.members) > 1], key=lambda c: -c.score):
         lines += [f"### c{c.id} {_cell(c.label, 60)} ({_combo(c)}, 점수 {c.score})", ""]
         if c.shared.get("names") or c.shared.get("keywords"):
             lines.append(f"- 공유: 이름 {c.shared.get('names') or '-'}, 키워드 {c.shared.get('keywords') or '-'}")
@@ -122,7 +122,7 @@ def write_cluster_report(stage: ClusterStage, cfg: BriefConfig, note: str = "") 
             lines.append(f"| {k} | {m.channel} | {m.relevance} | {_cell(m.title, 60)} | {how} | {s if s is not None else '-'} |")
         lines.append("")
     lines += ["### 1개짜리 토픽 후보", "", "| 묶음 | 구성원 | 채널 | relevance | 제목 | 점수 |", "|---|---|---|---|---|---|"]
-    for c in singles:
+    for c in sorted(singles, key=lambda c: -c.score):
         m = members[c.members[0]]
         lines.append(f"| c{c.id} | {m.key} | {m.channel} | {m.relevance} | {_cell(m.title, 60)} | {c.score} |")
     lines.append("")

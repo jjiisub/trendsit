@@ -326,7 +326,7 @@ class FactSupport(_Strict):
 
 
 class ReviewVerdict(RoleOutput):
-    ENFORCED_FIELDS = ("fact_support",)  # atoms에서 코드가 다시 셈
+    ENFORCED_FIELDS = ("fact_support", "status", "attention")  # atoms에서 다시 셈, 이슈가 있으면 reject, reject면 attention
 
     atoms: list[Atom] = Field(description="모든 원자 사실. 가장 먼저 채움")
     fact_support: FactSupport

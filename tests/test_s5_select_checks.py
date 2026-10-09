@@ -119,6 +119,10 @@ def test_slug_and_relation_label(tmp_path):
     applied = sel.apply(good(), CANDS, "2026-W42", db)
     assert applied[0].topic_id == "w42-s" and applied[1].topic_id == "w42-s-2"
     assert applied[1].relation_label == "9월 5주차 '지난 제목' 토픽의 후속"
+    res = sel.SelectResult(good(), "model", applied, CANDS)
+    sel.save(db, res, "r1", "2026-W42")
+    assert db.conn.execute("SELECT relation_label FROM topics WHERE run_id='r1' AND topic_id=?",
+                           (applied[1].topic_id,)).fetchone()[0] == "9월 5주차 '지난 제목' 토픽의 후속"
 
 
 # ---------- 코드 검사(A9) ----------

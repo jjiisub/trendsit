@@ -62,6 +62,8 @@ def export_topic(db: DB, run_id: str, topic_id: str, sources_by_id: dict[str, di
     rel: dict[str, Any] = {"type": t["relation_type"] or "new"}
     if t["relation_topic_id"]:
         rel["topic_id"] = t["relation_topic_id"]
+    if t["relation_label"]:
+        rel["label"] = t["relation_label"]
     return {"id": t["topic_id"], "week": t["week"].lower(), "rank": t["rank"], "lead": bool(t["lead"]),
             "title": page.title, "summary": page.summary, "relation": rel, "overview": page.overview,
             "points": [{"text": p.text, "refs": refs(p.refs)} | ({"check": True} if p.check else {}) for p in page.points],

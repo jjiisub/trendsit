@@ -215,12 +215,15 @@ def validate(plan: BriefingPlan, cands: list[Candidate], cfg: BriefConfig) -> li
 def reason_mismatches(plan: BriefingPlan, inp: EditorSelectInput, site_names: list[str]) -> list[str]:
     """reason 속 숫자·출처 이름이 그 후보 문서(또는 전체 입력)에 있는지(S3 editor_plan 교훈). 어긋나면 기록만."""
     docs = {d.id: d.text + " " + (d.title or "") for d in inp.candidates}
-    whole = inp.model_dump_json()  # 후보 문서 + keyword_trend + recent_topics + limits + 후보 id(c288 등)
+    # 그 후보 문서 + 입력의 짧은 칸(키워드 추세, 지난 토픽, 상한)만. 다른 후보 문서의 숫자는 그 후보의 reason 근거가 아님
+    shared = " ".join([json.dumps([k.model_dump() for k in inp.keyword_trend]), inp.limits.model_dump_json(),
+                       " ".join(t.title + " " + t.topic_id for t in inp.recent_topics), " ".join(d.id for d in inp.candidates)])
     out = []
     for d in plan.decisions:
         doc = docs.get(f"c{d.cluster_id}", "")
         for n in _NUM.findall(d.reason):
-            if n not in doc and n not in whole:
+            pat = rf"(?<![\d.]){re.escape(n)}(?![\d])"
+            if not re.search(pat, doc) and not re.search(pat, shared):
                 out.append(f"c{d.cluster_id} reason의 숫자 {n}이 입력에 없음: {d.reason[:80]}")
         for s in site_names:
             if s and s in d.reason and s not in doc:
@@ -349,7 +352,7 @@ def save(db: DB, res: SelectResult, run_id: str, week: str) -> None:
         for t in res.topics:
             db.conn.execute(
                 "INSERT INTO topics(run_id, topic_id, week, cluster_ids_json, rank, lead, relation_type, relation_topic_id, "
-                "status, angle) VALUES (?,?,?,?,?,?,?,?,?,?)",
+                "relation_label, status, angle) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
                 (run_id, t.topic_id, week, json.dumps(t.cluster_ids), t.rank, int(t.lead), t.relation_type,
-                 t.relation_topic_id, "selected", t.angle))
+                 t.relation_topic_id, t.relation_label or None, "selected", t.angle))
         db.conn.execute("UPDATE weeks SET status='selected' WHERE week=?", (week,))

@@ -121,3 +121,19 @@ def test_save_keeps_decided_status(db):
     row = db.conn.execute("SELECT status, seen FROM aliases").fetchone()
     assert (row["status"], row["seen"]) == ("approved", 2)
     assert al.load_decided(db, al.AliasTable([al.AliasRow("Claude", "클로드", "candidate", "x")])).rows[0].status == "approved"
+
+
+def test_numbers_inside_names_block_spelling_only_approval():
+    ms = [Member(f"it:{i}", "text", "", "", "", "high", [n], [], {}) for i, n in enumerate(("Llama 3 8B", "Llama 38B"))]
+    t = al.build(ms, config.KeywordsConfig(keywords=[], exclude=[]))
+    assert not t.approved()
+
+
+def test_alias_replacement_respects_word_boundaries():
+    from trendsit.brief import checks
+    from trendsit.core.artifacts_brief import Point, TopicPage
+
+    p = TopicPage(points=[Point(text="Aider와 AI 도구 비교 정리 내용", refs=["r"])], numbers=[], events=[], contributions=[],
+                  concepts=[], overview="o다.", summary="s다.", title="t", log="l")
+    fixed, _ = checks.autofix(p, config.load("brief.yaml"), {"AI": "인공지능"})
+    assert fixed.points[0].text == "Aider와 인공지능 도구 비교 정리 내용"

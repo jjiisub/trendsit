@@ -18,8 +18,6 @@ from . import aliases as al
 from . import cluster as cl
 from .evidence import WeekEvidence, week_days, week_evidence
 
-ALIAS_DECIDE_MAX = 10  # 주당 별칭 후보 decide 상한(묶기 decide 상한 안에서 먼저 씀)
-
 
 @dataclass
 class ClusterStage:
@@ -46,7 +44,7 @@ def make_decider(ctx: Ctx) -> cl.Decider:
 
 
 def decide_aliases(table: al.AliasTable, ev: WeekEvidence, decider: cl.Decider | None, min_conf: float,
-                   limit: int = ALIAS_DECIDE_MAX) -> list[dict[str, Any]]:
+                   limit: int = 10) -> list[dict[str, Any]]:
     """rapidfuzz 후보(애매한 것)만 decide. 같다(confidence 이상)면 approved, 다르다면 rejected, 낮으면 candidate 그대로."""
     out = []
     todo = [r for r in table.rows if r.status == "candidate" and r.keyword_id is None][:limit]
@@ -70,8 +68,9 @@ def decide_aliases(table: al.AliasTable, ev: WeekEvidence, decider: cl.Decider |
 
 
 def stage_cluster(week: str, ctx: Ctx, cfg: BriefConfig | None = None, embedder: Any = None,
-                  use_llm: bool = True) -> ClusterStage:
-    """cluster 단계. ctx.tracer의 run_id로 모든 행을 쌓고 weeks.current_run_id를 이 실행으로."""
+                  use_llm: bool = True, set_current: bool = True) -> ClusterStage:
+    """cluster 단계. ctx.tracer의 run_id로 모든 행을 쌓는다. set_current면 weeks.current_run_id를 이 실행으로
+    (cluster 명령 단독). weekly는 끝까지 마친 뒤에만 바꾼다(중간에 멈춘 run이 현재판이 되지 않게, 리뷰 지적 4)."""
     from ..filter.embed import make_embedder
 
     cfg = cfg or config.load("brief.yaml")
@@ -92,7 +91,7 @@ def stage_cluster(week: str, ctx: Ctx, cfg: BriefConfig | None = None, embedder:
     table = al.load_decided(db, al.build(list(ev.members.values()), keywords, cfg.aliases.fuzz_min_score))
     decider = make_decider(ctx) if use_llm else None
     try:
-        alias_dec = decide_aliases(table, ev, decider, cfg.cluster.decide.min_confidence)
+        alias_dec = decide_aliases(table, ev, decider, cfg.cluster.decide.min_confidence, cfg.cluster.alias_decide_max)
     except BudgetExceeded:
         alias_dec, decider = [], None
     al.save(db, table, run_id)
@@ -127,8 +126,9 @@ def stage_cluster(week: str, ctx: Ctx, cfg: BriefConfig | None = None, embedder:
     with db.conn:
         db.conn.execute(
             "INSERT INTO weeks(week, start_day, end_day, status, current_run_id) VALUES (?,?,?,?,?) "
-            "ON CONFLICT(week) DO UPDATE SET status=excluded.status, current_run_id=excluded.current_run_id",
-            (week, start.isoformat(), end.isoformat(), "clustered", run_id))
+            "ON CONFLICT(week) DO UPDATE SET status=excluded.status, current_run_id=COALESCE(?, weeks.current_run_id)",
+            (week, start.isoformat(), end.isoformat(), "clustered", run_id if set_current else None,
+             run_id if set_current else None))
     t3 = time.monotonic()
     return ClusterStage(run_id, ev, table, res, {"evidence": round(t1 - t0, 1), "normalize": round(t2 - t1, 1),
                                                  "cluster": round(t3 - t2, 1)}, alias_dec, vrel)

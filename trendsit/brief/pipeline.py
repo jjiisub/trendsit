@@ -53,7 +53,7 @@ def run_weekly(week: str, ctx: Ctx, from_step: str = "cluster", only_topic: str 
     if from_step != "cluster" and not src:
         raise ValueError(f"{week}: 이어 갈 현재판 run이 없음(--from-step cluster부터)")
     if from_step == "cluster":
-        stage = stage_cluster(week, ctx, cfg, embedder)
+        stage = stage_cluster(week, ctx, cfg, embedder, set_current=False)
         ev, table, cluster_run = stage.evidence, stage.aliases, run_id
         from .report import write_cluster_report, write_label_sheets
 
@@ -95,9 +95,9 @@ def run_weekly(week: str, ctx: Ctx, from_step: str = "cluster", only_topic: str 
             for t in topics:
                 db.conn.execute(
                     "INSERT INTO topics(run_id, topic_id, week, cluster_ids_json, rank, lead, relation_type, "
-                    "relation_topic_id, status, angle) VALUES (?,?,?,?,?,?,?,?,?,?)",
+                    "relation_topic_id, relation_label, status, angle) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
                     (run_id, t.topic_id, week, json.dumps(t.cluster_ids), t.rank, int(t.lead), t.relation_type,
-                     t.relation_topic_id, "selected", t.angle))
+                     t.relation_topic_id, t.relation_label or None, "selected", t.angle))
     dur["select"] = round(time.monotonic() - t1, 1)
     if until == "select":
         topics = []
@@ -112,7 +112,10 @@ def run_weekly(week: str, ctx: Ctx, from_step: str = "cluster", only_topic: str 
             r = db.conn.execute("SELECT page_json FROM topic_pages WHERE run_id=? AND topic_id=? AND round=1", (src, t.topic_id)
                                 ).fetchone()
             draft = TopicPage.model_validate_json(r["page_json"]) if r else None
-        res = wr.write_topic(ctx, t, ev.members, table, cfg, review=until != "write", draft=draft)
+        try:
+            res = wr.write_topic(ctx, t, ev.members, table, cfg, review=until != "write", draft=draft)
+        except Exception as e:  # noqa: BLE001 - 한 토픽의 예상 밖 오류가 주 전체를 멈추지 않게(기록 후 failed)
+            res = wr.TopicResult(t, "failed", None, [], [], [], [], 0, attention=[f"작성 중 오류: {type(e).__name__}: {e}"[:300]])
         wr.save(db, res, run_id)
         results.append(res)
         tr.step(kind="code", role="writer",
@@ -123,7 +126,7 @@ def run_weekly(week: str, ctx: Ctx, from_step: str = "cluster", only_topic: str 
                             {"round": lg.round, "checker": lg.checker, "status": lg.status, "issues": lg.issues,
                              "reverts": lg.reverts, "autofix": len(lg.autofix)} for lg in res.rounds]})
     dur["write_review"] = round(time.monotonic() - t2, 1)
-    if only_topic and src:
+    if only_topic and src and from_step != "cluster":  # 묶기부터 새로 했으면 원본 토픽과 맞지 않아 이어 오지 않음
         carry_over(db, src, run_id, keep={only_topic})
     save_topic_embeddings(db, run_id, embedder, results)
     if until == "select":
@@ -240,7 +243,8 @@ def compute_summary(db: DB, run_id: str) -> dict[str, Any]:
         "cluster": {"clusters": len(clusters), "single_item": sum(c["n_items"] == 1 for c in cands),
                     "multi_channel": sum(len(c) >= 2 for c in chans), "three_channel": sum(len(c) >= 3 for c in chans),
                     "decide_calls": sum(p["decided"] for p in pairs),
-                    "decide_merged": sum(1 for p in pairs if p["decided"] and p["answer"] and (p["confidence"] or 0) >= 0.6),
+                    "decide_merged": sum(1 for p in pairs if p["decided"] and p["answer"]
+                                         and (p["confidence"] or 0) >= config.load("brief.yaml").cluster.decide.min_confidence),
                     "past": {"new": rel_types.count("new"), "follow_up": rel_types.count("follow_up"),
                              "duplicate": drops["duplicate"]}},
         "select": {"candidates": len(plan.get("decisions", [])), "selected": len(plan.get("topics", [])),

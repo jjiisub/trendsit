@@ -50,6 +50,8 @@ class ClusterCfg(_Strict):
     thresholds: Thresholds
     name_border: float = Field(gt=0, le=1)
     generic_names: list[str]
+    broad_keywords: list[str]
+    alias_decide_max: int = Field(ge=0)
     embed_text: Literal["card", "body"]
     reviewed_suspicious: list[str] = []
     linkage: Literal["average"]

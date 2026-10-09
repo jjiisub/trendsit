@@ -109,7 +109,7 @@ def build(members: list[Member], keywords: KeywordsConfig, fuzz_min: float = 90)
         best = sorted(forms, key=lambda f: (-forms[f], -sum(c.isupper() for c in f), f))[0]
         canon[key] = best
         for f in forms:
-            if f != best:
+            if f != best and numbers_of(f) == numbers_of(best):  # 'Llama 3 8B' ↔ 'Llama 38B'는 표기 차이가 아님
                 rows.append(AliasRow(best, f, "approved", "표기 차이만(대소문자·띄어쓰기·하이픈·점)",
                                      evidence=sorted(where[f])))
     keys = sorted(canon)
