@@ -98,12 +98,67 @@ def judge_final(weeks: list[str], only: set[str] | None = None, prev: dict | Non
     return out
 
 
+def _rows(name: str) -> list[dict]:
+    with (LABELS / name).open(encoding="utf-8") as f:
+        return [r for r in csv.DictReader(f) if (r.get("labeler") or "").strip()]
+
+
+def agreement(judge: dict) -> list[str]:
+    """2차 라벨(D1-3) 기준 관문 B와 judge ↔ 라벨 일치율. 라벨이 단 출력(라벨 시트의 실행)에 대해서만."""
+    qs = ("Q0", "Q1", "Q2", "Q3", "Q4")
+    w = _rows("writer.csv")
+    lines = ["| 항목 | 라벨 기준 | 문턱값 | 판정 | judge ↔ 라벨 일치 |", "|---|---|---|---|---|"]
+    names = {"Q0": "근거 충실성", "Q1": "Q1 핵심", "Q2": "Q2 군더더기", "Q3": "Q3 읽기 쉬움", "Q4": "Q4 문체"}
+    both = 0
+    for q in qs:
+        lab = {r["topic_id"]: r[f"{q}_pass"] == "pass" for r in w if r[f"{q}_pass"]}
+        if q == "Q0":
+            jd = {k: v["facts"]["supported"] == v["facts"]["total"] for k, v in judge.items() if v.get("facts")}
+        else:
+            jd = {k: v["verdicts"].get(q, {}).get("verdict") == "pass" for k, v in judge.items()}
+        ok = sum(lab.values())
+        agree = sum(lab[k] == jd[k] for k in lab if k in jd)
+        need = 1.0 if q == "Q0" else 0.9
+        lines.append(f"| {names[q]} | {ok}/{len(lab)} | {'모든 토픽' if q == 'Q0' else '90%'} | "
+                     f"{'통과' if lab and ok / len(lab) >= need else '미달'} | {agree}/{sum(k in jd for k in lab)} |")
+    lab_all = {r["topic_id"]: r["label"] == "pass" for r in w}
+    jd_all = {k: all(x.get("verdict") == "pass" for x in v["verdicts"].values())
+              and v["facts"]["supported"] == v["facts"]["total"] for k, v in judge.items() if v.get("facts")}
+    both = sum(lab_all[k] == jd_all[k] for k in lab_all if k in jd_all)
+    lines.append(f"| writer 종합(label) | {sum(lab_all.values())}/{len(lab_all)} | - | - | {both}/{len(lab_all)} |")
+    c = _rows("critic.csv")
+    ok = sum(r["label"] == "pass" for r in c)
+    lines.append(f"| 검수(실제 판정이 맞음) | {ok}/{len(c)} ({ok / len(c):.0%}) | 80% | {'통과' if ok / len(c) >= .8 else '미달'} | - |")
+    dcs = _rows("decide.csv")
+    agree = sum(r["label"] == r["answer"] for r in dcs)
+    wrong = sum(1 for r in dcs if r["answer"] == "same" and r["label"] == "diff")
+    lines.append(f"| decide | {agree}/{len(dcs)}, 오병합 {wrong} | 오병합 0 | {'통과' if wrong == 0 else '미달'} | - |")
+    al = _rows("aliases.csv")
+    ok = sum(r["label"] == "correct" for r in al)
+    lines.append(f"| 정규화 | {ok}/{len(al)} | 90%, 오병합 0 | {'통과' if al and ok / len(al) >= .9 else '미달'} | - |")
+    es = [r for r in _rows("editor_select.csv") if r["action"] == "drop"]
+    ok = sum(r["label"] == r["drop_reason"] for r in es)
+    lines.append(f"| 선별 drop 이유 | {ok}/{len(es)} | 80% | {'통과' if es and ok / len(es) >= .8 else '미달'} | - |")
+    dj = json.loads((LABELS / "diagram_labels.json").read_text(encoding="utf-8"))
+    lab = {k: v for k, v in dj.items() if v.get("labeler")}
+    over = [k for k, v in lab.items() if len(v["numbers"]) > v["needed_numbers"] or len(v["events"]) > v["needed_events"]]
+    miss = [k for k, v in lab.items() if len(v["numbers"]) < v["needed_numbers"] or len(v["events"]) < v["needed_events"]]
+    lines.append(f"| 표현 선택 | 남발 {len(over)}({', '.join(over) or '-'}), 누락 {len(miss)}({', '.join(miss) or '-'}) | "
+                 f"남발 0, 누락 ≤1 | {'통과' if not over and len(miss) <= 1 else '미달'} | - |")
+    labelers = sorted({r["labeler"] for r in w + c + dcs})
+    return ["", f"라벨: {', '.join(labelers)}(잠정, D1-3). 일치율은 \"모델 대 모델\"", "", *lines]
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--weeks", nargs="+", required=True)
     ap.add_argument("--judge", action="store_true", help="최종판 judge를 새로 돌림(없으면 저장된 결과 사용)")
     ap.add_argument("--topics", nargs="*", help="--judge를 이 토픽만(나머지는 저장된 결과, E2 실패 건만 재실행)")
+    ap.add_argument("--agreement", metavar="JUDGE_JSON", help="라벨 기준 관문 B와 judge ↔ 라벨 일치율만 출력")
     args = ap.parse_args()
+    if args.agreement:
+        print("\n".join(agreement(json.loads(Path(args.agreement).read_text(encoding="utf-8")))))
+        return 0
     db = DB(ROOT / "data" / "trendsit.db")
     jpath = ROOT / "reports" / "S5_brief" / "gate_b_final_judge.json"
     saved = json.loads(jpath.read_text()) if jpath.exists() else {}

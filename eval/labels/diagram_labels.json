@@ -6,10 +6,10 @@
   "code_warnings": [
    "누락 의심: numbers가 비었는데 근거에 같은 단위 값 3개 이상(개 4)"
   ],
-  "needed_numbers": null,
-  "needed_events": null,
-  "labeler": null,
-  "critique": null
+  "needed_numbers": 0,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "도식 불필요(코드 경고 오탐)"
  },
  "w40-gemini-argon": {
   "week": "2026-W40",
@@ -18,10 +18,10 @@
   ],
   "events": [],
   "code_warnings": [],
-  "needed_numbers": null,
-  "needed_events": null,
-  "labeler": null,
-  "critique": null
+  "needed_numbers": 1,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "적절. 제목 파생 수치는 충실성 문제"
  },
  "w40-gpt-6-1-sol": {
   "week": "2026-W40",
@@ -30,30 +30,30 @@
   "code_warnings": [
    "누락 의심: numbers가 비었는데 근거에 같은 단위 값 3개 이상(% 5, 100만 토큰당 4)"
   ],
-  "needed_numbers": null,
-  "needed_events": null,
-  "labeler": null,
-  "critique": null
+  "needed_numbers": 0,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "같은 지표 값 3개 없음(경고 오탐)"
  },
  "w40-decision-api": {
   "week": "2026-W40",
   "numbers": [],
   "events": [],
   "code_warnings": [],
-  "needed_numbers": null,
-  "needed_events": null,
-  "labeler": null,
-  "critique": null
+  "needed_numbers": 0,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "불필요"
  },
  "w40-openai-security": {
   "week": "2026-W40",
   "numbers": [],
   "events": [],
   "code_warnings": [],
-  "needed_numbers": null,
-  "needed_events": null,
-  "labeler": null,
-  "critique": null
+  "needed_numbers": 0,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "불필요"
  },
  "w40-claude-sonnet-5-5": {
   "week": "2026-W40",
@@ -62,20 +62,20 @@
   ],
   "events": [],
   "code_warnings": [],
-  "needed_numbers": null,
-  "needed_events": null,
-  "labeler": null,
-  "critique": null
+  "needed_numbers": 1,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "적절"
  },
  "w40-deepseek-harness": {
   "week": "2026-W40",
   "numbers": [],
   "events": [],
   "code_warnings": [],
-  "needed_numbers": null,
-  "needed_events": null,
-  "labeler": null,
-  "critique": null
+  "needed_numbers": 0,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "불필요"
  },
  "w40-solar-mini-4": {
   "week": "2026-W40",
@@ -84,10 +84,10 @@
   ],
   "events": [],
   "code_warnings": [],
-  "needed_numbers": null,
-  "needed_events": null,
-  "labeler": null,
-  "critique": null
+  "needed_numbers": 1,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "값 2개 + baseline, 허용"
  },
  "w40-vidraft-darwin": {
   "week": "2026-W40",
@@ -96,10 +96,10 @@
   ],
   "events": [],
   "code_warnings": [],
-  "needed_numbers": null,
-  "needed_events": null,
-  "labeler": null,
-  "critique": null
+  "needed_numbers": 1,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "적절"
  },
  "w40-jev-decision-model": {
   "week": "2026-W40",
@@ -108,10 +108,10 @@
   ],
   "events": [],
   "code_warnings": [],
-  "needed_numbers": null,
-  "needed_events": null,
-  "labeler": null,
-  "critique": null
+  "needed_numbers": 1,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "적절, 단위 빈칸(형식)"
  },
  "w41-embedding-gemma-2": {
   "week": "2026-W41",
@@ -120,10 +120,10 @@
   ],
   "events": [],
   "code_warnings": [],
-  "needed_numbers": null,
-  "needed_events": null,
-  "labeler": null,
-  "critique": null
+  "needed_numbers": 1,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "값 2개 + baseline, 개요에 값 있음, 허용"
  },
  "w41-mistral-large-4": {
   "week": "2026-W41",
@@ -133,20 +133,20 @@
   ],
   "events": [],
   "code_warnings": [],
-  "needed_numbers": null,
-  "needed_events": null,
-  "labeler": null,
-  "critique": null
+  "needed_numbers": 2,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "적절(코딩 막대는 종합 지표와 개별 벤치가 섞여 있음)"
  },
  "w41-gpt-6-intelligent-ui": {
   "week": "2026-W41",
   "numbers": [],
   "events": [],
   "code_warnings": [],
-  "needed_numbers": null,
-  "needed_events": null,
-  "labeler": null,
-  "critique": null
+  "needed_numbers": 0,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "불필요"
  },
  "w41-claude-haiku-5-5": {
   "week": "2026-W41",
@@ -155,20 +155,20 @@
   "code_warnings": [
    "누락 의심: numbers가 비었는데 근거에 같은 단위 값 3개 이상(점 4, $ 3)"
   ],
-  "needed_numbers": null,
-  "needed_events": null,
-  "labeler": null,
-  "critique": null
+  "needed_numbers": 1,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "누락: 구간별 입력·출력 가격(100K 이하 $0.10/$0.50, 초과 $0.50/$2.50)이 angle의 핵심"
  },
  "w41-openai-rogue-agent": {
   "week": "2026-W41",
   "numbers": [],
   "events": [],
   "code_warnings": [],
-  "needed_numbers": null,
-  "needed_events": null,
-  "labeler": null,
-  "critique": null
+  "needed_numbers": 0,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "불필요(날짜 2개 + 월)"
  },
  "w41-mai-code-1-1": {
   "week": "2026-W41",
@@ -177,20 +177,20 @@
   ],
   "events": [],
   "code_warnings": [],
-  "needed_numbers": null,
-  "needed_events": null,
-  "labeler": null,
-  "critique": null
+  "needed_numbers": 1,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "적절"
  },
  "w41-openrig": {
   "week": "2026-W41",
   "numbers": [],
   "events": [],
   "code_warnings": [],
-  "needed_numbers": null,
-  "needed_events": null,
-  "labeler": null,
-  "critique": null
+  "needed_numbers": 0,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "불필요"
  },
  "w41-sift-framework": {
   "week": "2026-W41",
@@ -199,20 +199,20 @@
   ],
   "events": [],
   "code_warnings": [],
-  "needed_numbers": null,
-  "needed_events": null,
-  "labeler": null,
-  "critique": null
+  "needed_numbers": 0,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "남발: 단위가 다른 값을 한 막대에. 필요하면 심사자 유무 35.1 vs 29.8(값 2개 + baseline)"
  },
  "w41-openai-math": {
   "week": "2026-W41",
   "numbers": [],
   "events": [],
   "code_warnings": [],
-  "needed_numbers": null,
-  "needed_events": null,
-  "labeler": null,
-  "critique": null
+  "needed_numbers": 0,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "불필요"
  },
  "w41-textgrain-eu": {
   "week": "2026-W41",
@@ -221,9 +221,9 @@
   ],
   "events": [],
   "code_warnings": [],
-  "needed_numbers": null,
-  "needed_events": null,
-  "labeler": null,
-  "critique": null
+  "needed_numbers": 1,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "적절"
  }
 }

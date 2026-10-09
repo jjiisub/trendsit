@@ -1,7 +1,7 @@
 canonical,alias,status,reason,evidence,label,critique,labeler
-GPT-6 Luna,gpt-6-luna,approved,표기 차이만(대소문자·띄어쓰기·하이픈·점),it:1043,,,
-GPT-6.1 Sol,GPT-6.1-sol,approved,표기 차이만(대소문자·띄어쓰기·하이픈·점),it:1048,,,
-OpenRig,openrig,approved,표기 차이만(대소문자·띄어쓰기·하이픈·점),rp:mvschwarz/openrig,,,
-MAI 코드 1.1 플래시,MAI-코드-1.1 플래시,approved,표기 차이만(대소문자·띄어쓰기·하이픈·점),it:1161,,,
-터미널-벤치 2.1,터미널벤치 2.1,approved,표기 차이만(대소문자·띄어쓰기·하이픈·점),it:1205,,,
-Datasette,datasette.io,rejected,rapidfuzz 90,it:1047 it:1049,,,
+GPT-6 Luna,gpt-6-luna,approved,표기 차이만(대소문자·띄어쓰기·하이픈·점),it:1043,correct,,opus-5.5
+GPT-6.1 Sol,GPT-6.1-sol,approved,표기 차이만(대소문자·띄어쓰기·하이픈·점),it:1048,correct,,opus-5.5
+OpenRig,openrig,approved,표기 차이만(대소문자·띄어쓰기·하이픈·점),rp:mvschwarz/openrig,correct,,opus-5.5
+MAI 코드 1.1 플래시,MAI-코드-1.1 플래시,approved,표기 차이만(대소문자·띄어쓰기·하이픈·점),it:1161,correct,,opus-5.5
+터미널-벤치 2.1,터미널벤치 2.1,approved,표기 차이만(대소문자·띄어쓰기·하이픈·점),it:1205,correct,,opus-5.5
+Datasette,datasette.io,rejected,rapidfuzz 90,it:1047 it:1049,correct,제품과 그 사이트 도메인. 거절해도 오병합 아님,opus-5.5

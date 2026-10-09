@@ -1,27 +1,27 @@
 week,topic_id,round,status,issues,label,critique,labeler
-2026-W40,w40-openai-dots,1,reject,"[{""loc"": ""numbers"", ""type"": ""missing_diagram"", ""comment"": ""code_warnings가 지적한 대로, 근거에 '4,000개 이상 앱', '초당 300토큰', '월 500달러', 'Dots 1개' 등 비교 가능한 수치 4개가 존재함에도 numbers 칸이 비어 있음""}]",,,
-2026-W40,w40-openai-dots,2,reject,"[{""loc"": ""numbers"", ""type"": ""missing_diagram"", ""comment"": ""code_warnings가 지적한 대로, 근거에 '4,000개 이상 앱', '초당 300토큰', '월 500달러', 'Dots 1개' 등 비교 가능한 수치 4개가 존재함에도 numbers 칸이 비어 있음""}]",,,
-2026-W40,w40-gemini-argon,1,pass,[],,,
-2026-W40,w40-gpt-6-1-sol,2,reject,"[{""loc"": ""points[4]"", ""type"": ""unsupported"", ""comment"": ""근거 it:8#q5에는 'more than doubles GPT-6 Sol's score at maximum reasoning'만 있고 비용 절감(절반 이하) 언급이 없음""}, {""loc"": ""overview"", ""type"": ""unsupported"", ""comment"": ""Terminal-Bench Science 0.1에 대해 '비용 절감'을 주장하나, 근거 it:8#q5에는 점수 2배 이상만 있고 비용 언급이 없음. DeepSWE와 OSWorld는 비용 절감이 근거에 있으나 Terminal-Bench는 아님""}]",,,
-2026-W40,w40-gpt-6-1-sol,3,pass,[],,,
-2026-W40,w40-decision-api,2,pass,[],,,
-2026-W40,w40-openai-security,1,pass,[],,,
-2026-W40,w40-claude-sonnet-5-5,1,pass,[],,,
-2026-W40,w40-deepseek-harness,1,reject,"[{""loc"": ""points[5]"", ""type"": ""unsupported"", ""comment"": ""근거 it:185#q6에는 '플러그인 마켓' 언급이 없으며, it:185#q5에도 해당 내용이 없다. it:185(요약)에만 있으나 원문 근거에 없음""}]",,,
-2026-W40,w40-deepseek-harness,2,pass,[],,,
-2026-W40,w40-solar-mini-4,1,pass,[],,,
-2026-W40,w40-vidraft-darwin,1,pass,[],,,
-2026-W40,w40-jev-decision-model,2,reject,"[{""loc"": ""points[2]"", ""type"": ""wrong_ref"", ""comment"": ""패스 레이트 62.4% vs 62.8% 수치는 it:979#q4에 있으나, 해당 문장의 refs에는 it:979#q4가 빠져 있다""}, {""loc"": ""points[3]"", ""type"": ""unsupported"", ""comment"": ""Jeeves가 PostHog의 모델이라는 사실은 it:984#q1, it:984#q3 근거 원문에 없다 (it:984 전체 문서에만 있음)""}, {""loc"": ""overview"", ""type"": ""unsupported"", ""comment"": ""Jeeves가 오픈웨이트로 공개되었다는 사실은 근거 원문에 없다. it:979#q1은 Jeff만 'open'이라 하고, it:984#q1은 오픈웨이트 언급이 없다""}]",,,
-2026-W40,w40-jev-decision-model,3,pass,[],,,
-2026-W41,w41-embedding-gemma-2,1,reject,"[{""loc"": ""concepts[0]"", ""type"": ""unsupported"", ""comment"": ""근거 원문에는 차원 축소(truncate)만 언급되어 있고 '저장 공간 절감'이라는 효과 설명이 없다""}]",,,
-2026-W41,w41-embedding-gemma-2,2,reject,"[{""loc"": ""concepts[0]"", ""type"": ""unsupported"", ""comment"": ""근거 원문에는 차원 축소 기능만 기술되어 있고 '저장 공간 절감'이라는 효과 설명이 없다""}]",,,
-2026-W41,w41-mistral-large-4,1,pass,[],,,
-2026-W41,w41-gpt-6-intelligent-ui,2,pass,[],,,
-2026-W41,w41-claude-haiku-5-5,1,reject,"[{""loc"": ""numbers"", ""type"": ""missing_diagram"", ""comment"": ""code_warnings가 지적한 대로, 가격($0.10/$0.50, $0.50/$2.50)과 벤치마크 점수(1620, 1437) 등 같은 단위의 수치 3개 이상이 근거에 존재함에도 numbers 그룹이 비어 있어 수치 비교가 도식으로 표현되지 않음""}]",,,
-2026-W41,w41-claude-haiku-5-5,2,reject,"[{""loc"": ""numbers"", ""type"": ""missing_diagram"", ""comment"": ""code_warnings가 지적한 대로, 가격 구조 변화라는 angle의 핵심인 구간별 가격($0.10/$0.50, $0.50/$2.50)과 벤치마크 점수(1620, 1437, 735) 등 같은 단위의 수치 3개 이상이 근거에 존재함에도 numbers 도식이 비어 있음""}]",,,
-2026-W41,w41-openai-rogue-agent,1,pass,[],,,
-2026-W41,w41-mai-code-1-1,1,pass,[],,,
-2026-W41,w41-openrig,2,pass,[],,,
-2026-W41,w41-sift-framework,2,pass,[],,,
-2026-W41,w41-openai-math,1,pass,[],,,
-2026-W41,w41-textgrain-eu,1,pass,[],,,
+2026-W40,w40-openai-dots,1,reject,"[{""loc"": ""numbers"", ""type"": ""missing_diagram"", ""comment"": ""code_warnings가 지적한 대로, 근거에 '4,000개 이상 앱', '초당 300토큰', '월 500달러', 'Dots 1개' 등 비교 가능한 수치 4개가 존재함에도 numbers 칸이 비어 있음""}]",fail,"과잉 반려: 4개 값의 단위가 모두 다름(개, 토큰/초, 달러, 개). 코드 경고 ""개 4""도 오탐",opus-5.5
+2026-W40,w40-openai-dots,2,reject,"[{""loc"": ""numbers"", ""type"": ""missing_diagram"", ""comment"": ""code_warnings가 지적한 대로, 근거에 '4,000개 이상 앱', '초당 300토큰', '월 500달러', 'Dots 1개' 등 비교 가능한 수치 4개가 존재함에도 numbers 칸이 비어 있음""}]",fail,같은 오탐 반복 → checked. 실제 문제는 없음,opus-5.5
+2026-W40,w40-gemini-argon,1,pass,[],fail,놓침: 도식 제목의 파생 수치 3.7%p,opus-5.5
+2026-W40,w40-gpt-6-1-sol,2,reject,"[{""loc"": ""points[4]"", ""type"": ""unsupported"", ""comment"": ""근거 it:8#q5에는 'more than doubles GPT-6 Sol's score at maximum reasoning'만 있고 비용 절감(절반 이하) 언급이 없음""}, {""loc"": ""overview"", ""type"": ""unsupported"", ""comment"": ""Terminal-Bench Science 0.1에 대해 '비용 절감'을 주장하나, 근거 it:8#q5에는 점수 2배 이상만 있고 비용 언급이 없음. DeepSWE와 OSWorld는 비용 절감이 근거에 있으나 Terminal-Bench는 아님""}]",pass,맞음: Terminal-Bench 비용 주장 비지지,opus-5.5
+2026-W40,w40-gpt-6-1-sol,3,pass,[],fail,"놓침: 요약 ""워크로드 비용 최대 95% 절감"" 범위 부풀림",opus-5.5
+2026-W40,w40-decision-api,2,pass,[],fail,"놓침: 개요의 근거 밖 전망, 요약 ""출시"" ↔ 프리뷰 모순",opus-5.5
+2026-W40,w40-openai-security,1,pass,[],fail,"놓침: 두 출처를 인과로 합친 요약·개요, 개념 정의 오류",opus-5.5
+2026-W40,w40-claude-sonnet-5-5,1,pass,[],pass,맞음,opus-5.5
+2026-W40,w40-deepseek-harness,1,reject,"[{""loc"": ""points[5]"", ""type"": ""unsupported"", ""comment"": ""근거 it:185#q6에는 '플러그인 마켓' 언급이 없으며, it:185#q5에도 해당 내용이 없다. it:185(요약)에만 있으나 원문 근거에 없음""}]",pass,맞음: 플러그인 마켓은 요약 칸에만 있음,opus-5.5
+2026-W40,w40-deepseek-harness,2,pass,[],pass,맞음,opus-5.5
+2026-W40,w40-solar-mini-4,1,pass,[],pass,"맞음(사실 문제 없음, Q1은 검수 몫 아님)",opus-5.5
+2026-W40,w40-vidraft-darwin,1,pass,[],pass,맞음(사실 비지지 없음),opus-5.5
+2026-W40,w40-jev-decision-model,2,reject,"[{""loc"": ""points[2]"", ""type"": ""wrong_ref"", ""comment"": ""패스 레이트 62.4% vs 62.8% 수치는 it:979#q4에 있으나, 해당 문장의 refs에는 it:979#q4가 빠져 있다""}, {""loc"": ""points[3]"", ""type"": ""unsupported"", ""comment"": ""Jeeves가 PostHog의 모델이라는 사실은 it:984#q1, it:984#q3 근거 원문에 없다 (it:984 전체 문서에만 있음)""}, {""loc"": ""overview"", ""type"": ""unsupported"", ""comment"": ""Jeeves가 오픈웨이트로 공개되었다는 사실은 근거 원문에 없다. it:979#q1은 Jeff만 'open'이라 하고, it:984#q1은 오픈웨이트 언급이 없다""}]",pass,맞음: wrong_ref·비지지 지적 타당,opus-5.5
+2026-W40,w40-jev-decision-model,3,pass,[],pass,맞음(빈 단위는 코드 몫),opus-5.5
+2026-W41,w41-embedding-gemma-2,1,reject,"[{""loc"": ""concepts[0]"", ""type"": ""unsupported"", ""comment"": ""근거 원문에는 차원 축소(truncate)만 언급되어 있고 '저장 공간 절감'이라는 효과 설명이 없다""}]",pass,맞음,opus-5.5
+2026-W41,w41-embedding-gemma-2,2,reject,"[{""loc"": ""concepts[0]"", ""type"": ""unsupported"", ""comment"": ""근거 원문에는 차원 축소 기능만 기술되어 있고 '저장 공간 절감'이라는 효과 설명이 없다""}]",pass,맞음(수정본도 같은 문제),opus-5.5
+2026-W41,w41-mistral-large-4,1,pass,[],fail,"놓침: 개요 ""사이버 지수로 경쟁 오픈 모델을 앞선다""(근거는 동률 포함)",opus-5.5
+2026-W41,w41-gpt-6-intelligent-ui,2,pass,[],fail,"놓침: 요약 ""응답 속도 44% 향상"" 의미 왜곡",opus-5.5
+2026-W41,w41-claude-haiku-5-5,1,reject,"[{""loc"": ""numbers"", ""type"": ""missing_diagram"", ""comment"": ""code_warnings가 지적한 대로, 가격($0.10/$0.50, $0.50/$2.50)과 벤치마크 점수(1620, 1437) 등 같은 단위의 수치 3개 이상이 근거에 존재함에도 numbers 그룹이 비어 있어 수치 비교가 도식으로 표현되지 않음""}]",fail,핵심을 놓침: 토크나이저→숨겨진 가격 인상 비지지는 지적 없이 도식 누락만 지적,opus-5.5
+2026-W41,w41-claude-haiku-5-5,2,reject,"[{""loc"": ""numbers"", ""type"": ""missing_diagram"", ""comment"": ""code_warnings가 지적한 대로, 가격 구조 변화라는 angle의 핵심인 구간별 가격($0.10/$0.50, $0.50/$2.50)과 벤치마크 점수(1620, 1437, 735) 등 같은 단위의 수치 3개 이상이 근거에 존재함에도 numbers 도식이 비어 있음""}]",fail,같음,opus-5.5
+2026-W41,w41-openai-rogue-agent,1,pass,[],fail,"놓침: 제목 ""연관성 확인""(근거는 가능성)",opus-5.5
+2026-W41,w41-mai-code-1-1,1,pass,[],pass,맞음,opus-5.5
+2026-W41,w41-openrig,2,pass,[],pass,맞음,opus-5.5
+2026-W41,w41-sift-framework,2,pass,[],fail,"놓침: 단위 섞인 도식(overuse), 개념 비지지",opus-5.5
+2026-W41,w41-openai-math,1,pass,[],pass,맞음,opus-5.5
+2026-W41,w41-textgrain-eu,1,pass,[],pass,맞음,opus-5.5

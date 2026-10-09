@@ -1,0 +1,229 @@
+{
+ "w40-openai-dots": {
+  "week": "2026-W40",
+  "numbers": [],
+  "events": [],
+  "code_warnings": [
+   "누락 의심: numbers가 비었는데 근거에 같은 단위 값 3개 이상(개 4)"
+  ],
+  "needed_numbers": 0,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "도식 불필요(코드 경고 오탐)"
+ },
+ "w40-gemini-argon": {
+  "week": "2026-W40",
+  "numbers": [
+   "Gemini 4 Argon이 DeepSWE v1.1에서 경쟁 모델 대비 3.7%p 높음"
+  ],
+  "events": [],
+  "code_warnings": [],
+  "needed_numbers": 1,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "적절. 제목 파생 수치는 충실성 문제"
+ },
+ "w40-gpt-6-1-sol": {
+  "week": "2026-W40",
+  "numbers": [],
+  "events": [],
+  "code_warnings": [
+   "누락 의심: numbers가 비었는데 근거에 같은 단위 값 3개 이상(% 5, 100만 토큰당 4)"
+  ],
+  "needed_numbers": 0,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "같은 지표 값 3개 없음(경고 오탐)"
+ },
+ "w40-decision-api": {
+  "week": "2026-W40",
+  "numbers": [],
+  "events": [],
+  "code_warnings": [],
+  "needed_numbers": 0,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "불필요"
+ },
+ "w40-openai-security": {
+  "week": "2026-W40",
+  "numbers": [],
+  "events": [],
+  "code_warnings": [],
+  "needed_numbers": 0,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "불필요"
+ },
+ "w40-claude-sonnet-5-5": {
+  "week": "2026-W40",
+  "numbers": [
+   "Sonnet 5.5가 터미널벤치 4.0에서 Opus 5.5 상회"
+  ],
+  "events": [],
+  "code_warnings": [],
+  "needed_numbers": 1,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "적절"
+ },
+ "w40-deepseek-harness": {
+  "week": "2026-W40",
+  "numbers": [],
+  "events": [],
+  "code_warnings": [],
+  "needed_numbers": 0,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "불필요"
+ },
+ "w40-solar-mini-4": {
+  "week": "2026-W40",
+  "numbers": [
+   "Solar Mini 4가 MiMo-V2.5보다 에이전트 작업 완료 비용 43% 낮음"
+  ],
+  "events": [],
+  "code_warnings": [],
+  "needed_numbers": 1,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "값 2개 + baseline, 허용"
+ },
+ "w40-vidraft-darwin": {
+  "week": "2026-W40",
+  "numbers": [
+   "다윈-180B-RSI가 LEXam·LEXam-hard에서 경쟁 모델 대비 우위"
+  ],
+  "events": [],
+  "code_warnings": [],
+  "needed_numbers": 1,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "적절"
+ },
+ "w40-jev-decision-model": {
+  "week": "2026-W40",
+  "numbers": [
+   "Jeeves가 Kev-9B, Jev보다 높은 정확도 기록"
+  ],
+  "events": [],
+  "code_warnings": [],
+  "needed_numbers": 1,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "적절, 단위 빈칸(형식)"
+ },
+ "w41-embedding-gemma-2": {
+  "week": "2026-W41",
+  "numbers": [
+   "MTEB Code 점수 전작 대비 9.92점 상승"
+  ],
+  "events": [],
+  "code_warnings": [],
+  "needed_numbers": 1,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "값 2개 + baseline, 개요에 값 있음, 허용"
+ },
+ "w41-mistral-large-4": {
+  "week": "2026-W41",
+  "numbers": [
+   "ML4가 GPT-6 루나와 AAII 동급",
+   "코딩 에이전트 벤치마크별 점수"
+  ],
+  "events": [],
+  "code_warnings": [],
+  "needed_numbers": 2,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "적절(코딩 막대는 종합 지표와 개별 벤치가 섞여 있음)"
+ },
+ "w41-gpt-6-intelligent-ui": {
+  "week": "2026-W41",
+  "numbers": [],
+  "events": [],
+  "code_warnings": [],
+  "needed_numbers": 0,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "불필요"
+ },
+ "w41-claude-haiku-5-5": {
+  "week": "2026-W41",
+  "numbers": [],
+  "events": [],
+  "code_warnings": [
+   "누락 의심: numbers가 비었는데 근거에 같은 단위 값 3개 이상(점 4, $ 3)"
+  ],
+  "needed_numbers": 1,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "누락: 구간별 입력·출력 가격(100K 이하 $0.10/$0.50, 초과 $0.50/$2.50)이 angle의 핵심"
+ },
+ "w41-openai-rogue-agent": {
+  "week": "2026-W41",
+  "numbers": [],
+  "events": [],
+  "code_warnings": [],
+  "needed_numbers": 0,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "불필요(날짜 2개 + 월)"
+ },
+ "w41-mai-code-1-1": {
+  "week": "2026-W41",
+  "numbers": [
+   "터미널-벤치 2.1에서 로컬 버전이 클라우드 원본 상회"
+  ],
+  "events": [],
+  "code_warnings": [],
+  "needed_numbers": 1,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "적절"
+ },
+ "w41-openrig": {
+  "week": "2026-W41",
+  "numbers": [],
+  "events": [],
+  "code_warnings": [],
+  "needed_numbers": 0,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "불필요"
+ },
+ "w41-sift-framework": {
+  "week": "2026-W41",
+  "numbers": [
+   "SIFT가 Polyglot 벤치마크에서 35.1% 정확도 달성"
+  ],
+  "events": [],
+  "code_warnings": [],
+  "needed_numbers": 0,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "남발: 단위가 다른 값을 한 막대에. 필요하면 심사자 유무 35.1 vs 29.8(값 2개 + baseline)"
+ },
+ "w41-openai-math": {
+  "week": "2026-W41",
+  "numbers": [],
+  "events": [],
+  "code_warnings": [],
+  "needed_numbers": 0,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "불필요"
+ },
+ "w41-textgrain-eu": {
+  "week": "2026-W41",
+  "numbers": [
+   "동의어 치환에 따른 textGrain 탐지율 하락"
+  ],
+  "events": [],
+  "code_warnings": [],
+  "needed_numbers": 1,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "적절"
+ }
+}
