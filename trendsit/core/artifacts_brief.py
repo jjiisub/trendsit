@@ -94,6 +94,7 @@ class EditorSelectInput(RoleInput):
     keyword_trend: list[KeywordTrend]
     repo_cards: list[RepoLine]
     limits: SelectLimits
+    previous_errors: list[str] = Field(default=[], description="직전 출력이 코드 검증에서 거부된 이유(재시도 때만)")
 
 
 class Decision(_Strict):
@@ -230,8 +231,9 @@ class TopicPage(RoleOutput):
 
 
 # ---------- writer_revise (작성자 수정: 고친 칸만) ----------
+# 검수자 이슈 7종 + format(코드 검사 반려: 분량, 필수 칸, 금지 표현, 도식 칸 규칙)
 IssueType = Literal["unsupported", "number_mismatch", "overclaim", "wrong_ref", "missing_key", "overuse",
-                    "missing_diagram"]
+                    "missing_diagram", "format"]
 
 
 class Issue(_Strict):
