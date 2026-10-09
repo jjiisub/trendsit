@@ -321,8 +321,15 @@ def write_topic(ctx: Ctx, topic: Applied, members: dict[str, Member], table: Ali
         order = [e for e in refs_of(pg) if e in raw_ids] + [e for e in raw_ids if e not in refs_of(pg)]
         evid = [Document(id=e, source=pack[e][0].source.get("site") or pack[e][0].channel,
                          title=pack[e][0].source.get("title"), text=raw_evidence(ctx.db, e, pack[e])) for e in order]
-        out = _call(critic, CriticInput(loc_lines=loc_lines(pg), page=pg, evidence=evid, angle=topic.angle,
-                                        code_warnings=warns, round=rnd), ctx, res.costs, "critic")
+        cinp = CriticInput(loc_lines=loc_lines(pg), page=pg, evidence=evid, angle=topic.angle, code_warnings=warns, round=rnd)
+        out = _call(critic, cinp, ctx, res.costs, "critic")
+        # 원자 사실 0개로 통과 = 대조를 건너뛴 판정(W40 재실행 3토픽, 출력 49토큰). 한 번 다시 부르고, 또 비면 검수 실패
+        if out[0] is not None and not out[0].atoms and pg.points:
+            res.attention.append("검수자가 원자 사실 0개로 판정(대조 건너뜀), 다시 부름")
+            again = cinp.model_copy(update={"code_warnings": [*warns, "직전 판정이 원자 사실 0개: 모든 문장을 원자 사실로 나눠 대조"]})
+            out = _call(critic, again, ctx, res.costs, "critic")
+            if out[0] is not None and not out[0].atoms:
+                out = (None, "원자 사실 0개 판정 반복", out[2])
         critic_seen = critic_seen or out[0] is not None
         return out
     raw_page: dict[str, Any] | None = page.raw_dump() if hasattr(page, "raw_dump") else None

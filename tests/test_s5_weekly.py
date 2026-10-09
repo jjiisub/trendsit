@@ -276,3 +276,23 @@ def test_export_numbers_events_og_and_checks(tmp_path):
     assert ex["sources"] == [{"id": "s1", "channel": "text", "site": "S", "title": "T", "date": "2026-10-06",
                               "url": "https://s/5", "origin": "https://origin/5"}]
     assert ex["checks"] == ["summary"] and ex["has_check"]
+
+
+def test_critic_empty_atoms_is_not_a_pass(week):
+    """원자 사실 0개 통과는 대조를 건너뛴 판정: 한 번 다시 부르고, 또 비면 검수 실패(attention), 판정은 기록하지 않음."""
+    ctx, cids = week
+    empty = json.dumps({"atoms": [], "fact_support": {"total": 0, "supported": 0}, "issues": [], "status": "pass",
+                        "log": "원자 사실 0개", "attention": False})
+    responses = [plan(cids), page(1, "Argon이 DeepSWE에서 77.9% 기록"), empty, empty]
+    for i in (2, 3, 4):
+        responses += [page(i, f"{TITLES[i]} 근거 문장 요약 정리"), verdict([])]
+    ctx.llm.transport.responses = [response(r) for r in responses]
+    ctx.tracer = Tracer(ctx.db, "weekly", "S0")
+    pipeline.run_weekly("2026-W41", ctx, from_step="select", embedder=HashEmbedder(), cfg=CFG)
+    run_id = ctx.tracer.run_id
+    checkers = [r[0] for r in ctx.db.conn.execute(
+        "SELECT checker FROM verdicts WHERE run_id=? AND topic_id='w41-model-1' ORDER BY id", (run_id,))]
+    assert checkers == ["code"]  # 빈 판정 두 번 → 검수 실패, critic 판정 기록 없음
+    att = [json.loads(r[0]) for r in ctx.db.conn.execute(
+        "SELECT detail FROM steps WHERE run_id=? AND role='writer' AND kind='code' AND text LIKE 'w41-model-1%'", (run_id,))]
+    assert att and att[0]["topic_id"] == "w41-model-1"
