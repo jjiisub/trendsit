@@ -79,7 +79,7 @@ def run_weekly(week: str, ctx: Ctx, from_step: str = "cluster", only_topic: str 
                      + (" (대체 계획)" if sres.source == "fallback" else ""),
                 attention=sres.source == "fallback" or bool(sres.reason_mismatch),
                 detail={"errors_by_try": sres.errors_by_try, "reason_mismatch": sres.reason_mismatch,
-                        "source": sres.source})
+                        "source": sres.source, "reconciled": sres.reconciled})
     else:
         row = db.conn.execute("SELECT plan_json, source FROM briefing_plans WHERE run_id=? ORDER BY id DESC LIMIT 1",
                               (src,)).fetchone()

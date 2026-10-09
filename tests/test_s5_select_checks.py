@@ -230,3 +230,14 @@ def test_selected_but_not_in_topics_is_rejected():
     p = good()
     p = p.model_copy(update={"decisions": [d.model_copy(update={"action": "select", "drop_reason": None}) for d in p.decisions]})
     assert any("select인데 topics에 없는" in e for e in sel.validate(p, CANDS, CFG))
+
+
+def test_reconcile_decisions_to_topics():
+    p = good()
+    bad = p.model_copy(update={"decisions": [d.model_copy(update={"action": "drop", "drop_reason": "thin"}) if d.cluster_id == 1
+                                             else d.model_copy(update={"action": "select", "drop_reason": None})
+                                             for d in p.decisions]})
+    assert sel.validate(bad, CANDS, CFG)  # 원래 출력은 어긋남(기록)
+    fixed, notes = sel.reconcile(bad)
+    assert sel.validate(fixed, CANDS, CFG) == [] and len(notes) == 2
+    assert next(d for d in fixed.decisions if d.cluster_id == 5).drop_reason == "other"

@@ -72,6 +72,7 @@ class SelectResult:
     errors_by_try: list[list[str]] = field(default_factory=list)
     reason_mismatch: list[str] = field(default_factory=list)
     step_id: int | None = None
+    reconciled: list[str] = field(default_factory=list)  # 코드가 decisions를 topics에 맞춘 내역
 
 
 # ---------- 입력 ----------
@@ -289,10 +290,29 @@ def fallback_plan(cands: list[Candidate], cfg: BriefConfig, reason: str) -> Brie
         featured_repos=[], log=f"대체 계획: 점수 순 상위 {n}개 ({reason})", attention=True)
 
 
+def reconcile(plan: BriefingPlan) -> tuple[BriefingPlan, list[str]]:
+    """decisions의 action을 topics에 맞춘다(topics가 기준). topics에 있으면 select, 없는데 select면 drop(other).
+    W40 첫 실행에서 모델이 세 번 모두 둘을 어긋나게 냈다. 끌어낼 수 있는 값이라 코드가 맞추고 맞춘 건수를 기록한다."""
+    in_topics = {cid for t in plan.topics for cid in t.cluster_ids}
+    fixed, notes = [], []
+    for d in plan.decisions:
+        if d.cluster_id in in_topics and d.action != "select":
+            fixed.append(d.model_copy(update={"action": "select", "drop_reason": None}))
+            notes.append(f"c{d.cluster_id} drop → select(topics에 있음)")
+        elif d.cluster_id not in in_topics and d.action == "select":
+            fixed.append(d.model_copy(update={"action": "drop", "drop_reason": "other",
+                                              "reason": d.reason + " / 코드 정리: topics에 없음(토픽 수 상한)"}))
+            notes.append(f"c{d.cluster_id} select → drop(other)")
+        else:
+            fixed.append(d)
+    return (plan.model_copy(update={"decisions": fixed}) if notes else plan), notes
+
+
 def select(ctx: Ctx, cands: list[Candidate], ev: WeekEvidence, cfg: BriefConfig, site_names: list[str]) -> SelectResult:
     role = load_role("editor_select", ctx.models)
     inp = build_input(cands, ev, ctx.db, cfg)
     errors_by_try: list[list[str]] = []
+    reconciled: list[str] = []
     plan: BriefingPlan | None = None
     source = "model"
     for _ in range(SELECT_RETRIES + 1):
@@ -301,10 +321,13 @@ def select(ctx: Ctx, cands: list[Candidate], ev: WeekEvidence, cfg: BriefConfig,
         except (RoleFailed, LLMError, BudgetExceeded) as e:
             errors_by_try.append([f"{type(e).__name__}: {e}"])
             break
-        errs = validate(out, cands, cfg)  # type: ignore[arg-type]
-        errors_by_try.append(errs)
+        raw_errs = validate(out, cands, cfg)  # type: ignore[arg-type]  # 원래 출력 기준(모델 품질 기록)
+        fixed, notes = reconcile(out)  # type: ignore[arg-type]
+        errs = validate(fixed, cands, cfg)
+        errors_by_try.append(raw_errs)
         if not errs:
-            plan = out  # type: ignore[assignment]
+            plan = fixed
+            reconciled += notes
             break
         inp = inp.model_copy(update={"previous_errors": errs})
     if plan is None:
@@ -315,7 +338,8 @@ def select(ctx: Ctx, cands: list[Candidate], ev: WeekEvidence, cfg: BriefConfig,
     plan = plan.model_copy(update={"featured_repos": [r for r in plan.featured_repos
                                                       if r in {x.full_name for x in inp.repo_cards}]
                                    [: cfg.select.featured_repos_max]})
-    return SelectResult(plan, source, apply(plan, cands, ev.week, ctx.db), cands, errors_by_try, mism, ctx.last_step_id)
+    return SelectResult(plan, source, apply(plan, cands, ev.week, ctx.db), cands, errors_by_try, mism, ctx.last_step_id,
+                        reconciled)
 
 
 def save(db: DB, res: SelectResult, run_id: str, week: str) -> None:
