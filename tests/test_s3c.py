@@ -298,7 +298,7 @@ def test_n1_invalid_run_by_github_tool_errors():
     """설계 결정 N1: 무효 실행(…-165334)은 '도구 오류로 무효', 정상 실행(…-182928)은 판정 불변."""
     from eval.graders_text import aggregate_repo_analyst
 
-    rep = Path(__file__).parents[1] / "reports" / "eval"
+    rep = Path(__file__).parent / "fixtures" / "eval_reports"  # S5 E10 정리로 reports/eval에서 옮김
     bad = json.loads((rep / "repo_analyst_generate_20261008-165334.json").read_text())["results"]
     good = json.loads((rep / "repo_analyst_generate_20261008-182928.json").read_text())["results"]
     metrics, reasons = aggregate_repo_analyst(bad)
