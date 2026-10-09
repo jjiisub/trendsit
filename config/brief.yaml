@@ -43,13 +43,9 @@ cluster:
     weeks_back: 4
 
 select:
-  max_candidates: 20                # 편집장 입력 상한(코드 순서 상위)
-  # 설계 결정 C-21(PR #9 리뷰): 순서 = 관심 키워드 유사도 구간 → 출처 수 → 수치 유무 → 키워드 추세. 토픽 순서도 코드가 정함
-  # 2026-10-10 사용자 결정: 보류(mode score). 미리보기에서 큰 발표가 밀림(W40 지난 선정 11개 중 5개만 상위 20,
-  # Introducing dots 44위, Claude Sonnet 5.5 109위). reports/S5_brief/select_order_<week>.md
-  order:
-    mode: score                     # score: 묶기 점수 순, 편집장이 순서 / similarity: C-21(코드가 순서)
-    sim_band: 0.05                  # similarity 모드의 유사도 구간 폭(모든 채널 "제목 + 요약" 임베딩 ↔ 관심사 쿼리 코사인 최댓값)
+  max_candidates: 20                # 편집장 입력 상한(묶기 점수 상위, 동점이면 관심 유사도 높은 순: 설계 결정 C-21 수정 2026-10-10)
+  # C-21 원안(유사도 구간 먼저, 코드가 순서)은 미리보기에서 큰 발표가 밀려 취소(W40 지난 선정 11개 중 5개만 상위 20).
+  # 토픽 순서는 편집장. 비교 표 reports/S5_brief/select_order_<week>.md
   # 설계 결정 C-20: 관련성 relevance_min 이상 영상 묶음이 입력에 있으면 영상 묶음 토픽 최소 min개
   video_slot:
     min: 1

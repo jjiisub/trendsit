@@ -71,16 +71,10 @@ class VideoSlotCfg(_Strict):
     relevance_min: float = Field(ge=0, le=1)
 
 
-class OrderCfg(_Strict):
-    mode: Literal["score", "similarity"]
-    sim_band: float = Field(gt=0, le=1)
-
-
 class SelectCfg(_Strict):
     max_candidates: int = Field(ge=1)
     topics: TopicsCfg
     video_slot: VideoSlotCfg
-    order: OrderCfg
     lead: Literal[1]
     featured_repos_max: int = Field(ge=0)
 

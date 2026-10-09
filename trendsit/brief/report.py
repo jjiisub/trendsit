@@ -236,8 +236,10 @@ def write_cluster_report(stage: ClusterStage, cfg: BriefConfig, note: str = "") 
     return path
 
 
-def _merge_csv(path: Path, key: tuple[str, ...], cols: list[str], rows: list[dict[str, Any]], keep: tuple[str, ...]) -> None:
-    """라벨 시트를 다시 만들 때 이미 채운 라벨 칸(keep)은 같은 열쇠의 행에 보존한다."""
+def _merge_csv(path: Path, key: tuple[str, ...], cols: list[str], rows: list[dict[str, Any]], keep: tuple[str, ...],
+               other_week: str | None = None) -> None:
+    """라벨 시트를 다시 만들 때 이미 채운 라벨 칸(keep)은 같은 열쇠의 행에 보존한다. other_week를 주면 다른 주의
+    기존 행은 그대로 남긴다(W40·W41을 차례로 돌려도 앞 주 라벨이 지워지지 않게)."""
     old: dict[tuple[str, ...], dict[str, str]] = {}
     if path.exists():
         with path.open(encoding="utf-8") as f:
@@ -246,6 +248,10 @@ def _merge_csv(path: Path, key: tuple[str, ...], cols: list[str], rows: list[dic
     with path.open("w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=cols)
         w.writeheader()
+        if other_week:
+            for r in old.values():
+                if r.get("week") != other_week:
+                    w.writerow({c: r.get(c, "") for c in cols})
         for r in rows:
             prev = old.get(tuple(str(r[k]) for k in key), {})
             w.writerow(r | {k: prev.get(k, "") for k in keep})
@@ -265,6 +271,6 @@ def write_label_sheets(stage: ClusterStage) -> list[Path]:
     als = [{"canonical": r.canonical, "alias": r.alias, "status": r.status, "reason": r.reason,
             "evidence": " ".join(r.evidence[:5])} for r in stage.aliases.rows if r.keyword_id is None]
     out = [LABELS / "decide.csv", LABELS / "aliases.csv"]
-    _merge_csv(out[0], ("week", "a", "b"), dec_cols, dec, keep)
+    _merge_csv(out[0], ("week", "a", "b"), dec_cols, dec, keep, other_week=res.week)
     _merge_csv(out[1], ("canonical", "alias"), al_cols, als, keep)
     return out

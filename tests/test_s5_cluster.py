@@ -217,3 +217,24 @@ def test_build_pairs_real_routes_including_name_path():
     assert route[("it:1", "it:3")][0] == "none"  # 회사 이름(OpenAI)만 공유는 generic, 이름 공유 없음
     assert route[("it:1", "vd:A")] == ("decide", "name")  # 채널 넘음도 이름 경로
     assert route[("it:1", "it:4")][0] == "auto"
+
+
+def test_label_sheet_keeps_other_weeks_rows(tmp_path):
+    """W40·W41을 차례로 돌려도 앞 주 decide 라벨이 지워지지 않는다(PR #9 리뷰 반영 재실행)."""
+    import csv
+
+    from trendsit.brief.report import _merge_csv
+
+    p = tmp_path / "decide.csv"
+    cols = ["week", "a", "b", "answer", "label", "critique", "labeler"]
+    keep = ("label", "critique", "labeler")
+    _merge_csv(p, ("week", "a", "b"), cols, [{"week": "W41", "a": "x", "b": "y", "answer": "same"}], keep, "W41")
+    rows = list(csv.DictReader(p.open()))
+    rows[0]["label"] = "same"
+    with p.open("w", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=cols)
+        w.writeheader()
+        w.writerows(rows)
+    _merge_csv(p, ("week", "a", "b"), cols, [{"week": "W40", "a": "m", "b": "n", "answer": "diff"}], keep, "W40")
+    got = {(r["week"], r["a"], r["label"]) for r in csv.DictReader(p.open())}
+    assert got == {("W41", "x", "same"), ("W40", "m", "")}

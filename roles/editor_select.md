@@ -75,9 +75,8 @@ core_rules:
 1. `decisions[]`: 모든 후보마다 `{cluster_id, reason, action(select/drop), drop_reason?}`. select는 topics에 넣는 후보에만 쓴다(합친 후보 포함). 기준은 맞지만 토픽 수 상한 때문에 넣지 못한 후보는 drop, drop_reason other, reason에 '토픽 수 상한'. reason은 입력 값(채널 수, 근거 수, 제목, relevance, 과거 대조 후보)만 인용한 한 줄. 입력에 없는 사실(예: 없는 원본 종류, 없는 영상)을 쓰지 않는다
 2. `splits[]`: `{cluster_id, groups: [[근거 키...], ...], reason}`. 없으면 빈 목록
 3. `topics[]`: `{cluster_ids, rank, lead, relation: {type, topic_id?}, relation_reason, angle, slug_hint}`. slug_hint는 영문 소문자 2~3단어(하이픈), 고유명사 중심(예: "jev-local", "pi-durable")
-4. `lead_reason`: 빈 문자열(코드 순서를 쓰는 설정에서만 씀)
-5. `featured_repos[]`: 홈에 올릴 레포 이름 순서(관련 높은 것, 최대 5)
-6. `log`: 한 줄 명사형(예: "후보 12개 중 6개 선정, 후속 2, 고객 사례 2개 제외"), `attention`
+4. `featured_repos[]`: 홈에 올릴 레포 이름 순서(관련 높은 것, 최대 5)
+5. `log`: 한 줄 명사형(예: "후보 12개 중 6개 선정, 후속 2, 고객 사례 2개 제외"), `attention`
 
 ## 막혔을 때
 관심 주제 후보가 4개보다 적으면 있는 만큼만 고르고 attention을 true로, log에 "후보 부족"을 적는다. 기준을 낮춰 관심 밖 후보로 채우지 않는다.
@@ -87,7 +86,7 @@ core_rules:
 <example>
 보통: 후보 5개 중 4개 선정, 후속 1개
 입력: c3 "gpt-realtime-mini"(채널 2개: 글 2·영상 1, 과거 대조 없음), c5 "Jev 호환 서버"(채널 2개: 글 3·레포 2, 과거 대조 w41-jev-local 0.82), c7 "Barclays AI 도입"(채널 1개: 글 1, relevance mid), c8 "코딩 에이전트 하네스"(채널 2개: 글 2·영상 1), c11 "에이전트 평가 벤치"(채널 2개: 글 2·레포 1)
-출력(요지): decisions — c3 select "채널 2개(글 2·영상 1), 수치 있음" / c5 select "과거 대조 w41-jev-local, 호환 서버 검사 결과 새로 나옴" / c7 drop low_relevance "고객 사례 글 1건" / c8 select / c11 select. topics — c3 rank 1 lead, c5 rank 2 follow_up w41-jev-local, c8 rank 3, c11 rank 4. lead_reason "". log "후보 5개 중 4개 선정, 후속 1, 고객 사례 1개 제외"
+출력(요지): decisions — c3 select "채널 2개(글 2·영상 1), 수치 있음" / c5 select "과거 대조 w41-jev-local, 호환 서버 검사 결과 새로 나옴" / c7 drop low_relevance "고객 사례 글 1건" / c8 select / c11 select. topics — c3 rank 1 lead, c5 rank 2 follow_up w41-jev-local, c8 rank 3, c11 rank 4. log "후보 5개 중 4개 선정, 후속 1, 고객 사례 1개 제외"
 </example>
 <example>
 빈칸이 맞는 경우: 관심 후보가 3개뿐

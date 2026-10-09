@@ -40,8 +40,6 @@ def revision(changes: list[dict]) -> str:
 @pytest.fixture
 def week(tmp_path, monkeypatch):
     monkeypatch.setattr(briefing, "OUT", tmp_path / "out")
-    # 관심 유사도를 모두 같게: 코드 순서가 cluster_id 순(it:1~4)이 되어 모의 응답 순서와 맞음
-    monkeypatch.setattr(pipeline.cl, "interest_similarity", lambda *a, **k: {})
     ctx = make_ctx(tmp_path, FakeTransport([]), spec_cap=1.0)
     c = ctx.db.conn
     c.execute("INSERT INTO sources(id, channel, name) VALUES ('openai','text','OpenAI')")
@@ -67,7 +65,7 @@ def plan(cids: dict[str, int]) -> str:
                        "splits": [], "topics": [{"cluster_ids": [x], "rank": r, "lead": r == 1,
                                                  "relation": {"type": "new", "topic_id": None}, "relation_reason": "새",
                                                  "angle": "출시", "slug_hint": f"model {r}"} for r, x in enumerate(ids, 1)],
-                       "lead_reason": "테스트: 첫 후보를 리드로", "featured_repos": [], "log": "후보 4개 중 4개 선정",
+                       "featured_repos": [], "log": "후보 4개 중 4개 선정",
                        "attention": False}, ensure_ascii=False)
 
 

@@ -73,7 +73,7 @@ def run_weekly(week: str, ctx: Ctx, from_step: str = "cluster", only_topic: str 
     # ---------- select ----------
     t1 = time.monotonic()
     sims = cl.interest_similarity(db, list(ev.members.values()), embedder, [(x.keyword_id, x.text) for x in flt.interests])
-    cands = sel.load_candidates(db, cluster_run, ev, cfg.select.max_candidates, sims, cfg)
+    cands = sel.load_candidates(db, cluster_run, ev, cfg.select.max_candidates, sims)
     sites = [r["name"] for r in db.conn.execute("SELECT name FROM sources") if r["name"]]
     if from_step in ("cluster", "select"):
         sres = sel.select(ctx, cands, ev, cfg, sites)

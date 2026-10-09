@@ -57,6 +57,7 @@ def test_valid_plan_passes():
 @pytest.mark.parametrize("p,needle", [
     (plan([topic([1], 1, True), topic([2], 2, True), topic([3], 3), topic([4], 4)]), "lead가 2개"),
     (plan([topic([1], 1, True), topic([2], 2)]), "topics 개수 2개"),
+    (plan([topic([1], 1, True), topic([2], 3), topic([3], 4), topic([4], 5)]), "rank"),
     (plan([topic([1, 9], 1, True), topic([2], 2), topic([3], 3), topic([4], 4)]), "cluster_id 9"),
     (plan([topic([1], 1, True), topic([1, 2], 2), topic([3], 3), topic([4], 4)]), "토픽 2개에"),
     (plan([topic([1], 1, True), topic([3], 2, rel="follow_up", tid="w40-x"), topic([2], 3), topic([4], 4)]),
@@ -346,8 +347,8 @@ def test_r4_points_over_cap_are_truncated_from_the_back():
     assert not any(i.loc == "points" for i in r.issues)
 
 
-def _ordered(sims: dict[int, float], video: dict[int, float] | None = None) -> list[sel.Candidate]:
-    """C-21 순서 정보를 채운 후보(1~5). video: 영상 관련성이 있는 후보."""
+def _with_sims(sims: dict[int, float], video: dict[int, float] | None = None) -> list[sel.Candidate]:
+    """관심 유사도·영상 관련성을 채운 후보(1~5)."""
     out = []
     for c in CANDS:
         x = sel.Candidate(c.cluster_id, c.label, c.members, dict(c.channels), c.score, c.past, c.n_evidence,
@@ -355,39 +356,24 @@ def _ordered(sims: dict[int, float], video: dict[int, float] | None = None) -> l
         if x.video_sim is not None:
             x.channels = {"video": 1}
         out.append(x)
-    for i, c in enumerate(sorted(out, key=lambda c: sel.order_key(c, CFG.select.order.sim_band)), 1):
-        c.order = i
     return out
 
 
-def test_c21_order_key_band_then_sources():
-    a = sel.Candidate(1, "", ["it:1"], {}, 0, [], sim=0.74)
-    b = sel.Candidate(2, "", ["it:2", "it:3", "vd:A"], {}, 0, [], sim=0.71)  # 같은 구간(0.70~0.75), 출처 많음 → 앞
-    c = sel.Candidate(3, "", ["it:4"], {}, 0, [], sim=0.79)  # 더 높은 구간
-    d = sel.Candidate(4, "", ["it:5"], {}, 0, [], sim=0.95, low_only=True)  # low뿐 → 맨 아래
-    got = sorted([a, b, c, d], key=lambda x: sel.order_key(x, 0.05))
-    assert [x.cluster_id for x in got] == [3, 2, 1, 4]
-
-
-def test_c21_ranks_are_assigned_by_code_and_lead_reason(tmp_path):
-    from trendsit.core.db import DB
-
-    cands = _ordered({1: 0.6, 2: 0.9, 3: 0.7, 4: 0.8})
-    p = good()  # 리드 c1은 코드 순서 1위(c2)가 아님
-    assert any("lead_reason" in e for e in sel.validate(p, cands, CFG))
-    p = p.model_copy(update={"lead_reason": "글 2건, 이번 주 가장 큰 발표"})
-    assert sel.validate(p, cands, CFG) == []
-    applied = sel.apply(p, cands, "2026-W42", DB(tmp_path / "t.db"))
-    assert [(a.cluster_ids[0], a.rank) for a in applied] == [(1, 1), (2, 2), (4, 3), (3, 4)]  # 리드 1, 나머지 코드 순서
+def test_c21_revised_score_first_similarity_breaks_ties():
+    """C-21 수정(2026-10-10): 묶기 점수가 먼저, 동점일 때만 관심 유사도 높은 순(cluster_id 동점 깨기 대체)."""
+    a = sel.Candidate(1, "", ["it:1"], {}, 3119, [], sim=0.46)
+    b = sel.Candidate(2, "", ["it:2"], {}, 3119, [], sim=0.58)
+    c = sel.Candidate(3, "", ["it:3"], {}, 3219, [], sim=0.30)  # 점수가 높으면 유사도와 무관하게 앞
+    assert [x.cluster_id for x in sorted([a, b, c], key=sel.score_key)] == [3, 2, 1]
 
 
 def test_c20_video_slot_required_and_fallback_keeps_it():
-    cands = _ordered({1: 0.9, 2: 0.85, 3: 0.8, 4: 0.75, 5: 0.6}, video={5: 0.6})
+    cands = _with_sims({}, video={5: 0.6})
     p = plan([topic([1], 1, True), topic([2], 2, rel="follow_up", tid="w40-x"), topic([3], 3), topic([4], 4)])
     assert any("영상 묶음 토픽 0개" in e and "c5" in e for e in sel.validate(p, cands, CFG))
     ok = plan([topic([1], 1, True), topic([2], 2, rel="follow_up", tid="w40-x"), topic([3], 3), topic([5], 4)])
     assert sel.validate(ok, cands, CFG) == []
-    low = _ordered({1: 0.9, 2: 0.85, 3: 0.8, 4: 0.75, 5: 0.5}, video={5: 0.5})  # relevance_min 0.55 미만이면 자리 없음
+    low = _with_sims({}, video={5: 0.5})  # relevance_min 0.55 미만이면 자리 없음
     assert sel.validate(p, low, CFG) == []
     fb = sel.fallback_plan(cands, CFG, "x")
     assert 5 in {cid for t in fb.topics for cid in t.cluster_ids}
@@ -402,14 +388,3 @@ def test_r14_reason_channel_count_checked():
     p = plan([topic([1], 1, True)], decisions=[Decision(cluster_id=1, reason="근거 3건, 채널 3", action="select",
                                                         drop_reason=None)])
     assert any("채널 수 3" in x for x in sel.reason_mismatches(p, inp, []))
-
-
-def test_c21_held_score_mode_keeps_editor_rank(tmp_path):
-    """C-21 보류(mode score, 2026-10-10 사용자 결정): 후보는 점수 순, 순서는 편집장 rank(리드가 1). 영상 자리는 그대로."""
-    from trendsit.core.db import DB
-
-    assert CFG.select.order.mode == "score"
-    p = plan([topic([1], 2, True), topic([2], 1, rel="follow_up", tid="w40-x"), topic([3], 4), topic([4], 3)])
-    assert sel.validate(p, CANDS, CFG) == []  # order 정보 없음 → lead_reason 검사 안 함
-    applied = sel.apply(p, CANDS, "2026-W42", DB(tmp_path / "t.db"))
-    assert [(a.cluster_ids[0], a.rank) for a in applied] == [(1, 1), (2, 2), (4, 3), (3, 4)]

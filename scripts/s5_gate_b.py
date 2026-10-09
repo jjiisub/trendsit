@@ -30,9 +30,12 @@ from trendsit.core.style import EVAL_ENDINGS, ends_as_sentence, is_haeyo  # noqa
 
 LABELS = ROOT / os.environ.get("S5_LABELS", "eval/labels")  # 1차 라벨 스냅숏: eval/labels/s5_r1
 KEEP = ("label", "critique", "labeler")
+QCOLS = tuple(f"{q}_pass" for q in ("Q0", "Q1", "Q2", "Q3", "Q4"))
 
 
-def merge_csv(path: Path, key: tuple[str, ...], cols: list[str], rows: list[dict]) -> None:
+def merge_csv(path: Path, key: tuple[str, ...], cols: list[str], rows: list[dict], keep: tuple[str, ...] = KEEP) -> None:
+    """라벨 칸(keep)은 같은 열쇠이고 나머지 칸(출력)이 그대로인 행에만 옮긴다. 출력이 바뀐 행의 라벨은 그 출력의 것이
+    아니므로 비운다(이전 라벨은 eval/labels/s5_r1/ 스냅숏)."""
     old = {}
     if path.exists():
         with path.open(encoding="utf-8") as f:
@@ -42,7 +45,8 @@ def merge_csv(path: Path, key: tuple[str, ...], cols: list[str], rows: list[dict
         w.writeheader()
         for r in rows:
             prev = old.get(tuple(str(r[k]) for k in key), {})
-            w.writerow(r | {k: prev.get(k, "") for k in KEEP})
+            same = prev and all(str(r[c]) == prev.get(c, "") for c in cols if c not in keep)
+            w.writerow(r | {k: prev.get(k, "") if same else "" for k in keep})
 
 
 def style_violations(page: TopicPage) -> list[str]:
@@ -307,13 +311,16 @@ def main() -> int:
               "judge_facts": f"{(v.get('facts') or {}).get('supported')}/{(v.get('facts') or {}).get('total')}",
               **{f"{q}_pass": "" for q in ("Q0", "Q1", "Q2", "Q3", "Q4")}} for k, v in final.items()]
     if wrows:  # 최종판 라벨(Q0 = 근거 충실성: 모든 문장이 근거로 받쳐지나). 2차 라벨(D1-3)이 채움
-        merge_csv(LABELS / "writer.csv", ("topic_id",), list(wrows[0]) + list(KEEP), wrows)
+        merge_csv(LABELS / "writer.csv", ("topic_id",), list(wrows[0]) + list(KEEP), wrows, KEEP + QCOLS)
     dpath = LABELS / "diagram_labels.json"
     old = json.loads(dpath.read_text(encoding="utf-8")) if dpath.exists() else {}
     for k, v in diag.items():
+        o = old.get(k, {})
+        if o.get("numbers") != v["numbers"] or o.get("events") != v["events"]:
+            continue  # 도식이 바뀌면 라벨은 옮기지 않음
         for f in ("needed_numbers", "needed_events", "labeler", "critique"):
-            if old.get(k, {}).get(f) is not None:
-                v[f] = old[k][f]
+            if o.get(f) is not None:
+                v[f] = o[f]
     dpath.write_text(json.dumps(diag, ensure_ascii=False, indent=1), encoding="utf-8")
     print(path)
     return 0
