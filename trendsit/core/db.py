@@ -253,8 +253,11 @@ class DB:
                  now_kst()))
 
     def clear_trending(self, week: str) -> None:
+        """그 주 목록을 이번 수집으로 바꾸기 전에 지운다. 레포 카드가 이미 있는 레포 행은 남긴다(그 주 마지막 수집에서
+        빠져도 브리핑이 그 카드를 쓰므로 이전 수집판의 별 수를 보존, PR #9 리뷰 R9). 이번 목록에 있으면 값이 갱신된다."""
         with self.conn:
-            self.conn.execute("DELETE FROM repo_trending WHERE week=?", (week,))
+            self.conn.execute("DELETE FROM repo_trending WHERE week=? AND full_name NOT IN "
+                              "(SELECT full_name FROM repo_cards WHERE week=?)", (week, week))
 
     def save_trending(self, week: str, row: dict[str, Any], run_id: str) -> bool:
         """주차별 트렌딩 1행. 같은 주에 이미 있으면 수치만 갱신하고 False."""

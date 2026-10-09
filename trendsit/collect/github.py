@@ -86,7 +86,7 @@ class GithubCollector:
         if not rows:
             raise SourceFailed("트렌딩 0건: 페이지 구조가 바뀌었을 수 있음")
         week = iso_week(datetime.now(KST).date())
-        self.db.clear_trending(week)  # 같은 주에 다시 돌리면 이번 목록으로 바꾼다(빠진 레포 행이 남지 않게)
+        self.db.clear_trending(week)  # 같은 주에 다시 돌리면 이번 목록으로 바꾼다(빠진 레포 행은 카드가 있는 것만 남김)
         for row in rows:
             # 스펙 5.5: 설명, 토픽, README로 판정(이름은 넣지 않음). 설명을 제목 자리에(트렌딩 페이지에는 토픽이 없음)
             m = self.matcher.match(row["description"], None)

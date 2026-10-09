@@ -110,3 +110,17 @@ def test_truncated_output_is_detected_and_retried_once(tmp_path):
     assert "더 짧은 JSON" in t.bodies[1]["messages"][-1]["content"]
     steps = ctx.db.steps_of(ctx.tracer.run_id)
     assert all(s["text"].startswith("출력 잘림") for s in steps)
+
+
+def test_r9_clear_trending_keeps_repos_with_cards(tmp_path):
+    """그 주 마지막 수집에서 빠진 레포라도 카드가 있으면 이전 수집판 행(별 수)을 남긴다(PR #9 리뷰 R9)."""
+    from trendsit.core.db import DB
+
+    db = DB(tmp_path / "t.db")
+    for name, stars in (("a/carded", 3690), ("b/plain", 10)):
+        db.save_trending("2026-W41", {"full_name": name, "rank": 1, "stars_this_week": stars}, "r1")
+    db.conn.execute("INSERT INTO repo_cards(week, full_name, card_json) VALUES ('2026-W41', 'a/carded', '{}')")
+    db.conn.commit()
+    db.clear_trending("2026-W41")
+    left = db.conn.execute("SELECT full_name, stars_this_week FROM repo_trending").fetchall()
+    assert [tuple(r) for r in left] == [("a/carded", 3690)]
