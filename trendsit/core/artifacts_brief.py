@@ -246,6 +246,21 @@ class TopicPage(RoleOutput):
         return self
 
 
+def loc_lines(page: TopicPage) -> list[str]:
+    """위치 이름이 붙은 줄(번호 0부터). 검수자·수정이 위치를 1부터 세던 문제(W40·W41 평가 13/13)를 입력에서 막는다."""
+    out = [f"title: {page.title}", f"summary: {page.summary}", f"overview: {page.overview}"]
+    out += [f"points[{i}]: {p.text} (refs {', '.join(p.refs)})" for i, p in enumerate(page.points)]
+    for i, g in enumerate(page.numbers):
+        out.append(f"numbers[{i}] (anchor {g.anchor}): {g.title} / context: {g.context}")
+        out += [f"numbers[{i}].items[{j}]: {it.label} = {it.value} ({it.ref})" for j, it in enumerate(g.items)]
+    for i, g in enumerate(page.events):
+        out.append(f"events[{i}] (anchor {g.anchor}): {g.title} / context: {g.context}")
+        out += [f"events[{i}].items[{j}]: {it.date} {it.text} ({it.ref or it.topic_id})" for j, it in enumerate(g.items)]
+    out += [f"contributions[{i}]: [{c.channel}] {c.text}" for i, c in enumerate(page.contributions)]
+    out += [f"concepts[{i}]: {c.term} - {c.desc}" for i, c in enumerate(page.concepts)]
+    return out
+
+
 # ---------- writer_revise (작성자 수정: 고친 칸만) ----------
 # 검수자 이슈 7종 + format(코드 검사 반려: 분량, 필수 칸, 금지 표현, 도식 칸 규칙)
 IssueType = Literal["unsupported", "number_mismatch", "overclaim", "wrong_ref", "missing_key", "overuse",
@@ -265,6 +280,7 @@ class IndexedIssue(Issue):
 
 
 class WriterReviseInput(RoleInput):
+    loc_lines: list[str] = Field(default=[], description="previous를 위치 이름(loc)이 붙은 줄로 펼친 것")
     previous: TopicPage
     issues: list[IndexedIssue]
     evidence: list[Document] = Field(description="지적된 칸의 근거 원문만")
@@ -289,6 +305,7 @@ class TopicPageRevision(RoleOutput):
 
 # ---------- critic (검수자) ----------
 class CriticInput(RoleInput):
+    loc_lines: list[str] = Field(default=[], description="page를 위치 이름(loc)이 붙은 줄로 펼친 것. 이슈 loc은 이 이름 그대로")
     page: TopicPage
     evidence: list[Document] = Field(description="page의 refs가 가리키는 근거 원문만")
     angle: str

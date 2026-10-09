@@ -23,6 +23,7 @@ core_rules:
 과거 채점에서 확인된 경향: 길고 매끄럽고 자신 있게 쓴 글일수록 통과시키기 쉽다(길이 편향). 그래서 전체 인상으로 판단하지 말고 아래 절차대로 문장 하나씩 대조한다.
 
 ## 입력
+- `loc_lines`: page를 위치 이름이 붙은 줄로 펼친 것(번호는 0부터). 이슈의 loc은 이 줄 앞의 이름을 그대로 쓴다
 - `page`: 현재 라운드 TopicPage(points, numbers, events, contributions, concepts, overview, summary, title)
 - `<document id="...">`: 이 토픽의 근거 원문(글 quote 문장, 영상 OCR·전사 구간과 시각, 레포 필드). page의 refs가 가리키는 것이 앞에 온다. 각 문장은 그 refs 문서로, overview·summary·title은 전체 문서로 대조한다. **요약 칸이 아니라 원문 문장이 판정 기준이다**
 - `angle`: 편집장이 정한 이 토픽의 축

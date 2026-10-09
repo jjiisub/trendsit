@@ -215,7 +215,7 @@ def validate(plan: BriefingPlan, cands: list[Candidate], cfg: BriefConfig) -> li
 def reason_mismatches(plan: BriefingPlan, inp: EditorSelectInput, site_names: list[str]) -> list[str]:
     """reason 속 숫자·출처 이름이 그 후보 문서(또는 전체 입력)에 있는지(S3 editor_plan 교훈). 어긋나면 기록만."""
     docs = {d.id: d.text + " " + (d.title or "") for d in inp.candidates}
-    whole = " ".join(docs.values())
+    whole = inp.model_dump_json()  # 후보 문서 + keyword_trend + recent_topics + limits + 후보 id(c288 등)
     out = []
     for d in plan.decisions:
         doc = docs.get(f"c{d.cluster_id}", "")

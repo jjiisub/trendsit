@@ -131,11 +131,12 @@ graders.THRESHOLDS["critic"] = {"code_pass_all": False}
 
 # ---------- editor_select(코드 검증 100%, drop 이유 라벨 일치는 리뷰 라벨로) ----------
 def code_editor_select(inp: dict[str, Any], out: dict[str, Any], expect: dict[str, Any]) -> list[dict[str, Any]]:
-    from trendsit.brief.select import Candidate, reason_mismatches, validate
+    from trendsit.brief.select import Candidate, reason_mismatches, reconcile, validate
     from trendsit.core.artifacts_brief import BriefingPlan, EditorSelectInput
 
     cands = [Candidate(c["cluster_id"], "", c["members"], {}, 0, c.get("past", [])) for c in expect["candidates"]]
-    plan = BriefingPlan.model_validate(out)
+    raw = BriefingPlan.model_validate(out)
+    plan, _notes = reconcile(raw)  # decisions↔topics 맞춤은 코드 소유(pipeline과 같음). 원래 출력 어긋남은 aggregate에 기록
     errs = validate(plan, cands, config.load("brief.yaml"))
     mism = reason_mismatches(plan, EditorSelectInput.model_validate(inp), expect.get("sites", []))
     checks = [check("코드 검증 통과", not errs, "; ".join(errs)[:200]),
@@ -149,7 +150,17 @@ def code_editor_select(inp: dict[str, Any], out: dict[str, Any], expect: dict[st
     return checks
 
 
+def aggregate_editor_select(results: list[dict[str, Any]]) -> tuple[dict[str, Any], list[str]]:
+    from trendsit.brief.select import reconcile
+    from trendsit.core.artifacts_brief import BriefingPlan
+
+    rows = [r for r in results if r.get("output")]
+    raw_bad = sum(1 for r in rows if reconcile(BriefingPlan.model_validate(r["output"]))[1])
+    return {"decisions·topics 어긋남(원래 출력, 코드가 맞춤)": f"{raw_bad}/{len(rows)}"}, []
+
+
 graders.ROLE_CHECKS["editor_select"] = code_editor_select
+graders.AGGREGATES["editor_select"] = aggregate_editor_select
 graders.ROLE_STYLE_FIELDS["editor_select"] = ("log",)
 graders.THRESHOLDS["editor_select"] = {"code_pass_all": True}
 

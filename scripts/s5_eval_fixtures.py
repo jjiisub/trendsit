@@ -44,6 +44,7 @@ from trendsit.core.artifacts_brief import (  # noqa: E402
     TopicPage,
     WriterInput,
     WriterReviseInput,
+    loc_lines,
 )
 from trendsit.core.db import DB  # noqa: E402
 
@@ -134,7 +135,8 @@ def main() -> int:
             order = [e for e in refs_of(page) if e in t["pack"]] + [e for e in t["pack"] if e not in refs_of(page)]
             ev = [Document(id=e, source=t["pack"][e][0].source.get("site") or "", title=t["pack"][e][0].source.get("title"),
                            text=raw_evidence(db, e, t["pack"][e])) for e in order]
-            return CriticInput(page=page, evidence=ev, angle=t["topic"].angle, code_warnings=[], round=1).model_dump()
+            return CriticInput(loc_lines=loc_lines(page), page=page, evidence=ev, angle=t["topic"].angle,
+                               code_warnings=[], round=1).model_dump()
 
         if t["status"] == "passed":
             dump("critic", f"clean-{t['topic'].topic_id}", crit_inp(t["page"]), {"status": "pass"},
@@ -190,30 +192,44 @@ def main() -> int:
         page, pack = t["page"], t["pack"]
         if not page.points:
             continue
-        cases = [
-            ("number", [{"loc": "points[0]", "type": "number_mismatch", "evidence_id": (page.points[0].refs or [None])[0],
-                         "comment": "points[0]의 수치가 근거와 다름(근거 표기 그대로)", "hint": "근거 표기 그대로"}], "edit"),
-            ("delete", [{"loc": f"points[{len(page.points) - 1}]", "type": "unsupported", "evidence_id": None,
-                         "comment": f"points[{len(page.points) - 1}]의 내용이 근거 원문에 없음", "hint": "근거로 받칠 수 없으면 삭제"}],
-             "delete"),
-            ("overclaim-summary", [{"loc": "summary", "type": "overclaim", "evidence_id": None,
-                                    "comment": "summary의 평가 표현이 근거보다 셈", "hint": "근거가 말한 정도로"}], "edit"),
-        ]
-        name, issues, act = cases[rv % len(cases)]
-        ids = {i["evidence_id"] for i in issues if i["evidence_id"]} | {r for p in page.points[:1] for r in p.refs}
-        inp = WriterReviseInput(previous=page, issues=[IndexedIssue(idx=k, **x) for k, x in enumerate(issues)],
+        # 이슈가 실제로 맞도록 페이지에 오류를 심고 그 위치를 지적한다(첫 평가 때 멀쩡한 페이지에 이슈만 붙여 기대가 틀렸음)
+        kind = ("number", "delete", "overclaim-summary")[rv % 3]
+        if kind == "number":
+            m = mutate(page, pack, "number_mismatch")
+            if not m:
+                continue
+            page, loc = m
+            issues = [{"loc": loc, "type": "number_mismatch", "evidence_id": (page.points[int(loc[7:-1])].refs or [None])[0],
+                       "comment": f"{loc}의 수치가 근거와 다름", "hint": "근거 표기 그대로"}]
+            act = "edit"
+        elif kind == "delete":
+            m = mutate(page, pack, "unsupported")
+            page, loc = m  # type: ignore[misc]
+            issues = [{"loc": loc, "type": "unsupported", "evidence_id": None,
+                       "comment": f"{loc}의 '이용약관 조항에 따른 조치로 미국 사용자부터 적용'이 근거 원문에 없음",
+                       "hint": "근거에 있는 내용만 남기거나 삭제"}]
+            act = "edit"
+        else:
+            page = page.model_copy(update={"summary": "기술 역사상 가장 빠른 행보다. " + page.summary})
+            issues = [{"loc": "summary", "type": "overclaim", "evidence_id": None,
+                       "comment": "summary의 '기술 역사상 가장 빠른 행보'가 근거에 없는 평가", "hint": "근거가 말한 정도로"}]
+            act = "edit"
+        name = kind
+        ids = {i["evidence_id"] for i in issues if i["evidence_id"]} | {r for p in page.points for r in p.refs}
+        inp = WriterReviseInput(loc_lines=loc_lines(page), previous=page,
+                                issues=[IndexedIssue(idx=k, **x) for k, x in enumerate(issues)],
                                 evidence=[d for d in evidence_docs(pack) if d.id in ids], aliases=t["aliases"])
-        dump("writer_revise", f"{name}-{t['topic'].topic_id}", inp.model_dump(), {"action": act}, f"이슈 {name}")
+        dump("writer_revise", f"{name}-{t['topic'].topic_id}", inp.model_dump(), {"action": act}, f"이슈 {name}(오류를 심음)")
         rv += 1
     if done:
         t = done[0]
         page = t["page"]
-        trap = WriterReviseInput(previous=page, issues=[IndexedIssue(idx=0, loc="title", type="format", evidence_id=None,
+        trap = WriterReviseInput(loc_lines=loc_lines(page), previous=page, issues=[IndexedIssue(idx=0, loc="title", type="format", evidence_id=None,
                                                                      comment="title이 너무 김(30자 안팎)", hint="명사구로 줄임")],
                                  evidence=[], aliases=t["aliases"])
         dump("writer_revise", f"trap-only-title-{t['topic'].topic_id}", trap.model_dump(), {"action": "edit"},
              "함정: 제목만 지적, 다른 칸을 다듬고 싶어짐")
-        noev = WriterReviseInput(previous=page, issues=[IndexedIssue(idx=0, loc="points[0]", type="unsupported", evidence_id="it:0#q9",
+        noev = WriterReviseInput(loc_lines=loc_lines(page), previous=page, issues=[IndexedIssue(idx=0, loc="points[0]", type="unsupported", evidence_id="it:0#q9",
                                                                      comment="근거 원문 없음", hint="")],
                                  evidence=[], aliases=t["aliases"])
         dump("writer_revise", f"no-evidence-{t['topic'].topic_id}", noev.model_dump(), {},

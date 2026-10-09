@@ -33,6 +33,7 @@ from ..core.artifacts_brief import (
     TopicPageRevision,
     WriterInput,
     WriterReviseInput,
+    loc_lines,
 )
 from ..core.config_brief import BriefConfig
 from ..core.context import Ctx
@@ -299,7 +300,8 @@ def write_topic(ctx: Ctx, topic: Applied, members: dict[str, Member], table: Ali
             evid = [Document(id=e, source=pack[e][0].source.get("site") or pack[e][0].channel,
                              title=pack[e][0].source.get("title"), text=raw_evidence(ctx.db, e, pack[e]))
                     for e in order]
-            verdict, err, vsid = _call(critic, CriticInput(page=page, evidence=evid, angle=topic.angle,
+            verdict, err, vsid = _call(critic, CriticInput(loc_lines=loc_lines(page), page=page, evidence=evid,
+                                                           angle=topic.angle,
                                                            code_warnings=cr.warnings, round=rnd), ctx, res.costs, "critic")
             res.rounds.append(log)
             if verdict is None:
@@ -331,7 +333,7 @@ def write_topic(ctx: Ctx, topic: Applied, members: dict[str, Member], table: Ali
             res.final_round = rnd
             break
         flagged = {top_loc(i.loc) for i in live}
-        rinp = WriterReviseInput(previous=page, issues=[IndexedIssue(idx=i, **x.model_dump()) for i, x in enumerate(live)],
+        rinp = WriterReviseInput(loc_lines=loc_lines(page), previous=page, issues=[IndexedIssue(idx=i, **x.model_dump()) for i, x in enumerate(live)],
                                  evidence=[d for d in evidence_docs({k: v for k, v in pack.items()
                                                                      if k in {x.evidence_id for x in live} | set(
                                      r for loc in flagged for r in _loc_refs(page, loc))})],

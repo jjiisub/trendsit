@@ -157,7 +157,7 @@ def test_anchor_and_diagram_caps():
     g = NumberGroup(anchor=9, group="g", title="B가 가장 높음", context="같은 벤치 [it:1#q2]", unit="%",
                     items=[NumberItem(label="A", value="86.6%", ref="it:1#q2"), NumberItem(label="B", value="93.5%", ref="it:1#q2"),
                            NumberItem(label="C", value="81.2%", ref="it:1#q2")])
-    ev = EventGroup(anchor=2, title="t", context="c", items=[EventItem(date="10/6", text="x", ref="it:1#q1", topic_id=None)])
+    ev = EventGroup(anchor=2, title="t", context="c", items=[EventItem(date="10/6", text="x", ref="it:1#q1", topic_id=None)] * 3)
     issues = checks.run_checks(page(numbers=[g, g.model_copy(update={"anchor": 2}), g.model_copy(update={"anchor": 3})],
                                     events=[ev]), pack(), 2, CFG, {}).issues
     text = " ".join(i.comment for i in issues)
@@ -222,8 +222,11 @@ def test_diagram_warnings():
     assert any("누락 의심" in x for x in w) is False  # % 값 1개(수치 3개는 quote 안이라 kind=number 아님)
     two = NumberGroup(anchor=2, group="g", title="t", context="c [it:1#q2]", unit="%",
                       items=[NumberItem(label="A", value="86.6%", ref="it:1#q2"), NumberItem(label="B", value="93.5%", ref="it:1#q2")])
-    w2 = checks.run_checks(page(numbers=[two]), pack(), 2, CFG, {}).warnings
-    assert any("남발 의심" in x for x in w2)
+    r2 = checks.run_checks(page(numbers=[two]), pack(), 2, CFG, {})
+    assert r2.page.numbers == [] and any("그리는 조건" in f["rule"] for f in r2.autofix)  # 값 2개 + baseline 없음: 코드가 뺌
+    based = two.model_copy(update={"items": [two.items[0].model_copy(update={"baseline": True}), two.items[1]]})
+    kept = checks.run_checks(page(numbers=[based], summary="정확도가 93.5%로 올랐다."), pack(), 2, CFG, {})
+    assert len(kept.page.numbers) == 1  # 값 2개 + baseline + summary에 그 값: 그림
 
 
 def test_selected_but_not_in_topics_is_rejected():

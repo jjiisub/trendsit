@@ -84,6 +84,22 @@ def autofix(page: TopicPage, cfg: BriefConfig, canon: dict[str, str],
             fixes.append({"loc": "contributions", "rule": f"근거 채널 {sorted(channels)}에 맞게 contributions 정리",
                           "before": [c.model_dump() for c in page.contributions], "after": [c.model_dump() for c in keep]})
             page = page.model_copy(update={"contributions": keep})
+    # 0-1) 도식 그리는 조건(skills/diagrams.md): 맞지 않는 그룹은 빼고 포인트 문장만 남김
+    #   numbers: 값 3개 이상 / 또는 값 2개 + baseline + summary에 그 값이나 라벨이 나옴. events: 3개 이상 / 또는 2개 + flow_is_point
+    def drawable(g: Any) -> bool:
+        if len(g.items) >= 3:
+            return True
+        if len(g.items) == 2 and any(it.baseline for it in g.items):
+            return any(it.value in page.summary or it.label in page.summary for it in g.items)
+        return False
+
+    nums = [g for g in page.numbers if drawable(g)]
+    evs = [g for g in page.events if len(g.items) >= 3 or (len(g.items) == 2 and g.flow_is_point)]
+    if len(nums) != len(page.numbers) or len(evs) != len(page.events):
+        fixes.append({"loc": "numbers/events", "rule": "그리는 조건에 맞지 않는 도식 뺌(값 2개·사건 2개 등)",
+                      "before": [g.title for g in [*page.numbers, *page.events]],
+                      "after": [g.title for g in [*nums, *evs]]})
+        page = page.model_copy(update={"numbers": nums, "events": evs})
     # 1) 별칭 → 정본(긴 표기부터, 단어 경계가 애매한 한글은 그대로 치환)
     for loc, text in [*_text_slots(page), ("title", page.title)]:
         new = text
