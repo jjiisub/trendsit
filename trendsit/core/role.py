@@ -232,6 +232,7 @@ def run_role(role: Role, inp: RoleInput, ctx: Ctx) -> RoleOutput:
     alias = ctx.model or role.spec.model
     messages = initial_messages(role, inp)
     last_error = ""
+    truncated = False
     for attempt in range(ROLE_RETRIES + 1):
         try:
             res = ctx.llm.chat(alias, messages, schema=role.output_cls, max_tokens=role.spec.max_tokens,
@@ -247,12 +248,19 @@ def run_role(role: Role, inp: RoleInput, ctx: Ctx) -> RoleOutput:
                                           detail=enforce_detail(out, {"attempt": attempt + 1}))
             return out
         last_error = res.parse_error or "알 수 없는 검증 오류"
-        ctx.last_step_id = record_llm(ctx, role, res, text=f"스키마 검증 실패 ({attempt + 1}회)",
-                                      error=last_error, detail={"attempt": attempt + 1})
-        messages = [*messages, {"role": "assistant", "content": res.content or ""},
-                    {"role": "user", "content": f"직전 출력이 스키마 검증에 실패함: {last_error}\n"
-                                                "위 오류를 고친 JSON 하나로만 다시 출력할 것."}]
-    raise RoleFailed(f"{role.name}: 스키마 검증 {ROLE_RETRIES + 1}회 실패 ({last_error})")
+        cut = res.tokens_out is not None and res.tokens_out >= role.spec.max_tokens  # 출력 잘림(COMMON 6.1-9)
+        if cut:
+            last_error = f"출력 잘림(max_tokens {role.spec.max_tokens} 도달): {last_error}"
+        ctx.last_step_id = record_llm(ctx, role, res, text=f"{'출력 잘림' if cut else '스키마 검증 실패'} ({attempt + 1}회)",
+                                      error=last_error, detail={"attempt": attempt + 1, "truncated": cut})
+        if cut and truncated:  # 잘림은 한 번만 다시(같은 길이로 또 잘리면 더 돌려도 같음)
+            break
+        truncated = truncated or cut
+        retry = ("직전 출력이 길이 상한에서 잘림. 각 칸의 분량 규칙을 지켜 더 짧은 JSON 하나로 다시 출력할 것."
+                 if cut else f"직전 출력이 스키마 검증에 실패함: {last_error}\n위 오류를 고친 JSON 하나로만 다시 출력할 것.")
+        messages = [*initial_messages(role, inp), {"role": "user", "content": retry}] if cut else [
+            *messages, {"role": "assistant", "content": res.content or ""}, {"role": "user", "content": retry}]
+    raise RoleFailed(f"{role.name}: 스키마 검증 실패 ({last_error})")
 
 
 def run(role: Role, inp: RoleInput, ctx: Ctx) -> RoleOutput:

@@ -91,3 +91,22 @@ def test_numbers_module_shared():
     assert any(same(v, 1.2e6) for v in number_values("one point two million"))
     assert any(same(v, 1.2e6) for v in number_values("1.2M"))
     assert any(same(v, 3e8) for v in number_values("3억"))
+
+
+def test_truncated_output_is_detected_and_retried_once(tmp_path):
+    """COMMON 6.1-9: max_tokens에 닿아 잘린 출력은 '출력 잘림'으로 기록하고 한 번만 더(같은 길이면 또 잘림)."""
+    from tests.conftest import FakeTransport, make_ctx, response
+    from tests.test_role import INPUT
+    from trendsit.core.role import RoleFailed, load_role, run_role
+
+    models = config.load("models.yaml")
+    role = load_role("repo_oneliner", models)
+    cut = response('{"basis": "A tool', tokens=(100, role.spec.max_tokens))
+    t = FakeTransport([cut, cut, cut])
+    ctx = make_ctx(tmp_path, t)
+    with pytest.raises(RoleFailed, match="출력 잘림"):
+        run_role(role, INPUT, ctx)
+    assert t.calls == 2
+    assert "더 짧은 JSON" in t.bodies[1]["messages"][-1]["content"]
+    steps = ctx.db.steps_of(ctx.tracer.run_id)
+    assert all(s["text"].startswith("출력 잘림") for s in steps)

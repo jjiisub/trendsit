@@ -266,8 +266,8 @@ class Change(_Strict):
     issue_idx: int
     loc: str
     action: Literal["edit", "delete", "add"]
-    value: str | Point | NumberGroup | EventGroup | Contribution | Concept | None = Field(
-        description="그 위치의 새 값(writer와 같은 칸 형식). delete면 null")
+    value: str | Point | NumberGroup | EventGroup | Contribution | Concept | NumberItem | EventItem | None = Field(
+        description="그 위치의 새 값(writer와 같은 칸 형식, 하위 위치면 그 항목·글자). delete면 null")
 
 
 class TopicPageRevision(RoleOutput):

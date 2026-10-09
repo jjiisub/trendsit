@@ -6,7 +6,7 @@ output: BriefingPlan
 tools: []
 max_steps: 1
 max_depth: null
-max_tokens: 2500
+max_tokens: 4000
 temperature: 0.2
 includes: [skills/style_ko.md]
 task: "위 토픽 후보로 이번 주 브리핑에 넣을 토픽과 순서, 리드, 지난 토픽과의 관계를 정한다."

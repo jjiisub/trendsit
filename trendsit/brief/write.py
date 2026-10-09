@@ -46,6 +46,7 @@ from .select import Applied
 
 LOC = re.compile(r"^(title|summary|overview)$|^(points|numbers|events|contributions|concepts)\[(\d+)\]")
 LIST_LOC = re.compile(r"^(points|numbers|events|contributions|concepts)$")
+SUB_LOC = re.compile(r"^(numbers|events)\[(\d+)\]\.(items|context|title|unit)(?:\[(\d+)\])?$")
 FIELD_TYPES: dict[str, type] = {"points": Point, "numbers": NumberGroup, "events": EventGroup,
                                 "contributions": Contribution, "concepts": Concept}
 
@@ -196,6 +197,26 @@ def apply_revision(prev: TopicPage, rev: TopicPageRevision, allowed: set[str]) -
             continue
         if not m:
             notes.append(f"알 수 없는 위치 {ch.loc}")
+            continue
+        sub = SUB_LOC.match(normalize_loc(prev, ch.loc).strip())
+        if sub and not m.group(1):  # 하위 위치: numbers[i].items[j] / numbers[i].context·title / events[i].items[j]
+            name, i, field_, j = sub.group(1), int(sub.group(2)), sub.group(3), sub.group(4)
+            if i >= len(data[name]):
+                notes.append(f"{ch.loc}: 위치 없음")
+                continue
+            group = data[name][i]
+            if j is not None and field_ == "items":
+                k = int(j)
+                if ch.action == "delete" and k < len(group["items"]):
+                    group["items"].pop(k)
+                elif hasattr(ch.value, "model_dump") and k < len(group["items"]):
+                    group["items"][k] = ch.value.model_dump()
+                else:
+                    notes.append(f"{ch.loc}: 값 형식이 항목이 아님")
+            elif j is None and field_ in ("context", "title", "unit") and isinstance(ch.value, str):
+                group[field_] = ch.value
+            else:
+                notes.append(f"{ch.loc}: 바꿀 수 없는 하위 위치")
             continue
         if m.group(1):
             if ch.action == "edit" and isinstance(ch.value, str):

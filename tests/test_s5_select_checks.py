@@ -241,3 +241,20 @@ def test_reconcile_decisions_to_topics():
     fixed, notes = sel.reconcile(bad)
     assert sel.validate(fixed, CANDS, CFG) == [] and len(notes) == 2
     assert next(d for d in fixed.decisions if d.cluster_id == 5).drop_reason == "other"
+
+
+def test_revision_can_edit_sub_locations():
+    from trendsit.brief.write import apply_revision
+    from trendsit.core.artifacts_brief import Change, TopicPageRevision
+
+    g = NumberGroup(anchor=2, group="g", title="t", context="c [it:1#q2]", unit="%",
+                    items=[NumberItem(label="A", value="86.6%", ref="it:1#q2"), NumberItem(label="B", value="99%", ref="it:1#q2"),
+                           NumberItem(label="C", value="81.2%", ref="it:1#q2")])
+    p = page(numbers=[g])
+    rev = TopicPageRevision(changed=[
+        Change(issue_idx=0, loc="numbers[0].items[1]", action="edit",
+               value=NumberItem(label="B", value="93.5%", ref="it:1#q2")),
+        Change(issue_idx=1, loc="numbers[0].context", action="edit", value="같은 벤치 세 모델 [it:1#q2]")], log="l")
+    new, reverts, notes = apply_revision(p, rev, {"numbers[0]"})
+    assert new.numbers[0].items[1].value == "93.5%" and new.numbers[0].context.startswith("같은 벤치")
+    assert reverts == 0 and notes == []

@@ -6,7 +6,7 @@ output: TopicPage
 tools: []
 max_steps: 1
 max_depth: null
-max_tokens: 3000
+max_tokens: 5000
 temperature: 0.3
 includes: [skills/style_ko.md, skills/diagrams.md]
 task: "위 근거만으로 이 토픽의 토픽 페이지를 쓴다."

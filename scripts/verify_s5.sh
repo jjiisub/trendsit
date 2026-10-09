@@ -43,7 +43,7 @@ else
   fail A3 "$(grep FAIL "$TMP/cc" | head -3 | tr '\n' ' ')"
 fi
 
-pt A4 "공통 수정 5.1(명사 예외, ImageError 계열, 중첩 ImageFile 거부, ClassVar, 예산 기준값 위치, 수치 모듈)" tests/test_s5_common.py
+pt A4 "공통 수정 5.1(명사 예외, ImageError 계열, 중첩 ImageFile 거부, ClassVar, 예산 기준값 위치, 수치 모듈) + 출력 잘림 감지" tests/test_s5_common.py
 pt A5 "근거 목록(자격, 근거 id 형식, 입력 상한과 뺀 근거)" tests/test_s5_evidence.py -k "eligibility or v2 or cap_pack"
 pt A6 "정규화(표기 차이만 자동 승인, 숫자·버전 다른 쌍 후보 아님, name_pairs 전역 미반영)" tests/test_s5_evidence.py -k "version or spelling or name_pairs or decided"
 pt A7 "묶기(채널 넘는 조건, confidence 미달, 평균 연결, 레포만 묶음, 1개짜리, 재실행 run 보존)" tests/test_s5_cluster.py

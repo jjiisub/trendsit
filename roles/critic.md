@@ -6,7 +6,7 @@ output: ReviewVerdict
 tools: []
 max_steps: 1
 max_depth: null
-max_tokens: 3000
+max_tokens: 4000
 temperature: 0.0
 includes: []
 task: "위 토픽 페이지의 모든 문장을 원자 사실로 나눠 근거 원문과 하나씩 대조하고 통과 또는 반려를 판정한다."

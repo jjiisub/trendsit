@@ -55,6 +55,10 @@ def run_weekly(week: str, ctx: Ctx, from_step: str = "cluster", only_topic: str 
     if from_step == "cluster":
         stage = stage_cluster(week, ctx, cfg, embedder)
         ev, table, cluster_run = stage.evidence, stage.aliases, run_id
+        from .report import write_cluster_report, write_label_sheets
+
+        write_cluster_report(stage, cfg, note="weekly 실행의 묶기 단계")
+        write_label_sheets(stage)
         dur |= {"evidence": stage.seconds["evidence"] + stage.seconds["normalize"], "cluster": stage.seconds["cluster"]}
     else:
         ev = week_evidence(db, week)
