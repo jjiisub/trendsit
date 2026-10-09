@@ -186,14 +186,14 @@ def test_unknown_ref_and_single_source_contributions():
     p = page(points=[Point(text="근거 목록에 없는 id를 단 문장입니다 정말로", refs=["it:9#q1"]), *page().points[1:]],
              contributions=[Contribution(channel="text", text="x", refs=["it:1#q1"])])
     text_only = {k: v for k, v in pack().items() if not k.startswith("vd:")}
-    issues = checks.run_checks(p, text_only, 1, CFG, {}).issues
-    assert any(i.type == "wrong_ref" and "it:9#q1" in i.comment for i in issues)
-    assert any("근거 채널이 1개" in i.comment for i in issues)  # 글뿐인 토픽에 contributions
+    r = checks.run_checks(p, text_only, 1, CFG, {})
+    assert any(i.type == "wrong_ref" and "it:9#q1" in i.comment for i in r.issues)
+    assert r.page.contributions == [] and any(f["loc"] == "contributions" for f in r.autofix)  # 글뿐: 비움(반려 아님)
     wrong_ch = page(contributions=[Contribution(channel="github", text="레포 설명", refs=["it:1#q1"]),
                                    Contribution(channel="text", text="글 설명", refs=["it:1#q1"]),
                                    Contribution(channel="text", text="또 글 설명", refs=["it:1#q1"])])
-    msgs = " ".join(i.comment for i in checks.run_checks(wrong_ch, pack(), 2, CFG, {}).issues)
-    assert "채널 github의 근거가 이 토픽에 없음" in msgs and "채널 text이 겹침" in msgs
+    r2 = checks.run_checks(wrong_ch, pack(), 2, CFG, {})
+    assert [c.text for c in r2.page.contributions] == ["글 설명"] and r2.passed  # 없는 채널·겹친 채널 뺌
 
 
 def test_points_must_be_noun_form_and_summary_da():

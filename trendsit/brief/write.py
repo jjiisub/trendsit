@@ -45,6 +45,7 @@ from .evidence import EvidenceItem, Member, cap_pack
 from .select import Applied
 
 LOC = re.compile(r"^(title|summary|overview)$|^(points|numbers|events|contributions|concepts)\[(\d+)\]")
+LIST_LOC = re.compile(r"^(points|numbers|events|contributions|concepts)$")
 FIELD_TYPES: dict[str, type] = {"points": Point, "numbers": NumberGroup, "events": EventGroup,
                                 "contributions": Contribution, "concepts": Concept}
 
@@ -190,6 +191,9 @@ def apply_revision(prev: TopicPage, rev: TopicPageRevision, allowed: set[str]) -
             notes.append(f"지적 안 된 위치 {ch.loc} 변경 되돌림")
             continue
         m = LOC.match(loc)
+        if not m and LIST_LOC.match(loc) and ch.action == "delete":
+            data[loc] = []  # 칸 전체 비우기(예: numbers 그룹을 문장으로 옮길 때)
+            continue
         if not m:
             notes.append(f"알 수 없는 위치 {ch.loc}")
             continue

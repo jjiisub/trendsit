@@ -69,9 +69,21 @@ def _set(page: TopicPage, loc: str, text: str) -> TopicPage:
     return page.model_copy(update={"points": pts})
 
 
-def autofix(page: TopicPage, cfg: BriefConfig, canon: dict[str, str]) -> tuple[TopicPage, list[dict[str, Any]]]:
+def autofix(page: TopicPage, cfg: BriefConfig, canon: dict[str, str],
+            channels: set[str] | None = None) -> tuple[TopicPage, list[dict[str, Any]]]:
     hl = cfg.write.highlights
     fixes: list[dict[str, Any]] = []
+    # 0) contributions: 근거 채널이 2개 이상일 때만, 그 채널만, 채널마다 1문장(넘치는 것은 뺌)
+    if channels is not None and page.contributions:
+        keep, seen = [], set()
+        for c in page.contributions:
+            if len(channels) >= 2 and c.channel in channels and c.channel not in seen:
+                keep.append(c)
+                seen.add(c.channel)
+        if keep != page.contributions:
+            fixes.append({"loc": "contributions", "rule": f"근거 채널 {sorted(channels)}에 맞게 contributions 정리",
+                          "before": [c.model_dump() for c in page.contributions], "after": [c.model_dump() for c in keep]})
+            page = page.model_copy(update={"contributions": keep})
     # 1) 별칭 → 정본(긴 표기부터, 단어 경계가 애매한 한글은 그대로 치환)
     for loc, text in [*_text_slots(page), ("title", page.title)]:
         new = text
@@ -132,7 +144,6 @@ def _numbers_ok(text: str, ids: list[str], pack: dict[str, list[EvidenceItem]]) 
 
 
 def check(page: TopicPage, pack: dict[str, list[EvidenceItem]], n_sources: int, cfg: BriefConfig) -> list[Issue]:
-    channels = {it.channel for items in pack.values() for it in items}
     w = cfg.write
     issues: list[Issue] = []
     for name in ("title", "summary", "overview"):
@@ -221,18 +232,6 @@ def check(page: TopicPage, pack: dict[str, list[EvidenceItem]], n_sources: int, 
                 issues.append(_issue(f"events[{g_i}].items[{it_i}]", "wrong_ref", "사건에 근거 id나 지난 토픽 id가 없음", ""))
     if len(page.concepts) > w.concepts_max:
         issues.append(_issue("concepts", "format", f"concepts {len(page.concepts)}개(최대 {w.concepts_max})", ""))
-    if page.contributions and len(channels) < 2:
-        issues.append(_issue("contributions", "format", f"근거 채널이 {len(channels)}개({', '.join(sorted(channels))})인데 "
-                             "contributions가 있음(채널이 2개 이상일 때만, 채널마다 1문장)", "contributions를 비움"))
-    else:
-        seen_ch: set[str] = set()
-        for i, c in enumerate(page.contributions):
-            if c.channel not in channels:
-                issues.append(_issue(f"contributions[{i}]", "format", f"contributions[{i}] 채널 {c.channel}의 근거가 이 토픽에 없음",
-                                     f"근거 채널({', '.join(sorted(channels))})만"))
-            if c.channel in seen_ch:
-                issues.append(_issue(f"contributions[{i}]", "format", f"contributions[{i}] 채널 {c.channel}이 겹침", "채널마다 1문장"))
-            seen_ch.add(c.channel)
     # 명사형 칸: 포인트, 소스별 기여, 개념 풀이(skills/style_ko.md). 요약·개요는 "~다"
     for loc, text in [*[(f"points[{i}]", p.text) for i, p in enumerate(page.points)],
                       *[(f"contributions[{i}]", c.text) for i, c in enumerate(page.contributions)],
@@ -299,5 +298,5 @@ def warnings(page: TopicPage, pack: dict[str, list[EvidenceItem]], cfg: BriefCon
 
 def run_checks(page: TopicPage, pack: dict[str, list[EvidenceItem]], n_sources: int, cfg: BriefConfig,
                canon: dict[str, str]) -> CheckResult:
-    fixed, fixes = autofix(page, cfg, canon)
+    fixed, fixes = autofix(page, cfg, canon, {it.channel for items in pack.values() for it in items})
     return CheckResult(fixed, fixes, check(fixed, pack, n_sources, cfg), warnings(fixed, pack, cfg))
