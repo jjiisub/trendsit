@@ -31,6 +31,7 @@ pytest 실패 5건(0단계 시점, 모두 handoff 묶음이 원인): 새 역할 
 ### 원격 브랜치 정리
 - `git branch -r --merged origin/main` 기준 병합된 7개(s0-foundation, docs-readme-skeleton, s1-collect, s2-0-base, s2-s3, s4-video, p1-env)는 삭제함. 자동 모드가 `push --delete`를 막아 사용자가 직접 실행
 - **`docs-s2s4-handoff`는 남김**: PR #4가 스쿼시 병합(3b024bf)이라 git 기준으로는 병합으로 나오지 않는다. 스펙 규칙(병합 안 된 것은 지우지 말고 보고)대로 두었다. 내용은 main에 있으므로 지워도 된다
+- 10/9 16:06 사용자가 `docs-s2s4-handoff`도 삭제. `git fetch --prune` 뒤 남은 원격 브랜치는 main, s5-brief뿐
 
 ### 임시 수집 로그
 | 실행 | 소스 성공 | 실패 | 트렌딩 |
@@ -56,7 +57,7 @@ pytest 실패 5건(0단계 시점, 모두 handoff 묶음이 원인): 새 역할 
 | 4 | `VideoSummary.ENFORCED_FIELDS = ("name_pairs",)` ClassVar. 채점기는 클래스 값을 등록. S5 새 출력 클래스도 ClassVar(`ReviewVerdict.ENFORCED_FIELDS`) |
 | 5 | judge 대상(원래 출력이 코드 채점 실패면 enforce 후 전체)과 통과 판정(코드 소유 칸만 enforce 후)의 차이를 `docs/DEVELOPMENT.md`와 품질 리포트 머리말에 |
 | 6 | `ImageError(LLMError)`. `LLMError`는 `core/errors.py`로 옮김(llm ↔ images 순환 방지, `core.llm.LLMError`는 그대로 쓸 수 있음). `check_roles`가 최상위가 아닌 ImageFile 칸(목록 안, 하위 모델 안)을 거부 |
-| 7 | `reports/eval/` 역할별 최신 1개: **삭제는 자동 모드가 막아 사용자 몫**(아래 "사용자 필요"). 지울 34개 목록은 계산해 둠. 남길 12개 = 역할·모델별 최신 전체 실행 + 라벨 파일이 가리키는 실행(일치율 재현용) |
+| 7 | `reports/eval/` 역할별 최신 1개: 삭제는 자동 모드가 막아 사용자가 실행(3단계 끝 절). 34개 삭제. 남길 12개 = 역할·모델별 최신 전체 실행 + 라벨 파일이 가리키는 실행(일치율 재현용) |
 | 8 | (선택) 하지 않음 |
 | 9 | 수치 정규화를 `core/numbers.py`로(S4 `video/align.py`에서 옮김). S4 대조와 S5 코드 검사가 같이 씀 |
 | 10 | 검토 결과 그대로 둠: video_summary 입력의 판독 문서 id가 `vd:{item_id}@{sec}`라 메시지에 item_id가 들어가고, 근거 id 형식은 바꾸지 않으므로 캐시 키에서 뺄 수 없다. 이번에 한 번 재생성 |
@@ -132,9 +133,6 @@ pytest 실패 5건(0단계 시점, 모두 handoff 묶음이 원인): 새 역할 
 - 묶음 점수: (3 − 최고 relevance 등급)×1000 + 그 등급 항목 수×100 + 채널 수×10 + 근거 id 수(최대 9) + 키워드 추세. 관련성이 먼저고 나머지는 같은 관련성 안 순서
 - 편집장 계획 큐가 이미 더 깊게 처리한 영상(whisper+slides digest)을 whisper로 다시 처리하려 하면 실행하지 않았다(digest를 얕은 결과로 덮어쓰지 않게). S6 nightly에서 "이미 같은 깊이 이상 digest가 있으면 건너뜀"을 코드로 넣기를 제안
 
-### [사용자 필요] 자동 모드가 막은 것
-- `reports/eval/` 정리(5.1-7, E10): `git rm`이 막혔다. 지울 34개(역할·모델별 최신 전체 실행과 라벨이 가리키는 실행만 남김):
-```
-git rm reports/eval/editor_plan_generate_20261008-122719.json reports/eval/editor_plan_generate_20261008-183430.json reports/eval/item_card_generate_20261008-105652.json reports/eval/item_card_generate_20261008-111105.json reports/eval/item_card_generate_20261008-113213.json reports/eval/item_card_generate_20261008-114316.json reports/eval/item_card_generate_20261008-120230.json reports/eval/item_card_generate_20261008-120344.json reports/eval/item_card_generate_20261008-152008.json reports/eval/repo_analyst_generate_20261008-164718.json reports/eval/repo_analyst_generate_20261008-165334.json reports/eval/repo_analyst_generate_20261008-182928.json reports/eval/repo_oneliner_generate_20261007-153955.json reports/eval/repo_oneliner_generate_20261007-154045.json reports/eval/repo_oneliner_generate_20261007-154143.json reports/eval/repo_oneliner_generate_20261007-155746.json reports/eval/repo_oneliner_generate_20261007-165425.json reports/eval/repo_oneliner_generate_20261007-165530.json reports/eval/repo_oneliner_generate_20261007-165657.json reports/eval/repo_oneliner_generate_20261007-220820.json reports/eval/repo_oneliner_generate_20261008-071529.json reports/eval/repo_oneliner_generate_20261008-104252.json reports/eval/repo_oneliner_generate_20261008-140318.json reports/eval/repo_oneliner_judge_20261007-154252.json reports/eval/text_analyst_generate_20261008-122802.json reports/eval/text_analyst_generate_20261008-185127.json reports/eval/text_analyst_generate_20261008-185514.json reports/eval/text_analyst_generate_20261008-191228.json reports/eval/text_analyst_generate_20261009-001826.json reports/eval/video_summary_generate_20261008-135012.json reports/eval/video_summary_generate_20261008-135824.json reports/eval/video_summary_generate_20261008-140606.json reports/eval/video_summary_generate_20261008-140800.json reports/eval/video_summary_generate_20261008-153823.json
-```
-- 원격 `docs-s2s4-handoff` 브랜치(스쿼시 병합, 0단계)
+### 자동 모드가 막은 것: 처리 완료(사용자 실행, 2026-10-09)
+- `reports/eval/` 정리(5.1-7, E10): 사용자가 34개를 `git rm`, 커밋 `chore(s5): reports/eval 역할별 최신 1개만 남김(E10)`. 남은 것은 남길 목록 12개 + 그 뒤 S5 실행 2개(item_card `140559`, decide `141903`)
+- 원격 `docs-s2s4-handoff` 삭제(사용자)
