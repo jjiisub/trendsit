@@ -1,0 +1,47 @@
+# S5 주간 브리핑 조정값 (설계 세션 초안 2026-10-09, S5 스펙 소유: 코드 세션이 고칠 수 있고 바꾼 값은 리포트에)
+# 멈춤 지점(묶기 리포트) 뒤 리뷰 세션이 정한 값으로 바꾼다: cluster.thresholds, select.topics.max
+
+evidence:
+  max_tokens_per_topic: 8000        # 토픽당 근거 목록 상한(대략). 넘치면 관련성 → 채널 다양성 → 출처 균형 순으로 고름
+  max_refs_per_point: 3
+
+aliases:
+  auto_approve: [case, space, hyphen, dot]   # 표기 차이만 자동 승인
+  fuzz_min_score: 90                # rapidfuzz 후보 최소 점수(숫자·버전이 다르면 점수와 무관하게 후보 아님)
+
+cluster:
+  thresholds:
+    auto: 0.80                      # 임시값. 같은 채널 쌍은 이 이상이면 자동 묶음
+    border: 0.65                    # 임시값. border~auto 사이는 decide. 채널을 넘는 쌍은 키워드·별칭 공유 + border 이상이면 decide
+  linkage: average
+  max_cluster_size: 12
+  decide:
+    max_calls_per_week: 60
+    min_confidence: 0.6
+  past:
+    top_k: 3
+    weeks_back: 4
+
+select:
+  max_candidates: 20                # 편집장 입력 상한(관련성 우선 점수)
+  topics:
+    min: 4
+    max: 10                         # 채울 목표가 아니라 상한. 멈춤 지점에서 7·10·12 중 확정
+  lead: 1
+  featured_repos_max: 5
+
+write:
+  points: {single_source: [2, 3], multi_source: [3, 6]}
+  overview_sentences: [2, 4]
+  summary_sentences: [1, 3]
+  highlights: {summary: 1, overview: 1, per_point: 1, page: [3, 4]}
+  diagrams: {numbers_groups_max: 2, events_groups_max: 1, per_point_max: 1}
+  concepts_max: 3
+
+review:
+  max_rounds: 3                     # 초안 1 + 수정 2. 코드 반려도 셈
+  same_issue_repeat_to_check: 2     # 같은 위치·같은 이슈가 2번 남으면 check 확정
+  duplicate_point_similarity: 0.8
+
+runtime:
+  weekly_target_minutes: 90
