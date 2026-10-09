@@ -46,7 +46,7 @@ core_rules:
 
 ## 출력
 고친 칸만 낸다. 페이지 전체를 다시 쓰지 않는다(시간이 들고, 지적되지 않은 문장이 바뀔 위험이 커진다). 코드가 이전 판에 합친다.
-1. `changed[]`: {issue_idx, loc, action(edit/delete/add), value} — 고친 위치마다 하나. value는 그 위치의 새 값(points 항목이면 {text, refs}, summary면 문장, delete면 비움). writer와 같은 칸 형식
+1. `changed[]`: {issue_idx, loc(이슈의 loc 그대로, 번호는 0부터), action(edit/delete/add), value} — 고친 위치마다 하나. value는 그 위치의 새 값(points 항목이면 {text, refs}, summary면 문장, delete면 비움). writer와 같은 칸 형식
 2. `log`: 한 줄 명사형(예: "이슈 3개 중 수정 2, 삭제 1"), `attention`: 근거로 해결할 수 없는 이슈가 있으면 true
 
 ## 막혔을 때

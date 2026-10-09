@@ -68,7 +68,7 @@ core_rules:
 
 ## 출력
 칸 순서대로 채운다.
-1. `decisions[]`: 모든 후보마다 `{cluster_id, reason, action(select/drop), drop_reason?}`. reason은 입력 값(채널 수, 근거 수, 제목, relevance, 과거 대조 후보)만 인용한 한 줄. 입력에 없는 사실(예: 없는 원본 종류, 없는 영상)을 쓰지 않는다
+1. `decisions[]`: 모든 후보마다 `{cluster_id, reason, action(select/drop), drop_reason?}`. select는 topics에 넣는 후보에만 쓴다(합친 후보 포함). 기준은 맞지만 토픽 수 상한 때문에 넣지 못한 후보는 drop, drop_reason other, reason에 '토픽 수 상한'. reason은 입력 값(채널 수, 근거 수, 제목, relevance, 과거 대조 후보)만 인용한 한 줄. 입력에 없는 사실(예: 없는 원본 종류, 없는 영상)을 쓰지 않는다
 2. `splits[]`: `{cluster_id, groups: [[근거 키...], ...], reason}`. 없으면 빈 목록
 3. `topics[]`: `{cluster_ids, rank, lead, relation: {type, topic_id?}, relation_reason, angle, slug_hint}`. slug_hint는 영문 소문자 2~3단어(하이픈), 고유명사 중심(예: "jev-local", "pi-durable")
 4. `featured_repos[]`: 홈에 올릴 레포 이름 순서(관련 높은 것, 최대 5)

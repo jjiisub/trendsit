@@ -43,7 +43,8 @@ def run_weekly(week: str, ctx: Ctx, from_step: str = "cluster", only_topic: str 
     db, tr = ctx.db, ctx.tracer
     assert tr is not None
     run_id = tr.run_id
-    db.conn.execute("UPDATE runs SET week=? WHERE id=?", (week, run_id))
+    with db.conn:  # 바로 커밋(열린 쓰기 트랜잭션이 LLM 호출 내내 DB를 잠그지 않게)
+        db.conn.execute("UPDATE runs SET week=? WHERE id=?", (week, run_id))
     flt = config.load("filter.yaml")
     embedder = embedder or make_embedder("real", flt)
     dur: dict[str, float] = {}

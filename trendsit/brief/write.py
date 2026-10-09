@@ -167,12 +167,24 @@ def top_loc(loc: str) -> str:
     return m.group(1) or f"{m.group(2)}[{m.group(3)}]"
 
 
+def normalize_loc(page: TopicPage, loc: str) -> str:
+    """모델이 위치를 1부터 세면(마지막 다음 번호, 예: 항목 2개인데 [2]) 0부터로 바로잡는다. 그 밖은 그대로."""
+    m = LOC.match(loc.strip())
+    if not m or m.group(1):
+        return loc
+    name, idx = m.group(2), int(m.group(3))
+    n = len(getattr(page, name))
+    if n and idx == n:
+        return loc.replace(f"{name}[{idx}]", f"{name}[{idx - 1}]", 1)
+    return loc
+
+
 def apply_revision(prev: TopicPage, rev: TopicPageRevision, allowed: set[str]) -> tuple[TopicPage, int, list[str]]:
     """지적된 위치(최상위 칸 기준)만 합친다. 그 밖의 변경은 되돌림(세어 반환). 삭제는 뒤 번호부터."""
     data = prev.model_dump()
     reverts, notes, deletes = 0, [], []
     for ch in rev.changed:
-        loc = top_loc(ch.loc)
+        loc = top_loc(ch.loc if ch.action == "add" else normalize_loc(prev, ch.loc))
         if loc not in allowed and not (ch.action == "add" and loc.split("[")[0] in {a.split("[")[0] for a in allowed}):
             reverts += 1
             notes.append(f"지적 안 된 위치 {ch.loc} 변경 되돌림")
@@ -275,6 +287,8 @@ def write_topic(ctx: Ctx, topic: Applied, members: dict[str, Member], table: Ali
         if not issues:
             res.status, res.page, res.final_round = "passed", page, rnd
             break
+        # 위치 번호를 1부터 센 이슈는 0부터로(검수자가 contributions[2]로 두 번째 항목을 가리킨 사례)
+        issues = [i.model_copy(update={"loc": normalize_loc(page, i.loc)}) for i in issues]
         # 같은 위치·같은 유형이 두 번 남으면 확정(check) 후 제외
         live = []
         for it in issues:

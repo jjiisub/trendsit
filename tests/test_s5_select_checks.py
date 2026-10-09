@@ -185,9 +185,36 @@ def test_unknown_ref_and_single_source_contributions():
 
     p = page(points=[Point(text="근거 목록에 없는 id를 단 문장입니다 정말로", refs=["it:9#q1"]), *page().points[1:]],
              contributions=[Contribution(channel="text", text="x", refs=["it:1#q1"])])
-    issues = checks.run_checks(p, pack(), 1, CFG, {}).issues
+    text_only = {k: v for k, v in pack().items() if not k.startswith("vd:")}
+    issues = checks.run_checks(p, text_only, 1, CFG, {}).issues
     assert any(i.type == "wrong_ref" and "it:9#q1" in i.comment for i in issues)
-    assert any("contributions" in i.comment for i in issues)
+    assert any("근거 채널이 1개" in i.comment for i in issues)  # 글뿐인 토픽에 contributions
+    wrong_ch = page(contributions=[Contribution(channel="github", text="레포 설명", refs=["it:1#q1"]),
+                                   Contribution(channel="text", text="글 설명", refs=["it:1#q1"]),
+                                   Contribution(channel="text", text="또 글 설명", refs=["it:1#q1"])])
+    msgs = " ".join(i.comment for i in checks.run_checks(wrong_ch, pack(), 2, CFG, {}).issues)
+    assert "채널 github의 근거가 이 토픽에 없음" in msgs and "채널 text이 겹침" in msgs
+
+
+def test_points_must_be_noun_form_and_summary_da():
+    p = page(points=[Point(text="입력 100만 토큰당 $2로 이전보다 15% 저렴해졌다.", refs=["it:1#q1"]), *page().points[1:]],
+             summary="가격 인하 소식")
+    msgs = [i.comment for i in checks.run_checks(p, pack(), 2, CFG, {}).issues]
+    assert any("points[0]이 문장으로 끝남" in m for m in msgs) and any("summary이 '~다'로" in m for m in msgs)
+
+
+def test_writer_check_flags_are_reset_by_enforce():
+    p = page(points=[Point(text="입력 100만 토큰당 $2", refs=["it:1#q1"], check=True)])
+    out = p.enforce(None, None)
+    assert not out.points[0].check and out.enforced[0]["owned"] is True
+
+
+def test_one_based_issue_locations_are_normalized():
+    from trendsit.brief.write import normalize_loc
+
+    p = page()  # points 3개
+    assert normalize_loc(p, "points[3]") == "points[2]" and normalize_loc(p, "points[1]") == "points[1]"
+    assert normalize_loc(p, "summary") == "summary"
 
 
 def test_diagram_warnings():
@@ -197,3 +224,9 @@ def test_diagram_warnings():
                       items=[NumberItem(label="A", value="86.6%", ref="it:1#q2"), NumberItem(label="B", value="93.5%", ref="it:1#q2")])
     w2 = checks.run_checks(page(numbers=[two]), pack(), 2, CFG, {}).warnings
     assert any("남발 의심" in x for x in w2)
+
+
+def test_selected_but_not_in_topics_is_rejected():
+    p = good()
+    p = p.model_copy(update={"decisions": [d.model_copy(update={"action": "select", "drop_reason": None}) for d in p.decisions]})
+    assert any("select인데 topics에 없는" in e for e in sel.validate(p, CANDS, CFG))

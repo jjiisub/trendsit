@@ -205,6 +205,9 @@ def validate(plan: BriefingPlan, cands: list[Candidate], cfg: BriefConfig) -> li
     in_topics = {cid for t in plan.topics for cid in t.cluster_ids}
     if in_topics - selected:
         errs.append(f"topics에 있는데 decisions가 select가 아닌 후보: {sorted(in_topics - selected)}")
+    if selected - in_topics:
+        errs.append(f"decisions가 select인데 topics에 없는 후보: {sorted(selected - in_topics)}. "
+                    "토픽 수 상한을 넘으면 순서가 뒤인 후보를 drop(other)으로 두고 reason에 '토픽 수 상한'")
     return errs
 
 

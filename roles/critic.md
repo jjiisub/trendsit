@@ -57,7 +57,7 @@ core_rules:
 칸 순서대로 채운다.
 1. `atoms[]`: {loc, fact, evidence_id, supported(true/false)} — 모든 원자 사실
 2. `fact_support`: {total, supported} — atoms에서 센 값(코드가 다시 센다)
-3. `issues[]`: {loc, type, evidence_id, comment(한 줄, 무엇이 근거와 어떻게 다른지), hint(근거 표현 그대로 쓰라는 방향, 고친 문장 전체를 쓰지 않음)}
+3. `issues[]`: {loc(위치 번호는 0부터: points[0]이 첫 포인트), type, evidence_id, comment(한 줄, 무엇이 근거와 어떻게 다른지), hint(근거 표현 그대로 쓰라는 방향, 고친 문장 전체를 쓰지 않음)}
 4. `status`: pass / reject
 5. `log`: 한 줄 명사형(예: "원자 사실 18개 중 16개 지지, 단위 불일치 1, 근거 없음 1"), `attention`: reject면 true
 

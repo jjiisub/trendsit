@@ -79,7 +79,8 @@ def stage_cluster(week: str, ctx: Ctx, cfg: BriefConfig | None = None, embedder:
     db, tr = ctx.db, ctx.tracer
     assert tr is not None
     run_id = tr.run_id
-    db.conn.execute("UPDATE runs SET week=? WHERE id=?", (week, run_id))
+    with db.conn:  # 바로 커밋(열린 쓰기 트랜잭션이 LLM 호출 내내 DB를 잠그지 않게)
+        db.conn.execute("UPDATE runs SET week=? WHERE id=?", (week, run_id))
     t0 = time.monotonic()
     ev = week_evidence(db, week)
     n = ev.counts()

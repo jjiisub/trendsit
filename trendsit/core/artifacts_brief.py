@@ -6,7 +6,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal, Self
+from typing import TYPE_CHECKING, Any, Literal, Self
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -228,6 +228,13 @@ class TopicPage(RoleOutput):
     def fallback(cls, reason: str, inp: WriterInput) -> Self:
         return cls(points=[], numbers=[], events=[], contributions=[], concepts=[], overview="", summary="", title="",
                    log=f"작성 실패({reason})", attention=True)
+
+    def enforce(self, inp: Any, ctx: Ctx | None) -> Self:
+        """points[].check는 코드가 정하는 값(같은 이슈 두 번 → true). 작성자 출력의 check는 false로."""
+        if any(p.check for p in self.points):
+            return self.fix("points", [p.model_copy(update={"check": False}) for p in self.points],
+                            "check는 코드 소유(작성자 출력은 false)", owned=True)
+        return self
 
 
 # ---------- writer_revise (작성자 수정: 고친 칸만) ----------

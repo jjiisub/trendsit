@@ -51,8 +51,8 @@ pt A7 "묶기(채널 넘는 조건, confidence 미달, 평균 연결, 레포만 
 pt A8 "선별 검증(리드 1, 개수 범위, 범위 밖 합치기·나누기 거부, relation은 과거 대조 후보 안, 입력 순서 cluster_id, reason 값 대조, 재시도·대체)" \
   tests/test_s5_select_checks.py tests/test_s5_weekly.py -k "valid or reject or max_topics or order or reason or slug or retries"
 pt A9 "코드 검사(수치 대조·단위 환산 미허용, anchor, 도식 상한, 금지어, 자동 수정은 반려 아님, 경고)" \
-  tests/test_s5_select_checks.py -k "clean or number or anchor or forbidden or alias or unknown or warnings"
-pt A10 "라운드(상한 3, 코드 반려도 셈, 같은 이슈 2회 check, 지적 안 된 칸 되돌림)" tests/test_s5_weekly.py -k rounds
+  tests/test_s5_select_checks.py -k "clean or number or anchor or forbidden or alias or unknown or warnings or noun or reset"
+pt A10 "라운드(상한 3, 코드 반려도 셈, 같은 이슈 2회 check, 지적 안 된 칸 되돌림, 1부터 센 위치 바로잡기)" tests/test_s5_weekly.py tests/test_s5_select_checks.py -k "rounds or one_based"
 pt A11 "저장(마이그레이션 30~33, 재실행 run 보존·current_run_id, topic_evidence = 최종판 refs)" \
   tests/test_s5_weekly.py tests/test_s5_cluster.py -k "rounds or stage_cluster"
 pt A12 "실행 요약 JSON 형식과 표에서 다시 계산한 값 일치" tests/test_s5_weekly.py -k rounds
