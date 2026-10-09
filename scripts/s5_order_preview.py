@@ -30,7 +30,9 @@ def preview(db: DB, week: str, embedder, cfg) -> Path:
     ev = week_evidence(db, week)
     flt = config.load("filter.yaml")
     sims = cl.interest_similarity(db, list(ev.members.values()), embedder, [(x.keyword_id, x.text) for x in flt.interests])
-    allc = sel.load_candidates(db, cluster_run, ev, 10**6, sims, cfg)
+    sim_cfg = cfg.model_copy(update={"select": cfg.select.model_copy(update={
+        "order": cfg.select.order.model_copy(update={"mode": "similarity"})})})  # 설정이 score여도 C-21 순서로 미리보기
+    allc = sel.load_candidates(db, cluster_run, ev, 10**6, sims, sim_cfg)
     old = sorted(allc, key=lambda c: (-c.score, c.cluster_id))
     old_rank = {c.cluster_id: i for i, c in enumerate(old, 1)}
     plan = json.loads(db.conn.execute("SELECT plan_json FROM briefing_plans WHERE run_id=? ORDER BY id DESC LIMIT 1",

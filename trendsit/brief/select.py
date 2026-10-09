@@ -128,6 +128,9 @@ def load_candidates(db: DB, run_id: str, ev: WeekEvidence, limit: int, sims: dic
         c.low_only = all(m.relevance == "low" for m in ms)
         vids = [sims.get(m.key, 0.0) for m in ms if m.channel == "video"]
         c.video_sim = round(max(vids), 4) if vids else None
+    if cfg.select.order.mode == "score":  # C-21 보류: 묶기 점수 순, 순서는 편집장(영상 자리용 video_sim만 채움)
+        top = sorted(cands, key=lambda c: (-c.score, c.cluster_id))[:limit]
+        return sorted(top, key=lambda c: c.cluster_id)
     ranked = sorted(cands, key=lambda c: order_key(c, cfg.select.order.sim_band))
     for i, c in enumerate(ranked, 1):
         c.order = i
@@ -143,10 +146,11 @@ def candidate_doc(c: Candidate, members: dict[str, Member]) -> Document:
              f"채널 {len(c.channels)}개: " + ", ".join(f"{k}({CH_NOUN.get(k, k)} {v}건)" for k, v in c.channels.items()),
              f"출처(구성원) 수: {len(c.members)}", f"근거 수: {c.n_evidence}"]
     if c.order:
-        lines.append(f"관심 유사도: {c.sim} · 코드 순서: {c.order}위 · 수치 {'있음' if c.has_numbers else '없음'}"
-                     + (f" · 영상 관련성 {c.video_sim}" if c.video_sim is not None else ""))
+        lines.append(f"관심 유사도: {c.sim} · 코드 순서: {c.order}위 · 수치 {'있음' if c.has_numbers else '없음'}")
     else:
         lines.append(f"점수: {c.score}")
+    if c.video_sim is not None:
+        lines.append(f"영상 관련성: {c.video_sim}")
     lines.append("항목:")
     for k in c.members:
         m = members[k]

@@ -118,7 +118,7 @@ class Relation(_Strict):
 
 class PlannedTopic(_Strict):
     cluster_ids: list[int] = Field(min_length=1)
-    rank: int = Field(ge=1, description="참고용. 코드가 리드 1, 나머지 코드 순서로 다시 매김")
+    rank: int = Field(ge=1, description="1부터, 리드가 1(코드 순서 설정이면 코드가 다시 매김)")
     lead: bool
     relation: Relation
     relation_reason: str
@@ -130,7 +130,7 @@ class BriefingPlan(RoleOutput):
     decisions: list[Decision] = Field(description="모든 후보마다 하나. 가장 먼저 채움")
     splits: list[Split]
     topics: list[PlannedTopic]
-    lead_reason: str = Field(default="", description="리드가 코드 순서 1위 토픽이 아니면 그 이유(입력 값만), 1위면 빈 문자열")
+    lead_reason: str = Field(default="", description="코드 순서 설정에서 리드가 코드 순서 1위가 아니면 그 이유, 아니면 빈 문자열")
     featured_repos: list[str] = Field(description="홈에 올릴 레포 이름(최대 5)")
 
     @classmethod

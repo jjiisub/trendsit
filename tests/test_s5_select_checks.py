@@ -402,3 +402,14 @@ def test_r14_reason_channel_count_checked():
     p = plan([topic([1], 1, True)], decisions=[Decision(cluster_id=1, reason="근거 3건, 채널 3", action="select",
                                                         drop_reason=None)])
     assert any("채널 수 3" in x for x in sel.reason_mismatches(p, inp, []))
+
+
+def test_c21_held_score_mode_keeps_editor_rank(tmp_path):
+    """C-21 보류(mode score, 2026-10-10 사용자 결정): 후보는 점수 순, 순서는 편집장 rank(리드가 1). 영상 자리는 그대로."""
+    from trendsit.core.db import DB
+
+    assert CFG.select.order.mode == "score"
+    p = plan([topic([1], 2, True), topic([2], 1, rel="follow_up", tid="w40-x"), topic([3], 4), topic([4], 3)])
+    assert sel.validate(p, CANDS, CFG) == []  # order 정보 없음 → lead_reason 검사 안 함
+    applied = sel.apply(p, CANDS, "2026-W42", DB(tmp_path / "t.db"))
+    assert [(a.cluster_ids[0], a.rank) for a in applied] == [(1, 1), (2, 2), (4, 3), (3, 4)]

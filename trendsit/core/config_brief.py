@@ -72,6 +72,7 @@ class VideoSlotCfg(_Strict):
 
 
 class OrderCfg(_Strict):
+    mode: Literal["score", "similarity"]
     sim_band: float = Field(gt=0, le=1)
 
 
