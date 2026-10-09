@@ -320,7 +320,13 @@ def check(page: TopicPage, pack: dict[str, list[EvidenceItem]], n_sources: int, 
         if EMOJI.search(t):
             bad.append("이모지")
         if bad:
-            issues.append(_issue(loc, "format", f"{loc} 금지 표현: {', '.join(bad)}", "담백한 서술로"))
+            hint = "담백한 서술로"
+            if any(e in t for e in EVAL_ENDINGS):
+                hint = ("평가어를 빼고 사실로 끝맺음(예: '…확장하는 것이 핵심이다' → '…확장하는 구조다', "
+                        "'…가 눈에 띈다' → '…를 기록했다'). 그 문장만 고친 새 값을 낸다")
+            elif "해요체" in bad:
+                hint = "'~요'를 '~다'(요약·개요) 또는 명사형(포인트)으로"
+            issues.append(_issue(loc, "format", f"{loc} 금지 표현: {', '.join(bad)}", hint))
     return issues
 
 
