@@ -258,3 +258,10 @@ def test_revision_can_edit_sub_locations():
     new, reverts, notes = apply_revision(p, rev, {"numbers[0]"})
     assert new.numbers[0].items[1].value == "93.5%" and new.numbers[0].context.startswith("같은 벤치")
     assert reverts == 0 and notes == []
+
+
+def test_number_item_value_accepts_numbers():
+    """W40: value가 문자열만이면 모델이 숫자를 쓰려다 공백 반복으로 잘렸다. 숫자도 받고 문자열로 저장."""
+    assert NumberItem.model_validate({"label": "a", "value": 77.9, "ref": "x"}).value == "77.9"
+    assert NumberItem.model_validate({"label": "a", "value": 38, "ref": "x"}).value == "38"
+    assert NumberItem.model_validate({"label": "a", "value": "1.36달러", "ref": "x"}).value == "1.36달러"

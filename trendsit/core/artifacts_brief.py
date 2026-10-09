@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, Literal, Self
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from .artifacts import Document, RoleInput, RoleOutput, register_schemas
 
@@ -148,7 +148,16 @@ class Point(_Strict):
 
 class NumberItem(_Strict):
     label: str
-    value: str = Field(description="근거 표기 그대로")
+    # 숫자도 받는다: 문자열만 허용하면 모델이 숫자를 쓰려다 구조화 출력 문법에 막혀 공백만 반복하다 잘렸다(W40 7건).
+    # 받은 숫자는 문자열로 바꿔 저장(근거 표기와의 대조는 코드 검사가 값으로 한다)
+    value: str | float = Field(description="근거 표기 그대로(예: '77.9%'). 숫자만이면 숫자로 써도 됨")
+
+    @field_validator("value", mode="after")
+    @classmethod
+    def _as_text(cls, v: str | float) -> str:
+        if isinstance(v, float):
+            return f"{v:g}" if abs(v) < 1e15 else str(v)
+        return v
     ref: str
     baseline: bool = Field(default=False, description="전후 비교의 이전 값")
     emphasis: bool = False
