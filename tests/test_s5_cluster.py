@@ -76,9 +76,9 @@ def test_average_linkage_blocks_chain():
 
 def test_repo_only_cluster_is_not_candidate_but_single_text_is():
     cl, _, _ = run([m("rp:a/b", "github"), m("rp:c/d", "github"), m("it:1")], {("rp:a/b", "rp:c/d"): 0.9})
-    repo = next(c for c in cl if "rp:a/b" in c.members)
+    repos = [c for c in cl if c.members[0].startswith("rp:")]
     single = next(c for c in cl if c.members == ["it:1"])
-    assert repo.repo_only and sorted(repo.members) == ["rp:a/b", "rp:c/d"]
+    assert len(repos) == 2 and all(c.repo_only for c in repos)  # 레포끼리는 묶이지도 않음
     assert not single.repo_only
 
 
@@ -175,3 +175,8 @@ def test_label_sheets_keep_filled_labels(tmp_path, monkeypatch):
     again = list(csv.DictReader((tmp_path / "decide.csv").open()))
     assert (again[0]["label"], again[0]["labeler"]) == ("same", "opus-5.5")
     assert list(csv.DictReader((tmp_path / "aliases.csv").open()))[0]["alias"] == "클로드"
+
+
+def test_two_repos_never_merge():
+    cl, asked, _ = run([m("rp:a/x", "github"), m("rp:b/y", "github")], {("rp:a/x", "rp:b/y"): 0.95})
+    assert groups(cl) == [["rp:a/x"], ["rp:b/y"]] and not asked

@@ -165,8 +165,10 @@ def video_members(db: DB, week: str) -> tuple[list[Member], int]:
         if d.get("summary") and d["summary"] != "내용 없음":
             items.append(EvidenceItem(f"vd:{r['id']}", member, "video", "summary", d["summary"], source))
         names = [p["screen"] for p in d.get("name_pairs") or []]
+        kws = [k["keyword_id"] for k in db.conn.execute(
+            "SELECT keyword_id FROM item_keywords WHERE item_id=? ORDER BY keyword_id", (r["id"],))]
         out.append(Member(member, "video", r["title"], _first_sentence(d.get("summary") or ""), d.get("summary") or "",
-                          "high", names, [], source, items, r["id"],
+                          "high", names, kws, source, items, r["id"],
                           corrections={p["spoken"]: p["screen"] for p in d.get("name_pairs") or []}))
     return out, no_digest
 
@@ -174,7 +176,7 @@ def video_members(db: DB, week: str) -> tuple[list[Member], int]:
 def repo_members(db: DB, week: str) -> tuple[list[Member], int]:
     """relevant=true RepoCard. 근거: 하는 일 한 문장(oneliner), 신호, 이번 주 별, 릴리스."""
     rows = db.conn.execute(
-        "SELECT c.full_name, c.card_json, t.stars_this_week, t.rank, r.description, o.output_json AS oneliner "
+        "SELECT c.full_name, c.card_json, t.stars_this_week, t.rank, t.keywords, r.description, o.output_json AS oneliner "
         "FROM repo_cards c LEFT JOIN repo_trending t ON t.week=c.week AND t.full_name=c.full_name "
         "LEFT JOIN repos r ON r.full_name=c.full_name LEFT JOIN repo_oneliners o ON o.full_name=c.full_name "
         "WHERE c.week=? ORDER BY c.full_name", (week,)).fetchall()
@@ -201,7 +203,7 @@ def repo_members(db: DB, week: str) -> tuple[list[Member], int]:
                                       f"릴리스 {rel['tag']} ({rel['date']}): {rel['line']}", source))
         owner, repo = name.split("/", 1)
         out.append(Member(member, "github", name, line, " ".join(x for x in (line, r["description"] or "") if x),
-                          "high", [repo, name], [], source, items))
+                          "high", [repo, name], sorted(json.loads(r["keywords"] or "{}")), source, items))
     return out, irrelevant
 
 

@@ -129,7 +129,9 @@ def build_pairs(members: dict[str, Member], vecs: dict[str, list[float]], aliase
             ma, mb = members[a], members[b]
             cross = ma.channel != mb.channel
             p = Pair(a, b, s, cross, sorted(kws[a] & kws[b]), sorted(names[a] & names[b]))
-            if cross:
+            if ma.channel == mb.channel == "github":
+                p.route = "none"  # 레포끼리는 묶지 않음(agglomerate의 cannot-link와 같은 규칙)
+            elif cross:
                 if (p.shared_kw or p.shared_names) and s >= th.border:
                     p.route = "decide"
             elif s >= th.auto:
@@ -170,6 +172,8 @@ def agglomerate(members: dict[str, Member], pairs: list[Pair], sims: dict[tuple[
     th, min_conf, cap = cfg.cluster.thresholds, cfg.cluster.decide.min_confidence, cfg.cluster.max_cluster_size
     same = {(p.a, p.b) for p in pairs if p.decided and p.same and (p.confidence or 0) >= min_conf}
     cannot = {(p.a, p.b) for p in pairs if p.decided and not p.same and (p.confidence or 0) >= min_conf}
+    # 레포끼리는 이름(full_name)이 다르면 다른 대상이다. 임베딩이 가까워도 묶지 않는다(W41 첫 실행 오병합: openrig ↔ claude-mem)
+    cannot |= {(p.a, p.b) for p in pairs if members[p.a].channel == members[p.b].channel == "github"}
     same |= {(b, a) for a, b in same}
     cannot |= {(b, a) for a, b in cannot}
 

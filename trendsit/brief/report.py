@@ -49,7 +49,8 @@ def suspicious(c: Cluster, res: ClusterResult) -> list[str]:
     out = []
     for a, b in itertools.combinations(names, 2):
         base_a, base_b = re.sub(r"[\d.]+", "", norm_key(a)), re.sub(r"[\d.]+", "", norm_key(b))
-        if base_a and (base_a == base_b or base_a.startswith(base_b) or base_b.startswith(base_a)) \
+        both_numbered = bool(re.search(r"\d", a)) and bool(re.search(r"\d", b))  # 회사 ↔ 제품(Google ↔ Pixel 11)은 제외
+        if both_numbered and base_a and (base_a == base_b or base_a.startswith(base_b) or base_b.startswith(base_a)) \
                 and differs_in_version(a, b) and min(len(base_a), len(base_b)) >= 3:
             out.append(f"{a} ↔ {b}")
     return out[:6]
@@ -151,6 +152,17 @@ def write_cluster_report(stage: ClusterStage, cfg: BriefConfig, note: str = "") 
         share = ", ".join(p.shared_names[:3] + p.shared_kw[:2]) or "-"
         lines.append(f"| {p.a} {_cell(members[p.a].title, 35)} | {p.b} {_cell(members[p.b].title, 35)} | "
                      f"{'예' if p.cross else ''} | {p.sim} | {p.route} | {verdict} | {_cell(share, 40)} |")
+    lines.append("")
+
+    # border 아래에서 이름을 공유하는 쌍(문턱값을 낮추면 decide로 갈 후보)
+    below = sorted([p for p in res.pairs if owner[p.a] != owner[p.b] and p.route == "none" and p.shared_names
+                    and th.border - 0.10 <= p.sim < th.border], key=lambda p: -p.sim)[:NEAR_TOP]
+    lines += [f"### border 아래({th.border - 0.10:.2f}~{th.border:.2f})에서 이름을 공유하는 쌍 상위 {NEAR_TOP}", "",
+              "문턱값을 낮추면 decide로 갈 후보. 같은 대상인데 여기 있으면 border를 낮출 근거다.", "",
+              "| a | b | 채널 넘음 | sim | 공유 이름 |", "|---|---|---|---|---|"]
+    for p in below:
+        lines.append(f"| {p.a} {_cell(members[p.a].title, 35)} | {p.b} {_cell(members[p.b].title, 35)} | "
+                     f"{'예' if p.cross else ''} | {p.sim} | {_cell(', '.join(p.shared_names[:4]), 40)} |")
     lines.append("")
 
     # 의심 병합
