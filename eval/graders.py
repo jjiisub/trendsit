@@ -110,6 +110,8 @@ REENFORCE: dict[str, Any] = {}
 # 코드 소유 칸(S4 설계 결정 D2-1, S2~S3 결정 Q1): 규칙이 문자열로 확정 판정되어 enforce가 고친 값이 곧 정답인 칸.
 # 통과 판정은 이 칸만 enforce 후 값으로 바꾼 출력으로 한다. 원래 출력 점수는 모델 품질로 따로 기록. role → 칸 목록
 ENFORCED_FIELDS: dict[str, tuple[str, ...]] = {}
+# 원자 사실 judge(S5 관문 B 근거 충실성): role → judge md 경로. llm_grade가 질문 채점 뒤 한 번 더 부른다
+FACT_JUDGES: dict[str, str] = {}
 # S2~S3 역할은 칸 목록을 출력 클래스의 ENFORCED_FIELDS(ClassVar)에 선언하고 여기에 등록한다(한 곳에서만 정함)
 ENFORCED_FIELDS["repo_oneliner"] = RepoOneliner.ENFORCED_FIELDS
 
@@ -178,7 +180,8 @@ def judge_input(inp: RoleInput, out: dict[str, Any]) -> JudgeInput:
 
 
 def llm_grade(role: str, inp: RoleInput, out: dict[str, Any], ctx: Ctx) -> dict[str, Any]:
-    """역할 무관한 채점자(eval/judge.md) + 역할별 채점표(includes)를 1회 실행."""
+    """역할 무관한 채점자(eval/judge.md) + 역할별 채점표(includes)를 1회 실행. FACT_JUDGES 역할은 원자 사실 judge도 1회."""
+    out_full = out
     judge = load_role(JUDGE_ROLE, ctx.models, extra_includes=(str(rubric_path(role).relative_to(ROOT)),))
     judge_ctx = replace(ctx, model=None)  # 채점자는 항상 judge 별칭
     result: JudgeResult = run_role(judge, judge_input(inp, out), judge_ctx)  # type: ignore[assignment]
@@ -187,9 +190,16 @@ def llm_grade(role: str, inp: RoleInput, out: dict[str, Any], ctx: Ctx) -> dict[
     verdicts = {v.question: {"verdict": v.verdict, "critique": v.critique} for v in result.verdicts}
     scores = {s.criterion: {"score": s.score, "reason": s.reason} for s in result.scores}
     missing = [q for q in questions if q not in verdicts]
-    return {"verdicts": {q: verdicts[q] for q in questions if q in verdicts},
-            "scores": {c: scores[c] for c in criteria if c in scores}, "missing": missing,
-            "judge_prompt_hash": judge.prompt_hash, "judge_step_id": judge_ctx.last_step_id}
+    out = {"verdicts": {q: verdicts[q] for q in questions if q in verdicts},
+           "scores": {c: scores[c] for c in criteria if c in scores}, "missing": missing,
+           "judge_prompt_hash": judge.prompt_hash, "judge_step_id": judge_ctx.last_step_id}
+    if role in FACT_JUDGES:  # S5: 원자 사실 judge(근거 충실성은 코드가 지지율을 셈)
+        fj = load_role(FACT_JUDGES[role], ctx.models)
+        facts = run_role(fj, judge_input(inp, out_full), judge_ctx)
+        atoms = [a.model_dump() for a in facts.atoms]  # type: ignore[attr-defined]
+        out["facts"] = {"total": len(atoms), "supported": sum(a["supported"] for a in atoms),
+                        "unsupported": [a for a in atoms if not a["supported"]], "step_id": judge_ctx.last_step_id}
+    return out
 
 
 def model_agreement(results: list[dict[str, Any]], owned_fields: tuple[str, ...] = ()) -> dict[str, str]:

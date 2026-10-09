@@ -1,6 +1,6 @@
 # 주간 브리핑 2026-W41 (리뷰용 읽기본)
 
-> run `20261009-163817-weekly-be4c`. S6 export 전 임시 화면. 홈 순서대로 토픽, 끝에 홈 레포 목록. 근거 id 옆은 출처 제목. ⚠ = 확인 필요(같은 이슈가 두 번 남았거나 3라운드 뒤 남은 이슈)
+> run `20261009-164112-weekly-05d1`. S6 export 전 임시 화면. 홈 순서대로 토픽, 끝에 홈 레포 목록. 근거 id 옆은 출처 제목. ⚠ = 확인 필요(같은 이슈가 두 번 남았거나 3라운드 뒤 남은 이슈)
 
 ## 1. (리드 · 작성 실패) w41-mistral-large-4
 
@@ -10,7 +10,7 @@
 
 ## 4. Claude Haiku 5.5 출시와 토크나이저 변경에 따른 실질 API 비용 변화
 
-`w41-claude-haiku-5-5` · 상태 checked · 2라운드 · 축: 토크나이저 변경과 실질 API 비용 변화
+`w41-claude-haiku-5-5` · 상태 passed · 1라운드 · 축: 토크나이저 변경과 실질 API 비용 변화
 
 **요약(홈)** Anthropic이 Claude Haiku 5.5를 출시하며 100,000 토큰 이하 구간에서 전작 대비 90% 가격 인하를 발표했다. ==토크나이저 변경으로 토큰 사용량이 1.25배 증가해 실질 비용 절감 효과가 제한적==이라는 분석이 나왔다.
 
@@ -36,11 +36,6 @@
    | Claude Haiku 5.5 | 1620 | `it:1180#q4` | 강조 |
    | GPT-6 Luna | 1437 | `it:1180#q4` |  |
    | Haiku 4.5 | 735 | `it:1180#q4` |  |
-
-**소스별로 더한 것**
-
-- github: 토크나이저 변경으로 인한 실질 토큰 사용량 증가(1.25배)와 숨겨진 가격 인상 분석
-- github: 전작 대비 90% 가격 인하 및 GDPval-AA v2.1, OS월드 2.1 등 벤치마크 성능 수치 공개
 
 출처 2곳: `it:1180`, `it:1144`
 
@@ -119,13 +114,13 @@
  },
  "review": {
   "rounds": {
-   "1": 0,
-   "2": 1,
+   "1": 1,
+   "2": 0,
    "3": 0
   },
-  "code_rejects": 2,
+  "code_rejects": 0,
   "critic_rejects": 0,
-  "autofixes": 0,
+  "autofixes": 1,
   "reverts": 0,
   "issues": {
    "unsupported": 0,
@@ -142,16 +137,16 @@
   "decide": 0.0,
   "editor_select": 0.0,
   "writer": 0.0,
-  "writer_revise": 0.000742,
-  "critic": 0.0,
-  "total": 0.000742
+  "writer_revise": 0.0,
+  "critic": 0.003802,
+  "total": 0.003802
  },
  "duration_sec": {
   "evidence": 0,
   "cluster": 0,
   "select": 0.0,
-  "write_review": 4.1,
-  "total": 8.1
+  "write_review": 36.3,
+  "total": 40.2
  }
 }
 ```

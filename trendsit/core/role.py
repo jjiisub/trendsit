@@ -160,8 +160,8 @@ def lint_body(rel: str, body: str) -> list[ConfigError]:
 
 
 def role_files(root: Path = ROOT) -> list[Path]:
-    """검사 대상: roles/*.md + 채점자 역할 eval/judge.md."""
-    return sorted((root / "roles").glob("*.md")) + [p for p in [root / "eval" / "judge.md"] if p.exists()]
+    """검사 대상: roles/*.md + 채점자 역할 eval/judge*.md(S5 judge_facts 포함)."""
+    return sorted((root / "roles").glob("*.md")) + sorted((root / "eval").glob("judge*.md"))
 
 
 def nested_image_fields(cls: type[BaseModel], prefix: str = "", top: bool = True) -> list[str]:

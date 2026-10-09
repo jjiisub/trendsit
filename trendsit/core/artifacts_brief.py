@@ -322,6 +322,17 @@ class ReviewVerdict(RoleOutput):
         return out
 
 
+# ---------- 관문 B: 근거 충실성 judge(원자 사실, eval/judge_facts.md) ----------
+class FactCheck(RoleOutput):
+    """judge가 출력의 모든 문장을 원자 사실로 쪼개 근거 문서와 대조한 결과. 지지율은 코드가 센다."""
+
+    atoms: list[Atom] = Field(description="출력의 모든 원자 사실. 칸 순서대로")
+
+    @classmethod
+    def fallback(cls, reason: str, inp: Any) -> Self:
+        return cls(atoms=[], log=f"원자 사실 채점 실패({reason})", attention=True)
+
+
 INPUTS = (DecideInput, EditorSelectInput, WriterInput, WriterReviseInput, CriticInput)
-OUTPUTS = (DecideAnswer, BriefingPlan, TopicPage, TopicPageRevision, ReviewVerdict)
+OUTPUTS = (DecideAnswer, BriefingPlan, TopicPage, TopicPageRevision, ReviewVerdict, FactCheck)
 register_schemas("artifacts_brief", INPUTS, OUTPUTS)
