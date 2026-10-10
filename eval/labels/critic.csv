@@ -1,25 +1,23 @@
-week,topic_id,round,status,issues,label,critique,labeler
-2026-W40,w40-gpt-6-1-sol,2,pass,[],pass,맞음,opus-5.5
-2026-W40,w40-gemini-4-argon,2,pass,[],pass,맞음,opus-5.5
-2026-W40,w40-openai-dots,1,pass,[],pass,맞음,opus-5.5
-2026-W40,w40-claude-sonnet-5-5,2,pass,[],fail,놓침: 개요 끝 문장 근거 밖 인과,opus-5.5
-2026-W40,w40-decision-api,2,pass,[],pass,맞음(이전 출력의 라벨이 잘못 옮겨져 있었음: 출력이 바뀜),opus-5.5
-2026-W40,w40-solar-mini-4,2,pass,[],pass,맞음(문체·Q1은 검수 몫 아님),opus-5.5
-2026-W40,w40-deepseek-harness,2,pass,[],pass,맞음,opus-5.5
-2026-W40,w40-muse-gadgets,1,pass,[],pass,맞음,opus-5.5
-2026-W40,w40-claude-code-skills,1,reject,"[{""loc"": ""overview"", ""type"": ""overclaim"", ""comment"": ""근거는 목록이 컨텍스트에 들어온다는 사실만 서술하고, '스킬이 많아질수록 부담이 커지는 문제'라는 인과·평가 판단은 없다""}, {""loc"": ""summary"", ""type"": ""missing_diagram"", ""comment"": ""code_warnings가 지적한 대로, 같은 단위(개)의 수치 3개(50, 20, 60)가 근거에 있으나 numbers 도식이 비어 있음""}]",pass,overview overclaim 지적은 맞음. 같은 판정의 missing_diagram은 오탐(글쓴이 환경 개수 3개는 비교 도식 대상 아님),opus-5.5
-2026-W40,w40-claude-code-skills,2,reject,"[{""loc"": ""numbers"", ""type"": ""missing_diagram"", ""comment"": ""code_warnings가 'numbers가 비었는데 근거에 같은 단위 값 3개 이상(약개 3)'이라고 경고함. 근거 it:1025#q8에 '스킬 약 50개, 에이전트 약 20개, 도구 약 60개'라는 같은 단위(개)의 수치 3개가 존재하며, summary에 이 수치들이 명시되어 있음에도 numbers 도식이 비어 있음""}]",fail,"과잉 반려: 코드 경고 ""약개 3""(단위 파싱 버그) 오탐을 그대로 따름",opus-5.5
-2026-W40,w40-claude-code-skills,3,reject,"[{""loc"": ""numbers"", ""type"": ""missing_diagram"", ""comment"": ""code_warnings가 'numbers가 비었는데 근거에 같은 단위 값 3개 이상(약개 3)'이라고 경고함. 근거 it:1025#q8에 스킬 약 50개, 에이전트 약 20개, 도구 약 60개라는 같은 단위(개)의 수치 3개가 존재하며, summary에 이 수치들이 명시되어 있음에도 numbers 도식이 비어 있음""}]",fail,같은 오탐 반복 → checked,opus-5.5
-2026-W40,w40-llamaindex-context,1,pass,[],fail,"놓침: 개요 ParseBench·개념 비지지, 발표자 주장을 사실로",opus-5.5
-2026-W41,w41-gpt6-intelligent-ui,1,pass,[],pass,맞음,opus-5.5
-2026-W41,w41-embeddinggemma-2,1,reject,"[{""loc"": ""numbers"", ""type"": ""missing_diagram"", ""comment"": ""code_warnings가 지적한 대로, 근거에 같은 단위(차원, 점수)의 비교 가능한 수치 3개 이상 존재하나 numbers 도식이 비어 있음""}]",fail,"과잉 반려: 차원(768/512/256/128)은 비교 도식 대상이 아니고 점수는 2개뿐, 코드 경고 오탐",opus-5.5
-2026-W41,w41-embeddinggemma-2,2,pass,[],pass,맞음,opus-5.5
-2026-W41,w41-claude-haiku-5-5,2,pass,[],pass,맞음,opus-5.5
-2026-W41,w41-decision-api-spec,1,reject,"[{""loc"": ""overview"", ""type"": ""unsupported"", ""comment"": ""근거 원문에 '150ms'라는 수치가 없으며, '10x faster than the Responses API'라고만 되어 있음""}]",fail,"과잉 반려: ""지난 토픽에서 150ms를 확인했다""는 previous(지난 토픽) 입력의 사실. 후속 토픽의 지난 토픽 요약은 previous와 대조해야 함",opus-5.5
-2026-W41,w41-decision-api-spec,2,reject,"[{""loc"": ""overview"", ""type"": ""unsupported"", ""comment"": ""근거 원문에 '150ms'라는 수치가 없으며, '10x faster than the Responses API'만 언급되어 있음""}]",fail,같은 오탐 반복 → checked,opus-5.5
-2026-W41,w41-openai-rogue-agent,1,pass,[],pass,맞음(이전 출력의 라벨이 잘못 옮겨져 있었음: 제목이 바뀜),opus-5.5
-2026-W41,w41-openai-math-results,1,pass,[],fail,"놓침: 요약 ""4000개 문제를 풀고""",opus-5.5
-2026-W41,w41-openai-textgrain,2,pass,[],pass,맞음,opus-5.5
-2026-W41,w41-openrig-orchestrator,2,pass,[],pass,맞음(contributions는 코드 몫),opus-5.5
-2026-W41,w41-agent-coding-talks,1,reject,"[{""loc"": ""points[5]"", ""type"": ""unsupported"", ""comment"": ""근거 원문(vd:1291@380)에는 메가 프롬프트가 제어 흐름을 프롬프트 안에 인코딩한다는 내용만 있고, '규칙을 약화시킨다'는 사실은 해당 근거 구간에 없다(규칙이 컨텍스트로 희석된다는 내용은 다른 근거 vd:1291@469에 있음)""}]",pass,맞음: points[5] 근거 구간 밖,opus-5.5
-2026-W41,w41-agent-coding-talks,2,reject,"[{""loc"": ""points[5]"", ""type"": ""unsupported"", ""comment"": ""근거 원문(vd:1291@380)에는 메가 프롬프트가 제어 흐름을 프롬프트 안에 인코딩한다는 내용만 있고, '규칙을 약화시킨다'는 사실은 해당 근거 구간에 없다(규칙이 컨텍스트로 희석된다는 내용은 다른 근거 vd:1291@469에 있음)""}]",pass,맞음(수정본도 같은 문제),opus-5.5
+week,topic_id,round,status,page_hash,issues,label,critique,labeler
+2026-W40,w40-gpt-6-1-sol,2,pass,1855c65eebc3,[],,,
+2026-W40,w40-gemini-4-argon,2,pass,a9c787d92895,[],,,
+2026-W40,w40-openai-dots,1,pass,93dd7ee02953,[],,,
+2026-W40,w40-claude-sonnet-5-5,1,reject,1ed70404270f,"[{""loc"": ""overview"", ""type"": ""unsupported"", ""comment"": ""angle의 편집 축을 근거 없는 사실처럼 서술함. 근거 원문에는 '컨텍스트·출력 토큰 설계가 핵심 축'이라는 기술적 인과나 평가가 없음""}]",,,
+2026-W40,w40-claude-sonnet-5-5,2,reject,bcbd774e3ce5,"[{""loc"": ""points[3]"", ""type"": ""overclaim"", ""comment"": ""근거는 '지원할 것으로 예상된다'로 추정/예측 표현인데, 초안은 '지원함'으로 확정된 사실처럼 서술함""}]",,,
+2026-W40,w40-claude-sonnet-5-5,3,reject,7654d3857e22,"[{""loc"": ""points[0]"", ""type"": ""missing_key"", ""comment"": ""angle의 핵심인 '컨텍스트·출력 토큰 설계'와 '가성비'가 첫 포인트에 반영되지 않음. 근거에는 컨텍스트/출력 토큰 사양과 비용 데이터가 존재함""}]",,,
+2026-W40,w40-decision-api,2,pass,6ef1b4539347,[],,,
+2026-W40,w40-solar-mini-4,1,pass,d301e27348d7,[],,,
+2026-W40,w40-deepseek-harness,2,pass,2ac35beebea8,[],,,
+2026-W40,w40-muse-gadgets,1,pass,4e06897487a2,[],,,
+2026-W40,w40-claude-code-skills,1,pass,8753eeb1c13a,[],,,
+2026-W40,w40-llamaindex-context,2,pass,129e17048989,[],,,
+2026-W41,w41-gpt6-intelligent-ui,1,pass,c9bd156d0f48,[],,,
+2026-W41,w41-embeddinggemma-2,1,reject,0a9f158e541f,"[{""loc"": ""numbers"", ""type"": ""missing_diagram"", ""comment"": ""code_warnings가 지적한 대로, 근거에 같은 단위(차원, 점수)의 비교 가능한 수치 3개 이상 존재하나 numbers 도식이 비어 있음""}]",,,
+2026-W41,w41-embeddinggemma-2,2,pass,0a9f158e541f,[],,,
+2026-W41,w41-claude-haiku-5-5,1,pass,c1f264446503,[],,,
+2026-W41,w41-decision-api-spec,1,pass,c9107f2eb37a,[],,,
+2026-W41,w41-openai-rogue-agent,1,pass,3e5bb16f6a0c,[],,,
+2026-W41,w41-openai-math-results,1,pass,de1def97d92e,[],,,
+2026-W41,w41-openai-textgrain,2,pass,2e1e54186327,[],,,
+2026-W41,w41-openrig-orchestrator,2,pass,077b94f91aee,[],,,
+2026-W41,w41-agent-coding-talks,2,reject,06c2691117d6,"[{""loc"": ""points[1]"", ""type"": ""unsupported"", ""comment"": ""근거(vd:1291@380)는 메가 프롬프트가 제어 흐름을 프롬프트에 인코딩한다는 구조적 문제를 지적하지만, '규칙을 약화시킨다'는 결과/영향에 대한 서술은 해당 근거 구간에 없다. 규칙이 컨텍스트로 인해 약해진다는 내용은 다른 근거(vd:1291@469)에 있으나, 이 포인트의 refs에는 포함되지 않았다.""}]",,,

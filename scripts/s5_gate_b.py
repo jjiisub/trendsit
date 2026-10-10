@@ -271,6 +271,19 @@ def main() -> int:
                          f"{len(page.numbers)}·{len(page.events)} | {len(set(warn))} | {len(sv)} | "
                          f"{sum(p.check for p in page.points)} |")
         lines.append("")
+    # 코드가 뺀 도식과 남은 이슈(반영 확인 리뷰 F2): 토픽마다 마지막으로 쓴 run의 writer 기록
+    lines += ["### 코드가 뺀 도식(형식·수치 오류가 남은 것만)", "", "| 토픽 | 도식 | 제목 | 남은 이슈 |", "|---|---|---|---|"]
+    n_drop = 0
+    for week, t, *_rest in topics_all:
+        r = db.conn.execute("SELECT detail FROM steps WHERE role='writer' AND kind='code' AND text LIKE ? AND run_id IN "
+                            "(SELECT id FROM runs WHERE week=? AND kind='weekly') ORDER BY id DESC LIMIT 1",
+                            (t["topic_id"] + ":%", week)).fetchone()
+        for d in (json.loads(r["detail"]).get("dropped_diagrams") or []) if r else []:
+            n_drop += 1
+            lines.append(f"| {t['topic_id']} | {d['group']} | {d['title']} | {d['issue'][:160]} |")
+    if not n_drop:
+        lines.append("| 없음 | | | |")
+    lines.append("")
     n = len(topics_all)
     multi = sum(1 for _, _, _, c, _ in topics_all if len(c) >= 2)
     style = sum(len(sv) for *_, sv in topics_all)

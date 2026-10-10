@@ -38,15 +38,17 @@
  "w40-claude-sonnet-5-5": {
   "week": "2026-W40",
   "numbers": [
-   "소네트 5.5 터미널벤치 4.0 점수 70.6%로 3개 모델 중 최고",
-   "소네트 5.5 GDPval-AA 1844점으로 Opus 5.5와 대등"
+   "Claude Sonnet 5.5 터미널벤치 4.0 점수 70.6%로 3개 모델 중 최고",
+   "Claude Sonnet 5.5 GDPval-AA 1844점으로 Opus 5.5와 대등"
   ],
   "events": [],
-  "code_warnings": [],
-  "needed_numbers": 2,
-  "needed_events": 0,
-  "labeler": "opus-5.5",
-  "critique": "적절(두 벤치 각 3개 모델)"
+  "code_warnings": [
+   "핵심 의심: 다룰 축(angle '오퍼스급 지능과 가성비 사이의 컨텍스트·출력 토큰 설계')의 낱말(가성비, 사이, 설계, 오퍼스급, 지능, 출력, 컨텍스트, 토큰)이 첫 point에 없음"
+  ],
+  "needed_numbers": null,
+  "needed_events": null,
+  "labeler": null,
+  "critique": null
  },
  "w40-decision-api": {
   "week": "2026-W40",
@@ -63,17 +65,16 @@
  },
  "w40-solar-mini-4": {
   "week": "2026-W40",
-  "numbers": [
-   "Solar Mini 4 에이전트 작업 1,000세트 완료 비용 $1.25로 MiMo-V2.5보다 약 43% 낮음"
-  ],
+  "numbers": [],
   "events": [],
   "code_warnings": [
-   "단위 확인 필요: numbers[0].items[1] 값 2.2의 근거 단위를 찾지 못함(그룹 단위 $)"
+   "누락 의심(같은 근거 문장의 같은 단위 값 3개 이상, 같은 지표 비교인지 확인): it:1034#q4 100만 토큰당 3개",
+   "핵심 의심: 다룰 축(angle 'GPU 한 장 실행 가능한 MoE 소형 모델의 에이전트 최적화')의 낱말(gpu, moe, 소형, 실행, 에이전트, 최적화)이 첫 point에 없음"
   ],
-  "needed_numbers": 1,
-  "needed_events": 0,
-  "labeler": "opus-5.5",
-  "critique": "값 2개 + baseline, 허용"
+  "needed_numbers": null,
+  "needed_events": null,
+  "labeler": null,
+  "critique": null
  },
  "w40-deepseek-harness": {
   "week": "2026-W40",
@@ -99,9 +100,7 @@
   "week": "2026-W40",
   "numbers": [],
   "events": [],
-  "code_warnings": [
-   "누락 의심: numbers가 비었는데 근거에 같은 단위 값 3개 이상(약개 3)"
-  ],
+  "code_warnings": [],
   "needed_numbers": 0,
   "needed_events": 0,
   "labeler": "opus-5.5",
@@ -155,7 +154,9 @@
   "week": "2026-W41",
   "numbers": [],
   "events": [],
-  "code_warnings": [],
+  "code_warnings": [
+   "누락 의심(같은 근거 문장의 같은 단위 값 3개 이상, 같은 지표 비교인지 확인): it:1180#q4 점 3개, it:1144#q6 $ 3개"
+  ],
   "needed_numbers": 1,
   "needed_events": 0,
   "labeler": "opus-5.5",
@@ -195,7 +196,9 @@
   "week": "2026-W41",
   "numbers": [],
   "events": [],
-  "code_warnings": [],
+  "code_warnings": [
+   "누락 의심(같은 근거 문장의 같은 단위 값 3개 이상, 같은 지표 비교인지 확인): it:1225#q3 % 3개, it:1105#q4 % 3개, it:1225#q4 % 5개, it:1105#q5 % 3개"
+  ],
   "needed_numbers": 1,
   "needed_events": 0,
   "labeler": "opus-5.5",

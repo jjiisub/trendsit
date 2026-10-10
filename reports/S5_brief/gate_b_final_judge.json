@@ -127,51 +127,44 @@
  },
  "w40-claude-sonnet-5-5": {
   "week": "2026-W40",
-  "status": "passed",
+  "status": "checked",
   "verdicts": {
    "Q1": {
-    "verdict": "pass",
-    "critique": "summary 첫 문장에 결론(앤트로픽이 클로드 소네트 5.5를 출시해 Opus급 성능에 비용 30% 절감 달성)이 명시되어 있고, 첫 번째 포인트에 핵심 성능 벤치마크 결과가 잘 제시됨"
+    "verdict": "fail",
+    "critique": "plan.angle은 '컨텍스트·출력 토큰 설계'이나 첫 point가 벤치마크 점수(터미널벤치 4.0)로 angle의 핵심과 어긋남"
    },
    "Q2": {
     "verdict": "pass",
-    "critique": "3개 모델 비교에 baseline이 설정되어 있고 불필요한 빈칸이나 중복 포인트 없이 개요와 포인트가 적절히 구성됨"
+    "critique": "numbers 도식 2개 모두 3개 모델 비교 항목을 충실히 채웠고 불필요한 반복이나 조건 미달 칸 없음"
    },
    "Q3": {
     "verdict": "pass",
-    "critique": "도식의 context에 평가 대상과 테스트 내용이 명확히 기재되어 있고 핵심 차별점과 수치가 한눈에 파악됨"
+    "critique": "각 도식에 테스트 목적과 조건(터미널 환경 복잡 작업 평가, 44개 직종 업무 수행 능력) 등 context가 명확히 기재됨"
    },
    "Q4": {
     "verdict": "pass",
-    "critique": "번역투나 어색한 문장 없이 자연스럽고 명확한 어조로 작성됨"
+    "critique": "번역투나 어색한 문장 없이 간결하고 명확한 문체로 서술됨"
    }
   },
   "scores": {
    "정확성": {
     "score": 5,
-    "reason": "문서에 제시된 벤치마크 점수, 토큰 사양, 비용 절감치 등이 정확하게 반영됨"
+    "reason": "출력의 모든 사실 및 수치가 근거 문서의 내용과 정확히 일치함"
    },
    "구성": {
-    "score": 5,
-    "reason": "결론 중심 요약과 포인트 순서가 체계적이며 도식 맥락이 포인트와 잘 맞물림"
+    "score": 3,
+    "reason": "요약과 개요는 명확하나 제시된 angle(컨텍스트·출력 토큰 설계)과 포인트 우선순위가 일치하지 않음"
    },
    "표현": {
     "score": 5,
-    "reason": "군더더기 없는 담백한 문장과 명확한 기술 용어 표기가 돋보임"
+    "reason": "자연스러운 한국어 문장으로 결함 없이 작성됨"
    }
   },
   "facts": {
-   "total": 45,
-   "supported": 44,
-   "unsupported": [
-    {
-     "loc": "overview",
-     "fact": "컨텍스트·출력 토큰 설계에 반영됐다는 인과/평가",
-     "evidence_id": null,
-     "supported": false
-    }
-   ],
-   "step_id": 5456
+   "total": 37,
+   "supported": 37,
+   "unsupported": [],
+   "step_id": 5549
   }
  },
  "w40-decision-api": {
@@ -222,40 +215,47 @@
   "verdicts": {
    "Q1": {
     "verdict": "fail",
-    "critique": "summary 첫 문장에 결론이 제시되었으나, plan.angle이 'GPU 한 장 실행 가능한 MoE 소형 모델의 에이전트 최적화'임에도 첫 point는 회사의 투트랙 전략으로 시작해 실패 예시(angle이 최적화인데 첫 point가 회사의 투트랙 전략)에 해당함"
+    "critique": "angle이 'GPU 한 장 실행 가능한 MoE 소형 모델의 에이전트 최적화'인데 첫 point가 회사의 투트랙 전략으로 시작하여 실패 예시와 정확히 일치함"
    },
    "Q2": {
     "verdict": "fail",
-    "critique": "overview에서 points의 수치(24.1점, 43%)를 그대로 반복하고 있으며 도식 및 points 내용과 강하게 중복됨"
+    "critique": "overview가 points의 투트랙 전략, 35B/3B MoE 및 GPU 1장 구동, 24.1점 기록, 43% 비용 절감을 그대로 중복해서 되풀이함"
    },
    "Q3": {
     "verdict": "pass",
-    "critique": "numbers 도식에 명확한 context가 있고 summary와 points를 통해 사건의 중요성과 내용을 쉽게 파악할 수 있음"
+    "critique": "도식(numbers, events 등)이 없어 context 비교 대상은 없으나 전반적으로 핵심 사실과 벤치마크 결과를 명확히 파악할 수 있음"
    },
    "Q4": {
     "verdict": "pass",
-    "critique": "번역투나 어색한 문장 없이 자연스러운 개조식 및 줄글로 작성됨"
+    "critique": "번역투나 어색한 문장 없이 간결하고 명확한 문체로 서술됨"
    }
   },
   "scores": {
    "정확성": {
     "score": 5,
-    "reason": "문서에 제시된 수치와 사실관계를 왜곡 없이 정확하게 인용함"
+    "reason": "문서에 제시된 수치와 사실 관계가 충실히 반영됨"
    },
    "구성": {
-    "score": 3,
-    "reason": "angle의 핵심이 첫 번째 포인트가 아닌 두 번째 포인트에 배치되고 개요에서 수치가 중복 반복됨"
+    "score": 2,
+    "reason": "angle에 맞는 기술 핵심 대신 출시 및 투트랙 전략이 첫 포인트로 왔고 overview가 points를 그대로 반복함"
    },
    "표현": {
     "score": 5,
-    "reason": "군더더기 없는 담백한 문체로 번역투 없이 매끄럽게 작성됨"
+    "reason": "번역투 없이 간결하고 읽기 쉬움"
    }
   },
   "facts": {
-   "total": 28,
-   "supported": 28,
-   "unsupported": [],
-   "step_id": 5401
+   "total": 26,
+   "supported": 25,
+   "unsupported": [
+    {
+     "loc": "points[1]",
+     "fact": "업스테이지가 Solar 미니 4를 독자 사전학습함",
+     "evidence_id": null,
+     "supported": false
+    }
+   ],
+   "step_id": 5551
   }
  },
  "w40-deepseek-harness": {
@@ -344,44 +344,44 @@
  },
  "w40-claude-code-skills": {
   "week": "2026-W40",
-  "status": "checked",
+  "status": "passed",
   "verdicts": {
    "Q1": {
     "verdict": "pass",
-    "critique": "summary 첫 문장이 핵심 결론을 제시하고 첫 point가 스킬의 폴더 묶음 구조와 angle의 핵심을 잘 다룸"
+    "critique": "summary 첫 문장에 결론이 제시되고 angle(반복 작업을 재사용 가능한 스킬로 분리하는 설계 패턴)의 핵심이 첫 point에 잘 반영되어 있음"
    },
    "Q2": {
     "verdict": "pass",
-    "critique": "도식이 무리하게 추가되지 않았고 overview와 points의 중복 서술이 최소화되어 군더더기가 없음"
+    "critique": "무리하게 수치/사건 도식을 넣지 않고 비워두었으며, concepts와 points 간에 불필요한 중복이나 과도한 되풀이 없이 깔끔하게 구성됨"
    },
    "Q3": {
     "verdict": "pass",
-    "critique": "스킬 구조와 점진적 공개의 의미를 3분 안에 명확히 파악할 수 있도록 간결하게 정리됨"
+    "critique": "3분 안에 읽기 쉽게 핵심 설계 패턴과 배경(컨텍스트 부담)이 명확히 설명되어 있으며 도식 없는 본문 흐름이 자연스러움"
    },
    "Q4": {
     "verdict": "pass",
-    "critique": "번역투나 어색한 표현 없이 명확한 개조식 문체로 작성됨"
+    "critique": "번역투나 어색한 표현 없이 담백한 문체로 서술됨"
    }
   },
   "scores": {
    "정확성": {
     "score": 5,
-    "reason": "문서 it:1025의 주요 스킬 구조 및 폴더 분리 내용을 충실히 반영함"
+    "reason": "모든 포인트와 요약 내용이 근거 문서의 내용과 정확히 일치함"
    },
    "구성": {
     "score": 5,
-    "reason": "핵심 개념 정의부터 구조적 구현 방식까지 논리적으로 잘 배열됨"
+    "reason": "결론과 핵심 설계 방식이 먼저 제시되고 조건에 맞지 않는 불필요한 도식 칸을 비워 적절함"
    },
    "표현": {
     "score": 5,
-    "reason": "번역투 없이 담백하고 일관된 문체로 서술됨"
+    "reason": "문장이 명확하고 군더더기나 번역투가 없음"
    }
   },
   "facts": {
-   "total": 18,
-   "supported": 18,
+   "total": 20,
+   "supported": 20,
    "unsupported": [],
-   "step_id": 5407
+   "step_id": 5553
   }
  },
  "w40-llamaindex-context": {
@@ -390,33 +390,33 @@
   "verdicts": {
    "Q1": {
     "verdict": "pass",
-    "critique": "요약 첫 문장이 핵심 결론을 직관적으로 제시하고 angle인 '에이전트 하네스와 문서 컨텍스트 레이어로 분리'가 첫 번째 포인트(vd:274@35 근거)에 명확히 반영되어 있음"
+    "critique": "summary 첫 문장에서 Jerry Liu가 RAG를 에이전트 하네스와 문서 컨텍스트 레이어로 재정의했음을 제시하고, 첫 point 역시 해당 angle 핵심을 정확히 다룸"
    },
    "Q2": {
     "verdict": "pass",
-    "critique": "도식이나 사건 그룹 등 조건에 맞지 않는 불필요한 칸 생성 없이 깔끔하며 points와 overview 내용 간의 중복 과다 없이 자연스럽게 구성됨"
+    "critique": "부적절한 도식이나 중복된 point가 없고 개요가 포인트를 단순 반복하지 않으며 추가 맥락(90%, 10T+)을 포함함"
    },
    "Q3": {
     "verdict": "pass",
-    "critique": "문서 구조의 변화 배경과 3층 구조의 의미가 일관되게 서술되어 독자가 맥락과 의의를 3분 안에 명확히 파악할 수 있음"
+    "critique": "RAG의 패러다임 전환과 문서 레이어의 필요성 및 구성이 3분 내에 쉽게 파악되도록 명확히 서술됨"
    },
    "Q4": {
     "verdict": "pass",
-    "critique": "어색한 번역투나 반복적인 표현 없이 자연스럽고 명료한 한국어 문장으로 작성됨"
+    "critique": "번역투나 어색한 표현 없이 간결하고 담백한 문체로 작성됨"
    }
   },
   "scores": {
    "정확성": {
     "score": 5,
-    "reason": "근거 영상 전사 및 슬라이드 내용(2026 RAG 분리, 3개 레이어)과 사실관계가 정확히 일치함"
+    "reason": "근거 문서 전사 및 슬라이드 내용과 완벽히 부합함"
    },
    "구성": {
     "score": 5,
-    "reason": "핵심 결론이 먼저 제시되고 세부 레이어 설명으로 논리적으로 전개됨"
+    "reason": "결론 우선 제시 및 중요도 순 포인트 배치가 잘 이루어짐"
    },
    "표현": {
     "score": 5,
-    "reason": "번역투가 없고 문장이 담백하고 간결함"
+    "reason": "번역투 없이 명확하고 군더더기 없는 문체"
    }
   },
   "facts": {
@@ -424,19 +424,19 @@
    "supported": 13,
    "unsupported": [
     {
-     "loc": "overview",
-     "fact": "ParseBench 벤치마크를 통해 고정확도·저비용·초저지연 3가지 처리 영역을 구분한다",
-     "evidence_id": "vd:274@900",
+     "loc": "summary",
+     "fact": "ParseBench 기반 처리 영역 구분이 중심이다",
+     "evidence_id": null,
      "supported": false
     },
     {
-     "loc": "concepts[1]",
-     "fact": "에이전트 하네스는 검색 복잡도 처리를 담당하는 레이어다",
+     "loc": "concepts[2]",
+     "fact": "ParseBench는 고정확도·저비용·초저지연 3가지 처리 영역을 구분하는 벤치마크이다",
      "evidence_id": null,
      "supported": false
     }
    ],
-   "step_id": 5458
+   "step_id": 5555
   }
  },
  "w41-mistral-large-4": {
@@ -567,86 +567,93 @@
  },
  "w41-claude-haiku-5-5": {
   "week": "2026-W41",
-  "status": "checked",
+  "status": "passed",
   "verdicts": {
    "Q1": {
     "verdict": "pass",
-    "critique": "summary 첫 문장에서 앤트로픽의 하이쿠 5.5 출시 및 10만 토큰 이하 90% 인하 결론을 제시했고, plan angle인 10만 토큰 이하 90% 인하가 첫 번째 point에 정확히 반영됨"
+    "critique": "summary 첫 문장에 앤트로픽의 가격 90% 인하 결론이 명확하며, 첫 번째 포인트 역시 angle인 '10만 토큰 이하 요청 90% 인하'를 핵심으로 다룸"
    },
    "Q2": {
     "verdict": "pass",
-    "critique": "도식 칸들이 불필요하게 채워지지 않고 깔끔하게 비워져 있으며, points와 overview 간 무의미한 중복 서술이 없음"
+    "critique": "무리한 도식 생성이 없으며, overview가 단순 수치 나열에 그치지 않고 포인트를 종합적으로 요약함"
    },
    "Q3": {
     "verdict": "pass",
-    "critique": "가격 체계 변화(구간별 가격 및 토큰 수 차이)와 경쟁 모델 대비 성능 우위가 직관적이고 일목요연하게 정리되어 3분 내 파악 가능함"
+    "critique": "Haiku 5.5의 가격 인하 폭, GPT-6 Luna와의 비교, 초과 시 5배 인상 및 토큰 소모량 증가 변수까지 핵심 맥락이 3분 안에 파악되도록 명료하게 구성됨"
    },
    "Q4": {
     "verdict": "pass",
-    "critique": "번역투나 어색한 문장 없이 문장이 매끄럽고 명확함"
+    "critique": "번역투나 어색한 표현 없이 간결하고 명확한 문체로 서술됨"
    }
   },
   "scores": {
    "정확성": {
     "score": 5,
-    "reason": "가격, 점수, 배수 등 모든 수치와 사실관계가 근거 문서와 완벽히 일치함"
+    "reason": "모든 포인트와 요약 수치(90% 인하, $0.10/$0.50, 1620점, 1.25배 등)가 제공된 문서와 완전히 일치함"
    },
    "구성": {
     "score": 5,
-    "reason": "핵심 결론이 서두에 오고 중요 포인트 순서로 잘 정리됨"
+    "reason": "결론 중심 요약, angle과 직결된 순서 배치, 불필요한 도식 억제가 적절함"
    },
    "표현": {
     "score": 5,
-    "reason": "어색한 번역투 없이 간결하고 명확한 문체로 작성됨"
+    "reason": "군더더기 없는 담백한 문장과 명료한 서술로 작성됨"
    }
   },
   "facts": {
    "total": 23,
-   "supported": 23,
-   "unsupported": [],
-   "step_id": 5462
+   "supported": 22,
+   "unsupported": [
+    {
+     "loc": "points[3]",
+     "fact": "100,000 토큰 초과 시 토큰당(100만 토큰당) $0.50/$2.50 적용됨",
+     "evidence_id": "it:1144#q3",
+     "supported": false
+    }
+   ],
+   "step_id": 5557
   }
  },
  "w41-decision-api-spec": {
   "week": "2026-W41",
-  "status": "checked",
+  "status": "passed",
   "verdicts": {
    "Q1": {
     "verdict": "pass",
-    "critique": "요약 첫 문장이 3개 출력 유형 지원 결론을 제시하고 첫 포인트도 angle인 출력 유형 스펙을 정확히 다룸"
+    "critique": "summary 첫 문장에서 오픈AI 디시전스 API의 출력 유형 스펙을 명시하고 angle 핵심인 predicate·choice·score 스펙을 첫 번째 point에서 정확히 다룸"
    },
    "Q2": {
     "verdict": "pass",
-    "critique": "도식 없이 빈칸 규칙을 준수했으며 포인트를 개요에서 과도하게 반복하지 않고 concepts도 본문 용어로 채움"
+    "critique": "불필요한 도식이나 중복된 point가 없으며, overview가 후속 토픽 맥락을 설명하며 단순 되풀이를 피함"
    },
    "Q3": {
     "verdict": "pass",
-    "critique": "이전 토픽과의 맥락 및 세 가지 출력 유형과 과금 체계를 3분 안에 명확히 파악할 수 있음"
+    "critique": "이전 토픽 대비 추가된 스펙 및 과금 구조를 3분 안에 명확히 파악할 수 있도록 concepts와 본문이 잘 구성됨"
    },
    "Q4": {
     "verdict": "pass",
-    "critique": "번역투나 어색한 문장 없이 간결하고 담백한 문체로 서술됨"
+    "critique": "번역투나 어색한 문장 없이 매끄러운 개조식/평서문으로 서술됨"
    }
   },
   "scores": {
    "정확성": {
     "score": 5,
-    "reason": "제시된 모든 스펙 및 과금 수치가 근거 문서 내용과 완전히 일치함"
+    "reason": "모든 문장과 수치(100만 토큰당 10센트, 4.2센트 등)가 근거 문서와 정확히 일치함"
    },
    "구성": {
     "score": 5,
-    "reason": "angle에 맞춘 핵심 출력 유형부터 비교 및 가격 구조로 논리적 흐름이 매끄러움"
+    "reason": "결론과 앵글이 최상단에 배치되고 도식 없이 깔끔하게 concepts로 세부 스펙을 뒷받침함"
    },
    "표현": {
     "score": 5,
-    "reason": "번역투 없이 명확하고 군더더기 없는 문장을 구사함"
+    "reason": "번역투 없이 간결하고 담백하게 작성됨"
    }
   },
   "facts": {
-   "total": 23,
-   "supported": 23,
+   "total": 26,
+   "supported": 26,
    "unsupported": [],
-   "step_id": 5419
+   "step_id": 5559
   }
  },
  "w41-openai-rogue-agent": {
@@ -697,82 +704,82 @@
   "verdicts": {
    "Q1": {
     "verdict": "pass",
-    "critique": "summary 첫 문장에서 OpenAI가 4000개 문제로 722편 원고를 냈다는 결론을 제시했고, plan.angle 내용이 첫 번째 point에 핵심으로 배치됨"
+    "critique": "summary 첫 문장에 결론(오픈AI가 722편 수학 연구 원고 공개)이 제시되고 angle(4000개 문제·722편 원고 공개)의 핵심이 첫 point에 반영됨"
    },
    "Q2": {
     "verdict": "pass",
-    "critique": "무리하게 수치 막대나 타임라인을 채우지 않고 비워두었으며, concepts의 Lean도 본문에 등장하고 point와 overview의 과도한 중복 없이 요약됨"
+    "critique": "도식 칸 무리하게 채우지 않았고, concepts의 Lean은 본문 포인트에 명시된 용어이며 개요와 포인트 간 불필요한 중복 군더더기 없음"
    },
    "Q3": {
     "verdict": "pass",
-    "critique": "오픈AI의 연구 성과와 공개 맥락(Lean 검증, 연산량 규모, 한계점)이 명확히 전달되어 3분 내 이해 가능함"
+    "critique": "무슨 일인지(수학 성과 원고 공개), 왜 중요한지(Lean 형식화 및 추론 연산량 수준), 주의점(오류 가능성)이 명확히 전달됨"
    },
    "Q4": {
     "verdict": "pass",
-    "critique": "번역투나 부자연스러운 문장 없이 매끄럽게 서술됨"
+    "critique": "번역투 없이 간결하고 자연스러운 평서문/명사형 종결로 작성됨"
    }
   },
   "scores": {
    "정확성": {
     "score": 5,
-    "reason": "문서에 기재된 4000개 문제, 722편 원고, Lean 형식화, 3시간 연산량 등 주요 사실과 정확히 일치함"
+    "reason": "모든 문장과 수치가 근거 문서(it:1156, it:1102)와 정확히 일치함"
    },
    "구성": {
     "score": 5,
-    "reason": "결론 중심 요약과 중요도 순의 포인트 배치, 군더더기 없는 도식 생략이 잘 이루어짐"
+    "reason": "결론 중심 요약, 중요도 순 포인트 배치, 불필요한 도식 배제가 적절함"
    },
    "표현": {
     "score": 5,
-    "reason": "간결하고 담백한 문체로 번역투 없이 정리됨"
+    "reason": "번역투 없이 명확하고 담백하게 서술됨"
    }
   },
   "facts": {
-   "total": 21,
-   "supported": 21,
+   "total": 15,
+   "supported": 15,
    "unsupported": [],
-   "step_id": 5423
+   "step_id": 5561
   }
  },
  "w41-openai-textgrain": {
   "week": "2026-W41",
-  "status": "checked",
+  "status": "passed",
   "verdicts": {
    "Q1": {
     "verdict": "pass",
-    "critique": "summary 첫 문장에 오픈AI의 EU 내 textGrain 적용 결론이 명시되어 있고, 첫 point가 angle인 'EU AI Act 대응 textGrain 워터마크 적용'을 정확히 반영함"
+    "critique": "summary 첫 문장에서 오픈AI의 EU AI Act 대응 textGrain 적용 사실을 명확히 전달하고 있으며, angle 내용이 첫 번째 point에 충실히 반영되어 있음"
    },
    "Q2": {
     "verdict": "pass",
-    "critique": "도식 없이 필수 요소만 간결히 채웠으며, overview와 points 간의 불필요한 단순 수치 복제가 없고 내용 구분이 명확함"
+    "critique": "조건에 맞지 않는 불필요한 도식 칸을 억지로 채우지 않고 비워두었으며, points와 overview 간 무의미한 중복이 없음"
    },
    "Q3": {
     "verdict": "pass",
-    "critique": "배경과 핵심(적용 대상, 기술 특성, 한계점)이 명료하게 정리되어 3분 내 파악이 가능함"
+    "critique": "핵심 내용과 한계점, 성능 수치(길이 및 동의어 치환에 따른 탐지율)가 명확하여 처음 읽는 사람도 빠르게 파악할 수 있음"
    },
    "Q4": {
-    "verdict": "pass",
-    "critique": "어색한 번역투 없이 개조식 종결과 서술이 자연스럽고 명확함"
+    "verdict": "fail",
+    "critique": "point 2의 '성능을 맞거나 초과함'과 같은 어색한 직역 표현('matched or exceeded')이 포함되어 있어 매끄럽지 못함"
    }
   },
   "scores": {
    "정확성": {
     "score": 5,
-    "reason": "모든 포인트와 수치가 근거 문서 내용과 완전히 일치함"
+    "reason": "모든 주요 서술과 수치가 근거 문서의 내용과 정확히 일치함"
    },
    "구성": {
     "score": 5,
-    "reason": "핵심 발표 결론부터 세부 성능 및 한계 순으로 논리 정연하게 배열됨"
+    "reason": "결론 중심 요약과 중요도 순의 포인트 구성이 잘 갖추어져 있음"
    },
    "표현": {
-    "score": 5,
-    "reason": "군더더기 없는 담백한 문체로 번역투 없이 작성됨"
+    "score": 3,
+    "reason": "'성능을 맞거나 초과함' 등 일부 직역투 표현이 아쉬움"
    }
   },
   "facts": {
-   "total": 18,
-   "supported": 18,
+   "total": 17,
+   "supported": 17,
    "unsupported": [],
-   "step_id": 5425
+   "step_id": 5563
   }
  },
  "w41-openrig-orchestrator": {
@@ -781,40 +788,40 @@
   "verdicts": {
    "Q1": {
     "verdict": "pass",
-    "critique": "summary 첫 문장에 OpenRig의 핵심 역할과 v0.6.6 업데이트 내용이 결론으로 제시되고 첫 point에 angle 핵심이 반영됨"
+    "critique": "summary 첫 문장에서 OpenRig가 Claude Code와 Codex를 팀으로 오케스트레이션하는 오픈소스 CLI임을 결론으로 제시하고, angle의 핵심이 point 1에 잘 반영되어 있음"
    },
    "Q2": {
-    "verdict": "fail",
-    "critique": "근거 소스가 GitHub과 GeekNews 2곳이 있으나 contributions에 github 단일 채널만 작성되어 채널 요건 미충족"
+    "verdict": "pass",
+    "critique": "도식 요소가 없어야 할 때 깔끔하게 비워 두었고, overview가 points를 불필요하게 단순 반복하지 않고 유기적으로 정리함"
    },
    "Q3": {
     "verdict": "pass",
-    "critique": "무슨 일이고 왜 중요한지 명확하며 필요한 시스템 요구 사항과 핵심 구조를 알기 쉽게 설명함"
+    "critique": "처음 읽는 사람도 무엇을 하는 도구이고 어떤 기능이 추가되었는지 3분 안에 파악할 수 있으며 구조가 명확함"
    },
    "Q4": {
     "verdict": "pass",
-    "critique": "번역투나 어색한 표현 없이 명료하고 자연스러운 문체로 작성됨"
+    "critique": "번역투 없이 명확하고 자연스러운 문체로 작성됨"
    }
   },
   "scores": {
    "정확성": {
     "score": 5,
-    "reason": "모든 문장이 근거 문서의 내용과 정확히 일치함"
+    "reason": "출력된 모든 내용이 근거 문서와 정확히 일치함"
    },
    "구성": {
-    "score": 3,
-    "reason": "근거 채널이 2개인데 contributions에 1개 채널만 작성됨"
+    "score": 5,
+    "reason": "핵심 결론이 서두에 오고 포인트 및 개요 구성이 매끄러움"
    },
    "표현": {
     "score": 5,
-    "reason": "간결하고 자연스러운 기술 브리핑 문체 유지"
+    "reason": "번역투 없이 담백하고 군더더기 없는 문체임"
    }
   },
   "facts": {
-   "total": 22,
-   "supported": 22,
+   "total": 18,
+   "supported": 18,
    "unsupported": [],
-   "step_id": 5427
+   "step_id": 5565
   }
  },
  "w41-agent-coding-talks": {
@@ -823,40 +830,40 @@
   "verdicts": {
    "Q1": {
     "verdict": "pass",
-    "critique": "summary 첫 문장에 결론과 angle의 핵심 주제(코드베이스 부패, 상태 머신 등)가 담겨 있고 point 1에 angle의 첫 핵심인 Slop과 상태 머신이 잘 드러남"
+    "critique": "요약 첫 문장이 핵심 결론(코드베이스 부패와 Slop 문제 확대 및 대안 부상)을 포착하고 angle의 핵심 요소가 첫 point 및 후속 point에 명확히 연결됨"
    },
    "Q2": {
     "verdict": "pass",
-    "critique": "numbers, events, contributions를 무리하게 채우지 않았고 points 간 중복이 없으며 overview가 단순 반복에 그치지 않고 핵심을 잘 아우름"
+    "critique": "도식이나 사건 등 불필요한 빈 칸을 무리하게 채우지 않았고, overview와 points 간 과도한 수치/문장 중복 없이 군더더기가 없음"
    },
    "Q3": {
     "verdict": "pass",
-    "critique": "문제 상황(Slop, 코드베이스 부패)부터 해결책 및 워크플로우 변화까지 3분 안에 파악 가능하도록 명확하게 서술됨"
+    "critique": "3개의 비디오 소스에서 다룬 핵심 메시지(부패/Slop/검증 병목과 대안)가 3분 안에 파악 가능하도록 명확하고 논리적으로 정리됨"
    },
    "Q4": {
     "verdict": "pass",
-    "critique": "번역투나 어색한 표현 없이 간결하고 명확한 문체로 작성됨"
+    "critique": "어색한 직역투나 번역투 문장 없이 명확한 개조식 및 서술형 한국어로 매끄럽게 작성됨"
    }
   },
   "scores": {
    "정확성": {
     "score": 5,
-    "reason": "문서에 나타난 수치(72%, 80개 등)와 개념이 근거와 정확히 부합함"
+    "reason": "인용된 수치(72%) 및 각 영상의 핵심 발언 내용이 근거 문서와 정확히 일치함"
    },
    "구성": {
     "score": 5,
-    "reason": "angle에 맞추어 문제 정의에서 구체적 해법 및 사례 순으로 체계적으로 구성됨"
+    "reason": "결론 중심 요약과 문제 제기부터 해결 방안까지 포인트 순서 배치가 논리적임"
    },
    "표현": {
     "score": 5,
-    "reason": "군더더기 없는 담백한 문장과 명확한 용어 사용이 돋보임"
+    "reason": "군더더기 없고 담백하며 전문 용어 정리가 깔끔함"
    }
   },
   "facts": {
-   "total": 23,
-   "supported": 23,
+   "total": 19,
+   "supported": 19,
    "unsupported": [],
-   "step_id": 5429
+   "step_id": 5567
   }
  }
 }
