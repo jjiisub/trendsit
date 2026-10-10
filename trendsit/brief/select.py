@@ -399,10 +399,15 @@ def select(ctx: Ctx, cands: list[Candidate], ev: WeekEvidence, cfg: BriefConfig,
 
 
 def save(db: DB, res: SelectResult, run_id: str, week: str) -> None:
+    save_plan(db, run_id, week, res.source, res.plan.model_dump_json() if res.plan else "{}", res.topics)
+
+
+def save_plan(db: DB, run_id: str, week: str, source: str, plan_json: str, topics: list[Applied]) -> None:
+    """briefing_plans 한 줄과 topics 행들. 선별 결과(save)와 이어 받은 계획(--from-step write 이후)이 같이 쓴다."""
     with db.conn:
         db.conn.execute("INSERT INTO briefing_plans(run_id, week, source, plan_json, created_at) VALUES (?,?,?,?,?)",
-                        (run_id, week, res.source, res.plan.model_dump_json() if res.plan else "{}", now_kst()))
-        for t in res.topics:
+                        (run_id, week, source, plan_json, now_kst()))
+        for t in topics:
             db.conn.execute(
                 "INSERT INTO topics(run_id, topic_id, week, cluster_ids_json, rank, lead, relation_type, relation_topic_id, "
                 "relation_label, status, angle) VALUES (?,?,?,?,?,?,?,?,?,?,?)",

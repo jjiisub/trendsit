@@ -17,14 +17,14 @@ from ..core.artifacts_brief import BriefingPlan, TopicPage
 from ..core.budget import BudgetExceeded, PriceUnknown
 from ..core.config_brief import BriefConfig
 from ..core.context import Ctx
-from ..core.db import DB, now_kst
-from ..filter.embed import to_blob
+from ..core.db import DB
+from ..filter.embed import embed_interests, to_blob
 from . import aliases as al
 from . import cluster as cl
 from . import select as sel
 from . import write as wr
 from .evidence import week_evidence
-from .weekly import stage_cluster
+from .weekly import set_run_week, stage_cluster
 
 STEPS = ("cluster", "select", "write", "review")
 ROLES = ("decide", "editor_select", "writer", "writer_revise", "critic")
@@ -39,17 +39,17 @@ def run_weekly(week: str, ctx: Ctx, from_step: str = "cluster", only_topic: str 
     db, tr = ctx.db, ctx.tracer
     assert tr is not None
     run_id = tr.run_id
-    with db.conn:  # 바로 커밋(열린 쓰기 트랜잭션이 LLM 호출 내내 DB를 잠그지 않게)
-        db.conn.execute("UPDATE runs SET week=? WHERE id=?", (week, run_id))
+    set_run_week(db, run_id, week)
     flt = config.load("filter.yaml")
     embedder = embedder or make_embedder("real", flt)
+    interests = embed_interests(embedder, flt)
     dur: dict[str, float] = {}
     t0 = time.monotonic()
     src = (db.conn.execute("SELECT current_run_id FROM weeks WHERE week=?", (week,)).fetchone() or [None])[0]
     if from_step != "cluster" and not src:
         raise ValueError(f"{week}: 이어 갈 현재판 run이 없음(--from-step cluster부터)")
     if from_step == "cluster":
-        stage = stage_cluster(week, ctx, cfg, embedder, set_current=False)
+        stage = stage_cluster(week, ctx, cfg, embedder, set_current=False, interests=interests)
         ev, table, cluster_run = stage.evidence, stage.aliases, run_id
         from .report import write_cluster_report, write_label_sheets
 
@@ -59,11 +59,8 @@ def run_weekly(week: str, ctx: Ctx, from_step: str = "cluster", only_topic: str 
         dur |= {"evidence": stage.seconds["evidence"] + stage.seconds["normalize"], "cluster": stage.seconds["cluster"]}
     else:
         ev = week_evidence(db, week)
-        table = al.load_decided(db, al.build(list(ev.members.values()), config.load("keywords.yaml"),
-                                             cfg.aliases.fuzz_min_score,
-                                             cfg.aliases.transliteration))
-        cl.score_video_relevance(list(ev.members.values()), embedder, [(x.keyword_id, x.text) for x in flt.interests],
-                                 cfg.evidence.video_relevance_high)
+        table = al.decided_table(db, list(ev.members.values()), cfg)
+        cl.score_video_relevance(list(ev.members.values()), embedder, interests, cfg.evidence.video_relevance_high)
         r = db.conn.execute("SELECT summary_json FROM runs WHERE id=?", (src,)).fetchone()
         cluster_run = (json.loads(r["summary_json"]) if r and r["summary_json"] else {}).get("cluster_run") or src
     tr.step(kind="code", role="weekly", text=f"{week} weekly 시작: {from_step}부터", detail={
@@ -72,7 +69,7 @@ def run_weekly(week: str, ctx: Ctx, from_step: str = "cluster", only_topic: str 
         return _close(ctx, week, t0, dur)
     # ---------- select ----------
     t1 = time.monotonic()
-    sims = cl.interest_similarity(db, list(ev.members.values()), embedder, [(x.keyword_id, x.text) for x in flt.interests])
+    sims = cl.interest_similarity(db, list(ev.members.values()), embedder, interests)
     cands = sel.load_candidates(db, cluster_run, ev, cfg.select.max_candidates, sims)
     sites = [r["name"] for r in db.conn.execute("SELECT name FROM sources") if r["name"]]
     if from_step in ("cluster", "select"):
@@ -93,15 +90,7 @@ def run_weekly(week: str, ctx: Ctx, from_step: str = "cluster", only_topic: str 
                               (src,)).fetchone()
         plan = BriefingPlan.model_validate_json(row["plan_json"])
         topics = sel.apply(plan, cands, week, db)
-        with db.conn:
-            db.conn.execute("INSERT INTO briefing_plans(run_id, week, source, plan_json, created_at) VALUES (?,?,?,?,?)",
-                            (run_id, week, row["source"], row["plan_json"], now_kst()))
-            for t in topics:
-                db.conn.execute(
-                    "INSERT INTO topics(run_id, topic_id, week, cluster_ids_json, rank, lead, relation_type, "
-                    "relation_topic_id, relation_label, status, angle) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
-                    (run_id, t.topic_id, week, json.dumps(t.cluster_ids), t.rank, int(t.lead), t.relation_type,
-                     t.relation_topic_id, t.relation_label or None, "selected", t.angle))
+        sel.save_plan(db, run_id, week, row["source"], row["plan_json"], topics)
     dur["select"] = round(time.monotonic() - t1, 1)
     if until == "select":
         topics = []

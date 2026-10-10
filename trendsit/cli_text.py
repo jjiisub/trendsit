@@ -93,12 +93,11 @@ DEVICE_DIFF_MAX = 0.01  # 설계 결정 N5: 장치 간 재현 기준 = 판정이
 
 def cmd_filter_fixtures(args: argparse.Namespace) -> int:
     """재현 픽스처 20건의 점수만 계산(DB 없음). --record면 장치별 점수를 reports/S2_filter/fixture_scores.json에 기록."""
-    from .filter.embed import best_interest, make_embedder
+    from .filter.embed import best_interest, embed_interests, make_embedder
 
     cfg = config.load("filter.yaml")
     embedder = make_embedder(args.embedder, cfg, args.device)
-    interests = list(zip([x.keyword_id for x in cfg.interests],
-                         embedder.embed_queries([x.text for x in cfg.interests]), strict=True))
+    interests = embed_interests(embedder, cfg)
     fx = load_filter_fixtures()
     vecs = embedder.embed_docs([f["input"]["text"] for _, f in fx])
     ref_path = FILTER_REPORT / "fixture_scores.json"

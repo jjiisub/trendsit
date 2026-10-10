@@ -22,7 +22,7 @@ from ..core.artifacts import Document
 from ..core.artifacts_brief import DecideAnswer, DecideInput, PairShared
 from ..core.config_brief import BriefConfig
 from ..core.db import DB, now_kst
-from ..filter.embed import Embedder, cosine, from_blob, to_blob
+from ..filter.embed import Embedder, best_interest, cosine, from_blob, to_blob
 from .aliases import AliasTable, norm_key
 from .evidence import RELEVANCE_RANK, Member, WeekEvidence
 
@@ -113,32 +113,30 @@ def member_vectors(db: DB, members: Sequence[Member], embedder: Embedder, mode: 
     return vecs
 
 
-def score_video_relevance(members: Sequence[Member], embedder: Embedder, interests: Sequence[tuple[str, str]],
+def score_video_relevance(members: Sequence[Member], embedder: Embedder, interests: list[tuple[str, list[float]]],
                           high: float) -> dict[str, float]:
     """영상 relevance(멈춤 지점 결정 4): digest 요약을 S2 관련성 필터와 같은 방식(관심사 설명 쿼리와의 코사인 최댓값)으로
     점수 매겨 high 이상이면 high, 아래면 mid. Member.relevance를 바꾸고 점수를 돌려준다."""
     vids = [m for m in members if m.channel == "video"]
     if not vids:
         return {}
-    queries = embedder.embed_queries([t for _k, t in interests])
     docs = embedder.embed_docs([member_text(m) for m in vids])
     out = {}
     for m, v in zip(vids, docs, strict=True):
-        s = round(max(cosine(v, q) for q in queries), 4)
+        s = round(best_interest(v, interests)[0], 4)
         m.relevance = "high" if s >= high else "mid"
         out[m.key] = s
     return out
 
 
 def interest_similarity(db: DB, members: Sequence[Member], embedder: Embedder,
-                        interests: Sequence[tuple[str, str]]) -> dict[str, float]:
+                        interests: list[tuple[str, list[float]]]) -> dict[str, float]:
     """선별 순서(C-21): 모든 채널을 같은 재료("제목 + 요약": 글 카드 summary, 영상 digest 요약, 레포 oneliner)로 임베딩해
     관심사 쿼리와의 코사인 최댓값(S2 관련성 필터 방식). 임베딩은 member_embeddings 캐시(card 모드)를 쓴다."""
     if not members:
         return {}
     vecs = member_vectors(db, members, embedder, mode="card")
-    queries = embedder.embed_queries([t for _k, t in interests])
-    return {k: round(max(cosine(v, q) for q in queries), 4) for k, v in vecs.items()}
+    return {k: round(best_interest(v, interests)[0], 4) for k, v in vecs.items()}
 
 
 # ---------- 쌍 ----------

@@ -78,12 +78,11 @@ def main() -> int:
             return 2
         runs[w] = r[0]
     cfg = config.load("brief.yaml")
-    keywords = config.load("keywords.yaml")
     tl = cfg.aliases.transliteration
     pages = []
     for week, run in runs.items():
         ev = week_evidence(db, week)  # type: ignore[arg-type]
-        table = al.load_decided(db, al.build(list(ev.members.values()), keywords, cfg.aliases.fuzz_min_score, tl))  # type: ignore[arg-type]
+        table = al.decided_table(db, list(ev.members.values()), cfg)  # type: ignore[arg-type]
         for t in conn.execute("SELECT topic_id, cluster_ids_json FROM topics WHERE run_id=? ORDER BY rank, topic_id", (run,)):
             cids = json.loads(t["cluster_ids_json"])
             members = list(dict.fromkeys(
