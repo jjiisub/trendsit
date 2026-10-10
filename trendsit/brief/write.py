@@ -15,6 +15,7 @@ import re
 from dataclasses import dataclass, field
 from typing import Any
 
+from ..core import config
 from ..core.artifacts import Document
 from ..core.artifacts_brief import (
     AliasLine,
@@ -141,8 +142,8 @@ def alias_lines(table: AliasTable, members: list[Member]) -> list[AliasLine]:
     return [AliasLine(canonical=c, aliases=sorted(a)) for c, a in sorted(by.items())]
 
 
-def raw_evidence(db: DB, eid: str, items: list[EvidenceItem]) -> str:
-    """검수자용 근거 원문(요약 칸이 아님): 글 quote 문장, 영상 그 시각 앞뒤 30초 전사와 판독 글자, 레포 필드."""
+def raw_evidence(db: DB, eid: str, items: list[EvidenceItem], window_sec: int) -> str:
+    """검수자용 근거 원문(요약 칸이 아님): 글 quote 문장, 영상 그 시각 앞뒤 window_sec초 전사와 판독 글자, 레포 필드."""
     if eid.startswith("vd:") and "@" in eid:
         item_id, sec = eid[3:].split("@")
         sec_i = int(sec)
@@ -150,9 +151,9 @@ def raw_evidence(db: DB, eid: str, items: list[EvidenceItem]) -> str:
         parts = []
         if vid:
             segs = db.conn.execute('SELECT text FROM video_segments WHERE video_id=? AND "end">=? AND start<=? ORDER BY idx',
-                                   (vid["video_id"], sec_i - 30, sec_i + 30)).fetchall()
+                                   (vid["video_id"], sec_i - window_sec, sec_i + window_sec)).fetchall()
             if any(s["text"] for s in segs):
-                parts.append("전사(앞뒤 30초): " + " ".join(s["text"] for s in segs if s["text"]))
+                parts.append(f"전사(앞뒤 {window_sec}초): " + " ".join(s["text"] for s in segs if s["text"]))
             fr = db.conn.execute("SELECT reading_json FROM video_frames WHERE video_id=? ORDER BY ABS(t-?) LIMIT 1",
                                  (vid["video_id"], sec_i)).fetchone()
             if fr and fr["reading_json"]:
@@ -179,10 +180,6 @@ def refs_of(page: TopicPage) -> list[str]:
     ids += [r for c in page.contributions for r in c.refs]
     ids += [r for g in [*page.numbers, *page.events] for r in checks.REF.findall(g.context)]
     return list(dict.fromkeys(ids))
-
-
-def ref_channel(ref: str) -> str:
-    return "video" if ref.startswith("vd:") else "github" if ref.startswith("rp:") else "text"
 
 
 # ---------- 수정 합치기 ----------
@@ -262,7 +259,7 @@ def apply_revision(prev: TopicPage, rev: TopicPageRevision, allowed: set[str]) -
             val = Point(text=val, refs=data[name][idx]["refs"] if idx < len(data[name]) else [])
         if name == "contributions" and isinstance(val, Point):
             # 채널 없이 낸 기여 문장(OpenRig 재실행: 두 채널을 한 문장에, 반영 확인 리뷰 G6). refs가 한 채널이면 그 채널로
-            chans = {ref_channel(r) for r in val.refs}
+            chans = {"video" if r.startswith("vd:") else "github" if r.startswith("rp:") else "text" for r in val.refs}
             if len(chans) == 1:
                 val = Contribution(channel=chans.pop(), text=val.text, refs=val.refs)  # type: ignore[arg-type]
             else:
@@ -331,6 +328,7 @@ def write_topic(ctx: Ctx, topic: Applied, members: dict[str, Member], table: Ali
         ctx.tracer.step(kind="code", role="writer", text=f"{topic.topic_id}: 작성 실패", attention=True, error=err)
         return res
     critic = load_role("critic", ctx.models)
+    window_sec = config.load("video.yaml").align_window_sec
     reviser = load_role("writer_revise", ctx.models)
     seen: dict[tuple[str, str], int] = {}
     check_locs: set[str] = set()
@@ -344,7 +342,7 @@ def write_topic(ctx: Ctx, topic: Applied, members: dict[str, Member], table: Ali
         raw_ids = [e for e in pack if not all(it.kind == "summary" for it in pack[e])]
         order = [e for e in refs_of(pg) if e in raw_ids] + [e for e in raw_ids if e not in refs_of(pg)]
         evid = [Document(id=e, source=pack[e][0].source.get("site") or pack[e][0].channel,
-                         title=pack[e][0].source.get("title"), text=raw_evidence(ctx.db, e, pack[e])) for e in order]
+                         title=pack[e][0].source.get("title"), text=raw_evidence(ctx.db, e, pack[e], window_sec)) for e in order]
         cinp = CriticInput(loc_lines=loc_lines(pg), page=pg, evidence=evid, angle=topic.angle, previous=winp.previous,
                            code_warnings=warns, round=rnd)
         out = _call(critic, cinp, ctx, res.costs, "critic")
@@ -357,7 +355,7 @@ def write_topic(ctx: Ctx, topic: Applied, members: dict[str, Member], table: Ali
                 out = (None, "원자 사실 0개 판정 반복", out[2])
         critic_seen = critic_seen or out[0] is not None
         return out
-    raw_page: dict[str, Any] | None = page.raw_dump() if hasattr(page, "raw_dump") else None
+    raw_page: dict[str, Any] | None = page.raw_dump()
     for rnd in range(1, cfg.review.max_rounds + 1):
         cr = checks.run_checks(page, pack, n_sources, cfg, canon, translit, topic.angle)
         page = cr.page
@@ -412,13 +410,7 @@ def write_topic(ctx: Ctx, topic: Applied, members: dict[str, Member], table: Ali
             res.final_round = rnd
             break
         raw_page = rev.model_dump()
-        try:
-            page, reverts, notes = apply_revision(page, rev, flagged)
-        except ValueError as e:  # 형식이 다른 값(ValidationError)은 이전 판 유지 + 남은 이슈 check(리뷰 지적 4)
-            res.attention.append(f"수정 합치기 실패: {str(e)[:120]}")
-            check_locs |= flagged
-            res.final_round = rnd
-            break
+        page, reverts, notes = apply_revision(page, rev, flagged)
         res.rounds[-1].reverts = reverts
         if notes:
             res.attention += notes[:3]

@@ -9,18 +9,13 @@ trap 'rm -rf "$TMP"' EXIT
 EXTRA=()
 [ "$(uname -s)" = "Darwin" ] && EXTRA=(--extra video)
 
-pass() { echo "PASS $1 $2"; }
-fail() { echo "FAIL $1 $2"; FAILED=1; }
-pt() {
-  local id=$1 desc=$2; shift 2
-  local out
-  out=$(uv run --quiet "${EXTRA[@]}" pytest -q "$@" 2>&1 | tail -1)
-  if [[ "$out" == *passed* && "$out" != *failed* && "$out" != *error* ]]; then pass "$id" "$desc ($out)"; else fail "$id" "$desc: $out"; fi
-}
+REUSE=""
+[ "${1:-}" = "--reuse" ] && REUSE=$2  # verify_s5가 이미 돌린 s0·s1 출력을 쓰게 하는 인자
+source scripts/verify_common.sh
 
 # A1 회귀
 for s in 0 1; do
-  if bash "scripts/verify_s$s.sh" >"$TMP/s$s" 2>&1; then :; else fail A1 "verify_s$s.sh: $(grep '^FAIL' "$TMP/s$s" | head -2 | tr '\n' ' ')"; fi
+  if regress "$s"; then :; else fail A1 "verify_s$s.sh: $(grep '^FAIL' "$TMP/s$s" | head -2 | tr '\n' ' ')"; fi
 done
 grep -q '^FAIL' "$TMP/s0" "$TMP/s1" || pass A1 "verify_s0.sh $(grep -c '^PASS' "$TMP/s0")개, verify_s1.sh $(grep -c '^PASS' "$TMP/s1")개 전부 PASS"
 

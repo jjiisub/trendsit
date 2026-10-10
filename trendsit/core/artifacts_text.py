@@ -331,12 +331,6 @@ class CollectionPlan(RoleOutput):
     video_queue: list[VideoQueueItem] = Field(description="영상 처리 지시, 우선순위 순서")
     repo_queue: list[RepoQueueItem] = Field(description="깊게 볼 레포, 우선순위 순서")
 
-    @classmethod
-    def fallback(cls, reason: str, inp: PlanInput) -> Self:
-        from ..deep.plan import fallback_plan
-
-        return fallback_plan(inp, reason)
-
     def enforce(self, inp: PlanInput, ctx: Ctx | None) -> Self:
         from ..deep.plan import validate_plan
 

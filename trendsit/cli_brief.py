@@ -1,9 +1,10 @@
-"""S5 주간 브리핑 명령(COMMON 9장: 스펙별 파일의 register). 지금은 cluster 단계."""
+"""S5 주간 브리핑 명령(COMMON 9장: 스펙별 파일의 register): cluster, weekly, select, write, review."""
 
 from __future__ import annotations
 
 import argparse
 import re
+import sys
 from typing import Any
 
 WEEK = re.compile(r"^\d{4}-W\d{2}$")
@@ -27,7 +28,10 @@ def cmd_cluster(args: argparse.Namespace) -> int:
         stage = stage_cluster(args.week, ctx, use_llm=not args.no_llm)
         path = write_cluster_report(stage, config.load("brief.yaml"),
                                     note=args.note or "")
-        write_label_sheets(stage)
+        if ctx.stopped:
+            status = "stopped"
+        else:  # 멈춘 run은 그 주 라벨 시트 행을 덮지 않음
+            write_label_sheets(stage)
     except Exception:
         status = "failed"
         raise
@@ -36,6 +40,9 @@ def cmd_cluster(args: argparse.Namespace) -> int:
     res = stage.result
     print(f"run {stage.run_id}: 묶음 {len(res.clusters)}(토픽 후보 {len(res.candidates())}), decide {res.decide_calls}회, "
           f"리포트 {path}")
+    if ctx.stopped:
+        print(ctx.stopped, file=sys.stderr)
+        return 1
     return 0
 
 
@@ -46,17 +53,19 @@ def cmd_weekly(args: argparse.Namespace) -> int:
     from .brief.pipeline import run_weekly
     from .core.context import open_ctx
 
-    step = getattr(args, "step", None)  # select/write/review 단계 명령
-    from_step = args.from_step if step is None else ("select" if step == "select" else step)
-    until = step if step in ("select", "write") else None
+    until = getattr(args, "step", None)  # select/write/review 단계 명령
+    until = until if until in ("select", "write") else None
+    from_step = args.from_step
     ctx = open_ctx("weekly", spec=args.spec or "S5", no_cache=args.no_cache,
                    note=f"weekly {args.week} from {from_step}" + (f" until {until}" if until else "")
                    + (f" topic {args.topic}" if getattr(args, "topic", None) else ""))
     status = "ok"
     try:
         summary = run_weekly(args.week, ctx, from_step=from_step, only_topic=getattr(args, "topic", None), until=until)
-        status = {"ok": "ok", "partial": "partial"}.get(summary["status"], "failed")
-        path = write_briefing_md(ctx.db, args.week, ctx.tracer.run_id)
+        status = "ok" if summary["status"] == "done" else summary["status"]
+        all_failed = not until and summary["status"] == "failed"  # 현재판이 바뀌지 않음(pipeline._close)
+        if not ctx.stopped and not all_failed:  # 멈추거나 전부 실패한 run의 읽기본이 직전 현재판의 읽기본을 덮지 않게
+            path = write_briefing_md(ctx.db, args.week, ctx.tracer.run_id)
     except Exception:
         status = "failed"
         raise
@@ -64,6 +73,12 @@ def cmd_weekly(args: argparse.Namespace) -> int:
         ctx.tracer.finish(status)
     print(json.dumps({k: summary[k] for k in ("week", "status", "select", "write", "review", "cost_usd", "duration_sec")},
                      ensure_ascii=False))
+    if ctx.stopped:
+        print(f"run {ctx.tracer.run_id}, {ctx.stopped}", file=sys.stderr)
+        return 1
+    if all_failed:
+        print(f"run {ctx.tracer.run_id}, 토픽 전부 실패(0개 포함): 현재판 그대로", file=sys.stderr)
+        return 1
     print(f"run {ctx.tracer.run_id}, 브리핑 읽기본 {path}")
     return 0
 

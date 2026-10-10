@@ -15,7 +15,7 @@ from typing import Any
 from ..core.artifacts_brief import TopicPage
 from ..core.config import ROOT
 from ..core.db import DB
-from .evidence import EvidenceItem, week_evidence
+from .evidence import week_evidence
 
 OUT = ROOT / "reports" / "S5_brief"
 
@@ -71,7 +71,7 @@ def export_topic(db: DB, run_id: str, topic_id: str, sources_by_id: dict[str, di
     events = [{"type": "events", "anchor": g.anchor, "title": g.title, "context": g.context,
                "items": [{"date": it.date, "text": it.text} | ({"ref": by_eid.get(it.ref)} if it.ref else {"topic_id": it.topic_id})
                          for it in g.items]} for g in page.events]
-    checks = visible_checks(json.loads(t["checks_json"] or "[]") if "checks_json" in t.keys() else [], page)
+    checks = visible_checks(json.loads(t["checks_json"] or "[]"), page)
     rel: dict[str, Any] = {"type": t["relation_type"] or "new"}
     if t["relation_topic_id"]:
         rel["topic_id"] = t["relation_topic_id"]
@@ -87,19 +87,14 @@ def export_topic(db: DB, run_id: str, topic_id: str, sources_by_id: dict[str, di
             "has_check": any(p.check for p in page.points) or bool(checks), "checks": checks}
 
 
-def sources_index(db: DB, week: str) -> tuple[dict[str, dict[str, Any]], dict[str, list[EvidenceItem]]]:
+def sources_index(db: DB, week: str) -> dict[str, dict[str, Any]]:
     ev = week_evidence(db, week)
-    out, items = {}, {}
-    for m in ev.members.values():
-        for it in m.items:
-            out[it.id] = {"channel": m.channel} | it.source
-            items.setdefault(it.id, []).append(it)
-    return out, items
+    return {it.id: {"channel": m.channel} | it.source for m in ev.members.values() for it in m.items}
 
 
 def write_briefing_md(db: DB, week: str, run_id: str | None = None) -> Path:
     run_id = run_id or db.conn.execute("SELECT current_run_id FROM weeks WHERE week=?", (week,)).fetchone()[0]
-    srcs, _items = sources_index(db, week)
+    srcs = sources_index(db, week)
     topics = db.conn.execute("SELECT * FROM topics WHERE run_id=? ORDER BY rank", (run_id,)).fetchall()
     plan_row = db.conn.execute("SELECT plan_json, source FROM briefing_plans WHERE run_id=? ORDER BY id DESC LIMIT 1",
                                (run_id,)).fetchone()
@@ -123,7 +118,7 @@ def write_briefing_md(db: DB, week: str, run_id: str | None = None) -> Path:
                     if (checks := visible_checks(json.loads(t["checks_json"] or "[]"), page)) else []),
                   f"**요약(홈)** {page.summary}", "", f"**개요** {page.overview}", "", "**핵심 포인트**", ""]
         for i, p in enumerate(page.points, 1):
-            refs = "; ".join(f"`{r}` {(srcs.get(r) or {}).get('title', '?')[:50]}" for r in p.refs)
+            refs = "; ".join(f"`{r}` {((srcs.get(r) or {}).get('title') or '?')[:50]}" for r in p.refs)
             lines.append(f"{i}. {'⚠ ' if p.check else ''}{p.text}  \n   ← {refs}")
             for g in [g for g in page.numbers if g.anchor == i]:
                 lines += ["", f"   **도식(수치): {g.title}** ({g.unit}) — {g.context}", "",

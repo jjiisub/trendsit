@@ -9,19 +9,13 @@ FAILED=0
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 
-pass() { echo "PASS $1 $2"; }
-fail() { echo "FAIL $1 $2"; FAILED=1; }
-# pytest 묶음 하나를 항목 하나로: $1=항목 $2=설명 $3...=pytest 인자
-pt() {
-  local id=$1 desc=$2; shift 2
-  local out
-  out=$(uv run --quiet pytest -q "$@" 2>&1 | tail -1)
-  if [[ "$out" == *passed* && "$out" != *failed* && "$out" != *error* ]]; then pass "$id" "$desc ($out)"; else fail "$id" "$desc: $out"; fi
-}
+REUSE=""
+[ "${1:-}" = "--reuse" ] && REUSE=$2  # verify_s5가 이미 돌린 s0·s1 출력을 쓰게 하는 인자
+source scripts/verify_common.sh
 
 # ---------- 공통: 회귀, 정적 검사, 설정, 역할 md ----------
 for n in 0 1; do
-  if bash "scripts/verify_s$n.sh" >"$TMP/s$n" 2>&1; then ok[$n]=1; else ok[$n]=0; fi
+  if regress "$n"; then ok[$n]=1; else ok[$n]=0; fi
 done
 if [ "${ok[0]}" = 1 ] && [ "${ok[1]}" = 1 ]; then
   pass A1 "verify_s0.sh $(grep -c '^PASS' "$TMP/s0")개, verify_s1.sh $(grep -c '^PASS' "$TMP/s1")개 전부 PASS"

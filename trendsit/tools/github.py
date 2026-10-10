@@ -1,6 +1,6 @@
 """GitHub 도구(레포 분석가, 글 분석가). GitHub API를 safe_fetch로만 부른다. 결과는 모델에게 줄 짧은 사실 묶음.
 
-자원: state.ctx.resources["fetcher"](없으면 만들어 넣음), ["github_headers"](토큰), ["today"](날짜 고정, 테스트용).
+자원: state.ctx.resources["github_fetcher"](캐시 없는 Fetcher, 없으면 만들어 넣음), ["github_headers"](토큰), ["today"](날짜 고정, 테스트용).
 API 재시도: Fetcher가 429·5xx를 지수 백오프로 3회.
 """
 
@@ -29,10 +29,10 @@ def valid_name(name: str) -> bool:
 def resources(state: Any) -> dict[str, Any]:
     ctx = getattr(state, "ctx", None)
     res = ctx.resources if ctx is not None else getattr(state, "extras", {})
-    if "fetcher" not in res:
+    if "github_fetcher" not in res:
         from ..collect.fetch import Fetcher
 
-        res["fetcher"] = Fetcher(None, use_cache=False)
+        res["github_fetcher"] = Fetcher(None, use_cache=False)
     if "github_headers" not in res:
         from ..core.config import get_secret
 
@@ -51,7 +51,7 @@ def api_get(state: Any, path: str, *, raw: bool = False) -> tuple[int | None, An
     headers = dict(res["github_headers"])
     if raw:
         headers["Accept"] = "application/vnd.github.raw"
-    r = res["fetcher"].fetch(f"{API}{path}", kind="api", headers=headers)
+    r = res["github_fetcher"].fetch(f"{API}{path}", kind="api", headers=headers)
     if r.status == 404:
         return 404, None
     if not r.ok:

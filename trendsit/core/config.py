@@ -105,7 +105,6 @@ class TextSource(Strict):
     id: str
     name: str
     kind: Literal["primary", "curation", "news"]
-    lang: str
     feed: str | None = Field(default=None, pattern=r"^https?://")
     # list_origin: RSS를 쓰지 않고 날짜별 목록(backfill.day_archive)에서 제목, 원문 링크를 모은 뒤 본문은 원문 링크에서(GeekNews)
     fetch: Literal["feed_full", "feed_summary", "feed_title", "list_origin"]
@@ -134,8 +133,6 @@ class VideoBackfill(Strict):
 class VideoSource(Strict):
     id: str
     name: str
-    lang: str
-    channel_handle: str
     channel_id: str = Field(pattern=r"^UC[\w-]{22}$")
     feed: str = Field(pattern=r"^https?://")
     backfill: VideoBackfill = VideoBackfill(method="rss_only")
@@ -149,7 +146,6 @@ class Trending(Strict):
 
 class TrackedRepo(Strict):
     repo: str = Field(pattern=r"^[\w.-]+/[\w.-]+$")
-    why: str
 
 
 class GithubConfig(Strict):
@@ -174,7 +170,6 @@ class SourcesConfig(Strict):
 # ---------- link_kinds.yaml ----------
 class KindRule(Strict):
     domains: list[str] = []
-    paths: list[str] = []  # 참고용(예: arxiv /abs/). 판별은 도메인으로
     path_contains: list[str] = []  # 도메인이 달라도 경로에 이 문자열이 있으면 이 종류
 
 
@@ -256,7 +251,6 @@ class DeepConfig(Strict):
     video_minutes: int = Field(ge=0)  # 밤 하나에 처리할 영상 분(skip 제외, 60분 넘는 영상은 처리 구간만)
     slide_videos: int = Field(ge=0)  # whisper+slides 영상 수
     vlm_frames: int = Field(ge=0)  # 슬라이드 판독 프레임 총수
-    frames_per_slide_video: int = Field(default=20, ge=1)  # 영상당 프레임 상한(S4 --frames-cap)
     text_items: int = Field(ge=0)  # 글 분석가 항목 수
     text_tool_calls_per_item: int = Field(ge=1)
     repo_items: int = Field(ge=0)
@@ -264,7 +258,6 @@ class DeepConfig(Strict):
     default_text_depth: int = Field(ge=1)
     max_text_depth: int = Field(ge=1, le=MAX_DEPTH_ALL)
     plan_share: float = Field(default=0.8, gt=0, le=1)  # 계획은 예산의 이 비율까지(나머지는 재시도 몫)
-    video_max_minutes: int = Field(default=60, ge=1)  # 영상 하나 처리 구간 상한(CONTRACTS 1장)
     lookback_days: int = Field(default=7, ge=1)  # 계획 입력: day 포함 최근 며칠의 영상·글
 
     @model_validator(mode="after")

@@ -14,8 +14,7 @@ import pytest
 
 from tests.conftest import FakeTransport, make_ctx, response
 from trendsit.collect.video.process import Deps, MediaFailed
-from trendsit.collect.video.settings import load_video_config
-from trendsit.core import migrations
+from trendsit.core import config, migrations
 from trendsit.core.artifacts_video import NO_CONTENT, MediaResult, VideoQueueItem
 from trendsit.core.db import KST
 from trendsit.video import store
@@ -64,7 +63,7 @@ def thumbs_count(media: MediaResult) -> int:
 def run(tmp_path, transport, item, media, **kw):
     ctx = make_ctx(tmp_path, transport)
     add_video(ctx.db, item.video_id, media.duration_sec if media else 1200)
-    return ctx, analyze(item, ctx, load_video_config(), tmp_path / "media", media=media, **kw)
+    return ctx, analyze(item, ctx, config.load("video.yaml"), tmp_path / "media", media=media, **kw)
 
 
 def test_slides_pipeline_saves_digest(tmp_path):
@@ -161,7 +160,7 @@ def test_media_failure_logs_fetch_failure(tmp_path):
 
 def test_unknown_video_and_skip_mode(tmp_path):
     ctx = make_ctx(tmp_path, FakeTransport([]))
-    cfg = load_video_config()
+    cfg = config.load("video.yaml")
     out = analyze(VideoQueueItem(video_id="ZZZZZZZZZZZ", mode="whisper", reason="x"), ctx, cfg, tmp_path)
     assert out.status == "failed" and "collect" in out.note
     add_video(ctx.db, "DDDDDDDDDDD")

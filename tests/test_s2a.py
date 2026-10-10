@@ -240,9 +240,16 @@ def test_n5_device_reproduction_rule():
     import json
     from pathlib import Path
 
-    from trendsit.cli_text import DEVICE_DIFF_MAX, device_flips
+    from trendsit.cli_text import DEVICE_DIFF_MAX
 
     cfg = config.load("filter.yaml")
+
+    def device_flips(scores, other, cfg):  # cmd_filter_fixtures 안의 판정 구간 규칙과 같은 정의
+        def band(s):
+            return 0 if s < cfg.drop_below else 2 if s >= cfg.rescue_above else 1
+
+        return [f for f, s in scores.items() if f in other and band(s) != band(other[f])]
+
     rec = json.loads((Path(__file__).parents[1] / "reports" / "S2_filter" / "fixture_scores.json").read_text())
     cpu, mps = rec["Qwen/Qwen3-Embedding-0.6B@cpu"], rec["Qwen/Qwen3-Embedding-0.6B@mps"]
     assert max(abs(cpu[k] - mps[k]) for k in cpu) <= DEVICE_DIFF_MAX and device_flips(cpu, mps, cfg) == []

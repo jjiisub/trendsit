@@ -133,12 +133,6 @@ class BriefingPlan(RoleOutput):
     topics: list[PlannedTopic]
     featured_repos: list[str] = Field(description="홈에 올릴 레포 이름(최대 5)")
 
-    @classmethod
-    def fallback(cls, reason: str, inp: EditorSelectInput) -> Self:
-        """코드 대체(점수 순 상위 N)는 brief/select.py가 만든다. 여기서는 빈 계획 + attention."""
-        return cls(decisions=[], splits=[], topics=[], featured_repos=[], log=f"편집장 선별 실패({reason})",
-                   attention=True)
-
 
 # ---------- writer (작성자) ----------
 class Point(_Strict):
@@ -234,11 +228,6 @@ class TopicPage(RoleOutput):
     summary: str = Field(description="1~2문장(최대 3), 첫 문장이 결론")
     title: str = Field(description="명사구 30자 안팎")
 
-    @classmethod
-    def fallback(cls, reason: str, inp: WriterInput) -> Self:
-        return cls(points=[], numbers=[], events=[], contributions=[], concepts=[], overview="", summary="", title="",
-                   log=f"작성 실패({reason})", attention=True)
-
     def enforce(self, inp: Any, ctx: Ctx | None) -> Self:
         """points[].check는 코드가 정하는 값(같은 이슈 두 번 → true). 작성자 출력의 check는 false로."""
         if any(p.check for p in self.points):
@@ -299,10 +288,6 @@ class Change(_Strict):
 class TopicPageRevision(RoleOutput):
     changed: list[Change]
 
-    @classmethod
-    def fallback(cls, reason: str, inp: WriterReviseInput) -> Self:
-        return cls(changed=[], log=f"수정 실패({reason})", attention=True)
-
 
 # ---------- critic (검수자) ----------
 class CriticInput(RoleInput):
@@ -335,11 +320,6 @@ class ReviewVerdict(RoleOutput):
     issues: list[Issue]
     status: Literal["pass", "reject"]
 
-    @classmethod
-    def fallback(cls, reason: str, inp: CriticInput) -> Self:
-        return cls(atoms=[], fact_support=FactSupport(total=0, supported=0), issues=[], status="pass",
-                   log=f"검수 실패({reason})", attention=True)
-
     def enforce(self, inp: CriticInput, ctx: Ctx | None) -> Self:
         support = FactSupport(total=len(self.atoms), supported=sum(a.supported for a in self.atoms))
         out = self.fix("fact_support", support, "원자 사실 수를 atoms에서 다시 셈")
@@ -355,10 +335,6 @@ class FactCheck(RoleOutput):
     """judge가 출력의 모든 문장을 원자 사실로 쪼개 근거 문서와 대조한 결과. 지지율은 코드가 센다."""
 
     atoms: list[Atom] = Field(description="출력의 모든 원자 사실. 칸 순서대로")
-
-    @classmethod
-    def fallback(cls, reason: str, inp: Any) -> Self:
-        return cls(atoms=[], log=f"원자 사실 채점 실패({reason})", attention=True)
 
 
 INPUTS = (DecideInput, EditorSelectInput, WriterInput, WriterReviseInput, CriticInput)

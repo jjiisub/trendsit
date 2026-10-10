@@ -316,7 +316,7 @@ def test_list_pages_stops_before_since(tmp_path):
     from trendsit.collect.text import SourceStats
     from trendsit.core.config import TextSource
 
-    src = TextSource(id="aitimes", name="t", kind="news", lang="ko", feed="https://www.aitimes.com/rss.xml",
+    src = TextSource(id="aitimes", name="t", kind="news", feed="https://www.aitimes.com/rss.xml",
                      fetch="feed_summary", backfill={"method": "list_pages",
                                                      "url_template": "https://www.aitimes.com/list?p=1",
                                                      "page_template": "https://www.aitimes.com/ajax?page={page}"})

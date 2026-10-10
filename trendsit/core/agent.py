@@ -63,10 +63,6 @@ class AgentState:
     extras: dict[str, Any] = field(default_factory=dict)  # 도구끼리 주고받는 실행 중 상태(가져온 페이지 등)
 
 
-def _args_summary(args: dict[str, Any]) -> str:
-    return ", ".join(f"{k}={v}" for k, v in args.items())[:200]
-
-
 def _tool_message(call_id: str, content: str) -> dict[str, Any]:
     return {"role": "tool", "tool_call_id": call_id, "content": content}
 
@@ -74,19 +70,12 @@ def _tool_message(call_id: str, content: str) -> dict[str, Any]:
 NULL_STRINGS = {"None", "none", "null", "NULL", "Null", ""}
 
 
-def nullable_fields(model: type[BaseModel]) -> set[str]:
-    """스키마상 null을 허용하는 칸."""
-    out = set()
-    for name, f in model.model_fields.items():
-        if f.annotation is None or type(None) in getattr(f.annotation, "__args__", ()):
-            out.add(name)
-    return out
-
-
 def normalize_nulls(model: type[BaseModel], args: dict[str, Any]) -> list[str]:
     """null을 허용하는 칸에 들어온 "None", "null", ""를 null로 바꾼다(소형 모델의 흔한 실수). 바꾼 칸 이름을 돌려준다."""
     changed = []
-    for name in nullable_fields(model):
+    nullable = {name for name, f in model.model_fields.items()
+                if f.annotation is None or type(None) in getattr(f.annotation, "__args__", ())}  # 스키마상 null 허용 칸
+    for name in nullable:
         if isinstance(args.get(name), str) and args[name].strip() in NULL_STRINGS:
             args[name] = None
             changed.append(name)
@@ -256,7 +245,7 @@ def run_agent(role: Role, inp: RoleInput, ctx: Ctx) -> RoleOutput:
             if cap is not None:  # 남은 횟수를 알려 일찍 멈출 수 있게
                 content += f"\n[남은 도구 호출 {cap - state.tool_calls}회]"
             ctx.tracer.step(kind="tool", role=role.name,
-                            text=f"{tc['name']}: {_args_summary(info['args'] or {})}",
+                            text=f"{tc['name']}: {', '.join(f'{k}={v}' for k, v in (info['args'] or {}).items())[:200]}",
                             error=info["error"], attention=bool(info["error"]),
                             detail={k: info[k] for k in ("args", "depth", "truncated", "normalized")})
             messages.append(_tool_message(tc["id"], content))

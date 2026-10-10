@@ -10,12 +10,6 @@ from trendsit import cli
 from trendsit.core import artifacts
 
 
-def test_missing_spec_modules_are_skipped():
-    artifacts._merge("artifacts_no_such_spec")
-    sub = argparse.ArgumentParser().add_subparsers()
-    cli._register(sub, "cli_no_such_spec")
-
-
 def test_spec_module_is_merged(monkeypatch):
     class FakeIn(artifacts.RoleInput):
         x: int

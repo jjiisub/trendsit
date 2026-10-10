@@ -15,7 +15,6 @@ import json
 import re
 from collections import Counter
 from dataclasses import dataclass, field
-from typing import Any
 
 from ..core.config import KeywordsConfig
 from ..core.db import DB, now_kst
@@ -120,7 +119,7 @@ class AliasTable:
                 "rejected": sum(r.status == "rejected" for r in ent)}
 
 
-def build(members: list[Member], keywords: KeywordsConfig, fuzz_min: float = 90,
+def build(members: list[Member], keywords: KeywordsConfig, fuzz_min: float,
           translit: dict[str, str] | None = None) -> AliasTable:
     """구성원의 이름(글 카드 entities, 영상 판독 표기, 레포 이름)에서 별칭 후보를 만든다(LLM 없음)."""
     from rapidfuzz import fuzz
@@ -204,6 +203,3 @@ def load_decided(db: DB, table: AliasTable) -> AliasTable:
             r.status = done[(r.canonical, r.alias)]
     return table
 
-
-def as_dicts(table: AliasTable) -> list[dict[str, Any]]:
-    return [r.__dict__ for r in table.rows if r.keyword_id is None]

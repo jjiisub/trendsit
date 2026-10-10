@@ -12,7 +12,7 @@ from __future__ import annotations
 import json
 import sys
 
-from trendsit.collect.video.settings import load_video_config
+from trendsit.core import config
 from trendsit.core.artifacts_video import MediaResult, VideoQueueItem
 from trendsit.core.config import ROOT
 from trendsit.core.context import open_ctx
@@ -23,7 +23,7 @@ OUT = ROOT / "reports/S4_video"
 
 
 def main(ids: list[str]) -> int:
-    cfg = load_video_config()
+    cfg = config.load("video.yaml")
     ctx = open_ctx(None, spec="S4")
     for vid in ids:
         media = MediaResult.model_validate_json((ROOT / "data/media" / vid / "media_result.json").read_text())

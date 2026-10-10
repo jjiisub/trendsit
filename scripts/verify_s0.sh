@@ -8,8 +8,7 @@ TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 FIXTURE=eval/fixtures/repo_oneliner/encode__httpx.json
 
-pass() { echo "PASS $1 $2"; }
-fail() { echo "FAIL $1 $2"; FAILED=1; }
+source scripts/verify_common.sh
 py() { uv run --quiet python "$@"; }
 
 # A1 설치와 정적 검사

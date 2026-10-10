@@ -1,0 +1,663 @@
+{
+ "pages": [
+  {
+   "autofix": [
+    {
+     "loc": "contributions",
+     "rule": "근거 채널 ['text']에 맞게 contributions 정리"
+    },
+    {
+     "loc": "numbers/events",
+     "rule": "그리는 조건에 맞지 않는 도식 뺌(값 2개·사건 2개 등)"
+    }
+   ],
+   "issues": [
+    {
+     "comment": "points[4]의 '2'가 it:8#q5에 없음. 근거의 가까운 값은 0.1, 6, 6.1",
+     "loc": "points[4]",
+     "type": "number_mismatch"
+    },
+    {
+     "comment": "points[5] 금지 표현: 조사 'Work와'(영문 이름 끝 받침이면 이/은/을/과)",
+     "loc": "points[5]",
+     "type": "format"
+    }
+   ],
+   "round": 1,
+   "topic_id": "w40-gpt-6-1-sol",
+   "warnings": []
+  },
+  {
+   "autofix": [],
+   "issues": [
+    {
+     "comment": "points[4]의 '2'가 it:8#q5에 없음. 근거의 가까운 값은 0.1, 6, 6.1",
+     "loc": "points[4]",
+     "type": "number_mismatch"
+    },
+    {
+     "comment": "points[5] 금지 표현: 조사 'Work와'(영문 이름 끝 받침이면 이/은/을/과)",
+     "loc": "points[5]",
+     "type": "format"
+    }
+   ],
+   "round": 2,
+   "topic_id": "w40-gpt-6-1-sol",
+   "warnings": []
+  },
+  {
+   "autofix": [
+    {
+     "loc": "contributions",
+     "rule": "근거 채널 ['text']에 맞게 contributions 정리"
+    }
+   ],
+   "issues": [
+    {
+     "comment": "numbers[1].items[1] 값 '1e+06'가 it:18#q3에 없음",
+     "loc": "numbers[1].items[1]",
+     "type": "number_mismatch"
+    }
+   ],
+   "round": 1,
+   "topic_id": "w40-gemini-4-argon",
+   "warnings": []
+  },
+  {
+   "autofix": [],
+   "issues": [],
+   "round": 2,
+   "topic_id": "w40-gemini-4-argon",
+   "warnings": []
+  },
+  {
+   "autofix": [],
+   "issues": [],
+   "round": 1,
+   "topic_id": "w40-openai-dots",
+   "warnings": []
+  },
+  {
+   "autofix": [],
+   "issues": [],
+   "round": 1,
+   "topic_id": "w40-claude-sonnet-5-5",
+   "warnings": [
+    "핵심 의심: 다룰 축(angle '오퍼스급 지능과 가성비 사이의 컨텍스트·출력 토큰 설계')의 낱말(가성비, 사이, 설계, 오퍼스급, 지능, 출력, 컨텍스트, 토큰)이 summary 첫 문장과 첫 두 point에 없음",
+    "누락 의심: points[4] 안에 같은 단위 값 3개 이상($ 2/10/0.20), 같은 지표면 numbers"
+   ]
+  },
+  {
+   "autofix": [],
+   "issues": [],
+   "round": 2,
+   "topic_id": "w40-claude-sonnet-5-5",
+   "warnings": [
+    "핵심 의심: 다룰 축(angle '오퍼스급 지능과 가성비 사이의 컨텍스트·출력 토큰 설계')의 낱말(가성비, 사이, 설계, 오퍼스급, 지능, 출력, 컨텍스트, 토큰)이 summary 첫 문장과 첫 두 point에 없음",
+    "누락 의심: points[4] 안에 같은 단위 값 3개 이상($ 2/10/0.20), 같은 지표면 numbers"
+   ]
+  },
+  {
+   "autofix": [],
+   "issues": [],
+   "round": 3,
+   "topic_id": "w40-claude-sonnet-5-5",
+   "warnings": [
+    "핵심 의심: 다룰 축(angle '오퍼스급 지능과 가성비 사이의 컨텍스트·출력 토큰 설계')의 낱말(가성비, 사이, 설계, 오퍼스급, 지능, 출력, 컨텍스트, 토큰)이 summary 첫 문장과 첫 두 point에 없음",
+    "누락 의심: points[4] 안에 같은 단위 값 3개 이상($ 2/10/0.20), 같은 지표면 numbers"
+   ]
+  },
+  {
+   "autofix": [
+    {
+     "loc": "summary",
+     "rule": "별칭 표기를 정본으로"
+    },
+    {
+     "loc": "overview",
+     "rule": "별칭 표기를 정본으로"
+    },
+    {
+     "loc": "points[0]",
+     "rule": "별칭 표기를 정본으로"
+    },
+    {
+     "loc": "points[1]",
+     "rule": "별칭 표기를 정본으로"
+    },
+    {
+     "loc": "title",
+     "rule": "별칭 표기를 정본으로"
+    }
+   ],
+   "issues": [
+    {
+     "comment": "overview 5문장(2~4)",
+     "loc": "overview",
+     "type": "format"
+    },
+    {
+     "comment": "numbers[0].items[1] 값 '1600'가 og:982#q4에 없음",
+     "loc": "numbers[0].items[1]",
+     "type": "number_mismatch"
+    }
+   ],
+   "round": 1,
+   "topic_id": "w40-decision-api",
+   "warnings": [
+    "단위 확인 필요: numbers[0].items[0] 값 150의 근거 단위를 찾지 못함(그룹 단위 ms)",
+    "단위 확인 필요: numbers[0].items[1] 값 1600의 근거 단위를 찾지 못함(그룹 단위 ms)"
+   ]
+  },
+  {
+   "autofix": [
+    {
+     "loc": "summary",
+     "rule": "별칭 표기를 정본으로"
+    },
+    {
+     "loc": "overview",
+     "rule": "별칭 표기를 정본으로"
+    },
+    {
+     "loc": "points[0]",
+     "rule": "별칭 표기를 정본으로"
+    },
+    {
+     "loc": "points[1]",
+     "rule": "별칭 표기를 정본으로"
+    },
+    {
+     "loc": "title",
+     "rule": "별칭 표기를 정본으로"
+    }
+   ],
+   "issues": [
+    {
+     "comment": "overview 5문장(2~4)",
+     "loc": "overview",
+     "type": "format"
+    }
+   ],
+   "round": 2,
+   "topic_id": "w40-decision-api",
+   "warnings": []
+  },
+  {
+   "autofix": [
+    {
+     "loc": "contributions",
+     "rule": "근거 채널 ['text']에 맞게 contributions 정리"
+    },
+    {
+     "loc": "numbers/events",
+     "rule": "그리는 조건에 맞지 않는 도식 뺌(값 2개·사건 2개 등)"
+    },
+    {
+     "loc": "summary",
+     "rule": "별칭 표기를 정본으로"
+    },
+    {
+     "loc": "overview",
+     "rule": "별칭 표기를 정본으로"
+    },
+    {
+     "loc": "points[0]",
+     "rule": "별칭 표기를 정본으로"
+    }
+   ],
+   "issues": [],
+   "round": 1,
+   "topic_id": "w40-solar-mini-4",
+   "warnings": [
+    "누락 의심(같은 근거 문장의 같은 단위 값 3개 이상, 같은 지표 비교인지 확인): it:1034#q4 100만 토큰당 3개"
+   ]
+  },
+  {
+   "autofix": [
+    {
+     "loc": "contributions",
+     "rule": "근거 채널 ['text']에 맞게 contributions 정리"
+    }
+   ],
+   "issues": [
+    {
+     "comment": "summary 금지 표현: 핵심이다, 조사 'DeepSeek가'(영문 이름 끝 받침이면 이/은/을/과)",
+     "loc": "summary",
+     "type": "format"
+    },
+    {
+     "comment": "overview 금지 표현: 조사 'DeepSeek가'(영문 이름 끝 받침이면 이/은/을/과)",
+     "loc": "overview",
+     "type": "format"
+    },
+    {
+     "comment": "points[0] 금지 표현: 조사 'DeepSeek가'(영문 이름 끝 받침이면 이/은/을/과)",
+     "loc": "points[0]",
+     "type": "format"
+    }
+   ],
+   "round": 1,
+   "topic_id": "w40-deepseek-harness",
+   "warnings": []
+  },
+  {
+   "autofix": [],
+   "issues": [
+    {
+     "comment": "summary 금지 표현: 조사 'DeepSeek가'(영문 이름 끝 받침이면 이/은/을/과)",
+     "loc": "summary",
+     "type": "format"
+    },
+    {
+     "comment": "overview 금지 표현: 조사 'DeepSeek가'(영문 이름 끝 받침이면 이/은/을/과)",
+     "loc": "overview",
+     "type": "format"
+    },
+    {
+     "comment": "points[0] 금지 표현: 조사 'DeepSeek가'(영문 이름 끝 받침이면 이/은/을/과)",
+     "loc": "points[0]",
+     "type": "format"
+    }
+   ],
+   "round": 2,
+   "topic_id": "w40-deepseek-harness",
+   "warnings": []
+  },
+  {
+   "autofix": [
+    {
+     "loc": "contributions",
+     "rule": "근거 채널 ['text']에 맞게 contributions 정리"
+    }
+   ],
+   "issues": [],
+   "round": 1,
+   "topic_id": "w40-muse-gadgets",
+   "warnings": []
+  },
+  {
+   "autofix": [
+    {
+     "loc": "points",
+     "rule": "points 5개 → 3개(근거 소스 1개, 뒤에서 자름)"
+    }
+   ],
+   "issues": [
+    {
+     "comment": "summary의 수치 '50'가 points·numbers에 없음",
+     "loc": "summary",
+     "type": "unsupported"
+    },
+    {
+     "comment": "summary의 수치 '20'가 points·numbers에 없음",
+     "loc": "summary",
+     "type": "unsupported"
+    },
+    {
+     "comment": "summary의 수치 '60'가 points·numbers에 없음",
+     "loc": "summary",
+     "type": "unsupported"
+    },
+    {
+     "comment": "summary 금지 표현: 핵심이다",
+     "loc": "summary",
+     "type": "format"
+    }
+   ],
+   "round": 1,
+   "topic_id": "w40-claude-code-skills",
+   "warnings": []
+  },
+  {
+   "autofix": [],
+   "issues": [],
+   "round": 2,
+   "topic_id": "w40-claude-code-skills",
+   "warnings": []
+  },
+  {
+   "autofix": [],
+   "issues": [],
+   "round": 3,
+   "topic_id": "w40-claude-code-skills",
+   "warnings": []
+  },
+  {
+   "autofix": [
+    {
+     "loc": "points",
+     "rule": "points 5개 → 3개(근거 소스 1개, 뒤에서 자름)"
+    }
+   ],
+   "issues": [
+    {
+     "comment": "overview의 수치 '90'가 points·numbers에 없음",
+     "loc": "overview",
+     "type": "unsupported"
+    },
+    {
+     "comment": "overview의 수치 '99'가 points·numbers에 없음",
+     "loc": "overview",
+     "type": "unsupported"
+    },
+    {
+     "comment": "points[0]이 문장으로 끝남('…로 분리된다고 설명했다')",
+     "loc": "points[0]",
+     "type": "format"
+    }
+   ],
+   "round": 1,
+   "topic_id": "w40-llamaindex-context",
+   "warnings": []
+  },
+  {
+   "autofix": [],
+   "issues": [
+    {
+     "comment": "overview의 수치 '90'가 points·numbers에 없음",
+     "loc": "overview",
+     "type": "unsupported"
+    },
+    {
+     "comment": "overview의 수치 '99'가 points·numbers에 없음",
+     "loc": "overview",
+     "type": "unsupported"
+    }
+   ],
+   "round": 2,
+   "topic_id": "w40-llamaindex-context",
+   "warnings": []
+  },
+  {
+   "autofix": [],
+   "issues": [
+    {
+     "comment": "overview의 수치 '90'가 points·numbers에 없음",
+     "loc": "overview",
+     "type": "unsupported"
+    },
+    {
+     "comment": "overview의 수치 '99'가 points·numbers에 없음",
+     "loc": "overview",
+     "type": "unsupported"
+    }
+   ],
+   "round": 3,
+   "topic_id": "w40-llamaindex-context",
+   "warnings": []
+  },
+  {
+   "autofix": [
+    {
+     "loc": "contributions",
+     "rule": "근거 채널 ['text']에 맞게 contributions 정리"
+    },
+    {
+     "loc": "numbers/events",
+     "rule": "그리는 조건에 맞지 않는 도식 뺌(값 2개·사건 2개 등)"
+    },
+    {
+     "loc": "points[3]",
+     "rule": "별칭 표기를 정본으로"
+    }
+   ],
+   "issues": [
+    {
+     "comment": "summary의 문장이 '~다'로 끝나지 않음('…6 Luna와 동급임.')",
+     "loc": "summary",
+     "type": "format"
+    },
+    {
+     "comment": "overview의 문장이 '~다'로 끝나지 않음('…이달 말 공개 예정임.')",
+     "loc": "overview",
+     "type": "format"
+    },
+    {
+     "comment": "overview의 문장이 '~다'로 끝나지 않음('…와 동급 성능을 보임.')",
+     "loc": "overview",
+     "type": "format"
+    }
+   ],
+   "round": 1,
+   "topic_id": "w41-mistral-large-4",
+   "warnings": [
+    "누락 의심(같은 근거 문장의 같은 단위 값 3개 이상, 같은 지표 비교인지 확인): it:1198#q5 % 4개, it:1198#q6 100만개당 3개",
+    "누락 의심: points[4] 안에 같은 단위 값 3개 이상($ 1.36/4.18/0.14), 같은 지표면 numbers"
+   ]
+  },
+  {
+   "autofix": [
+    {
+     "loc": "points[3]",
+     "rule": "별칭 표기를 정본으로"
+    }
+   ],
+   "issues": [],
+   "round": 2,
+   "topic_id": "w41-mistral-large-4",
+   "warnings": [
+    "누락 의심(같은 근거 문장의 같은 단위 값 3개 이상, 같은 지표 비교인지 확인): it:1198#q5 % 4개, it:1198#q6 100만개당 3개",
+    "누락 의심: points[4] 안에 같은 단위 값 3개 이상($ 1.36/4.18/0.14), 같은 지표면 numbers"
+   ]
+  },
+  {
+   "autofix": [
+    {
+     "loc": "contributions",
+     "rule": "근거 채널 ['text']에 맞게 contributions 정리"
+    },
+    {
+     "loc": "overview",
+     "rule": "별칭 표기를 정본으로"
+    },
+    {
+     "loc": "points[5]",
+     "rule": "별칭 표기를 정본으로"
+    }
+   ],
+   "issues": [
+    {
+     "comment": "points[2] 금지 표현: 조사 'Instant가'(영문 이름 끝 받침이면 이/은/을/과)",
+     "loc": "points[2]",
+     "type": "format"
+    }
+   ],
+   "round": 1,
+   "topic_id": "w41-gpt6-intelligent-ui",
+   "warnings": []
+  },
+  {
+   "autofix": [
+    {
+     "loc": "contributions",
+     "rule": "근거 채널 ['text']에 맞게 contributions 정리"
+    },
+    {
+     "loc": "numbers/events",
+     "rule": "그리는 조건에 맞지 않는 도식 뺌(값 2개·사건 2개 등)"
+    }
+   ],
+   "issues": [],
+   "round": 1,
+   "topic_id": "w41-embeddinggemma-2",
+   "warnings": [
+    "누락 의심(같은 근거 문장의 같은 단위 값 3개 이상, 같은 지표 비교인지 확인): it:1183#q4 점 3개"
+   ]
+  },
+  {
+   "autofix": [],
+   "issues": [],
+   "round": 2,
+   "topic_id": "w41-embeddinggemma-2",
+   "warnings": [
+    "누락 의심(같은 근거 문장의 같은 단위 값 3개 이상, 같은 지표 비교인지 확인): it:1183#q4 점 3개"
+   ]
+  },
+  {
+   "autofix": [],
+   "issues": [
+    {
+     "comment": "points[0]이 문장으로 끝남('…ku 5.5를 출시했다')",
+     "loc": "points[0]",
+     "type": "format"
+    },
+    {
+     "comment": "summary 금지 표현: 조사 'Anthropic가'(영문 이름 끝 받침이면 이/은/을/과)",
+     "loc": "summary",
+     "type": "format"
+    },
+    {
+     "comment": "overview 금지 표현: 조사 'Anthropic가'(영문 이름 끝 받침이면 이/은/을/과)",
+     "loc": "overview",
+     "type": "format"
+    },
+    {
+     "comment": "points[0] 금지 표현: 조사 'Anthropic가'(영문 이름 끝 받침이면 이/은/을/과)",
+     "loc": "points[0]",
+     "type": "format"
+    }
+   ],
+   "round": 1,
+   "topic_id": "w41-claude-haiku-5-5",
+   "warnings": []
+  },
+  {
+   "autofix": [],
+   "issues": [
+    {
+     "comment": "summary의 문장이 '~다'로 끝나지 않음('…aiku 5.5 출시.')",
+     "loc": "summary",
+     "type": "format"
+    },
+    {
+     "comment": "overview의 문장이 '~다'로 끝나지 않음('…aiku 5.5 출시.')",
+     "loc": "overview",
+     "type": "format"
+    }
+   ],
+   "round": 2,
+   "topic_id": "w41-claude-haiku-5-5",
+   "warnings": []
+  },
+  {
+   "autofix": [
+    {
+     "loc": "points",
+     "rule": "points 5개 → 3개(근거 소스 1개, 뒤에서 자름)"
+    },
+    {
+     "loc": "numbers/events",
+     "rule": "그리는 조건에 맞지 않는 도식 뺌(값 2개·사건 2개 등)"
+    }
+   ],
+   "issues": [
+    {
+     "comment": "points[2]의 '토큰당'은 근거에서 '100만 토큰당'(per 1M)",
+     "loc": "points[2]",
+     "type": "number_mismatch"
+    }
+   ],
+   "round": 1,
+   "topic_id": "w41-decision-api-spec",
+   "warnings": []
+  },
+  {
+   "autofix": [
+    {
+     "loc": "contributions",
+     "rule": "근거 채널 ['text']에 맞게 contributions 정리"
+    }
+   ],
+   "issues": [],
+   "round": 1,
+   "topic_id": "w41-openai-rogue-agent",
+   "warnings": []
+  },
+  {
+   "autofix": [],
+   "issues": [],
+   "round": 1,
+   "topic_id": "w41-openai-math-results",
+   "warnings": []
+  },
+  {
+   "autofix": [
+    {
+     "loc": "numbers/events",
+     "rule": "그리는 조건에 맞지 않는 도식 뺌(값 2개·사건 2개 등)"
+    }
+   ],
+   "issues": [],
+   "round": 1,
+   "topic_id": "w41-openai-textgrain",
+   "warnings": [
+    "누락 의심(같은 근거 문장의 같은 단위 값 3개 이상, 같은 지표 비교인지 확인): it:1225#q3 % 3개, it:1105#q4 % 3개, it:1225#q4 % 5개, it:1105#q5 % 3개",
+    "누락 의심: points[2] 안에 같은 단위 값 3개 이상(% 1/80/95), 같은 지표면 numbers",
+    "누락 의심: points[3] 안에 같은 단위 값 3개 이상(% 10/92/66/25/17), 같은 지표면 numbers"
+   ]
+  },
+  {
+   "autofix": [],
+   "issues": [
+    {
+     "comment": "근거 채널 ['github', 'text'] 중 ['github', 'text']의 contributions 문장이 없음",
+     "loc": "contributions",
+     "type": "format"
+    }
+   ],
+   "round": 1,
+   "topic_id": "w41-openrig-orchestrator",
+   "warnings": []
+  },
+  {
+   "autofix": [],
+   "issues": [],
+   "round": 2,
+   "topic_id": "w41-openrig-orchestrator",
+   "warnings": []
+  },
+  {
+   "autofix": [
+    {
+     "loc": "contributions",
+     "rule": "근거 채널 ['video']에 맞게 contributions 정리"
+    }
+   ],
+   "issues": [
+    {
+     "comment": "summary 금지 표현: 부상했다",
+     "loc": "summary",
+     "type": "format"
+    }
+   ],
+   "round": 1,
+   "topic_id": "w41-agent-coding-talks",
+   "warnings": [
+    "누락 의심: events가 비었는데 근거에 날짜 다른 사건 후보 3개"
+   ]
+  },
+  {
+   "autofix": [],
+   "issues": [],
+   "round": 2,
+   "topic_id": "w41-agent-coding-talks",
+   "warnings": [
+    "누락 의심: events가 비었는데 근거에 날짜 다른 사건 후보 3개"
+   ]
+  },
+  {
+   "autofix": [],
+   "issues": [],
+   "round": 3,
+   "topic_id": "w41-agent-coding-talks",
+   "warnings": [
+    "누락 의심: events가 비었는데 근거에 날짜 다른 사건 후보 3개"
+   ]
+  }
+ ],
+ "runs": {
+  "2026-W40": "20261010-144517-weekly-67f5",
+  "2026-W41": "20261010-124834-weekly-75b1"
+ }
+}

@@ -82,6 +82,7 @@ def judge_final(weeks: list[str], only: set[str] | None = None, prev: dict | Non
     from trendsit.core.context import open_ctx
 
     cfg = config.load("brief.yaml")
+    window = config.load("video.yaml").align_window_sec
     ctx = open_ctx("eval", spec="S5", note="관문 B 최종판 judge(W40 + W41)")
     out = dict(prev or {})
     try:
@@ -98,7 +99,7 @@ def judge_final(weeks: list[str], only: set[str] | None = None, prev: dict | Non
                                   aliases=t["aliases"])
                 # judge 입력은 근거 원문(COMMON 2: 요약 칸이 아니라). 작성자 입력과 같은 id, 글자는 검수자와 같은 원문
                 raw = [Document(id=d.id, source=d.source, title=d.title, url=d.url,
-                                text=raw_evidence(ctx.db, d.id, t["pack"][d.id])) for d in inp.evidence]
+                                text=raw_evidence(ctx.db, d.id, t["pack"][d.id], window)) for d in inp.evidence]
                 r = graders.llm_grade("writer", inp.model_copy(update={"evidence": raw}), t["page"].model_dump(), ctx)
                 out[tp.topic_id] = {"week": w, "status": t["status"], "verdicts": r["verdicts"], "scores": r["scores"],
                                     "facts": r.get("facts")}

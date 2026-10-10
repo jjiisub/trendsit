@@ -91,16 +91,6 @@ def load_filter_fixtures() -> list[tuple[str, dict[str, Any]]]:
 DEVICE_DIFF_MAX = 0.01  # 설계 결정 N5: 장치 간 재현 기준 = 판정이 바뀐 픽스처 0건 + 최대 점수 차이 0.01 이하(bf16)
 
 
-def score_band(score: float, cfg: Any) -> int:
-    """문턱값 기준 구간: 0 = drop_below 미만, 1 = 그 사이, 2 = rescue_above 이상. 구간이 같으면 keep/drop 판정이 같다."""
-    return 0 if score < cfg.drop_below else 2 if score >= cfg.rescue_above else 1
-
-
-def device_flips(scores: dict[str, float], other: dict[str, float], cfg: Any) -> list[str]:
-    """두 장치 점수에서 판정 구간이 갈리는 픽스처."""
-    return [f for f, s in scores.items() if f in other and score_band(s, cfg) != score_band(other[f], cfg)]
-
-
 def cmd_filter_fixtures(args: argparse.Namespace) -> int:
     """재현 픽스처 20건의 점수만 계산(DB 없음). --record면 장치별 점수를 reports/S2_filter/fixture_scores.json에 기록."""
     from .filter.embed import best_interest, make_embedder
@@ -123,7 +113,10 @@ def cmd_filter_fixtures(args: argparse.Namespace) -> int:
         diffs = [abs(s - o[fid]) for o in others.values() if fid in o]
         worst = max([worst, *diffs])
         print(f"| {fid} | {s:.4f} | {kid} | " + " | ".join(f"{d:.4f}" for d in diffs) + " |")
-    flips = sorted({f for o in others.values() for f in device_flips(scores, o, cfg)})
+    def band(s: float) -> int:  # 0 = drop_below 미만, 1 = 그 사이, 2 = rescue_above 이상. 구간이 같으면 keep/drop 판정이 같다
+        return 0 if s < cfg.drop_below else 2 if s >= cfg.rescue_above else 1
+
+    flips = sorted({f for o in others.values() for f, s in scores.items() if f in o and band(s) != band(o[f])})
     if others:
         print(f"다른 장치와의 최대 차이 {worst:.4f}, 판정이 바뀐 픽스처 {len(flips)}건 {flips or ''}"
               f"(기준: 판정 변화 0건 + 최대 차이 {DEVICE_DIFF_MAX} 이하, 설계 결정 N5)")

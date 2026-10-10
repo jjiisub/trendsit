@@ -14,6 +14,7 @@ from typing import Any
 
 from ..core import config
 from ..core.artifacts_brief import BriefingPlan, TopicPage
+from ..core.budget import BudgetExceeded, PriceUnknown
 from ..core.config_brief import BriefConfig
 from ..core.context import Ctx
 from ..core.db import DB, now_kst
@@ -27,11 +28,6 @@ from .weekly import stage_cluster
 
 STEPS = ("cluster", "select", "write", "review")
 ROLES = ("decide", "editor_select", "writer", "writer_revise", "critic")
-
-
-def _summary_src(db: DB, run_id: str) -> dict[str, Any]:
-    r = db.conn.execute("SELECT summary_json FROM runs WHERE id=?", (run_id,)).fetchone()
-    return json.loads(r["summary_json"]) if r and r["summary_json"] else {}
 
 
 def run_weekly(week: str, ctx: Ctx, from_step: str = "cluster", only_topic: str | None = None,
@@ -58,7 +54,8 @@ def run_weekly(week: str, ctx: Ctx, from_step: str = "cluster", only_topic: str 
         from .report import write_cluster_report, write_label_sheets
 
         write_cluster_report(stage, cfg, note="weekly 실행의 묶기 단계")
-        write_label_sheets(stage)
+        if not ctx.stopped:  # 멈춘 run은 그 주 라벨 시트 행을 덮지 않음(판정 못 한 쌍의 줄이 빠지지 않게)
+            write_label_sheets(stage)
         dur |= {"evidence": stage.seconds["evidence"] + stage.seconds["normalize"], "cluster": stage.seconds["cluster"]}
     else:
         ev = week_evidence(db, week)
@@ -67,9 +64,12 @@ def run_weekly(week: str, ctx: Ctx, from_step: str = "cluster", only_topic: str 
                                              cfg.aliases.transliteration))
         cl.score_video_relevance(list(ev.members.values()), embedder, [(x.keyword_id, x.text) for x in flt.interests],
                                  cfg.evidence.video_relevance_high)
-        cluster_run = _summary_src(db, src).get("cluster_run") or src
+        r = db.conn.execute("SELECT summary_json FROM runs WHERE id=?", (src,)).fetchone()
+        cluster_run = (json.loads(r["summary_json"]) if r and r["summary_json"] else {}).get("cluster_run") or src
     tr.step(kind="code", role="weekly", text=f"{week} weekly 시작: {from_step}부터", detail={
         "from_step": from_step, "source_run": src, "cluster_run": cluster_run})
+    if ctx.stopped:  # 묶기 중 예산 초과: 현재판은 그대로, 선별부터는 시작하지 않음
+        return _close(ctx, week, t0, dur)
     # ---------- select ----------
     t1 = time.monotonic()
     sims = cl.interest_similarity(db, list(ev.members.values()), embedder, [(x.keyword_id, x.text) for x in flt.interests])
@@ -77,6 +77,8 @@ def run_weekly(week: str, ctx: Ctx, from_step: str = "cluster", only_topic: str 
     sites = [r["name"] for r in db.conn.execute("SELECT name FROM sources") if r["name"]]
     if from_step in ("cluster", "select"):
         sres = sel.select(ctx, cands, ev, cfg, sites)
+        if ctx.stopped:  # 선별 중 예산 초과: 대체 계획을 저장하지 않고 멈춤
+            return _close(ctx, week, t0, dur)
         sel.save(db, sres, run_id, week)
         plan = sres.plan
         topics = sres.topics
@@ -116,7 +118,9 @@ def run_weekly(week: str, ctx: Ctx, from_step: str = "cluster", only_topic: str 
             draft = TopicPage.model_validate_json(r["page_json"]) if r else None
         try:
             res = wr.write_topic(ctx, t, ev.members, table, cfg, review=until != "write", draft=draft)
-        except Exception as e:  # noqa: BLE001 - 한 토픽의 예상 밖 오류가 주 전체를 멈추지 않게(기록 후 failed)
+        except Exception as e:  # noqa: BLE001 - 한 토픽의 예상 밖 오류가 주 전체를 멈추지 않게(기록 후 failed). 예산 초과만 전체 중단
+            if isinstance(e, (BudgetExceeded, PriceUnknown)):
+                ctx.stopped = f"{type(e).__name__}: {e}"
             res = wr.TopicResult(t, "failed", None, [], [], [], [], 0, attention=[f"작성 중 오류: {type(e).__name__}: {e}"[:300]])
         wr.save(db, res, run_id)
         results.append(res)
@@ -128,23 +132,33 @@ def run_weekly(week: str, ctx: Ctx, from_step: str = "cluster", only_topic: str 
                         "n_sources": res.n_sources, "costs": res.costs, "rounds": [
                             {"round": lg.round, "checker": lg.checker, "status": lg.status, "issues": lg.issues,
                              "reverts": lg.reverts, "autofix": len(lg.autofix)} for lg in res.rounds]})
+        if ctx.stopped:
+            break
     dur["write_review"] = round(time.monotonic() - t2, 1)
-    if only_topic and src and from_step != "cluster":  # 묶기부터 새로 했으면 원본 토픽과 맞지 않아 이어 오지 않음
+    if ctx.stopped:
+        return _close(ctx, week, t0, dur, len(results))
+    if only_topic and from_step != "cluster":  # 묶기부터 새로 했으면 원본 토픽과 맞지 않아 이어 오지 않음
         carry_over(db, src, run_id, keep={only_topic})
     save_topic_embeddings(db, run_id, embedder, results)
-    if until == "select":
-        status = "selected"
-    elif until == "write":
-        status = "written"
-    else:
-        status = "done" if results and all(r.status != "failed" for r in results) else ("failed" if not results else "written")
-    with db.conn:
-        db.conn.execute("UPDATE weeks SET status=?, current_run_id=? WHERE week=?", (status, run_id, week))
+    return _close(ctx, week, t0, dur, len(results), until)
+
+
+def _close(ctx: Ctx, week: str, t0: float, dur: dict[str, float], n_topics: int = 0, until: str | None = None) -> dict[str, Any]:
+    """실행 요약을 계산해 저장하고, 멈추지 않았고 전부 실패도 아니면(until 단계 명령은 그대로) 이 run을 그 주 현재판으로
+    올린다. weeks.status는 요약 상태에서 따온다."""
+    db, tr = ctx.db, ctx.tracer
+    assert tr is not None
+    run_id = tr.run_id
     dur["total"] = round(time.monotonic() - t0, 1)
-    tr.step(kind="code", role="weekly", text=f"{week} weekly 끝: 토픽 {len(results)}개", detail={"duration_sec": dur})
+    tr.step(kind="code", role="weekly", text=f"{week} weekly 끝: 토픽 {n_topics}개" + (f", 예산 중단 {ctx.stopped}" if ctx.stopped else ""),
+            attention=bool(ctx.stopped), detail={"duration_sec": dur, "stopped": ctx.stopped})
     summary = compute_summary(db, run_id)
     with db.conn:
         db.conn.execute("UPDATE runs SET summary_json=? WHERE id=?", (json.dumps(summary, ensure_ascii=False), run_id))
+        if not ctx.stopped and (until or summary["status"] != "failed"):
+            status = ({"select": "selected", "write": "written"}[until] if until
+                      else {"done": "done", "partial": "written"}[summary["status"]])
+            db.conn.execute("UPDATE weeks SET status=?, current_run_id=? WHERE week=?", (status, run_id, week))
     return summary
 
 
@@ -238,11 +252,8 @@ def compute_summary(db: DB, run_id: str) -> dict[str, Any]:
     cost["total"] = round(sum(cost.values()), 6)
     end = next(iter(_detail(db, run_id, "weekly", f"{week} weekly 끝")), {})
     rel_types = [t.get("relation", {}).get("type") for t in plan.get("topics", [])]
-    status = "ok"
-    if any(t["status"] == "failed" for t in topics) or not topics:
-        status = "partial" if topics else "failed"
     return {
-        "week": week, "model": _model(db, run_id), "status": status,
+        "week": week, "model": _model(db, run_id), "status": "stopped" if end.get("stopped") else run_status(topics),
         "cluster_run": cluster_run,
         "evidence": {"items": ev.get("counts", {"text": 0, "video": 0, "github": 0}),
                      "excluded": ev.get("excluded", {"no_card": 0, "no_digest": 0, "irrelevant_repo": 0}),
@@ -270,6 +281,12 @@ def compute_summary(db: DB, run_id: str) -> dict[str, Any]:
         "duration_sec": {k: end.get("duration_sec", {}).get(k, 0) for k in ("evidence", "cluster", "select", "write_review",
                                                                             "total")},
     }
+
+
+def run_status(topics: list[Any]) -> str:
+    """토픽 상태들 → done(실패 없음) / partial(일부 실패) / failed(전부 실패, 토픽 없음 포함). weeks.status도 이 결과에서 따온다."""
+    failed = sum(t["status"] == "failed" for t in topics)
+    return "failed" if failed == len(topics) else "partial" if failed else "done"
 
 
 def _model(db: DB, run_id: str) -> str:

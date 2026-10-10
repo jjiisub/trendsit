@@ -142,6 +142,43 @@ def test_tool_cap_and_role_settings(make, models):
     assert sum(1 for s in steps if s["text"].endswith("상한으로 거부")) == 1  # 7번째는 실행하지 않음
 
 
+@pytest.mark.parametrize("url", ["https://github.com/Foo/Bar", "http://example.com/a", "https://arxiv.org/pdf/2401.01234v2"])
+def test_read_more_page_key(url):
+    """C-7: fetch_page(u) 뒤 read_more(doc=u)가 거부되지 않는다(github 대문자, http, arxiv pdf). 네트워크 없이 fetcher 대역."""
+    from types import SimpleNamespace
+
+    from trendsit.core.agent import DepthTracker
+    from trendsit.tools.web import FetchArgs, ReadMoreArgs, fetch_page, read_more
+
+    class Fetched:
+        ok, text, content_type, error = True, "가" * 3500, "text/plain", None
+        final_url = url
+
+    class FakeFetcher:
+        def fetch(self, u, kind):
+            return Fetched()
+
+    state = SimpleNamespace(extras={"fetcher": FakeFetcher(), "link_kinds": object()}, depth=DepthTracker(None))
+    args = FetchArgs(url=url, parent=None)
+    state.depth.roots.add(args.url)
+    assert fetch_page(args, state).content["parts"] == 2
+    out = read_more(ReadMoreArgs(doc=url, part=2), state)
+    assert out.content["part"] == 2 and out.content["text"] == "가" * 500
+
+
+def test_github_and_web_tools_keep_their_own_fetcher():
+    """github 도구는 캐시 없는 fetcher, 웹 도구는 HTTP 캐시 fetcher. 어느 쪽을 먼저 불러도 서로 덮지 않는다."""
+    from types import SimpleNamespace
+
+    from trendsit.tools import github, web
+
+    for first, second in ((github, web), (web, github)):
+        state = SimpleNamespace(extras={})
+        first.resources(state)
+        second.resources(state)
+        assert not state.extras["github_fetcher"].use_cache and state.extras["fetcher"].use_cache
+
+
 def test_read_more_and_fallback(make):
     c = make([call("fetch_page", url=ORIGIN, parent=TOPIC), call("read_more", doc=ORIGIN, part=2),
               call("read_more", doc=ORIGIN, part=9), call("finish", **v2())])
@@ -233,7 +270,7 @@ def test_eval_registers_github_readme_as_fetched_page(tmp_path, monkeypatch):
     monkeypatch.setattr(graders, "llm_grade", lambda *a: {"verdicts": {}, "scores": {}, "missing": []})
     c = make_ctx(tmp_path, FakeTransport([call("github_repo", name="NVIDIA/OpenShell"), call("finish", **out)]),
                  spec_cap=1.0)
-    c.resources.update(fetcher=fetcher_for(FixtureTransport("repo_tools")), github_headers={})
+    c.resources.update(github_fetcher=fetcher_for(FixtureTransport("repo_tools")), github_headers={})
     c.resources["fetched_pages"] = {"stale": "이전 픽스처"}  # 이전 픽스처의 기록은 지워져야 함
     rec = run_eval._evaluate(c, "text_analyst", None, None, "t")["results"][0]
     assert not any(e["field"] in ("quotes", "verified") for e in rec.get("enforced") or [])

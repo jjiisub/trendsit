@@ -125,7 +125,7 @@ def test_weekly_rounds_storage_summary_export(week):
                                  "drops_by": {"model": 0, "code": 0, "fallback": 0}}
     assert summary["write"] == {"topics": 4, "failed": 0}
     # A13: 저장값만으로 예시 JSON 토픽 칸
-    srcs, _ = briefing.sources_index(ctx.db, "2026-W41")
+    srcs = briefing.sources_index(ctx.db, "2026-W41")
     ex = briefing.export_topic(ctx.db, run_id, t1["topic_id"], srcs)
     assert set(ex) >= {"id", "week", "rank", "lead", "title", "summary", "relation", "overview", "points", "diagrams",
                        "concepts", "contributions", "sources", "channels", "has_check"}
@@ -340,3 +340,163 @@ def test_g6_contribution_given_as_point_gets_channel_from_refs():
         log="l")
     new, _rv, notes = apply_revision(prev, rev, {"contributions"})
     assert [(c.channel, c.text) for c in new.contributions] == [("github", "릴리스 노트")] and any("섞음" in n for n in notes)
+
+
+# ---------- 예산 초과 멈춤(F-1·F-7, C-6)과 실행 요약 상태(F-27) ----------
+def stub_run_role(monkeypatch, module, fail):
+    """module.run_role을 감싸 n번째 호출(1부터)에 fail(n, role)이 돌려준 예외를 던진다. 나머지는 진짜 호출."""
+    real, calls = module.run_role, []
+
+    def fake(role, inp, ctx):
+        calls.append(role.name)
+        if (exc := fail(len(calls), role)) is not None:
+            raise exc
+        return real(role, inp, ctx)
+
+    monkeypatch.setattr(module, "run_role", fake)
+    return calls
+
+
+def run_cmd(ctx, monkeypatch, tmp_path, from_step="select", cfg=None) -> int:
+    """cmd_weekly를 그대로(종료 코드, runs.status까지). 임베더·출력 폴더는 모의/임시."""
+    import argparse
+
+    from trendsit.brief import report
+    from trendsit.cli_brief import cmd_weekly
+
+    ctx.tracer = Tracer(ctx.db, "weekly", "S0")
+    monkeypatch.setattr("trendsit.core.context.open_ctx", lambda *a, **k: ctx)
+    monkeypatch.setattr("trendsit.filter.embed.make_embedder", lambda *a, **k: HashEmbedder())
+    monkeypatch.setattr(report, "OUT", tmp_path / "brief")
+    monkeypatch.setattr(report, "LABELS", tmp_path / "labels")
+    if cfg is not None:
+        orig = config.load
+        monkeypatch.setattr(config, "load", lambda name, *a, **k: cfg if name == "brief.yaml" else orig(name, *a, **k))
+    args = argparse.Namespace(week="2026-W41", from_step=from_step, step=None, topic=None, no_cache=True, spec=None)
+    return cmd_weekly(args)
+
+
+def assert_stopped(ctx, tmp_path, capsys, before, needle):
+    """C-6: 현재판 포인터·상태 그대로, run은 stopped, 요약 상태 stopped, 종료 코드는 호출한 쪽이 1로 확인, 읽기본은 쓰지 않음."""
+    run_id = ctx.tracer.run_id
+    db = ctx.db.conn
+    assert tuple(db.execute("SELECT status, current_run_id FROM weeks").fetchone()) == before
+    assert db.execute("SELECT status FROM runs WHERE id=?", (run_id,)).fetchone()[0] == "stopped"
+    assert json.loads(db.execute("SELECT summary_json FROM runs WHERE id=?", (run_id,)).fetchone()[0])["status"] == "stopped"
+    assert needle in capsys.readouterr().err
+    assert not (tmp_path / "out" / "briefing_2026-W41.md").exists()
+
+
+def test_budget_stop_write(week, monkeypatch, tmp_path, capsys):
+    from trendsit.brief import write as wr
+    from trendsit.core.budget import BudgetExceeded
+
+    ctx, cids = week
+    before = tuple(ctx.db.conn.execute("SELECT status, current_run_id FROM weeks").fetchone())
+    ctx.llm.transport.responses = [response(r) for r in [plan(cids), page(1, "Argon이 DeepSWE에서 77.9% 기록"), verdict([])]]
+    calls = stub_run_role(monkeypatch, wr, lambda n, role: BudgetExceeded("상한") if n == 3 else None)
+    assert run_cmd(ctx, monkeypatch, tmp_path) == 1
+    assert_stopped(ctx, tmp_path, capsys, before, "BudgetExceeded: 상한")
+    st = {r["rank"]: r["status"] for r in ctx.db.conn.execute("SELECT rank, status FROM topics WHERE run_id=?", (ctx.tracer.run_id,))}
+    assert st == {1: "passed", 2: "failed", 3: "selected", 4: "selected"}  # 3·4번째는 시작하지 않음
+    assert calls == ["writer", "critic", "writer"]
+
+
+@pytest.mark.parametrize("exc", ["BudgetExceeded", "PriceUnknown"])
+def test_budget_stop_select(week, monkeypatch, tmp_path, capsys, exc):
+    from trendsit.brief import select as sel
+    from trendsit.core import budget
+
+    ctx, _ = week
+    before = tuple(ctx.db.conn.execute("SELECT status, current_run_id FROM weeks").fetchone())
+    calls = stub_run_role(monkeypatch, sel, lambda n, role: getattr(budget, exc)("상한"))
+    assert run_cmd(ctx, monkeypatch, tmp_path) == 1
+    assert_stopped(ctx, tmp_path, capsys, before, f"{exc}: 상한")
+    assert calls == ["editor_select"] and ctx.llm.transport.calls == 0
+    assert ctx.db.conn.execute("SELECT COUNT(*) FROM topics WHERE run_id=?", (ctx.tracer.run_id,)).fetchone()[0] == 0
+
+
+def test_budget_stop_cluster(week, monkeypatch, tmp_path, capsys):
+    """decide 두 번째 호출에서 초과: 이미 받은 첫 판정은 저장, 이후 쌍은 판정 없음, 선별은 시작하지 않음."""
+    from trendsit.brief import weekly
+    from trendsit.core.budget import BudgetExceeded
+
+    ctx, _ = week
+    before = tuple(ctx.db.conn.execute("SELECT status, current_run_id FROM weeks").fetchone())
+    tuned = CFG.model_copy(deep=True)
+    tuned.cluster.thresholds.auto, tuned.cluster.thresholds.border = 2.0, -1.0  # 같은 채널 쌍이 모두 decide로
+    answer = json.dumps({"reason": "다른 글", "same": False, "confidence": 0.9, "log": "다름", "attention": False})
+    ctx.llm.transport.responses = [response(answer)]
+    calls = stub_run_role(monkeypatch, weekly, lambda n, role: BudgetExceeded("상한") if n == 2 else None)
+    assert run_cmd(ctx, monkeypatch, tmp_path, from_step="cluster", cfg=tuned) == 1
+    assert_stopped(ctx, tmp_path, capsys, before, "BudgetExceeded: 상한")
+    run_id = ctx.tracer.run_id
+    assert calls == ["decide", "decide"] and ctx.llm.transport.calls == 1
+    assert ctx.db.conn.execute("SELECT COUNT(*) FROM cluster_pairs WHERE run_id=? AND decided=1", (run_id,)).fetchone()[0] == 1
+    assert ctx.db.conn.execute("SELECT COUNT(*) FROM topics WHERE run_id=?", (run_id,)).fetchone()[0] == 0
+    assert not (tmp_path / "labels").exists()  # 멈춘 run은 라벨 시트를 쓰지 않음
+
+
+def _status_of(ctx, cids, monkeypatch, fail) -> dict:
+    from trendsit.brief import write as wr
+
+    ctx.llm.transport.responses = [response(r) for r in [plan(cids)] + [x for i in TITLES for x in
+                                                                        (page(i, f"{TITLES[i]} 근거 문장 요약 정리"), verdict([]))]]
+    stub_run_role(monkeypatch, wr, fail)
+    ctx.tracer = Tracer(ctx.db, "weekly", "S0")
+    summary = pipeline.run_weekly("2026-W41", ctx, from_step="select", embedder=HashEmbedder(), cfg=CFG)
+    assert summary == pipeline.compute_summary(ctx.db, ctx.tracer.run_id)  # 표에서 다시 계산해도 같음
+    return summary
+
+
+def test_summary_status_failed(week, monkeypatch):
+    from trendsit.core.role import RoleFailed
+
+    ctx, cids = week
+    before = tuple(ctx.db.conn.execute("SELECT status, current_run_id FROM weeks").fetchone())
+    summary = _status_of(ctx, cids, monkeypatch, lambda n, role: RoleFailed("출력 검증 실패"))
+    assert summary["status"] == "failed" and summary["write"] == {"topics": 4, "failed": 4}
+    assert tuple(ctx.db.conn.execute("SELECT status, current_run_id FROM weeks").fetchone()) == before  # 현재판 그대로
+
+
+def test_summary_status_partial(week, monkeypatch):
+    from trendsit.core.role import RoleFailed
+
+    ctx, cids = week
+    summary = _status_of(ctx, cids, monkeypatch, lambda n, role: RoleFailed("출력 검증 실패") if n == 7 else None)
+    assert summary["status"] == "partial" and summary["write"] == {"topics": 4, "failed": 1}
+    assert ctx.db.conn.execute("SELECT status FROM weeks").fetchone()[0] == "written"
+
+
+def test_summary_status_stopped(week, monkeypatch):
+    from trendsit.core.budget import BudgetExceeded
+
+    ctx, cids = week
+    before = tuple(ctx.db.conn.execute("SELECT status, current_run_id FROM weeks").fetchone())
+    summary = _status_of(ctx, cids, monkeypatch, lambda n, role: BudgetExceeded("상한") if n == 3 else None)
+    assert summary["status"] == "stopped" and ctx.stopped == "BudgetExceeded: 상한"
+    assert tuple(ctx.db.conn.execute("SELECT status, current_run_id FROM weeks").fetchone()) == before
+
+
+def test_editor_select_fallback_reason_tells_call_failure_from_validation(week, monkeypatch):
+    """대체 계획 이유: 마지막 시도가 예외면 호출 실패, 검증이 계속 실패하면 검증 실패(F-17)."""
+    from trendsit.brief import select as sel
+    from trendsit.core.errors import LLMError
+
+    ctx, cids = week
+    stub_run_role(monkeypatch, sel, lambda n, role: LLMError("제공사 오류"))
+    ctx.tracer = Tracer(ctx.db, "weekly", "S0")
+    ctx.llm.transport.responses = [response(x) for i in TITLES for x in (page(i, f"{TITLES[i]} 근거 문장 요약 정리"), verdict([]))]
+    pipeline.run_weekly("2026-W41", ctx, from_step="select", embedder=HashEmbedder(), cfg=CFG)
+    log = json.loads(ctx.db.conn.execute("SELECT plan_json FROM briefing_plans WHERE run_id=?", (ctx.tracer.run_id,)).fetchone()[0])["log"]
+    assert "호출 실패" in log and "검증 실패" not in log
+
+
+def test_briefing_md_untitled_source(week, monkeypatch):
+    """제목이 NULL인 근거가 있어도 읽기본이 멈추지 않고 '?'로 적는다(F-33)."""
+    ctx, cids = week
+    summary = _status_of(ctx, cids, monkeypatch, lambda n, role: None)
+    assert summary["status"] == "done"
+    ctx.db.conn.execute("UPDATE items SET title=NULL WHERE id=1")
+    text = briefing.write_briefing_md(ctx.db, "2026-W41").read_text()
+    assert "`it:1#q1` ?" in text

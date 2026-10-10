@@ -1,7 +1,7 @@
 """편집장 선별(S5_TASK 5.5, roles/editor_select.md, LLM 1회 + 코드 검증·재시도 2회·대체).
 
 입력: 묶음(토픽 후보, 레포만 묶음 제외) 중 묶기 점수 상위 max_candidates를 cluster_id 순서로(위치 편향 방지).
-점수는 그대로(관련성 등급 → 항목 수 → 채널 수 → 근거 수 → 추세), 동점이면 관심 유사도 높은 순(설계 결정 C-21 수정,
+점수는 그대로(관련성 등급 → 항목 수 → 채널 수 → 근거 수), 동점이면 관심 유사도 높은 순(설계 결정 C-21 수정,
 2026-10-10: 모든 채널 "제목 + 요약" 임베딩과 관심사 쿼리의 코사인 최댓값). 토픽 순서는 편집장이 정한다.
 검증(어기면 오류 메시지로 재시도): 리드 정확히 1, 토픽 수 min~max(후보가 min보다 적으면 후보 수까지), rank 1부터 연속,
 cluster_ids·splits는 입력 후보와 그 항목 안, 한 후보는 한 토픽에만, relation.topic_id는 그 후보의 과거 대조 후보 안,
@@ -28,7 +28,7 @@ from ..core.artifacts_brief import (
     RepoLine,
     SelectLimits,
 )
-from ..core.budget import BudgetExceeded
+from ..core.budget import BudgetExceeded, PriceUnknown
 from ..core.config_brief import BriefConfig
 from ..core.context import Ctx
 from ..core.db import DB, now_kst
@@ -146,7 +146,7 @@ def candidate_doc(c: Candidate, members: dict[str, Member]) -> Document:
     return Document(id=f"c{c.cluster_id}", source="cluster", title=c.label, text="\n".join(lines))
 
 
-def recent_topics(db: DB, week: str, weeks_back: int = 4) -> list[RecentTopic]:
+def recent_topics(db: DB, week: str, weeks_back: int) -> list[RecentTopic]:
     rows = db.conn.execute(
         "SELECT t.topic_id, t.week, t.title, t.summary FROM topics t JOIN weeks w ON w.week=t.week "
         "AND w.current_run_id=t.run_id WHERE t.week<? AND t.status IN ('passed','checked') ORDER BY t.week DESC, t.rank",
@@ -286,10 +286,6 @@ def slugify(hint: str) -> str:
     return "-".join(s.split("-")[:4]) or "topic"
 
 
-def week_num(week: str) -> int:
-    return int(week.split("-W")[1])
-
-
 def relation_label(db: DB, topic_id: str | None) -> str:
     if not topic_id:
         return ""
@@ -309,7 +305,7 @@ def apply(plan: BriefingPlan, cands: list[Candidate], week: str, db: DB) -> list
     used: set[str] = set()
     out = []
     for t in sorted(plan.topics, key=lambda t: t.rank):
-        base = f"w{week_num(week)}-{slugify(t.slug_hint)}"
+        base = f"w{int(week.split('-W')[1])}-{slugify(t.slug_hint)}"
         tid, k = base, 2
         while tid in used:
             tid, k = f"{base}-{k}", k + 1
@@ -371,11 +367,15 @@ def select(ctx: Ctx, cands: list[Candidate], ev: WeekEvidence, cfg: BriefConfig,
     reconciled: list[str] = []
     plan: BriefingPlan | None = None
     source = "model"
+    call_failed = False
     for _ in range(SELECT_RETRIES + 1):
         try:
             out = run_role(role, inp, ctx)
-        except (RoleFailed, LLMError, BudgetExceeded) as e:
+        except (RoleFailed, LLMError, BudgetExceeded, PriceUnknown) as e:
+            if isinstance(e, (BudgetExceeded, PriceUnknown)):
+                ctx.stopped = f"{type(e).__name__}: {e}"
             errors_by_try.append([f"{type(e).__name__}: {e}"])
+            call_failed = True  # 예외는 루프를 끝내므로 마지막 시도가 호출 실패
             break
         raw_errs = validate(out, cands, cfg)  # type: ignore[arg-type]  # 원래 출력 기준(모델 품질 기록)
         fixed, notes = reconcile(out)  # type: ignore[arg-type]
@@ -387,7 +387,7 @@ def select(ctx: Ctx, cands: list[Candidate], ev: WeekEvidence, cfg: BriefConfig,
             break
         inp = inp.model_copy(update={"previous_errors": errs})
     if plan is None:
-        plan, source = fallback_plan(cands, cfg, "검증 실패" if errors_by_try else "호출 실패"), "fallback"
+        plan, source = fallback_plan(cands, cfg, "호출 실패" if call_failed else "검증 실패"), "fallback"
     mism = reason_mismatches(plan, inp, site_names) if source == "model" else []
     if mism and not plan.attention:
         plan = plan.model_copy(update={"attention": True})
@@ -408,4 +408,3 @@ def save(db: DB, res: SelectResult, run_id: str, week: str) -> None:
                 "relation_label, status, angle) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
                 (run_id, t.topic_id, week, json.dumps(t.cluster_ids), t.rank, int(t.lead), t.relation_type,
                  t.relation_topic_id, t.relation_label or None, "selected", t.angle))
-        db.conn.execute("UPDATE weeks SET status='selected' WHERE week=?", (week,))
