@@ -276,9 +276,9 @@ judge 판정: **잠정**(사람 라벨 없음. `eval/labels/writer.csv`를 채�
 
 > `scripts/s5_gate_b.py`가 붙인 절. 라벨이 필요한 항목은 2차 라벨(D1-3, 리뷰 세션 opus-5.5) 전 잠정.
 
-### 2026-W40 (run `20261010-123148-weekly-8839`, 묶기 run `20261010-073230-weekly-d33d`)
+### 2026-W40 (run `20261010-142332-weekly-d62a`, 묶기 run `20261010-073230-weekly-d33d`)
 
-- 실행 요약: 토픽 10, 실패 0, 라운드 {'1': 3, '2': 4, '3': 3}, 코드 반려 9, 검수 반려 5, 되돌림 0, check 포인트 2, 사용액 $0.013692, 시간 138.6초
+- 실행 요약: 토픽 10, 실패 0, 라운드 {'1': 3, '2': 5, '3': 2}, 코드 반려 10, 검수 반려 5, 되돌림 0, check 포인트 2, 사용액 $0.00388, 시간 71.2초
 - 선별: 첫 시도 코드 검증 실패(1회 시도, 계획 model), reason 입력 대조 위반 0
 
 | 순위 | 토픽 | 상태 | 라운드 | 채널 | 도식(수치·사건) | 코드 경고 | 문체 위반 | check |
@@ -291,12 +291,12 @@ judge 판정: **잠정**(사람 라벨 없음. `eval/labels/writer.csv`를 채�
 | 6 | w40-solar-mini-4 | passed | 1 | text | 0·0 | 2 | 0 | 0 |
 | 7 | w40-deepseek-harness | passed | 2 | text | 0·0 | 0 | 0 | 0 |
 | 8 | w40-muse-gadgets | passed | 1 | text | 0·0 | 0 | 0 | 0 |
-| 9 | w40-claude-code-skills | passed | 3 | text | 0·0 | 0 | 0 | 0 |
+| 9 | w40-claude-code-skills | checked | 2 | text | 0·0 | 0 | 1 | 0 |
 | 10 | w40-llamaindex-context | passed | 3 | video | 0·0 | 0 | 0 | 0 |
 
-### 2026-W41 (run `20261010-124834-weekly-75b1`, 묶기 run `20261010-075543-weekly-fd8a`)
+### 2026-W41 (run `20261010-142717-weekly-1895`, 묶기 run `20261010-075543-weekly-fd8a`)
 
-- 실행 요약: 토픽 10, 실패 0, 라운드 {'1': 5, '2': 4, '3': 1}, 코드 반려 5, 검수 반려 4, 되돌림 0, check 포인트 2, 사용액 $0.005823, 시간 81.0초
+- 실행 요약: 토픽 10, 실패 0, 라운드 {'1': 5, '2': 4, '3': 1}, 코드 반려 5, 검수 반려 4, 되돌림 0, check 포인트 2, 사용액 $0.013192, 시간 149.0초
 - 선별: 첫 시도 코드 검증 통과(1회 시도, 계획 model), reason 입력 대조 위반 3
 
 | 순위 | 토픽 | 상태 | 라운드 | 채널 | 도식(수치·사건) | 코드 경고 | 문체 위반 | check |
@@ -304,7 +304,7 @@ judge 판정: **잠정**(사람 라벨 없음. `eval/labels/writer.csv`를 채�
 | 1 | w41-mistral-large-4 | passed | 2 | text | 0·0 | 1 | 0 | 0 |
 | 2 | w41-gpt6-intelligent-ui | passed | 1 | text | 0·0 | 0 | 0 | 0 |
 | 3 | w41-embeddinggemma-2 | passed | 2 | text | 0·0 | 1 | 0 | 0 |
-| 4 | w41-claude-haiku-5-5 | checked | 2 | text | 1·0 | 0 | 2 | 0 |
+| 4 | w41-claude-haiku-5-5 | checked | 2 | text | 1·0 | 0 | 1 | 0 |
 | 5 | w41-decision-api-spec | passed | 1 | text | 0·0 | 0 | 0 | 0 |
 | 6 | w41-openai-rogue-agent | passed | 1 | text | 0·0 | 0 | 0 | 0 |
 | 7 | w41-openai-math-results | passed | 1 | text | 0·0 | 0 | 0 | 0 |
@@ -330,30 +330,29 @@ judge 판정: **잠정**(사람 라벨 없음. `eval/labels/writer.csv`를 채�
 | w40-solar-mini-4 | passed | fail | fail | pass | pass | 25/26 | points[1] 업스테이지가 Solar 미니 4를 독자 사전학습함 |
 | w40-deepseek-harness | passed | pass | pass | pass | pass | 22/22 |  |
 | w40-muse-gadgets | passed | pass | pass | pass | pass | 25/25 |  |
-| w40-claude-code-skills | passed | pass | fail | pass | pass | 23/23 |  |
+| w40-claude-code-skills | checked | pass | pass | pass | pass | 24/24 |  |
 | w40-llamaindex-context | passed | pass | pass | pass | pass | 18/18 |  |
 | w41-mistral-large-4 | passed | pass | pass | pass | pass | 29/29 |  |
 | w41-gpt6-intelligent-ui | passed | pass | pass | pass | pass | 20/20 |  |
 | w41-embeddinggemma-2 | passed | pass | pass | pass | pass | 28/28 |  |
-| w41-claude-haiku-5-5 | checked | pass | pass | pass | pass | 29/29 |  |
+| w41-claude-haiku-5-5 | checked | pass | pass | pass | pass | 25/26 | summary 소형 모델 가격 경쟁이 격화됐다. |
 | w41-decision-api-spec | passed | pass | pass | pass | pass | 26/26 |  |
 | w41-openai-rogue-agent | passed | pass | pass | pass | pass | 17/17 |  |
 | w41-openai-math-results | passed | pass | pass | pass | pass | 15/15 |  |
 | w41-openai-textgrain | passed | pass | pass | pass | pass | 18/18 |  |
 | w41-openrig-orchestrator | passed | pass | pass | pass | pass | 24/24 |  |
-| w41-agent-coding-talks | checked | pass | pass | pass | pass | 23/23 |  |
+| w41-agent-coding-talks | checked | pass | pass | pass | pass | 24/24 |  |
 - w40-claude-sonnet-5-5 Q1: plan.angle은 '컨텍스트·출력 토큰 설계'이나 첫 point가 벤치마크 점수(터미널벤치 4.0)로 angle의 핵심과 어긋남
 - w40-solar-mini-4 Q1: angle이 'GPU 한 장 실행 가능한 MoE 소형 모델의 에이전트 최적화'인데 첫 point가 회사의 투트랙 전략으로 시작하여 실패 예시와 정확히 일치함
 - w40-solar-mini-4 Q2: overview가 points의 투트랙 전략, 35B/3B MoE 및 GPU 1장 구동, 24.1점 기록, 43% 비용 절감을 그대로 중복해서 되풀이함
-- w40-claude-code-skills Q2: summary와 overview의 문장이 거의 토씨 하나 안 틀리고 똑같이 반복되어 개요가 포인트를 그대로 되풀이하고 있음
 
 ### 관문 B 항목(실제 실행)
 
 | 항목 | 결과 | 문턱값 | 판정 |
 |---|---|---|---|
-| 근거 충실성(원자 사실, 토픽별) | 19/20 토픽 100% | 모든 토픽 100% | 미달(잠정) |
+| 근거 충실성(원자 사실, 토픽별) | 18/20 토픽 100% | 모든 토픽 100% | 미달(잠정) |
 | 핵심 포착(Q1) | 18/20 | 90% | 통과(잠정) |
-| 군더더기 없음(Q2) | 18/20 | 90% | 통과(잠정) |
+| 군더더기 없음(Q2) | 19/20 | 90% | 통과(잠정) |
 | 읽기 쉬움(Q3) | 20/20 | 90% | 통과(잠정) |
 | 문체(번역투)(Q4) | 20/20 | 90% | 통과(잠정) |
 | 문체(코드 정규식, 최종판) | 위반 2건 | 0 | 미달 |
