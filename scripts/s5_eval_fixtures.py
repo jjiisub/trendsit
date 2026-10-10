@@ -31,6 +31,7 @@ from trendsit.brief.write import (  # noqa: E402
     previous_topic,
     raw_evidence,
     refs_of,
+    writer_limits,
 )
 from trendsit.core import config  # noqa: E402
 from trendsit.core.artifacts import Document  # noqa: E402
@@ -83,7 +84,7 @@ def week_topics(db: DB, week: str, cfg) -> list[dict]:
         pack = pack_index(kept)
         out.append({"week": week, "run": run, "topic": t, "status": row["status"] if row else None,
                     "page": TopicPage.model_validate_json(page[0]) if page else None, "pack": pack,
-                    "aliases": alias_lines(table, ms), "inp_select": sel.build_input(cands, ev, db, cfg), "cands": cands})
+                    "aliases": alias_lines(table, ms), "n_sources": len({it.member for it in kept}), "inp_select": sel.build_input(cands, ev, db, cfg), "cands": cands})
     return out
 
 
@@ -127,7 +128,7 @@ def main() -> int:
         inp = WriterInput(plan=PlanBrief(rank=tp.rank, angle=tp.angle, relation=Relation(type=tp.relation_type,
                                                                                        topic_id=tp.relation_topic_id)),
                           evidence=evidence_docs(t["pack"]), previous=previous_topic(db, tp.relation_topic_id),
-                          aliases=t["aliases"])
+                          aliases=t["aliases"], limits=writer_limits(cfg, t["n_sources"]))
         dump("writer", tp.topic_id, inp.model_dump(), {}, f"{t['week']} 실제 토픽 입력(run {t['run']})")
     # critic: 깨끗한 판 + 심은 오류
     done = [t for t in topics if t["page"] is not None and t["status"] in ("passed", "checked")]

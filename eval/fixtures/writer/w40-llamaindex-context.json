@@ -1,0 +1,193 @@
+{
+ "input": {
+  "plan": {
+   "rank": 10,
+   "angle": "RAG를 에이전트 하네스와 문서 컨텍스트 레이어로 재정의하는 접근",
+   "relation": {
+    "type": "new",
+    "topic_id": null
+   }
+  },
+  "evidence": [
+   {
+    "id": "vd:274@422",
+    "source": "Tech Bridge",
+    "text": "발표 슬라이드 수치: human-created documents [10T+ pages]",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": "https://www.youtube.com/watch?v=S-bRN-avZ4Q"
+   },
+   {
+    "id": "vd:274@447",
+    "source": "Tech Bridge",
+    "text": "발표 슬라이드 수치: pages of human-created documents [10T+ T+]",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": "https://www.youtube.com/watch?v=S-bRN-avZ4Q"
+   },
+   {
+    "id": "vd:274@525",
+    "source": "Tech Bridge",
+    "text": "발표 슬라이드 수치: of the world's data lies in unstructured documents [90% %]",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": "https://www.youtube.com/watch?v=S-bRN-avZ4Q"
+   },
+   {
+    "id": "vd:274@900",
+    "source": "Tech Bridge",
+    "text": "발표 슬라이드 수치: Low Cost Regime volume [1M docs per day]",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": "https://www.youtube.com/watch?v=S-bRN-avZ4Q"
+   },
+   {
+    "id": "vd:274@957",
+    "source": "Tech Bridge",
+    "text": "발표 슬라이드 수치: accuracy (High Accuracy Regime) [99%+ %]",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": "https://www.youtube.com/watch?v=S-bRN-avZ4Q"
+   },
+   {
+    "id": "vd:274@992",
+    "source": "Tech Bridge",
+    "text": "발표 슬라이드 수치: requirement (Low Cost Regime) [1M docs per day]",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": "https://www.youtube.com/watch?v=S-bRN-avZ4Q"
+   },
+   {
+    "id": "vd:274@35",
+    "source": "Tech Bridge",
+    "text": "핵심 포인트: 2026년 RAG 구조가 에이전트 하네스와 문서 컨텍스트 레이어로 분리",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": "https://www.youtube.com/watch?v=S-bRN-avZ4Q"
+   },
+   {
+    "id": "vd:274@152",
+    "source": "Tech Bridge",
+    "text": "핵심 포인트: 검색 복잡도 처리가 에이전트 레이어로 이동, 컨텍스트 관리가 MCP 서버 및 스킬 구성으로 상향",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": "https://www.youtube.com/watch?v=S-bRN-avZ4Q"
+   },
+   {
+    "id": "vd:274@396",
+    "source": "Tech Bridge",
+    "text": "핵심 포인트: 에이전트 네이티브 문서 플랫폼의 파싱, 시맨틱 저장, 에이전틱 워크플로 3층 구조",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": "https://www.youtube.com/watch?v=S-bRN-avZ4Q"
+   },
+   {
+    "id": "vd:274@536",
+    "source": "Tech Bridge",
+    "text": "핵심 포인트: PDF 내부 구조가 좌표 기반 글리프와 선분으로 저장되어 기계 해석이 어려움",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": "https://www.youtube.com/watch?v=S-bRN-avZ4Q"
+   },
+   {
+    "id": "vd:274@712",
+    "source": "Tech Bridge",
+    "text": "핵심 포인트: 파이프라인과 VLM을 결합한 하이브리드 OCR 방식과 LlamaParse 서비스",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": "https://www.youtube.com/watch?v=S-bRN-avZ4Q"
+   },
+   {
+    "id": "vd:274@816",
+    "source": "Tech Bridge",
+    "text": "핵심 포인트: ParseBench 벤치마크와 고정확도·저비용·초저지연 3가지 처리 영역 구분",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": "https://www.youtube.com/watch?v=S-bRN-avZ4Q"
+   },
+   {
+    "id": "vd:274@0",
+    "source": "Tech Bridge",
+    "text": "구간: 개요 및 2026년 RAG 정의",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": "https://www.youtube.com/watch?v=S-bRN-avZ4Q"
+   },
+   {
+    "id": "vd:274@79",
+    "source": "Tech Bridge",
+    "text": "구간: 단순 Top-K 검색의 한계",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": "https://www.youtube.com/watch?v=S-bRN-avZ4Q"
+   },
+   {
+    "id": "vd:274@177",
+    "source": "Tech Bridge",
+    "text": "구간: 에이전트 하네스와 컨텍스트 스택 변화",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": "https://www.youtube.com/watch?v=S-bRN-avZ4Q"
+   },
+   {
+    "id": "vd:274@301",
+    "source": "Tech Bridge",
+    "text": "구간: 문서 컨텍스트 레이어의 필요성",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": "https://www.youtube.com/watch?v=S-bRN-avZ4Q"
+   },
+   {
+    "id": "vd:274@398",
+    "source": "Tech Bridge",
+    "text": "구간: 에이전트 네이티브 문서 플랫폼 3층 구조",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": "https://www.youtube.com/watch?v=S-bRN-avZ4Q"
+   },
+   {
+    "id": "vd:274@493",
+    "source": "Tech Bridge",
+    "text": "구간: PDF 구조와 OCR 난이도",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": "https://www.youtube.com/watch?v=S-bRN-avZ4Q"
+   },
+   {
+    "id": "vd:274@632",
+    "source": "Tech Bridge",
+    "text": "구간: OCR 접근법 진화와 하이브리드 방식",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": "https://www.youtube.com/watch?v=S-bRN-avZ4Q"
+   },
+   {
+    "id": "vd:274@795",
+    "source": "Tech Bridge",
+    "text": "구간: ParseBench 벤치마크 결과",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": "https://www.youtube.com/watch?v=S-bRN-avZ4Q"
+   },
+   {
+    "id": "vd:274@894",
+    "source": "Tech Bridge",
+    "text": "구간: 정확도-비용-지연 파레토 곡선",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": "https://www.youtube.com/watch?v=S-bRN-avZ4Q"
+   },
+   {
+    "id": "vd:274@991",
+    "source": "Tech Bridge",
+    "text": "구간: LightParse와 에이전트 루프 통합",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": "https://www.youtube.com/watch?v=S-bRN-avZ4Q"
+   }
+  ],
+  "previous": null,
+  "aliases": [],
+  "limits": {
+   "points": [
+    2,
+    3
+   ],
+   "overview_sentences": [
+    2,
+    4
+   ],
+   "summary_sentences": [
+    1,
+    3
+   ],
+   "highlights_page": [
+    3,
+    4
+   ],
+   "numbers_groups_max": 2,
+   "events_groups_max": 1,
+   "concepts_max": 3
+  }
+ },
+ "expect": {},
+ "note": "2026-W40 실제 토픽 입력(run 20261010-144517-weekly-67f5)"
+}

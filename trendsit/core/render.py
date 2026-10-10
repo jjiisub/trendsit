@@ -73,7 +73,8 @@ def render_body(obj: Any) -> str:
     if isinstance(obj, BaseModel):
         out: list[str] = []
         for name in type(obj).model_fields:
-            out += _lines(name, getattr(obj, name))
+            if name not in getattr(obj, "RENDER_SKIP", ()):
+                out += _lines(name, getattr(obj, name))
         return "\n".join(out)
     return "\n".join(_lines("", obj))
 

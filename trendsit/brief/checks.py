@@ -97,7 +97,7 @@ def autofix(page: TopicPage, cfg: BriefConfig, canon: dict[str, str],
     fixes: list[dict[str, Any]] = []
     # 00) points 개수 초과: 중요도 순이라 뒤에서 자른다. 잘린 포인트에 붙은 도식도 뺌(리뷰 R4, SIFT 소스 1개에 4개)
     if n_sources is not None:
-        hi = cfg.write.points["multi_source" if n_sources > 1 else "single_source"][1]
+        hi = cfg.write.points_for(n_sources)[1]
         if len(page.points) > hi:
             fixes.append({"loc": "points", "rule": f"points {len(page.points)}개 → {hi}개(근거 소스 {n_sources}개, 뒤에서 자름)",
                           "before": [p.text for p in page.points[hi:]], "after": []})
@@ -220,7 +220,7 @@ def check(page: TopicPage, pack: dict[str, list[EvidenceItem]], n_sources: int, 
     if page.overview.strip() and not w.overview_sentences[0] <= no <= w.overview_sentences[1]:
         issues.append(_issue("overview", "format", f"overview {no}문장({w.overview_sentences[0]}~{w.overview_sentences[1]})",
                              "1문단"))
-    lo, hi = w.points["multi_source" if n_sources > 1 else "single_source"]
+    lo, hi = w.points_for(n_sources)
     if not lo <= len(page.points) <= hi:
         issues.append(_issue("points", "format", f"points {len(page.points)}개(근거 소스 {n_sources}개면 {lo}~{hi}개)",
                              "중요도 순으로 개수 맞춤"))

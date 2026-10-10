@@ -417,3 +417,40 @@ def test_h1_summary_overview_numbers_must_be_in_points():
     p = page(summary="OpenAI가 가격을 15% 내렸다. 스킬 약 50개, 에이전트 약 20개, 도구 약 60개를 쓴다.")
     bad = {i.comment for i in checks.run_checks(p, pack(), 2, CFG, {}).issues if i.loc == "summary" and i.type == "unsupported"}
     assert {c.split("'")[1] for c in bad} == {"50", "20", "60"}  # 15%는 points[0]에 있음
+
+
+def test_writer_limits_follow_source_count_and_brief_yaml():
+    from trendsit.brief.write import writer_limits
+
+    assert writer_limits(CFG, 1).points == (2, 3) and writer_limits(CFG, 2).points == (3, 6)
+    full = writer_limits(CFG, 2)
+    assert (full.overview_sentences, full.summary_sentences, full.highlights_page) == ((2, 4), (1, 3), (3, 4))
+    assert (full.numbers_groups_max, full.events_groups_max, full.concepts_max) == (2, 1, 3)
+    tuned = CFG.model_copy(deep=True)  # 값이 md가 아니라 brief.yaml에서 옴
+    tuned.write.points["single_source"] = (1, 2)
+    tuned.write.concepts_max = 5
+    assert writer_limits(tuned, 1).points == (1, 2) and writer_limits(tuned, 1).concepts_max == 5
+
+
+def test_writer_limits_required_in_writer_input():
+    from pydantic import ValidationError
+
+    from trendsit.core.artifacts_brief import PlanBrief, WriterInput
+
+    plan_ = PlanBrief(rank=1, angle="a", relation=Relation(type="new", topic_id=None))
+    with pytest.raises(ValidationError, match="limits"):
+        WriterInput(plan=plan_, evidence=[], previous=None, aliases=[])
+
+
+def test_render_no_page_dup():
+    """검수자·수정 입력에 같은 포인트 문장이 loc_lines로 한 번만(page·previous는 코드만 씀)."""
+    from trendsit.core.artifacts_brief import CriticInput, IndexedIssue, WriterReviseInput, loc_lines
+    from trendsit.core.render import render_data
+
+    p = page()
+    sentence = p.points[0].text
+    critic = CriticInput(loc_lines=loc_lines(p), page=p, evidence=[], angle="a", code_warnings=[], round=1)
+    revise = WriterReviseInput(loc_lines=loc_lines(p), previous=p, evidence=[], aliases=[],
+                               issues=[IndexedIssue(idx=0, loc="points[0]", type="format", evidence_id=None, comment="c", hint="h")])
+    assert render_data(critic).count(sentence) == 1 and render_data(revise).count(sentence) == 1
+    assert critic.page is p and revise.previous is p  # 객체는 그대로

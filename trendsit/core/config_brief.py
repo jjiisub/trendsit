@@ -97,6 +97,10 @@ class WriteCfg(_Strict):
     diagrams: DiagramsCfg
     concepts_max: int
 
+    def points_for(self, n_sources: int) -> tuple[int, int]:
+        """작성자 points 개수 범위: 근거 소스가 둘 이상이면 multi_source."""
+        return self.points["multi_source" if n_sources > 1 else "single_source"]
+
 
 class ReviewCfg(_Strict):
     max_rounds: int = Field(ge=1, le=3)

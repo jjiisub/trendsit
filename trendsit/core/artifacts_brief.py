@@ -6,7 +6,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Literal, Self
+from typing import TYPE_CHECKING, Any, ClassVar, Literal, Self
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -38,7 +38,7 @@ class DecideInput(RoleInput):
 class DecideAnswer(RoleOutput):
     reason: str = Field(description="두 항목이 가리키는 대상을 각각 이름으로 적고 같은지 다른지 한 줄")
     same: bool
-    confidence: float = Field(ge=0, le=1, description="0~1. 코드는 0.6 미만이면 묶지 않음")
+    confidence: float = Field(ge=0, le=1, description="0~1. 낮으면 코드가 same과 관계없이 묶지 않음")
 
     @classmethod
     def fallback(cls, reason: str, inp: DecideInput) -> Self:
@@ -211,11 +211,22 @@ class AliasLine(_Strict):
     aliases: list[str]
 
 
+class WriterLimits(_Strict):
+    points: tuple[int, int] = Field(description="이 토픽의 근거 소스 수로 고른 points 개수 범위")
+    overview_sentences: tuple[int, int]
+    summary_sentences: tuple[int, int]
+    highlights_page: tuple[int, int] = Field(description="페이지 전체 형광 개수 범위")
+    numbers_groups_max: int
+    events_groups_max: int
+    concepts_max: int
+
+
 class WriterInput(RoleInput):
     plan: PlanBrief
     evidence: list[Document] = Field(description="이 토픽의 근거 목록. id가 근거 id")
     previous: PreviousTopic | None
     aliases: list[AliasLine]
+    limits: WriterLimits
 
 
 class TopicPage(RoleOutput):
@@ -270,6 +281,8 @@ class IndexedIssue(Issue):
 
 
 class WriterReviseInput(RoleInput):
+    RENDER_SKIP: ClassVar[tuple[str, ...]] = ("previous",)  # loc_lines와 같은 내용이라 렌더하지 않음(코드는 객체를 씀)
+
     loc_lines: list[str] = Field(default=[], description="previous를 위치 이름(loc)이 붙은 줄로 펼친 것")
     previous: TopicPage
     issues: list[IndexedIssue]
@@ -291,6 +304,8 @@ class TopicPageRevision(RoleOutput):
 
 # ---------- critic (검수자) ----------
 class CriticInput(RoleInput):
+    RENDER_SKIP: ClassVar[tuple[str, ...]] = ("page",)  # loc_lines와 같은 내용이라 렌더하지 않음(코드는 객체를 씀)
+
     loc_lines: list[str] = Field(default=[], description="page를 위치 이름(loc)이 붙은 줄로 펼친 것. 이슈 loc은 이 이름 그대로")
     page: TopicPage
     evidence: list[Document] = Field(description="이 토픽의 근거 원문(refs가 가리키는 것 먼저, 카드 요약 id 제외)")

@@ -35,6 +35,7 @@ from ..core.artifacts_brief import (
     TopicPage,
     TopicPageRevision,
     WriterInput,
+    WriterLimits,
     WriterReviseInput,
     loc_lines,
 )
@@ -124,6 +125,14 @@ def previous_topic(db: DB, topic_id: str | None) -> PreviousTopic | None:
         return None
     pts = [p["text"] for p in json.loads(r["page_json"]).get("points", [])] if r["page_json"] else []
     return PreviousTopic(topic_id=r["topic_id"], title=r["title"] or "", summary=r["summary"] or "", points=pts)
+
+
+def writer_limits(cfg: BriefConfig, n_sources: int) -> WriterLimits:
+    w = cfg.write
+    return WriterLimits(points=w.points_for(n_sources), overview_sentences=w.overview_sentences,
+                        summary_sentences=w.summary_sentences, highlights_page=w.highlights.page,
+                        numbers_groups_max=w.diagrams.numbers_groups_max, events_groups_max=w.diagrams.events_groups_max,
+                        concepts_max=w.concepts_max)
 
 
 def alias_lines(table: AliasTable, members: list[Member]) -> list[AliasLine]:
@@ -307,7 +316,7 @@ def write_topic(ctx: Ctx, topic: Applied, members: dict[str, Member], table: Ali
     winp = WriterInput(plan=PlanBrief(rank=topic.rank, angle=topic.angle,
                                       relation=Relation(type=topic.relation_type, topic_id=topic.relation_topic_id)),
                        evidence=evidence_docs(pack), previous=previous_topic(ctx.db, topic.relation_topic_id),
-                       aliases=alias_lines(table, ms))
+                       aliases=alias_lines(table, ms), limits=writer_limits(cfg, n_sources))
     if draft is None:
         writer = load_role("writer", ctx.models)
         page, err, sid = _call(writer, winp, ctx, res.costs, "writer")

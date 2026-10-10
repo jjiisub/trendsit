@@ -129,6 +129,13 @@ sys.exit(0 if list(SPECULATIVE) == json.load(open('reports/S5-1/speculative_befo
 else
   fail B6 "금지 표현 목록 달라짐"
 fi
+pt B8 "작성자 입력 limits(소스 1개 [2,3], 2개 이상 [3,6], 값은 brief.yaml에서, 없으면 검증 오류)" tests/test_s5_select_checks.py -k writer_limits
+pt B9 "검수자·수정 입력 렌더에 같은 포인트 문장이 한 번만" tests/test_s5_select_checks.py -k render_no_page_dup
+# B10 md 중복: <data> 처리 문장 0, writer.md에 diagrams.md·style_ko.md와 같은 줄 0, 설정 숫자 0
+md_dup=$(grep -n '<data>' roles/*.md
+         awk 'length($0) > 20' roles/writer.md | grep -Fxf skills/diagrams.md -f skills/style_ko.md
+         grep -nE '4~10|0\.55|0\.6|2~3|3~6|3~4' roles/editor_select.md roles/decide.md roles/writer.md)
+if [ -z "$md_dup" ]; then pass B10 "<data> 문장 0, writer.md와 diagrams·style_ko 같은 줄 0, editor_select·decide·writer의 설정 숫자 0"; else fail B10 "$(echo "$md_dup" | head -2 | tr '\n' ' ')"; fi
 # A18 효과 없는 설정 키 0(S5-1a 5.7 표): yaml은 주석을 떼고, 스키마(core/config*.py)는 필드 정의 줄에서 찾는다
 DEAD='auto_approve|linkage|per_point_max|runtime|weekly_target_minutes|lang|channel_handle|why|paths|video_max_minutes|frames_per_slide_video'
 dead=$(for f in config/*.yaml; do sed 's/#.*//' "$f" | grep -nE "(^|[[:space:]{,-])($DEAD):" | sed "s#^#$f:#"; done
