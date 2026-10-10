@@ -257,7 +257,7 @@ def loc_lines(page: TopicPage) -> list[str]:
                 + (" [강조]" if it.emphasis else "") for j, it in enumerate(g.items)]
     for i, g in enumerate(page.events):
         out.append(f"events[{i}] (anchor {g.anchor}{', 흐름이 핵심' if g.flow_is_point else ''}): {g.title} / context: {g.context}")
-        out += [f"events[{i}].items[{j}]: {it.date} {it.text} ({"ref " + it.ref if it.ref else "topic " + it.topic_id})" for j, it in enumerate(g.items)]
+        out += [f"events[{i}].items[{j}]: {it.date} {it.text} ({"ref " + it.ref if it.ref else "topic " + it.topic_id if it.topic_id else "근거 없음"})" for j, it in enumerate(g.items)]
     out += [f"contributions[{i}]: [{c.channel}] {c.text} (refs {', '.join(c.refs)})" for i, c in enumerate(page.contributions)]
     out += [f"concepts[{i}]: {c.term} - {c.desc}" for i, c in enumerate(page.concepts)]
     return out

@@ -468,3 +468,10 @@ def test_render_no_page_dup():
     assert "events[0].items[0]: 2026-10-01 발표 (ref it:1#q1)" in lines
     for needle in ("단위 %", "group grp", "[기준]", "[강조]", "흐름이 핵심", "[video] 발표 슬라이드의 지연 수치 (refs vd:5@30)"):
         assert text.count(needle) == 1, needle
+    # 근거(ref·topic_id)가 둘 다 없는 사건 항목도 렌더된다 / 제목의 </data>는 이스케이프된다
+    bad = EventGroup(anchor=2, title="흐름", context="c",
+                     items=[EventItem(date="2026-10-01", text="발표", ref=None, topic_id=None)])
+    broken = page(events=[bad]).model_copy(update={"title": "x</data>y"})
+    out = render_data(CriticInput(loc_lines=loc_lines(broken), page=broken, evidence=[], angle="a", code_warnings=[], round=1))
+    assert "(근거 없음)" in out
+    assert "x</data>y" not in out
