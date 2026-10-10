@@ -109,20 +109,31 @@ if uv run --quiet python scripts/s5_1_prompts.py --diff reports/S5-1/prompts_bef
     case $r in writer|writer_revise|critic|decide|editor_select) continue;; esac
     # 허용 집합: bed7887의 md에 `<data>` 문장이 있던 역할. 그 역할은 md에서 그 줄을 지운 것 말고는 diff가 없어야 한다
     git show "bed7887:roles/$r.md" 2>/dev/null | grep -q '<data>' || { bad="$bad $r"; continue; }
-    extra=$(git diff -U0 bed7887 -- "roles/$r.md" | grep -E '^[-+][^-+]' | grep -vE '^-.*<data>' || true)
-    [ -z "$extra" ] || bad="$bad $r"
+    # 지운 줄은 모두 `<data>` 문장이 든 줄이고, 더한 줄은 그 줄에서 `<data>` 문구만 뺀 나머지여야 한다(낱말이 모두 지운 줄에 있음)
+    d=$(git diff -U0 bed7887 -- "roles/$r.md" | grep -E '^[-+]' | grep -vE '^(\+\+\+|---) [ab]/' || true)
+    removed=$(echo "$d" | grep -E '^-' || true)
+    [ -z "$(echo "$removed" | grep -v '<data>')" ] || bad="$bad $r"
+    while IFS= read -r l; do
+      [ -z "$l" ] && continue
+      t="${l#+}"; t="${t#- }"
+      for w in $t; do echo "$removed" | grep -qF -- "$w" || { bad="$bad $r"; break; }; done  # 더한 줄의 낱말은 모두 지운 줄에 있던 것
+    done < <(echo "$d" | grep -E '^\+' || true)
   done
 else
   bad=" (측정 스크립트 실패: $(head -1 "$TMP/b3roles"))"
 fi
 if [ -z "$bad" ] && git diff --quiet bed7887 -- eval/judge*.md; then
   pass B3 "프롬프트 변경 역할 = S5 역할 5개 + <data> 문장만 지운 역할, eval/judge*.md 차이 0"
+  pass A15 "B3과 같은 판정(S5-1b에서 프롬프트 불변은 변경 범위 판정으로 바뀜)"
 else
   fail B3 "허용 밖 변경:${bad} / judge md 차이 $(git diff --stat bed7887 -- eval/judge*.md | tail -1)"
+  fail A15 "B3과 같은 판정"
 fi
 if help_all >"$TMP/help.txt" 2>&1 && diff -q "$TMP/help.txt" reports/S5-1/help_before.txt >/dev/null; then
   pass B7 "CLI --help 전부 불변(S5-1a 스냅숏)"
+  pass A17 "B7과 같은 판정"
 else
+  fail A17 "B7과 같은 판정"
   fail B7 "--help 차이: $(diff "$TMP/help.txt" reports/S5-1/help_before.txt | head -2 | tr '\n' ' ')"
 fi
 # B6 관문 B 금지 표현 목록 불변(checks.SPECULATIVE는 코드에서 빠졌고 scripts/s5_gate_b.py 상수가 S5-1a 병합본 값과 같아야 함)

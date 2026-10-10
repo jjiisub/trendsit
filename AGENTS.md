@@ -18,7 +18,7 @@
 - 역할은 순수 함수. DB 쓰기는 오케스트레이터만. 모든 역할 출력에 `log`, `attention`
 - 모델 이름과 제공사는 `config/models.yaml`에만. 코드에 박지 않음
 - 최종 출력 형식은 예시 사이트의 `trendsit-example.json`과 같아야 함(S6에서 연결)
-- 역할 md는 COMMON 6.1과 `docs/reference/prompt_guide.md` 형식(섹션 고정, task와 core_rules, 인용·이유 칸 먼저). `check-config`는 섹션 순서, 예시 3~5개, 굵게 1개 이하만 검사
+- 역할 md는 COMMON 6.1과 `docs/reference/prompt_guide.md` 형식(섹션 고정, task와 core_rules, 인용·이유 칸 먼저). `check-config`는 frontmatter(필수 칸·모델 별칭 등)와 본문의 섹션 순서, 예시 3~5개, 굵게 1개 이하를 검사
 
 ## 함정
 - API 예산: 최소 구현 단계 전체 20달러(키 공통 한도 50달러, `config/budget.yaml`). 캐시를 끄고 반복 실행하지 말 것. 큰 실행 전 `cost` 확인

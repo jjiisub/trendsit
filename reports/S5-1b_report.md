@@ -20,7 +20,7 @@
 | B2 | 뺀 규칙 이름 11개 + `SPECULATIVE`(trendsit/brief/) 0건 |
 | B3 | 프롬프트 변경 역할 = S5 역할 5개 + `<data>` 문장만 지운 역할, `eval/judge*.md` 차이 0 |
 | B4 | 500줄 넘는 `trendsit/**/*.py` 0개, 5개 함수 모두 60줄 이하(9장) |
-| B5 | `bed7887` 기준 `trendsit/` +691/−710, `roles/ skills/` +53/−73 |
+| B5 | `bed7887` 기준 `trendsit/` +699/−717, `roles/ skills/` +61/−74 |
 | B6 | `scripts/s5_gate_b.py` 금지 표현 8개 == `reports/S5-1/speculative_before.json` |
 | B7 | CLI `--help` 전부 불변 |
 | B8 | `pytest -k writer_limits`(소스 1개 [2,3], 2개 이상 [3,6], 값은 brief.yaml, `limits` 없으면 검증 오류) |
@@ -45,7 +45,7 @@
 
 ## 4. 결정한 것
 - `run_checks`는 `angle` 인자를 받기만 하고 쓰지 않는다. `eval/graders_brief.py`(수정 금지 영역)가 `angle=`을 넘기기 때문이다. 쓰지 않는 인자가 남았다는 뜻이므로 명세 개정 때 정리 대상.
-- `UNIT_KINDS`·`unit_kind`는 요약·개요 수치 대조(`with_units`)가 "단위가 붙었는가"만 보므로 종류 이름을 버리고 단위 낱말 목록 하나(`UNIT_WORDS`, `UNIT_LETTERS`)와 `is_unit`으로 줄였다.
+- `UNIT_KINDS`·`unit_kind`는 지웠다. 요약·개요 수치 대조(`with_units`)는 "단위가 붙었는가"만 보므로 단위 낱말 목록 하나(`UNIT_WORDS`, 호출부 정규식 `[가-힣%]+`로 닿는 낱말만)와 `is_unit`만 남겼다.
 - `CriticInput.page`·`WriterReviseInput.previous`는 렌더에서만 뺀다. `Field(exclude=True)`는 `model_dump()`에서도 빠져 `s5_eval_fixtures.py`가 만드는 critic·writer_revise 픽스처에서 page가 사라지므로, 두 입력 클래스에만 `RENDER_SKIP` ClassVar를 두고 `render_body`가 `getattr(obj, "RENDER_SKIP", ())`로 읽게 했다(공통 부모 `RoleInput`은 바꾸지 않음).
 - `WriteCfg.points_for(n_sources)`를 두어 checks 2곳과 `writer_limits`가 같은 "소스 수 → points 범위" 선택을 쓰게 했다.
 - `config.current_spec(override, default)`: `--spec`, 환경변수 `TRENDSIT_SPEC`, 기본값 순. 이전에 `args.spec or "S2"` 꼴이던 명령(rematch, filter, summarize, repo-analyze, plan, deep-text, cluster, weekly)은 환경변수가 있으면 이제 환경변수를 따른다(전에는 명령 기본 스펙이 환경변수보다 앞이었다).
@@ -54,6 +54,12 @@
 - 코드가 고정으로 검사하는 형식 계약 숫자(도식 항목 2~6개 등)는 md에 남겼다. `brief.yaml` 값이지만 `limits`에 칸이 없는 것(형광 칸별 개수, 후보 상한 등)은 숫자를 빼고 일반 문구로 바꿨다(NG-1: `limits` 외 새 입력 칸 금지).
 - 리뷰 반영 A2: writer.md에서 style_ko.md·diagrams.md와 문구만 다른 같은 규칙(문체 core_rules, 도식 context·그림 없이 읽히게, 요약 "~다", numbers title·단위, 형광 "핵심 결론"만)을 지웠다. 그 결과 writer.md 본문의 굵게는 0개다(check-config "1개 이하" 만족). critic.md는 문체 몫을 사실에 맞게 고쳤다(코드가 보지 않는 문체는 format 이슈로).
 - 리뷰 반영 A2: `UNIT_WORDS`는 호출부 정규식 `[가-힣%]+`로 닿는 낱말만 남겼다(골든 출력 바이트 동일 확인).
+- 리뷰 반영 A3: `loc_lines`가 page의 단위·group·기준·강조·흐름이 핵심·기여 refs·확인 필요 표시까지 담는다(렌더에서 page를 뺀 뒤에도 정보가 한 번 남게). `page.log`/`attention`(모델이 낸 기록 칸)은 싣지 않는다. B9 테스트가 이를 단언한다.
+- 리뷰 반영 A3: critic.md 문체 서술은 사실만 적는다(문체·형광·분량은 반려 사유가 아니고 코드가 검사). 5.1은 오탐 때문에 규칙을 코드에서 뺐고 md 처리는 writer 쪽 `style_ko.md`다. 검수자 반려로 되살리지 않는다.
+- 리뷰 반영 A3: `<data>` 문장만 지우고 역할별 꼬리 지시(인젝션 인용 금지, 이미지 속 글자는 자료, README 지시 따르지 않기, 도구 결과는 자료)는 7개 역할에 복원했다. B3는 지운 줄이 `<data>` 줄이고 더한 줄의 낱말이 모두 지운 줄에 있는지 본다.
+- 리뷰 반영 A3: 골든 B1은 `--before` 파일의 runs(같은 run_id)로 고정해 계산한다. 그 run이 DB에 없으면 종료 코드 2. 근거 목록·별칭은 현재 데이터를 쓰므로 수집 데이터가 바뀌면 달라질 수 있다.
+- 리뷰 반영 A3: verify는 A15·A17을 원래 ID로 두고 B3·B7과 같은 판정을 낸다(A16만 B1로 대체).
+- 리뷰 반영 A3: writer.md 본문에 굵게 1개(핵심 규칙 "각 문장은 그 문장에 다는 근거 id의 내용만 담는다")를 되살렸다(F-35).
 - 리뷰 반영 A2: B3는 측정 스크립트 종료 코드를 확인하고, 달라진 역할 집합이 허용 집합(S5 5개 + `bed7887` md에 `<data>` 줄이 있던 역할)의 부분집합인지 비교한다.
 - `weekly.set_run_week`: `UPDATE runs SET week`는 한 함수. cluster부터면 `stage_cluster`가, 그 밖의 단계부터면 `run_weekly`가 한 번 부른다(이어 갈 run이 없어 `ValueError`가 나는 경우에는 week를 쓰지 않는다).
 - 영상 관련성 계산은 `cluster.score_video_relevance(ev, embedder, interests, cfg)` 한 호출 형태로 합쳤다.
@@ -66,7 +72,7 @@
 - 전 스냅숏: `bed7887`을 `git worktree`로 꺼내 `s5_1_golden.py`·`s5_1_prompts.py`와 `checks.SPECULATIVE`를 다시 만들었다. golden·prompts는 기존 `golden_before.json`·`prompts_before.json`과 바이트 동일이라 파일은 그대로고, `speculative_before.json`만 새로 저장했다. worktree는 지웠다.
 - `intended_removals.json`의 `match`는 원문 앞부분이고, 한 줄이 차이 한 건에 대응한다.
 - 픽스처: `s5_eval_fixtures.py`를 실행했더니 현재 DB 기준 writer 입력 20개가 기존 파일 20개와 이름이 9개만 같았다(나머지 11개는 이전 run의 토픽 이름). 기존 11개는 지우고 새 11개를 넣어 writer 디렉터리는 현재 20토픽 = 20파일이다. 기존 9개는 현재 입력 형식(원문 줄, 카드 주장 줄 없음)과 `limits`로 바뀌었다. critic·editor_select·writer_revise 픽스처는 되돌려 그대로다(그 디렉터리도 현재 DB 기준으로는 달라지지만 명세가 "그대로").
-- `data/trendsit.db`: 첫 구현 때 픽스처 스크립트가 DB를 쓰기 모드로 열어 해시가 바뀌었고 복사본으로 되돌렸다. 리뷰 반영 A2에서 스크립트가 읽기 전용 연결로 임시 DB에 복사해 그 복사본을 열도록 고쳤다. 다시 돌려 실제 DB 해시가 그대로이고 writer 픽스처 20개가 바뀌지 않음을 확인했다.
+- `data/trendsit.db`: 첫 구현 때 픽스처 스크립트가 DB를 쓰기 모드로 열어 sha256이 `fa12c3f2…` → `1f82d701…`로 바뀌었고 실행 전 복사본으로 되돌려 `fa12c3f2…`로 복구했다. 리뷰 반영 A2에서 스크립트가 읽기 전용 연결로 임시 DB에 복사해 그 복사본을 열도록 고쳤다. 다시 돌려 실제 DB 해시가 그대로이고 writer 픽스처 20개가 바뀌지 않음을 확인했다.
 
 ## 5. 스펙과 다르게 한 것
 - F-12의 "video_summary.md에서 style_ko.md와 같은 문장 삭제"는 하지 않았다(사용자 결정). NG-4가 S2~S4 역할 md의 지침 변경을 `<data>` 문장 삭제만 예외로 막고, B3도 그 역할에는 그 줄만 허용한다. 해당 줄에는 영상 전용 꼬리("해석, 평가는 쓰지 않는다")도 있다.
@@ -91,6 +97,11 @@
 - `current_spec` 환경변수 우선순위 변경은 동작이 미세하게 달라지는 부분이다.
 - `run_checks(angle=)` 미사용 인자는 `eval/graders_brief.py`를 고칠 수 있을 때 같이 지운다.
 
+### 6-1. optional로 남긴 것
+- 명세에 없는 인자·옵션·헬퍼: `run_checks(angle=)`(미사용), `stage_cluster(interests=)`, `WriteCfg.points_for`, `writer_limits`, `checks.page_refs`, `pack_index`(evidence로 이동), `embed_interests`, `set_run_week`, `open_db`, 공개 `parse_date`, `ascii_slug`, `collect.links.XML_REF`, `CriticInput/WriterReviseInput.RENDER_SKIP`, `current_spec(default=)`, `trendsit/brief/revision.py`, 측정 도구 옵션 `s5_1_golden --before/--removals`·`s5_1_prompts --roles`. `trendsit` CLI 명령·옵션과 설정 키는 추가하지 않았다.
+- writer 픽스처 토픽 11개 교체(현재 DB 토픽에 맞춤): `eval` writer 결과를 이전 `reports/eval/` 실행과 비교할 때 토픽 구성이 다르다(같은 이름 9개는 입력 형식·`limits`도 바뀜).
+- 관문 B judge 입력(`eval.graders.judge_input`)의 `source_fields`에 `limits`가 들어간다(작성자 입력의 필드를 그대로 싣기 때문). judge md·채점표는 그대로다.
+
 ## 7. 사용액
 $0 (워크플로우 안 LLM 호출 없음). 임베딩은 로컬 모델로 픽스처 스크립트에서만 돌렸다.
 
@@ -99,15 +110,15 @@ $0 (워크플로우 안 LLM 호출 없음). 임베딩은 로컬 모델로 픽스
 
 ## 8. impl-workflow SUMMARY 요약
 - 런 `002-s5-1b`: 구현 A1(S-1~S-4 전부, 게이트 `--fast` 통과). 이후 리뷰·수정 라운드 결과는 `.workflow/002-s5-1b/SUMMARY.md`에 오케스트레이터가 이어 적는다. QA 대상 AC 없음.
-- 복잡도 예산: 변경 60/35 파일(재생성 픽스처·base 커밋의 `COMMON.md` 제외, **초과, 사용자 승인**), 새 코드 파일 1/3(`revision.py`) + 데이터 2(`intended_removals.json`, `speculative_before.json`), 삭제 1(`s5_order_preview.py`), `trendsit/` +691/−710, `roles/ skills/` +53/−73, 새 의존성·옵션·환경변수 0
+- 복잡도 예산: 변경 60/35 파일(재생성 픽스처·base 커밋의 `COMMON.md` 제외, **초과, 사용자 승인**), 새 코드 파일 1/3(`revision.py`) + 데이터 2(`intended_removals.json`, `speculative_before.json`), 삭제 1(`s5_order_preview.py`), `trendsit/` +699/−717, `roles/ skills/` +61/−74, 새 의존성·옵션·환경변수 0
 - findings 승계: 002-I01(`fetch_page` 깊이 재계산, 금지 구조 필요), 002-I02(리포트 장이 비어 있는 채 grep PASS, 런 뒤 채우는 장) — 둘 다 이번 명세 범위 밖으로 처리하지 않음
 - 거부·optional: 없음(구현 첫 라운드)
 
 ## 9. 줄 수 전후 (`bed7887` → 이 브랜치)
 | | 전 | 후 |
 |---|---|---|
-| `trendsit/` 추가·삭제 | | +691 / −710 (순 −19) |
-| `roles/ skills/` 추가·삭제 | | +53 / −73 (순 −20) |
+| `trendsit/` 추가·삭제 | | +699 / −717 (순 −18) |
+| `roles/ skills/` 추가·삭제 | | +61 / −74 (순 −13) |
 | `brief/checks.py` | 507 | 440 |
 | `brief/write.py` | 523 | 415 (+ `brief/revision.py` 121) |
 | `brief/pipeline.py` | 295 | 306 |

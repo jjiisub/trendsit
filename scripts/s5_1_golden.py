@@ -1,7 +1,7 @@
 """골든 회귀(S5-1a 5.1): 저장된 W40·W41 현재판의 모든 토픽 × 모든 라운드 판에 코드 검사를 다시 돌려 JSON으로 남긴다.
 
 실행: uv run python scripts/s5_1_golden.py --out <path> [--db data/trendsit.db] [--before <golden.json> --removals <표.json>]
-DB는 읽기 전용으로 연다. LLM·임베딩 호출 없음. 종료 코드: 0 성공, 1 전후 차이가 의도한 제거 표와 다름, 2 DB·run 없음.
+DB는 읽기 전용으로 연다. --before가 있으면 현재판이 아니라 그 파일의 runs(같은 run_id)로 계산한다. LLM·임베딩 호출 없음. 종료 코드: 0 성공, 1 전후 차이가 의도한 제거 표와 다름, 2 DB·run 없음.
 --before/--removals(S5-1b B1): 이번 결과와 --before의 차이가 --removals 표와 정확히 같아야 한다. 차이의 단위는 이슈 한 건,
 자동 수정 한 건, 경고 한 건이고 "금지 표현: a, b"는 낱말마다 한 건으로 센다. 표 한 줄은 차이 한 건에 대응한다.
 """
@@ -70,13 +70,21 @@ def main() -> int:
     conn = sqlite3.connect(f"file:{args.db}?mode=ro", uri=True)
     conn.row_factory = sqlite3.Row
     db = SimpleNamespace(conn=conn)
-    runs = {}
-    for w in WEEKS:
-        r = conn.execute("SELECT current_run_id FROM weeks WHERE week=?", (w,)).fetchone()
-        if r is None or not r[0]:
-            print(f"run 없음: {w}", file=sys.stderr)
-            return 2
-        runs[w] = r[0]
+    if args.before:  # 전후 비교는 --before가 기록한 run으로 고정(그 뒤 weekly 재실행으로 현재판이 바뀌어도 같은 판을 비교)
+        runs = json.loads(Path(args.before).read_text(encoding="utf-8"))["runs"]
+        for w, run in runs.items():
+            if conn.execute("SELECT 1 FROM runs WHERE id=?", (run,)).fetchone() is None or not conn.execute(
+                    "SELECT 1 FROM topics WHERE run_id=?", (run,)).fetchone():
+                print(f"--before의 run이 DB에 없음: {w} {run}", file=sys.stderr)
+                return 2
+    else:
+        runs = {}
+        for w in WEEKS:
+            r = conn.execute("SELECT current_run_id FROM weeks WHERE week=?", (w,)).fetchone()
+            if r is None or not r[0]:
+                print(f"run 없음: {w}", file=sys.stderr)
+                return 2
+            runs[w] = r[0]
     cfg = config.load("brief.yaml")
     tl = cfg.aliases.transliteration
     pages = []

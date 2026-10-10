@@ -250,14 +250,15 @@ class TopicPage(RoleOutput):
 def loc_lines(page: TopicPage) -> list[str]:
     """위치 이름이 붙은 줄(번호 0부터). 검수자·수정이 위치를 1부터 세던 문제(W40·W41 평가 13/13)를 입력에서 막는다."""
     out = [f"title: {page.title}", f"summary: {page.summary}", f"overview: {page.overview}"]
-    out += [f"points[{i}]: {p.text} (refs {', '.join(p.refs)})" for i, p in enumerate(page.points)]
+    out += [f"points[{i}]: {p.text} (refs {', '.join(p.refs)})" + (" [확인 필요]" if p.check else "") for i, p in enumerate(page.points)]
     for i, g in enumerate(page.numbers):
-        out.append(f"numbers[{i}] (anchor {g.anchor}): {g.title} / context: {g.context}")
-        out += [f"numbers[{i}].items[{j}]: {it.label} = {it.value} ({it.ref})" for j, it in enumerate(g.items)]
+        out.append(f"numbers[{i}] (anchor {g.anchor}, group {g.group}, 단위 {g.unit}): {g.title} / context: {g.context}")
+        out += [f"numbers[{i}].items[{j}]: {it.label} = {it.value} ({it.ref})" + (" [기준]" if it.baseline else "")
+                + (" [강조]" if it.emphasis else "") for j, it in enumerate(g.items)]
     for i, g in enumerate(page.events):
-        out.append(f"events[{i}] (anchor {g.anchor}): {g.title} / context: {g.context}")
+        out.append(f"events[{i}] (anchor {g.anchor}{', 흐름이 핵심' if g.flow_is_point else ''}): {g.title} / context: {g.context}")
         out += [f"events[{i}].items[{j}]: {it.date} {it.text} ({it.ref or it.topic_id})" for j, it in enumerate(g.items)]
-    out += [f"contributions[{i}]: [{c.channel}] {c.text}" for i, c in enumerate(page.contributions)]
+    out += [f"contributions[{i}]: [{c.channel}] {c.text} (refs {', '.join(c.refs)})" for i, c in enumerate(page.contributions)]
     out += [f"concepts[{i}]: {c.term} - {c.desc}" for i, c in enumerate(page.concepts)]
     return out
 
@@ -283,7 +284,7 @@ class IndexedIssue(Issue):
 class WriterReviseInput(RoleInput):
     RENDER_SKIP: ClassVar[tuple[str, ...]] = ("previous",)  # loc_lines와 같은 내용이라 렌더하지 않음(코드는 객체를 씀)
 
-    loc_lines: list[str] = Field(default=[], description="previous를 위치 이름(loc)이 붙은 줄로 펼친 것")
+    loc_lines: list[str] = Field(default=[], description="previous 페이지의 모든 칸을 위치 이름(loc)이 붙은 줄로 펼친 것")
     previous: TopicPage
     issues: list[IndexedIssue]
     evidence: list[Document] = Field(description="지적된 칸의 근거 원문만")
@@ -306,7 +307,7 @@ class TopicPageRevision(RoleOutput):
 class CriticInput(RoleInput):
     RENDER_SKIP: ClassVar[tuple[str, ...]] = ("page",)  # loc_lines와 같은 내용이라 렌더하지 않음(코드는 객체를 씀)
 
-    loc_lines: list[str] = Field(default=[], description="page를 위치 이름(loc)이 붙은 줄로 펼친 것. 이슈 loc은 이 이름 그대로")
+    loc_lines: list[str] = Field(default=[], description="page의 모든 칸을 위치 이름(loc)이 붙은 줄로 펼친 것. 이슈 loc은 이 이름 그대로")
     page: TopicPage
     evidence: list[Document] = Field(description="이 토픽의 근거 원문(refs가 가리키는 것 먼저, 카드 요약 id 제외)")
     angle: str

@@ -454,3 +454,14 @@ def test_render_no_page_dup():
                                issues=[IndexedIssue(idx=0, loc="points[0]", type="format", evidence_id=None, comment="c", hint="h")])
     assert render_data(critic).count(sentence) == 1 and render_data(revise).count(sentence) == 1
     assert critic.page is p and revise.previous is p  # 객체는 그대로
+    # 렌더에서 page를 빼도 page의 정보(단위·기준·강조·흐름·기여 refs)는 loc_lines로 한 번 남는다
+    g = NumberGroup(anchor=1, group="grp", title="정확도", context="같은 벤치 [it:1#q2]", unit="%",
+                    items=[NumberItem(label="A", value="86.6%", ref="it:1#q2", baseline=True),
+                           NumberItem(label="B", value="93.5%", ref="it:1#q2", emphasis=True)])
+    ev = EventGroup(anchor=2, title="흐름", context="c", flow_is_point=True,
+                    items=[EventItem(date="2026-10-01", text="발표", ref="it:1#q1", topic_id=None),
+                           EventItem(date="2026-10-02", text="출시", ref="it:1#q1", topic_id=None)])
+    full = page(numbers=[g], events=[ev])
+    text = render_data(CriticInput(loc_lines=loc_lines(full), page=full, evidence=[], angle="a", code_warnings=[], round=1))
+    for needle in ("단위 %", "group grp", "[기준]", "[강조]", "흐름이 핵심", "[video] 발표 슬라이드의 지연 수치 (refs vd:5@30)"):
+        assert text.count(needle) == 1, needle

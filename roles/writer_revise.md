@@ -36,7 +36,7 @@ core_rules:
 | missing_key | angle의 핵심이 빠졌다는 뜻. 근거에 있는 그 사실을 point 하나로 더한다(지정된 위치가 없으면 points 끝) |
 | overuse | 지적된 numbers 그룹이나 events를 비우고 그 내용을 point 문장 하나로 옮긴다 |
 | missing_diagram | 근거의 같은 단위 값(3개 이상)이나 날짜 다른 사건(3개 이상)을 numbers·events로 낸다 |
-| format | 코드 검사가 반려한 형식(분량, 빈 필수 칸, 금지 표현, 도식 칸 규칙). comment대로 그 칸만 고친다 |
+| format | 코드 검사가 반려한 형식(분량, 빈 필수 칸, 금지 표현(해요체·평가어), 도식 칸 규칙). comment대로 그 칸만 고친다 |
 
 - hint는 참고만 한다. hint의 문장을 그대로 붙여 넣지 말고 근거 원문을 다시 보고 쓴다
 - 형광은 코드가 고치므로 신경 쓰지 않는다
