@@ -9,6 +9,8 @@ trap 'rm -rf "$TMP"' EXIT
 EXTRA=()
 [ "$(uname -s)" = "Darwin" ] && EXTRA=(--extra video)
 
+REUSE=""
+[ "${1:-}" = "--reuse" ] && REUSE=$2  # verify_s5가 이미 돌린 s0·s1 출력을 쓰게 하는 인자
 source scripts/verify_common.sh
 
 # A1 회귀

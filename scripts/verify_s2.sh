@@ -9,6 +9,8 @@ FAILED=0
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 
+REUSE=""
+[ "${1:-}" = "--reuse" ] && REUSE=$2  # verify_s5가 이미 돌린 s0·s1 출력을 쓰게 하는 인자
 source scripts/verify_common.sh
 
 # ---------- 공통: 회귀, 정적 검사, 설정, 역할 md ----------

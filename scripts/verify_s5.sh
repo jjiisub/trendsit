@@ -11,6 +11,17 @@ EXTRA=(--extra video --extra embed)  # 건너뜀 0은 두 extra 모두에서(리
 
 source scripts/verify_common.sh
 
+# 모든 CLI 명령(하위 명령 포함)의 --help를 이어 붙여 출력(S5-1a C-4 스냅숏 형식). 하위 명령 목록은 도움말의 {a,b,...} 줄에서 읽는다.
+help_all() {
+  local path=${1:-} text sub first=${2:-1}
+  text=$(COLUMNS=100 uv run --quiet python -m trendsit $path --help)
+  [ "$first" = 1 ] || echo
+  printf '$ trendsit%s --help\n%s\n' "${path:+ $path}" "$text"
+  for sub in $(echo "$text" | awk '/^ +\{.*\}/ {line=$1; getline; if ($0 ~ /^    [^ ]/) {gsub(/[{}]/, "", line); print line; exit}}' | tr ',' ' '); do
+    help_all "${path:+$path }$sub" 0
+  done
+}
+
 # A1 회귀: 종료 코드로 판정(리뷰 R16)
 if [ "$FAST" = 1 ]; then
   echo "SKIP A1 --fast: verify_s0~s4 재실행 생략(A2 전체 pytest가 s0~s4 테스트 포함)"
