@@ -357,7 +357,7 @@ def write_topic(ctx: Ctx, topic: Applied, members: dict[str, Member], table: Ali
         return out
     raw_page: dict[str, Any] | None = page.raw_dump()
     for rnd in range(1, cfg.review.max_rounds + 1):
-        cr = checks.run_checks(page, pack, n_sources, cfg, canon, translit, topic.angle)
+        cr = checks.run_checks(page, pack, n_sources, cfg, canon, translit)
         page = cr.page
         res.pages.append((rnd, page, raw_page, sid))
         issues = cr.issues

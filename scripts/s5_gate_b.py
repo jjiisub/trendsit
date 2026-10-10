@@ -30,6 +30,8 @@ from trendsit.core.style import EVAL_ENDINGS, ends_as_sentence, is_haeyo  # noqa
 
 LABELS = ROOT / os.environ.get("S5_LABELS", "eval/labels")  # 1차 라벨 스냅숏: eval/labels/s5_r1
 KEEP = ("label", "critique", "labeler")
+# 근거 없는 전망·평가형 마무리. 관문 B 문체 지표용(S5 병합 시점 checks.SPECULATIVE와 같은 값)
+SPECULATIVE = ("주목된다", "것으로 보인다", "것으로 전망된다", "지 주목", "것이 쟁점이다", "핵심 변화다", "핵심 축으로", "부상했다")
 QCOLS = tuple(f"{q}_pass" for q in ("Q0", "Q1", "Q2", "Q3", "Q4"))
 
 
@@ -61,7 +63,7 @@ def style_violations(page: TopicPage) -> list[str]:
     for loc, text in [("summary", page.summary), ("overview", page.overview),
                       *[(f"points[{i}]", p.text) for i, p in enumerate(page.points)]]:
         t = checks.plain(text)
-        if any(is_haeyo(s) for s in checks.sentences(t)) or any(e in t for e in (*EVAL_ENDINGS, *checks.SPECULATIVE)):
+        if any(is_haeyo(s) for s in checks.sentences(t)) or any(e in t for e in (*EVAL_ENDINGS, *SPECULATIVE)):
             out.append(f"{loc} 해요체·평가형")
         if loc.startswith("points") and ends_as_sentence(t):
             out.append(f"{loc} 명사형 아님")

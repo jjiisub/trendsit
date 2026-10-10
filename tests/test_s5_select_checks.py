@@ -172,12 +172,12 @@ def test_anchor_and_diagram_caps():
 
 
 def test_forbidden_words_reject_but_highlights_are_autofixed():
-    p = page(summary="==OpenAI==가 ==가격==을 내렸다.", overview="최근 AI 업계에서는 가격 경쟁이 핵심이다. 정확도도 나왔어요.")
+    p = page(summary="==OpenAI==가 ==가격==을 내렸다.", overview="가격 경쟁이 핵심이다. 정확도도 나왔어요.")
     r = checks.run_checks(p, pack(), 2, CFG, {})
     assert r.page.summary.count("==") == 2  # 형광 2개 → 1개(뒤쪽 제거), 반려 아님
     assert any(f["rule"].startswith("형광") for f in r.autofix)
     text = " ".join(i.comment for i in r.issues)
-    assert "해요체" in text and "핵심이다" in text and "일반론 시작" in text
+    assert "해요체" in text and "핵심이다" in text
     assert not any("summary" == i.loc for i in r.issues)
 
 
@@ -279,21 +279,6 @@ def test_number_item_value_accepts_numbers():
     assert NumberItem.model_validate({"label": "a", "value": "1.36달러", "ref": "x"}).value == "1.36달러"
 
 
-def test_bar_value_unit_checked_against_evidence():
-    """W40 judge: ms 그룹에 1.6초, $ 그룹에 % 값. 근거에서 그 값 뒤 단위가 그룹 단위와 다르면 반려."""
-    src = {"site": "s", "title": "t"}
-    pk = {"it:2#q1": [EvidenceItem("it:2#q1", "it:2", "text", "quote",
-                                   "Decision API 150ms, 120ms, Luna는 1.6초", src)]}
-    g = NumberGroup(anchor=1, group="g", title="응답 시간", context="c [it:2#q1]", unit="ms",
-                    items=[NumberItem(label="A", value="150", ref="it:2#q1"), NumberItem(label="B", value="120", ref="it:2#q1"),
-                           NumberItem(label="Luna", value="1.6", ref="it:2#q1")])
-    p = page(points=[Point(text="Decision API 응답 150ms, Luna 1.6초보다 빠름", refs=["it:2#q1"]),
-                     Point(text="두 번째 근거 문장 요약 정리", refs=["it:2#q1"])], numbers=[g])
-    issues = checks.run_checks(p, pk, 1, CFG, {}).issues
-    assert any("numbers[0].items[2]" == i.loc and "근거 단위는 s" in i.comment for i in issues)
-    assert not any(i.loc in ("numbers[0].items[0]", "numbers[0].items[1]") for i in issues)
-
-
 def _pack_r3() -> dict[str, list[EvidenceItem]]:
     src = {"site": "SIFT", "title": "t", "date": "2026-10-06"}
     return pack() | {"it:2#q1": [EvidenceItem("it:2#q1", "it:2", "text", "quote",
@@ -301,18 +286,11 @@ def _pack_r3() -> dict[str, list[EvidenceItem]]:
                                  EvidenceItem("it:2#q1", "it:2", "text", "claim", "정확도가 3.7%p 올랐다고 주장", src)]}
 
 
-def test_r3_unit_kinds_label_unit_and_empty_unit():
-    mixed = NumberGroup(anchor=1, group="g", title="SIFT 결과", context="같은 실험 [it:2#q1]", unit="%",
-                        items=[NumberItem(label="정확도", value="35.1", ref="it:2#q1"),
-                               NumberItem(label="소요", value="5", ref="it:2#q1"),
-                               NumberItem(label="CPU(시간)", value="42", ref="it:2#q1")])
-    issues = checks.run_checks(page(numbers=[mixed]), _pack_r3(), 2, CFG, {}).issues
-    locs = {i.loc for i in issues if i.type == "number_mismatch"}
-    assert "numbers[0].items[1]" in locs  # 근거 단위 '시간'(h) ≠ %
-    assert "numbers[0].items[2]" in locs  # 라벨 끝 괄호 단위
-    empty = mixed.model_copy(update={"unit": "()", "items": mixed.items[:1] * 3})
+def test_r3_empty_unit():
+    g = NumberGroup(anchor=1, group="g", title="SIFT 결과", context="같은 실험 [it:2#q1]", unit="()",
+                    items=[NumberItem(label="정확도", value="35.1", ref="it:2#q1")] * 3)
     assert any(i.loc == "numbers[0]" and "단위가 비어" in i.comment
-               for i in checks.run_checks(page(numbers=[empty]), _pack_r3(), 2, CFG, {}).issues)
+               for i in checks.run_checks(page(numbers=[g]), _pack_r3(), 2, CFG, {}).issues)
 
 
 def test_r3_numbers_checked_in_titles_and_by_value_not_substring():
@@ -328,8 +306,8 @@ def test_r3_numbers_checked_in_titles_and_by_value_not_substring():
     assert any(i.loc == "summary" for i in checks.run_checks(p, _pack_r3(), 2, CFG, {}).issues)
 
 
-def test_r3_speculative_endings_and_eval_words_in_points():
-    p = page(overview="OpenAI가 새 가격을 발표했다. 시장 재편을 가속화할 것으로 보인다.",
+def test_r3_evaluative_endings_and_eval_words_in_points():
+    p = page(overview="OpenAI가 새 가격을 발표했다. 가격 구조 변화가 핵심이다.",
              points=[Point(text="혁신적인 가격 정책으로 100만 토큰당 $2", refs=["it:1#q1"]), *page().points[1:]])
     bad = {i.loc for i in checks.run_checks(p, pack(), 2, CFG, {}).issues if "금지 표현" in i.comment}
     assert bad == {"overview", "points[0]"}
@@ -422,53 +400,9 @@ def test_f3_missing_diagram_warning_only_same_sentence_same_unit():
         assert any("누락 의심" in x for x in w) is want, (p, w)
 
 
-def test_f7_angle_words_missing_from_first_point_warns():
-    """C-23: summary 첫 문장과 첫 두 point 어디에도 angle 핵심 낱말이 없을 때만 경고."""
-    p = page(points=[Point(text="업스테이지 투트랙 전략으로 사업 확대", refs=["it:1#q1"]),
-                     Point(text="정확도 B 93.5%로 세 모델 중 가장 높음", refs=["it:1#q2"]), *page().points[2:]])
-    w = checks.run_checks(p, pack(), 2, CFG, {}, angle="GPU 한 장 실행 가능한 MoE 소형 모델의 에이전트 최적화").warnings
-    assert any(x.startswith("핵심 의심") for x in w)
-    ok = page(points=[Point(text="업스테이지 투트랙 전략으로 사업 확대", refs=["it:1#q1"]),
-                      Point(text="GPU 한 장에서 돌아가는 MoE 소형 모델", refs=["it:1#q1"]), *page().points[2:]])  # 둘째 point
-    assert not any(x.startswith("핵심 의심") for x in checks.run_checks(
-        ok, pack(), 2, CFG, {}, angle="GPU 한 장 실행 가능한 MoE 소형 모델의 에이전트 최적화").warnings)
-
-
 def test_f11_evaluative_endings():
-    p = page(summary="Anthropic이 Haiku 5.5를 내놨다. 구간 가격이 다른 것이 쟁점이다.")
+    p = page(summary="Anthropic이 Haiku 5.5를 내놨다. 구간 가격이 다른 것이 핵심이다.")
     assert any(i.loc == "summary" and "금지 표현" in i.comment for i in checks.run_checks(p, pack(), 2, CFG, {}).issues)
-
-
-def test_g2_point_with_three_same_unit_values_and_no_diagram_warns():
-    p = page(points=[Point(text="동의어 치환율 0·10·20%에서 탐지율 92%, 66%, 17%로 떨어짐", refs=["it:1#q2"]), *page().points[1:]])
-    w = checks.warnings(p, pack(), CFG)
-    assert any(x.startswith("누락 의심: points[0]") for x in w)
-    dims = page(points=[Point(text="차원 768, 512, 256개 지원", refs=["it:1#q2"]), *page().points[1:]])
-    assert not any(x.startswith("누락 의심: points[0]") for x in checks.warnings(dims, pack(), CFG))
-
-
-def test_g3_per_million_shortened_and_english_particle():
-    src = {"site": "S", "title": "t"}
-    pk = pack() | {"it:3#q1": [EvidenceItem("it:3#q1", "it:3", "text", "quote",
-                                            "Over 100K: $0.50 / $2.50 per million tokens.", src)]}
-    p = page(points=[*page().points, Point(text="10만 토큰 초과 시 입력/출력 토큰당 $0.50/$2.50 적용", refs=["it:3#q1"])])
-    issues = checks.run_checks(p, pk, 2, CFG, {}).issues
-    assert any(i.loc == "points[3]" and "100만 토큰당" in i.comment for i in issues)
-    ok = page(points=[*page().points, Point(text="10만 토큰 초과 시 100만 토큰당 $0.50/$2.50 적용", refs=["it:3#q1"])])
-    assert not any("토큰당" in i.comment for i in checks.run_checks(ok, pk, 2, CFG, {}).issues)
-    bad = page(summary="Anthropic가 Haiku를 내놨다.")
-    assert any("조사 'Anthropic가'" in i.comment for i in checks.run_checks(bad, pack(), 2, CFG, {}).issues)
-    fine = page(summary="Anthropic이 Claude를 내놨고 GPT가 뒤따랐다.")
-    assert not any("조사" in i.comment for i in checks.run_checks(fine, pack(), 2, CFG, {}).issues)
-
-
-def test_g7_concept_without_explanation_is_dropped():
-    from trendsit.core.artifacts_brief import Concept
-
-    p = page(concepts=[Concept(term="Agentic Batch Changes", desc="베타 출시된 기능"),
-                       Concept(term="MoE", desc="입력마다 전문가 일부만 켜서 계산량을 줄이는 구조")])
-    fixed, fixes = checks.autofix(p, CFG, {})
-    assert [c.term for c in fixed.concepts] == ["MoE"] and any(f["loc"] == "concepts" for f in fixes)
 
 
 def test_version_after_english_name_is_not_a_measurement():

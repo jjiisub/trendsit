@@ -1,7 +1,9 @@
 """골든 회귀(S5-1a 5.1): 저장된 W40·W41 현재판의 모든 토픽 × 모든 라운드 판에 코드 검사를 다시 돌려 JSON으로 남긴다.
 
-실행: uv run python scripts/s5_1_golden.py --out <path> [--db data/trendsit.db]
-DB는 읽기 전용으로 연다. LLM·임베딩 호출 없음. 종료 코드: 0 성공, 2 DB·run 없음.
+실행: uv run python scripts/s5_1_golden.py --out <path> [--db data/trendsit.db] [--before <golden.json> --removals <표.json>]
+DB는 읽기 전용으로 연다. LLM·임베딩 호출 없음. 종료 코드: 0 성공, 1 전후 차이가 의도한 제거 표와 다름, 2 DB·run 없음.
+--before/--removals(S5-1b B1): 이번 결과와 --before의 차이가 --removals 표와 정확히 같아야 한다. 차이의 단위는 이슈 한 건,
+자동 수정 한 건, 경고 한 건이고 "금지 표현: a, b"는 낱말마다 한 건으로 센다. 표 한 줄은 차이 한 건에 대응한다.
 """
 
 from __future__ import annotations
@@ -10,6 +12,7 @@ import argparse
 import json
 import sqlite3
 import sys
+from collections import Counter
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -26,9 +29,39 @@ from trendsit.core.artifacts_brief import TopicPage  # noqa: E402
 WEEKS = ("2026-W40", "2026-W41")
 
 
+def _units(pages: list[dict]) -> Counter:
+    out: Counter = Counter()
+    for p in pages:
+        key = (p["topic_id"], p["round"])
+        for i in p["issues"]:
+            head, sep, rest = i["comment"].partition(" 금지 표현: ")
+            for text in ([f"{head}{sep}{w}" for w in rest.split(", ")] if sep else [i["comment"]]):
+                out[(*key, "issue", text)] += 1
+        out.update((*key, "autofix", f["rule"]) for f in p["autofix"])
+        out.update((*key, "warning", w) for w in p["warnings"])
+    return out
+
+
+def check_removals(before: Path, after: list[dict], removals: Path) -> str | None:
+    """전후 차이가 의도한 제거 표와 같으면 None, 아니면 첫 불일치."""
+    old = _units(json.loads(before.read_text(encoding="utf-8"))["pages"])
+    new = _units(after)
+    if added := new - old:
+        return f"전에 없던 결과: {next(iter(added))}"
+    rows = json.loads(removals.read_text(encoding="utf-8"))
+    for unit in (old - new).elements():
+        hit = next((r for r in rows if (r["topic_id"], r["round"], r["kind"]) == unit[:3] and unit[3].startswith(r["match"])), None)
+        if hit is None:
+            return f"표에 없는 제거: {unit}"
+        rows.remove(hit)
+    return f"차이로 나타나지 않은 표 항목: {rows[0]}" if rows else None
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", required=True)
+    ap.add_argument("--before")
+    ap.add_argument("--removals")
     ap.add_argument("--db", default=str(ROOT / "data" / "trendsit.db"))
     args = ap.parse_args()
     if not Path(args.db).exists():
@@ -51,7 +84,7 @@ def main() -> int:
     for week, run in runs.items():
         ev = week_evidence(db, week)  # type: ignore[arg-type]
         table = al.load_decided(db, al.build(list(ev.members.values()), keywords, cfg.aliases.fuzz_min_score, tl))  # type: ignore[arg-type]
-        for t in conn.execute("SELECT topic_id, cluster_ids_json, angle FROM topics WHERE run_id=? ORDER BY rank, topic_id", (run,)):
+        for t in conn.execute("SELECT topic_id, cluster_ids_json FROM topics WHERE run_id=? ORDER BY rank, topic_id", (run,)):
             cids = json.loads(t["cluster_ids_json"])
             members = list(dict.fromkeys(
                 r["member"] for cid in cids for r in conn.execute(
@@ -69,7 +102,7 @@ def main() -> int:
             for p in conn.execute("SELECT round, page_json, raw_json FROM topic_pages WHERE run_id=? AND topic_id=? ORDER BY round",
                                   (run, t["topic_id"])):
                 page = TopicPage.model_validate_json(p["raw_json"] if p["round"] == 1 and p["raw_json"] else p["page_json"])
-                cr = checks.run_checks(page, pack, n_sources, cfg, canon, translit, t["angle"] or "")
+                cr = checks.run_checks(page, pack, n_sources, cfg, canon, translit)
                 pages.append({
                     "topic_id": t["topic_id"], "round": p["round"],
                     "issues": [{"loc": i.loc, "type": i.type, "comment": i.comment} for i in cr.issues],
@@ -77,6 +110,9 @@ def main() -> int:
                     "warnings": cr.warnings})
     Path(args.out).write_text(json.dumps({"runs": runs, "pages": pages}, ensure_ascii=False, sort_keys=True, indent=1) + "\n",
                               encoding="utf-8")
+    if args.before and args.removals and (msg := check_removals(Path(args.before), pages, Path(args.removals))):
+        print(f"골든 차이 != 의도한 제거: {msg}", file=sys.stderr)
+        return 1
     return 0
 
 

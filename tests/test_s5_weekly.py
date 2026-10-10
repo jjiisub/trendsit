@@ -184,8 +184,8 @@ def test_unresolved_diagram_issue_drops_the_group(week):
     ctx, cids = week
     p1 = json.loads(page(1, "Argon이 DeepSWE에서 77.9% 기록"))
     p1["numbers"] = [{"anchor": 1, "group": "g", "title": "점수", "context": "같은 벤치 [it:1#q1]", "unit": "ms",
-                      "items": [{"label": lab, "value": "77.9", "ref": "it:1#q1", "baseline": False, "emphasis": False}
-                                for lab in ("a", "b", "c")]}]
+                      "items": [{"label": lab, "value": v, "ref": "it:1#q1", "baseline": False, "emphasis": False}
+                                for lab, v in (("a", "77.9"), ("b", "77.9"), ("c", "12.3"))]}]  # 12.3은 근거에 없는 값
     # 코드 반려만 이어지면 끝에서 검수자가 한 번 봄(리뷰 지적 2) → verdict 응답 하나
     responses = [plan(cids), json.dumps(p1, ensure_ascii=False), revision([]), verdict([])]
     for i in (2, 3, 4):

@@ -1,7 +1,7 @@
 """작성자 출력의 코드 검사(S5_TASK 5.7, LLM 0원). 검수자 앞에서 돈다.
 
 1. 고칠 수 있는 형식은 직접 고친다(반려하지 않음): 형광 개수 초과(뒤쪽부터 제거), 공백·문장부호, 별칭 표기 → 정본
-2. 반려(라운드에 셈): 필수 칸·분량, refs 실재, 수치 대조, 도식 칸 규칙, concepts·contributions 조건, 금지어
+2. 반려(라운드에 셈): 필수 칸·분량, refs 실재, 수치 대조, 도식 칸 규칙, concepts·contributions 조건, 문체(평가어·해요체)
 3. 경고(검수자 입력으로): 도식 누락·남발 의심, 같은 point 중복
 반려 메시지는 위치·근거·힌트를 구체적으로(예: "points[2]의 '15%'가 it:812#q2에 없음. 근거의 값은 1.5%").
 """
@@ -21,58 +21,21 @@ from ..core.style import EVAL_ENDINGS, EVAL_WORDS, ends_as_sentence, is_haeyo
 from .evidence import EvidenceItem
 
 HL = re.compile(r"==(.+?)==")
-GENERIC_START = re.compile(r"^최근\s.*(업계|분야|시장)에서는")
-EMOJI = re.compile("[\U0001F300-\U0001FAFF☀-➿]")
 DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 REF = re.compile(r"(?:it|og|vd|rp):[\w./#@:-]+")
 _SENT = re.compile(r"(?<=[.!?다])\s+")
 
 
-# 앞에서부터 맞춰 보므로 긴 낱말(분기, 개월)을 짧은 낱말(분, 개)보다 먼저 둔다
-UNIT_KINDS = (("%", ("%", "퍼센트", "%p", "포인트")), ("ms", ("ms", "밀리초")), ("s", ("초", "s", "sec")),
-              ("$", ("$", "달러", "usd")), ("원", ("원",)), ("배", ("배", "x", "×")), ("tok/s", ("tok/s", "토큰/초")),
-              ("분기", ("분기",)), ("h", ("시간", "hours", "hour", "h")), ("min", ("분", "min", "minutes")),
-              ("개월", ("개월",)), ("개", ("개",)), ("명", ("명",)), ("회", ("회",)), ("건", ("건",)))
-# 근거에 없는 전망·평가형 마무리(리뷰 R3-d, W40 Decision API "주목된다", "것으로 보인다")
-# 반영 확인 리뷰 F11: "…것이 쟁점이다", "핵심 변화다", "핵심 축으로 부상했다"(평가형 마무리). "쟁점은 …이다"는 허용(writer.md 예시)
-SPECULATIVE = ("주목된다", "것으로 보인다", "것으로 전망된다", "지 주목", "것이 쟁점이다", "핵심 변화다", "핵심 축으로", "부상했다")
-# 영문 이름 뒤 조사: 끝 발음에 받침이 있는데 받침 없는 조사(가·는·를·와). "Anthropic가" → "Anthropic이"(반영 확인 리뷰 G3)
-BAD_PARTICLE = re.compile(r"(?<![A-Za-z])([A-Za-z]*[a-z][cktpmnl])(가|는|를|와)(?![가-힣])")
-PER_MILLION = re.compile(r"100만\s?토큰당|per\s?(1M|million)|/\s?1M|MTok|million tokens", re.IGNORECASE)
-BARE_PER_TOKEN = re.compile(r"(?<!만)(?<!만 )(?<!M )(?<!1M )토큰당")
-_VAL = re.compile(r"(\$)?(?<![\d.])(\d+(?:[.,]\d+)?)\s?([%a-zA-Z가-힣/×]{0,6})")
-CONCEPT_DESC_MIN = 15  # 이보다 짧은 개념 풀이는 풀이가 없는 것으로 보고 뺀다(G7: "베타 출시된 기능")
+# 요약·개요 수치 대조(with_units)가 단위로 인정하는 낱말. 한 글자 영문은 단독일 때만
+UNIT_WORDS = ("%", "퍼센트", "포인트", "ms", "밀리초", "초", "sec", "$", "달러", "usd", "원", "배", "×", "tok/s", "토큰/초",
+              "분기", "시간", "hour", "개월", "분", "min", "개", "명", "회", "건")
+UNIT_LETTERS = ("s", "x", "h")
 COUNT_UNITS = {"개", "명", "건", "회", "편", "종", "곳", "개국", "차원", "개월", "년"}
-LABEL_UNIT = re.compile(r"\(([^()]+)\)\s*$")
 
 
-def unit_kind(text: str) -> str | None:
-    """단위 표기의 종류. 앞에서부터 본다('$/1M tokens' → $, '초' → s). 한 글자 영문 단위(s, x)는 단독일 때만."""
+def is_unit(text: str) -> bool:
     t = (text or "").strip().lower()
-    if not t:
-        return None
-    for kind, words in UNIT_KINDS:
-        for w in words:
-            if len(w) == 1 and w.isascii() and w.isalpha():
-                if t == w:
-                    return kind
-            elif t.startswith(w):
-                return kind
-    return None
-
-
-def evidence_unit(value: str, src: str) -> str | None:
-    """근거 글에서 값(숫자) 바로 앞뒤에 붙은 단위 종류. 못 찾으면 None(대조하지 않음)."""
-    num = re.sub(r"[^\d.]", "", value or "")
-    if not num:
-        return None
-    for m in re.finditer(rf"(\$?)(?<![\d.]){re.escape(num)}(?![\d])\s?([%a-zA-Z가-힣/×]{{0,6}})", src):
-        if m.group(1):
-            return "$"
-        k = unit_kind(m.group(2))
-        if k:
-            return k
-    return None
+    return t in UNIT_LETTERS or t.startswith(UNIT_WORDS)
 
 
 def sentences(text: str) -> list[str]:
@@ -141,12 +104,6 @@ def autofix(page: TopicPage, cfg: BriefConfig, canon: dict[str, str],
             fixes.append({"loc": "contributions", "rule": f"근거 채널 {sorted(channels)}에 맞게 contributions 정리",
                           "before": [c.model_dump() for c in page.contributions], "after": [c.model_dump() for c in keep]})
             page = page.model_copy(update={"contributions": keep})
-    # 0-0) 풀이가 없는 개념(짧은 풀이)은 뺀다(G7, writer.md "풀이가 없으면 넣지 않는다")
-    thin = [c for c in page.concepts if len(plain(c.desc).strip()) < CONCEPT_DESC_MIN]
-    if thin:
-        fixes.append({"loc": "concepts", "rule": f"풀이가 {CONCEPT_DESC_MIN}자 미만인 개념 뺌", "before": [c.term for c in thin],
-                      "after": []})
-        page = page.model_copy(update={"concepts": [c for c in page.concepts if c not in thin]})
     # 0-1) 도식 그리는 조건(skills/diagrams.md): 맞지 않는 그룹은 빼고 포인트 문장만 남김
     #   numbers: 값 3개 이상 / 또는 값 2개 + baseline + summary에 그 값이나 라벨이 나옴. events: 3개 이상 / 또는 2개 + flow_is_point
     def drawable(g: Any) -> bool:
@@ -215,14 +172,14 @@ def _ev_text(ids: list[str], pack: dict[str, list[EvidenceItem]]) -> str:
 def _numbers_ok(text: str, ids: list[str], pack: dict[str, list[EvidenceItem]],
                 with_units: bool = False) -> list[tuple[str, str]]:
     """본문 수치(figures 규칙) 중 근거에 같은 값이 없는 것과 근거의 비슷한 값(힌트). 부분 문자열이 아니라 값으로 비교
-    ('3.7'이 '13.75' 안에 있다고 통과하지 않게, 리뷰 R3-c). with_units면 단위(unit_kind)가 붙은 작은 수("약 50개")도 본다."""
+    ('3.7'이 '13.75' 안에 있다고 통과하지 않게, 리뷰 R3-c). with_units면 단위가 붙은 작은 수("약 50개")도 본다."""
     src = _ev_text(ids, pack)
     vals = number_values(src)
     out = []
     body = plain(text)
     found = figures(body)
     if with_units:
-        found += [m.group(1) for m in re.finditer(r"(?<![\d.,])(\d+)\s?([가-힣%]+)", body) if unit_kind(m.group(2))]
+        found += [m.group(1) for m in re.finditer(r"(?<![\d.,])(\d+)\s?([가-힣%]+)", body) if is_unit(m.group(2))]
     for f in dict.fromkeys(found):
         # 영문 이름 바로 뒤 숫자(단위 없음)는 버전·제품 이름이지 측정값이 아님: "Claude Haiku 5.5", "Gemini 4.1"(3차 재실행 Haiku
         # 도식 제목 '5.5' 오탐으로 반려 3회)
@@ -334,11 +291,6 @@ def check(page: TopicPage, pack: dict[str, list[EvidenceItem]], n_sources: int, 
                 issues.append(_issue(loc, "format", f"{loc} 항목 {len(g.items)}개(2~6)", ""))
     if len(anchors) != len(set(anchors)):
         issues.append(_issue("numbers", "format", f"한 포인트에 도식 둘 이상(anchor {anchors})", "한 포인트에 도식 하나"))
-    # "100만 토큰당" 근거를 "토큰당"으로 줄인 단위 왜곡(G3: Haiku "입력/출력 토큰당 $0.50/$2.50")
-    for loc, text, ids in [*slots[:3], *[(f"points[{i}]", p.text, p.refs) for i, p in enumerate(page.points)]]:
-        if BARE_PER_TOKEN.search(plain(text)) and PER_MILLION.search(_ev_text(ids, pack)):
-            issues.append(_issue(loc, "number_mismatch", f"{loc}의 '토큰당'은 근거에서 '100만 토큰당'(per 1M)",
-                                 "근거 기준 그대로 '100만 토큰당'"))
     # 4차 리뷰 H1(a): 요약·개요의 수치는 points·numbers에 있는 값만(Claude Code 스킬 "스킬 약 50개·에이전트 약 20개" 3회째)
     body_pack = {"points": [EvidenceItem("points", "page", "text", "quote", " ".join(
         [plain(p.text) for p in page.points] + [f"{it.value} {it.label}" for g in page.numbers for it in g.items]), {})]}
@@ -346,25 +298,10 @@ def check(page: TopicPage, pack: dict[str, list[EvidenceItem]], n_sources: int, 
         for f, _near in _numbers_ok(getattr(page, name), ["points"], body_pack, with_units=True):
             issues.append(_issue(name, "unsupported", f"{name}의 수치 '{f}'가 points·numbers에 없음",
                                  "요약·개요는 points에 있는 사실만(수치를 쓰려면 먼저 point에)"))
-    # 막대 값의 단위를 근거 표기와 대조: 근거에서 그 값 바로 뒤 단위가 그룹 단위와 다르면 반려(W40 judge: ms 그룹에 1.6초, $ 그룹에 %)
     for g_i, g in enumerate(page.numbers):
         if not g.unit.strip("() \t"):  # 빈 단위(Jeff·Jeeves 정확도 "()", 리뷰 R3-b)
             issues.append(_issue(f"numbers[{g_i}]", "format", f"numbers[{g_i}] 단위가 비어 있음",
                                  "근거의 단위 그대로(단위 없는 비율·점수면 '점수', '비율'처럼 무엇인지)"))
-        gu = unit_kind(g.unit)
-        for it_i, it in enumerate(g.items):
-            m = LABEL_UNIT.search(it.label)  # 라벨 끝 괄호 단위("CPU 시간(시간)")도 그룹 단위와 대조
-            lu = unit_kind(m.group(1)) if m else None
-            if gu and lu and lu != gu:
-                issues.append(_issue(f"numbers[{g_i}].items[{it_i}]", "number_mismatch",
-                                     f"numbers[{g_i}].items[{it_i}] 라벨 단위 '{m.group(1)}'가 그룹 단위 {g.unit}와 다름",  # type: ignore[union-attr]
-                                     "같은 단위 값만 한 그룹에(다르면 그룹을 나누거나 문장으로)", evidence_id=it.ref))
-                continue
-            ev_unit = evidence_unit(it.value, _ev_text([it.ref], pack))
-            if gu and ev_unit and ev_unit != gu:
-                issues.append(_issue(f"numbers[{g_i}].items[{it_i}]", "number_mismatch",
-                                     f"numbers[{g_i}].items[{it_i}] 값 {it.value}의 근거 단위는 {ev_unit}인데 그룹 단위는 {g.unit}",
-                                     "같은 단위 값만 한 그룹에(다르면 그룹을 나누거나 문장으로)", evidence_id=it.ref))
     for g_i, g in enumerate(page.numbers):
         mixed = {re.sub(r"[\d.,\s]", "", it.value) for it in g.items} - {"", g.unit}
         if len(mixed) > 1:
@@ -389,67 +326,26 @@ def check(page: TopicPage, pack: dict[str, list[EvidenceItem]], n_sources: int, 
             if not sent.strip().rstrip(".").endswith("다"):
                 issues.append(_issue(name, "format", f"{name}의 문장이 '~다'로 끝나지 않음('…{sent.strip()[-12:]}')",
                                      "요약·개요는 문장마다 평서체 '~다'(명사형 '~함', '~음' 아님)"))
-    # 금지어(모델 md에는 넣지 않음)
+    # 금지어
     texts = [("title", page.title), ("summary", page.summary), ("overview", page.overview)]
     texts += [(f"points[{i}]", p.text) for i, p in enumerate(page.points)]
     texts += [(f"contributions[{i}]", c.text) for i, c in enumerate(page.contributions)]
     texts += [(f"concepts[{i}]", c.desc) for i, c in enumerate(page.concepts)]
     for loc, text in texts:
         t = plain(text)
-        bad = []
-        if any(is_haeyo(s) for s in sentences(t)):
-            bad.append("해요체")
-        bad += [e for e in (*EVAL_ENDINGS, *SPECULATIVE) if e in t]
+        bad = ["해요체"] if any(is_haeyo(s) for s in sentences(t)) else []
+        bad += [e for e in EVAL_ENDINGS if e in t]
         if loc.startswith("points"):
             bad += [e for e in EVAL_WORDS if e in t]
-        if GENERIC_START.search(t):
-            bad.append("일반론 시작")
-        if "!" in t:
-            bad.append("감탄")
-        if t.rstrip().endswith("?"):
-            bad.append("질문형 끝")
-        if EMOJI.search(t):
-            bad.append("이모지")
-        if (m := BAD_PARTICLE.search(t)):
-            bad.append(f"조사 '{m.group(0)}'(영문 이름 끝 받침이면 이/은/을/과)")
         if bad:
-            hint = "담백한 서술로"
-            if any(e in t for e in SPECULATIVE):
-                hint = ("근거 밖 전망·평가 마무리를 빼고 근거의 사실로 끝맺음(예: '…가속화할 것으로 보인다' → 그 문장 삭제, "
-                        "'…자리잡을지 주목된다' → '…를 공개했다'). 그 문장만 고친 새 값을 낸다")
-            elif any(e in t for e in EVAL_ENDINGS) or any(e in t for e in EVAL_WORDS):
-                hint = ("평가어를 빼고 사실로 끝맺음(예: '…확장하는 것이 핵심이다' → '…확장하는 구조다', "
-                        "'…가 눈에 띈다' → '…를 기록했다'). 그 문장만 고친 새 값을 낸다")
-            elif "해요체" in bad:
-                hint = "'~요'를 '~다'(요약·개요) 또는 명사형(포인트)으로"
-            issues.append(_issue(loc, "format", f"{loc} 금지 표현: {', '.join(bad)}", hint))
+            issues.append(_issue(loc, "format", f"{loc} 금지 표현: {', '.join(bad)}",
+                                 "평가어·해요체를 빼고 사실로 끝맺음(예: '…확장하는 것이 핵심이다' → '…확장하는 구조다'). 그 문장만 고친 새 값을 낸다"))
     return issues
 
 
 # ---------- 경고 ----------
-# angle 핵심 낱말 뽑기: 조사를 떼고 2글자 이상, 어느 토픽에나 나오는 일반어는 뺀다
-_PARTICLE = re.compile(r"(으로|에서|에게|과의|와의|의|와|과|을|를|이|가|은|는|에|로|도|만)$")
-_GENERIC = {"모델", "출시", "공개", "발표", "기능", "성능", "가격", "비용", "사용", "지원", "변화", "영향", "전략", "방식",
-            "구조", "비교", "중심", "관점", "의미", "축", "대한", "통한", "위한", "가능한", "새로운"}
-
-
-def angle_words(angle: str) -> set[str]:
-    words = set()
-    for w in re.findall(r"[A-Za-z][\w.\-]*|[가-힣]+", angle or ""):
-        w = _PARTICLE.sub("", w) if re.match(r"[가-힣]", w) else w
-        if len(w) >= 2 and w not in _GENERIC:
-            words.add(w.lower())
-    return words
-
-
-def warnings(page: TopicPage, pack: dict[str, list[EvidenceItem]], cfg: BriefConfig, angle: str = "") -> list[str]:
+def warnings(page: TopicPage, pack: dict[str, list[EvidenceItem]], cfg: BriefConfig) -> list[str]:
     out = []
-    # angle 핵심 낱말이 summary 첫 문장과 첫 두 point에 하나도 없으면 경고 → 검수자가 missing_key로 본다(F7, 설계 결정
-    # C-23: 첫 point는 이번 주 사건이어도 되고 angle 핵심은 요약 첫 문장 또는 첫 두 point 안). 반려가 아니라 경고로만
-    words = angle_words(angle)
-    head = " ".join([*(sentences(plain(page.summary))[:1]), *(plain(p.text) for p in page.points[:2])]).lower()
-    if words and page.points and not any(w in head for w in words):
-        out.append(f"핵심 의심: 다룰 축(angle '{angle}')의 낱말({', '.join(sorted(words))})이 summary 첫 문장과 첫 두 point에 없음")
     # 같은 비교 대상 = 같은 근거 문장(id) 안의 같은 단위 값. 개수 단위(개·명 등)와 단위 없는 값은 비교 막대 대상으로 보지
     # 않는다(반영 확인 리뷰 F3: 글쓴이 환경의 "스킬 약 50개·에이전트 약 20개"가 "약개 3"으로, 차원 768/512/256이 셈에 들어감)
     by_unit: dict[tuple[str, str], int] = {}
@@ -464,29 +360,11 @@ def warnings(page: TopicPage, pack: dict[str, list[EvidenceItem]], cfg: BriefCon
     if not page.numbers and many:
         out.append("누락 의심(같은 근거 문장의 같은 단위 값 3개 이상, 같은 지표 비교인지 확인): " +
                    ", ".join(f"{e} {u} {n}개" for e, u, n in many))
-    # 한 point 안에 같은 단위 값 3개 이상인데 그 point에 붙은 도식이 없으면 누락 의심(G2: textGrain 92→66→17%,
-    # Haiku 구간 가격). 차원·개수 단위는 빼는 F3 조건 그대로
-    anchored = {g.anchor for g in [*page.numbers, *page.events]}
-    for i, p in enumerate(page.points):
-        kinds: dict[str, list[str]] = {}
-        for m in _VAL.finditer(plain(p.text)):
-            k = "$" if m.group(1) else unit_kind(m.group(3))
-            if k and k not in COUNT_UNITS and k not in ("개", "명", "회", "건", "개월", "분기"):
-                kinds.setdefault(k, []).append(m.group(2))
-        many_p = {k: v for k, v in kinds.items() if len(v) >= 3}
-        if many_p and (i + 1) not in anchored:
-            out.append(f"누락 의심: points[{i}] 안에 같은 단위 값 3개 이상(" +
-                       ", ".join(f"{k} {'/'.join(v)}" for k, v in many_p.items()) + "), 같은 지표면 numbers")
     dates = {d for items in pack.values() for it in items for d in re.findall(r"\d{4}-\d{2}-\d{2}", it.text)}
     dates |= {it.source.get("date") for items in pack.values() for it in items if it.source.get("date")}
     if not page.events and len(dates) >= 3:
         out.append(f"누락 의심: events가 비었는데 근거에 날짜 다른 사건 후보 {len(dates)}개")
     for g_i, g in enumerate(page.numbers):
-        if unit_kind(g.unit):
-            for it_i, it in enumerate(g.items):
-                if it.ref in pack and evidence_unit(it.value, _ev_text([it.ref], pack)) is None:
-                    out.append(f"단위 확인 필요: numbers[{g_i}].items[{it_i}] 값 {it.value}의 근거 단위를 찾지 못함"
-                               f"(그룹 단위 {g.unit})")
         if len(g.items) == 2 and not any(it.baseline for it in g.items):
             out.append(f"남발 의심: numbers[{g_i}] 값 2개인데 baseline 없음")
     for g_i, g in enumerate(page.events):
@@ -502,6 +380,6 @@ def warnings(page: TopicPage, pack: dict[str, list[EvidenceItem]], cfg: BriefCon
 
 def run_checks(page: TopicPage, pack: dict[str, list[EvidenceItem]], n_sources: int, cfg: BriefConfig,
                canon: dict[str, str], translit: list[tuple[re.Pattern[str], str]] | None = None,
-               angle: str = "") -> CheckResult:
+               angle: str = "") -> CheckResult:  # angle: eval/graders_brief.py(수정 금지)가 넘겨서 받기만 하고 쓰지 않음
     fixed, fixes = autofix(page, cfg, canon, {it.channel for items in pack.values() for it in items}, n_sources, translit)
-    return CheckResult(fixed, fixes, check(fixed, pack, n_sources, cfg), warnings(fixed, pack, cfg, angle))
+    return CheckResult(fixed, fixes, check(fixed, pack, n_sources, cfg), warnings(fixed, pack, cfg))
