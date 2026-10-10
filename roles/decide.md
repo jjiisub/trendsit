@@ -41,7 +41,7 @@ core_rules:
 
 ## 출력
 칸 순서대로 채운다.
-1. `reason`: 한 줄. 두 항목이 가리키는 대상을 각각 이름으로 적고 같은지 다른지(예: "it:930은 Qwen3.5 출시, rp:QwenLM/Qwen3은 Qwen3 레포 → 다른 버전")
+1. `reason`: 한 줄. 두 항목이 가리키는 대상을 각각 이름으로 적고 같은지 다른지(예: "a는 Qwen3.5 출시, b는 Qwen3 벤치 비교 → 다른 버전")
 2. `same`: true / false
 3. `confidence`: 0~1. 낮으면 코드가 same과 관계없이 묶지 않는다
 4. `log`: 한 줄 명사형, `attention`: 판단이 특히 어려우면 true
@@ -53,22 +53,22 @@ core_rules:
 <examples>
 <example>
 보통: 같은 발표의 글과 영상
-입력: 첫째 it:812 "OpenAI, gpt-realtime-mini 공개"(요약: 더 작은 음성 대 음성 모델, 70% 저렴), 둘째 vd:Xk2 "gpt-realtime-mini 데모와 가격"(요약: gpt-realtime-mini 시연, 지연 300ms 아래)
-출력: `{"reason": "it:812, vd:Xk2 모두 gpt-realtime-mini 공개를 다룸", "same": true, "confidence": 0.9, "log": "같은 제품 발표, 글·영상", "attention": false}`
+입력: a = it:812 "OpenAI, gpt-realtime-mini 공개"(요약: 더 작은 음성 대 음성 모델, 70% 저렴), b = vd:Xk2 "gpt-realtime-mini 데모와 가격"(요약: gpt-realtime-mini 시연, 지연 300ms 아래)
+출력: `{"reason": "a, b 모두 gpt-realtime-mini 공개를 다룸", "same": true, "confidence": 0.9, "log": "같은 제품 발표, 글·영상", "attention": false}`
 </example>
 <example>
 함정: 같은 회사, 다른 제품
-입력: 첫째 it:901 "GPT-5 mini 가격 인하", 둘째 it:915 "GPT-5 추론 벤치 결과"
-출력: `{"reason": "it:901은 GPT-5 mini 가격, it:915는 GPT-5 벤치 → 다른 모델", "same": false, "confidence": 0.85, "log": "같은 회사 다른 모델", "attention": false}`
+입력: a = it:901 "GPT-5 mini 가격 인하", b = it:915 "GPT-5 추론 벤치 결과"
+출력: `{"reason": "a는 GPT-5 mini 가격, b는 GPT-5 벤치 → 다른 모델", "same": false, "confidence": 0.85, "log": "같은 회사 다른 모델", "attention": false}`
 </example>
 <example>
 함정: 발표 글과 시험 글(같은 모델)
-입력: 첫째 it:1046 "Introducing Mistral Large 4"(출시 발표, 벤치 수치), 둘째 it:1048 "Mistral Large 4"(개인 블로그, 같은 모델을 직접 돌려 본 결과)
-출력: `{"reason": "it:1046은 Mistral Large 4 출시, it:1048은 같은 Mistral Large 4를 시험한 글 → 같은 대상", "same": true, "confidence": 0.85, "log": "같은 모델 발표와 시험", "attention": false}`
+입력: a = it:1046 "Introducing Mistral Large 4"(출시 발표, 벤치 수치), b = it:1048 "Mistral Large 4"(개인 블로그, 같은 모델을 직접 돌려 본 결과)
+출력: `{"reason": "a는 Mistral Large 4 출시, b는 같은 Mistral Large 4를 시험한 글 → 같은 대상", "same": true, "confidence": 0.85, "log": "같은 모델 발표와 시험", "attention": false}`
 </example>
 <example>
 함정: 숫자가 다른 이름
-입력: 첫째 rp:QwenLM/Qwen3 "Qwen3 레포", 둘째 it:930 "Qwen3.5 출시, 컨텍스트 1M"
-출력: `{"reason": "rp:QwenLM/Qwen3은 Qwen3, it:930은 Qwen3.5 → 버전이 다름", "same": false, "confidence": 0.8, "log": "버전 다름", "attention": false}`
+입력: a = rp:QwenLM/Qwen3 "Qwen3 레포", b = it:930 "Qwen3.5 출시, 컨텍스트 1M"
+출력: `{"reason": "a는 Qwen3, b는 Qwen3.5 → 버전이 다름", "same": false, "confidence": 0.8, "log": "버전 다름", "attention": false}`
 </example>
 </examples>
