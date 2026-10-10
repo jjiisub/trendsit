@@ -286,10 +286,6 @@ def slugify(hint: str) -> str:
     return "-".join(s.split("-")[:4]) or "topic"
 
 
-def week_num(week: str) -> int:
-    return int(week.split("-W")[1])
-
-
 def relation_label(db: DB, topic_id: str | None) -> str:
     if not topic_id:
         return ""
@@ -309,7 +305,7 @@ def apply(plan: BriefingPlan, cands: list[Candidate], week: str, db: DB) -> list
     used: set[str] = set()
     out = []
     for t in sorted(plan.topics, key=lambda t: t.rank):
-        base = f"w{week_num(week)}-{slugify(t.slug_hint)}"
+        base = f"w{int(week.split('-W')[1])}-{slugify(t.slug_hint)}"
         tid, k = base, 2
         while tid in used:
             tid, k = f"{base}-{k}", k + 1

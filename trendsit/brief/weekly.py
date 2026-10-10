@@ -1,4 +1,4 @@
-"""weekly 단계 실행(S5_TASK 5.10). 지금은 cluster 단계(근거 목록 → 표기 정규화 → 묶기 → 과거 대조 → 저장 → 리포트)."""
+"""weekly의 묶기 단계(S5_TASK 5.10): 근거 목록 → 표기 정규화 → 묶기 → 과거 대조 → 저장 → 리포트."""
 
 from __future__ import annotations
 

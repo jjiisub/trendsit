@@ -30,11 +30,6 @@ STEPS = ("cluster", "select", "write", "review")
 ROLES = ("decide", "editor_select", "writer", "writer_revise", "critic")
 
 
-def _summary_src(db: DB, run_id: str) -> dict[str, Any]:
-    r = db.conn.execute("SELECT summary_json FROM runs WHERE id=?", (run_id,)).fetchone()
-    return json.loads(r["summary_json"]) if r and r["summary_json"] else {}
-
-
 def run_weekly(week: str, ctx: Ctx, from_step: str = "cluster", only_topic: str | None = None,
                embedder: Any = None, cfg: BriefConfig | None = None, until: str | None = None) -> dict[str, Any]:
     """from_step부터 until까지(없으면 끝까지). until=select면 선별까지, write면 초안 + 코드 검사까지(검수자 없음)."""
@@ -68,7 +63,8 @@ def run_weekly(week: str, ctx: Ctx, from_step: str = "cluster", only_topic: str 
                                              cfg.aliases.transliteration))
         cl.score_video_relevance(list(ev.members.values()), embedder, [(x.keyword_id, x.text) for x in flt.interests],
                                  cfg.evidence.video_relevance_high)
-        cluster_run = _summary_src(db, src).get("cluster_run") or src
+        r = db.conn.execute("SELECT summary_json FROM runs WHERE id=?", (src,)).fetchone()
+        cluster_run = (json.loads(r["summary_json"]) if r and r["summary_json"] else {}).get("cluster_run") or src
     tr.step(kind="code", role="weekly", text=f"{week} weekly 시작: {from_step}부터", detail={
         "from_step": from_step, "source_run": src, "cluster_run": cluster_run})
     if ctx.stopped:  # 묶기 중 예산 초과: 현재판은 그대로, 선별부터는 시작하지 않음
@@ -140,7 +136,7 @@ def run_weekly(week: str, ctx: Ctx, from_step: str = "cluster", only_topic: str 
     dur["write_review"] = round(time.monotonic() - t2, 1)
     if ctx.stopped:
         return _close(ctx, week, t0, dur, len(results))
-    if only_topic and src and from_step != "cluster":  # 묶기부터 새로 했으면 원본 토픽과 맞지 않아 이어 오지 않음
+    if only_topic and from_step != "cluster":  # 묶기부터 새로 했으면 원본 토픽과 맞지 않아 이어 오지 않음
         carry_over(db, src, run_id, keep={only_topic})
     save_topic_embeddings(db, run_id, embedder, results)
     return _close(ctx, week, t0, dur, len(results), until)

@@ -182,10 +182,6 @@ def refs_of(page: TopicPage) -> list[str]:
     return list(dict.fromkeys(ids))
 
 
-def ref_channel(ref: str) -> str:
-    return "video" if ref.startswith("vd:") else "github" if ref.startswith("rp:") else "text"
-
-
 # ---------- 수정 합치기 ----------
 def top_loc(loc: str) -> str:
     m = LOC.match(loc.strip())
@@ -263,7 +259,7 @@ def apply_revision(prev: TopicPage, rev: TopicPageRevision, allowed: set[str]) -
             val = Point(text=val, refs=data[name][idx]["refs"] if idx < len(data[name]) else [])
         if name == "contributions" and isinstance(val, Point):
             # 채널 없이 낸 기여 문장(OpenRig 재실행: 두 채널을 한 문장에, 반영 확인 리뷰 G6). refs가 한 채널이면 그 채널로
-            chans = {ref_channel(r) for r in val.refs}
+            chans = {"video" if r.startswith("vd:") else "github" if r.startswith("rp:") else "text" for r in val.refs}
             if len(chans) == 1:
                 val = Contribution(channel=chans.pop(), text=val.text, refs=val.refs)  # type: ignore[arg-type]
             else:
@@ -359,7 +355,7 @@ def write_topic(ctx: Ctx, topic: Applied, members: dict[str, Member], table: Ali
                 out = (None, "원자 사실 0개 판정 반복", out[2])
         critic_seen = critic_seen or out[0] is not None
         return out
-    raw_page: dict[str, Any] | None = page.raw_dump() if hasattr(page, "raw_dump") else None
+    raw_page: dict[str, Any] | None = page.raw_dump()
     for rnd in range(1, cfg.review.max_rounds + 1):
         cr = checks.run_checks(page, pack, n_sources, cfg, canon, translit, topic.angle)
         page = cr.page
@@ -414,13 +410,7 @@ def write_topic(ctx: Ctx, topic: Applied, members: dict[str, Member], table: Ali
             res.final_round = rnd
             break
         raw_page = rev.model_dump()
-        try:
-            page, reverts, notes = apply_revision(page, rev, flagged)
-        except ValueError as e:  # 형식이 다른 값(ValidationError)은 이전 판 유지 + 남은 이슈 check(리뷰 지적 4)
-            res.attention.append(f"수정 합치기 실패: {str(e)[:120]}")
-            check_locs |= flagged
-            res.final_round = rnd
-            break
+        page, reverts, notes = apply_revision(page, rev, flagged)
         res.rounds[-1].reverts = reverts
         if notes:
             res.attention += notes[:3]

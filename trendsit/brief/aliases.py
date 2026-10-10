@@ -15,7 +15,6 @@ import json
 import re
 from collections import Counter
 from dataclasses import dataclass, field
-from typing import Any
 
 from ..core.config import KeywordsConfig
 from ..core.db import DB, now_kst
@@ -204,6 +203,3 @@ def load_decided(db: DB, table: AliasTable) -> AliasTable:
             r.status = done[(r.canonical, r.alias)]
     return table
 
-
-def as_dicts(table: AliasTable) -> list[dict[str, Any]]:
-    return [r.__dict__ for r in table.rows if r.keyword_id is None]

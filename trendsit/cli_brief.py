@@ -1,4 +1,4 @@
-"""S5 주간 브리핑 명령(COMMON 9장: 스펙별 파일의 register). 지금은 cluster 단계."""
+"""S5 주간 브리핑 명령(COMMON 9장: 스펙별 파일의 register): cluster, weekly, select, write, review."""
 
 from __future__ import annotations
 
@@ -52,9 +52,9 @@ def cmd_weekly(args: argparse.Namespace) -> int:
     from .brief.pipeline import run_weekly
     from .core.context import open_ctx
 
-    step = getattr(args, "step", None)  # select/write/review 단계 명령
-    from_step = args.from_step if step is None else ("select" if step == "select" else step)
-    until = step if step in ("select", "write") else None
+    until = getattr(args, "step", None)  # select/write/review 단계 명령
+    until = until if until in ("select", "write") else None
+    from_step = args.from_step
     ctx = open_ctx("weekly", spec=args.spec or "S5", no_cache=args.no_cache,
                    note=f"weekly {args.week} from {from_step}" + (f" until {until}" if until else "")
                    + (f" topic {args.topic}" if getattr(args, "topic", None) else ""))

@@ -125,7 +125,7 @@ def test_weekly_rounds_storage_summary_export(week):
                                  "drops_by": {"model": 0, "code": 0, "fallback": 0}}
     assert summary["write"] == {"topics": 4, "failed": 0}
     # A13: 저장값만으로 예시 JSON 토픽 칸
-    srcs, _ = briefing.sources_index(ctx.db, "2026-W41")
+    srcs = briefing.sources_index(ctx.db, "2026-W41")
     ex = briefing.export_topic(ctx.db, run_id, t1["topic_id"], srcs)
     assert set(ex) >= {"id", "week", "rank", "lead", "title", "summary", "relation", "overview", "points", "diagrams",
                        "concepts", "contributions", "sources", "channels", "has_check"}

@@ -249,15 +249,14 @@ def agglomerate(members: dict[str, Member], pairs: list[Pair], sims: dict[tuple[
 
 
 # ---------- 점수, 이름 ----------
-def score(c: Cluster, members: dict[str, Member], trend: dict[str, int] | None = None) -> float:
-    """관련성이 먼저(묶음 안 relevance 최댓값, 그 등급의 항목 수). 채널 수·근거 수·키워드 추세는 같은 관련성 안 순서만."""
+def score(c: Cluster, members: dict[str, Member]) -> float:
+    """관련성이 먼저(묶음 안 relevance 최댓값, 그 등급의 항목 수). 채널 수·근거 수는 같은 관련성 안 순서만."""
     ms = [members[k] for k in c.members]
     best = min(RELEVANCE_RANK.get(m.relevance, 3) for m in ms)
     n_best = sum(RELEVANCE_RANK.get(m.relevance, 3) == best for m in ms)
     channels = len({m.channel for m in ms})
     evidence = len({it.id for m in ms for it in m.items})
-    up = sum(1 for m in ms for k in m.keywords if (trend or {}).get(k, 0) > 0)
-    return round((3 - best) * 1000 + min(n_best, 9) * 100 + channels * 10 + min(evidence, 9) + min(up, 9) / 10, 2)
+    return round((3 - best) * 1000 + min(n_best, 9) * 100 + channels * 10 + min(evidence, 9), 2)
 
 
 def finalize(clusters: list[Cluster], members: dict[str, Member], aliases: AliasTable,
@@ -318,7 +317,7 @@ def cluster_week(db: DB, ev: WeekEvidence, aliases: AliasTable, cfg: BriefConfig
     return ClusterResult(ev.week, clusters, pairs, sims, blocked, calls, alias_decide_calls, capped, members)
 
 
-def save(db: DB, res: ClusterResult, run_id: str, truncated: dict[int, list[str]] | None = None) -> None:
+def save(db: DB, res: ClusterResult, run_id: str) -> None:
     """clusters, cluster_items, cluster_pairs(판정한 쌍과 후보 쌍만, 전부는 아님)에 run_id로 쌓는다."""
     with db.conn:
         for c in res.clusters:
