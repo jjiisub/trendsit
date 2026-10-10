@@ -5,7 +5,7 @@
 [![CI](https://github.com/jjiisub/trendsit/actions/workflows/ci.yml/badge.svg)](https://github.com/jjiisub/trendsit/actions/workflows/ci.yml)
 [예시 사이트](https://trendsit.jiseop.com) · 위키(준비 중) · [프로젝트 맥락](docs/CONTEXT.md)
 
-> 현재 상태(2026-10-11): **S0~S5 구현 완료(S5 병합).** 글 6곳·유튜브·GitHub 트렌딩 수집, 글 1차 요약과 원본 추적, 레포 분석, 영상 전사와 슬라이드 판독까지 동작한다. 매일 02:00 수집이 돌고 있다. 주간 브리핑(묶기 → 편집장 선별 → 작성자 ⇄ 코드 검사·검수자 → 저장)은 `weekly` 명령으로 돈다. W40·W41 결과는 `reports/S5_brief/briefing_<주>.md`(읽기본)에서 볼 수 있고, 사이트 연결은 S6. **S5-1a 정리 반영**(예산 초과 시 멈춤·종료 코드 1, `read_more` 조회 열쇠, 효과 없는 설정 키·죽은 코드 삭제, 프롬프트·코드 검사 결과 불변, 리뷰 대기). **S5-1b 단순화 반영**(코드 검사 규칙을 넓고 자주 걸리는 것만 남기고 지엽 규칙은 역할 md로, 중복 코드·중복 md 문장 정리, 작성자 입력 `limits`, 긴 함수 쪼개기. W40·W41 재실행 관문 B 근거 충실성 20/20·오병합 0, 리뷰 대기. 편집장 영상 자리 불안정은 리뷰 확인 항목). 예시 사이트는 예시 데이터로 만든 화면이다.
+> 현재 상태(2026-10-11): **S0~S5 구현 완료(S5 병합).** 글 6곳·유튜브·GitHub 트렌딩 수집, 글 1차 요약과 원본 추적, 레포 분석, 영상 전사와 슬라이드 판독까지 동작한다. 매일 02:00 수집이 돌고 있다. 주간 브리핑(묶기 → 편집장 선별 → 작성자 ⇄ 코드 검사·검수자 → 저장)은 `weekly` 명령으로 돈다. W40·W41 결과는 `reports/S5_brief/briefing_<주>.md`(읽기본)에서 볼 수 있고, 사이트 연결은 S6. **S5-1a 정리 반영**(예산 초과 시 멈춤·종료 코드 1, `read_more` 조회 열쇠, 효과 없는 설정 키·죽은 코드 삭제, 프롬프트·코드 검사 결과 불변, 리뷰 대기). **S5-1b 단순화 반영**(코드 검사 규칙을 넓고 자주 걸리는 것만 남기고 지엽 규칙은 역할 md로, 중복 코드·중복 md 문장 정리, 작성자 입력 `limits`, 긴 함수 쪼개기. W40·W41 재실행 관문 B 근거 충실성 20/20·오병합 0, 리뷰 대기. 편집장 영상 자리 불안정은 리뷰 확인 항목). 예시 사이트는 예시 데이터로 만든 화면이다. **S6b 자동 실행 구현**(`ops nightly`·`ops weekly`·`publish`, main 전용 실행 폴더, launchd 두 개 plist, 임시 수집 예약 대체. launchd 등록은 아래 "자동 실행"대로 사용자가).
 
 ## 1. 왜 만들었나
 - 개발자로 일하며 새 기술을 따라가려면 블로그, 뉴스, 발표 영상, GitHub를 매주 따로 돌아야 했다(주 3시간 안팎)
@@ -81,6 +81,18 @@ TRENDSIT_SPEC=S4 uv run --extra video python -m trendsit video run --queue q.jso
 uv run python -m trendsit video purge --older-than 7                                # 영상·프레임 정리(DB 텍스트는 남음)
 ```
 시스템 의존성(영상): ffmpeg·ffprobe(`brew install ffmpeg`), yt-dlp용 JS 런타임 deno·node·bun 중 하나(없으면 유튜브 영상 포맷이 403). 전사는 로컬 mlx-whisper(`large-v3-turbo`, 첫 실행 때 약 1.6GB 받음). 외부 전사 API와 유튜브 자동 자막은 쓰지 않는다. `uv run`은 선택 묶음을 지우므로 영상 명령은 `--extra video`를 붙인다.
+### 자동 실행 (S6b)
+매일 02:00 `ops nightly`(수집 → 필터 → 글 요약 → 날마다 편집장 계획·글·영상·레포 분석)와 월 07:00 `ops weekly`(막 끝난 주의 브리핑 → 성공하면 사이트 발행)가 launchd로 돈다. 개발 중인 브랜치 코드가 섞이지 않게 main만 체크아웃한 별도 폴더 `~/Claude/projects/trendsit-run`(git worktree)에서 돌고, `data/`와 `site/`는 이 작업 폴더 것을 링크로 함께 쓴다. 자동 실행 비용은 주당 $1.50 상한(`RUN-<ISO 주차>` 꼬리표, `config/budget.yaml`). 맥이 꺼졌던 날은 다음 실행이 따라잡는다(`config/ops.yaml`).
+```bash
+bash scripts/setup_run_worktree.sh        # 실행 폴더 만들기(두 번 돌려도 같음). 이 작업 폴더는 main이 아닌 브랜치여야 함
+launchctl bootout gui/$(id -u)/com.trendsit.collect-temp    # 임시 수집 예약 해제(이 예약은 이 스펙에서 대체됨)
+cp ops/launchd/com.trendsit.*.plist ~/Library/LaunchAgents/
+launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.trendsit.nightly.plist
+launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.trendsit.weekly.plist
+```
+- 로그: `data/logs/ops/<날짜>-nightly.log`, `<날짜>-weekly.log`(단계 출력 전체), `data/logs/ops/launchd.log`. 단계별 종료 코드·시간·오류는 실행 기록의 `runs.summary_json`(`kind='nightly'`)
+- 종료 코드: 0 성공, 1 단계 실패(나머지 단계는 계속 돔), 2 거부(발행된 주의 `weekly`, 발행 대상이 아닌 주), 3 잠금을 못 얻음·실행 폴더가 main 아님(다음 예약이 다시 시도)
+- 손 실행: `uv run python -m trendsit ops nightly [--day 2026-10-12]`, `ops weekly [--week 2026-W42]`, `publish --week 2026-W42`. 실패한 날은 자동 재시도하지 않으니 `ops nightly --day D`로 다시. 발행된 주를 다시 쓰려면 `weekly --week W --force` 뒤 `publish --week W`
 그 밖의 명령: 수집 항목 보기 `items [--week 2026-W40] [--status pass]`, 기록된 호출 다시 실행 `role --replay <step_id> [--model 별칭]`, 평가 `eval <역할> [--model 별칭]`, 실행 기록 보기 `trace <run_id>`. 전체 명령표와 동작 방식은 [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
 
 ## 5. 사용 예시 / 결과물
@@ -134,6 +146,7 @@ trendsit/    파이썬 패키지: cli, core(LLM 호출, 캐시, 예산, run_role
 eval/        평가: 픽스처, 채점표, 채점기, 채점자 역할
 tests/       단위 테스트(LLM은 모의)
 scripts/     관문 A 확인 스크립트(verify_s<n>.sh) 등
+ops/         자동 실행 launchd plist(ops/launchd/). 실행 래퍼와 폴더 준비는 scripts/run_ops.sh, setup_run_worktree.sh
 reports/     스펙별 리포트와 품질 리포트
 docs/        CONTEXT(전체 맥락), handoff(스펙), reference(에이전트 명세 등)
 site_src/    예시 사이트 빌드 코드
@@ -147,7 +160,8 @@ data/        실행 기록 DB, 캐시(git 제외), 예시 사이트 데이터(�
 - [x] S3 깊게 보기: 편집장 계획, 글 분석가(원본 추적), 레포 분석가
 - [x] S4 영상 분석가(로컬 전사 + 슬라이드 판독, 맥)
 - [x] S5 주간 브리핑: 묶기, 선별, 작성 ⇄ 검수(관문 B 잠정, 근거 충실성 3토픽 미달)
-- [ ] S6 공개와 자동화: 사이트 연결, 매일·매주 자동 실행
+- [x] S6b 자동 실행: 매일 02:00 분석, 월 07:00 브리핑·발행, main 전용 실행 폴더(launchd 등록은 사용자)
+- [ ] S6a 공개: 사이트를 실제 데이터로 연결(export, 도식 렌더)
 - [ ] 9주차 이후: 로컬 모델 전환, 자연어 추적 관리, 쌓인 브리핑 Q&A
 
 알려진 한계
