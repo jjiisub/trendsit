@@ -123,7 +123,7 @@ def write_briefing_md(db: DB, week: str, run_id: str | None = None) -> Path:
                     if (checks := visible_checks(json.loads(t["checks_json"] or "[]"), page)) else []),
                   f"**요약(홈)** {page.summary}", "", f"**개요** {page.overview}", "", "**핵심 포인트**", ""]
         for i, p in enumerate(page.points, 1):
-            refs = "; ".join(f"`{r}` {(srcs.get(r) or {}).get('title', '?')[:50]}" for r in p.refs)
+            refs = "; ".join(f"`{r}` {((srcs.get(r) or {}).get('title') or '?')[:50]}" for r in p.refs)
             lines.append(f"{i}. {'⚠ ' if p.check else ''}{p.text}  \n   ← {refs}")
             for g in [g for g in page.numbers if g.anchor == i]:
                 lines += ["", f"   **도식(수치): {g.title}** ({g.unit}) — {g.context}", "",

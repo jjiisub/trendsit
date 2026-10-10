@@ -473,3 +473,27 @@ def test_summary_status_stopped(week, monkeypatch):
     summary = _status_of(ctx, cids, monkeypatch, lambda n, role: BudgetExceeded("상한") if n == 3 else None)
     assert summary["status"] == "stopped" and ctx.stopped == "BudgetExceeded: 상한"
     assert tuple(ctx.db.conn.execute("SELECT status, current_run_id FROM weeks").fetchone()) == before
+
+
+def test_editor_select_fallback_reason_tells_call_failure_from_validation(week, monkeypatch):
+    """대체 계획 이유: 마지막 시도가 예외면 호출 실패, 검증이 계속 실패하면 검증 실패(F-17)."""
+    from trendsit.brief import select as sel
+    from trendsit.core.errors import LLMError
+
+    ctx, cids = week
+    stub_run_role(monkeypatch, sel, lambda n, role: LLMError("제공사 오류"))
+    ctx.tracer = Tracer(ctx.db, "weekly", "S0")
+    ctx.llm.transport.responses = [response(x) for i in TITLES for x in (page(i, f"{TITLES[i]} 근거 문장 요약 정리"), verdict([]))]
+    pipeline.run_weekly("2026-W41", ctx, from_step="select", embedder=HashEmbedder(), cfg=CFG)
+    log = json.loads(ctx.db.conn.execute("SELECT plan_json FROM briefing_plans WHERE run_id=?", (ctx.tracer.run_id,)).fetchone()[0])["log"]
+    assert "호출 실패" in log and "검증 실패" not in log
+
+
+def test_briefing_md_untitled_source(week, monkeypatch):
+    """제목이 NULL인 근거가 있어도 읽기본이 멈추지 않고 '?'로 적는다(F-33)."""
+    ctx, cids = week
+    summary = _status_of(ctx, cids, monkeypatch, lambda n, role: None)
+    assert summary["status"] == "done"
+    ctx.db.conn.execute("UPDATE items SET title=NULL WHERE id=1")
+    text = briefing.write_briefing_md(ctx.db, "2026-W41").read_text()
+    assert "`it:1#q1` ?" in text

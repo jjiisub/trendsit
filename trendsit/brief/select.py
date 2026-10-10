@@ -371,6 +371,7 @@ def select(ctx: Ctx, cands: list[Candidate], ev: WeekEvidence, cfg: BriefConfig,
     reconciled: list[str] = []
     plan: BriefingPlan | None = None
     source = "model"
+    call_failed = False
     for _ in range(SELECT_RETRIES + 1):
         try:
             out = run_role(role, inp, ctx)
@@ -378,6 +379,7 @@ def select(ctx: Ctx, cands: list[Candidate], ev: WeekEvidence, cfg: BriefConfig,
             if isinstance(e, (BudgetExceeded, PriceUnknown)):
                 ctx.stopped = f"{type(e).__name__}: {e}"
             errors_by_try.append([f"{type(e).__name__}: {e}"])
+            call_failed = True  # 예외는 루프를 끝내므로 마지막 시도가 호출 실패
             break
         raw_errs = validate(out, cands, cfg)  # type: ignore[arg-type]  # 원래 출력 기준(모델 품질 기록)
         fixed, notes = reconcile(out)  # type: ignore[arg-type]
@@ -389,7 +391,7 @@ def select(ctx: Ctx, cands: list[Candidate], ev: WeekEvidence, cfg: BriefConfig,
             break
         inp = inp.model_copy(update={"previous_errors": errs})
     if plan is None:
-        plan, source = fallback_plan(cands, cfg, "검증 실패" if errors_by_try else "호출 실패"), "fallback"
+        plan, source = fallback_plan(cands, cfg, "호출 실패" if call_failed else "검증 실패"), "fallback"
     mism = reason_mismatches(plan, inp, site_names) if source == "model" else []
     if mism and not plan.attention:
         plan = plan.model_copy(update={"attention": True})

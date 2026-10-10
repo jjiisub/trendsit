@@ -42,11 +42,13 @@ else
 fi
 
 # A3 설정: brief.yaml, budget S5, 역할 md 5개
+roles_ok=1
+for r in decide editor_select writer writer_revise critic; do [ -f "roles/$r.md" ] || roles_ok=0; done
 if uv run --quiet python -m trendsit check-config >"$TMP/cc" 2>&1 \
-   && grep -q 'S5:' config/budget.yaml; then
+   && grep -q 'S5:' config/budget.yaml && [ "$roles_ok" = 1 ]; then
   pass A3 "check-config $(cat "$TMP/cc"), budget S5 있음, 역할 md 5개(decide, editor_select, writer, writer_revise, critic) 섹션 검사 포함"
 else
-  fail A3 "$(grep FAIL "$TMP/cc" | head -3 | tr '\n' ' ')"
+  fail A3 "$(grep FAIL "$TMP/cc" | head -3 | tr '\n' ' ') 역할 md 5개 존재=$roles_ok"
 fi
 
 pt A4 "공통 수정 5.1(명사 예외, ImageError 계열, 중첩 ImageFile 거부, ClassVar, 예산 기준값 위치, 수치 모듈) + 출력 잘림 감지" tests/test_s5_common.py
