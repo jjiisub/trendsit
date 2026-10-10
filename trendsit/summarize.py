@@ -76,7 +76,7 @@ def targets(db: DB, since: date | None, until: date | None, *, redo: bool = Fals
 
 def save_card(db: DB, item_id: int, version: int, card: Any, model: str | None, run_id: str | None,
               fallback: bool = False) -> None:
-    data = card.model_dump() if hasattr(card, "model_dump") else card
+    data = card.model_dump()
     with db.conn:
         db.conn.execute(
             "INSERT OR REPLACE INTO item_cards(item_id, version, card_json, model, run_id, created_at, fallback) "

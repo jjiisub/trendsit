@@ -215,10 +215,6 @@ def week_evidence(db: DB, week: str) -> WeekEvidence:
     return WeekEvidence(week, members, {"no_card": no_card, "no_digest": no_digest, "irrelevant_repo": irrelevant})
 
 
-def item_tokens(item: EvidenceItem) -> int:
-    return estimate_tokens(item.as_dict())
-
-
 def cap_pack(members: list[Member], max_tokens: int) -> tuple[list[EvidenceItem], list[str]]:
     """토픽 근거를 입력 상한 안으로. 넘치면 관련성 → 채널 다양성 → 출처당 균형 순으로 고른다.
 
@@ -241,7 +237,7 @@ def cap_pack(members: list[Member], max_tokens: int) -> tuple[list[EvidenceItem]
                       key=lambda m: (m.channel in seen_channels, RELEVANCE_RANK.get(m.relevance, 3), m.key))
         for m in turn:
             g = queues[m.key].pop(0)
-            cost = sum(item_tokens(x) for x in g)
+            cost = sum(estimate_tokens(x.as_dict()) for x in g)
             if total + cost <= max_tokens:
                 kept += g
                 total += cost

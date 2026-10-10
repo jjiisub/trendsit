@@ -202,7 +202,7 @@ OUTPUTS: dict[str, type[RoleOutput]] = {
 
 # ---------- 스펙별 스키마 모듈 합치기(COMMON 9장) ----------
 # 스펙마다 자기 파일에 입력·출력 스키마를 두고 INPUTS, OUTPUTS 튜플을 내놓는다. 여기에는 합치는 줄만.
-# 아직 없는 모듈은 건너뛴다(병행 브랜치가 먼저 병합되는 경우). 같은 이름이 다른 클래스로 들어오면 오류.
+# 같은 이름이 다른 클래스로 들어오면 오류.
 # 스키마 모듈은 무거운 선택 의존성(numpy, torch 등)을 import하지 않는다. 안 그러면 그 묶음이 없는 환경에서 모든 명령이 멈춘다.
 def register_schemas(module: str, inputs: tuple[type[RoleInput], ...], outputs: tuple[type[RoleOutput], ...]) -> None:
     """스펙별 모듈이 끝에서 부른다. 같은 이름이 다른 클래스로 들어오면 오류."""
@@ -221,12 +221,7 @@ def _merge(module: str) -> None:
     name = f"{__package__}.{module}"
     if name in sys.modules and not hasattr(sys.modules[name], "INPUTS"):
         return  # 읽히는 중: 모듈 끝의 register_schemas가 등록
-    try:
-        mod = importlib.import_module(name)
-    except ModuleNotFoundError as e:
-        if e.name == name:
-            return
-        raise
+    mod = importlib.import_module(name)
     register_schemas(module, tuple(getattr(mod, "INPUTS", ())), tuple(getattr(mod, "OUTPUTS", ())))
 
 

@@ -62,11 +62,6 @@ def ceil_sec(seconds: float) -> int:
     return int(math.ceil(seconds - 1e-6)) if seconds > 0 else 0
 
 
-def have_tools() -> list[str]:
-    """없는 시스템 도구 이름."""
-    return [t for t in ("ffmpeg", "ffprobe") if shutil.which(t) is None]
-
-
 def versions() -> dict[str, str]:
     out: dict[str, str] = {"python": platform.python_version(), "platform": f"{platform.system()}-{platform.machine()}"}
     for pkg in ("mlx-whisper", "mlx", "yt-dlp"):

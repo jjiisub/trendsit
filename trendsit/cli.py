@@ -274,13 +274,7 @@ def cmd_report(args: argparse.Namespace) -> int:
 def _register(sub: Any, module: str) -> None:
     import importlib
 
-    try:
-        mod = importlib.import_module(f"{__package__}.{module}")
-    except ModuleNotFoundError as e:
-        if e.name == f"{__package__}.{module}":
-            return
-        raise
-    mod.register(sub)
+    importlib.import_module(f"{__package__}.{module}").register(sub)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -344,7 +338,7 @@ def main(argv: list[str] | None = None) -> int:
     rp.add_argument("--until")
     rp.set_defaults(fn=cmd_report)
 
-    # 스펙별 명령(COMMON 9장): 각 파일의 register(sub). 여기에는 등록 한 줄씩만. 없는 모듈은 건너뜀
+    # 스펙별 명령(COMMON 9장): 각 파일의 register(sub). 여기에는 등록 한 줄씩만
     _register(sub, "cli_text")  # S2~S3
     _register(sub, "cli_video")  # S4
     _register(sub, "cli_brief")  # S5
