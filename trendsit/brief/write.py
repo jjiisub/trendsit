@@ -359,9 +359,9 @@ def write_topic(ctx: Ctx, topic: Applied, members: dict[str, Member], table: Ali
     if review and not any(lg.checker == "critic" for lg in res.rounds) and res.status != "passed":
         _critic_unseen_pages(ctx, res, topic, winp, pack, final, check_locs, cfg)
     final, renamed = _drop_code_bad_diagrams(res, final, pack, cfg, last_issue, check_locs)
+    pts = [p.model_copy(update={"check": f"points[{i}]" in check_locs}) for i, p in enumerate(final.points)]
+    final = final.model_copy(update={"points": pts})  # check는 코드 소유: 이어 온 초안의 옛 true도 여기서 덮어씀
     if check_locs:
-        pts = [p.model_copy(update={"check": True}) if f"points[{i}]" in check_locs else p for i, p in enumerate(final.points)]
-        final = final.model_copy(update={"points": pts})
         # ⚠가 빠진 도식을 가리키면 "빠진 도식: 제목", 남은 도식은 뺀 뒤의 번호로
         res.checks = sorted({renamed.get(loc, loc) for loc in check_locs})
         res.status = "checked"

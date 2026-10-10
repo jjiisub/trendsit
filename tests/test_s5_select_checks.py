@@ -287,6 +287,23 @@ def test_revision_resets_writer_check_on_edit_and_add():
     assert not any(pt.check for pt in new.points)
 
 
+def test_write_topic_final_check_follows_check_locs_only(tmp_path, monkeypatch):
+    from tests.conftest import FakeTransport, make_ctx
+    from trendsit.brief import write
+    from trendsit.brief.aliases import AliasTable
+
+    src = {"site": "OpenAI", "title": "t", "date": "2026-10-06"}
+    m = Member("it:1", "text", "t", "l", "s", "high", [], [], src, pack()["it:1#q1"] + pack()["it:1#q2"])
+    ctx = make_ctx(tmp_path, FakeTransport([]), spec_cap=1.0)
+    t = sel.Applied("w42-x", 1, True, [1], ["it:1"], "new", None, "", "a")
+    draft = page(points=[Point(text="입력 100만 토큰당 $2로 이전보다 15% 저렴함", refs=["it:1#q1"], check=True),
+                         Point(text="정확도 B 93.5%로 세 모델 중 가장 높음", refs=["it:1#q2"], check=True)])
+    for locs, expect in [(set(), [False, False]), ({"points[1]"}, [False, True])]:
+        monkeypatch.setattr(write, "_rounds", lambda *a, _l=locs, **k: (a[7], set(_l), {}))
+        res = write.write_topic(ctx, t, {"it:1": m}, AliasTable([]), CFG, review=False, draft=draft)  # draft = --from-step review
+        assert [p.check for p in res.page.points] == expect
+
+
 def test_number_item_value_accepts_numbers():
     """W40: value가 문자열만이면 모델이 숫자를 쓰려다 공백 반복으로 잘렸다. 숫자도 받고 문자열로 저장."""
     assert NumberItem.model_validate({"label": "a", "value": 77.9, "ref": "x"}).value == "77.9"
