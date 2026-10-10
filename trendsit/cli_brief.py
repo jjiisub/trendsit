@@ -22,7 +22,7 @@ def cmd_cluster(args: argparse.Namespace) -> int:
     from .core import config
     from .core.context import open_ctx
 
-    ctx = open_ctx("weekly", spec=args.spec or "S5", no_cache=args.no_cache, note=f"cluster {args.week}")
+    ctx = open_ctx("weekly", spec=config.current_spec(args.spec, "S5"), no_cache=args.no_cache, note=f"cluster {args.week}")
     status = "ok"
     try:
         stage = stage_cluster(args.week, ctx, use_llm=not args.no_llm)
@@ -51,12 +51,13 @@ def cmd_weekly(args: argparse.Namespace) -> int:
 
     from .brief.briefing import write_briefing_md
     from .brief.pipeline import run_weekly
+    from .core import config
     from .core.context import open_ctx
 
     until = getattr(args, "step", None)  # select/write/review 단계 명령
     until = until if until in ("select", "write") else None
     from_step = args.from_step
-    ctx = open_ctx("weekly", spec=args.spec or "S5", no_cache=args.no_cache,
+    ctx = open_ctx("weekly", spec=config.current_spec(args.spec, "S5"), no_cache=args.no_cache,
                    note=f"weekly {args.week} from {from_step}" + (f" until {until}" if until else "")
                    + (f" topic {args.topic}" if getattr(args, "topic", None) else ""))
     status = "ok"

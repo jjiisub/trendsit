@@ -42,6 +42,10 @@ def budget_state_path(data_dir: Path | None) -> Path:
     return shared
 
 
+def open_db(data_dir: Path | None = None) -> DB:
+    return DB((data_dir or config.ROOT / "data") / "trendsit.db")
+
+
 def open_ctx(kind: str | None, *, spec: str | None = None, no_cache: bool = False, model: str | None = None,
              note: str | None = None, data_dir: Path | None = None, transport: Transport | None = None,
              key_status: bool = True) -> Ctx:
@@ -50,7 +54,7 @@ def open_ctx(kind: str | None, *, spec: str | None = None, no_cache: bool = Fals
     spec = config.current_spec(spec)
     models = config.load("models.yaml")
     budget_cfg = config.load("budget.yaml")
-    db = DB(data_dir / "trendsit.db")
+    db = open_db(data_dir)
     llm = LLMClient(models, cache=Cache(data_dir / "cache"), transport=transport)
     budget = Budget(budget_cfg, spec, db, state_path,
                     key_status=llm.key_status if key_status else None,

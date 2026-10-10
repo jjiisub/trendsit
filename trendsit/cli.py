@@ -12,8 +12,8 @@ from typing import Any
 from .core import config
 from .core.budget import BudgetExceeded, PriceUnknown
 from .core.config import ROOT, ConfigError
-from .core.context import open_ctx
-from .core.db import DB, KST
+from .core.context import open_ctx, open_db
+from .core.db import KST
 from .core.llm import LLMError
 from .core.role import Role, load_role, record_llm, role_path, run
 
@@ -193,7 +193,7 @@ def cmd_cost(args: argparse.Namespace) -> int:
 
 # ---------- trace ----------
 def cmd_trace(args: argparse.Namespace) -> int:
-    db = DB(ROOT / "data" / "trendsit.db")
+    db = open_db()
     run_row = db.run(args.run_id)
     if run_row is None:
         print(f"없는 실행: {args.run_id}", file=sys.stderr)
@@ -242,7 +242,7 @@ def cmd_collect(args: argparse.Namespace) -> int:
 
 
 def cmd_items(args: argparse.Namespace) -> int:
-    db = DB(ROOT / "data" / "trendsit.db")
+    db = open_db()
     sql = ("SELECT i.*, (SELECT group_concat(keyword_id, ',') FROM item_keywords k WHERE k.item_id=i.id) kws "
            "FROM items i WHERE 1=1")
     params: list[Any] = []

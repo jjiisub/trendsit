@@ -12,23 +12,16 @@ from datetime import date
 from pathlib import Path
 from typing import Any
 
+from .cli import _parse_date
 from .core import config
 from .core.config import ROOT
-from .core.db import DB
+from .core.context import open_db
 from .core.trace import Tracer
 
 FILTER_REPORT = ROOT / "reports" / "S2_filter"
 FILTER_FIXTURES = ROOT / "eval" / "fixtures" / "filter"
 SEED = ROOT / "eval" / "labels" / "relevance_seed.csv"
 RELEVANCE_LABELS = ROOT / "eval" / "labels" / "relevance.csv"
-
-
-def _date(text: str | None) -> date | None:
-    return date.fromisoformat(text) if text else None
-
-
-def _db() -> DB:
-    return DB(ROOT / "data" / "trendsit.db")
 
 
 def _period(args: argparse.Namespace) -> str:
@@ -39,9 +32,9 @@ def _period(args: argparse.Namespace) -> str:
 def cmd_rematch(args: argparse.Namespace) -> int:
     from .filter.rematch import rematch
 
-    db = _db()
-    tracer = Tracer(db, "rematch", config.current_spec(args.spec or "S2"), note=f"rematch {_period(args)}".strip())
-    res = rematch(db, config.load("keywords.yaml"), _date(args.since), _date(args.until))
+    db = open_db()
+    tracer = Tracer(db, "rematch", config.current_spec(args.spec, "S2"), note=f"rematch {_period(args)}".strip())
+    res = rematch(db, config.load("keywords.yaml"), _parse_date(args.since), _parse_date(args.until))
     tracer.step(kind="code", role="rematch", text=res.summary(), detail=res.__dict__)
     tracer.finish("ok")
     print(res.summary())
@@ -53,13 +46,13 @@ def cmd_filter(args: argparse.Namespace) -> int:
     from .filter.embed import make_embedder, run_filter
 
     cfg = config.load("filter.yaml")
-    db = _db()
-    tracer = Tracer(db, "filter", config.current_spec(args.spec or "S2"),
+    db = open_db()
+    tracer = Tracer(db, "filter", config.current_spec(args.spec, "S2"),
                     note=f"filter {args.embedder} {_period(args)}".strip())
     status = "failed"
     try:
         embedder = make_embedder(args.embedder, cfg, args.device)
-        res = run_filter(db, cfg, embedder, tracer.run_id, _date(args.since), _date(args.until))
+        res = run_filter(db, cfg, embedder, tracer.run_id, _parse_date(args.since), _parse_date(args.until))
         dropped = res.decisions.get("low_similarity", 0)
         tracer.step(kind="code", role="filter", text=res.summary(),
                     detail={k: v for k, v in res.__dict__.items() if k != "rows"},
@@ -132,11 +125,11 @@ def cmd_summarize(args: argparse.Namespace) -> int:
     from .core.context import open_ctx
     from .summarize import run_summarize, targets
 
-    ctx = open_ctx("summarize", spec=args.spec or "S2", model=args.model, no_cache=args.no_cache,
+    ctx = open_ctx("summarize", spec=config.current_spec(args.spec, "S2"), model=args.model, no_cache=args.no_cache,
                    note=f"summarize {_period(args)}".strip())
     status = "failed"
     try:
-        ids = targets(ctx.db, _date(args.since), _date(args.until), redo=args.redo, limit=args.limit)
+        ids = targets(ctx.db, _parse_date(args.since), _parse_date(args.until), redo=args.redo, limit=args.limit)
         res = run_summarize(ctx, ids, config.load("keywords.yaml"))
         ctx.tracer.step(kind="code", role="summarize", text=res.summary(), detail=res.__dict__,
                         attention=bool(res.stopped or res.fallback))
@@ -168,7 +161,7 @@ def cmd_repo_analyze(args: argparse.Namespace) -> int:
     from .core.context import open_ctx
     from .deep.repo_agent import build_input, rule_queue, run_repo_analysis, write_traces
 
-    ctx = open_ctx("repo-analyze", spec=args.spec or "S3", model=args.model, no_cache=args.no_cache,
+    ctx = open_ctx("repo-analyze", spec=config.current_spec(args.spec, "S3"), model=args.model, no_cache=args.no_cache,
                    note=f"repo-analyze {args.week}")
     status = "failed"
     try:
@@ -214,7 +207,7 @@ def cmd_plan(args: argparse.Namespace) -> int:
 
     day = date.fromisoformat(args.day)
     if args.action == "show":
-        db = _db()
+        db = open_db()
         got = P.latest_plan(db, args.day)
         if got is None:
             print(f"{args.day} 계획 없음", file=sys.stderr)
@@ -225,7 +218,7 @@ def cmd_plan(args: argparse.Namespace) -> int:
         a = P.mode_agreement(PLAN_LABELS)
         print(a if a else f"채운 라벨 없음: {PLAN_LABELS.relative_to(ROOT)}")
         return 0 if a else 1
-    ctx = open_ctx("plan", spec=args.spec or "S3", model=args.model, no_cache=args.no_cache, note=f"plan {args.day}")
+    ctx = open_ctx("plan", spec=config.current_spec(args.spec, "S3"), model=args.model, no_cache=args.no_cache, note=f"plan {args.day}")
     status = "failed"
     try:
         cfg = config.load("deep.yaml")
@@ -272,7 +265,7 @@ def cmd_deep(args: argparse.Namespace) -> int:
     if not args.day and args.item is None:
         print("--day(계획의 text_queue) 또는 --item이 필요함", file=sys.stderr)
         return 2
-    ctx = open_ctx("deep-text", spec=args.spec or "S3", model=args.model, no_cache=args.no_cache,
+    ctx = open_ctx("deep-text", spec=config.current_spec(args.spec, "S3"), model=args.model, no_cache=args.no_cache,
                    note=f"deep text {args.day or args.item}")
     status = "failed"
     try:

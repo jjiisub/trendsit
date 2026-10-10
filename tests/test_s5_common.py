@@ -76,14 +76,14 @@ def test_quality_report_brief_cuts_nested_input():
 
 
 def test_budget_state_moves_to_shared_place(tmp_path, monkeypatch):
-    root, home = tmp_path / "repo", tmp_path / "home" / ".config" / "trendsit"
+    root = tmp_path / "repo"
     (root / "data").mkdir(parents=True)
     old = {"phase": "mvp", "phase_baseline_usd": 0.48331, "recorded_at": "2026-10-07T15:33:03+09:00"}
     (root / "data" / "budget_state.json").write_text(json.dumps(old))
     monkeypatch.setattr(config, "ROOT", root)
-    monkeypatch.setattr(config, "SECRET_FILE", home / ".env")
+    monkeypatch.setattr(config, "SECRET_FILE", tmp_path / "home" / ".env")
     p = context.budget_state_path(None)
-    assert p == home / "budget_state.json" and json.loads(p.read_text()) == old  # 10/7 기준값 유지
+    assert p == config.SECRET_FILE.parent / "budget_state.json" and json.loads(p.read_text()) == old  # 10/7 기준값 유지
     assert context.budget_state_path(tmp_path / "x") == tmp_path / "x" / "budget_state.json"
 
 
