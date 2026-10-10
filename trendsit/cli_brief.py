@@ -16,12 +16,29 @@ def _week(v: str) -> str:
     return v
 
 
+def _guard_published(week: str, force: bool) -> int | None:
+    """발행된 주는 --force 없이 다시 쓰지 않는다(종료 코드 2). --force면 발행을 푼다(status done, published_at NULL: C-3)."""
+    from .core.db import open_db
+
+    db = open_db()
+    if not db.conn.execute("SELECT 1 FROM weeks WHERE week=? AND status='published'", (week,)).fetchone():
+        return None
+    if not force:
+        print("발행된 주: --force로 다시 실행", file=sys.stderr)
+        return 2
+    with db.conn:
+        db.conn.execute("UPDATE weeks SET status='done', published_at=NULL WHERE week=?", (week,))
+    return None
+
+
 def cmd_cluster(args: argparse.Namespace) -> int:
     from .brief.report import write_cluster_report, write_label_sheets
     from .brief.weekly import stage_cluster
     from .core import config
     from .core.context import open_ctx
 
+    if (refused := _guard_published(args.week, getattr(args, "force", False))) is not None:
+        return refused
     ctx = open_ctx("weekly", spec=config.current_spec(args.spec, "S5"), no_cache=args.no_cache, note=f"cluster {args.week}")
     status = "ok"
     try:
@@ -53,12 +70,9 @@ def cmd_weekly(args: argparse.Namespace) -> int:
     from .brief.pipeline import run_weekly
     from .core import config
     from .core.context import open_ctx
-    from .core.db import open_db
 
-    published = open_db().conn.execute("SELECT 1 FROM weeks WHERE week=? AND status='published'", (args.week,)).fetchone()
-    if published and not args.force:
-        print("발행된 주: --force로 다시 실행", file=sys.stderr)
-        return 2
+    if (refused := _guard_published(args.week, getattr(args, "force", False))) is not None:
+        return refused
     until = getattr(args, "step", None)  # select/write/review 단계 명령
     until = until if until in ("select", "write") else None
     from_step = args.from_step
@@ -113,5 +127,6 @@ def register(sub: Any) -> None:
     c.add_argument("--no-llm", action="store_true", help="decide를 부르지 않음(경계 쌍은 묶지 않음, 0원)")
     c.add_argument("--note", help="리포트 머리에 남길 메모(예: 수집 범위)")
     c.add_argument("--no-cache", action="store_true")
+    c.add_argument("--force", action="store_true", help="발행된 주도 다시 실행(발행은 publish로 따로)")
     c.add_argument("--spec")
     c.set_defaults(fn=cmd_cluster)

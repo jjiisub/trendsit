@@ -90,6 +90,16 @@ def _skipped(db: DB, kind: str, spec: str, summary: dict[str, Any]) -> int:
     return 3
 
 
+def _error_line(out: str, err: str) -> str:
+    """실패 이유 한 줄(200자). 예산 초과 줄은 명령이 stdout에 쓸 수도 있어 둘 다에서 먼저 찾고, 없으면 stderr(없으면 stdout)의 마지막 줄."""
+    lines = [x.strip() for x in (err + "\n" + out).splitlines() if x.strip()]
+    hit = next((x for x in lines if "BudgetExceeded" in x or "상한 초과" in x), None)
+    if hit is None:
+        tail = [x.strip() for x in (err or out).splitlines() if x.strip()]
+        hit = tail[-1] if tail else ""
+    return hit[:200]
+
+
 class StepLog:
     """단계 실행 + 로그 파일 + steps 기록. summary_json.steps의 한 칸을 만든다."""
 
@@ -109,15 +119,15 @@ class StepLog:
         with self.path.open("a", encoding="utf-8") as f:
             f.write(f"== {now_kst()} {text}\n")
 
-    def add(self, name: str, day: date | None, code: int, sec: float, err: str = "") -> None:
+    def add(self, name: str, day: date | None, code: int, sec: float, out: str = "", err: str = "") -> None:
         step: dict[str, Any] = {"name": name, "day": day.isoformat() if day else None, "exit": code, "sec": sec}
         if code != 0:
-            step["error"] = next((x for x in reversed(err.strip().splitlines()) if x.strip()), "")[:200]
+            step["error"] = _error_line(out, err)
         self.steps.append(step)
 
     def step(self, name: str, day: date | None, args: list[str], extra: tuple[str, ...] = ()) -> tuple[int, str]:
         code, out, err, sec = self.run(["uv", "run", *extra, "python", "-m", "trendsit", *args])
-        self.add(name, day, code, sec, err or out)
+        self.add(name, day, code, sec, out, err)
         return code, out
 
 
@@ -187,7 +197,7 @@ def _video(log: StepLog, d: date, tag: list[str], data_dir: Path) -> None:
         except ValueError:
             code, err = 1, "plan show 출력이 JSON이 아님"
     if code != 0:
-        log.add("video", d, code, sec, err or out)
+        log.add("video", d, code, sec, out, err)
     elif not queue:
         log.add("video", d, 0, sec)
     else:
@@ -223,7 +233,7 @@ def weekly(db: DB, cfg: OpsConfig, *, week: str | None = None, now: datetime | N
                 if wk == 0:
                     t0 = time.monotonic()
                     pub = publish(db, week, lambda cmd: _logged(log, cmd))
-                    log.add("publish", None, pub, round(time.monotonic() - t0, 1), "빌드 실패 또는 발행 불가(로그 참고)")
+                    log.add("publish", None, pub, round(time.monotonic() - t0, 1), err="빌드 실패 또는 발행 불가(로그 참고)")
                     status, code = ("ok", 0) if pub == 0 else ("failed", 1)
         finally:
             _close_run(db, tr, status, {"week": week, "steps": log.steps})

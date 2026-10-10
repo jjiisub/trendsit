@@ -350,3 +350,24 @@ def test_cli_dispatch_and_exit_codes(db, monkeypatch):
     assert seen == [("nightly", date(2026, 10, 12)), ("weekly", "2026-W42"), ("weekly", None)]
     with pytest.raises(SystemExit):  # ops weekly는 --force를 받지 않는다(C-8)
         cli.main(["ops", "weekly", "--force"])
+
+
+# ---------- 실패 이유(5.11): 예산 초과 메시지 ----------
+def test_b3_error_finds_budget_message_on_stdout(db, tmp_path):
+    class Real(Fake):
+        """실제 하위 명령처럼: 예산 초과는 stdout 요약 줄(또는 stderr 중간)에, stderr 끝은 다른 줄."""
+
+        def __call__(self, cmd):
+            name = tail(cmd)[0]
+            if name == "summarize":
+                return 1, "요약 3건\nstopped: BudgetExceeded: 스펙 RUN-2026-W42 상한 초과: 누적 $1.4900\n", "경고: 다른 줄\n"
+            if name == "collect":
+                return 1, "", "BudgetExceeded: 단계 상한 초과\nuv 종료 안내 줄\n"
+            if name == "filter":
+                return 1, "", "Traceback\nValueError: 다른 오류\n"
+            return super().__call__(cmd)
+
+    run_night(db, tmp_path, at(2026, 10, 13), Real(db))
+    err = {x["name"]: x["error"] for x in nightly_rows(db)[-1]["summary"]["steps"] if x["exit"]}
+    assert "상한 초과" in err["summarize"] and "BudgetExceeded" in err["collect"]
+    assert err["filter"] == "ValueError: 다른 오류"  # 예산 줄이 없으면 stderr 마지막 줄

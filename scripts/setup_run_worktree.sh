@@ -11,6 +11,10 @@ if [ ! -e "$RUN/.git" ]; then
   # data/에는 추적 파일(예시 JSON 등)이 있어 링크와 겹친다. 실행 폴더의 data/는 지우고 작업 폴더 것을 링크한다
   rm -rf "$RUN/data"
   echo "실행 폴더 만듦: $RUN (main)"
+  # uv sync는 정확 동기화라 지정하지 않은 묶음을 지운다. video(영상)와 embed(임베딩 필터)를 함께 둔다. 이미 있는 폴더는 링크만 확인
+  if [ -f "$RUN/pyproject.toml" ]; then
+    (cd "$RUN" && uv sync --extra video --extra embed)
+  fi
 fi
 
 for name in data site; do
@@ -26,8 +30,4 @@ done
 
 mkdir -p "$WORK/data/logs/ops"  # launchd가 StandardOutPath를 열려면 폴더가 먼저 있어야 함
 
-# uv sync는 정확 동기화라 지정하지 않은 묶음을 지운다. video(영상)와 embed(임베딩 필터)를 함께 둔다
-if [ -f "$RUN/pyproject.toml" ]; then
-  (cd "$RUN" && uv sync --extra video --extra embed)
-fi
 echo "준비됨: $RUN -> data, site 링크 확인"

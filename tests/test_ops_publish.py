@@ -123,3 +123,31 @@ def test_b9_weekly_force_runs(tmp_path, monkeypatch):
     monkeypatch.setattr("trendsit.brief.briefing.write_briefing_md", lambda *a, **k: "읽기본.md")
     assert cli.main(["weekly", "--week", "2026-W41", "--force"]) == 0
     assert seen == ["2026-W41"]
+
+
+def test_b9_cluster_refuses_published_and_force_unpublishes(tmp_path, monkeypatch):
+    db = weeks_db(tmp_path, "published")
+    db.conn.execute("UPDATE weeks SET published_at='2026-10-12T07:10:00+09:00'")
+    db.conn.commit()
+    monkeypatch.setattr("trendsit.core.db.open_db", lambda *a, **k: db)
+    assert cli.main(["cluster", "--week", "2026-W41"]) == 2
+    assert tuple(week_row(db)) == ("published", "2026-10-12T07:10:00+09:00")
+
+    def stop(*a, **k):  # --force는 발행을 풀고 진행(여기서는 진입 직후 멈춤)
+        raise RuntimeError("stop")
+
+    monkeypatch.setattr("trendsit.core.context.open_ctx", stop)
+    with pytest.raises(RuntimeError):
+        cli.main(["cluster", "--week", "2026-W41", "--force"])
+    assert tuple(week_row(db)) == ("done", None)  # C-3: published가 아니면 published_at도 없음
+
+
+def test_b9_weekly_force_clears_published_at(tmp_path, monkeypatch):
+    db = weeks_db(tmp_path, "published")
+    db.conn.execute("UPDATE weeks SET published_at='2026-10-12T07:10:00+09:00'")
+    db.conn.commit()
+    monkeypatch.setattr("trendsit.core.db.open_db", lambda *a, **k: db)
+    monkeypatch.setattr("trendsit.core.context.open_ctx", lambda *a, **k: (_ for _ in ()).throw(RuntimeError("stop")))
+    with pytest.raises(RuntimeError):
+        cli.main(["weekly", "--week", "2026-W41", "--force"])
+    assert tuple(week_row(db)) == ("done", None)
