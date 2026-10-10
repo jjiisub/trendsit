@@ -33,12 +33,12 @@ from ..core.config_brief import BriefConfig
 from ..core.context import Ctx
 from ..core.db import DB, now_kst
 from ..core.errors import LLMError
+from ..core.numbers import DECIMAL
 from ..core.role import RoleFailed, load_role, run_role
 from .evidence import Member, WeekEvidence
 
 SELECT_RETRIES = 2
 RECONCILE_MARK = "코드 정리: topics에 없음"  # reconcile이 drop으로 바꾼 결정의 reason 끝(실행 요약 drops_by가 셈)
-_NUM = re.compile(r"\d+(?:\.\d+)?")
 
 
 @dataclass
@@ -270,7 +270,7 @@ def reason_mismatches(plan: BriefingPlan, inp: EditorSelectInput, site_names: li
         for n in re.findall(r"채널\s*(\d)", d.reason):  # 글 수를 채널 수로 부름(리뷰 R14)
             if f"c{d.cluster_id}" in n_ch and int(n) != n_ch[f"c{d.cluster_id}"]:
                 out.append(f"c{d.cluster_id} reason의 채널 수 {n}이 입력({n_ch[f'c{d.cluster_id}']}개)과 다름: {d.reason[:80]}")
-        for n in _NUM.findall(d.reason):
+        for n in DECIMAL.findall(d.reason):
             pat = rf"(?<![\d.]){re.escape(n)}(?![\d])"
             if not re.search(pat, doc) and not re.search(pat, shared):
                 out.append(f"c{d.cluster_id} reason의 숫자 {n}이 입력에 없음: {d.reason[:80]}")

@@ -20,12 +20,12 @@ from ..core import config
 from ..core.config import KeywordsConfig
 from ..core.config_brief import BriefConfig
 from ..core.db import DB, now_kst
+from ..core.numbers import DECIMAL
 from .evidence import Member
 
 # 크기·등급 낱말: 이름에 붙으면 다른 제품(GPT-5 ↔ GPT-5 mini)
 SIZE_WORDS = {"mini", "nano", "micro", "small", "medium", "large", "xl", "pro", "max", "plus", "lite", "flash",
               "ultra", "turbo", "air", "base", "instruct", "preview"}
-_NUM = re.compile(r"\d+(?:\.\d+)?")
 
 
 def norm_key(name: str) -> str:
@@ -71,7 +71,7 @@ def translit_pattern(name: str, translit: dict[str, str]) -> re.Pattern[str] | N
 
 
 def numbers_of(name: str) -> tuple[str, ...]:
-    return tuple(_NUM.findall(name))
+    return tuple(DECIMAL.findall(name))
 
 
 def sizes_of(name: str) -> frozenset[str]:

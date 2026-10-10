@@ -22,6 +22,7 @@ SMALL = {w: i for i, w in enumerate(
 TENS = {"twenty": 20, "thirty": 30, "forty": 40, "fifty": 50, "sixty": 60, "seventy": 70, "eighty": 80, "ninety": 90}
 SCALES = {"thousand": 1e3, "million": 1e6, "billion": 1e9, "trillion": 1e12}
 TOL = 1e-6
+DECIMAL = re.compile(r"\d+(?:\.\d+)?")  # 이름·문장 속 수(쉼표·크기 단위 없이 숫자 그대로): 별칭의 버전 숫자, 선별 reason 대조
 
 
 def _digits(text: str) -> list[tuple[float, bool]]:

@@ -30,13 +30,13 @@ def host_of(url: str) -> str:
 
 
 _A = re.compile(r"<a\s[^>]*?href\s*=\s*[\"']([^\"']+)[\"'][^>]*>(.*?)</a>", re.I | re.S)
-_REF = re.compile(r"<ref target=\"([^\"]+)\">(.*?)</ref>", re.S)
+XML_REF = re.compile(r"<ref target=\"([^\"]+)\">(.*?)</ref>", re.S)
 _TAG = re.compile(r"<[^>]+>")
 
 
 def extract_links(html: str, base_url: str, *, xml_refs: bool = False) -> list[dict[str, str]]:
     """바깥 링크(다른 호스트, http/https)만. xml_refs=True면 trafilatura XML의 <ref target>에서."""
-    pattern = _REF if xml_refs else _A
+    pattern = XML_REF if xml_refs else _A
     own = host_of(base_url)
     out: dict[str, dict[str, str]] = {}
     for href, inner in pattern.findall(html or ""):
