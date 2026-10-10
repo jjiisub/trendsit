@@ -144,11 +144,6 @@ class SlideReading(RoleOutput):
     table: list[list[str]] | None = Field(description="화면의 표를 행 목록으로. 표가 없으면 null")
     title: str = Field(description="슬라이드 제목 그대로. 없으면 빈 문자열")
 
-    @classmethod
-    def fallback(cls, reason: str, inp: SlideInput) -> Self:
-        return cls(frame_kind="other", ocr_text="", numbers=[], table=None, title="",
-                   log=f"{inp.sec}초 판독 실패 ({reason})", attention=True)
-
     def enforce(self, inp: SlideInput, ctx: Ctx | None) -> Self:
         """슬라이드가 아니면 수치 비움. 수치 값은 ocr_text 안에 글자 그대로 있어야 남김(없으면 지우고 attention)."""
         out = self
