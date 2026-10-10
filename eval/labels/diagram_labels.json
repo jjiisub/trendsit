@@ -157,10 +157,10 @@
   ],
   "events": [],
   "code_warnings": [],
-  "needed_numbers": null,
-  "needed_events": null,
-  "labeler": null,
-  "critique": null
+  "needed_numbers": 0,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "불필요(4차 리뷰 라벨 정정): 구간 가격은 입력·출력 두 지표라 한 막대로 그릴 수 없음, points 2·3에 단위 포함 정확"
  },
  "w41-decision-api-spec": {
   "week": "2026-W41",

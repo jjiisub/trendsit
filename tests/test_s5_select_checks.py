@@ -477,3 +477,40 @@ def test_version_after_english_name_is_not_a_measurement():
     assert not any("'5.5'" in m for m in msgs)
     p2 = page(summary="정확도가 Haiku 5.5% 높아졌다.")  # 단위가 붙으면 측정값
     assert any("'5.5'" in i.comment for i in checks.run_checks(p2, pack(), 2, CFG, {}).issues)
+
+
+def test_h1_summary_overview_numbers_must_be_in_points_and_no_repeat():
+    p = page(summary="OpenAI가 가격을 15% 내렸다. 스킬 약 50개, 에이전트 약 20개를 쓴다.")
+    issues = checks.run_checks(p, pack(), 2, CFG, {}).issues
+    bad = {i.comment for i in issues if i.loc == "summary" and i.type == "unsupported"}
+    assert any("'50'" in c for c in bad) and any("'20'" in c for c in bad) and not any("'15'" in c for c in bad)
+    rep = page(summary="OpenAI가 새 가격을 발표했다. 정확도 비교도 함께 나왔다.",
+               overview="OpenAI가 새 가격을 발표했다. 정확도 비교도 함께 나왔다. 영상도 있었다.")
+    assert any(i.loc == "overview" and "반복" in i.comment for i in checks.run_checks(rep, pack(), 2, CFG, {}).issues)
+
+
+@pytest.mark.parametrize("before,after", [
+    ("Anthropic, 100,000 토큰 이하 요청 시 90% 가격 인하된 Claude Haiku 5.5 출시. GPT-6 Luna와 같은 가격에 점수는 더 높다.",
+     "Anthropic이 100,000 토큰 이하 요청 시 90% 가격 인하된 Claude Haiku 5.5 출시했다. GPT-6 Luna와 같은 가격에 점수는 더 높다."),
+    ("100,000 토큰 이하 요청 가격을 전작 대비 90% 낮춘 Claude Haiku 5.5 공개. 소형 모델 가격 경쟁이 격화됐다.",
+     "100,000 토큰 이하 요청 가격을 전작 대비 90% 낮춘 Claude Haiku 5.5 공개했다. 소형 모델 가격 경쟁이 격화됐다."),
+])
+def test_h2_noun_ending_autofixed_to_haetda(before, after):
+    fixed, fixes = checks.autofix(page(summary=before, overview=before), CFG, {})
+    assert fixed.summary == after and fixed.overview == after and any("'~했다'" in f["rule"] for f in fixes)
+    assert not any("'~다'" in i.comment for i in checks.check(fixed, pack(), 2, CFG))  # 반려 아님
+
+
+def test_h3_video_only_summary_needs_speaker_and_thin_concept_dropped():
+    from trendsit.core.artifacts_brief import Concept
+
+    src = {"site": "Tech Bridge", "title": "[한영자막] 코드베이스 부패 — Quinn Slack, Sourcegraph"}
+    vp = {"vd:9@30": [EvidenceItem("vd:9@30", "vd:X", "video", "claim", "코딩 에이전트가 코드베이스를 망가뜨림", src)]}
+    pts = [Point(text="코딩 에이전트가 거대한 코드베이스를 망가뜨린다는 주장", refs=["vd:9@30"]),
+           Point(text="상태 머신 기반 구조로 대응하자는 제안", refs=["vd:9@30"])]
+    p = page(points=pts, contributions=[], summary="코드베이스 부패 문제가 심화되고 대응책이 제시됐다.", overview="a다. b다.")
+    assert any(i.loc == "summary" and i.type == "missing_key" for i in checks.run_checks(p, vp, 1, CFG, {}).issues)
+    ok = p.model_copy(update={"summary": "Sourcegraph의 Quinn Slack은 코드베이스 부패를 경고했다."})
+    assert not any(i.type == "missing_key" for i in checks.run_checks(ok, vp, 1, CFG, {}).issues)
+    c = page(concepts=[Concept(term="Agentic Batch Changes", desc="Sourcegraph의 베타 출시 기능")])
+    assert checks.autofix(c, CFG, {})[0].concepts == []
