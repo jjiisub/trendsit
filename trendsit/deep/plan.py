@@ -99,7 +99,11 @@ def repo_candidates(ctx: Any, day: date, *, hype: bool = True) -> list[RepoCandi
 
 
 def budget_of(cfg: DeepConfig) -> PlanBudget:
-    return PlanBudget(**{k: getattr(cfg, k) for k in PlanBudget.model_fields})
+    """영상 구간·프레임 상한은 실제로 자르는 video.yaml 값(deep.yaml에는 없음)."""
+    video = config.load("video.yaml")
+    own = {k: getattr(cfg, k) for k in PlanBudget.model_fields if k not in ("video_max_minutes", "frames_per_slide_video")}
+    return PlanBudget(**own, video_max_minutes=video.max_span_sec // 60,
+                      frames_per_slide_video=video.modes.whisper_slides.frames_cap)
 
 
 def build_plan_input(ctx: Any, day: date, cfg: DeepConfig, keywords: config.KeywordsConfig, *,

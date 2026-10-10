@@ -120,7 +120,7 @@ class AliasTable:
                 "rejected": sum(r.status == "rejected" for r in ent)}
 
 
-def build(members: list[Member], keywords: KeywordsConfig, fuzz_min: float = 90,
+def build(members: list[Member], keywords: KeywordsConfig, fuzz_min: float,
           translit: dict[str, str] | None = None) -> AliasTable:
     """구성원의 이름(글 카드 entities, 영상 판독 표기, 레포 이름)에서 별칭 후보를 만든다(LLM 없음)."""
     from rapidfuzz import fuzz

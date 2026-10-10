@@ -11,34 +11,30 @@
 # 백필 URL은 2026-10-07 코드 세션이 실제로 열어 확인하고 고쳤다(S1 리포트 표).
 text:
   - id: openai
-    name: OpenAI News
+    name: OpenAI News   # 언어 en
     kind: primary
-    lang: en
     feed: https://openai.com/news/rss.xml
     fetch: feed_summary
     backfill: {method: rss_only}
     note: 기업 사례 글이 많음. 필터로 거름
 
   - id: anthropic
-    name: Anthropic News
+    name: Anthropic News   # 언어 en
     kind: primary
-    lang: en
     feed: https://raw.githubusercontent.com/Olshansk/rss-feeds/main/feeds/feed_anthropic_news.xml
     fetch: feed_summary
     backfill: {method: list_pages, url_template: "https://www.anthropic.com/news", max_pages: 1, note: "공식 RSS 없음. 커뮤니티 피드(2021~)가 멈추면 목록 페이지(최신 10건 안팎, 페이지 넘김 없음) 파싱"}
 
   - id: deepmind
-    name: Google DeepMind Blog
+    name: Google DeepMind Blog   # 언어 en
     kind: primary
-    lang: en
     feed: https://deepmind.google/blog/rss.xml
     fetch: feed_summary
     backfill: {method: rss_only}
 
   - id: geeknews
-    name: GeekNews
+    name: GeekNews   # 언어 ko
     kind: curation
-    lang: ko
     # 설계 결정(S1 Q1, Q5): RSS, 상세 페이지(topic?id=), 메인 화면을 쓰지 않는다.
     # 매일 수집과 백필 모두 날짜별 목록 past?day=<날짜>에서 날짜당 pages_per_day페이지(1이면 그날 점수 상위 약 20건).
     # 목록에서 제목, 원문 링크, 요약 앞부분, 점수, 댓글 수를 받고 본문은 원문 링크에서. 같은 글은 topic id로 한 번
@@ -49,18 +45,16 @@ text:
     note: 기술 외 글이 섞임. 원문 링크가 원본 추적(S3)의 출발점
 
   - id: simonw
-    name: Simon Willison's Weblog
+    name: Simon Willison's Weblog   # 언어 en
     kind: curation
-    lang: en
     feed: https://simonwillison.net/atom/everything/
     fetch: feed_full
     backfill: {method: day_archive, url_template: "https://simonwillison.net/{yyyy}/{Mon}/{d}/", archive_tz: utc}
     note: 피드 20건(약 9일). 전문 + 원본 링크가 많음
 
   - id: aitimes
-    name: AI타임스
+    name: AI타임스   # 언어 ko
     kind: news
-    lang: ko
     feed: https://www.aitimes.com/rss/allArticle.xml
     fetch: feed_summary
     backfill: {method: list_pages, url_template: "https://www.aitimes.com/news/articleList.html?sc_sdate={since}&sc_edate={until}&view_type=sm", page_template: "https://www.aitimes.com/news/ajaxArticlePaging.php?page={page}&list_per_page=20&page_per_page=10&sc_sdate={since}&sc_edate={until}&sc_order_by=E&view_type=sm", note: "목록의 page 값은 무시됨(더보기는 JS). 2페이지부터는 AJAX JSON"}
@@ -68,9 +62,7 @@ text:
 
 video:
   - id: techbridge
-    name: Tech Bridge
-    lang: ko                 # 전사는 로컬 Whisper(원음, 주로 영어). 수동 자막은 보조, 자동 자막은 쓰지 않음
-    channel_handle: "@TechBridge-KR"
+    name: Tech Bridge   # 언어 ko(전사는 로컬 Whisper 원음, 주로 영어. 수동 자막은 보조, 자동 자막은 쓰지 않음), 채널 핸들 @TechBridge-KR
     channel_id: UC895rbZX2iXLTDfji7W4PfA
     feed: https://www.youtube.com/feeds/videos.xml?channel_id=UC895rbZX2iXLTDfji7W4PfA
     backfill: {method: channel_listing, note: "RSS는 최근 15편. 더 필요하면 yt-dlp 채널 목록(다운로드 없음)"}
@@ -81,12 +73,8 @@ github:
     url: https://github.com/trending?since=weekly
     # 2026-10-07 설계 결정(S1 Q2): 주간 페이지에 보이는 전부 수집(개수 상한 없음), 0개면 실패. 언어별·월간 페이지는 쓰지 않음
   tracked:                         # 릴리스 소식만 받음
-    - repo: ollama/ollama
-      why: 로컬 전환 때 쓸 실행 환경
-    - repo: NousResearch/hermes-agent
-      why: 10주차 수업 도구
-    - repo: openai/codex
-      why: 코딩 에이전트. OpenAI 글과 교차
-    - repo: anthropics/claude-code
-      why: 코딩 에이전트. Anthropic 글과 교차
+    - repo: ollama/ollama   # 로컬 전환 때 쓸 실행 환경
+    - repo: NousResearch/hermes-agent   # 10주차 수업 도구
+    - repo: openai/codex   # 코딩 에이전트. OpenAI 글과 교차
+    - repo: anthropics/claude-code   # 코딩 에이전트. Anthropic 글과 교차
   # 릴리스 피드: https://github.com/<repo>/releases.atom / README: GitHub API(토큰 있으면 사용)

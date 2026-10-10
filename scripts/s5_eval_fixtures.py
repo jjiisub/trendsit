@@ -135,6 +135,7 @@ def main() -> int:
     done = [t for t in topics if t["page"] is not None and t["status"] in ("passed", "checked")]
     kinds = ["number_mismatch", "unsupported", "overclaim", "wrong_ref"]
     n_crit = 0
+    window = config.load("video.yaml").align_window_sec
     for i, t in enumerate(done):
         if n_crit >= 20:
             break
@@ -142,7 +143,7 @@ def main() -> int:
         def crit_inp(page: TopicPage, t=t) -> dict:
             order = [e for e in refs_of(page) if e in t["pack"]] + [e for e in t["pack"] if e not in refs_of(page)]
             ev = [Document(id=e, source=t["pack"][e][0].source.get("site") or "", title=t["pack"][e][0].source.get("title"),
-                           text=raw_evidence(db, e, t["pack"][e])) for e in order]
+                           text=raw_evidence(db, e, t["pack"][e], window)) for e in order]
             return CriticInput(loc_lines=loc_lines(page), page=page, evidence=ev, angle=t["topic"].angle,
                                code_warnings=[], round=1).model_dump()
 

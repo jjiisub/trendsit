@@ -1,7 +1,7 @@
 # 본문 속 링크 종류 판별 규칙 (코드가 도메인과 경로로 판별, 위에서부터 먼저 맞는 것. huggingface.co/blog는 official, 나머지 huggingface.co는 repo)
 # 글 분석가(S3)가 원본 후보를 고를 때 쓰는 재료. 1차 자료 우선순위: paper > official > repo > press > news > curation > social
 kinds:
-  paper:     {domains: [arxiv.org, openreview.net, aclanthology.org, proceedings.neurips.cc], paths: ["/abs/", "/pdf/"]}
+  paper:     {domains: [arxiv.org, openreview.net, aclanthology.org, proceedings.neurips.cc]}   # 경로 참고: /abs/, /pdf/
   official:  {domains: [openai.com, anthropic.com, deepmind.google, blog.google, ai.meta.com, mistral.ai, qwenlm.github.io, huggingface.co/blog, docs.anthropic.com, platform.openai.com]}
   repo:      {domains: [github.com, huggingface.co, gitlab.com]}
   press:     {domains: [prnewswire.com, businesswire.com], path_contains: ["/press", "/newsroom"]}

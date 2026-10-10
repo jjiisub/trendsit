@@ -100,7 +100,7 @@ def test_spelling_only_difference_is_auto_approved():
           Member("it:3", "text", "", "", "", "high", ["claude-code"], [], {}),
           Member("it:4", "text", "", "", "", "high", ["FrontierCode"], [], {}),
           Member("it:5", "text", "", "", "", "high", ["Frontier Code"], [], {})]
-    t = al.build(ms, config.KeywordsConfig(keywords=[], exclude=[]))
+    t = al.build(ms, config.KeywordsConfig(keywords=[], exclude=[]), fuzz_min=90)
     amap = t.approved()
     assert amap["claude-code"] == "Claude Code"
     assert {"FrontierCode", "Frontier Code"} & set(amap)
@@ -109,7 +109,7 @@ def test_spelling_only_difference_is_auto_approved():
 
 def test_video_name_pairs_not_global(db):
     ev = week_evidence(db, "2026-W41")
-    t = al.build(list(ev.members.values()), config.KeywordsConfig(keywords=[], exclude=[]))
+    t = al.build(list(ev.members.values()), config.KeywordsConfig(keywords=[], exclude=[]), fuzz_min=90)
     assert not [r for r in t.rows if "Sweebench" in (r.alias, r.canonical)]
 
 
@@ -125,7 +125,7 @@ def test_save_keeps_decided_status(db):
 
 def test_numbers_inside_names_block_spelling_only_approval():
     ms = [Member(f"it:{i}", "text", "", "", "", "high", [n], [], {}) for i, n in enumerate(("Llama 3 8B", "Llama 38B"))]
-    t = al.build(ms, config.KeywordsConfig(keywords=[], exclude=[]))
+    t = al.build(ms, config.KeywordsConfig(keywords=[], exclude=[]), fuzz_min=90)
     assert not t.approved()
 
 
@@ -146,7 +146,7 @@ def test_r11_transliteration_aliases_and_autofix():
     tr = {"Luna": "루나", "Flash": "플래시", "DeepSeek": "딥시크"}
     ms = [Member(f"it:{i}", "text", "", "", "", "high", [n], [], {})
           for i, n in enumerate(("GPT-6 Luna", "GPT-6 루나", "GPT-7 루나"))]
-    rows = al.build(ms, config.KeywordsConfig(keywords=[], exclude=[]), translit=tr).rows
+    rows = al.build(ms, config.KeywordsConfig(keywords=[], exclude=[]), fuzz_min=90, translit=tr).rows
     got = {(r.canonical, r.alias, r.status) for r in rows if r.reason.startswith("음차")}
     assert got == {("GPT-6 Luna", "GPT-6 루나", "approved")}  # 숫자가 다른 GPT-7 루나는 아님
     pat = al.translit_pattern("DeepSeek V4.1 Flash", tr)

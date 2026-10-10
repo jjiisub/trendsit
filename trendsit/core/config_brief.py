@@ -21,7 +21,6 @@ class EvidenceCfg(_Strict):
 
 
 class AliasesCfg(_Strict):
-    auto_approve: list[Literal["case", "space", "hyphen", "dot"]]
     fuzz_min_score: float = Field(ge=50, le=100)
     transliteration: dict[str, str] = {}  # 영문 낱말 → 한글 음차(작성자 출력·묶기 이름 신호의 표기 맞춤, 리뷰 R11)
 
@@ -55,7 +54,6 @@ class ClusterCfg(_Strict):
     alias_decide_max: int = Field(ge=0)
     embed_text: Literal["card", "body"]
     reviewed_suspicious: list[str] = []
-    linkage: Literal["average"]
     max_cluster_size: int = Field(ge=2)
     decide: DecideCfg
     past: PastCfg
@@ -89,7 +87,6 @@ class HighlightsCfg(_Strict):
 class DiagramsCfg(_Strict):
     numbers_groups_max: int
     events_groups_max: int
-    per_point_max: int
 
 
 class WriteCfg(_Strict):
@@ -107,10 +104,6 @@ class ReviewCfg(_Strict):
     duplicate_point_similarity: float = Field(gt=0, le=1)
 
 
-class RuntimeCfg(_Strict):
-    weekly_target_minutes: int
-
-
 class BriefConfig(_Strict):
     evidence: EvidenceCfg
     aliases: AliasesCfg
@@ -118,4 +111,3 @@ class BriefConfig(_Strict):
     select: SelectCfg
     write: WriteCfg
     review: ReviewCfg
-    runtime: RuntimeCfg

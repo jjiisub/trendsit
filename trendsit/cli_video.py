@@ -98,10 +98,12 @@ def cmd_run(args: argparse.Namespace) -> int:
 
 def cmd_purge(args: argparse.Namespace) -> int:
     from .collect.video.workspace import purge
+    from .core import config
     from .core.db import DB
     from .video.store import expire_segment_text
 
-    res = purge(MEDIA_ROOT, args.older_than)
+    older = args.older_than if args.older_than is not None else config.load("video.yaml").retention_days
+    res = purge(MEDIA_ROOT, older)
     db = DB(ROOT / "data" / "trendsit.db")
     n = expire_segment_text(db)
     print(json.dumps({"removed": res["removed"], "kept": len(res["kept"]),
@@ -144,7 +146,7 @@ def register(sub: Any) -> None:
     r.add_argument("--spec")
     r.set_defaults(fn=cmd_run)
     p = vs.add_parser("purge", help="오래된 작업 폴더(영상, 프레임)와 보관 기한 지난 segments 텍스트 정리")
-    p.add_argument("--older-than", type=float, default=7, help="일 수(기본 7)")
+    p.add_argument("--older-than", type=float, help="일 수(기본 7)")
     p.set_defaults(fn=cmd_purge)
     rp = vs.add_parser("report", help="영상 처리 기록 요약(markdown)")
     rp.add_argument("--since")

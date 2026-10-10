@@ -15,6 +15,7 @@ import re
 from dataclasses import dataclass, field
 from typing import Any
 
+from ..core import config
 from ..core.artifacts import Document
 from ..core.artifacts_brief import (
     AliasLine,
@@ -141,8 +142,8 @@ def alias_lines(table: AliasTable, members: list[Member]) -> list[AliasLine]:
     return [AliasLine(canonical=c, aliases=sorted(a)) for c, a in sorted(by.items())]
 
 
-def raw_evidence(db: DB, eid: str, items: list[EvidenceItem]) -> str:
-    """검수자용 근거 원문(요약 칸이 아님): 글 quote 문장, 영상 그 시각 앞뒤 30초 전사와 판독 글자, 레포 필드."""
+def raw_evidence(db: DB, eid: str, items: list[EvidenceItem], window_sec: int) -> str:
+    """검수자용 근거 원문(요약 칸이 아님): 글 quote 문장, 영상 그 시각 앞뒤 window_sec초 전사와 판독 글자, 레포 필드."""
     if eid.startswith("vd:") and "@" in eid:
         item_id, sec = eid[3:].split("@")
         sec_i = int(sec)
@@ -150,9 +151,9 @@ def raw_evidence(db: DB, eid: str, items: list[EvidenceItem]) -> str:
         parts = []
         if vid:
             segs = db.conn.execute('SELECT text FROM video_segments WHERE video_id=? AND "end">=? AND start<=? ORDER BY idx',
-                                   (vid["video_id"], sec_i - 30, sec_i + 30)).fetchall()
+                                   (vid["video_id"], sec_i - window_sec, sec_i + window_sec)).fetchall()
             if any(s["text"] for s in segs):
-                parts.append("전사(앞뒤 30초): " + " ".join(s["text"] for s in segs if s["text"]))
+                parts.append(f"전사(앞뒤 {window_sec}초): " + " ".join(s["text"] for s in segs if s["text"]))
             fr = db.conn.execute("SELECT reading_json FROM video_frames WHERE video_id=? ORDER BY ABS(t-?) LIMIT 1",
                                  (vid["video_id"], sec_i)).fetchone()
             if fr and fr["reading_json"]:
@@ -331,6 +332,7 @@ def write_topic(ctx: Ctx, topic: Applied, members: dict[str, Member], table: Ali
         ctx.tracer.step(kind="code", role="writer", text=f"{topic.topic_id}: 작성 실패", attention=True, error=err)
         return res
     critic = load_role("critic", ctx.models)
+    window_sec = config.load("video.yaml").align_window_sec
     reviser = load_role("writer_revise", ctx.models)
     seen: dict[tuple[str, str], int] = {}
     check_locs: set[str] = set()
@@ -344,7 +346,7 @@ def write_topic(ctx: Ctx, topic: Applied, members: dict[str, Member], table: Ali
         raw_ids = [e for e in pack if not all(it.kind == "summary" for it in pack[e])]
         order = [e for e in refs_of(pg) if e in raw_ids] + [e for e in raw_ids if e not in refs_of(pg)]
         evid = [Document(id=e, source=pack[e][0].source.get("site") or pack[e][0].channel,
-                         title=pack[e][0].source.get("title"), text=raw_evidence(ctx.db, e, pack[e])) for e in order]
+                         title=pack[e][0].source.get("title"), text=raw_evidence(ctx.db, e, pack[e], window_sec)) for e in order]
         cinp = CriticInput(loc_lines=loc_lines(pg), page=pg, evidence=evid, angle=topic.angle, previous=winp.previous,
                            code_warnings=warns, round=rnd)
         out = _call(critic, cinp, ctx, res.costs, "critic")

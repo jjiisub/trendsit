@@ -96,6 +96,15 @@ if uv run --quiet python scripts/s5_1_prompts.py --help-all >"$TMP/help.txt" 2>&
 else
   fail A17 "--help 차이: $(diff "$TMP/help.txt" reports/S5-1/help_before.txt | head -2 | tr '\n' ' ')"
 fi
+# A18 효과 없는 설정 키 0(S5-1a 5.7 표): yaml은 주석을 떼고, 스키마(core/config*.py)는 필드 정의 줄에서 찾는다
+DEAD='auto_approve|linkage|per_point_max|runtime|weekly_target_minutes|lang|channel_handle|why|paths|video_max_minutes|frames_per_slide_video'
+dead=$(for f in config/*.yaml; do sed 's/#.*//' "$f" | grep -nE "(^|[[:space:]{,-])($DEAD):" | sed "s#^#$f:#"; done
+       grep -nE "^[[:space:]]+($DEAD)[[:space:]]*:" trendsit/core/config*.py)
+if [ -z "$dead" ] && uv run --quiet python -m trendsit check-config >"$TMP/a18" 2>&1; then
+  pass A18 "삭제 대상 설정 키 0건, $(cat "$TMP/a18")"
+else
+  fail A18 "남은 키: $(echo "$dead" | head -3 | tr '\n' ' ') / $(tail -1 "$TMP/a18")"
+fi
 pt A19 "예산 초과 시 멈춤(write·select·cluster 도중 BudgetExceeded: 현재판 불변, run stopped, 종료 코드 1, 남은 일 시작 0)" tests/test_s5_weekly.py -k budget_stop
 pt A20 "실행 요약 상태(전부 실패 failed, 일부 partial, 예산 stopped)" -k summary_status
 pt A21 "read_more 열쇠(fetch_page가 저장한 열쇠로 찾음: github 대문자, http, arxiv pdf)" -k read_more_page_key

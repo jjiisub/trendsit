@@ -146,7 +146,7 @@ def candidate_doc(c: Candidate, members: dict[str, Member]) -> Document:
     return Document(id=f"c{c.cluster_id}", source="cluster", title=c.label, text="\n".join(lines))
 
 
-def recent_topics(db: DB, week: str, weeks_back: int = 4) -> list[RecentTopic]:
+def recent_topics(db: DB, week: str, weeks_back: int) -> list[RecentTopic]:
     rows = db.conn.execute(
         "SELECT t.topic_id, t.week, t.title, t.summary FROM topics t JOIN weeks w ON w.week=t.week "
         "AND w.current_run_id=t.run_id WHERE t.week<? AND t.status IN ('passed','checked') ORDER BY t.week DESC, t.rank",
