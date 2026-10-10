@@ -272,6 +272,21 @@ def test_revision_can_edit_sub_locations():
     assert reverts == 0 and notes == []
 
 
+def test_revision_resets_writer_check_on_edit_and_add():
+    from trendsit.brief.write import apply_revision
+    from trendsit.core.artifacts_brief import Change, TopicPageRevision
+
+    p = page()
+    rev = TopicPageRevision(changed=[
+        Change(issue_idx=0, loc="points[0]", action="edit", value=Point(text="입력 100만 토큰당 $2", refs=["it:1#q1"], check=True)),
+        Change(issue_idx=1, loc="points", action="add", value=Point(text="출력 100만 토큰당 $8", refs=["it:1#q1"], check=True))],
+        log="l")
+    new, reverts, notes = apply_revision(p, rev, {"points"})
+    assert len(new.points) == len(p.points) + 1 and reverts == 0
+    assert new.points[0].text == "입력 100만 토큰당 $2" and new.points[-1].text == "출력 100만 토큰당 $8"
+    assert not any(pt.check for pt in new.points)
+
+
 def test_number_item_value_accepts_numbers():
     """W40: value가 문자열만이면 모델이 숫자를 쓰려다 공백 반복으로 잘렸다. 숫자도 받고 문자열로 저장."""
     assert NumberItem.model_validate({"label": "a", "value": 77.9, "ref": "x"}).value == "77.9"

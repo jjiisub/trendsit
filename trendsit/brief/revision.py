@@ -108,6 +108,8 @@ def apply_revision(prev: TopicPage, rev: TopicPageRevision, allowed: set[str]) -
         if not isinstance(val, FIELD_TYPES[name]):
             notes.append(f"{ch.loc}: 값 형식이 {FIELD_TYPES[name].__name__}가 아님")
             continue
+        if isinstance(val, Point):
+            val = val.model_copy(update={"check": False})  # check는 코드 소유(write_topic의 check_locs만 정함)
         if ch.action == "edit" and idx < len(data[name]):
             data[name][idx] = val.model_dump()
         else:
