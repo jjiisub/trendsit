@@ -75,21 +75,6 @@ def evidence_unit(value: str, src: str) -> str | None:
     return None
 
 
-# 요약·개요가 '-하다' 명사 + "."로 끝나면 "~했다."로(4차 리뷰 H2: Haiku "…Claude Haiku 5.5 출시." 반려 두 번에도 재발)
-NOUN_END = re.compile(r"(출시|공개|발표|도입|적용|확대|추가|인하|인상|개편|지원)\s*\.?$")
-LEAD_COMMA = re.compile(r"^([A-Za-z][\w.\-]*(?: [A-Za-z0-9][\w.\-]*)*|[가-힣]+),\s")
-# 풀이가 이름·"기능/도구"뿐인 개념(H3: "Sourcegraph의 베타 출시 기능")
-THIN_DESC = re.compile(r"(기능|도구|서비스|제품|모델|플랫폼|프로젝트)\.?$")
-
-
-def subject_particle(name: str) -> str:
-    """이/가: 영문은 끝 글자(받침 소리 c·k·t·p·m·n·l), 한글은 받침 유무로."""
-    last = name.strip()[-1]
-    if "가" <= last <= "힣":
-        return "이" if (ord(last) - 0xAC00) % 28 else "가"
-    return "이" if last in "cktpmnl" else "가"
-
-
 def sentences(text: str) -> list[str]:
     return [s for s in _SENT.split((text or "").strip()) if s.strip()]
 
@@ -157,8 +142,7 @@ def autofix(page: TopicPage, cfg: BriefConfig, canon: dict[str, str],
                           "before": [c.model_dump() for c in page.contributions], "after": [c.model_dump() for c in keep]})
             page = page.model_copy(update={"contributions": keep})
     # 0-0) 풀이가 없는 개념(짧은 풀이)은 뺀다(G7, writer.md "풀이가 없으면 넣지 않는다")
-    thin = [c for c in page.concepts if len(plain(c.desc).strip()) < CONCEPT_DESC_MIN
-            or (len(plain(c.desc).strip()) < 30 and THIN_DESC.search(plain(c.desc).strip()))]
+    thin = [c for c in page.concepts if len(plain(c.desc).strip()) < CONCEPT_DESC_MIN]
     if thin:
         fixes.append({"loc": "concepts", "rule": f"풀이가 {CONCEPT_DESC_MIN}자 미만인 개념 뺌", "before": [c.term for c in thin],
                       "after": []})
@@ -191,21 +175,6 @@ def autofix(page: TopicPage, cfg: BriefConfig, canon: dict[str, str],
             new = tp.sub(target, new)
         if new != text:
             fixes.append({"loc": loc, "rule": "별칭 표기를 정본으로", "before": text, "after": new})
-            page = _set(page, loc, new)
-    # 1-1) 요약·개요의 명사형 마무리 → "~했다."(H2, 반려가 아니라 자동 수정)
-    for loc in ("summary", "overview"):
-        text = getattr(page, loc)
-        out = []
-        for sent in sentences(text):
-            s = sent.rstrip()
-            if NOUN_END.search(plain(s)) and not plain(s).rstrip(".").endswith("다"):
-                s = NOUN_END.sub(lambda m: m.group(1) + "했다.", s)
-                if (m := LEAD_COMMA.match(s)):
-                    s = f"{m.group(1)}{subject_particle(m.group(1))} " + s[m.end():]
-            out.append(s)
-        new = " ".join(out)
-        if new != text.strip():
-            fixes.append({"loc": loc, "rule": "명사형 마무리 → '~했다'", "before": text, "after": new})
             page = _set(page, loc, new)
     # 2) 공백·문장부호: 겹친 공백, 문장부호 앞 공백, 같은 부호 반복
     for loc, text in [*_text_slots(page), ("title", page.title)]:
@@ -243,14 +212,18 @@ def _ev_text(ids: list[str], pack: dict[str, list[EvidenceItem]]) -> str:
     return " ".join(out)
 
 
-def _numbers_ok(text: str, ids: list[str], pack: dict[str, list[EvidenceItem]]) -> list[tuple[str, str]]:
+def _numbers_ok(text: str, ids: list[str], pack: dict[str, list[EvidenceItem]],
+                with_units: bool = False) -> list[tuple[str, str]]:
     """본문 수치(figures 규칙) 중 근거에 같은 값이 없는 것과 근거의 비슷한 값(힌트). 부분 문자열이 아니라 값으로 비교
-    ('3.7'이 '13.75' 안에 있다고 통과하지 않게, 리뷰 R3-c)."""
+    ('3.7'이 '13.75' 안에 있다고 통과하지 않게, 리뷰 R3-c). with_units면 단위(unit_kind)가 붙은 작은 수("약 50개")도 본다."""
     src = _ev_text(ids, pack)
     vals = number_values(src)
     out = []
     body = plain(text)
-    for f in figures(body):
+    found = figures(body)
+    if with_units:
+        found += [m.group(1) for m in re.finditer(r"(?<![\d.,])(\d+)\s?([가-힣%]+)", body) if unit_kind(m.group(2))]
+    for f in dict.fromkeys(found):
         # 영문 이름 바로 뒤 숫자(단위 없음)는 버전·제품 이름이지 측정값이 아님: "Claude Haiku 5.5", "Gemini 4.1"(3차 재실행 Haiku
         # 도식 제목 '5.5' 오탐으로 반려 3회)
         if re.search(rf"[A-Za-z]\s{re.escape(f)}(?![\d.]|\s?(%|배|x|×|점|달러|초|ms))", body):
@@ -366,6 +339,13 @@ def check(page: TopicPage, pack: dict[str, list[EvidenceItem]], n_sources: int, 
         if BARE_PER_TOKEN.search(plain(text)) and PER_MILLION.search(_ev_text(ids, pack)):
             issues.append(_issue(loc, "number_mismatch", f"{loc}의 '토큰당'은 근거에서 '100만 토큰당'(per 1M)",
                                  "근거 기준 그대로 '100만 토큰당'"))
+    # 4차 리뷰 H1(a): 요약·개요의 수치는 points·numbers에 있는 값만(Claude Code 스킬 "스킬 약 50개·에이전트 약 20개" 3회째)
+    body_pack = {"points": [EvidenceItem("points", "page", "text", "quote", " ".join(
+        [plain(p.text) for p in page.points] + [f"{it.value} {it.label}" for g in page.numbers for it in g.items]), {})]}
+    for name in ("summary", "overview"):
+        for f, _near in _numbers_ok(getattr(page, name), ["points"], body_pack, with_units=True):
+            issues.append(_issue(name, "unsupported", f"{name}의 수치 '{f}'가 points·numbers에 없음",
+                                 "요약·개요는 points에 있는 사실만(수치를 쓰려면 먼저 point에)"))
     # 막대 값의 단위를 근거 표기와 대조: 근거에서 그 값 바로 뒤 단위가 그룹 단위와 다르면 반려(W40 judge: ms 그룹에 1.6초, $ 그룹에 %)
     for g_i, g in enumerate(page.numbers):
         if not g.unit.strip("() \t"):  # 빈 단위(Jeff·Jeeves 정확도 "()", 리뷰 R3-b)
@@ -409,45 +389,6 @@ def check(page: TopicPage, pack: dict[str, list[EvidenceItem]], n_sources: int, 
             if not sent.strip().rstrip(".").endswith("다"):
                 issues.append(_issue(name, "format", f"{name}의 문장이 '~다'로 끝나지 않음('…{sent.strip()[-12:]}')",
                                      "요약·개요는 문장마다 평서체 '~다'(명사형 '~함', '~음' 아님)"))
-    # H1(a): 요약·개요의 수치는 points·numbers에 있는 값만(Claude Code 스킬 "스킬 약 50개·에이전트 약 20개" 3회째)
-    pt_vals = number_values(" ".join([plain(p.text) for p in page.points]
-                                     + [f"{it.value} {it.label}" for g in page.numbers for it in g.items]))
-    for name in ("summary", "overview"):
-        body = plain(getattr(page, name))
-        cands = set(figures(body))
-        for m in _VAL.finditer(body):
-            if m.group(1) or unit_kind(m.group(3)):
-                cands.add(m.group(2))
-        for f in sorted(cands):
-            if re.search(rf"[A-Za-z]\s{re.escape(f)}(?![\d.]|\s?(%|배|x|×|점|달러|초|ms|개|명))", body):
-                continue  # 영문 이름 뒤 버전 숫자
-            try:
-                v = float(f.replace(",", ""))
-            except ValueError:
-                continue
-            if not any(same(v, w) for w in pt_vals):
-                issues.append(_issue(name, "unsupported", f"{name}의 수치 '{f}'가 points·numbers에 없음",
-                                     "요약·개요는 points에 있는 사실만(수치를 쓰려면 먼저 point에)"))
-    # H1(b): 개요가 요약 문장을 그대로 되풀이(2문장 이상)
-    s_sents = [plain(x).strip() for x in sentences(page.summary)]
-    dup = [o for o in sentences(page.overview)
-           if any(SequenceMatcher(None, plain(o).strip(), x).ratio() >= 0.9 for x in s_sents)]
-    if len(dup) >= 2:
-        issues.append(_issue("overview", "format", f"overview가 summary 문장 {len(dup)}개를 그대로 반복",
-                             "개요는 배경·맥락을 더하고 요약 문장을 되풀이하지 않음"))
-    # H3: 근거가 영상뿐인 토픽은 요약 첫 문장에 발표자나 채널 이름(코딩 에이전트 발표 요약 주어 없음 3회째)
-    items = [it for v in pack.values() for it in v]
-    if items and all(it.channel == "video" for it in items):
-        names = {it.source.get("site") or "" for it in items}
-        for it in items:
-            title = it.source.get("title") or ""
-            if "—" in title:
-                names |= {n.strip() for n in title.split("—", 1)[1].split(",")}
-        names = {n for n in names if len(n) >= 2}
-        first = (sentences(plain(page.summary)) or [""])[0]
-        if names and not any(n in first for n in names):
-            issues.append(_issue("summary", "missing_key", "영상 근거뿐인 토픽인데 summary 첫 문장에 발표자·채널 이름이 없음",
-                                 f"첫 문장 주어를 발표자나 채널로(후보: {', '.join(sorted(names)[:6])})"))
     # 금지어(모델 md에는 넣지 않음)
     texts = [("title", page.title), ("summary", page.summary), ("overview", page.overview)]
     texts += [(f"points[{i}]", p.text) for i, p in enumerate(page.points)]

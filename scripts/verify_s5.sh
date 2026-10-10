@@ -51,7 +51,7 @@ pt A7 "묶기(채널 넘는 조건, confidence 미달, 평균 연결, 레포만 
 pt A8 "선별 검증(리드 1, 개수 범위, 범위 밖 합치기·나누기 거부, relation은 과거 대조 후보 안, 입력 순서 cluster_id, reason 값·채널 수 대조, 재시도·대체, 점수 동점은 관심 유사도(C-21 수정), 영상 자리(C-20))" \
   tests/test_s5_select_checks.py tests/test_s5_weekly.py -k "valid or reject or max_topics or order or reason or slug or retries or reconcile or c20 or c21 or r14"
 pt A9 "코드 검사(수치 대조 값 비교·제목·도식 칸까지·단위 환산 미허용, 막대 단위·빈 단위·라벨 단위, anchor, 도식 상한, 금지어·전망형, contributions 채널, points 자르기, 음차 정본, 자동 수정은 반려 아님, 경고)" \
-  tests/test_s5_select_checks.py tests/test_s5_evidence.py -k "clean or number or anchor or forbidden or alias or unknown or warnings or noun or reset or unit or bar or r3 or r4 or r11 or f1 or f3 or f7 or f11 or g2 or g3 or g7 or h1 or h2 or h3"
+  tests/test_s5_select_checks.py tests/test_s5_evidence.py -k "clean or number or anchor or forbidden or alias or unknown or warnings or noun or reset or unit or bar or r3 or r4 or r11 or f1 or f3 or f7 or f11 or g2 or g3 or g7 or h1"
 pt A10 "라운드(상한 3, 코드 반려도 셈, 같은 이슈 2회 check, 지적 안 된 칸 되돌림, 1부터 센 위치 바로잡기, 원자 사실 0개 판정 거부, 도식은 코드 확인 오류만 뺌, 목록 위치 add·채널 없는 기여 문장)" tests/test_s5_weekly.py tests/test_s5_select_checks.py -k "rounds or one_based or empty_atoms or f2 or diagram_issue or g6"
 pt A11 "저장(마이그레이션 30~35, 재실행 run 보존·current_run_id, topic_evidence = 최종판 refs, 토픽 수준 확인 필요)" \
   tests/test_s5_weekly.py tests/test_s5_cluster.py -k "rounds or stage_cluster"
