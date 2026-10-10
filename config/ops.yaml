@@ -1,0 +1,4 @@
+# S6b 자동 실행 설정(S6b 소유). check-config가 검증한다
+start_day: 2026-10-12        # 따라잡기의 가장 이른 날(W42 시작). 이전 날은 손으로 돌렸음
+max_catchup_days: 7
+weekly_lock_wait_min: 240    # 주간 실행이 밤 실행 끝을 기다리는 최대 시간

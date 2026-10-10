@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+from datetime import date
 from pathlib import Path
 from typing import Annotated, Any, Literal
 
@@ -267,6 +268,13 @@ class DeepConfig(Strict):
         return self
 
 
+# ---------- ops.yaml (S6b 자동 실행) ----------
+class OpsConfig(Strict):
+    start_day: date  # 따라잡기의 가장 이른 날
+    max_catchup_days: int = Field(gt=0)
+    weekly_lock_wait_min: int = Field(gt=0)  # 주간 실행이 밤 실행 끝을 기다리는 최대 시간(분)
+
+
 FILES: dict[str, type[BaseModel]] = {
     "models.yaml": ModelsConfig,
     "budget.yaml": BudgetConfig,
@@ -277,6 +285,7 @@ FILES: dict[str, type[BaseModel]] = {
     "deep.yaml": DeepConfig,  # S3
     "video.yaml": VideoConfig,  # S4
     "brief.yaml": BriefConfig,  # S5
+    "ops.yaml": OpsConfig,  # S6b
 }
 
 
