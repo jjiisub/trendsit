@@ -390,5 +390,6 @@ def redact_secrets(data: bytes) -> bytes:
     return data
 
 
-def current_spec(override: str | None = None) -> str:
-    return override or os.environ.get("TRENDSIT_SPEC") or "S0"
+def current_spec(override: str | None = None, default: str = "S0") -> str:
+    """--spec, 없으면 환경변수 TRENDSIT_SPEC, 없으면 명령의 기본 스펙."""
+    return override or os.environ.get("TRENDSIT_SPEC") or default

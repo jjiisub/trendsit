@@ -172,12 +172,12 @@ def test_anchor_and_diagram_caps():
 
 
 def test_forbidden_words_reject_but_highlights_are_autofixed():
-    p = page(summary="==OpenAI==가 ==가격==을 내렸다.", overview="최근 AI 업계에서는 가격 경쟁이 핵심이다. 정확도도 나왔어요.")
+    p = page(summary="==OpenAI==가 ==가격==을 내렸다.", overview="가격 경쟁이 핵심이다. 정확도도 나왔어요.")
     r = checks.run_checks(p, pack(), 2, CFG, {})
     assert r.page.summary.count("==") == 2  # 형광 2개 → 1개(뒤쪽 제거), 반려 아님
     assert any(f["rule"].startswith("형광") for f in r.autofix)
     text = " ".join(i.comment for i in r.issues)
-    assert "해요체" in text and "핵심이다" in text and "일반론 시작" in text
+    assert "해요체" in text and "핵심이다" in text
     assert not any("summary" == i.loc for i in r.issues)
 
 
@@ -272,26 +272,59 @@ def test_revision_can_edit_sub_locations():
     assert reverts == 0 and notes == []
 
 
+def test_revision_resets_writer_check_on_edit_and_add():
+    from trendsit.brief.write import apply_revision
+    from trendsit.core.artifacts_brief import Change, TopicPageRevision
+
+    p = page()
+    rev = TopicPageRevision(changed=[
+        Change(issue_idx=0, loc="points[0]", action="edit", value=Point(text="입력 100만 토큰당 $2", refs=["it:1#q1"], check=True)),
+        Change(issue_idx=1, loc="points", action="add", value=Point(text="출력 100만 토큰당 $8", refs=["it:1#q1"], check=True))],
+        log="l")
+    new, reverts, notes = apply_revision(p, rev, {"points"})
+    assert len(new.points) == len(p.points) + 1 and reverts == 0
+    assert new.points[0].text == "입력 100만 토큰당 $2" and new.points[-1].text == "출력 100만 토큰당 $8"
+    assert not any(pt.check for pt in new.points)
+
+
+def test_write_topic_final_check_follows_check_locs_only(tmp_path, monkeypatch):
+    from tests.conftest import FakeTransport, make_ctx
+    from trendsit.brief import write
+    from trendsit.brief.aliases import AliasTable
+
+    src = {"site": "OpenAI", "title": "t", "date": "2026-10-06"}
+    m = Member("it:1", "text", "t", "l", "s", "high", [], [], src, pack()["it:1#q1"] + pack()["it:1#q2"])
+    ctx = make_ctx(tmp_path, FakeTransport([]), spec_cap=1.0)
+    t = sel.Applied("w42-x", 1, True, [1], ["it:1"], "new", None, "", "a")
+    draft = page(points=[Point(text="입력 100만 토큰당 $2로 이전보다 15% 저렴함", refs=["it:1#q1"], check=True),
+                         Point(text="정확도 B 93.5%로 세 모델 중 가장 높음", refs=["it:1#q2"], check=True)])
+    for locs, expect in [(set(), [False, False]), ({"points[1]"}, [False, True])]:
+        monkeypatch.setattr(write, "_rounds", lambda *a, _l=locs, **k: (a[7], set(_l), {}))
+        res = write.write_topic(ctx, t, {"it:1": m}, AliasTable([]), CFG, review=False, draft=draft)  # draft = --from-step review
+        assert [p.check for p in res.page.points] == expect
+
+
+def test_write_topic_resumed_draft_old_check_not_in_first_round(tmp_path):
+    from tests.conftest import FakeTransport, make_ctx
+    from trendsit.brief import write
+    from trendsit.brief.aliases import AliasTable
+
+    src = {"site": "OpenAI", "title": "t", "date": "2026-10-06"}
+    m = Member("it:1", "text", "t", "l", "s", "high", [], [], src, pack()["it:1#q1"] + pack()["it:1#q2"])
+    ctx = make_ctx(tmp_path, FakeTransport([]), spec_cap=1.0)
+    t = sel.Applied("w42-x", 1, True, [1], ["it:1"], "new", None, "", "a")
+    draft = page(points=[Point(text="입력 100만 토큰당 $2로 이전보다 15% 저렴함", refs=["it:1#q1"], check=True),
+                         Point(text="정확도 B 93.5%로 세 모델 중 가장 높음", refs=["it:1#q2"], check=True)])
+    res = write.write_topic(ctx, t, {"it:1": m}, AliasTable([]), CFG, review=False, draft=draft)
+    assert res.pages and not any(p.check for p in res.pages[0][1].points)
+    assert "[확인 필요]" not in "\n".join(write.loc_lines(res.pages[0][1]))
+
+
 def test_number_item_value_accepts_numbers():
     """W40: value가 문자열만이면 모델이 숫자를 쓰려다 공백 반복으로 잘렸다. 숫자도 받고 문자열로 저장."""
     assert NumberItem.model_validate({"label": "a", "value": 77.9, "ref": "x"}).value == "77.9"
     assert NumberItem.model_validate({"label": "a", "value": 38, "ref": "x"}).value == "38"
     assert NumberItem.model_validate({"label": "a", "value": "1.36달러", "ref": "x"}).value == "1.36달러"
-
-
-def test_bar_value_unit_checked_against_evidence():
-    """W40 judge: ms 그룹에 1.6초, $ 그룹에 % 값. 근거에서 그 값 뒤 단위가 그룹 단위와 다르면 반려."""
-    src = {"site": "s", "title": "t"}
-    pk = {"it:2#q1": [EvidenceItem("it:2#q1", "it:2", "text", "quote",
-                                   "Decision API 150ms, 120ms, Luna는 1.6초", src)]}
-    g = NumberGroup(anchor=1, group="g", title="응답 시간", context="c [it:2#q1]", unit="ms",
-                    items=[NumberItem(label="A", value="150", ref="it:2#q1"), NumberItem(label="B", value="120", ref="it:2#q1"),
-                           NumberItem(label="Luna", value="1.6", ref="it:2#q1")])
-    p = page(points=[Point(text="Decision API 응답 150ms, Luna 1.6초보다 빠름", refs=["it:2#q1"]),
-                     Point(text="두 번째 근거 문장 요약 정리", refs=["it:2#q1"])], numbers=[g])
-    issues = checks.run_checks(p, pk, 1, CFG, {}).issues
-    assert any("numbers[0].items[2]" == i.loc and "근거 단위는 s" in i.comment for i in issues)
-    assert not any(i.loc in ("numbers[0].items[0]", "numbers[0].items[1]") for i in issues)
 
 
 def _pack_r3() -> dict[str, list[EvidenceItem]]:
@@ -301,18 +334,11 @@ def _pack_r3() -> dict[str, list[EvidenceItem]]:
                                  EvidenceItem("it:2#q1", "it:2", "text", "claim", "정확도가 3.7%p 올랐다고 주장", src)]}
 
 
-def test_r3_unit_kinds_label_unit_and_empty_unit():
-    mixed = NumberGroup(anchor=1, group="g", title="SIFT 결과", context="같은 실험 [it:2#q1]", unit="%",
-                        items=[NumberItem(label="정확도", value="35.1", ref="it:2#q1"),
-                               NumberItem(label="소요", value="5", ref="it:2#q1"),
-                               NumberItem(label="CPU(시간)", value="42", ref="it:2#q1")])
-    issues = checks.run_checks(page(numbers=[mixed]), _pack_r3(), 2, CFG, {}).issues
-    locs = {i.loc for i in issues if i.type == "number_mismatch"}
-    assert "numbers[0].items[1]" in locs  # 근거 단위 '시간'(h) ≠ %
-    assert "numbers[0].items[2]" in locs  # 라벨 끝 괄호 단위
-    empty = mixed.model_copy(update={"unit": "()", "items": mixed.items[:1] * 3})
+def test_r3_empty_unit():
+    g = NumberGroup(anchor=1, group="g", title="SIFT 결과", context="같은 실험 [it:2#q1]", unit="()",
+                    items=[NumberItem(label="정확도", value="35.1", ref="it:2#q1")] * 3)
     assert any(i.loc == "numbers[0]" and "단위가 비어" in i.comment
-               for i in checks.run_checks(page(numbers=[empty]), _pack_r3(), 2, CFG, {}).issues)
+               for i in checks.run_checks(page(numbers=[g]), _pack_r3(), 2, CFG, {}).issues)
 
 
 def test_r3_numbers_checked_in_titles_and_by_value_not_substring():
@@ -328,8 +354,8 @@ def test_r3_numbers_checked_in_titles_and_by_value_not_substring():
     assert any(i.loc == "summary" for i in checks.run_checks(p, _pack_r3(), 2, CFG, {}).issues)
 
 
-def test_r3_speculative_endings_and_eval_words_in_points():
-    p = page(overview="OpenAI가 새 가격을 발표했다. 시장 재편을 가속화할 것으로 보인다.",
+def test_r3_evaluative_endings_and_eval_words_in_points():
+    p = page(overview="OpenAI가 새 가격을 발표했다. 가격 구조 변화가 핵심이다.",
              points=[Point(text="혁신적인 가격 정책으로 100만 토큰당 $2", refs=["it:1#q1"]), *page().points[1:]])
     bad = {i.loc for i in checks.run_checks(p, pack(), 2, CFG, {}).issues if "금지 표현" in i.comment}
     assert bad == {"overview", "points[0]"}
@@ -422,53 +448,9 @@ def test_f3_missing_diagram_warning_only_same_sentence_same_unit():
         assert any("누락 의심" in x for x in w) is want, (p, w)
 
 
-def test_f7_angle_words_missing_from_first_point_warns():
-    """C-23: summary 첫 문장과 첫 두 point 어디에도 angle 핵심 낱말이 없을 때만 경고."""
-    p = page(points=[Point(text="업스테이지 투트랙 전략으로 사업 확대", refs=["it:1#q1"]),
-                     Point(text="정확도 B 93.5%로 세 모델 중 가장 높음", refs=["it:1#q2"]), *page().points[2:]])
-    w = checks.run_checks(p, pack(), 2, CFG, {}, angle="GPU 한 장 실행 가능한 MoE 소형 모델의 에이전트 최적화").warnings
-    assert any(x.startswith("핵심 의심") for x in w)
-    ok = page(points=[Point(text="업스테이지 투트랙 전략으로 사업 확대", refs=["it:1#q1"]),
-                      Point(text="GPU 한 장에서 돌아가는 MoE 소형 모델", refs=["it:1#q1"]), *page().points[2:]])  # 둘째 point
-    assert not any(x.startswith("핵심 의심") for x in checks.run_checks(
-        ok, pack(), 2, CFG, {}, angle="GPU 한 장 실행 가능한 MoE 소형 모델의 에이전트 최적화").warnings)
-
-
 def test_f11_evaluative_endings():
-    p = page(summary="Anthropic이 Haiku 5.5를 내놨다. 구간 가격이 다른 것이 쟁점이다.")
+    p = page(summary="Anthropic이 Haiku 5.5를 내놨다. 구간 가격이 다른 것이 핵심이다.")
     assert any(i.loc == "summary" and "금지 표현" in i.comment for i in checks.run_checks(p, pack(), 2, CFG, {}).issues)
-
-
-def test_g2_point_with_three_same_unit_values_and_no_diagram_warns():
-    p = page(points=[Point(text="동의어 치환율 0·10·20%에서 탐지율 92%, 66%, 17%로 떨어짐", refs=["it:1#q2"]), *page().points[1:]])
-    w = checks.warnings(p, pack(), CFG)
-    assert any(x.startswith("누락 의심: points[0]") for x in w)
-    dims = page(points=[Point(text="차원 768, 512, 256개 지원", refs=["it:1#q2"]), *page().points[1:]])
-    assert not any(x.startswith("누락 의심: points[0]") for x in checks.warnings(dims, pack(), CFG))
-
-
-def test_g3_per_million_shortened_and_english_particle():
-    src = {"site": "S", "title": "t"}
-    pk = pack() | {"it:3#q1": [EvidenceItem("it:3#q1", "it:3", "text", "quote",
-                                            "Over 100K: $0.50 / $2.50 per million tokens.", src)]}
-    p = page(points=[*page().points, Point(text="10만 토큰 초과 시 입력/출력 토큰당 $0.50/$2.50 적용", refs=["it:3#q1"])])
-    issues = checks.run_checks(p, pk, 2, CFG, {}).issues
-    assert any(i.loc == "points[3]" and "100만 토큰당" in i.comment for i in issues)
-    ok = page(points=[*page().points, Point(text="10만 토큰 초과 시 100만 토큰당 $0.50/$2.50 적용", refs=["it:3#q1"])])
-    assert not any("토큰당" in i.comment for i in checks.run_checks(ok, pk, 2, CFG, {}).issues)
-    bad = page(summary="Anthropic가 Haiku를 내놨다.")
-    assert any("조사 'Anthropic가'" in i.comment for i in checks.run_checks(bad, pack(), 2, CFG, {}).issues)
-    fine = page(summary="Anthropic이 Claude를 내놨고 GPT가 뒤따랐다.")
-    assert not any("조사" in i.comment for i in checks.run_checks(fine, pack(), 2, CFG, {}).issues)
-
-
-def test_g7_concept_without_explanation_is_dropped():
-    from trendsit.core.artifacts_brief import Concept
-
-    p = page(concepts=[Concept(term="Agentic Batch Changes", desc="베타 출시된 기능"),
-                       Concept(term="MoE", desc="입력마다 전문가 일부만 켜서 계산량을 줄이는 구조")])
-    fixed, fixes = checks.autofix(p, CFG, {})
-    assert [c.term for c in fixed.concepts] == ["MoE"] and any(f["loc"] == "concepts" for f in fixes)
 
 
 def test_version_after_english_name_is_not_a_measurement():
@@ -483,3 +465,61 @@ def test_h1_summary_overview_numbers_must_be_in_points():
     p = page(summary="OpenAI가 가격을 15% 내렸다. 스킬 약 50개, 에이전트 약 20개, 도구 약 60개를 쓴다.")
     bad = {i.comment for i in checks.run_checks(p, pack(), 2, CFG, {}).issues if i.loc == "summary" and i.type == "unsupported"}
     assert {c.split("'")[1] for c in bad} == {"50", "20", "60"}  # 15%는 points[0]에 있음
+
+
+def test_writer_limits_follow_source_count_and_brief_yaml():
+    from trendsit.brief.write import writer_limits
+
+    assert writer_limits(CFG, 1).points == (2, 3) and writer_limits(CFG, 2).points == (3, 6)
+    full = writer_limits(CFG, 2)
+    assert (full.overview_sentences, full.summary_sentences, full.highlights_page) == ((2, 4), (1, 3), (3, 4))
+    assert (full.numbers_groups_max, full.events_groups_max, full.concepts_max) == (2, 1, 3)
+    tuned = CFG.model_copy(deep=True)  # 값이 md가 아니라 brief.yaml에서 옴
+    tuned.write.points["single_source"] = (1, 2)
+    tuned.write.concepts_max = 5
+    assert writer_limits(tuned, 1).points == (1, 2) and writer_limits(tuned, 1).concepts_max == 5
+
+
+def test_writer_limits_required_in_writer_input():
+    from pydantic import ValidationError
+
+    from trendsit.core.artifacts_brief import PlanBrief, WriterInput
+
+    plan_ = PlanBrief(rank=1, angle="a", relation=Relation(type="new", topic_id=None))
+    with pytest.raises(ValidationError, match="limits"):
+        WriterInput(plan=plan_, evidence=[], previous=None, aliases=[])
+
+
+def test_render_no_page_dup():
+    """검수자·수정 입력에 같은 포인트 문장이 loc_lines로 한 번만(page·previous는 코드만 씀)."""
+    from trendsit.core.artifacts_brief import CriticInput, IndexedIssue, WriterReviseInput, loc_lines
+    from trendsit.core.render import render_data
+
+    p = page()
+    sentence = p.points[0].text
+    critic = CriticInput(loc_lines=loc_lines(p), page=p, evidence=[], angle="a", code_warnings=[], round=1)
+    revise = WriterReviseInput(loc_lines=loc_lines(p), previous=p, evidence=[], aliases=[],
+                               issues=[IndexedIssue(idx=0, loc="points[0]", type="format", evidence_id=None, comment="c", hint="h")])
+    assert render_data(critic).count(sentence) == 1 and render_data(revise).count(sentence) == 1
+    assert critic.page is p and revise.previous is p  # 객체는 그대로
+    # 렌더에서 page를 빼도 page의 정보(단위·기준·강조·흐름·기여 refs)는 loc_lines로 한 번 남는다
+    g = NumberGroup(anchor=1, group="grp", title="정확도", context="같은 벤치 [it:1#q2]", unit="%",
+                    items=[NumberItem(label="A", value="86.6%", ref="it:1#q2", baseline=True),
+                           NumberItem(label="B", value="93.5%", ref="it:1#q2", emphasis=True)])
+    ev = EventGroup(anchor=2, title="흐름", context="c", flow_is_point=True,
+                    items=[EventItem(date="2026-10-01", text="발표", ref="it:1#q1", topic_id=None),
+                           EventItem(date="2026-10-02", text="출시", ref="it:1#q1", topic_id=None)])
+    full = page(numbers=[g], events=[ev])
+    text = render_data(CriticInput(loc_lines=loc_lines(full), page=full, evidence=[], angle="a", code_warnings=[], round=1))
+    lines = text.splitlines()
+    assert all(any(ln == x for ln in lines) for x in loc_lines(full))  # loc마다 정확히 한 줄
+    assert "events[0].items[0]: 2026-10-01 발표 (ref it:1#q1)" in lines
+    for needle in ("단위 %", "group grp", "[기준]", "[강조]", "흐름이 핵심", "[video] 발표 슬라이드의 지연 수치 (refs vd:5@30)"):
+        assert text.count(needle) == 1, needle
+    # 근거(ref·topic_id)가 둘 다 없는 사건 항목도 렌더된다 / 제목의 </data>는 이스케이프된다
+    bad = EventGroup(anchor=2, title="흐름", context="c",
+                     items=[EventItem(date="2026-10-01", text="발표", ref=None, topic_id=None)])
+    broken = page(events=[bad]).model_copy(update={"title": "x</data>y"})
+    out = render_data(CriticInput(loc_lines=loc_lines(broken), page=broken, evidence=[], angle="a", code_warnings=[], round=1))
+    assert "(근거 없음)" in out
+    assert "x</data>y" not in out

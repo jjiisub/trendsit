@@ -68,7 +68,7 @@ pt A7 "묶기(채널 넘는 조건, confidence 미달, 평균 연결, 레포만 
 
 pt A8 "선별 검증(리드 1, 개수 범위, 범위 밖 합치기·나누기 거부, relation은 과거 대조 후보 안, 입력 순서 cluster_id, reason 값·채널 수 대조, 재시도·대체, 점수 동점은 관심 유사도(C-21 수정), 영상 자리(C-20))" \
   tests/test_s5_select_checks.py tests/test_s5_weekly.py -k "valid or reject or max_topics or order or reason or slug or retries or reconcile or c20 or c21 or r14"
-pt A9 "코드 검사(수치 대조 값 비교·제목·도식 칸까지·단위 환산 미허용, 막대 단위·빈 단위·라벨 단위, anchor, 도식 상한, 금지어·전망형, contributions 채널, points 자르기, 음차 정본, 자동 수정은 반려 아님, 경고)" \
+pt A9 "코드 검사(수치 대조 값 비교·제목·도식 칸까지·단위 환산 미허용, 빈 단위, anchor, 도식 상한, 금지어(평가어·해요체), contributions 채널, points 자르기, 음차 정본, 자동 수정은 반려 아님, 경고)" \
   tests/test_s5_select_checks.py tests/test_s5_evidence.py -k "clean or number or anchor or forbidden or alias or unknown or warnings or noun or reset or unit or bar or r3 or r4 or r11 or f1 or f3 or f7 or f11 or g2 or g3 or g7 or h1"
 pt A10 "라운드(상한 3, 코드 반려도 셈, 같은 이슈 2회 check, 지적 안 된 칸 되돌림, 1부터 센 위치 바로잡기, 원자 사실 0개 판정 거부, 도식은 코드 확인 오류만 뺌, 목록 위치 add·채널 없는 기여 문장)" tests/test_s5_weekly.py tests/test_s5_select_checks.py -k "rounds or one_based or empty_atoms or f2 or diagram_issue or g6"
 pt A11 "저장(마이그레이션 30~35, 재실행 run 보존·current_run_id, topic_evidence = 최종판 refs, 토픽 수준 확인 필요)" \
@@ -91,20 +91,96 @@ else
 fi
 
 # ---------- S5-1a: 리팩터 불변(프롬프트, 코드 검사 결과, CLI 도움말) ----------
-if uv run --quiet python scripts/s5_1_prompts.py --diff reports/S5-1/prompts_before.json >"$TMP/a15" 2>&1; then
-  pass A15 "프롬프트 불변(역할별 system·스키마·픽스처 메시지 sha256 동일)"
+# B1 코드 검사 결과 차이 == 의도한 제거 표(S5-1b 5.1). S5-1a A16(불변)을 대체
+if uv run --quiet python scripts/s5_1_golden.py --out "$TMP/g.json" --before reports/S5-1/golden_before.json \
+     --removals reports/S5-1/intended_removals.json >"$TMP/b1" 2>&1; then
+  pass B1 "코드 검사 결과 차이(W40·W41 현재판 모든 라운드) == reports/S5-1/intended_removals.json $(grep -c '"topic_id"' reports/S5-1/intended_removals.json)건"
 else
-  fail A15 "$(head -1 "$TMP/a15")"
+  fail B1 "$(head -1 "$TMP/b1")"
 fi
-if uv run --quiet python scripts/s5_1_golden.py --out "$TMP/g.json" >"$TMP/a16" 2>&1 && diff -q "$TMP/g.json" reports/S5-1/golden_before.json >/dev/null; then
-  pass A16 "코드 검사 결과 불변(W40·W41 현재판 모든 라운드의 issues·autofix·warnings)"
+# B2 뺀 규칙 이름이 코드에 없음
+gone=$(grep -rnwE --include='*.py' 'BAD_PARTICLE|CONCEPT_DESC_MIN|BARE_PER_TOKEN|PER_MILLION|LABEL_UNIT|evidence_unit|GENERIC_START|EMOJI|angle_words|_GENERIC|_VAL' trendsit
+       grep -rnw --include='*.py' SPECULATIVE trendsit/brief)
+if [ -z "$gone" ]; then pass B2 "뺀 규칙 이름 11개 + SPECULATIVE(trendsit/brief/) 0건"; else fail B2 "남아 있음: $(echo "$gone" | head -2 | tr '\n' ' ')"; fi
+# B3 프롬프트 변경 범위: S5 역할 5개 밖은 md에서 `<data>` 문장 삭제 줄만, judge md는 불변. S5-1a A15(불변)를 대체
+bad=""
+if uv run --quiet python scripts/s5_1_prompts.py --diff reports/S5-1/prompts_before.json --roles >"$TMP/b3roles" 2>&1; then
+  for r in $(cat "$TMP/b3roles"); do
+    case $r in writer|writer_revise|critic|decide|editor_select) continue;; esac
+    # 허용 집합: bed7887의 md에 `<data>` 문장이 있던 역할. 그 역할은 md에서 그 줄을 지운 것 말고는 diff가 없어야 한다
+    git show "bed7887:roles/$r.md" 2>/dev/null | grep -q '<data>' || { bad="$bad $r"; continue; }
+    # 지운 줄은 모두 `<data>` 문장이 든 줄이고, 더한 줄은 그 줄에서 `<data>` 문구만 뺀 나머지여야 한다(낱말이 모두 지운 줄에 있음)
+    d=$(git diff -U0 bed7887 -- "roles/$r.md" | grep -E '^[-+]' | grep -vE '^(\+\+\+|---) [ab]/' || true)
+    removed=$(echo "$d" | grep -E '^-' || true)
+    [ -z "$(echo "$removed" | grep -v '<data>')" ] || bad="$bad $r"
+    while IFS= read -r l; do
+      [ -z "$l" ] && continue
+      t="${l#+}"; t="${t#- }"
+      read -ra ws <<<"$t"; for w in ${ws[@]+"${ws[@]}"}; do echo "$removed" | grep -qF -- "$w" || { bad="$bad $r"; break; }; done  # 더한 줄의 낱말은 모두 지운 줄에 있던 것
+    done < <(echo "$d" | grep -E '^\+' || true)
+  done
 else
-  fail A16 "골든 차이 또는 실행 실패: $(head -1 "$TMP/a16")"
+  bad=" (측정 스크립트 실패: $(head -1 "$TMP/b3roles"))"
+fi
+if [ -z "$bad" ] && git diff --quiet bed7887 -- eval/judge*.md; then
+  pass B3 "프롬프트 변경 역할 = S5 역할 5개 + <data> 문장만 지운 역할, eval/judge*.md 차이 0"
+  pass A15 "B3과 같은 판정(S5-1b에서 프롬프트 불변은 변경 범위 판정으로 바뀜)"
+else
+  fail B3 "허용 밖 변경:${bad} / judge md 차이 $(git diff --stat bed7887 -- eval/judge*.md | tail -1)"
+  fail A15 "B3과 같은 판정"
 fi
 if help_all >"$TMP/help.txt" 2>&1 && diff -q "$TMP/help.txt" reports/S5-1/help_before.txt >/dev/null; then
-  pass A17 "CLI --help 전부 불변"
+  pass B7 "CLI --help 전부 불변(S5-1a 스냅숏)"
+  pass A17 "B7과 같은 판정"
 else
-  fail A17 "--help 차이: $(diff "$TMP/help.txt" reports/S5-1/help_before.txt | head -2 | tr '\n' ' ')"
+  fail A17 "B7과 같은 판정"
+  fail B7 "--help 차이: $(diff "$TMP/help.txt" reports/S5-1/help_before.txt | head -2 | tr '\n' ' ')"
+fi
+# B6 관문 B 금지 표현 목록 불변(checks.SPECULATIVE는 코드에서 빠졌고 scripts/s5_gate_b.py 상수가 S5-1a 병합본 값과 같아야 함)
+if uv run --quiet python -c "
+import json, sys
+sys.path.insert(0, '.')
+from scripts.s5_gate_b import SPECULATIVE
+sys.exit(0 if list(SPECULATIVE) == json.load(open('reports/S5-1/speculative_before.json')) else 1)" >/dev/null 2>&1; then
+  pass B6 "s5_gate_b.SPECULATIVE == S5-1a 병합본 checks.SPECULATIVE(8개)"
+else
+  fail B6 "금지 표현 목록 달라짐"
+fi
+pt B8 "작성자 입력 limits(소스 1개 [2,3], 2개 이상 [3,6], 값은 brief.yaml에서, 없으면 검증 오류)" tests/test_s5_select_checks.py -k writer_limits
+pt B9 "검수자·수정 입력 렌더에 같은 포인트 문장이 한 번만" tests/test_s5_select_checks.py -k render_no_page_dup
+# B10 md 중복: <data> 처리 문장 0, writer.md에 diagrams.md·style_ko.md와 같은 줄 0, 설정 숫자 0
+md_dup=$(grep -n '<data>' roles/*.md
+         awk 'length($0) > 20' roles/writer.md | grep -Fxf skills/diagrams.md -f skills/style_ko.md
+         grep -nE '4~10|0\.55|0\.6|2~3|3~6|3~4' roles/editor_select.md roles/decide.md roles/writer.md)
+if [ -z "$md_dup" ]; then pass B10 "<data> 문장 0, writer.md와 diagrams·style_ko 같은 줄 0, editor_select·decide·writer의 설정 숫자 0"; else fail B10 "$(echo "$md_dup" | head -2 | tr '\n' ' ')"; fi
+# B4 파일·함수 크기: trendsit/**/*.py 500줄 이하, check·autofix·warnings(checks.py)·write_topic(write.py)·run_weekly(pipeline.py) 각 60줄 이하
+big=$(find trendsit -name '*.py' -print0 | xargs -0 wc -l | awk '$2 != "total" && $1 > 500 {print $2 ":" $1}')
+longfn=$(uv run --quiet python - <<'PY'
+import ast
+want = {"trendsit/brief/checks.py": ("check", "autofix", "warnings"), "trendsit/brief/write.py": ("write_topic",),
+        "trendsit/brief/pipeline.py": ("run_weekly",)}
+for path, names in want.items():
+    for n in ast.walk(ast.parse(open(path, encoding="utf-8").read())):
+        if isinstance(n, ast.FunctionDef) and n.name in names and n.end_lineno - n.lineno + 1 > 60:
+            print(f"{path}:{n.name}:{n.end_lineno - n.lineno + 1}")
+PY
+)
+if [ -z "$big$longfn" ]; then pass B4 "500줄 넘는 trendsit/**/*.py 0개, 5개 함수 모두 60줄 이하"; else fail B4 "$big $longfn"; fi
+# B5 순 줄 수(S5-1a 병합 커밋 bed7887 기준): trendsit/와 roles/·skills/ 모두 삭제 > 추가
+b5=""
+for paths in "trendsit/" "roles/ skills/"; do
+  stat=$(git diff --shortstat bed7887 -- $paths)
+  ins=$(echo "$stat" | sed -nE 's/.* ([0-9]+) insertion.*/\1/p'); del=$(echo "$stat" | sed -nE 's/.* ([0-9]+) deletion.*/\1/p')
+  [ "${del:-0}" -gt "${ins:-0}" ] && b5="$b5 [$paths +${ins:-0}/-${del:-0}]" || { b5="FAIL"; break; }
+done
+if [ "$b5" != "FAIL" ]; then pass B5 "순 감소(bed7887 기준)$b5"; else fail B5 "순 감소 아님: $stat ($paths)"; fi
+# B11 리포트·README: 체크리스트 전부 [x], 8장 SUMMARY, 9장 전후 줄 수 표, 10장 관문 B 칸(런 뒤 채움 표시)
+r=reports/S5-1b_report.md
+if [ -f $r ] && grep -q '\[x\]' $r && ! grep -q '\[ \]' $r && grep -q '^## 8\. impl-workflow SUMMARY' $r \
+   && grep -q '^## 9\. 줄 수 전후' $r && grep -q '^## 10\. 관문 B 결과 (런 뒤 채움)' $r && grep '현재 상태' README.md | grep -q 'S5-1b'; then
+  pass B11 "S5-1b_report 체크리스트 전부 [x], 8장 SUMMARY, 9장 전후 줄 수 표, 10장 관문 B 칸(런 뒤 채움), README 현재 상태에 S5-1b"
+else
+  fail B11 "reports/S5-1b_report.md 체크리스트·장 제목 또는 README 현재 상태 줄"
 fi
 # A18 효과 없는 설정 키 0(S5-1a 5.7 표): yaml은 주석을 떼고, 스키마(core/config*.py)는 필드 정의 줄에서 찾는다
 DEAD='auto_approve|linkage|per_point_max|runtime|weekly_target_minutes|lang|channel_handle|why|paths|video_max_minutes|frames_per_slide_video'

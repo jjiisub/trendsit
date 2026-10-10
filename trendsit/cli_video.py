@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import sys
 from pathlib import Path
 from typing import Any
@@ -16,10 +15,6 @@ from .core.trace import Tracer
 
 MEDIA_ROOT = ROOT / "data" / "media"
 SPEC = "S4"  # --spec도 TRENDSIT_SPEC도 없으면 S4로 기록(기본값 S0에 잡히지 않게)
-
-
-def _spec(args: argparse.Namespace) -> str:
-    return args.spec or os.environ.get("TRENDSIT_SPEC") or SPEC
 
 
 def _queue(args: argparse.Namespace) -> list[Any]:
@@ -58,7 +53,7 @@ def cmd_run(args: argparse.Namespace) -> int:
         print("--from-json은 같은 영상, 같은 mode 하나에만", file=sys.stderr)
         return 2
     cfg = config.load("video.yaml")
-    ctx = open_ctx(None, spec=_spec(args), no_cache=args.no_cache, model=args.model)
+    ctx = open_ctx(None, spec=config.current_spec(args.spec, SPEC), no_cache=args.no_cache, model=args.model)
     overrides = Overrides(frames=args.frames, frames_res=args.res, lang=args.lang)
     results, code = [], 0
     for item in items:
@@ -99,12 +94,12 @@ def cmd_run(args: argparse.Namespace) -> int:
 def cmd_purge(args: argparse.Namespace) -> int:
     from .collect.video.workspace import purge
     from .core import config
-    from .core.db import DB
+    from .core.db import open_db
     from .video.store import expire_segment_text
 
     older = args.older_than if args.older_than is not None else config.load("video.yaml").retention_days
     res = purge(MEDIA_ROOT, older)
-    db = DB(ROOT / "data" / "trendsit.db")
+    db = open_db()
     n = expire_segment_text(db)
     print(json.dumps({"removed": res["removed"], "kept": len(res["kept"]),
                       "freed_mb": round(res["freed_bytes"] / 1024 ** 2, 1), "segments_text_expired": n},
@@ -113,10 +108,10 @@ def cmd_purge(args: argparse.Namespace) -> int:
 
 
 def cmd_report(args: argparse.Namespace) -> int:
-    from .core.db import DB
+    from .core.db import open_db
     from .video.report import runs_markdown
 
-    text = runs_markdown(DB(ROOT / "data" / "trendsit.db"), args.since, args.until)
+    text = runs_markdown(open_db(), args.since, args.until)
     if args.out:
         Path(args.out).write_text(text, encoding="utf-8")
         print(args.out)

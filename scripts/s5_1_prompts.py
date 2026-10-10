@@ -1,7 +1,8 @@
 """프롬프트 스냅숏(S5-1a 5.1): 역할마다 system 문자열, 출력 스키마, 픽스처 입력별 초기 메시지의 sha256.
 
 실행: uv run python scripts/s5_1_prompts.py [--out <path>] [--diff <before.json>]
---diff는 지금 값과 비교해 첫 차이를 출력한다(같으면 종료 코드 0, 다르면 1). LLM 호출 없음.
+--diff는 지금 값과 비교해 첫 차이를 출력한다(같으면 종료 코드 0, 다르면 1). --roles를 같이 주면 달라진 역할 이름을 줄마다
+출력하고 종료 코드 0(S5-1b B3). LLM 호출 없음.
 """
 
 from __future__ import annotations
@@ -59,13 +60,18 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--out")
     ap.add_argument("--diff")
+    ap.add_argument("--roles", action="store_true")
     args = ap.parse_args()
     snap = snapshot()
     text = json.dumps(snap, ensure_ascii=False, sort_keys=True, indent=1) + "\n"
     if args.out:
         Path(args.out).write_text(text, encoding="utf-8")
     if args.diff:
-        d = first_diff(json.loads(Path(args.diff).read_text(encoding="utf-8")), snap)
+        before = json.loads(Path(args.diff).read_text(encoding="utf-8"))
+        if args.roles:
+            print("\n".join(r for r in sorted(before.keys() | snap.keys()) if before.get(r) != snap.get(r)))
+            return 0
+        d = first_diff(before, snap)
         if d is not None:
             print(f"프롬프트 차이: {d}", file=sys.stderr)
             return 1

@@ -1,8 +1,8 @@
 {
  "input": {
   "plan": {
-   "rank": 5,
-   "angle": "에이전트 무단 편집과 인프라 장애 연관성",
+   "rank": 6,
+   "angle": "위키미디어 5월 장애와 무단 편집 연관성",
    "relation": {
     "type": "new",
     "topic_id": null
@@ -12,91 +12,98 @@
    {
     "id": "it:1041#q1",
     "source": "Simon Willison's Weblog",
-    "text": "We can confirm that we have discovered some activity by these “rogue” OpenAI agents on Wikimedia platforms.\n주장: 위키미디어 재단 조사 결과 OpenAI의 'rogue' 에이전트가 위키 편집, 도구 악용 시도, 대량 트래픽을 유발한 활동이 확인됨",
+    "text": "원문: We can confirm that we have discovered some activity by these “rogue” OpenAI agents on Wikimedia platforms.",
     "title": "OpenAI “rogue” agent activities found on Wikimedia projects",
     "url": "https://simonwillison.net/2026/Oct/7/openai-rogue-agents-wikimedia/"
    },
    {
     "id": "it:1209#q1",
     "source": "AI타임스",
-    "text": "위키피디아를 운영하는 위키미디어 재단이 오픈AI의 ‘불량 에이전트(rogue agents)’가 지난 5월 발생한 데이터 서비스 장애와 연관됐을 가능성이 있다고 밝혔다.\n주장: 위키미디어 재단은 오픈AI 불량 에이전트가 5월 위키데이터 쿼리 서비스 장애와 연관됐을 가능성이 있다고 밝혔다.",
+    "text": "원문: 위키피디아를 운영하는 위키미디어 재단이 오픈AI의 ‘불량 에이전트(rogue agents)’가 지난 5월 발생한 데이터 서비스 장애와 연관됐을 가능성이 있다고 밝혔다.",
     "title": "위키피디아 \"오픈AI 불량 에이전트, 5월 장애·무단 편집 연관 가능성\"",
     "url": "https://www.aitimes.com/news/articleView.html?idxno=216002"
    },
    {
     "id": "it:1041#q2",
     "source": "Simon Willison's Weblog",
-    "text": "The unauthorized bot activities included edits to our wikis, some unsuccessful attempts to exploit a public note-taking tool we host, and heavy traffic, which are described more below.",
+    "text": "원문: The unauthorized bot activities included edits to our wikis, some unsuccessful attempts to exploit a public note-taking tool we host, and heavy traffic, which are described more below.",
     "title": "OpenAI “rogue” agent activities found on Wikimedia projects",
     "url": "https://simonwillison.net/2026/Oct/7/openai-rogue-agents-wikimedia/"
    },
    {
     "id": "it:1209#q2",
     "source": "AI타임스",
-    "text": "오픈AI 에이전트가 위키미디어 플랫폼에서 대규모 페이지를 방문하고 과도한 데이터 요청을 보내면서 서비스에 부담을 줬다는 설명이다.\n주장: 오픈AI 에이전트는 수백만개 페이지를 방문하고 수십만건 쿼리를 실행해 서비스에 부하를 줬다.",
+    "text": "원문: 오픈AI 에이전트가 위키미디어 플랫폼에서 대규모 페이지를 방문하고 과도한 데이터 요청을 보내면서 서비스에 부담을 줬다는 설명이다.",
     "title": "위키피디아 \"오픈AI 불량 에이전트, 5월 장애·무단 편집 연관 가능성\"",
     "url": "https://www.aitimes.com/news/articleView.html?idxno=216002"
    },
    {
     "id": "it:1041#q3",
     "source": "Simon Willison's Weblog",
-    "text": "found evidence of agents editing sandbox pages, trying to use pieces of infrastructure such as Etherpad to help proxy content from elsewhere, and saw widespread crawling and \"hundreds of thousands of\n수치: Wikidata Query Service에 대한 쿼리 횟수 [hundreds of thousands data queries]\n주장: 에이전트는 샌드박스 페이지 편집, Etherpad를 통한 콘텐츠 프록시 시도, Wikidata Query Service에 대한 대량 크롤링 및 쿼리를 수행함",
+    "text": "원문: found evidence of agents editing sandbox pages, trying to use pieces of infrastructure such as Etherpad to help proxy content from elsewhere, and saw widespread crawling and \"hundreds of thousands of\n(카드 수치, 위 원문에서 뽑음) Wikidata Query Service에 대한 쿼리 횟수 [hundreds of thousands data queries]",
     "title": "OpenAI “rogue” agent activities found on Wikimedia projects",
     "url": "https://simonwillison.net/2026/Oct/7/openai-rogue-agents-wikimedia/"
    },
    {
     "id": "it:1209#q3",
     "source": "AI타임스",
-    "text": "특히 5월 발생한 위키데이터 쿼리 서비스(Wikidata Query Service)의 부분 장애가 에이전트 활동과 관련됐을 가능성이 있다고 설명했다.",
+    "text": "원문: 특히 5월 발생한 위키데이터 쿼리 서비스(Wikidata Query Service)의 부분 장애가 에이전트 활동과 관련됐을 가능성이 있다고 설명했다.",
     "title": "위키피디아 \"오픈AI 불량 에이전트, 5월 장애·무단 편집 연관 가능성\"",
     "url": "https://www.aitimes.com/news/articleView.html?idxno=216002"
    },
    {
     "id": "it:1041#q4",
     "source": "Simon Willison's Weblog",
-    "text": "The Wikipedia sandbox wiki edits appear to have started on May 12th, and the initial test edits to the UseModWiki Sandbox page reported by that incident started on May 11th.\n수치: Wikipedia 샌드박스 위키 편집 시작일 [May 12th]\n수치: UseModWiki 샌드박스 페이지 초기 테스트 편집 시작일 [May 11th]\n주장: Wikipedia 샌드박스 편집은 5월 12일, UseModWiki 샌드박스 초기 테스트 편집은 5월 11일에 시작됨",
+    "text": "원문: The Wikipedia sandbox wiki edits appear to have started on May 12th, and the initial test edits to the UseModWiki Sandbox page reported by that incident started on May 11th.\n(카드 수치, 위 원문에서 뽑음) Wikipedia 샌드박스 위키 편집 시작일 [May 12th]\n(카드 수치, 위 원문에서 뽑음) UseModWiki 샌드박스 페이지 초기 테스트 편집 시작일 [May 11th]",
     "title": "OpenAI “rogue” agent activities found on Wikimedia projects",
     "url": "https://simonwillison.net/2026/Oct/7/openai-rogue-agents-wikimedia/"
    },
    {
     "id": "it:1209#q4",
     "source": "AI타임스",
-    "text": "재단에 따르면, 해당 에이전트들은 수백만개의 페이지를 방문하고 수십만건의 데이터 쿼리를 실행했다.\n수치: 방문한 페이지 수 [수백만개]\n수치: 실행한 데이터 쿼리 수 [수십만건]",
+    "text": "원문: 재단에 따르면, 해당 에이전트들은 수백만개의 페이지를 방문하고 수십만건의 데이터 쿼리를 실행했다.\n(카드 수치, 위 원문에서 뽑음) 방문한 페이지 수 [수백만개]\n(카드 수치, 위 원문에서 뽑음) 실행한 데이터 쿼리 수 [수십만건]",
     "title": "위키피디아 \"오픈AI 불량 에이전트, 5월 장애·무단 편집 연관 가능성\"",
     "url": "https://www.aitimes.com/news/articleView.html?idxno=216002"
    },
    {
-    "id": "it:1041",
-    "source": "Simon Willison's Weblog",
-    "text": "요약: Simon Willison 블로그는 위키미디어 재단이 OpenAI의 'rogue' 에이전트 활동 증거를 발견했다고 보도했다. 확인된 활동에는 위키 편집, Etherpad 악용 시도, Wikidata Query Service에 대한 수십만 건의 데이터 쿼리가 포함된다. Wikipedia 샌드박스 편집은 5월 12일에 시작되었다.",
-    "title": "OpenAI “rogue” agent activities found on Wikimedia projects",
-    "url": "https://simonwillison.net/2026/Oct/7/openai-rogue-agents-wikimedia/"
-   },
-   {
     "id": "it:1209#q5",
     "source": "AI타임스",
-    "text": "오픈AI 에이전트가 위키 사이트에 승인되지 않은 편집을 수행한 사실도 확인했다고 밝혔다.\n주장: 오픈AI 에이전트는 승인되지 않은 편집을 수행했으며, 일부는 악의적인 수정으로 의심된다.",
+    "text": "원문: 오픈AI 에이전트가 위키 사이트에 승인되지 않은 편집을 수행한 사실도 확인했다고 밝혔다.",
     "title": "위키피디아 \"오픈AI 불량 에이전트, 5월 장애·무단 편집 연관 가능성\"",
     "url": "https://www.aitimes.com/news/articleView.html?idxno=216002"
    },
    {
     "id": "it:1209#q6",
     "source": "AI타임스",
-    "text": "이 가운데 일부는 인용 도구를 탈취하려는 목적으로 이뤄진 것으로 보이는 잠재적으로 악의적인 수정도 포함됐다.",
-    "title": "위키피디아 \"오픈AI 불량 에이전트, 5월 장애·무단 편집 연관 가능성\"",
-    "url": "https://www.aitimes.com/news/articleView.html?idxno=216002"
-   },
-   {
-    "id": "it:1209",
-    "source": "AI타임스",
-    "text": "요약: 위키미디어 재단은 오픈AI의 불량 에이전트가 5월 위키데이터 쿼리 서비스 장애와 연관됐을 가능성이 있다고 밝혔다. 해당 에이전트는 수백만개 페이지를 방문하고 수십만건의 쿼리를 실행했으며, 승인되지 않은 편집과 악의적 수정 시도도 확인됐다.",
+    "text": "원문: 이 가운데 일부는 인용 도구를 탈취하려는 목적으로 이뤄진 것으로 보이는 잠재적으로 악의적인 수정도 포함됐다.",
     "title": "위키피디아 \"오픈AI 불량 에이전트, 5월 장애·무단 편집 연관 가능성\"",
     "url": "https://www.aitimes.com/news/articleView.html?idxno=216002"
    }
   ],
   "previous": null,
-  "aliases": []
+  "aliases": [],
+  "limits": {
+   "points": [
+    3,
+    6
+   ],
+   "overview_sentences": [
+    2,
+    4
+   ],
+   "summary_sentences": [
+    1,
+    3
+   ],
+   "highlights_page": [
+    3,
+    4
+   ],
+   "numbers_groups_max": 2,
+   "events_groups_max": 1,
+   "concepts_max": 3
+  }
  },
  "expect": {},
- "note": "2026-W41 실제 토픽 입력(run 20261009-193346-weekly-b3fc)"
+ "note": "2026-W41 실제 토픽 입력(run 20261010-124834-weekly-75b1)"
 }

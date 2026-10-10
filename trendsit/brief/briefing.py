@@ -13,11 +13,9 @@ from pathlib import Path
 from typing import Any
 
 from ..core.artifacts_brief import TopicPage
-from ..core.config import ROOT
 from ..core.db import DB
+from . import report
 from .evidence import week_evidence
-
-OUT = ROOT / "reports" / "S5_brief"
 
 
 def visible_checks(checks: list[str], page: TopicPage) -> list[str]:
@@ -156,7 +154,7 @@ def write_briefing_md(db: DB, week: str, run_id: str | None = None) -> Path:
     if summ and summ["summary_json"]:
         lines += ["", "## 실행 요약", "", "```json", json.dumps(json.loads(summ["summary_json"]), ensure_ascii=False, indent=1),
                   "```"]
-    OUT.mkdir(parents=True, exist_ok=True)
-    path = OUT / f"briefing_{week}.md"
+    report.OUT.mkdir(parents=True, exist_ok=True)
+    path = report.OUT / f"briefing_{week}.md"
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
     return path

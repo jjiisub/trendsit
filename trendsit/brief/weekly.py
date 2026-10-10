@@ -12,8 +12,10 @@ from ..core.artifacts_brief import DecideAnswer, DecideInput, PairShared
 from ..core.budget import BudgetExceeded, PriceUnknown
 from ..core.config_brief import BriefConfig
 from ..core.context import Ctx
+from ..core.db import DB
 from ..core.errors import LLMError
 from ..core.role import RoleFailed, load_role, run_role
+from ..filter.embed import embed_interests
 from . import aliases as al
 from . import cluster as cl
 from .evidence import WeekEvidence, week_days, week_evidence
@@ -76,19 +78,23 @@ def decide_aliases(table: al.AliasTable, ev: WeekEvidence, decider: cl.Decider |
     return out
 
 
+def set_run_week(db: DB, run_id: str, week: str) -> None:
+    with db.conn:  # 바로 커밋(열린 쓰기 트랜잭션이 LLM 호출 내내 DB를 잠그지 않게)
+        db.conn.execute("UPDATE runs SET week=? WHERE id=?", (week, run_id))
+
+
 def stage_cluster(week: str, ctx: Ctx, cfg: BriefConfig | None = None, embedder: Any = None,
-                  use_llm: bool = True, set_current: bool = True) -> ClusterStage:
+                  use_llm: bool = True, set_current: bool = True,
+                  interests: list[tuple[str, list[float]]] | None = None) -> ClusterStage:
     """cluster 단계. ctx.tracer의 run_id로 모든 행을 쌓는다. set_current면 weeks.current_run_id를 이 실행으로
     (cluster 명령 단독). weekly는 끝까지 마친 뒤에만 바꾼다(중간에 멈춘 run이 현재판이 되지 않게, 리뷰 지적 4)."""
     from ..filter.embed import make_embedder
 
     cfg = cfg or config.load("brief.yaml")
-    keywords = config.load("keywords.yaml")
     db, tr = ctx.db, ctx.tracer
     assert tr is not None
     run_id = tr.run_id
-    with db.conn:  # 바로 커밋(열린 쓰기 트랜잭션이 LLM 호출 내내 DB를 잠그지 않게)
-        db.conn.execute("UPDATE runs SET week=? WHERE id=?", (week, run_id))
+    set_run_week(db, run_id, week)
     t0 = time.monotonic()
     ev = week_evidence(db, week)
     n = ev.counts()
@@ -97,8 +103,7 @@ def stage_cluster(week: str, ctx: Ctx, cfg: BriefConfig | None = None, embedder:
                  f"digest 없음 {ev.excluded['no_digest']}, 관련 없는 레포 {ev.excluded['irrelevant_repo']}",
             detail={"counts": n, "excluded": ev.excluded})
     t1 = time.monotonic()
-    table = al.load_decided(db, al.build(list(ev.members.values()), keywords, cfg.aliases.fuzz_min_score,
-                                         cfg.aliases.transliteration))
+    table = al.decided_table(db, list(ev.members.values()), cfg)
     decider = make_decider(ctx) if use_llm else None
     alias_dec = decide_aliases(table, ev, decider, cfg.cluster.decide.min_confidence, cfg.cluster.alias_decide_max)
     al.save(db, table, run_id)
@@ -109,8 +114,7 @@ def stage_cluster(week: str, ctx: Ctx, cfg: BriefConfig | None = None, embedder:
     t2 = time.monotonic()
     flt = config.load("filter.yaml")
     embedder = embedder or make_embedder("real", flt)
-    vrel = cl.score_video_relevance(list(ev.members.values()), embedder,
-                                    [(x.keyword_id, x.text) for x in flt.interests], cfg.evidence.video_relevance_high)
+    vrel = cl.score_video_relevance(ev, embedder, interests or embed_interests(embedder, flt), cfg)
     if vrel:
         tr.step(kind="code", role="evidence",
                 text=f"영상 관련성 점수: high {sum(v >= cfg.evidence.video_relevance_high for v in vrel.values())}, "

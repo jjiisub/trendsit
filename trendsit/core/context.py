@@ -9,7 +9,7 @@ from typing import Any
 from . import config
 from .budget import Budget, PriceBook
 from .cache import Cache
-from .db import DB
+from .db import DB, open_db
 from .llm import LLMClient, Transport
 from .trace import Tracer
 
@@ -50,7 +50,7 @@ def open_ctx(kind: str | None, *, spec: str | None = None, no_cache: bool = Fals
     spec = config.current_spec(spec)
     models = config.load("models.yaml")
     budget_cfg = config.load("budget.yaml")
-    db = DB(data_dir / "trendsit.db")
+    db = open_db(data_dir)
     llm = LLMClient(models, cache=Cache(data_dir / "cache"), transport=transport)
     budget = Budget(budget_cfg, spec, db, state_path,
                     key_status=llm.key_status if key_status else None,

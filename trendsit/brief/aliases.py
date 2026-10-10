@@ -16,14 +16,16 @@ import re
 from collections import Counter
 from dataclasses import dataclass, field
 
+from ..core import config
 from ..core.config import KeywordsConfig
+from ..core.config_brief import BriefConfig
 from ..core.db import DB, now_kst
+from ..core.numbers import DECIMAL
 from .evidence import Member
 
 # 크기·등급 낱말: 이름에 붙으면 다른 제품(GPT-5 ↔ GPT-5 mini)
 SIZE_WORDS = {"mini", "nano", "micro", "small", "medium", "large", "xl", "pro", "max", "plus", "lite", "flash",
               "ultra", "turbo", "air", "base", "instruct", "preview"}
-_NUM = re.compile(r"\d+(?:\.\d+)?")
 
 
 def norm_key(name: str) -> str:
@@ -69,7 +71,7 @@ def translit_pattern(name: str, translit: dict[str, str]) -> re.Pattern[str] | N
 
 
 def numbers_of(name: str) -> tuple[str, ...]:
-    return tuple(_NUM.findall(name))
+    return tuple(DECIMAL.findall(name))
 
 
 def sizes_of(name: str) -> frozenset[str]:
@@ -192,6 +194,11 @@ def save(db: DB, table: AliasTable, run_id: str) -> None:
                 status = old["status"] if old["status"] != "candidate" else r.status
                 db.conn.execute("UPDATE aliases SET seen=seen+1, status=?, run_id=?, updated_at=?, evidence_json=? "
                                 "WHERE id=?", (status, run_id, now, json.dumps(r.evidence, ensure_ascii=False), old["id"]))
+
+
+def decided_table(db: DB, members: list[Member], cfg: BriefConfig) -> AliasTable:
+    """이번 주 구성원의 별칭 표(keywords.yaml 별칭 + 설정의 임계값·음차 사전)에 지난 판정을 반영."""
+    return load_decided(db, build(members, config.load("keywords.yaml"), cfg.aliases.fuzz_min_score, cfg.aliases.transliteration))
 
 
 def load_decided(db: DB, table: AliasTable) -> AliasTable:

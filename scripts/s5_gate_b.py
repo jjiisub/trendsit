@@ -30,6 +30,8 @@ from trendsit.core.style import EVAL_ENDINGS, ends_as_sentence, is_haeyo  # noqa
 
 LABELS = ROOT / os.environ.get("S5_LABELS", "eval/labels")  # 1차 라벨 스냅숏: eval/labels/s5_r1
 KEEP = ("label", "critique", "labeler")
+# 근거 없는 전망·평가형 마무리. 관문 B 문체 지표용(S5 병합 시점 checks.SPECULATIVE와 같은 값)
+SPECULATIVE = ("주목된다", "것으로 보인다", "것으로 전망된다", "지 주목", "것이 쟁점이다", "핵심 변화다", "핵심 축으로", "부상했다")
 QCOLS = tuple(f"{q}_pass" for q in ("Q0", "Q1", "Q2", "Q3", "Q4"))
 
 
@@ -61,7 +63,7 @@ def style_violations(page: TopicPage) -> list[str]:
     for loc, text in [("summary", page.summary), ("overview", page.overview),
                       *[(f"points[{i}]", p.text) for i, p in enumerate(page.points)]]:
         t = checks.plain(text)
-        if any(is_haeyo(s) for s in checks.sentences(t)) or any(e in t for e in (*EVAL_ENDINGS, *checks.SPECULATIVE)):
+        if any(is_haeyo(s) for s in checks.sentences(t)) or any(e in t for e in (*EVAL_ENDINGS, *SPECULATIVE)):
             out.append(f"{loc} 해요체·평가형")
         if loc.startswith("points") and ends_as_sentence(t):
             out.append(f"{loc} 명사형 아님")
@@ -75,7 +77,7 @@ def judge_final(weeks: list[str], only: set[str] | None = None, prev: dict | Non
     """두 주 현재판 최종 페이지를 judge(질문 Q1~Q4) + 원자 사실 judge로 채점. 작성자가 받은 입력을 같은 코드로 다시 조립."""
     from eval import graders
     from scripts.s5_eval_fixtures import week_topics
-    from trendsit.brief.write import evidence_docs, previous_topic, raw_evidence
+    from trendsit.brief.write import evidence_docs, previous_topic, raw_evidence, writer_limits
     from trendsit.core import config
     from trendsit.core.artifacts import Document
     from trendsit.core.artifacts_brief import PlanBrief, Relation, WriterInput
@@ -96,7 +98,7 @@ def judge_final(weeks: list[str], only: set[str] | None = None, prev: dict | Non
                 inp = WriterInput(plan=PlanBrief(rank=tp.rank, angle=tp.angle,
                                                  relation=Relation(type=tp.relation_type, topic_id=tp.relation_topic_id)),
                                   evidence=evidence_docs(t["pack"]), previous=previous_topic(ctx.db, tp.relation_topic_id),
-                                  aliases=t["aliases"])
+                                  aliases=t["aliases"], limits=writer_limits(cfg, t["n_sources"]))
                 # judge 입력은 근거 원문(COMMON 2: 요약 칸이 아니라). 작성자 입력과 같은 id, 글자는 검수자와 같은 원문
                 raw = [Document(id=d.id, source=d.source, title=d.title, url=d.url,
                                 text=raw_evidence(ctx.db, d.id, t["pack"][d.id], window)) for d in inp.evidence]

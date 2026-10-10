@@ -16,7 +16,9 @@ import argparse
 import json
 import random
 import re
+import sqlite3
 import sys
+import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -24,14 +26,14 @@ sys.path.insert(0, str(ROOT))
 
 from trendsit.brief import aliases as al  # noqa: E402
 from trendsit.brief import select as sel  # noqa: E402
-from trendsit.brief.evidence import cap_pack, week_evidence  # noqa: E402
+from trendsit.brief.evidence import cap_pack, pack_index, week_evidence  # noqa: E402
 from trendsit.brief.write import (  # noqa: E402
     alias_lines,
     evidence_docs,
-    pack_index,
     previous_topic,
     raw_evidence,
     refs_of,
+    writer_limits,
 )
 from trendsit.core import config  # noqa: E402
 from trendsit.core.artifacts import Document  # noqa: E402
@@ -63,15 +65,14 @@ def week_topics(db: DB, week: str, cfg) -> list[dict]:
     run = db.conn.execute("SELECT current_run_id FROM weeks WHERE week=?", (week,)).fetchone()[0]
     src = json.loads(db.conn.execute("SELECT summary_json FROM runs WHERE id=?", (run,)).fetchone()[0] or "{}")
     ev = week_evidence(db, week)
-    table = al.load_decided(db, al.build(list(ev.members.values()), config.load("keywords.yaml"), cfg.aliases.fuzz_min_score,
-                                             cfg.aliases.transliteration))
+    table = al.decided_table(db, list(ev.members.values()), cfg)
     # pipeline과 같은 후보(점수 동점은 관심 유사도로 끊으므로 유사도도 같게 계산)
     from trendsit.brief.cluster import interest_similarity
-    from trendsit.filter.embed import make_embedder
+    from trendsit.filter.embed import embed_interests, make_embedder
 
     flt = config.load("filter.yaml")
-    sims = interest_similarity(db, list(ev.members.values()), make_embedder("real", flt),
-                               [(x.keyword_id, x.text) for x in flt.interests])
+    embedder = make_embedder("real", flt)
+    sims = interest_similarity(db, list(ev.members.values()), embedder, embed_interests(embedder, flt))
     cands = sel.load_candidates(db, src.get("cluster_run") or run, ev, cfg.select.max_candidates, sims)
     plan = BriefingPlan.model_validate_json(db.conn.execute(
         "SELECT plan_json FROM briefing_plans WHERE run_id=? ORDER BY id DESC LIMIT 1", (run,)).fetchone()[0])
@@ -85,7 +86,7 @@ def week_topics(db: DB, week: str, cfg) -> list[dict]:
         pack = pack_index(kept)
         out.append({"week": week, "run": run, "topic": t, "status": row["status"] if row else None,
                     "page": TopicPage.model_validate_json(page[0]) if page else None, "pack": pack,
-                    "aliases": alias_lines(table, ms), "inp_select": sel.build_input(cands, ev, db, cfg), "cands": cands})
+                    "aliases": alias_lines(table, ms), "n_sources": len({it.member for it in kept}), "inp_select": sel.build_input(cands, ev, db, cfg), "cands": cands})
     return out
 
 
@@ -121,7 +122,14 @@ def main() -> int:
     ap.add_argument("--weeks", nargs="+", required=True)
     args = ap.parse_args()
     cfg = config.load("brief.yaml")
-    db = DB(ROOT / "data" / "trendsit.db")
+    # 실제 DB는 읽기만(DB 클래스는 열 때 스키마·캐시를 쓰므로 읽기 전용 연결로 복사한 임시 DB를 연다)
+    tmp = tempfile.TemporaryDirectory()
+    src = sqlite3.connect(f"file:{ROOT / 'data' / 'trendsit.db'}?mode=ro", uri=True)
+    dst = sqlite3.connect(Path(tmp.name) / "trendsit.db")
+    src.backup(dst)
+    dst.close()
+    src.close()
+    db = DB(Path(tmp.name) / "trendsit.db")
     topics = [t for w in args.weeks for t in week_topics(db, w, cfg)]
     # writer
     for t in topics[:20]:
@@ -129,7 +137,7 @@ def main() -> int:
         inp = WriterInput(plan=PlanBrief(rank=tp.rank, angle=tp.angle, relation=Relation(type=tp.relation_type,
                                                                                        topic_id=tp.relation_topic_id)),
                           evidence=evidence_docs(t["pack"]), previous=previous_topic(db, tp.relation_topic_id),
-                          aliases=t["aliases"])
+                          aliases=t["aliases"], limits=writer_limits(cfg, t["n_sources"]))
         dump("writer", tp.topic_id, inp.model_dump(), {}, f"{t['week']} 실제 토픽 입력(run {t['run']})")
     # critic: 깨끗한 판 + 심은 오류
     done = [t for t in topics if t["page"] is not None and t["status"] in ("passed", "checked")]

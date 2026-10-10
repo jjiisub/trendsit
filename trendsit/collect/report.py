@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from ..core import config
-from ..core.db import DB
+from ..core.db import DB, open_db
 from .links import normalize_url
 
 # handoff(S1) 묶음의 백필 후보(GeekNews는 설계 결정 Q1·Q5로 정한 실제 방식). 실제로 열어 확인한 결과와 나란히 보여 준다
@@ -50,7 +50,7 @@ def _latest_logs(db: DB, since: date, until: date) -> dict[str, dict[str, Any]]:
 def build(since: date, until: date, *, data_dir: Path | None = None, out: Path | None = None) -> tuple[Path, dict]:
     data_dir = data_dir or config.ROOT / "data"
     sources = config.load("sources.yaml")
-    db = DB(data_dir / "trendsit.db")
+    db = open_db(data_dir)
     logs = _latest_logs(db, since, until)
     rng = (since.isoformat(), until.isoformat())
     q = db.conn.execute

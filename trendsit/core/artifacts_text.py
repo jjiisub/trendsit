@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING, Literal, Self
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from ..collect.links import normalize_url
 from .artifacts import Document, RoleInput, RoleOutput, register_schemas
 
 if TYPE_CHECKING:
@@ -338,18 +339,11 @@ class CollectionPlan(RoleOutput):
 
 
 # ---------- 글 분석가 (text_analyst, S3 3b) ----------
-def norm_url(url: str) -> str:
-    """깊이 추적과 대조의 문서 id(추적 파라미터, 조각, 끝 슬래시 정리)."""
-    from ..collect.links import normalize_url
-
-    return normalize_url(url)
-
-
 def page_key(url: str) -> str:
     """가져온 문서 대조 열쇠: 정규화 URL + github.com은 소문자, arxiv는 https·버전 없는 abs 주소."""
     import re
 
-    u = norm_url(url).replace("http://", "https://", 1)
+    u = normalize_url(url).replace("http://", "https://", 1)
     if u.startswith("https://github.com/"):
         return u.lower()
     m = re.match(r"https://(?:export\.)?arxiv\.org/(?:abs|pdf)/(\d{4}\.\d{4,5})(v\d+)?", u)
@@ -392,7 +386,7 @@ class TextAnalystInput(RoleInput):
         return min(self.max_depth, default or MAX_DEPTH_ALL, MAX_DEPTH_ALL)
 
     def depth_seed(self) -> list[tuple[str, list[str]]]:
-        return [(norm_url(self.url), [norm_url(x.url) for x in self.links])]
+        return [(normalize_url(self.url), [normalize_url(x.url) for x in self.links])]
 
 
 class TrailStep(Strict):

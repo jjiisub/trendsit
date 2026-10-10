@@ -6,7 +6,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-from ..core.artifacts_text import ArticleLink, CheckItem, ItemCardV1, ItemCardV2, TextAnalystInput, norm_url
+from ..collect.links import normalize_url
+from ..core.artifacts_text import ArticleLink, CheckItem, ItemCardV1, ItemCardV2, TextAnalystInput
 from ..core.db import DB
 from ..summarize import load_card, save_card
 
@@ -86,7 +87,7 @@ def run_text_analysis(ctx: Any, queue: list[tuple[int, int]]) -> TextRunResult:
         res.done += 1
         if card.origin is not None:
             res.origin_found += 1
-            d = next((t.depth for t in card.trail if norm_url(t.url) == norm_url(card.origin.url)), None) or 0
+            d = next((t.depth for t in card.trail if normalize_url(t.url) == normalize_url(card.origin.url)), None) or 0
             res.depths[d] = res.depths.get(d, 0) + 1
         for v in card.verified:
             res.statuses[v.status] = res.statuses.get(v.status, 0) + 1

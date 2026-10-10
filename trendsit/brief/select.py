@@ -14,7 +14,7 @@ from __future__ import annotations
 import json
 import re
 from dataclasses import dataclass, field
-from datetime import date
+from datetime import timedelta
 from typing import Any
 
 from ..core.artifacts import Document
@@ -33,12 +33,12 @@ from ..core.config_brief import BriefConfig
 from ..core.context import Ctx
 from ..core.db import DB, now_kst
 from ..core.errors import LLMError
+from ..core.numbers import DECIMAL
 from ..core.role import RoleFailed, load_role, run_role
-from .evidence import Member, WeekEvidence
+from .evidence import Member, WeekEvidence, week_days
 
 SELECT_RETRIES = 2
 RECONCILE_MARK = "코드 정리: topics에 없음"  # reconcile이 drop으로 바꾼 결정의 reason 끝(실행 요약 drops_by가 셈)
-_NUM = re.compile(r"\d+(?:\.\d+)?")
 
 
 @dataclass
@@ -157,9 +157,7 @@ def recent_topics(db: DB, week: str, weeks_back: int) -> list[RecentTopic]:
 
 
 def prev_week(week: str) -> str:
-    y, w = week.split("-W")
-    d = date.fromisocalendar(int(y), int(w), 1).toordinal() - 7
-    iso = date.fromordinal(d).isocalendar()
+    iso = (week_days(week)[0] - timedelta(days=7)).isocalendar()
     return f"{iso[0]}-W{iso[1]:02d}"
 
 
@@ -270,7 +268,7 @@ def reason_mismatches(plan: BriefingPlan, inp: EditorSelectInput, site_names: li
         for n in re.findall(r"채널\s*(\d)", d.reason):  # 글 수를 채널 수로 부름(리뷰 R14)
             if f"c{d.cluster_id}" in n_ch and int(n) != n_ch[f"c{d.cluster_id}"]:
                 out.append(f"c{d.cluster_id} reason의 채널 수 {n}이 입력({n_ch[f'c{d.cluster_id}']}개)과 다름: {d.reason[:80]}")
-        for n in _NUM.findall(d.reason):
+        for n in DECIMAL.findall(d.reason):
             pat = rf"(?<![\d.]){re.escape(n)}(?![\d])"
             if not re.search(pat, doc) and not re.search(pat, shared):
                 out.append(f"c{d.cluster_id} reason의 숫자 {n}이 입력에 없음: {d.reason[:80]}")
@@ -281,8 +279,12 @@ def reason_mismatches(plan: BriefingPlan, inp: EditorSelectInput, site_names: li
 
 
 # ---------- 적용 ----------
+def ascii_slug(text: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "-", text.lower())
+
+
 def slugify(hint: str) -> str:
-    s = re.sub(r"[^a-z0-9]+", "-", hint.lower()).strip("-")
+    s = ascii_slug(hint).strip("-")
     return "-".join(s.split("-")[:4]) or "topic"
 
 
@@ -293,8 +295,7 @@ def relation_label(db: DB, topic_id: str | None) -> str:
                         "WHERE t.topic_id=?", (topic_id,)).fetchone()
     if r is None:
         return ""
-    y, w = r["week"].split("-W")
-    monday = date.fromisocalendar(int(y), int(w), 1)
+    monday = week_days(r["week"])[0]
     nth = (monday.day + monday.replace(day=1).weekday() - 1) // 7 + 1  # 달력 줄 기준(1일이 든 주가 1주차)
     return f"{monday.month}월 {nth}주차 '{r['title']}' 토픽의 후속"
 
@@ -305,7 +306,7 @@ def apply(plan: BriefingPlan, cands: list[Candidate], week: str, db: DB) -> list
     used: set[str] = set()
     out = []
     for t in sorted(plan.topics, key=lambda t: t.rank):
-        base = f"w{int(week.split('-W')[1])}-{slugify(t.slug_hint)}"
+        base = f"w{week_days(week)[0].isocalendar().week}-{slugify(t.slug_hint)}"
         tid, k = base, 2
         while tid in used:
             tid, k = f"{base}-{k}", k + 1
@@ -336,7 +337,7 @@ def fallback_plan(cands: list[Candidate], cfg: BriefConfig, reason: str) -> Brie
                             drop_reason=None if c.cluster_id in chosen else "other") for c in cands],
         splits=[],
         topics=[PlannedTopic(cluster_ids=[c.cluster_id], rank=i, lead=i == 1, relation=Relation(type="new", topic_id=None),
-                             relation_reason="대체 계획", angle="", slug_hint=re.sub(r"[^a-z0-9]+", "-", c.label.lower())[:30]
+                             relation_reason="대체 계획", angle="", slug_hint=ascii_slug(c.label)[:30]
                              or f"c{c.cluster_id}")
                 for i, c in enumerate(top, 1)],
         featured_repos=[], log=f"대체 계획: 점수 순 상위 {n}개 ({reason})", attention=True)
@@ -399,10 +400,15 @@ def select(ctx: Ctx, cands: list[Candidate], ev: WeekEvidence, cfg: BriefConfig,
 
 
 def save(db: DB, res: SelectResult, run_id: str, week: str) -> None:
+    save_plan(db, run_id, week, res.source, res.plan.model_dump_json() if res.plan else "{}", res.topics)
+
+
+def save_plan(db: DB, run_id: str, week: str, source: str, plan_json: str, topics: list[Applied]) -> None:
+    """briefing_plans 한 줄과 topics 행들. 선별 결과(save)와 이어 받은 계획(--from-step write 이후)이 같이 쓴다."""
     with db.conn:
         db.conn.execute("INSERT INTO briefing_plans(run_id, week, source, plan_json, created_at) VALUES (?,?,?,?,?)",
-                        (run_id, week, res.source, res.plan.model_dump_json() if res.plan else "{}", now_kst()))
-        for t in res.topics:
+                        (run_id, week, source, plan_json, now_kst()))
+        for t in topics:
             db.conn.execute(
                 "INSERT INTO topics(run_id, topic_id, week, cluster_ids_json, rank, lead, relation_type, relation_topic_id, "
                 "relation_label, status, angle) VALUES (?,?,?,?,?,?,?,?,?,?,?)",

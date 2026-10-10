@@ -25,7 +25,7 @@ from trendsit.brief.evidence import week_evidence  # noqa: E402
 from trendsit.brief.weekly import make_decider  # noqa: E402
 from trendsit.core import config  # noqa: E402
 from trendsit.core.context import open_ctx  # noqa: E402
-from trendsit.filter.embed import make_embedder  # noqa: E402
+from trendsit.filter.embed import embed_interests, make_embedder  # noqa: E402
 
 
 def main() -> int:
@@ -45,11 +45,8 @@ def main() -> int:
         cfg = base.model_copy(deep=True)
         cfg.cluster.embed_text = mode
         ev = week_evidence(ctx.db, args.week)
-        table = al.load_decided(ctx.db, al.build(list(ev.members.values()), config.load("keywords.yaml"),
-                                                 cfg.aliases.fuzz_min_score,
-                                             cfg.aliases.transliteration))
-        cl.score_video_relevance(list(ev.members.values()), embedder, [(x.keyword_id, x.text) for x in flt.interests],
-                                 cfg.evidence.video_relevance_high)
+        table = al.decided_table(ctx.db, list(ev.members.values()), cfg)
+        cl.score_video_relevance(ev, embedder, embed_interests(embedder, flt), cfg)
         res = cl.cluster_week(ctx.db, ev, table, cfg, embedder, make_decider(ctx))
         owner = {k: i for i, c in enumerate(res.clusters) for k in c.members}
         tp = fp = fn = tn = 0

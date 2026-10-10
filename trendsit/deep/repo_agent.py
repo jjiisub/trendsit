@@ -9,11 +9,12 @@ import hashlib
 import json
 import re
 from dataclasses import dataclass, field
-from datetime import UTC, date, datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
 
+from ..brief.evidence import week_days
 from ..core import config
 from ..core.artifacts import RepoOnelinerInput
 from ..core.artifacts_repo import HypeCheck, ItemTitle, RepoAnalystInput, RepoCard, TrendingStats
@@ -78,7 +79,7 @@ def hype_check(ctx: Any, full_name: str, stats: TrendingStats | None, readme: st
         if stars >= HYPE_STARS_WEEK:
             end = today(state)
             if stats is not None:  # 지난 주차를 분석할 때는 그 주 일요일까지의 7일
-                week_end = date.fromisocalendar(int(stats.week[:4]), int(stats.week[6:]), 7)
+                week_end = week_days(stats.week)[1]
                 end = min(end, week_end + timedelta(days=1))
             since = (datetime.combine(end, datetime.min.time(), UTC) - timedelta(days=7)).strftime("%Y-%m-%dT%H:%M:%SZ")
             until = datetime.combine(end, datetime.min.time(), UTC).strftime("%Y-%m-%dT%H:%M:%SZ")

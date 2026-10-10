@@ -133,6 +133,11 @@ def doc_text(row: Any, doc_chars: int) -> str:
     return "\n".join(p.strip() for p in parts if p and p.strip())
 
 
+def embed_interests(embedder: Embedder, cfg: FilterConfig) -> list[tuple[str, list[float]]]:
+    """관심사 설명 쿼리의 (키워드 id, 벡터). best_interest의 interests 인자."""
+    return list(zip((x.keyword_id for x in cfg.interests), embedder.embed_queries([x.text for x in cfg.interests]), strict=True))
+
+
 def best_interest(vec: Sequence[float], interests: list[tuple[str, list[float]]]) -> tuple[float, str]:
     """관심사 설명들과의 코사인 최댓값과 그 키워드 id."""
     score, kid = max((cosine(vec, q), k) for k, q in interests)
@@ -210,8 +215,7 @@ def run_filter(db: DB, cfg: FilterConfig, embedder: Embedder, run_id: str, since
     t0 = time.monotonic()
     res = FilterResult(run_id, embedder.model_id, embedder.device)
     rows = item_rows(db, since, until)
-    queries = embedder.embed_queries([x.text for x in cfg.interests])
-    interests = [(x.keyword_id, q) for x, q in zip(cfg.interests, queries, strict=True)]
+    interests = embed_interests(embedder, cfg)
     vecs, res.computed = embeddings_for(db, embedder, rows, cfg)
     out = []
     for r in rows:

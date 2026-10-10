@@ -11,6 +11,7 @@ from pydantic import BaseModel, ValidationError
 from ..tools import TOOLS, ToolOutput, ToolRejected
 from .artifacts import RoleInput, RoleOutput, apply_enforce
 from .budget import BudgetExceeded
+from .config import loc_to_path
 from .llm import LLMError, parse_json_output, strict_json_schema
 from .render import render_data
 from .role import Role, enforce_detail, initial_messages, record_llm
@@ -103,14 +104,6 @@ ERROR_KO = {  # pydantic 오류 종류 → 모델에게 줄 짧은 설명
 }
 
 
-def _loc(loc: tuple[Any, ...]) -> str:
-    """('origin', 'items', 0, 'kind') → origin.items[0].kind"""
-    out = ""
-    for part in loc:
-        out += f"[{part}]" if isinstance(part, int) else (f".{part}" if out else str(part))
-    return out or "(최상위)"
-
-
 def validation_paths(e: ValidationError, limit: int = 5) -> str:
     """도구 인자 검증 오류를 칸 경로와 함께 한 줄씩(S1 리뷰 M4). 작은 모델이 중첩 인자를 고칠 수 있게."""
     parts = []
@@ -121,7 +114,7 @@ def validation_paths(e: ValidationError, limit: int = 5) -> str:
             reason += f" (허용: {ctx['expected']})"
         elif err["type"] not in ("missing", "extra_forbidden") and "input" in err:
             reason += f" (받은 값: {json.dumps(err['input'], ensure_ascii=False, default=str)[:60]})"
-        parts.append(f"{_loc(err['loc'])}: {reason}")
+        parts.append(f"{loc_to_path(err['loc']) or '(최상위)'}: {reason}")
     more = len(e.errors()) - limit
     return "; ".join(parts) + (f" 외 {more}건" if more > 0 else "")
 

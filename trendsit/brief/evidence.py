@@ -215,20 +215,22 @@ def week_evidence(db: DB, week: str) -> WeekEvidence:
     return WeekEvidence(week, members, {"no_card": no_card, "no_digest": no_digest, "irrelevant_repo": irrelevant})
 
 
+def pack_index(items: list[EvidenceItem]) -> dict[str, list[EvidenceItem]]:
+    """근거 id → 그 id의 항목들(quote + 수치 + 주장은 한 묶음)."""
+    out: dict[str, list[EvidenceItem]] = {}
+    for it in items:
+        out.setdefault(it.id, []).append(it)
+    return out
+
+
 def cap_pack(members: list[Member], max_tokens: int) -> tuple[list[EvidenceItem], list[str]]:
     """토픽 근거를 입력 상한 안으로. 넘치면 관련성 → 채널 다양성 → 출처당 균형 순으로 고른다.
 
     구성원마다 근거를 차례로 하나씩 돌려 담는 방식(라운드 로빈): 관련성 높은 구성원부터, 같은 관련성이면 아직 안 담은
     채널부터. 한 출처가 상한을 다 쓰지 않게 된다. 반환: (담은 근거, 뺀 근거 id). 근거 id 하나에 항목이 여럿이면
     (quote + 수치 + 주장) 한 묶음으로 담고 뺀다."""
-    def groups(m: Member) -> list[list[EvidenceItem]]:
-        by_id: dict[str, list[EvidenceItem]] = {}
-        for it in m.items:
-            by_id.setdefault(it.id, []).append(it)
-        return list(by_id.values())
-
     order = sorted(members, key=lambda m: (RELEVANCE_RANK.get(m.relevance, 3), m.key))
-    queues = {m.key: groups(m) for m in order}
+    queues = {m.key: list(pack_index(m.items).values()) for m in order}
     total, kept, dropped = 0, [], []
     seen_channels: set[str] = set()
     while any(queues.values()):

@@ -274,3 +274,10 @@ class DB:
                  row.get("forks"), run_id, row.get("score"), row.get("filter_status"), row.get("filter_reason"),
                  _json(row.get("keywords"))))
         return exists is None
+
+
+def open_db(data_dir: Path | None = None) -> DB:
+    """실제 DB(data/trendsit.db). data_dir은 테스트·다른 작업 폴더용."""
+    from .config import ROOT
+
+    return DB((data_dir or ROOT / "data") / "trendsit.db")

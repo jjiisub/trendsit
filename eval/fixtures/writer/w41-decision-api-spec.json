@@ -1,0 +1,141 @@
+{
+ "input": {
+  "plan": {
+   "rank": 5,
+   "angle": "predicate·choice·score 출력 유형 스펙",
+   "relation": {
+    "type": "follow_up",
+    "topic_id": "w40-decision-api"
+   }
+  },
+  "evidence": [
+   {
+    "id": "og:1043#q1",
+    "source": "Simon Willison's Weblog",
+    "text": "원문: With gpt-6-luna, input costs $0.10 per 1M tokens. You pay only for input tokens: there are no cache-read, cache-write, or output-token charges.\n(카드 수치, 위 원문에서 뽑음) gpt-6-luna 입력 토큰 가격 [$0.10 per 1M tokens]",
+    "title": "llm-openai-decisions 0.1a0",
+    "url": "https://developers.openai.com/api/docs/guides/decisions"
+   },
+   {
+    "id": "og:1043#q2",
+    "source": "Simon Willison's Weblog",
+    "text": "원문: The Decisions API evaluates text, images, or both and returns typed answers about 10x faster than the Responses API.\n(카드 수치, 위 원문에서 뽑음) Responses API 대비 속도 [10x]",
+    "title": "llm-openai-decisions 0.1a0",
+    "url": "https://developers.openai.com/api/docs/guides/decisions"
+   },
+   {
+    "id": "og:1043#q3",
+    "source": "Simon Willison's Weblog",
+    "text": "원문: gpt-6-luna is the only model currently available. Use the dedicated POST   /v1/decisions endpoint.",
+    "title": "llm-openai-decisions 0.1a0",
+    "url": "https://developers.openai.com/api/docs/guides/decisions"
+   },
+   {
+    "id": "og:1043#q4",
+    "source": "Simon Willison's Weblog",
+    "text": "원문: The Decisions API is in public beta, and we expect to GA in the coming weeks.",
+    "title": "llm-openai-decisions 0.1a0",
+    "url": "https://developers.openai.com/api/docs/guides/decisions"
+   },
+   {
+    "id": "og:1043#q5",
+    "source": "Simon Willison's Weblog",
+    "text": "원문: predicate | Check a condition, such as visible damage or passage relevance. | probability: an estimate from 0 to 1 that the condition is true.",
+    "title": "llm-openai-decisions 0.1a0",
+    "url": "https://developers.openai.com/api/docs/guides/decisions"
+   },
+   {
+    "id": "og:1043#q6",
+    "source": "Simon Willison's Weblog",
+    "text": "원문: choice | Select one option, such as a department or content category. | choice: one of your supplied values.",
+    "title": "llm-openai-decisions 0.1a0",
+    "url": "https://developers.openai.com/api/docs/guides/decisions"
+   },
+   {
+    "id": "og:1043#q7",
+    "source": "Simon Willison's Weblog",
+    "text": "원문: score | Rate an input against ordered levels, such as issue severity. | score: the probability-weighted average of the level indices.",
+    "title": "llm-openai-decisions 0.1a0",
+    "url": "https://developers.openai.com/api/docs/guides/decisions"
+   },
+   {
+    "id": "it:1043#q1",
+    "source": "Simon Willison's Weblog",
+    "text": "원문: OpenAI released their new Jev-style Decisions API, as previously announced at last week's DevDay.",
+    "title": "llm-openai-decisions 0.1a0",
+    "url": "https://simonwillison.net/2026/Oct/6/llm-openai-decisions/"
+   },
+   {
+    "id": "it:1043#q2",
+    "source": "Simon Willison's Weblog",
+    "text": "원문: Unlike Jev, the new gpt-6-luna decision model supports image input in addition to text.",
+    "title": "llm-openai-decisions 0.1a0",
+    "url": "https://simonwillison.net/2026/Oct/6/llm-openai-decisions/"
+   },
+   {
+    "id": "it:1043#q3",
+    "source": "Simon Willison's Weblog",
+    "text": "원문: Both models charge for input it and not for output: OpenAI's is 10 cents per million input tokens, Jev's is 4.2 cents per million.\n(카드 수치, 위 원문에서 뽑음) OpenAI Decisions API 입력 토큰 가격 [10 cents per million input tokens]\n(카드 수치, 위 원문에서 뽑음) Jev 입력 토큰 가격 [4.2 cents per million]",
+    "title": "llm-openai-decisions 0.1a0",
+    "url": "https://simonwillison.net/2026/Oct/6/llm-openai-decisions/"
+   },
+   {
+    "id": "it:1043#q4",
+    "source": "Simon Willison's Weblog",
+    "text": "원문: Jev supports three question types for yes/no, choices, or scores. OpenAI Decisions supports the same three types.",
+    "title": "llm-openai-decisions 0.1a0",
+    "url": "https://simonwillison.net/2026/Oct/6/llm-openai-decisions/"
+   }
+  ],
+  "previous": {
+   "topic_id": "w40-decision-api",
+   "title": "오픈AI, GPT-6 Luna 기반 디시전스 API 출시",
+   "summary": "오픈AI가 GPT-6 Luna 기반 디시전스 API를 출시했다. ==채팅 모델이 아닌 판단 전용 API==로, 응답 150ms로 GPT-6 Luna(1.6초)보다 빠르며, 자사 에이전트 안전성 제어에 활용된다.",
+   "points": [
+    "오픈AI가 29일 데브데이 2026에서 개발자가 미리 정해놓은 선택지 중 하나를 골라주는 ==디시전스 API(Decisions API)==를 출시함",
+    "디시전스 API는 채팅 모델이 아니라 사전 정의된 답변과 신뢰도 점수를 반환하며, 콘텐츠 분류·요청 라우팅·에이전트 다음 행동 선택에 적합함",
+    "응답 시간 150ms로, GPT-6 Luna(1.6초)보다 빠름",
+    "오픈AI가 자사 에이전트 시스템 내부의 안전성 제어 및 오작동 방지 장치로 이 모델을 활용하겠다고 밝힘",
+    "구조와 역할이 타입세이프 AI의 판단 전용 모델 '제브(Jev)'와 사실상 동일함",
+    "현재 제한된 프리뷰 단계이며, 정식 출시가 며칠 내로 예정됨"
+   ]
+  },
+  "aliases": [
+   {
+    "canonical": "GPT-6 Astra",
+    "aliases": [
+     "GPT-6 아스트라"
+    ]
+   },
+   {
+    "canonical": "GPT-6 Luna",
+    "aliases": [
+     "gpt-6-luna"
+    ]
+   }
+  ],
+  "limits": {
+   "points": [
+    2,
+    3
+   ],
+   "overview_sentences": [
+    2,
+    4
+   ],
+   "summary_sentences": [
+    1,
+    3
+   ],
+   "highlights_page": [
+    3,
+    4
+   ],
+   "numbers_groups_max": 2,
+   "events_groups_max": 1,
+   "concepts_max": 3
+  }
+ },
+ "expect": {},
+ "note": "2026-W41 실제 토픽 입력(run 20261010-124834-weekly-75b1)"
+}

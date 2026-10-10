@@ -10,7 +10,8 @@ from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from ..collect.links import normalize_url as norm_url  # artifacts_text를 여기서 import하면 합치기 순서가 꼬임
+from ..collect.links import XML_REF
+from ..collect.links import normalize_url as norm_url
 from .registry import ToolOutput, ToolRejected, tool
 
 HEAD_CHARS = 3000
@@ -44,15 +45,12 @@ def remember(state: Any, url: str, text: str, depth: int | None = None) -> None:
         res.setdefault("page_depth", {})[page_key(url)] = depth
 
 
-_REF = re.compile(r'<ref target="([^"]+)">(.*?)</ref>', re.S)
-
-
 def page_links(xml: str, base: str) -> list[dict[str, str]]:
     """본문 링크 전부(같은 사이트 포함: 공식 블로그 → 같은 도메인 논문·문서). http/https만, 자기 자신·조각 제외."""
     from urllib.parse import urljoin, urlsplit
 
     out, seen = [], {norm_url(base)}
-    for href, anchor in _REF.findall(xml):
+    for href, anchor in XML_REF.findall(xml):
         url = urljoin(base, href.strip())
         if urlsplit(url).scheme not in ("http", "https"):
             continue
