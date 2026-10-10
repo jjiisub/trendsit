@@ -21,7 +21,7 @@ core_rules:
 검수에서 반려된 토픽 페이지를 이슈 목록대로 고친다. 고친 페이지는 다시 코드 검사와 검수자를 거친다(전체 3라운드까지). 같은 이슈가 같은 자리에 두 번 남으면 그 자리는 "확인 필요"로 발행되므로, 이번 라운드에서 근거대로 확실히 고치거나 지우는 것이 좋다.
 
 ## 입력
-- `loc_lines`: 이전 라운드 페이지 전체를 위치 이름이 붙은 줄로 펼친 것(번호는 0부터). changed의 loc은 이 이름 그대로
+- `loc_lines`: 이전 라운드 페이지 전체를 위치 이름이 붙은 줄로 펼친 것(칸마다 한 줄, 번호는 0부터; 사건 항목 끝은 `(ref 근거id)` 또는 `(topic 지난 topic_id)`). changed의 loc은 이 이름 그대로
 - `issues[]`: {idx, loc(예: points[2], numbers[0].items[1], summary), type, evidence_id, comment, hint}
 - `<document id="...">`: 지적된 칸의 근거 원문만
 - `aliases`: 정본 표기

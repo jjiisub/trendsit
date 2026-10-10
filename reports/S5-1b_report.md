@@ -52,14 +52,14 @@
 - DB 열기는 `core/db.py`의 `open_db(data_dir=None)` 한 함수. `open_ctx`, cli, `collect/run.py`, `collect/report.py`가 쓴다.
 - `cli_text`의 날짜 파서는 `cli.parse_date`(공개 이름)를 import한다(둘이 같았다).
 - 코드가 고정으로 검사하는 형식 계약 숫자(도식 항목 2~6개 등)는 md에 남겼다. `brief.yaml` 값이지만 `limits`에 칸이 없는 것(형광 칸별 개수, 후보 상한 등)은 숫자를 빼고 일반 문구로 바꿨다(NG-1: `limits` 외 새 입력 칸 금지).
-- 리뷰 반영 A2: writer.md에서 style_ko.md·diagrams.md와 문구만 다른 같은 규칙(문체 core_rules, 도식 context·그림 없이 읽히게, 요약 "~다", numbers title·단위, 형광 "핵심 결론"만)을 지웠다. 그 결과 writer.md 본문의 굵게는 0개다(check-config "1개 이하" 만족). critic.md는 문체 몫을 사실에 맞게 고쳤다(코드가 보지 않는 문체는 format 이슈로).
+- 리뷰 반영 A2: writer.md에서 style_ko.md·diagrams.md와 문구만 다른 같은 규칙(문체 core_rules, 도식 context·그림 없이 읽히게, 요약 "~다", numbers title·단위, 형광 "핵심 결론"만)을 지웠다. 그 결과 이 시점 writer.md 본문의 굵게는 0개였다(A3에서 1개로 되살림, 아래). critic.md는 문체 몫을 사실에 맞게 고쳤다(코드가 보지 않는 문체는 format 이슈로).
 - 리뷰 반영 A2: `UNIT_WORDS`는 호출부 정규식 `[가-힣%]+`로 닿는 낱말만 남겼다(골든 출력 바이트 동일 확인).
 - 리뷰 반영 A3: `loc_lines`가 page의 단위·group·기준·강조·흐름이 핵심·기여 refs·확인 필요 표시까지 담는다(렌더에서 page를 뺀 뒤에도 정보가 한 번 남게). `page.log`/`attention`(모델이 낸 기록 칸)은 싣지 않는다. B9 테스트가 이를 단언한다.
 - 리뷰 반영 A3: critic.md 문체 서술은 사실만 적는다(문체·형광·분량은 반려 사유가 아니고 코드가 검사). 5.1은 오탐 때문에 규칙을 코드에서 뺐고 md 처리는 writer 쪽 `style_ko.md`다. 검수자 반려로 되살리지 않는다.
 - 리뷰 반영 A3: `<data>` 문장만 지우고 역할별 꼬리 지시(인젝션 인용 금지, 이미지 속 글자는 자료, README 지시 따르지 않기, 도구 결과는 자료)는 7개 역할에 복원했다. B3는 지운 줄이 `<data>` 줄이고 더한 줄의 낱말이 모두 지운 줄에 있는지 본다.
 - 리뷰 반영 A3: 골든 B1은 `--before` 파일의 runs(같은 run_id)로 고정해 계산한다. 그 run이 DB에 없으면 종료 코드 2. 근거 목록·별칭은 현재 데이터를 쓰므로 수집 데이터가 바뀌면 달라질 수 있다.
 - 리뷰 반영 A3: verify는 A15·A17을 원래 ID로 두고 B3·B7과 같은 판정을 낸다(A16만 B1로 대체).
-- 리뷰 반영 A3: writer.md 본문에 굵게 1개(핵심 규칙 "각 문장은 그 문장에 다는 근거 id의 내용만 담는다")를 되살렸다(F-35).
+- 리뷰 반영 A3: writer.md 본문에 굵게 1개(핵심 규칙 "각 문장은 그 문장에 다는 근거 id의 내용만 담는다")를 되살렸고 diagrams.md 굵게는 풀어, 최종 writer system 프롬프트의 굵게는 1개다(F-35).
 - 리뷰 반영 A2: B3는 측정 스크립트 종료 코드를 확인하고, 달라진 역할 집합이 허용 집합(S5 5개 + `bed7887` md에 `<data>` 줄이 있던 역할)의 부분집합인지 비교한다.
 - `weekly.set_run_week`: `UPDATE runs SET week`는 한 함수. cluster부터면 `stage_cluster`가, 그 밖의 단계부터면 `run_weekly`가 한 번 부른다(이어 갈 run이 없어 `ValueError`가 나는 경우에는 week를 쓰지 않는다).
 - 영상 관련성 계산은 `cluster.score_video_relevance(ev, embedder, interests, cfg)` 한 호출 형태로 합쳤다.

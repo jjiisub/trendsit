@@ -116,7 +116,7 @@ if uv run --quiet python scripts/s5_1_prompts.py --diff reports/S5-1/prompts_bef
     while IFS= read -r l; do
       [ -z "$l" ] && continue
       t="${l#+}"; t="${t#- }"
-      for w in $t; do echo "$removed" | grep -qF -- "$w" || { bad="$bad $r"; break; }; done  # 더한 줄의 낱말은 모두 지운 줄에 있던 것
+      read -ra ws <<<"$t"; for w in ${ws[@]+"${ws[@]}"}; do echo "$removed" | grep -qF -- "$w" || { bad="$bad $r"; break; }; done  # 더한 줄의 낱말은 모두 지운 줄에 있던 것
     done < <(echo "$d" | grep -E '^\+' || true)
   done
 else

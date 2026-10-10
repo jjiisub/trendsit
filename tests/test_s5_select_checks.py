@@ -463,5 +463,8 @@ def test_render_no_page_dup():
                            EventItem(date="2026-10-02", text="출시", ref="it:1#q1", topic_id=None)])
     full = page(numbers=[g], events=[ev])
     text = render_data(CriticInput(loc_lines=loc_lines(full), page=full, evidence=[], angle="a", code_warnings=[], round=1))
+    lines = text.splitlines()
+    assert all(any(ln == x for ln in lines) for x in loc_lines(full))  # loc마다 정확히 한 줄
+    assert "events[0].items[0]: 2026-10-01 발표 (ref it:1#q1)" in lines
     for needle in ("단위 %", "group grp", "[기준]", "[강조]", "흐름이 핵심", "[video] 발표 슬라이드의 지연 수치 (refs vd:5@30)"):
         assert text.count(needle) == 1, needle

@@ -73,7 +73,9 @@ def render_body(obj: Any) -> str:
     if isinstance(obj, BaseModel):
         out: list[str] = []
         for name in type(obj).model_fields:
-            if name not in getattr(obj, "RENDER_SKIP", ()):
+            if name in getattr(obj, "RENDER_LINES", ()):  # list[str]을 한 항목 한 줄로
+                out += [f"{name}:", *getattr(obj, name)]
+            elif name not in getattr(obj, "RENDER_SKIP", ()):
                 out += _lines(name, getattr(obj, name))
         return "\n".join(out)
     return "\n".join(_lines("", obj))

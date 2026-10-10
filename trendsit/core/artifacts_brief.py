@@ -257,7 +257,7 @@ def loc_lines(page: TopicPage) -> list[str]:
                 + (" [강조]" if it.emphasis else "") for j, it in enumerate(g.items)]
     for i, g in enumerate(page.events):
         out.append(f"events[{i}] (anchor {g.anchor}{', 흐름이 핵심' if g.flow_is_point else ''}): {g.title} / context: {g.context}")
-        out += [f"events[{i}].items[{j}]: {it.date} {it.text} ({it.ref or it.topic_id})" for j, it in enumerate(g.items)]
+        out += [f"events[{i}].items[{j}]: {it.date} {it.text} ({"ref " + it.ref if it.ref else "topic " + it.topic_id})" for j, it in enumerate(g.items)]
     out += [f"contributions[{i}]: [{c.channel}] {c.text} (refs {', '.join(c.refs)})" for i, c in enumerate(page.contributions)]
     out += [f"concepts[{i}]: {c.term} - {c.desc}" for i, c in enumerate(page.concepts)]
     return out
@@ -282,6 +282,7 @@ class IndexedIssue(Issue):
 
 
 class WriterReviseInput(RoleInput):
+    RENDER_LINES: ClassVar[tuple[str, ...]] = ("loc_lines",)
     RENDER_SKIP: ClassVar[tuple[str, ...]] = ("previous",)  # loc_lines와 같은 내용이라 렌더하지 않음(코드는 객체를 씀)
 
     loc_lines: list[str] = Field(default=[], description="previous 페이지의 모든 칸을 위치 이름(loc)이 붙은 줄로 펼친 것")
@@ -305,6 +306,7 @@ class TopicPageRevision(RoleOutput):
 
 # ---------- critic (검수자) ----------
 class CriticInput(RoleInput):
+    RENDER_LINES: ClassVar[tuple[str, ...]] = ("loc_lines",)
     RENDER_SKIP: ClassVar[tuple[str, ...]] = ("page",)  # loc_lines와 같은 내용이라 렌더하지 않음(코드는 객체를 씀)
 
     loc_lines: list[str] = Field(default=[], description="page의 모든 칸을 위치 이름(loc)이 붙은 줄로 펼친 것. 이슈 loc은 이 이름 그대로")

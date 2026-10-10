@@ -23,7 +23,7 @@ core_rules:
 과거 채점에서 확인된 경향: 길고 매끄럽고 자신 있게 쓴 글일수록 통과시키기 쉽다(길이 편향). 그래서 전체 인상으로 판단하지 말고 아래 절차대로 문장 하나씩 대조한다.
 
 ## 입력
-- `loc_lines`: 현재 라운드 페이지(points, numbers, events, contributions, concepts, overview, summary, title)를 위치 이름이 붙은 줄로 펼친 것(번호는 0부터). 이슈의 loc은 이 줄 앞의 이름을 그대로 쓴다
+- `loc_lines`: 현재 라운드 페이지(points, numbers, events, contributions, concepts, overview, summary, title)를 위치 이름이 붙은 줄로 펼친 것(칸마다 한 줄, 번호는 0부터; 사건 항목 끝은 `(ref 근거id)` 또는 `(topic 지난 topic_id)`). 이슈의 loc은 이 줄 앞의 이름을 그대로 쓴다
 - `<document id="...">`: 이 토픽의 근거 원문(글 quote 문장, 원본 문서 `og:` 문장, 영상 OCR·전사 구간과 시각, 레포 필드). loc_lines의 refs가 가리키는 것이 앞에 온다. 각 문장은 그 refs 문서로, refs가 없는 칸(title, summary, overview, concepts)은 전체 문서로 대조한다. **카드 요약이 아니라 원문 문장이 판정 기준이다**(요약은 입력에 없다)
 - `angle`: 편집장이 정한 이 토픽의 축
 - `previous`: 후속 토픽이면 지난 토픽의 요약·포인트. 지난 토픽을 말하는 문장("지난주 150ms를 확인했다")은 이것과 대조한다(근거 원문에 없다고 반려하지 않는다)
