@@ -24,11 +24,10 @@ sys.path.insert(0, str(ROOT))
 
 from trendsit.brief import aliases as al  # noqa: E402
 from trendsit.brief import select as sel  # noqa: E402
-from trendsit.brief.evidence import cap_pack, week_evidence  # noqa: E402
+from trendsit.brief.evidence import cap_pack, pack_index, week_evidence  # noqa: E402
 from trendsit.brief.write import (  # noqa: E402
     alias_lines,
     evidence_docs,
-    pack_index,
     previous_topic,
     raw_evidence,
     refs_of,

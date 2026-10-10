@@ -14,7 +14,7 @@ from __future__ import annotations
 import json
 import re
 from dataclasses import dataclass, field
-from datetime import date
+from datetime import timedelta
 from typing import Any
 
 from ..core.artifacts import Document
@@ -35,7 +35,7 @@ from ..core.db import DB, now_kst
 from ..core.errors import LLMError
 from ..core.numbers import DECIMAL
 from ..core.role import RoleFailed, load_role, run_role
-from .evidence import Member, WeekEvidence
+from .evidence import Member, WeekEvidence, week_days
 
 SELECT_RETRIES = 2
 RECONCILE_MARK = "코드 정리: topics에 없음"  # reconcile이 drop으로 바꾼 결정의 reason 끝(실행 요약 drops_by가 셈)
@@ -157,9 +157,7 @@ def recent_topics(db: DB, week: str, weeks_back: int) -> list[RecentTopic]:
 
 
 def prev_week(week: str) -> str:
-    y, w = week.split("-W")
-    d = date.fromisocalendar(int(y), int(w), 1).toordinal() - 7
-    iso = date.fromordinal(d).isocalendar()
+    iso = (week_days(week)[0] - timedelta(days=7)).isocalendar()
     return f"{iso[0]}-W{iso[1]:02d}"
 
 
@@ -281,8 +279,12 @@ def reason_mismatches(plan: BriefingPlan, inp: EditorSelectInput, site_names: li
 
 
 # ---------- 적용 ----------
+def ascii_slug(text: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "-", text.lower())
+
+
 def slugify(hint: str) -> str:
-    s = re.sub(r"[^a-z0-9]+", "-", hint.lower()).strip("-")
+    s = ascii_slug(hint).strip("-")
     return "-".join(s.split("-")[:4]) or "topic"
 
 
@@ -293,8 +295,7 @@ def relation_label(db: DB, topic_id: str | None) -> str:
                         "WHERE t.topic_id=?", (topic_id,)).fetchone()
     if r is None:
         return ""
-    y, w = r["week"].split("-W")
-    monday = date.fromisocalendar(int(y), int(w), 1)
+    monday = week_days(r["week"])[0]
     nth = (monday.day + monday.replace(day=1).weekday() - 1) // 7 + 1  # 달력 줄 기준(1일이 든 주가 1주차)
     return f"{monday.month}월 {nth}주차 '{r['title']}' 토픽의 후속"
 
@@ -305,7 +306,7 @@ def apply(plan: BriefingPlan, cands: list[Candidate], week: str, db: DB) -> list
     used: set[str] = set()
     out = []
     for t in sorted(plan.topics, key=lambda t: t.rank):
-        base = f"w{int(week.split('-W')[1])}-{slugify(t.slug_hint)}"
+        base = f"w{week_days(week)[0].isocalendar().week}-{slugify(t.slug_hint)}"
         tid, k = base, 2
         while tid in used:
             tid, k = f"{base}-{k}", k + 1
@@ -336,7 +337,7 @@ def fallback_plan(cands: list[Candidate], cfg: BriefConfig, reason: str) -> Brie
                             drop_reason=None if c.cluster_id in chosen else "other") for c in cands],
         splits=[],
         topics=[PlannedTopic(cluster_ids=[c.cluster_id], rank=i, lead=i == 1, relation=Relation(type="new", topic_id=None),
-                             relation_reason="대체 계획", angle="", slug_hint=re.sub(r"[^a-z0-9]+", "-", c.label.lower())[:30]
+                             relation_reason="대체 계획", angle="", slug_hint=ascii_slug(c.label)[:30]
                              or f"c{c.cluster_id}")
                 for i, c in enumerate(top, 1)],
         featured_repos=[], log=f"대체 계획: 점수 순 상위 {n}개 ({reason})", attention=True)

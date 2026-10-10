@@ -46,6 +46,17 @@ def plain(text: str) -> str:
     return HL.sub(r"\1", text or "")
 
 
+def page_refs(page: TopicPage) -> list[tuple[str, int, str, list[str]]]:
+    """페이지의 근거 id 칸 전부: (칸 이름, 번호, topic_evidence.field, 근거 id들). 포인트, 수치 그룹(항목, context),
+    사건 그룹(항목, context), 기여 문장 순. 근거 id는 context 글 속 id도 센다."""
+    out = [("points", i, "point", p.refs) for i, p in enumerate(page.points)]
+    for i, g in enumerate(page.numbers):
+        out += [("numbers", i, "number", [it.ref for it in g.items]), ("numbers", i, "context", REF.findall(g.context))]
+    for i, g in enumerate(page.events):
+        out += [("events", i, "event", [it.ref for it in g.items if it.ref]), ("events", i, "context", REF.findall(g.context))]
+    return out + [("contributions", i, "contribution", c.refs) for i, c in enumerate(page.contributions)]
+
+
 @dataclass
 class CheckResult:
     page: TopicPage
@@ -226,16 +237,8 @@ def check(page: TopicPage, pack: dict[str, list[EvidenceItem]], n_sources: int, 
             if r not in pack:
                 issues.append(_issue(loc, "wrong_ref", f"{loc}의 근거 id {r}가 이 토픽 근거 목록에 없음",
                                      "근거 목록의 id만", evidence_id=r))
-    for i, p in enumerate(page.points):
-        refs_exist(f"points[{i}]", p.refs)
-    for g_i, g in enumerate(page.numbers):
-        refs_exist(f"numbers[{g_i}]", [it.ref for it in g.items])
-        refs_exist(f"numbers[{g_i}].context", REF.findall(g.context))
-    for g_i, g in enumerate(page.events):
-        refs_exist(f"events[{g_i}]", [it.ref for it in g.items if it.ref])
-        refs_exist(f"events[{g_i}].context", REF.findall(g.context))
-    for c_i, c in enumerate(page.contributions):
-        refs_exist(f"contributions[{c_i}]", c.refs)
+    for name, i, field_, ids in page_refs(page):
+        refs_exist(f"{name}[{i}]" + (".context" if field_ == "context" else ""), ids)
     # 근거 채널이 2개 이상이면 채널마다 1문장(리뷰 R12, OpenRig: github 한 줄뿐이고 text 빠짐)
     channels = {it.channel for items in pack.values() for it in items}
     missing = sorted(channels - {c.channel for c in page.contributions}) if len(channels) >= 2 else []

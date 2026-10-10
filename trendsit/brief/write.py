@@ -45,7 +45,7 @@ from ..core.errors import LLMError
 from ..core.role import RoleFailed, load_role, run_role
 from . import checks
 from .aliases import AliasTable, to_original, translit_pattern
-from .evidence import EvidenceItem, Member, cap_pack
+from .evidence import EvidenceItem, Member, cap_pack, pack_index
 from .select import Applied
 
 LOC = re.compile(r"^(title|summary|overview)$|^(points|numbers|events|contributions|concepts)\[(\d+)\]")
@@ -87,13 +87,6 @@ class TopicResult:
 
 
 # ---------- 입력 조립 ----------
-def pack_index(items: list[EvidenceItem]) -> dict[str, list[EvidenceItem]]:
-    out: dict[str, list[EvidenceItem]] = {}
-    for it in items:
-        out.setdefault(it.id, []).append(it)
-    return out
-
-
 def evidence_docs(pack: dict[str, list[EvidenceItem]]) -> list[Document]:
     """근거 id마다 문서 하나. 글은 quote 문장 + 그 quote의 수치·주장, 영상은 시각의 수치·포인트·라벨, 레포는 필드.
     요약 id(it:{n}, vd:{n})는 CONTRACTS 근거 id가 아니고 원문도 아니라 작성자에게 주지 않는다(리뷰 지적 8).
@@ -174,12 +167,9 @@ def raw_evidence(db: DB, eid: str, items: list[EvidenceItem], window_sec: int) -
 
 
 def refs_of(page: TopicPage) -> list[str]:
-    ids = [r for p in page.points for r in p.refs]
-    ids += [it.ref for g in page.numbers for it in g.items]
-    ids += [it.ref for g in page.events for it in g.items if it.ref]
-    ids += [r for c in page.contributions for r in c.refs]
-    ids += [r for g in [*page.numbers, *page.events] for r in checks.REF.findall(g.context)]
-    return list(dict.fromkeys(ids))
+    order = ("point", "number", "event", "contribution", "context")  # 칸 종류 순(같은 종류는 페이지 순서)
+    slots = sorted(checks.page_refs(page), key=lambda s: order.index(s[2]))
+    return list(dict.fromkeys(r for *_, refs in slots for r in refs))
 
 
 # ---------- 수정 합치기 ----------
@@ -468,15 +458,7 @@ def _loc_refs(page: TopicPage, loc: str) -> list[str]:
     if not m or m.group(1):
         return refs_of(page)
     name, idx = m.group(2), int(m.group(3))
-    items = getattr(page, name)
-    if idx >= len(items):
-        return []
-    x = items[idx]
-    if name == "points" or name == "contributions":
-        return list(x.refs)
-    if name in ("numbers", "events"):
-        return [it.ref for it in x.items if getattr(it, "ref", None)] + checks.REF.findall(x.context)
-    return []
+    return [r for n, i, _f, refs in checks.page_refs(page) if (n, i) == (name, idx) for r in refs]
 
 
 # ---------- 저장 ----------
@@ -502,20 +484,10 @@ def save(db: DB, res: TopicResult, run_id: str) -> None:
                              "fact_support": lg.fact_support}, ensure_ascii=False), lg.step_id))
         page = res.page
         if page is not None and res.status != "failed":
-            rows = []
-            for i, p in enumerate(page.points):
-                rows += [(r, "point", i) for r in p.refs]
-            for i, g in enumerate(page.numbers):
-                rows += [(it.ref, "number", i) for it in g.items]
-                rows += [(r, "context", i) for r in checks.REF.findall(g.context)]
-            for i, g in enumerate(page.events):
-                rows += [(it.ref, "event", i) for it in g.items if it.ref]
-                rows += [(r, "context", i) for r in checks.REF.findall(g.context)]
-            for i, c in enumerate(page.contributions):
-                rows += [(r, "contribution", i) for r in c.refs]
             db.conn.executemany(
                 "INSERT INTO topic_evidence(run_id, topic_id, evidence_id, member, field, idx) VALUES (?,?,?,?,?,?)",
-                [(run_id, t.topic_id, eid, res.member_by_id.get(eid, eid), f, i) for eid, f, i in rows])
+                [(run_id, t.topic_id, eid, res.member_by_id.get(eid, eid), f, i)
+                 for _n, i, f, refs in checks.page_refs(page) for eid in refs])
         db.conn.execute("UPDATE topics SET status=?, final_round=?, title=?, summary=?, checks_json=? "
                         "WHERE run_id=? AND topic_id=?",
                         (res.status, res.final_round, page.title if page else None, page.summary if page else None,

@@ -7,7 +7,7 @@ import json
 import pytest
 
 from tests.conftest import FakeTransport, make_ctx, response
-from trendsit.brief import briefing, pipeline
+from trendsit.brief import briefing, pipeline, report
 from trendsit.brief.weekly import stage_cluster
 from trendsit.core import config
 from trendsit.core.trace import Tracer
@@ -39,7 +39,7 @@ def revision(changes: list[dict]) -> str:
 
 @pytest.fixture
 def week(tmp_path, monkeypatch):
-    monkeypatch.setattr(briefing, "OUT", tmp_path / "out")
+    monkeypatch.setattr(report, "OUT", tmp_path / "out")  # 읽기본·묶기 리포트 모두 이 폴더
     ctx = make_ctx(tmp_path, FakeTransport([]), spec_cap=1.0)
     c = ctx.db.conn
     c.execute("INSERT INTO sources(id, channel, name) VALUES ('openai','text','OpenAI')")
@@ -361,13 +361,11 @@ def run_cmd(ctx, monkeypatch, tmp_path, from_step="select", cfg=None) -> int:
     """cmd_weekly를 그대로(종료 코드, runs.status까지). 임베더·출력 폴더는 모의/임시."""
     import argparse
 
-    from trendsit.brief import report
     from trendsit.cli_brief import cmd_weekly
 
     ctx.tracer = Tracer(ctx.db, "weekly", "S0")
     monkeypatch.setattr("trendsit.core.context.open_ctx", lambda *a, **k: ctx)
     monkeypatch.setattr("trendsit.filter.embed.make_embedder", lambda *a, **k: HashEmbedder())
-    monkeypatch.setattr(report, "OUT", tmp_path / "brief")
     monkeypatch.setattr(report, "LABELS", tmp_path / "labels")
     if cfg is not None:
         orig = config.load
