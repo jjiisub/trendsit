@@ -144,13 +144,24 @@ def test_tool_cap_and_role_settings(make, models):
 
 @pytest.mark.parametrize("url", ["https://github.com/Foo/Bar", "http://example.com/a", "https://arxiv.org/pdf/2401.01234v2"])
 def test_read_more_page_key(url):
-    """fetch_page가 저장한 열쇠(page_key)로 read_more가 찾는다: github 대문자, http, arxiv pdf."""
+    """C-7: fetch_page(u) 뒤 read_more(doc=u)가 거부되지 않는다(github 대문자, http, arxiv pdf). 네트워크 없이 fetcher 대역."""
     from types import SimpleNamespace
 
-    from trendsit.tools.web import ReadMoreArgs, read_more, remember
+    from trendsit.core.agent import DepthTracker
+    from trendsit.tools.web import FetchArgs, ReadMoreArgs, fetch_page, read_more
 
-    state = SimpleNamespace(extras={"fetcher": object(), "link_kinds": object()})
-    remember(state, url, "가" * 3500)
+    class Fetched:
+        ok, text, content_type, error = True, "가" * 3500, "text/plain", None
+        final_url = url
+
+    class FakeFetcher:
+        def fetch(self, u, kind):
+            return Fetched()
+
+    state = SimpleNamespace(extras={"fetcher": FakeFetcher(), "link_kinds": object()}, depth=DepthTracker(None))
+    args = FetchArgs(url=url, parent=None)
+    state.depth.roots.add(args.url)
+    assert fetch_page(args, state).content["parts"] == 2
     out = read_more(ReadMoreArgs(doc=url, part=2), state)
     assert out.content["part"] == 2 and out.content["text"] == "가" * 500
 

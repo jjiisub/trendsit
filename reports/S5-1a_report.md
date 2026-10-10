@@ -18,14 +18,14 @@
 없음(프롬프트 불변, 명세 7장).
 
 ## 4. 결정한 것
-- `--help` 전체 스냅숏은 `s5_1_prompts.py --help-all`(새 파일 예산 절약).
+- `--help` 전체 스냅숏은 `scripts/verify_common.sh`의 `help_all`이 만든다(하위 명령 목록은 도움말에서 읽음, `COLUMNS=100`).
 - `--older-than` 기본값은 `video.yaml retention_days`(argparse default는 None, `--help` 문구는 C-4로 그대로라 "기본 7"이 설정과 어긋날 수 있음).
 - 멈춘 run은 `weeks`를 건드리지 않고(행이 없으면 `open`으로만 생성) 브리핑 읽기본도 쓰지 않는다. weekly 중간의 `weeks.status` clustered/selected 쓰기는 없앴다.
 - 요약 `status` 어휘 `ok` → `done`, `weeks.status`는 요약 상태에서 파생(partial → written).
 - 선별에서도 `PriceUnknown`을 멈춤 사유로 잡는다.
-- `device_flips`는 `tests/test_s2a.py`가 import하므로 남기고 `score_band`만 안으로 넣음. 지우는 기능을 검사하던 `test_missing_spec_modules_are_skipped`는 함께 삭제.
+- `device_flips`·`score_band`는 `cmd_filter_fixtures` 안으로 넣고 `tests/test_s2a.py`는 같은 규칙을 테스트 안에 정의해 맞춤. 지우는 기능을 검사하던 `test_missing_spec_modules_are_skipped`는 함께 삭제.
 - `tools/web.py` fetch_page 깊이는 `hasattr` 방어만 제거(`execute_tool`에서 값을 넘기는 경로가 없음).
-- verify 중첩 실행 제거는 환경변수 `VERIFY_NESTED`(verify 스크립트 안에서만)로 s1~s4의 A1 회귀 재실행을 건너뜀. 각 verify 단독 판정은 그대로.
+- verify 중첩 실행 제거는 `verify_s5`가 s1~s4를 `--reuse <폴더>`로 불러 이미 나온 s0~s1 출력과 종료 코드를 쓰게 함(환경변수·SKIP 없음, PASS 줄 그대로). 단독 실행 판정은 그대로.
 
 ## 5. 스펙과 다르게 한 것
 - 복잡도 예산: 변경 파일이 40을 넘을 것으로 보여 멈추고 보고했고, 사용자가 상한을 60으로 올림(명세 개정 `e17bea8`).

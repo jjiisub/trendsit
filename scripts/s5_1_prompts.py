@@ -2,7 +2,6 @@
 
 실행: uv run python scripts/s5_1_prompts.py [--out <path>] [--diff <before.json>]
 --diff는 지금 값과 비교해 첫 차이를 출력한다(같으면 종료 코드 0, 다르면 1). LLM 호출 없음.
---help-all: 모든 CLI 명령(하위 명령 포함)의 --help를 이어 붙여 출력(C-4 스냅숏, 폭 100 고정).
 """
 
 from __future__ import annotations
@@ -10,7 +9,6 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-import os
 import sys
 from pathlib import Path
 from typing import Any
@@ -57,47 +55,11 @@ def first_diff(a: Any, b: Any, path: str = "") -> str | None:
     return None if a == b else f"{path}: {a} → {b}"
 
 
-def help_all() -> str:
-    """cli.main이 만든 파서를 parse_args 호출 시점에 가로채 하위 파서를 재귀로 순회한다."""
-    os.environ["COLUMNS"] = "100"
-    from trendsit import cli
-
-    class Caught(Exception):
-        pass
-
-    def grab(self: argparse.ArgumentParser, *_a: Any, **_k: Any) -> None:
-        raise Caught(self)
-
-    orig = argparse.ArgumentParser.parse_args
-    argparse.ArgumentParser.parse_args = grab  # type: ignore[method-assign]
-    try:
-        cli.main([])
-    except Caught as e:
-        root = e.args[0]
-    finally:
-        argparse.ArgumentParser.parse_args = orig  # type: ignore[method-assign]
-    out: list[str] = []
-
-    def walk(p: argparse.ArgumentParser, name: str) -> None:
-        out.append(f"$ {name} --help\n{p.format_help()}")
-        for act in p._actions:
-            if isinstance(act, argparse._SubParsersAction):
-                for sub_name, sp in act.choices.items():
-                    walk(sp, f"{name} {sub_name}")
-
-    walk(root, "trendsit")
-    return "\n".join(out)
-
-
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--out")
     ap.add_argument("--diff")
-    ap.add_argument("--help-all", action="store_true")
     args = ap.parse_args()
-    if args.help_all:
-        print(help_all(), end="")
-        return 0
     snap = snapshot()
     text = json.dumps(snap, ensure_ascii=False, sort_keys=True, indent=1) + "\n"
     if args.out:

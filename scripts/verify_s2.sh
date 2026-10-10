@@ -13,11 +13,9 @@ source scripts/verify_common.sh
 
 # ---------- 공통: 회귀, 정적 검사, 설정, 역할 md ----------
 for n in 0 1; do
-  if [ -n "${VERIFY_NESTED:-}" ]; then ok[$n]=1; elif bash "scripts/verify_s$n.sh" >"$TMP/s$n" 2>&1; then ok[$n]=1; else ok[$n]=0; fi
+  if regress "$n"; then ok[$n]=1; else ok[$n]=0; fi
 done
-if [ -n "${VERIFY_NESTED:-}" ]; then
-  echo "SKIP A1 verify_s5가 s0·s1을 이미 실행함"
-elif [ "${ok[0]}" = 1 ] && [ "${ok[1]}" = 1 ]; then
+if [ "${ok[0]}" = 1 ] && [ "${ok[1]}" = 1 ]; then
   pass A1 "verify_s0.sh $(grep -c '^PASS' "$TMP/s0")개, verify_s1.sh $(grep -c '^PASS' "$TMP/s1")개 전부 PASS"
 else
   fail A1 "회귀: verify_s0.sh FAIL [$(grep '^FAIL' "$TMP/s0" | cut -c6- | cut -c1-40 | tr '\n' ';')] verify_s1.sh FAIL [$(grep '^FAIL' "$TMP/s1" | cut -d' ' -f2 | tr '\n' ' ')]"

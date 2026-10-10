@@ -16,14 +16,19 @@ if [ "$FAST" = 1 ]; then
   echo "SKIP A1 --fast: verify_s0~s4 재실행 생략(A2 전체 pytest가 s0~s4 테스트 포함)"
 else
   a1_bad=""
+  mkdir "$TMP/reuse"
   for s in 0 1 2 3 4; do
-    # s1~s4는 s0·s1 회귀를 다시 부르므로 VERIFY_NESTED로 건너뛰게 해 s0~s4가 각각 한 번만 돈다(단독 실행 판정은 그대로)
-    VERIFY_NESTED=1 bash "scripts/verify_s$s.sh" >"$TMP/s$s" 2>&1 || a1_bad="$a1_bad s$s"
+    # s1~s4가 앞 스펙 회귀를 다시 돌리지 않고 이미 나온 출력을 쓰게 한다(--reuse). s0~s4가 각각 한 번만 돌고 PASS 줄은 그대로
+    rc=0
+    if [ "$s" = 0 ]; then bash scripts/verify_s0.sh >"$TMP/reuse/s0" 2>&1 || rc=$?
+    else bash "scripts/verify_s$s.sh" --reuse "$TMP/reuse" >"$TMP/reuse/s$s" 2>&1 || rc=$?; fi
+    echo "$rc" >"$TMP/reuse/s$s.rc"
+    [ "$rc" = 0 ] || a1_bad="$a1_bad s$s"
   done
   if [ -n "$a1_bad" ]; then
-    fail A1 "종료 코드 실패:${a1_bad} / $(grep -h '^FAIL' "$TMP"/s[0-4] | head -3 | tr '\n' ' ')"
+    fail A1 "종료 코드 실패:${a1_bad} / $(grep -h '^FAIL' "$TMP"/reuse/s[0-4] | head -3 | tr '\n' ' ')"
   else
-    pass A1 "verify_s0~s4 종료 코드 0, PASS $(cat "$TMP"/s[0-4] | grep -c '^PASS')개"
+    pass A1 "verify_s0~s4 종료 코드 0, PASS $(cat "$TMP"/reuse/s[0-4] | grep -c '^PASS')개"
   fi
 fi
 
@@ -85,7 +90,7 @@ if uv run --quiet python scripts/s5_1_golden.py --out "$TMP/g.json" >"$TMP/a16" 
 else
   fail A16 "골든 차이 또는 실행 실패: $(head -1 "$TMP/a16")"
 fi
-if uv run --quiet python scripts/s5_1_prompts.py --help-all >"$TMP/help.txt" 2>&1 && diff -q "$TMP/help.txt" reports/S5-1/help_before.txt >/dev/null; then
+if help_all >"$TMP/help.txt" 2>&1 && diff -q "$TMP/help.txt" reports/S5-1/help_before.txt >/dev/null; then
   pass A17 "CLI --help 전부 불변"
 else
   fail A17 "--help 차이: $(diff "$TMP/help.txt" reports/S5-1/help_before.txt | head -2 | tr '\n' ' ')"
