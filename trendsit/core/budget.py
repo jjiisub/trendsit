@@ -11,6 +11,7 @@
 from __future__ import annotations
 
 import json
+import re
 import sys
 import time
 from collections.abc import Callable
@@ -23,6 +24,7 @@ from .config import BudgetConfig, ConfigError, ModelSpec
 from .db import DB, now_kst
 
 PRICE_TTL_S = 24 * 3600
+RUN_TAG = re.compile(r"^RUN-\d{4}-W\d{2}$")  # 자동 실행(S6b) 꼬리표. 상한은 specs.RUN을 꼬리표마다 따로 적용
 
 
 class BudgetExceeded(Exception):
@@ -109,9 +111,10 @@ class Budget:
         self.cfg, self.spec, self.db, self.state_path = cfg, spec, db, state_path
         self.key_status = key_status
         self.prices = prices
-        if spec not in cfg.specs:  # 상한 없는 스펙(오타 포함)으로는 실행하지 않는다
+        cap_key = "RUN" if RUN_TAG.match(spec) else spec
+        if cap_key not in cfg.specs:  # 상한 없는 스펙(오타 포함)으로는 실행하지 않는다
             raise ConfigError("budget.yaml", "specs", f"스펙 '{spec}'의 상한이 없음 (있는 스펙: {', '.join(cfg.specs)})")
-        self.spec_cap: float = cfg.specs[spec]
+        self.spec_cap: float = cfg.specs[cap_key]
         self.session_cost = 0.0
         self.phase_used_at_refresh = 0.0
         self.spec_spent_at_refresh = 0.0
