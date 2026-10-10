@@ -8,6 +8,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 from typing import Any
 
@@ -17,6 +18,15 @@ from ..core.db import DB
 from .evidence import EvidenceItem, week_evidence
 
 OUT = ROOT / "reports" / "S5_brief"
+
+
+def visible_checks(checks: list[str], page: TopicPage) -> list[str]:
+    """⚠ 위치가 없는 도식(코드가 뺀 것)을 가리키면 "빠진 도식"으로(반영 확인 리뷰 F2-c, 이전 규칙으로 저장된 토픽 포함)."""
+    out = []
+    for loc in checks:
+        m = re.match(r"^(numbers|events)\[(\d+)\]", loc)
+        out.append(f"빠진 도식({loc})" if m and int(m.group(2)) >= len(getattr(page, m.group(1))) else loc)
+    return out
 
 
 def _final_page(db: DB, run_id: str, topic_id: str) -> TopicPage | None:
@@ -61,7 +71,7 @@ def export_topic(db: DB, run_id: str, topic_id: str, sources_by_id: dict[str, di
     events = [{"type": "events", "anchor": g.anchor, "title": g.title, "context": g.context,
                "items": [{"date": it.date, "text": it.text} | ({"ref": by_eid.get(it.ref)} if it.ref else {"topic_id": it.topic_id})
                          for it in g.items]} for g in page.events]
-    checks = json.loads(t["checks_json"] or "[]") if "checks_json" in t.keys() else []
+    checks = visible_checks(json.loads(t["checks_json"] or "[]") if "checks_json" in t.keys() else [], page)
     rel: dict[str, Any] = {"type": t["relation_type"] or "new"}
     if t["relation_topic_id"]:
         rel["topic_id"] = t["relation_topic_id"]
@@ -110,7 +120,7 @@ def write_briefing_md(db: DB, week: str, run_id: str | None = None) -> Path:
                   f"`{t['topic_id']}` · 상태 {t['status']} · {t['final_round']}라운드 · 축: {t['angle']}"
                   + (f" · 후속: {t['relation_topic_id']}" if t["relation_topic_id"] else ""), "",
                   *([f"> ⚠ 확인 필요: {', '.join(checks)}(이슈가 남은 채 발행된 위치)", ""]
-                    if (checks := json.loads(t["checks_json"] or "[]")) else []),
+                    if (checks := visible_checks(json.loads(t["checks_json"] or "[]"), page)) else []),
                   f"**요약(홈)** {page.summary}", "", f"**개요** {page.overview}", "", "**핵심 포인트**", ""]
         for i, p in enumerate(page.points, 1):
             refs = "; ".join(f"`{r}` {(srcs.get(r) or {}).get('title', '?')[:50]}" for r in p.refs)

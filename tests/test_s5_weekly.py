@@ -320,3 +320,10 @@ def test_f2_diagram_with_only_critic_issue_is_kept_with_check(week):
     final = json.loads(ctx.db.conn.execute("SELECT page_json FROM topic_pages WHERE run_id=? AND topic_id='w41-model-1' "
                                            "ORDER BY round DESC, id DESC", (run_id,)).fetchone()[0])
     assert t["status"] == "checked" and json.loads(t["checks_json"]) == ["numbers[0]"] and len(final["numbers"]) == 1
+
+
+def test_f2c_check_pointing_to_removed_diagram_is_labeled():
+    from trendsit.core.artifacts_brief import TopicPage
+
+    p = TopicPage.model_validate(json.loads(page(1, "Argon이 DeepSWE에서 77.9% 기록")))
+    assert briefing.visible_checks(["numbers[1]", "points[0]"], p) == ["빠진 도식(numbers[1])", "points[0]"]
