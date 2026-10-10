@@ -157,6 +157,14 @@ for paths in "trendsit/" "roles/ skills/"; do
   [ "${del:-0}" -gt "${ins:-0}" ] && b5="$b5 [$paths +${ins:-0}/-${del:-0}]" || { b5="FAIL"; break; }
 done
 if [ "$b5" != "FAIL" ]; then pass B5 "순 감소(bed7887 기준)$b5"; else fail B5 "순 감소 아님: $stat ($paths)"; fi
+# B11 리포트·README: 체크리스트 전부 [x], 8장 SUMMARY, 9장 전후 줄 수 표, 10장 관문 B 칸(런 뒤 채움 표시)
+r=reports/S5-1b_report.md
+if [ -f $r ] && grep -q '\[x\]' $r && ! grep -q '\[ \]' $r && grep -q '^## 8\. impl-workflow SUMMARY' $r \
+   && grep -q '^## 9\. 줄 수 전후' $r && grep -q '^## 10\. 관문 B 결과 (런 뒤 채움)' $r && grep '현재 상태' README.md | grep -q 'S5-1b'; then
+  pass B11 "S5-1b_report 체크리스트 전부 [x], 8장 SUMMARY, 9장 전후 줄 수 표, 10장 관문 B 칸(런 뒤 채움), README 현재 상태에 S5-1b"
+else
+  fail B11 "reports/S5-1b_report.md 체크리스트·장 제목 또는 README 현재 상태 줄"
+fi
 # A18 효과 없는 설정 키 0(S5-1a 5.7 표): yaml은 주석을 떼고, 스키마(core/config*.py)는 필드 정의 줄에서 찾는다
 DEAD='auto_approve|linkage|per_point_max|runtime|weekly_target_minutes|lang|channel_handle|why|paths|video_max_minutes|frames_per_slide_video'
 dead=$(for f in config/*.yaml; do sed 's/#.*//' "$f" | grep -nE "(^|[[:space:]{,-])($DEAD):" | sed "s#^#$f:#"; done
