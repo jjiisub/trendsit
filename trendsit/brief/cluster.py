@@ -26,7 +26,7 @@ from ..filter.embed import Embedder, cosine, from_blob, to_blob
 from .aliases import AliasTable, norm_key
 from .evidence import RELEVANCE_RANK, Member, WeekEvidence
 
-Decider = Callable[[DecideInput], tuple[DecideAnswer, int | None]]  # (판정, step_id)
+Decider = Callable[[DecideInput], tuple[DecideAnswer, int | None] | None]  # (판정, step_id), None = 예산 초과로 멈춤
 
 
 @dataclass
@@ -194,7 +194,10 @@ def run_decides(pairs: list[Pair], members: dict[str, Member], decider: Decider 
     for p in todo[:cap]:
         if decider is None:
             break
-        ans, step_id = decider(decide_input(p, members))
+        res = decider(decide_input(p, members))
+        if res is None:
+            break
+        ans, step_id = res
         p.decided, p.same, p.confidence, p.reason, p.step_id = True, ans.same, ans.confidence, ans.reason, step_id
         calls += 1
     return calls, max(0, len(todo) - cap)

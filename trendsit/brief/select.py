@@ -28,7 +28,7 @@ from ..core.artifacts_brief import (
     RepoLine,
     SelectLimits,
 )
-from ..core.budget import BudgetExceeded
+from ..core.budget import BudgetExceeded, PriceUnknown
 from ..core.config_brief import BriefConfig
 from ..core.context import Ctx
 from ..core.db import DB, now_kst
@@ -374,7 +374,9 @@ def select(ctx: Ctx, cands: list[Candidate], ev: WeekEvidence, cfg: BriefConfig,
     for _ in range(SELECT_RETRIES + 1):
         try:
             out = run_role(role, inp, ctx)
-        except (RoleFailed, LLMError, BudgetExceeded) as e:
+        except (RoleFailed, LLMError, BudgetExceeded, PriceUnknown) as e:
+            if isinstance(e, (BudgetExceeded, PriceUnknown)):
+                ctx.stopped = f"{type(e).__name__}: {e}"
             errors_by_try.append([f"{type(e).__name__}: {e}"])
             break
         raw_errs = validate(out, cands, cfg)  # type: ignore[arg-type]  # 원래 출력 기준(모델 품질 기록)
@@ -408,4 +410,3 @@ def save(db: DB, res: SelectResult, run_id: str, week: str) -> None:
                 "relation_label, status, angle) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
                 (run_id, t.topic_id, week, json.dumps(t.cluster_ids), t.rank, int(t.lead), t.relation_type,
                  t.relation_topic_id, t.relation_label or None, "selected", t.angle))
-        db.conn.execute("UPDATE weeks SET status='selected' WHERE week=?", (week,))

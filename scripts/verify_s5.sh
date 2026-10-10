@@ -94,4 +94,6 @@ if uv run --quiet python scripts/s5_1_prompts.py --help-all >"$TMP/help.txt" 2>&
 else
   fail A17 "--help 차이: $(diff "$TMP/help.txt" reports/S5-1/help_before.txt | head -2 | tr '\n' ' ')"
 fi
+pt A19 "예산 초과 시 멈춤(write·select·cluster 도중 BudgetExceeded: 현재판 불변, run stopped, 종료 코드 1, 남은 일 시작 0)" tests/test_s5_weekly.py -k budget_stop
+pt A20 "실행 요약 상태(전부 실패 failed, 일부 partial, 예산 stopped)" -k summary_status
 exit $FAILED

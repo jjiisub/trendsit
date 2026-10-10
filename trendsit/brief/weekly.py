@@ -9,7 +9,7 @@ from typing import Any
 from ..core import config
 from ..core.artifacts import Document
 from ..core.artifacts_brief import DecideAnswer, DecideInput, PairShared
-from ..core.budget import BudgetExceeded
+from ..core.budget import BudgetExceeded, PriceUnknown
 from ..core.config_brief import BriefConfig
 from ..core.context import Ctx
 from ..core.errors import LLMError
@@ -33,9 +33,15 @@ class ClusterStage:
 def make_decider(ctx: Ctx) -> cl.Decider:
     role = load_role("decide", ctx.models)
 
-    def decide(inp: DecideInput) -> tuple[DecideAnswer, int | None]:
+    def decide(inp: DecideInput) -> tuple[DecideAnswer, int | None] | None:
+        """None = 예산 초과로 멈춤: 이미 받은 판정은 두고, 이 쌍과 이후 쌍은 판정하지 않는다(묶지 않음)."""
+        if ctx.stopped:
+            return None
         try:
             out = run_role(role, inp, ctx)
+        except (BudgetExceeded, PriceUnknown) as e:
+            ctx.stopped = f"{type(e).__name__}: {e}"
+            return None
         except (RoleFailed, LLMError) as e:  # 실패하면 묶지 않음(s5_role_notes 0.4)
             return DecideAnswer.fallback(type(e).__name__, inp), ctx.last_step_id
         return out, ctx.last_step_id  # type: ignore[return-value]
@@ -44,7 +50,7 @@ def make_decider(ctx: Ctx) -> cl.Decider:
 
 
 def decide_aliases(table: al.AliasTable, ev: WeekEvidence, decider: cl.Decider | None, min_conf: float,
-                   limit: int = 10) -> list[dict[str, Any]]:
+                   limit: int) -> list[dict[str, Any]]:
     """rapidfuzz 후보(애매한 것)만 decide. 같다(confidence 이상)면 approved, 다르다면 rejected, 낮으면 candidate 그대로."""
     out = []
     todo = [r for r in table.rows if r.status == "candidate" and r.keyword_id is None][:limit]
@@ -57,8 +63,11 @@ def decide_aliases(table: al.AliasTable, ev: WeekEvidence, decider: cl.Decider |
             return Document(id=f"name:{tag}", source="name", title=name,
                             text=f"이름: {name}\n나온 글·영상: " + " / ".join(titles[:4]))
 
-        ans, step_id = decider(DecideInput(a=doc(r.canonical, "a"), b=doc(r.alias, "b"),
-                                           shared=PairShared(keywords=[], aliases=[], similarity=0.0)))
+        res = decider(DecideInput(a=doc(r.canonical, "a"), b=doc(r.alias, "b"),
+                                  shared=PairShared(keywords=[], aliases=[], similarity=0.0)))
+        if res is None:
+            break
+        ans, step_id = res
         if ans.confidence >= min_conf:
             r.status = "approved" if ans.same else "rejected"
         r.reason += f" / decide: {ans.reason}"
@@ -91,10 +100,7 @@ def stage_cluster(week: str, ctx: Ctx, cfg: BriefConfig | None = None, embedder:
     table = al.load_decided(db, al.build(list(ev.members.values()), keywords, cfg.aliases.fuzz_min_score,
                                          cfg.aliases.transliteration))
     decider = make_decider(ctx) if use_llm else None
-    try:
-        alias_dec = decide_aliases(table, ev, decider, cfg.cluster.decide.min_confidence, cfg.cluster.alias_decide_max)
-    except BudgetExceeded:
-        alias_dec, decider = [], None
+    alias_dec = decide_aliases(table, ev, decider, cfg.cluster.decide.min_confidence, cfg.cluster.alias_decide_max)
     al.save(db, table, run_id)
     c = table.counts()
     tr.step(kind="code", role="normalize",
@@ -109,27 +115,26 @@ def stage_cluster(week: str, ctx: Ctx, cfg: BriefConfig | None = None, embedder:
         tr.step(kind="code", role="evidence",
                 text=f"영상 관련성 점수: high {sum(v >= cfg.evidence.video_relevance_high for v in vrel.values())}, "
                      f"mid {sum(v < cfg.evidence.video_relevance_high for v in vrel.values())}", detail=vrel)
-    try:
-        res = cl.cluster_week(db, ev, table, cfg, embedder, decider, alias_decide_calls=len(alias_dec))
-    except BudgetExceeded as e:
-        tr.step(kind="code", role="cluster", text="예산 상한으로 decide 중단, 판정 없이 묶기", attention=True, error=str(e))
-        res = cl.cluster_week(db, ev, table, cfg, embedder, None, alias_decide_calls=len(alias_dec))
+    res = cl.cluster_week(db, ev, table, cfg, embedder, decider, alias_decide_calls=len(alias_dec))
     cl.save(db, res, run_id)
     cands = res.candidates()
     multi = [x for x in cands if len(x.channels) >= 2]
     tr.step(kind="code", role="cluster",
             text=f"묶음 {len(res.clusters)}개(토픽 후보 {len(cands)}, 레포만 {len(res.clusters) - len(cands)}), "
                  f"2채널 이상 {len(multi)}, decide {res.decide_calls}회",
-            attention=bool(res.blocked_size or res.capped_decides),
+            attention=bool(res.blocked_size or res.capped_decides or ctx.stopped),
             detail={"clusters": len(res.clusters), "candidates": len(cands), "multi_channel": len(multi),
                     "decide_calls": res.decide_calls, "capped": res.capped_decides, "blocked_size": len(res.blocked_size)})
     start, end = week_days(week)
     with db.conn:
-        db.conn.execute(
-            "INSERT INTO weeks(week, start_day, end_day, status, current_run_id) VALUES (?,?,?,?,?) "
-            "ON CONFLICT(week) DO UPDATE SET status=excluded.status, current_run_id=COALESCE(?, weeks.current_run_id)",
-            (week, start.isoformat(), end.isoformat(), "clustered", run_id if set_current else None,
-             run_id if set_current else None))
+        if set_current and not ctx.stopped:
+            db.conn.execute(
+                "INSERT INTO weeks(week, start_day, end_day, status, current_run_id) VALUES (?,?,?,?,?) "
+                "ON CONFLICT(week) DO UPDATE SET status=excluded.status, current_run_id=excluded.current_run_id",
+                (week, start.isoformat(), end.isoformat(), "clustered", run_id))
+        else:  # weekly는 끝까지 마친 뒤에, 멈춘 run은 현재판을 바꾸지 않음(행만 보장)
+            db.conn.execute("INSERT OR IGNORE INTO weeks(week, start_day, end_day, status) VALUES (?,?,?,?)",
+                            (week, start.isoformat(), end.isoformat(), "open"))
     t3 = time.monotonic()
     return ClusterStage(run_id, ev, table, res, {"evidence": round(t1 - t0, 1), "normalize": round(t2 - t1, 1),
                                                  "cluster": round(t3 - t2, 1)}, alias_dec, vrel)

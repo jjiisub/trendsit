@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import re
+import sys
 from typing import Any
 
 WEEK = re.compile(r"^\d{4}-W\d{2}$")
@@ -28,6 +29,8 @@ def cmd_cluster(args: argparse.Namespace) -> int:
         path = write_cluster_report(stage, config.load("brief.yaml"),
                                     note=args.note or "")
         write_label_sheets(stage)
+        if ctx.stopped:
+            status = "stopped"
     except Exception:
         status = "failed"
         raise
@@ -36,6 +39,9 @@ def cmd_cluster(args: argparse.Namespace) -> int:
     res = stage.result
     print(f"run {stage.run_id}: 묶음 {len(res.clusters)}(토픽 후보 {len(res.candidates())}), decide {res.decide_calls}회, "
           f"리포트 {path}")
+    if ctx.stopped:
+        print(ctx.stopped, file=sys.stderr)
+        return 1
     return 0
 
 
@@ -55,8 +61,9 @@ def cmd_weekly(args: argparse.Namespace) -> int:
     status = "ok"
     try:
         summary = run_weekly(args.week, ctx, from_step=from_step, only_topic=getattr(args, "topic", None), until=until)
-        status = {"ok": "ok", "partial": "partial"}.get(summary["status"], "failed")
-        path = write_briefing_md(ctx.db, args.week, ctx.tracer.run_id)
+        status = "ok" if summary["status"] == "done" else summary["status"]
+        if not ctx.stopped:  # 멈춘 run의 읽기본이 직전 현재판의 읽기본을 덮지 않게
+            path = write_briefing_md(ctx.db, args.week, ctx.tracer.run_id)
     except Exception:
         status = "failed"
         raise
@@ -64,6 +71,9 @@ def cmd_weekly(args: argparse.Namespace) -> int:
         ctx.tracer.finish(status)
     print(json.dumps({k: summary[k] for k in ("week", "status", "select", "write", "review", "cost_usd", "duration_sec")},
                      ensure_ascii=False))
+    if ctx.stopped:
+        print(f"run {ctx.tracer.run_id}, {ctx.stopped}", file=sys.stderr)
+        return 1
     print(f"run {ctx.tracer.run_id}, 브리핑 읽기본 {path}")
     return 0
 
