@@ -77,4 +77,21 @@ if grep -q 'S5' README.md && grep -q '진행 체크리스트' reports/S5_report.
 else
   fail A14 "README/리포트/eval 정리 확인:${over}"
 fi
+
+# ---------- S5-1a: 리팩터 불변(프롬프트, 코드 검사 결과, CLI 도움말) ----------
+if uv run --quiet python scripts/s5_1_prompts.py --diff reports/S5-1/prompts_before.json >"$TMP/a15" 2>&1; then
+  pass A15 "프롬프트 불변(역할별 system·스키마·픽스처 메시지 sha256 동일)"
+else
+  fail A15 "$(head -1 "$TMP/a15")"
+fi
+if uv run --quiet python scripts/s5_1_golden.py --out "$TMP/g.json" >"$TMP/a16" 2>&1 && diff -q "$TMP/g.json" reports/S5-1/golden_before.json >/dev/null; then
+  pass A16 "코드 검사 결과 불변(W40·W41 현재판 모든 라운드의 issues·autofix·warnings)"
+else
+  fail A16 "골든 차이 또는 실행 실패: $(head -1 "$TMP/a16")"
+fi
+if uv run --quiet python scripts/s5_1_prompts.py --help-all >"$TMP/help.txt" 2>&1 && diff -q "$TMP/help.txt" reports/S5-1/help_before.txt >/dev/null; then
+  pass A17 "CLI --help 전부 불변"
+else
+  fail A17 "--help 차이: $(diff "$TMP/help.txt" reports/S5-1/help_before.txt | head -2 | tr '\n' ' ')"
+fi
 exit $FAILED

@@ -1,0 +1,339 @@
+$ trendsit --help
+usage: trendsit [-h]
+                {check-config,role,eval,cost,trace,collect,items,report,rematch,filter,summarize,repo-analyze,plan,deep,filter-fixtures,video,weekly,select,write,review,cluster}
+                ...
+
+positional arguments:
+  {check-config,role,eval,cost,trace,collect,items,report,rematch,filter,summarize,repo-analyze,plan,deep,filter-fixtures,video,weekly,select,write,review,cluster}
+    check-config        설정 파일과 역할 정의 검증
+    role                역할 1회 실행 또는 재생
+    eval                픽스처로 실행 → 채점 → 리포트
+    cost                스펙별, 모델별 사용액과 남은 예산
+    trace               실행 1건의 걸음 목록
+    collect             기간 수집(글, 유튜브, GitHub). RSS가 짧으면 백필
+    items               수집 항목 목록
+    report              리포트 생성
+    rematch             바뀐 keywords.yaml로 저장된 항목의 키워드 판정을 다시 계산(네트워크 없음)
+    filter              임베딩 관련성 필터(keep/drop) + 같은 URL 연결
+    summarize           글 1차 요약(item_card): 필터 keep이고 같은 URL 기준 항목인 글
+    repo-analyze        레포 분석가(repo_analyst): 규칙 기반 큐 또는 --queue 파일
+    plan                편집장 계획(editor_plan): run(실행) / show(보기) / agreement(영상 mode 동의율)
+    deep                깊게 보기: text(글 분석가, 원본 추적)
+    filter-fixtures     eval/fixtures/filter 20건 점수(장치별 비교)
+    video               영상 분석가(S4): 받기, 전사, 슬라이드 판독, 요약
+    weekly              주간 브리핑(S5): 묶기 → 선별 → 작성 ⇄ 검수 → 저장 → 실행 요약 → 브리핑 읽기본
+    select              주간 브리핑 단계(S5): 편집장 선별까지(현재판 묶기에서)
+    write               주간 브리핑 단계(S5): 작성자 초안 + 코드 검사까지(검수자 없음)
+    review              주간 브리핑 단계(S5): 현재판 초안부터 검사 ⇄ 검수 ⇄ 수정
+    cluster             주간 묶기(S5): 근거 목록 → 표기 정규화 → 묶기 → 과거 대조 → 묶기 리포트
+
+options:
+  -h, --help            show this help message and exit
+
+$ trendsit check-config --help
+usage: trendsit check-config [-h] [--root ROOT]
+
+options:
+  -h, --help   show this help message and exit
+  --root ROOT  config/, roles/가 있는 폴더 (기본: 저장소 루트)
+
+$ trendsit role --help
+usage: trendsit role [-h] [--input INPUT] [--replay STEP_ID] [--model MODEL] [--no-cache]
+                     [--spec SPEC]
+                     [name]
+
+positional arguments:
+  name
+
+options:
+  -h, --help        show this help message and exit
+  --input INPUT     입력 JSON 파일 경로 또는 JSON 문자열 (픽스처 파일이면 input 칸 사용)
+  --replay STEP_ID
+  --model MODEL     models.yaml 별칭
+  --no-cache
+  --spec SPEC
+
+$ trendsit eval --help
+usage: trendsit eval [-h] [--model MODEL] [--limit LIMIT] [--no-cache] [--spec SPEC] [--note NOTE]
+                     [--label] [--agreement] [--regrade REPORT_JSON] [--no-judge]
+                     role
+
+positional arguments:
+  role
+
+options:
+  -h, --help            show this help message and exit
+  --model MODEL
+  --limit LIMIT
+  --no-cache
+  --spec SPEC
+  --note NOTE           반복 기록에 남길 메모(이번 수정의 이유 등)
+  --label               최근 eval 결과로 사람 라벨 CSV(eval/labels/<역할>.csv) 생성
+  --agreement           사람 라벨과 judge 판정의 질문별 일치율
+  --regrade REPORT_JSON
+                        저장된 eval 결과를 생성 재실행 없이 지금 규칙으로 다시 채점
+  --no-judge            --regrade에서 judge를 부르지 않음(0원)
+
+$ trendsit cost --help
+usage: trendsit cost [-h] [--spec SPEC]
+
+options:
+  -h, --help   show this help message and exit
+  --spec SPEC
+
+$ trendsit trace --help
+usage: trendsit trace [-h] run_id
+
+positional arguments:
+  run_id
+
+options:
+  -h, --help  show this help message and exit
+
+$ trendsit collect --help
+usage: trendsit collect [-h] [--source SOURCE] [--since SINCE] [--until UNTIL] [--no-body]
+                        [--no-http-cache] [--max-items MAX_ITEMS] [--spec SPEC]
+
+options:
+  -h, --help            show this help message and exit
+  --source SOURCE       소스 하나만(sources.yaml의 id, github_trending, github_releases)
+  --since SINCE         시작일 YYYY-MM-DD(한국 시간, 포함). 기본: --until 하루 전
+  --until UNTIL         끝일 YYYY-MM-DD(포함). 기본: 오늘
+  --no-body             본문 추출 생략(목록과 링크만)
+  --no-http-cache       HTTP 캐시(ETag) 끔
+  --max-items MAX_ITEMS
+                        개발용: 소스마다 앞의 N건만
+  --spec SPEC
+
+$ trendsit items --help
+usage: trendsit items [-h] [--week WEEK] [--source SOURCE] [--status {pass,filtered}]
+                      [--limit LIMIT]
+
+options:
+  -h, --help            show this help message and exit
+  --week WEEK           ISO 주차(예: 2026-W40)
+  --source SOURCE
+  --status {pass,filtered}
+  --limit LIMIT
+
+$ trendsit report --help
+usage: trendsit report [-h] [--since SINCE] [--until UNTIL] {collection}
+
+positional arguments:
+  {collection}
+
+options:
+  -h, --help     show this help message and exit
+  --since SINCE
+  --until UNTIL
+
+$ trendsit rematch --help
+usage: trendsit rematch [-h] [--since SINCE] [--until UNTIL] [--spec SPEC]
+
+options:
+  -h, --help     show this help message and exit
+  --since SINCE
+  --until UNTIL
+  --spec SPEC
+
+$ trendsit filter --help
+usage: trendsit filter [-h] [--since SINCE] [--until UNTIL] [--embedder {real,mock}]
+                       [--device {cpu,mps,cuda}] [--report] [--labels] [--spec SPEC]
+
+options:
+  -h, --help            show this help message and exit
+  --since SINCE
+  --until UNTIL
+  --embedder {real,mock}
+                        mock: 단어 해시(개발, 테스트용)
+  --device {cpu,mps,cuda}
+                        기본: mps → cuda → cpu 자동
+  --report              reports/S2_filter/ 검증 산출물 생성
+  --labels              eval/labels/relevance.csv 40건 생성(채운 expected 보존)
+  --spec SPEC
+
+$ trendsit summarize --help
+usage: trendsit summarize [-h] [--since SINCE] [--until UNTIL] [--limit LIMIT] [--model MODEL]
+                          [--redo] [--no-cache] [--spec SPEC]
+
+options:
+  -h, --help     show this help message and exit
+  --since SINCE
+  --until UNTIL
+  --limit LIMIT
+  --model MODEL  models.yaml 별칭
+  --redo         이미 v1이 있는 글도 다시
+  --no-cache
+  --spec SPEC
+
+$ trendsit repo-analyze --help
+usage: trendsit repo-analyze [-h] --week WEEK [--top TOP] [--queue QUEUE] [--fixtures FIXTURES]
+                             [--traces] [--model MODEL] [--no-cache] [--spec SPEC]
+
+options:
+  -h, --help           show this help message and exit
+  --week WEEK          ISO 주차(예: 2026-W41)
+  --top TOP
+  --queue QUEUE        큐 JSON(편집장 계획의 repo_queue 또는 [{full_name, max_depth, reason}])
+  --fixtures FIXTURES  실행하지 않고 관문 B 픽스처(입력)만 이 폴더에
+  --traces             reports/S3_traces/repo/ 검증 산출물
+  --model MODEL
+  --no-cache
+  --spec SPEC
+
+$ trendsit plan --help
+usage: trendsit plan [-h] --day DAY [--video-queue] [--report] [--labels] [--fixture FIXTURE]
+                     [--no-hype] [--model MODEL] [--no-cache] [--spec SPEC]
+                     [{run,show,agreement}]
+
+positional arguments:
+  {run,show,agreement}
+
+options:
+  -h, --help            show this help message and exit
+  --day DAY             YYYY-MM-DD(이날 포함 최근 lookback_days의 후보)
+  --video-queue         show: CONTRACTS 1장 형식 JSON 배열(S4 입력)
+  --report              reports/S3_plan.md
+  --labels              eval/labels/editor_plan_mode.csv(영상 mode 동의)
+  --fixture FIXTURE     실행하지 않고 관문 B 픽스처(입력)만 이 파일에
+  --no-hype             레포 과열 규칙 API를 부르지 않음
+  --model MODEL
+  --no-cache
+  --spec SPEC
+
+$ trendsit deep --help
+usage: trendsit deep [-h] [--day DAY] [--item ITEM] [--max-depth MAX_DEPTH] [--traces]
+                     [--fixtures FIXTURES] [--model MODEL] [--no-cache] [--spec SPEC]
+                     {text}
+
+positional arguments:
+  {text}
+
+options:
+  -h, --help            show this help message and exit
+  --day DAY             이날 계획(plan)의 text_queue
+  --item ITEM           한 항목만(items.id)
+  --max-depth MAX_DEPTH
+                        --item일 때 깊이(기본 deep.yaml default_text_depth)
+  --traces              reports/S3_traces/text/ 검증 산출물
+  --fixtures FIXTURES   실행하지 않고 관문 B 픽스처(입력)만 이 폴더에
+  --model MODEL
+  --no-cache
+  --spec SPEC
+
+$ trendsit filter-fixtures --help
+usage: trendsit filter-fixtures [-h] [--embedder {real,mock}] [--record] [--device {cpu,mps,cuda}]
+
+options:
+  -h, --help            show this help message and exit
+  --embedder {real,mock}
+  --record
+  --device {cpu,mps,cuda}
+
+$ trendsit video --help
+usage: trendsit video [-h] {run,purge,report} ...
+
+positional arguments:
+  {run,purge,report}
+    run               영상 처리 지시(큐 JSON) 또는 영상 하나
+    purge             오래된 작업 폴더(영상, 프레임)와 보관 기한 지난 segments 텍스트 정리
+    report            영상 처리 기록 요약(markdown)
+
+options:
+  -h, --help          show this help message and exit
+
+$ trendsit video run --help
+usage: trendsit video run [-h] [--queue QUEUE] [--video-id VIDEO_ID]
+                          [--mode {skip,captions,whisper,whisper+slides}] [--start START]
+                          [--end END] [--reason REASON] [--frames {auto,full}] [--res RES]
+                          [--lang LANG] [--from-json FROM_JSON] [--reuse-media] [--model MODEL]
+                          [--no-cache] [--spec SPEC]
+
+options:
+  -h, --help            show this help message and exit
+  --queue QUEUE         CONTRACTS 1장 JSON 배열 파일, -면 표준 입력
+  --video-id VIDEO_ID   11자 id 또는 영상 URL
+  --mode {skip,captions,whisper,whisper+slides}
+  --start START         처리 구간 시작(초)
+  --end END             처리 구간 끝(초)
+  --reason REASON       처리 이유 한 줄(log에 이어 씀)
+  --frames {auto,full}  whisper+slides 프레임 후보 방식(장면 전환이 많은 슬라이드 발표는 full)
+  --res RES             프레임 가로 픽셀(수치 많은 발표는 1024)
+  --lang LANG           전사 언어 강제(기본: 다지점 자동 감지)
+  --from-json FROM_JSON
+                        저장한 1차 처리 결과(MediaResult)로 판독 이후만
+  --reuse-media         영상마다 data/media/<id>/media_result.json이 있고 mode가 같으면 전사 없이 판독 이후만
+  --model MODEL         역할 모델 별칭 덮어쓰기
+  --no-cache
+  --spec SPEC
+
+$ trendsit video purge --help
+usage: trendsit video purge [-h] [--older-than OLDER_THAN]
+
+options:
+  -h, --help            show this help message and exit
+  --older-than OLDER_THAN
+                        일 수(기본 7)
+
+$ trendsit video report --help
+usage: trendsit video report [-h] [--since SINCE] [--until UNTIL] [--out OUT]
+
+options:
+  -h, --help     show this help message and exit
+  --since SINCE
+  --until UNTIL
+  --out OUT
+
+$ trendsit weekly --help
+usage: trendsit weekly [-h] --week WEEK [--from-step {cluster,select,write,review}]
+                       [--topic TOPIC] [--no-cache] [--spec SPEC]
+
+options:
+  -h, --help            show this help message and exit
+  --week WEEK
+  --from-step {cluster,select,write,review}
+                        앞 단계는 이 주의 현재판 run에서 읽고 새 run으로 이어서
+  --topic TOPIC         한 토픽만(write·review)
+  --no-cache
+  --spec SPEC
+
+$ trendsit select --help
+usage: trendsit select [-h] --week WEEK [--topic TOPIC] [--no-cache] [--spec SPEC]
+
+options:
+  -h, --help     show this help message and exit
+  --week WEEK
+  --topic TOPIC
+  --no-cache
+  --spec SPEC
+
+$ trendsit write --help
+usage: trendsit write [-h] --week WEEK [--topic TOPIC] [--no-cache] [--spec SPEC]
+
+options:
+  -h, --help     show this help message and exit
+  --week WEEK
+  --topic TOPIC
+  --no-cache
+  --spec SPEC
+
+$ trendsit review --help
+usage: trendsit review [-h] --week WEEK [--topic TOPIC] [--no-cache] [--spec SPEC]
+
+options:
+  -h, --help     show this help message and exit
+  --week WEEK
+  --topic TOPIC
+  --no-cache
+  --spec SPEC
+
+$ trendsit cluster --help
+usage: trendsit cluster [-h] --week WEEK [--no-llm] [--note NOTE] [--no-cache] [--spec SPEC]
+
+options:
+  -h, --help   show this help message and exit
+  --week WEEK  ISO 주차(예: 2026-W42)
+  --no-llm     decide를 부르지 않음(경계 쌍은 묶지 않음, 0원)
+  --note NOTE  리포트 머리에 남길 메모(예: 수집 범위)
+  --no-cache
+  --spec SPEC

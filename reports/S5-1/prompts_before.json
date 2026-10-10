@@ -1,0 +1,232 @@
+{
+ "critic": {
+  "fixtures": {
+   "clean-w40-claude-sonnet-5-5.json": "613350ca5fc6825e4446840ac1205acdd036c826042bb5b1f0a7204d29da5668",
+   "clean-w40-gemini-argon.json": "62e260637ea27e10eddd39bdc67a56f0a3e1520a8375d5916edb144dafbd9fd1",
+   "clean-w40-jev-decision-model.json": "27d82b4fe4611160a64ec0e271b70a5da711adf3aeb7184354dc39c5c0621750",
+   "clean-w40-openai-security.json": "a6a8c8cdfdcf695a62f19062274e67a525656acfa7b2a23057071ca01451e27a",
+   "clean-w40-solar-mini-4.json": "ae184de117d1f23e0023555772fa30ed9c98c2a536ca70edbf2c570d8bb55d50",
+   "clean-w41-claude-haiku-5-5.json": "3696f4e1c0fac517d8fa1a4fa6546f66aa467ae9d8f10ffd20b4b21c040a5797",
+   "clean-w41-gpt-6-intelligent-ui.json": "6d71e86e4939db6c54050f7c21286f9da1edcc7ea288ed643c54f25fbd34421e",
+   "clean-w41-mistral-large-4.json": "a42c069eafe2669ff116e9886bf6403606a5f65cb416a0527515742066220780",
+   "number_mismatch-w40-vidraft-darwin.json": "c280034784e3bcb4362e94674345c4e390c0333a45864e834a417a207640e5d7",
+   "number_mismatch-w41-gpt-6-intelligent-ui.json": "7f2c57cb09274e76d6c248839ca6e220e725dad6da97803d0e6c9247c08bb910",
+   "overclaim-w40-deepseek-harness.json": "6b723648bba006b415e0ee55f2a82ddcbfb3537b6ac670a9e8eb76bb61c1dd13",
+   "overclaim-w40-gpt-6-1-sol.json": "1587d09d30b70c4bc101991c2a16c113fedcd9bd9cb51bdad6b1cfd9b56b79b4",
+   "overclaim-w41-embedding-gemma-2.json": "b9e707308c2bcc55cb926dcbea5530baba0b7bfa410aeed32ab94ccbb424f0a4",
+   "unsupported-w40-claude-sonnet-5-5.json": "b495dbcc2e5d24f8e8c9d12354063b0e12aa5e6966ad6877c3467f1cc74f043f",
+   "unsupported-w40-gemini-argon.json": "28cf7d6d98bb3571916f8af6c0b255921bbb95013740562bf61769cf8baed76e",
+   "unsupported-w40-jev-decision-model.json": "74e16b55117b49a544176a8e680376e4e6df9b830ec62fc0f7163940a503bd20",
+   "unsupported-w41-claude-haiku-5-5.json": "36acf7cda7cd6610b1e1a3de9df5a756e51ba64d2a7f1946c9a8e0f03ae3682d",
+   "wrong_ref-w40-decision-api.json": "cfa19f93a5077360b7dcb1688668e5f7f54fa70cc3319e542947cfb877b0d99f",
+   "wrong_ref-w40-solar-mini-4.json": "16ec4ba7c9db4fa40eebb237747180135609193ebf6a04a74bf8921b43fc91ba",
+   "wrong_ref-w41-mistral-large-4.json": "dd3076a813a505d4f569b434c114222c8de7dac6989cc242d342a2dc769afebe"
+  },
+  "schema": "1bc9cb612bc979aa8f1296347a9ced2a65d84eea3299a5e6f90f6c98d5914a3d",
+  "system": "32223a86ea75f5b8427b627b67b1a1ab54ccaf56f1c238daf5639980aa92169b"
+ },
+ "decide": {
+  "fixtures": {
+   "customer-case-vs-capability.json": "c9ea465f991c0271a67f36dfb3fbf6099c0a4311c6c267e096dc9761de16d448",
+   "injection.json": "797094761ac6b1e550131c57bf66788e8fb81941925b3f1b460c08bd15fabfa7",
+   "mention-only.json": "f2bf958152c90a2a4257fd5d1dd644f4f7f443a234ca2611ea236a182e8fb870",
+   "same-company-other-product.json": "9c987bb3ecc0d875f16ac6411f9ccbc5dae4efec5a475c873e28d1ef7ca4be79",
+   "same-field-other-talk.json": "acad3c5140cbf76cb53eb5b6e53064e7132545174b36914a3c43ff59c050f2f2",
+   "same-release-text-text.json": "1da18b6f2a3d747a85b1ad0f14b16e4fff62bd143b656025dc449d02f2559c82",
+   "text-repo-same.json": "5f18e946395b07a0143dfd2685da76574768c41da9db75676741cd6b9e15202e",
+   "translit-same.json": "56e145dc4d89363f7e5aa10dcad562e5d729df64b57daf548e6ab798eb3ab94d",
+   "version-differs.json": "f02360c4d112dbf94c1a0918168d677b51623db37bb96febcbd11850a3bff52b",
+   "video-text-same-talk.json": "afbf7ecb3d835f267ac9985da898349583c6fe8d0dc6476cceebc7d603c5e7ab"
+  },
+  "schema": "735d3335a5354c675ee61ff4620b802c6e7d63e40aedebdf8dfb29cb39b1a5fe",
+  "system": "f746c9ea6c3080d569405c6f5143b3fcc6fd02478404f547ca67e1293de58c63"
+ },
+ "editor_plan": {
+  "fixtures": {
+   "2026-10-04.json": "166987a330749c02f5c5ed996d203420895d6b4a61bcc9349e5365d95f236d54",
+   "dev-2026-10-04.json": "4e1b966bae3b76a1d050f4d78bd061bb9b9c3a0da444b717d33964a7a775e4aa",
+   "dev-2026-10-06.json": "d98b805e0fe75abdd4b5399bce9654af7f18201d2e8c160ad922c9d14cd8639e"
+  },
+  "schema": "8c44997f8f748a97793f3dbd0d656f55efcc3d4ba495dfbaf7a9d3ae1cdf5448",
+  "system": "6ea3071e500d0e06a2c1abb15d65c6773578d5cf42b783369a40f9303c4b0eae"
+ },
+ "editor_select": {
+  "fixtures": {
+   "few-2026-W40.json": "a2d4236a0f0629d50d71f04f2f097500e30400712dcee7b70d58a38039453765",
+   "few-2026-W41.json": "007eb85b0ab1b7755bb2e1e2997c0395918f8988fa7e0f8cba07ab8ab6db5afe",
+   "injection-2026-W40.json": "06ef8727b790998e4e892bbf23ef81e55392d05cc23bb2cebe96009e64cbb078",
+   "injection-2026-W41.json": "c9ca8a37b925d1b3880bddf70004fb3c8cd8e1f10411b2d5700345aa9239b4b7",
+   "offtopic-2026-W40.json": "e4cf4248d3d2be37007025090e055e25d5ac2bdb7ea5629749672e7f7e302a0f",
+   "offtopic-2026-W41.json": "f71359ba37ae4c02a9405017d5d78c846815bc7754bb474398ac4369834317ba",
+   "real-2026-W40.json": "4ff50636f569dabdc17c26bafa1f1870b10317d60e14c273d883a4359b5a8204",
+   "real-2026-W41.json": "4d94df96dde579cc6b207f3ca9863ff104bbe564fb1645872d0ea7a84e45f2e6"
+  },
+  "schema": "8c6f0b71bf580c4be8c09b6d34b4fd0881dd733c45250b8fbd119681c5ec4355",
+  "system": "97f385a28b1b4486097ec9e42ca01273c521101eed0e4c00335ca2745a905429"
+ },
+ "item_card": {
+  "fixtures": {
+   "aitimes__articleView-html-idxno-215688.json": "33f32ae6a3cfbaef2c7aac81c3f7ddce093afb0c5395f6b87fc9b9686c6d7d15",
+   "aitimes__articleView-html-idxno-215863.json": "5ba1bbb9d04f79910708c93b5b2267c7ca26262dece728e78b00ed6fb4e5ea3e",
+   "aitimes__articleView-html-idxno-215937.json": "666da0629ac3d6df40e2bfb274303ce7624310bb7df027b2d5eed4496fa133a4",
+   "aitimes__articleView-html-idxno-215945.json": "44727e976bbae2c68c8d067d7db5dbe1e9da3f14f5dbdb833584703a66f93a11",
+   "aitimes__articleView-html-idxno-215986.json": "c604f8e1a406fbf9eddcf6ec117d125f1319973d53fb864408543978db0ddea6",
+   "aitimes__articleView-html-idxno-215996.json": "d99b74e9fa1efe0176814862daa85edb09ea6008898a29c1ac7b713b2f74234a",
+   "aitimes__articleView-html-idxno-216001.json": "79acf74867dc26dd81db6742e4052496956f562f980576688eb4335d6435f484",
+   "anthropic__cyber-verification-program.json": "e6cad1a3b79abaeb29a6eb4022f092ab5fba171b67125a97f64f5d6f89cd62c6",
+   "deepmind__blog-gemini-4-argon-our-next-era-of-frontier-intel.json": "46440858cdbfcf5db175dc4b2898e88c04797d22497e908e3db0299e4fef35a4",
+   "geeknews__topic-id-34739.json": "d61f360558de0175f54918644e6155a6deecde0edfbf7797e46a31f4544fc56a",
+   "geeknews__topic-id-34752.json": "232e6e87e1fc185f9957a7da002ab21ef867b42f90bae45ce6d849c58989e203",
+   "geeknews__topic-id-34854.json": "28b1b8c195ee68d1d4e4fba3d2e2459434d82604d9d4b99768acc1971a1febef",
+   "geeknews__topic-id-34873.json": "88d108c6ccf1a0dbb04d7a85544b96e319cb1c2754b5578c705ada85301713a4",
+   "injection__openai-math-progress.json": "4cf9dad87b88b9721964ca712d1408dcfc8e5d429f694998d6d154828b3893ef",
+   "openai__advancing-computer-use-with-ironclad.json": "0fef72a2249ad5d7af39eee5fe8ca5c5940e8e3590045346ca30e17b202793f7",
+   "openai__index-basis-tax-workbook-with-astra.json": "347680b349705e57a4d6a53832b12e1ae2fef345ec06b36e66d5e4d7342973b0",
+   "openai__jump-trading.json": "d67bff0b0b8107e5fd7d0ddfbab83631fbe0028b9deb5bcfe923ce298af000b4",
+   "openai__sharing-ai-progress-in-mathematics.json": "be82e8621681c4ab333eaa7a814d55ce3808ac719d007c8cbdd19cde39e32abe",
+   "simonw__felix-rieseberg.json": "a16e7ba32f149f71648ceef8428a755f740f65550ce71a77a476386ecfff125b",
+   "simonw__john-gruber.json": "34ba9f877117c67c2b2c0c282a71ea5c89e2ffb8a6af165dff0e75d607eb26f5",
+   "simonw__kakapo-party.json": "6be9b6737224c8657f995924c557a30b4065c98a945b1396b4997ba51e84146f"
+  },
+  "schema": "87a1f2f3cf2b9f6e79cff7dbcb4a4b0317d8d0eda39f38748de19d1abfab2477",
+  "system": "8991a926f8349c6b438e4097821f9c3dc5c16f1b0ca6c4eabcdae4a5198006bc"
+ },
+ "judge": {
+  "fixtures": {},
+  "schema": "60f1426ad0e1b4cabba38b37aced350a41aa9f62dfe74d8f30e4b0483f971dd6",
+  "system": "d1d3fa23819a9ea77c85bd96c6a51a7b9144ee9d9123d3f1439b854486f5aad2"
+ },
+ "judge_facts": {
+  "fixtures": {},
+  "schema": "214439086ab926b476af9fe80d175a5210e5126d11f7700edf70d6139896ea95",
+  "system": "d49f52099446813693cd3d0ef496fea67071eb00753d70d4c33207073eb52a15"
+ },
+ "lookup_agent": {
+  "fixtures": {
+   "depth1_root.json": "3d39921d2c9dd2f28f3ff10248ca95de1078c371d5e815853f7d0ee85407e0b0",
+   "depth2_shallowest.json": "7c33a12549f43ae25157c849ae25056ae1eeaf4a224e5b55a69eb994a65ae796",
+   "depth3_found.json": "52ecc1434e030ce11b9a79850ecdd5c11cdee205f962a7a01e17131fa12ecab0",
+   "depth4_only.json": "78080c39e55730086935073afb129ae6344325b066d16647f492f5b8a1ee4f4c",
+   "depth4_other_branch.json": "a20bd2633d9b69a3e20e8ed9cc9fb43afc35dff57dd0f355ef7379ab7926089f"
+  },
+  "schema": "dad2228e80e0a95d503515a8d85d9dc25fd6583665580b911cf1c9cc9b110616",
+  "system": "90dc3f9a783fdb95c802c62866bee4d22cfb5e8426d20cc64e327db061b73891"
+ },
+ "repo_analyst": {
+  "fixtures": {
+   "DuarteSantos8__openGym.json": "b8e60d2e793c5b577f9e985891e1fc6ce95d891f93c22770344aa9c54496cc41",
+   "HunxByts__GhostTrack.json": "be26827b3659e1162f7e033ccd3e6f7a1552b45868bce08543e7554af955098c",
+   "NVIDIA__OpenShell.json": "5b644599502434b3848962bbad3cd5acd96260bae1f8d47cd27844e9e6cb30c4",
+   "boykopovar__AnyPS5.json": "62bedefd85777032f98f0771f277488a7f11e9f2ff43189dde681f983c42a36d",
+   "cursor__plugins.json": "7053bd74c1d4dc390d7ce0428aec6389c75538a0f6a33408a20a7e3130b0759d",
+   "heygen-com__hyperframes.json": "2e191e2df88f25d2eadc16c385dd07b2fa7f4d7f11014a1812cb280730d6a30e",
+   "mvschwarz__openrig.json": "7d84add135979442560e987fe87681efba2fa3ac90a82a7f6a2b928a9c853c76",
+   "pablostanley__yoinks.json": "add1a2b011d7425dfa2c9b247cc2d30b6fa1100a4a5297373d26a513d39f05c9",
+   "thedotmack__claude-mem.json": "58da2aed3b832b7ecc61a57199bc4dca3ff2ff2a3ceacdf3cf7f5b725e77a37d",
+   "tile-ai__tilelang.json": "d94555a123e0e6b8bdb3813f1ef61f503dfeef12aefd3df10b07fb29419effca"
+  },
+  "schema": "482c326876861ef8c8af923b1406b1830ca579fa4efdee7b903bb6910a5f3aa2",
+  "system": "72a1c93c1dd0f7e710d093b697508a9172a231e2b06a88c8bcd87f35dfafbba5"
+ },
+ "repo_oneliner": {
+  "fixtures": {
+   "NousResearch__hermes-agent.json": "2f010797d3da75d32ec2a0478d24fd80bb25b613faafe76d9e4eb9189f25446c",
+   "Python3WebSpider__Images360.json": "21c62cb91f40d0092ae47a5bc2effcd6301afb3d658b01b1db971d0fc238120c",
+   "anthropics__claude-code.json": "85a56f6e8c18591801d4551bd2552238dbcf1da3bb01734ecfdd3798f385ba05",
+   "encode__httpx.json": "5d93e5f382d7ff5607b2fd61353fbba708846500b27b519d44bd5fa055b11df7",
+   "excalidraw__excalidraw.json": "d68a8893e93be10171fb5eef73ecc61d2d2756d7f83b07ae8654c52ebf406d54",
+   "fastapi__full-stack-fastapi-template.json": "b26f3b736caef72df8ac0f0152e867f9affe61e59acc4775e99e06f1d920fa64",
+   "kakao__khaiii.json": "b8866e123d673d832568bf040ee376bc7da701f5a3197ca53889db1b4f7ed416",
+   "ollama__ollama.json": "840f80680c4aa63af085ee957bd87101c1fbb7d035ce606ce48317c45e2256a2",
+   "openai__codex.json": "65a4ff35909dafabfd78fe79da4f0b03bc0aeee7ecf6087975ecc70e37a1322e",
+   "punkpeye__awesome-mcp-servers.json": "ad46504811cd688606ed89b1e98f762f359518fe6578bb78c44d6e5b1a19a8f7"
+  },
+  "schema": "f4f4e012f0ffec6d9f8d05d0b13ae71f6d278ca22bb5434ecabe2b15ba6a43ef",
+  "system": "6440dc6f287311d245d2fb9e0e91fdf2c061c3d70b328ffa82757e2d8e0a3070"
+ },
+ "text_analyst": {
+  "fixtures": {
+   "dev-it20.json": "5ef44d96c3d938a65ae3625d59deaf052791b82a112a069ab0e1843b93804d36",
+   "dev-it21.json": "666866492aa15fc09f65d83d24439ab03192fe3373706392843bb7adf48611bf",
+   "dev-it22.json": "c0987ac534bd126c2edc99a2d1de35542cfbbac2fcf933a8405d6298fdd8ea67",
+   "dev-it23.json": "21cc00cf4b5311f468b8f636366d763fa7cae7145325089211c7f647926f233e",
+   "dev-it5.json": "d4f04c6cc77d61ee0dd937967edf172708fffaabdedc28db0763d30bb5398468",
+   "dev-it6.json": "344d73dae41c1641b19c0d87371c46de1f2218bed54e8f08f84d6021070e2c0f",
+   "it162.json": "1ffb69a9732d0575b7c2090662c55f484e49376dd2756d16d7325e0de70da8c5",
+   "it201.json": "09610b674b7cfea40e90305aa03c867113e755328b072599931b6c3d2b5c9dab",
+   "it240.json": "1b5eea041f672465eff75c3aabab9e7ec0e01f21f576b3ac6cbf83d536a8815d",
+   "it933.json": "e99db1eaf01419f5e241d03dd87eaf4f7ef717c32a5492e42a6b1c50f72f354d",
+   "it959.json": "3367caf31e1434fe36df40ce55b71cfde5d9f798484f4af250a486d6b0f25a43",
+   "it972.json": "daf1e13b98e29396d68e6bfe86ca1680d060e00bfb215aae280ef74eb0a25c51",
+   "it981.json": "4962ef12b6ffbdddd5d0f37682e3532272f1d19c4e80e22cee0f00568dec165e",
+   "it982.json": "711770401a6acb5c53077ee9972f6f7bba6cda7766d780cd6c0041de4891463c",
+   "it986.json": "27ec82f86055886b12068f704a66a577e98ac16eb8cd1c15633b1d3d4ffaf144",
+   "it997.json": "ad5200dcefc6d27e92148ebea68254cb1b1d64a09699feec77d3cc68f7721ce2"
+  },
+  "schema": "fc6b75c3c8caba2d070ca6b41a552cd505686c35813b2cc439c1e54a05e175de",
+  "system": "4fb1bab3cc1f96e5c091f66dc2d19fb3d753f93d6979421c6c5c0dd85e0931c8"
+ },
+ "video_slide": {
+  "fixtures": {},
+  "schema": "660438abdf14166a28be5176a7fae5b66b872dd463aa509816658f03fd146640",
+  "system": "f32c5f46205df1075bef8c8a78f009b3a2fabbd262c927e5e5d7315118621a4f"
+ },
+ "video_summary": {
+  "fixtures": {
+   "-TeOEuplMrQ.json": "bc14d8f3a988cb1c69d357809a0fd396f722cb297d4b9e41012d59834185cec3",
+   "31XD1O74pks.json": "bbca8762a2cad24d6d34a67e0dbec798fe5356aa15fce233a88a203073bf002d",
+   "5wDzydCqkV8.json": "15fdd9982ca859cf830a55c23364a8b7bd819031ecee96a2339f75272d10e847",
+   "PACIHCnvNMo.json": "c883c622ccbe3b82e1a1d93941e2fe2cd6a314f02e15f510427281e553bddcc4",
+   "S-bRN-avZ4Q.json": "f0f731cb77955991ee17f7bb0d66585c00464576e27197c638c3ac2970e95ce2",
+   "derived_empty_5wDzydCqkV8.json": "5f72c729d29341301cd553ff4a23709d57c38b14a89a13fcba95a6415ab0f8c0",
+   "derived_suspect_hallucination_xRZHLI5SPWo.json": "ff13efec5af0f5096aac200bc33105627cb1a5aafefccd19980b8703eeb69be1",
+   "eTtZlAPA9H4.json": "b7a5b9b2f411cab1d3cb8412dc2542c1dc455f5e26044490bd73121013d67b9c",
+   "oeL0uP-NO-U.json": "000ec2759446d51a59df6c5b84785f75852a7f216a56496bcd30f25a7b97cce5",
+   "wrii8VocfZU.json": "d1ccce339abdc99e87935c5e507c2323f3949b167569389ebfc314751ca28728",
+   "xRZHLI5SPWo.json": "b56085a55af9f55d478903287908c6ffa4a04ff6cdfe2b58aeee8ddd68a3a6d0",
+   "yNPS1Z64wQM.json": "8995ca7023c37e7c43ba09cd37ab13021e8088fc9202c2aecf7bc2917b9720e5"
+  },
+  "schema": "fcca4e8d2ac5174c8ce01ffb4dcbca311a9eb8d5c8b11419792dbe5b91ec3f8f",
+  "system": "8cb09e7f5b552389b021890275175b124de3f02aadcf7f790d11db245165b0ae"
+ },
+ "writer": {
+  "fixtures": {
+   "w40-claude-sonnet-5-5.json": "c94e6b21015088bf6ab69a1743a89fc2dbb6db4cc2475a739d688cb7a0c64e42",
+   "w40-decision-api.json": "86e24269a8c3a10fb2fdd71bb5c4dd5352519b4b5fbf986006f7eb0de65f02a9",
+   "w40-deepseek-harness.json": "665df457e7270ae848b732fc7a272b7cba9cb1914707f47ca21f34bbbdeec866",
+   "w40-gemini-argon.json": "62c74bd8c43bb716a8a8993af91f72b01b0d29c0936ba903f86a587e37062ca6",
+   "w40-gpt-6-1-sol.json": "61189c2fdf0366bf1237694b8f26f61f9dc19db57486244640350a02867cee33",
+   "w40-jev-decision-model.json": "fa73ac5835975c1ab4e69f6199d2eae39c23e60ab295a029e84181820a7256d4",
+   "w40-openai-dots.json": "44b66577e032a86214c821c95d34728acb448138f5b5f4ce4b01e8f5d3a58b84",
+   "w40-openai-security.json": "ecf66d6a6e0c15ffa816143c48330f6e29bd86a1adfdcda35ca66d5c53aa63fb",
+   "w40-solar-mini-4.json": "3c97ed22f3e254b037c1fc85cc3294d0ea7498a43d9790cbc97e182408a90f1a",
+   "w40-vidraft-darwin.json": "517611610d023de80f54c5fea1df7bc8eb291ac36434be20337d8db5e5394a67",
+   "w41-claude-haiku-5-5.json": "be523f81aa9962bcb67a664b7bebd39c980029cc3753c41570afb3ef9e8ffea9",
+   "w41-embedding-gemma-2.json": "7470d1d7d03e574c268abe35ecef2c14ef0b68cd1138338acff8aa1931d0feab",
+   "w41-gpt-6-intelligent-ui.json": "23f85230d97ab1b5441697ef3fefcf9509b7afaefce69159829f85db418d880f",
+   "w41-mai-code-1-1.json": "fb3b49908fb501195c48c6740b4e5c36888e63ea7df03a7a34a3d7b9db5fe1a8",
+   "w41-mistral-large-4.json": "33c648358636908061bd2b60089528f53a18d8c44178d81b34cc33d8dbab563e",
+   "w41-openai-math.json": "b2609a778aecaea4c7388411d29d3ed872c1c4679b22556f989ac4f25f570ef8",
+   "w41-openai-rogue-agent.json": "9fc2121af2dff15959e49d6ddba8c6bb1cfa06094446bf445a0dca2a3b84f874",
+   "w41-openrig.json": "291c6960bcd5f54a83b4e94cd97f71172921ba1d7803c42754e691b488b1a38b",
+   "w41-sift-framework.json": "3a3e0e623d9c31f7a6e65dcd0c750e94b93c692e4efd4564434cdd6ed6c3b00f",
+   "w41-textgrain-eu.json": "14b2b3e239d419f438d338ac462520aed498a366e7aff6628a2e2dccafe2f443"
+  },
+  "schema": "7c4f08b2ace366b210e3c7c8e1fa581822dfa713dc46462b3301b8493f9f8f29",
+  "system": "04bc1cadceb600649f745810a4fc58d5d18a17e7021e695ceff1e88fdfd15234"
+ },
+ "writer_revise": {
+  "fixtures": {
+   "delete-w40-deepseek-harness.json": "19ce1a68b1a35768205f2a55040dfdaa563e97be892acc14f99903232f14bce4",
+   "delete-w40-gpt-6-1-sol.json": "e8948eb6839574e3c9fe35f7a22ef86fc14620874fc7ee808d6a10e652fbe77f",
+   "no-evidence-w40-openai-dots.json": "31070058b51e4b1f34b59d42970f4295cae623e570645a7056a630f62e1afceb",
+   "number-w40-claude-sonnet-5-5.json": "9fbcb7622c6e340f373e1134faf6f65e1a1a5768c4bbdd872cc0edc11001eadb",
+   "number-w40-gemini-argon.json": "1ffcf8c4725cd968a01aa7e559a0c9a7fdae51d214e2dc0d97714f4bbc1fcb5b",
+   "overclaim-summary-w40-decision-api.json": "eb09d0791af14ab6ac3742b56326c8324f1c5eddd84ffca237f9a96a876a6607",
+   "overclaim-summary-w40-solar-mini-4.json": "d29f035a1f1b2337ffc6afe653b218913d3ba397fbaebc024f55a90c57d0519b",
+   "trap-only-title-w40-openai-dots.json": "93916acd3f2688e5f042c813a910fcd78fe3f4ba116d86ebae89cecc085627c3"
+  },
+  "schema": "249d8558d2f47ce8ad6215697aa6231447760ef9e530f38e89e9b57f9e46620b",
+  "system": "a98666741b6d98af38df86b302e90cbabae27de21ebd40571c539a995271c97a"
+ }
+}
