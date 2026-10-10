@@ -291,9 +291,9 @@ judge 판정: **잠정**(사람 라벨 없음. `eval/labels/writer.csv`를 채�
 | 9 | w40-claude-code-skills | passed | 3 | text | 0·0 | 0 | 0 | 0 |
 | 10 | w40-llamaindex-context | passed | 3 | video | 0·0 | 0 | 0 | 0 |
 
-### 2026-W41 (run `20261010-124112-weekly-9d5a`, 묶기 run `20261010-075543-weekly-fd8a`)
+### 2026-W41 (run `20261010-124834-weekly-75b1`, 묶기 run `20261010-075543-weekly-fd8a`)
 
-- 실행 요약: 토픽 10, 실패 0, 라운드 {'1': 5, '2': 4, '3': 1}, 코드 반려 5, 검수 반려 4, 되돌림 0, check 포인트 2, 사용액 $0.016716, 시간 187.7초
+- 실행 요약: 토픽 10, 실패 0, 라운드 {'1': 5, '2': 4, '3': 1}, 코드 반려 5, 검수 반려 4, 되돌림 0, check 포인트 2, 사용액 $0.005823, 시간 81.0초
 - 선별: 첫 시도 코드 검증 통과(1회 시도, 계획 model), reason 입력 대조 위반 3
 
 | 순위 | 토픽 | 상태 | 라운드 | 채널 | 도식(수치·사건) | 코드 경고 | 문체 위반 | check |
@@ -332,7 +332,7 @@ judge 판정: **잠정**(사람 라벨 없음. `eval/labels/writer.csv`를 채�
 | w41-mistral-large-4 | passed | pass | pass | pass | pass | 29/29 |  |
 | w41-gpt6-intelligent-ui | passed | pass | pass | pass | pass | 20/20 |  |
 | w41-embeddinggemma-2 | passed | pass | pass | pass | pass | 28/28 |  |
-| w41-claude-haiku-5-5 | checked | pass | pass | pass | pass | 23/23 |  |
+| w41-claude-haiku-5-5 | checked | pass | pass | pass | pass | 29/29 |  |
 | w41-decision-api-spec | passed | pass | pass | pass | pass | 26/26 |  |
 | w41-openai-rogue-agent | passed | pass | pass | pass | pass | 17/17 |  |
 | w41-openai-math-results | passed | pass | pass | pass | pass | 15/15 |  |

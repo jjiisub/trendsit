@@ -6,7 +6,7 @@ output: TopicPageRevision
 tools: []
 max_steps: 1
 max_depth: null
-max_tokens: 1500
+max_tokens: 3000
 temperature: 0.2
 includes: [skills/style_ko.md, skills/diagrams.md]
 task: "검수 이슈가 지적한 칸만 근거에 맞게 고친 토픽 페이지를 낸다."

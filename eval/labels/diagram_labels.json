@@ -153,7 +153,7 @@
  "w41-claude-haiku-5-5": {
   "week": "2026-W41",
   "numbers": [
-   "Claude Haiku GDPval-AA v2.1 점수 1620점으로 3개 모델 중 최고"
+   "Claude Haiku 5.5 GDPval-AA v2.1 점수 1620점으로 3개 모델 중 최고"
   ],
   "events": [],
   "code_warnings": [],

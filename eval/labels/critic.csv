@@ -16,7 +16,7 @@ week,topic_id,round,status,page_hash,issues,label,critique,labeler
 2026-W41,w41-gpt6-intelligent-ui,1,pass,c9bd156d0f48,[],,,
 2026-W41,w41-embeddinggemma-2,1,reject,0a9f158e541f,"[{""loc"": ""numbers"", ""type"": ""missing_diagram"", ""comment"": ""code_warnings가 지적한 대로, 근거에 같은 단위(차원, 점수)의 비교 가능한 수치 3개 이상 존재하나 numbers 도식이 비어 있음""}]",,,
 2026-W41,w41-embeddinggemma-2,2,pass,0a9f158e541f,[],,,
-2026-W41,w41-claude-haiku-5-5,2,reject,5d5b11543639,"[{""loc"": ""overview"", ""type"": ""unsupported"", ""comment"": ""근거는 토큰 수 증가를 관찰한 것일 뿐, 그 원인이 '토큰화 방식 변화'라고 명시하지 않았다""}]",,,
+2026-W41,w41-claude-haiku-5-5,2,reject,2001d7f1b328,"[{""loc"": ""overview"", ""type"": ""unsupported"", ""comment"": ""근거는 토큰 수 증가와 숨은 가격 상승만 언급하며 '토큰화 방식 변화'라는 원인을 명시하지 않음""}]",,,
 2026-W41,w41-decision-api-spec,1,pass,c9107f2eb37a,[],,,
 2026-W41,w41-openai-rogue-agent,1,pass,3e5bb16f6a0c,[],,,
 2026-W41,w41-openai-math-results,1,pass,de1def97d92e,[],,,

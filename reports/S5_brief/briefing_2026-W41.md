@@ -1,6 +1,6 @@
 # 주간 브리핑 2026-W41 (리뷰용 읽기본)
 
-> run `20261010-124112-weekly-9d5a`. S6 export 전 임시 화면. 홈 순서대로 토픽, 끝에 홈 레포 목록. 근거 id 옆은 출처 제목. ⚠ = 확인 필요(같은 이슈가 두 번 남았거나 3라운드 뒤 남은 이슈)
+> run `20261010-124834-weekly-75b1`. S6 export 전 임시 화면. 홈 순서대로 토픽, 끝에 홈 레포 목록. 근거 id 옆은 출처 제목. ⚠ = 확인 필요(같은 이슈가 두 번 남았거나 3라운드 뒤 남은 이슈)
 
 ## 1. 리드 · Mistral Large 4: 1조500억개 MoE 모델 공개 및 오픈웨이트 일정
 
@@ -99,7 +99,7 @@
 
 **핵심 포인트**
 
-1. Anthropic, 소형 모델 ==Claude Haiku 5.5== 출시  
+1. Anthropic의 소형 모델 ==Claude Haiku 5.5== 출시  
    ← `it:1144#q1` Claude Haiku 5.5; `it:1180#q1` 앤트로픽, API 비용 최대 90% 낮춘 '클로드 하이쿠 5.5' 공개
 2. 100,000 토큰 이하 요청 시 입력/출력 토큰 가격이 100만 토큰당 각각 0.10달러, 0.50달러로 전작 대비 90% 인하  
    ← `it:1180#q2` 앤트로픽, API 비용 최대 90% 낮춘 '클로드 하이쿠 5.5' 공개
@@ -108,7 +108,7 @@
 4. GDPval-AA v2.1에서 1620점으로 전작 Haiku 4.5(735점)와 GPT-6 Luna(1437점)를 넘어섬  
    ← `it:1180#q4` 앤트로픽, API 비용 최대 90% 낮춘 '클로드 하이쿠 5.5' 공개
 
-   **도식(수치): Claude Haiku GDPval-AA v2.1 점수 1620점으로 3개 모델 중 최고** (점) — 지식 노동 역량을 평가하는 GDPval-AA v2.1 벤치마크에서 3개 모델의 점수를 비교 [it:1180#q4]
+   **도식(수치): Claude Haiku 5.5 GDPval-AA v2.1 점수 1620점으로 3개 모델 중 최고** (점) — 지식 노동 역량을 평가하는 GDPval-AA v2.1 벤치마크에서 3개 모델의 점수를 비교 [it:1180#q4]
 
    | 라벨 | 값 | 근거 | 표시 |
    |---|---|---|---|
@@ -307,7 +307,7 @@
    "no_digest": 8,
    "irrelevant_repo": 0
   },
-  "truncated_topics": 1
+  "truncated_topics": 0
  },
  "aliases": {
   "candidates": 0,
@@ -373,17 +373,17 @@
  "cost_usd": {
   "decide": 0.0,
   "editor_select": 0.0,
-  "writer": 0.003102,
-  "writer_revise": 0.001674,
-  "critic": 0.01194,
-  "total": 0.016716
+  "writer": 0.0,
+  "writer_revise": 0.001549,
+  "critic": 0.004274,
+  "total": 0.005823
  },
  "duration_sec": {
   "evidence": 0,
   "cluster": 0,
   "select": 0.8,
-  "write_review": 182.9,
-  "total": 187.7
+  "write_review": 76.2,
+  "total": 81.0
  }
 }
 ```

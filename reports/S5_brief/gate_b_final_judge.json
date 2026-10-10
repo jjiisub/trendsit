@@ -558,40 +558,40 @@
   "verdicts": {
    "Q1": {
     "verdict": "pass",
-    "critique": "요약 첫 문장과 두 번째 포인트에서 '10만 토큰 이하 요청 시 90% 가격 인하'라는 angle의 핵심과 결론을 정확히 포착함"
+    "critique": "summary 첫 문장에 결론(Anthropic의 10만 토큰 이하 90% 인하된 Claude Haiku 5.5 출시)이 명시되어 있고, angle 핵심이 첫 문장과 point 2번에 충실히 반영됨"
    },
    "Q2": {
     "verdict": "pass",
-    "critique": "도식 항목 3개에 적절한 단위와 context가 갖춰져 있고, 조건 미충족 칸이나 불필요한 포인트 반복 없음"
+    "critique": "군더더기 없이 적절한 3개 모델 비교 numbers 막대 그룹 구성 및 중복되거나 불필요한 필드가 채워지지 않음"
    },
    "Q3": {
     "verdict": "pass",
-    "critique": "도식 context가 지식 노동 역량 평가 맥락을 명확히 설명하고 벤치마크 및 가격 차이를 3분 안에 파악하기 쉬움"
+    "critique": "핵심 내용과 벤치마크/가격 비교 맥락이 3분 내 파악 가능하며, numbers 그룹 context에 측정 조건 및 비교 맥락이 명확히 제시됨"
    },
    "Q4": {
     "verdict": "pass",
-    "critique": "어색한 번역투 없이 간결하고 명확한 문체로 서술됨"
+    "critique": "번역투나 어색한 표현 없이 명확하고 간결한 문체로 서술됨"
    }
   },
   "scores": {
    "정확성": {
     "score": 5,
-    "reason": "가격 인하율, 조건, 벤치마크 점수 등 모든 수치와 서술이 근거 문서와 완벽히 부합함"
+    "reason": "문서에 기재된 가격 인하 폭, 조건, 벤치마크 수치 및 토큰 증가 이슈와 정확히 일치함"
    },
    "구성": {
     "score": 5,
-    "reason": "핵심 결론 제시 후 세부 가격 정책과 성능 비교 순으로 논리 정연하게 구성됨"
+    "reason": "결론 중심 요약, angle과 일치하는 포인트 순서, 포인트에 부합하는 도식 구성이 잘 갖춰짐"
    },
    "표현": {
     "score": 5,
-    "reason": "간결하고 담백하며 번역투가 없는 우수한 문장 구조임"
+    "reason": "군더더기 없는 담백한 문장과 자연스러운 종결 표현 사용"
    }
   },
   "facts": {
-   "total": 23,
-   "supported": 23,
+   "total": 29,
+   "supported": 29,
    "unsupported": [],
-   "step_id": 5641
+   "step_id": 5675
   }
  },
  "w41-decision-api-spec": {
