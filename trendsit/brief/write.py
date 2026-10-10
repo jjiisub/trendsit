@@ -349,6 +349,8 @@ def write_topic(ctx: Ctx, topic: Applied, members: dict[str, Member], table: Ali
                                       relation=Relation(type=topic.relation_type, topic_id=topic.relation_topic_id)),
                        evidence=evidence_docs(pack), previous=previous_topic(ctx.db, topic.relation_topic_id),
                        aliases=alias_lines(table, ms), limits=writer_limits(cfg, n_sources))
+    if draft is not None:  # check는 코드 소유: 이어 온 초안의 옛 true가 중간 라운드 저장·검수자 입력에 남지 않게
+        draft = draft.model_copy(update={"points": [p.model_copy(update={"check": False}) for p in draft.points]})
     page, err, sid = (draft, None, None) if draft is not None else _call(load_role("writer", ctx.models), winp, ctx, res.costs, "writer")
     if page is None or not page.points:
         res.attention.append(f"작성 실패: {err or '포인트 없음'}")
