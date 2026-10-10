@@ -112,7 +112,7 @@ def fetch_page(args: FetchArgs, state: Any) -> ToolOutput:
         text, title, when, heads, links = extract(r.text, r.final_url)
     if not text:
         raise ToolRejected("본문을 추출하지 못함(JS 페이지일 수 있음)")
-    depth = state.depth.resolve(args.url, args.parent) if hasattr(state, "depth") else None  # 이미 통과한 검사, 값만
+    depth = state.depth.resolve(args.url, args.parent)  # execute_tool이 이미 통과시킨 검사, 값만
     remember(state, args.url, text, depth)
     if norm_url(r.final_url) != args.url:
         remember(state, r.final_url, text, depth)
