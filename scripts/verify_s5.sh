@@ -2,6 +2,8 @@
 # S5 관문 A(S5_TASK 6장). 항목마다 PASS/FAIL과 이유를 한 줄씩, 하나라도 FAIL이면 종료 코드 1.
 set -u
 cd "$(dirname "$0")/.."
+FAST=0
+[ "${1:-}" = "--fast" ] && FAST=1  # A1(s0~s4 회귀 재실행)만 건너뜀. A2의 전체 pytest가 s0~s4 테스트를 포함
 FAILED=0
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
@@ -17,14 +19,18 @@ pt() {
 }
 
 # A1 회귀: 종료 코드로 판정(리뷰 R16)
-a1_bad=""
-for s in 0 1 2 3 4; do
-  bash "scripts/verify_s$s.sh" >"$TMP/s$s" 2>&1 || a1_bad="$a1_bad s$s"
-done
-if [ -n "$a1_bad" ]; then
-  fail A1 "종료 코드 실패:${a1_bad} / $(grep -h '^FAIL' "$TMP"/s[0-4] | head -3 | tr '\n' ' ')"
+if [ "$FAST" = 1 ]; then
+  echo "SKIP A1 --fast: verify_s0~s4 재실행 생략(A2 전체 pytest가 s0~s4 테스트 포함)"
 else
-  pass A1 "verify_s0~s4 종료 코드 0, PASS $(cat "$TMP"/s[0-4] | grep -c '^PASS')개"
+  a1_bad=""
+  for s in 0 1 2 3 4; do
+    bash "scripts/verify_s$s.sh" >"$TMP/s$s" 2>&1 || a1_bad="$a1_bad s$s"
+  done
+  if [ -n "$a1_bad" ]; then
+    fail A1 "종료 코드 실패:${a1_bad} / $(grep -h '^FAIL' "$TMP"/s[0-4] | head -3 | tr '\n' ' ')"
+  else
+    pass A1 "verify_s0~s4 종료 코드 0, PASS $(cat "$TMP"/s[0-4] | grep -c '^PASS')개"
+  fi
 fi
 
 # A2 정적 검사, 테스트(건너뜀 0)
