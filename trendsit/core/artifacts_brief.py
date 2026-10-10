@@ -310,6 +310,7 @@ class CriticInput(RoleInput):
     page: TopicPage
     evidence: list[Document] = Field(description="이 토픽의 근거 원문(refs가 가리키는 것 먼저, 카드 요약 id 제외)")
     angle: str
+    previous: PreviousTopic | None = Field(default=None, description="후속 토픽이면 지난 토픽(요약·포인트). 지난 토픽을 말하는 문장은 이것과 대조")
     code_warnings: list[str]
     round: int = Field(ge=1, le=3)
 

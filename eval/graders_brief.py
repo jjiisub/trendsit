@@ -67,7 +67,7 @@ def code_writer(inp: dict[str, Any], out: dict[str, Any], expect: dict[str, Any]
     cfg = config.load("brief.yaml")
     pack = _pack_from_docs(inp)
     n_sources = len({k.split("#")[0].split("@")[0] for k in pack})
-    r = run_checks(TopicPage.model_validate(out), pack, n_sources, cfg, {})
+    r = run_checks(TopicPage.model_validate(out), pack, n_sources, cfg, {}, angle=inp["plan"]["angle"])
     by_type: dict[str, list[str]] = {}
     for i in r.issues:
         by_type.setdefault("문체(금지어·명사형)" if "금지 표현" in i.comment or "끝남" in i.comment or "'~다'" in i.comment

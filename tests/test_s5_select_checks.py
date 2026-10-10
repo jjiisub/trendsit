@@ -209,7 +209,7 @@ def test_points_must_be_noun_form_and_summary_da():
     p = page(points=[Point(text="입력 100만 토큰당 $2로 이전보다 15% 저렴해졌다.", refs=["it:1#q1"]), *page().points[1:]],
              summary="가격 인하 소식")
     msgs = [i.comment for i in checks.run_checks(p, pack(), 2, CFG, {}).issues]
-    assert any("points[0]이 문장으로 끝남" in m for m in msgs) and any("summary이 '~다'로" in m for m in msgs)
+    assert any("points[0]이 문장으로 끝남" in m for m in msgs) and any("summary의 문장이 '~다'로" in m for m in msgs)
 
 
 def test_writer_check_flags_are_reset_by_enforce():
@@ -398,3 +398,39 @@ def test_c20_threshold_in_input_limits_is_not_a_reason_mismatch():
     p = plan([topic([5], 1, True)], decisions=[Decision(cluster_id=5, reason="영상 관련성 0.53로 0.55 미만", action="select",
                                                         drop_reason=None)])
     assert sel.reason_mismatches(p, inp, []) == []
+
+
+@pytest.mark.parametrize("name,text", [
+    ("overview", "Upstage가 Solar Mini 4를 공개했다. GPU 한 장으로 실행을 제공함. 비용은 43% 낮음. 소형 모델 경쟁으로 전환된다."),
+    ("summary", "디시전스 API 스펙은 Jev와 동일한 구조를 가짐. Jev는 4.2센트다."),
+])
+def test_f1_every_sentence_of_summary_overview_ends_with_da(name, text):
+    issues = checks.run_checks(page(**{name: text}), pack(), 2, CFG, {}).issues
+    assert any(i.loc == name and "'~다'" in i.comment for i in issues)
+
+
+def test_f3_missing_diagram_warning_only_same_sentence_same_unit():
+    src = {"site": "S", "title": "t"}
+    def num(eid, v, u=""):
+        return EvidenceItem(eid, eid.split("#")[0], "text", "number", "값", src, value=v, unit=u)
+    counts = {"it:7#q1": [num("it:7#q1", "약 50개"), num("it:7#q1", "약 20개"), num("it:7#q1", "약 60개")]}
+    dims = {"it:8#q1": [num("it:8#q1", "768"), num("it:8#q1", "512"), num("it:8#q1", "256")]}
+    spread = {f"it:9#q{i}": [num(f"it:9#q{i}", f"{v}%")] for i, v in enumerate((92, 66, 17))}
+    same = {"it:9#q1": [num("it:9#q1", "92%"), num("it:9#q1", "66%"), num("it:9#q1", "17%")]}
+    for p, want in ((counts, False), (dims, False), (spread, False), (same, True)):
+        w = checks.warnings(page(numbers=[]), p, CFG)
+        assert any("누락 의심" in x for x in w) is want, (p, w)
+
+
+def test_f7_angle_words_missing_from_first_point_warns():
+    p = page(points=[Point(text="업스테이지 투트랙 전략으로 사업 확대", refs=["it:1#q1"]), *page().points[1:]])
+    w = checks.run_checks(p, pack(), 2, CFG, {}, angle="GPU 한 장 실행 가능한 MoE 소형 모델의 에이전트 최적화").warnings
+    assert any(x.startswith("핵심 의심") for x in w)
+    ok = page(points=[Point(text="GPU 한 장에서 돌아가는 MoE 소형 모델", refs=["it:1#q1"]), *page().points[1:]])
+    assert not any(x.startswith("핵심 의심") for x in checks.run_checks(
+        ok, pack(), 2, CFG, {}, angle="GPU 한 장 실행 가능한 MoE 소형 모델의 에이전트 최적화").warnings)
+
+
+def test_f11_evaluative_endings():
+    p = page(summary="Anthropic이 Haiku 5.5를 내놨다. 구간 가격이 다른 것이 쟁점이다.")
+    assert any(i.loc == "summary" and "금지 표현" in i.comment for i in checks.run_checks(p, pack(), 2, CFG, {}).issues)

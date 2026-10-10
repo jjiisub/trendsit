@@ -11,9 +11,11 @@ aliases:
   fuzz_min_score: 90                # rapidfuzz 후보 최소 점수(숫자·버전이 다르면 점수와 무관하게 후보 아님)
   # 음차·약어 사전(PR #9 리뷰 R11: 한 주 안 "GPT-6 루나 / GPT-6 Luna", "딥시크-V4.1 플래시"). 낱말 단위로만 바꾼다.
   # 이 낱말만 다른 이름은 같은 이름(자동 approved, 정본은 영문), 작성자 출력의 음차 표기는 코드가 정본으로 고친다
+  # 값에 음차가 여럿이면 '|'로. 띄어쓰기·하이픈은 무관하게 맞춘다(F10: "딥시크-V4.1 플래시")
   transliteration: {Luna: 루나, Sol: 솔, Astra: 아스트라, Argon: 아르곤, Flash: 플래시, DeepSeek: 딥시크, Claude: 클로드,
-                    Gemini: 제미나이, Gemma: 젬마, Opus: 오퍼스, Sonnet: 소넷, Haiku: 하이쿠, Mistral: 미스트랄, Llama: 라마,
-                    Qwen: 큐웬, Codex: 코덱스, Grok: 그록, Kimi: 키미, Solar: 솔라, Exaone: 엑사원, HyperCLOVA: 하이퍼클로바}
+                    Gemini: 제미나이, Gemma: 젬마, Opus: 오퍼스, Sonnet: 소넷|소네트, Haiku: 하이쿠, Mistral: 미스트랄,
+                    Llama: 라마, Qwen: 큐웬|큐원|퀜, Codex: 코덱스, Grok: 그록, Kimi: 키미, Solar: 솔라, Exaone: 엑사원,
+                    HyperCLOVA: 하이퍼클로바, Decisions: 디시전스, Nemotron: 네모트론}
 
 cluster:
   thresholds:

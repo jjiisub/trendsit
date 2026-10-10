@@ -43,7 +43,7 @@ from ..core.db import DB
 from ..core.errors import LLMError
 from ..core.role import RoleFailed, load_role, run_role
 from . import checks
-from .aliases import AliasTable, translit_variants
+from .aliases import AliasTable, to_original, translit_pattern
 from .evidence import EvidenceItem, Member, cap_pack
 from .select import Applied
 
@@ -82,6 +82,7 @@ class TopicResult:
     costs: dict[str, float] = field(default_factory=dict)
     member_by_id: dict[str, str] = field(default_factory=dict)
     checks: list[str] = field(default_factory=list)  # 이슈가 남은 채 발행된 위치(토픽 수준 확인 필요, 리뷰 R4)
+    dropped_diagrams: list[dict[str, Any]] = field(default_factory=list)  # 코드가 뺀 도식과 남은 이슈(반영 확인 리뷰 F2)
 
 
 # ---------- 입력 조립 ----------
@@ -285,11 +286,14 @@ def write_topic(ctx: Ctx, topic: Applied, members: dict[str, Member], table: Ali
     pack = pack_index(kept)
     n_sources = len({it.member for it in kept})
     canon = {a: c.canonical for c in alias_lines(table, ms) for a in c.aliases}
-    # 이 토픽 이름의 한글 음차 표기(GPT-6 루나, 딥시크-V4.1 플래시)도 정본으로 고친다(리뷰 R11)
+    # 이 토픽 이름의 한글 음차 표기(GPT-6 루나, 딥시크-V4.1 플래시)도 정본으로 고친다(리뷰 R11, F10). 근거가 모두 한글
+    # 음차뿐인 이름(클로드 소네트 5.5)도 사전으로 되돌린 영문 표기가 정본
+    tl = cfg.aliases.transliteration
+    translit = []
     for name in sorted({n for m in ms for n in m.entities if n.strip()}):
-        target = table.canonical(name)
-        for v in translit_variants(target, cfg.aliases.transliteration):
-            canon.setdefault(v, target)
+        target = to_original(table.canonical(name), tl)
+        if (pat := translit_pattern(target, tl)) is not None:
+            translit.append((pat, target))
     res = TopicResult(topic, "failed", None, [], [], list(pack), dropped, n_sources, costs={},
                       member_by_id={i: v[0].member for i, v in pack.items()})
     if not pack:
@@ -312,6 +316,7 @@ def write_topic(ctx: Ctx, topic: Applied, members: dict[str, Member], table: Ali
     reviser = load_role("writer_revise", ctx.models)
     seen: dict[tuple[str, str], int] = {}
     check_locs: set[str] = set()
+    last_issue: dict[str, str] = {}  # 위치 → 마지막 이슈 원문(뺀 도식 표)
     critic_seen = False
 
     def run_critic(pg: TopicPage, rnd: int, warns: list[str]) -> tuple[Any, str | None, int | None]:
@@ -322,7 +327,8 @@ def write_topic(ctx: Ctx, topic: Applied, members: dict[str, Member], table: Ali
         order = [e for e in refs_of(pg) if e in raw_ids] + [e for e in raw_ids if e not in refs_of(pg)]
         evid = [Document(id=e, source=pack[e][0].source.get("site") or pack[e][0].channel,
                          title=pack[e][0].source.get("title"), text=raw_evidence(ctx.db, e, pack[e])) for e in order]
-        cinp = CriticInput(loc_lines=loc_lines(pg), page=pg, evidence=evid, angle=topic.angle, code_warnings=warns, round=rnd)
+        cinp = CriticInput(loc_lines=loc_lines(pg), page=pg, evidence=evid, angle=topic.angle, previous=winp.previous,
+                           code_warnings=warns, round=rnd)
         out = _call(critic, cinp, ctx, res.costs, "critic")
         # 원자 사실 0개로 통과 = 대조를 건너뛴 판정(W40 재실행 3토픽, 출력 49토큰). 한 번 다시 부르고, 또 비면 검수 실패
         if out[0] is not None and not out[0].atoms and pg.points:
@@ -335,7 +341,7 @@ def write_topic(ctx: Ctx, topic: Applied, members: dict[str, Member], table: Ali
         return out
     raw_page: dict[str, Any] | None = page.raw_dump() if hasattr(page, "raw_dump") else None
     for rnd in range(1, cfg.review.max_rounds + 1):
-        cr = checks.run_checks(page, pack, n_sources, cfg, canon)
+        cr = checks.run_checks(page, pack, n_sources, cfg, canon, translit, topic.angle)
         page = cr.page
         res.pages.append((rnd, page, raw_page, sid))
         issues = cr.issues
@@ -358,6 +364,8 @@ def write_topic(ctx: Ctx, topic: Applied, members: dict[str, Member], table: Ali
             break
         # 위치 번호를 1부터 센 이슈는 0부터로(검수자가 contributions[2]로 두 번째 항목을 가리킨 사례)
         issues = [i.model_copy(update={"loc": normalize_loc(page, i.loc)}) for i in issues]
+        for it in issues:
+            last_issue[top_loc(it.loc)] = f"{log.checker} {it.type}: {it.comment}"
         # 같은 위치·같은 유형이 두 번 남으면 확정(check) 후 제외
         # 라운드 사이 반복만 센다(같은 라운드 안의 중복 이슈는 한 번으로, 리뷰 지적 1)
         live = []
@@ -409,19 +417,33 @@ def write_topic(ctx: Ctx, topic: Applied, members: dict[str, Member], table: Ali
                                        fact_support=verdict.fact_support.model_dump()))
             if verdict.status == "reject":
                 check_locs |= {top_loc(normalize_loc(final, i.loc)) for i in verdict.issues}
-    if check_locs:
-        pts = [p.model_copy(update={"check": True}) if f"points[{i}]" in check_locs else p for i, p in enumerate(final.points)]
-        # 도식 그룹에 남은 이슈는 그 그룹을 뺀다(포인트 문장은 그림 없이도 읽힘, skills/diagrams.md). check를 달 자리가 없어
-        # 틀린 막대가 그대로 발행되던 문제(W40 gpt-6-1-sol, decision-api: 단위 섞인 막대)
-        drop = {(m.group(1), int(m.group(2))) for loc in check_locs if (m := re.match(r"^(numbers|events)\[(\d+)\]", loc))}
-        upd: dict[str, Any] = {"points": pts}
+    # 도식을 빼는 것은 코드가 최종판에서 확인한 형식·수치 오류(단위 섞임, 값 불일치, 빈 단위)일 때만(반영 확인 리뷰 F2:
+    # 검수자의 의미 지적만 남은 맞는 도식까지 지워 Haiku 구간 가격·textGrain 탐지율이 빠졌음). 의미 지적만 남으면 두고 ⚠
+    code_bad = {(m.group(1), int(m.group(2))) for i in checks.check(final, pack, n_sources, cfg)
+                if (m := re.match(r"^(numbers|events)\[(\d+)\]", i.loc))}
+    renamed: dict[str, str] = {}
+    if code_bad:
+        upd: dict[str, Any] = {}
         for name in ("numbers", "events"):
-            keep = [g for i, g in enumerate(getattr(final, name)) if (name, i) not in drop]
+            keep = []
+            for i, g in enumerate(getattr(final, name)):
+                loc = f"{name}[{i}]"
+                if (name, i) in code_bad:
+                    renamed[loc] = f"빠진 도식: {g.title}"
+                    res.dropped_diagrams.append({"group": loc, "title": g.title, "issue": last_issue.get(loc, "")})
+                    check_locs.add(loc)
+                else:
+                    renamed[loc] = f"{name}[{len(keep)}]"
+                    keep.append(g)
             if len(keep) != len(getattr(final, name)):
                 upd[name] = keep
-                res.attention.append(f"이슈가 남은 {name} 도식 {len(getattr(final, name)) - len(keep)}개 뺌")
+                res.attention.append(f"형식·수치 오류가 남은 {name} 도식 {len(getattr(final, name)) - len(keep)}개 뺌")
         final = final.model_copy(update=upd)
-        res.checks = sorted(check_locs)
+    if check_locs:
+        pts = [p.model_copy(update={"check": True}) if f"points[{i}]" in check_locs else p for i, p in enumerate(final.points)]
+        final = final.model_copy(update={"points": pts})
+        # ⚠가 빠진 도식을 가리키면 "빠진 도식: 제목", 남은 도식은 뺀 뒤의 번호로
+        res.checks = sorted({renamed.get(loc, loc) for loc in check_locs})
         res.status = "checked"
     elif res.status != "passed":
         res.status = "checked"

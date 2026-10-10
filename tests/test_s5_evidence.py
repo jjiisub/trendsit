@@ -149,11 +149,14 @@ def test_r11_transliteration_aliases_and_autofix():
     rows = al.build(ms, config.KeywordsConfig(keywords=[], exclude=[]), translit=tr).rows
     got = {(r.canonical, r.alias, r.status) for r in rows if r.reason.startswith("음차")}
     assert got == {("GPT-6 Luna", "GPT-6 루나", "approved")}  # 숫자가 다른 GPT-7 루나는 아님
-    assert set(al.translit_variants("DeepSeek-V4.1 Flash", tr)) == {
-        "딥시크-V4.1 Flash", "DeepSeek-V4.1 플래시", "딥시크-V4.1 플래시"}
-    canon = {v: "DeepSeek-V4.1 Flash" for v in al.translit_variants("DeepSeek-V4.1 Flash", tr)}
+    pat = al.translit_pattern("DeepSeek V4.1 Flash", tr)
+    canon_pat = [(pat, "DeepSeek V4.1 Flash")]
+    for text in ("딥시크-V4.1 플래시", "DeepSeek-V4.1 플래시", "딥시크 V4.1 Flash"):
+        assert pat.sub("X", f"{text}가 나왔다") == "X가 나왔다"
+    assert al.translit_pattern("Sol", {"Sol": "솔"}).sub("X", "솔루션과 솔은") == "솔루션과 X은"  # 낱말 안은 아님
+    assert al.to_original("클로드 소네트 5.5", {"Claude": "클로드", "Sonnet": "소넷|소네트"}) == "Claude Sonnet 5.5"
     page = TopicPage(points=[Point(text="딥시크-V4.1 플래시 공개, 가격 인하함", refs=["it:1#q1"])], numbers=[], events=[],
                      contributions=[], concepts=[], overview="a다. b다.", summary="딥시크-V4.1 플래시가 나왔다.", title="t",
                      log="l", attention=False)
-    fixed, _ = checks.autofix(page, config.load("brief.yaml"), canon)
-    assert fixed.summary == "DeepSeek-V4.1 Flash가 나왔다." and fixed.points[0].text.startswith("DeepSeek-V4.1 Flash")
+    fixed, _ = checks.autofix(page, config.load("brief.yaml"), {}, translit=canon_pat)
+    assert fixed.summary == "DeepSeek V4.1 Flash가 나왔다." and fixed.points[0].text.startswith("DeepSeek V4.1 Flash")

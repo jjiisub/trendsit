@@ -34,7 +34,9 @@ UNIT_KINDS = (("%", ("%", "퍼센트", "%p", "포인트")), ("ms", ("ms", "밀�
               ("분기", ("분기",)), ("h", ("시간", "hours", "hour", "h")), ("min", ("분", "min", "minutes")),
               ("개월", ("개월",)), ("개", ("개",)), ("명", ("명",)), ("회", ("회",)), ("건", ("건",)))
 # 근거에 없는 전망·평가형 마무리(리뷰 R3-d, W40 Decision API "주목된다", "것으로 보인다")
-SPECULATIVE = ("주목된다", "것으로 보인다", "것으로 전망된다", "지 주목")
+# 반영 확인 리뷰 F11: "…것이 쟁점이다", "핵심 변화다", "핵심 축으로 부상했다"(평가형 마무리). "쟁점은 …이다"는 허용(writer.md 예시)
+SPECULATIVE = ("주목된다", "것으로 보인다", "것으로 전망된다", "지 주목", "것이 쟁점이다", "핵심 변화다", "핵심 축으로", "부상했다")
+COUNT_UNITS = {"개", "명", "건", "회", "편", "종", "곳", "개국", "차원", "개월", "년"}
 LABEL_UNIT = re.compile(r"\(([^()]+)\)\s*$")
 
 
@@ -109,7 +111,8 @@ def _set(page: TopicPage, loc: str, text: str) -> TopicPage:
 
 
 def autofix(page: TopicPage, cfg: BriefConfig, canon: dict[str, str],
-            channels: set[str] | None = None, n_sources: int | None = None) -> tuple[TopicPage, list[dict[str, Any]]]:
+            channels: set[str] | None = None, n_sources: int | None = None,
+            translit: list[tuple[re.Pattern[str], str]] | None = None) -> tuple[TopicPage, list[dict[str, Any]]]:
     hl = cfg.write.highlights
     fixes: list[dict[str, Any]] = []
     # 00) points 개수 초과: 중요도 순이라 뒤에서 자른다. 잘린 포인트에 붙은 도식도 뺌(리뷰 R4, SIFT 소스 1개에 4개)
@@ -156,6 +159,8 @@ def autofix(page: TopicPage, cfg: BriefConfig, canon: dict[str, str],
             pat = rf"(?<![A-Za-z0-9]){re.escape(alias)}(?![A-Za-z0-9])"
             if alias and re.search(pat, new) and canon[alias] not in new:
                 new = re.sub(pat, canon[alias], new)
+        for tp, target in translit or []:  # 음차 표기 → 정본(띄어쓰기·하이픈 무관, F10)
+            new = tp.sub(target, new)
         if new != text:
             fixes.append({"loc": loc, "rule": "별칭 표기를 정본으로", "before": text, "after": new})
             page = _set(page, loc, new)
@@ -345,10 +350,12 @@ def check(page: TopicPage, pack: dict[str, list[EvidenceItem]], n_sources: int, 
                       *[(f"concepts[{i}]", c.desc) for i, c in enumerate(page.concepts)]]:
         if ends_as_sentence(plain(text)):
             issues.append(_issue(loc, "format", f"{loc}이 문장으로 끝남('…{plain(text)[-12:]}')", "명사형 끝(~함, ~임, 명사)"))
+    # 요약·개요는 문장마다 "~다"(마지막 문장만 보던 것을 고침, 반영 확인 리뷰 F1: Solar 개요 "…제공함. …낮음. …전환된다.")
     for name in ("summary", "overview"):
-        t = plain(getattr(page, name)).strip()
-        if t and not t.rstrip(".").endswith("다"):
-            issues.append(_issue(name, "format", f"{name}이 '~다'로 끝나지 않음('…{t[-12:]}')", "평서체 '~다'"))
+        for sent in sentences(plain(getattr(page, name))):
+            if not sent.strip().rstrip(".").endswith("다"):
+                issues.append(_issue(name, "format", f"{name}의 문장이 '~다'로 끝나지 않음('…{sent.strip()[-12:]}')",
+                                     "요약·개요는 문장마다 평서체 '~다'(명사형 '~함', '~음' 아님)"))
     # 금지어(모델 md에는 넣지 않음)
     texts = [("title", page.title), ("summary", page.summary), ("overview", page.overview)]
     texts += [(f"points[{i}]", p.text) for i, p in enumerate(page.points)]
@@ -385,17 +392,42 @@ def check(page: TopicPage, pack: dict[str, list[EvidenceItem]], n_sources: int, 
 
 
 # ---------- 경고 ----------
-def warnings(page: TopicPage, pack: dict[str, list[EvidenceItem]], cfg: BriefConfig) -> list[str]:
+# angle 핵심 낱말 뽑기: 조사를 떼고 2글자 이상, 어느 토픽에나 나오는 일반어는 뺀다
+_PARTICLE = re.compile(r"(으로|에서|에게|과의|와의|의|와|과|을|를|이|가|은|는|에|로|도|만)$")
+_GENERIC = {"모델", "출시", "공개", "발표", "기능", "성능", "가격", "비용", "사용", "지원", "변화", "영향", "전략", "방식",
+            "구조", "비교", "중심", "관점", "의미", "축", "대한", "통한", "위한", "가능한", "새로운"}
+
+
+def angle_words(angle: str) -> set[str]:
+    words = set()
+    for w in re.findall(r"[A-Za-z][\w.\-]*|[가-힣]+", angle or ""):
+        w = _PARTICLE.sub("", w) if re.match(r"[가-힣]", w) else w
+        if len(w) >= 2 and w not in _GENERIC:
+            words.add(w.lower())
+    return words
+
+
+def warnings(page: TopicPage, pack: dict[str, list[EvidenceItem]], cfg: BriefConfig, angle: str = "") -> list[str]:
     out = []
-    by_unit: dict[str, int] = {}
-    for items in pack.values():
+    # 첫 point에 angle 핵심 낱말이 하나도 없으면 경고 → 검수자가 missing_key로 본다(반영 확인 리뷰 F7: Solar 첫 point가
+    # 두 번 모두 회사 투트랙 전략, md 문구로는 같은 실패 2회라 코드 규칙으로)
+    words = angle_words(angle)
+    if words and page.points and not any(w in plain(page.points[0].text).lower() for w in words):
+        out.append(f"핵심 의심: 다룰 축(angle '{angle}')의 낱말({', '.join(sorted(words))})이 첫 point에 없음")
+    # 같은 비교 대상 = 같은 근거 문장(id) 안의 같은 단위 값. 개수 단위(개·명 등)와 단위 없는 값은 비교 막대 대상으로 보지
+    # 않는다(반영 확인 리뷰 F3: 글쓴이 환경의 "스킬 약 50개·에이전트 약 20개"가 "약개 3"으로, 차원 768/512/256이 셈에 들어감)
+    by_unit: dict[tuple[str, str], int] = {}
+    for eid, items in pack.items():
         for it in items:
             if it.kind in ("number", "slide_fact") and it.value:
-                u = (it.unit or re.sub(r"[\d.,\s]", "", it.value) or "-").strip()
-                by_unit[u] = by_unit.get(u, 0) + 1
-    if not page.numbers and any(n >= 3 for u, n in by_unit.items() if u != "-"):
-        out.append("누락 의심: numbers가 비었는데 근거에 같은 단위 값 3개 이상(" +
-                   ", ".join(f"{u} {n}" for u, n in by_unit.items() if n >= 3) + ")")
+                raw = it.unit or re.sub(r"[\d.,\s]", "", it.value)
+                u = re.sub(r"^(약|최대|최소|평균|~|±)+", "", raw.strip()).strip()
+                if u and u not in COUNT_UNITS:
+                    by_unit[(eid, u)] = by_unit.get((eid, u), 0) + 1
+    many = [(e, u, n) for (e, u), n in by_unit.items() if n >= 3]
+    if not page.numbers and many:
+        out.append("누락 의심(같은 근거 문장의 같은 단위 값 3개 이상, 같은 지표 비교인지 확인): " +
+                   ", ".join(f"{e} {u} {n}개" for e, u, n in many))
     dates = {d for items in pack.values() for it in items for d in re.findall(r"\d{4}-\d{2}-\d{2}", it.text)}
     dates |= {it.source.get("date") for items in pack.values() for it in items if it.source.get("date")}
     if not page.events and len(dates) >= 3:
@@ -420,6 +452,7 @@ def warnings(page: TopicPage, pack: dict[str, list[EvidenceItem]], cfg: BriefCon
 
 
 def run_checks(page: TopicPage, pack: dict[str, list[EvidenceItem]], n_sources: int, cfg: BriefConfig,
-               canon: dict[str, str]) -> CheckResult:
-    fixed, fixes = autofix(page, cfg, canon, {it.channel for items in pack.values() for it in items}, n_sources)
-    return CheckResult(fixed, fixes, check(fixed, pack, n_sources, cfg), warnings(fixed, pack, cfg))
+               canon: dict[str, str], translit: list[tuple[re.Pattern[str], str]] | None = None,
+               angle: str = "") -> CheckResult:
+    fixed, fixes = autofix(page, cfg, canon, {it.channel for items in pack.values() for it in items}, n_sources, translit)
+    return CheckResult(fixed, fixes, check(fixed, pack, n_sources, cfg), warnings(fixed, pack, cfg, angle))

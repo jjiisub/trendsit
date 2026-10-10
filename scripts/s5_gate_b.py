@@ -33,6 +33,13 @@ KEEP = ("label", "critique", "labeler")
 QCOLS = tuple(f"{q}_pass" for q in ("Q0", "Q1", "Q2", "Q3", "Q4"))
 
 
+def _hash(text: str) -> str:
+    """출력(토픽 페이지) 해시: 라벨은 해시가 같은 행에만 옮긴다(반영 확인 리뷰 F8: 제목만 바뀐 출력에 이전 라벨이 붙음)."""
+    import hashlib
+
+    return hashlib.sha256(text.encode()).hexdigest()[:12]
+
+
 def merge_csv(path: Path, key: tuple[str, ...], cols: list[str], rows: list[dict], keep: tuple[str, ...] = KEEP) -> None:
     """라벨 칸(keep)은 같은 열쇠이고 나머지 칸(출력)이 그대로인 행에만 옮긴다. 출력이 바뀐 행의 라벨은 그 출력의 것이
     아니므로 비운다(이전 라벨은 eval/labels/s5_r1/ 스냅숏)."""
@@ -54,12 +61,12 @@ def style_violations(page: TopicPage) -> list[str]:
     for loc, text in [("summary", page.summary), ("overview", page.overview),
                       *[(f"points[{i}]", p.text) for i, p in enumerate(page.points)]]:
         t = checks.plain(text)
-        if any(is_haeyo(s) for s in checks.sentences(t)) or any(e in t for e in EVAL_ENDINGS):
+        if any(is_haeyo(s) for s in checks.sentences(t)) or any(e in t for e in (*EVAL_ENDINGS, *checks.SPECULATIVE)):
             out.append(f"{loc} 해요체·평가형")
         if loc.startswith("points") and ends_as_sentence(t):
             out.append(f"{loc} 명사형 아님")
-        if loc in ("summary", "overview") and t and not t.rstrip(".").endswith("다"):
-            out.append(f"{loc} '~다' 아님")
+        if loc in ("summary", "overview") and any(not x.strip().rstrip(".").endswith("다") for x in checks.sentences(t)):
+            out.append(f"{loc} '~다' 아님(문장마다)")
     return out
 
 
@@ -241,7 +248,10 @@ def main() -> int:
                                  "topic_id=? ORDER BY id", (run, t["topic_id"])).fetchall()
             for v in vs:
                 if v["checker"] == "critic":
+                    rp = db.conn.execute("SELECT page_json FROM topic_pages WHERE run_id=? AND topic_id=? AND round=?",
+                                         (run, t["topic_id"], v["round"])).fetchone()
                     crit_rows.append({"week": week, "topic_id": t["topic_id"], "round": v["round"], "status": v["status"],
+                                      "page_hash": _hash(rp[0] if rp else ""),
                                       "issues": json.dumps([{k: i[k] for k in ("loc", "type", "comment")}
                                                             for i in json.loads(v["issues_json"] or "[]")], ensure_ascii=False)})
             if page_row is None:
@@ -305,8 +315,9 @@ def main() -> int:
     merge_csv(LABELS / "editor_select.csv", ("week", "cluster_id"),
               ["week", "cluster_id", "action", "drop_reason", "reason", *KEEP], sel_rows)
     merge_csv(LABELS / "critic.csv", ("week", "topic_id", "round"),
-              ["week", "topic_id", "round", "status", "issues", *KEEP], crit_rows)
-    wrows = [{"topic_id": k, "week": v["week"], "status": v["status"],
+              ["week", "topic_id", "round", "status", "page_hash", "issues", *KEEP], crit_rows)
+    hashes = {t["topic_id"]: _hash(p.model_dump_json()) for _w, t, p, _c, _s in topics_all}
+    wrows = [{"topic_id": k, "week": v["week"], "status": v["status"], "page_hash": hashes.get(k, ""),
               **{f"judge_{q}": v["verdicts"].get(q, {}).get("verdict", "") for q in ("Q1", "Q2", "Q3", "Q4")},
               "judge_facts": f"{(v.get('facts') or {}).get('supported')}/{(v.get('facts') or {}).get('total')}",
               **{f"{q}_pass": "" for q in ("Q0", "Q1", "Q2", "Q3", "Q4")}} for k, v in final.items()]

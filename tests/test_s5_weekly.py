@@ -198,6 +198,8 @@ def test_unresolved_diagram_issue_drops_the_group(week):
     final = json.loads(ctx.db.conn.execute("SELECT page_json FROM topic_pages WHERE run_id=? AND topic_id='w41-model-1' "
                                            "ORDER BY round DESC, id DESC", (run_id,)).fetchone()[0])
     assert t1["status"] == "checked" and final["numbers"] == [] and "77.9%" in final["points"][0]["text"]
+    checks_json = ctx.db.conn.execute("SELECT checks_json FROM topics WHERE run_id=? AND rank=1", (run_id,)).fetchone()[0]
+    assert "빠진 도식: 점수" in json.loads(checks_json)  # ⚠가 빠진 도식을 가리키면 제목으로(F2-c)
     checkers = [r[0] for r in ctx.db.conn.execute("SELECT checker FROM verdicts WHERE run_id=? AND topic_id='w41-model-1' "
                                                   "ORDER BY id", (run_id,))]
     assert checkers == ["code", "code", "critic"]
@@ -296,3 +298,25 @@ def test_critic_empty_atoms_is_not_a_pass(week):
     att = [json.loads(r[0]) for r in ctx.db.conn.execute(
         "SELECT detail FROM steps WHERE run_id=? AND role='writer' AND kind='code' AND text LIKE 'w41-model-1%'", (run_id,))]
     assert att and att[0]["topic_id"] == "w41-model-1"
+
+
+def test_f2_diagram_with_only_critic_issue_is_kept_with_check(week):
+    """도식은 코드가 확인한 형식·수치 오류일 때만 뺀다. 검수자 의미 지적만 두 번 남으면 도식은 두고 ⚠(반영 확인 리뷰 F2)."""
+    ctx, cids = week
+    p1 = json.loads(page(1, "Argon이 DeepSWE에서 77.9% 기록"))
+    p1["numbers"] = [{"anchor": 1, "group": "g", "title": "Argon DeepSWE 77.9%", "context": "같은 벤치 [it:1#q1]", "unit": "%",
+                      "items": [{"label": lab, "value": "77.9", "ref": "it:1#q1", "baseline": False, "emphasis": False}
+                                for lab in ("a", "b", "c")]}]
+    over = [{"loc": "numbers[0]", "type": "overuse", "evidence_id": "it:1#q1", "comment": "같은 값 셋", "hint": "h"}]
+    responses = [plan(cids), json.dumps(p1, ensure_ascii=False), verdict(over),
+                 revision([{"issue_idx": 0, "loc": "numbers[0].title", "action": "edit", "value": "Argon 점수"}]), verdict(over)]
+    for i in (2, 3, 4):
+        responses += [page(i, f"{TITLES[i]} 근거 문장 요약 정리"), verdict([])]
+    ctx.llm.transport.responses = [response(r) for r in responses]
+    ctx.tracer = Tracer(ctx.db, "weekly", "S0")
+    pipeline.run_weekly("2026-W41", ctx, from_step="select", embedder=HashEmbedder(), cfg=CFG)
+    run_id = ctx.tracer.run_id
+    t = ctx.db.conn.execute("SELECT status, checks_json FROM topics WHERE run_id=? AND topic_id='w41-model-1'", (run_id,)).fetchone()
+    final = json.loads(ctx.db.conn.execute("SELECT page_json FROM topic_pages WHERE run_id=? AND topic_id='w41-model-1' "
+                                           "ORDER BY round DESC, id DESC", (run_id,)).fetchone()[0])
+    assert t["status"] == "checked" and json.loads(t["checks_json"]) == ["numbers[0]"] and len(final["numbers"]) == 1

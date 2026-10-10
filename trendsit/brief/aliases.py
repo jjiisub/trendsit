@@ -35,25 +35,38 @@ def norm_key(name: str) -> str:
     return s.replace("․", ".")
 
 
-def _swap_tokens(name: str, table: dict[str, str]) -> list[str]:
-    """이름의 낱말 중 사전에 있는 것을 하나씩 바꿔 본 모든 표기(원래 표기 제외). 낱말 단위만(솔루션의 솔은 아님)."""
-    parts = re.split(r"([\s\-_/]+)", name)
-    opts = [[p] + ([table[p.lower()]] if p.lower() in table else []) for p in parts]
-    out = [""]
-    for o in opts:
-        out = [a + b for a in out for b in o]
-    return [v for v in out if v != name]
+_SEP = re.compile(r"([\s\-_/]+)")
 
 
-def translit_variants(name: str, translit: dict[str, str]) -> list[str]:
-    """영문 이름 → 한글 음차가 섞인 표기들('DeepSeek-V4.1 Flash' → '딥시크-V4.1 플래시' 등). 작성자 출력 자동 수정용."""
-    return _swap_tokens(name, {k.lower(): v for k, v in translit.items()})
+def _alts(translit: dict[str, str]) -> dict[str, list[str]]:
+    """낱말(소문자) → 같은 이름의 다른 표기들. 사전 값은 '소넷|소네트'처럼 여러 음차를 '|'로."""
+    out: dict[str, list[str]] = {}
+    for en, ko in translit.items():
+        forms = [en, *ko.split("|")]
+        for f in forms:
+            out.setdefault(f.lower(), [])
+            out[f.lower()] += [x for x in forms if x.lower() != f.lower() and x not in out[f.lower()]]
+    return out
 
 
 def to_original(name: str, translit: dict[str, str]) -> str:
     """한글 음차 낱말을 영문으로 되돌린 표기(사전에 있는 낱말만)."""
-    inv = {v.lower(): k for k, v in translit.items()}
-    return "".join(inv.get(p.lower(), p) for p in re.split(r"([\s\-_/]+)", name))
+    inv = {v.lower(): k for k, vs in translit.items() for v in vs.split("|")}
+    return "".join(inv.get(p.lower(), p) for p in _SEP.split(name))
+
+
+def translit_pattern(name: str, translit: dict[str, str]) -> re.Pattern[str] | None:
+    """이름의 음차 섞인 표기를 모두 잡는 정규식(낱말 사이 띄어쓰기·하이픈은 있어도 없어도). 사전 낱말이 없으면 None.
+    예: 'DeepSeek V4.1 Flash' → '딥시크-V4.1 플래시', 'DeepSeek-V4.1 플래시'도(반영 확인 리뷰 F10)."""
+    alts = _alts(translit)
+    toks = [t for t in _SEP.split(name) if t and not _SEP.fullmatch(t)]
+    if not any(t.lower() in alts for t in toks):
+        return None
+    parts = ["(?:" + "|".join(re.escape(x) for x in sorted({t, *alts.get(t.lower(), [])}, key=len, reverse=True)) + ")"
+             for t in toks]
+    # 한글 경계: 앞은 글자가 아니고, 뒤는 글자가 아니거나 조사(솔루션의 '솔'은 잡지 않음)
+    after = r"(?=$|[^0-9A-Za-z가-힣]|(?:으로|에서|보다|처럼|은|는|이|가|을|를|의|에|와|과|도|로|만)(?:$|[^가-힣]))"
+    return re.compile(r"(?<![0-9A-Za-z가-힣])" + r"[\s\-]?".join(parts) + after, re.IGNORECASE)
 
 
 def numbers_of(name: str) -> tuple[str, ...]:

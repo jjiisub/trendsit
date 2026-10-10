@@ -124,6 +124,7 @@ def run_weekly(week: str, ctx: Ctx, from_step: str = "cluster", only_topic: str 
                 text=f"{t.topic_id}: {res.status}, {res.final_round}라운드" + (f", 확인 필요 {res.attention[0]}" if res.attention else ""),
                 attention=res.status != "passed" or bool(res.attention),
                 detail={"topic_id": t.topic_id, "evidence": res.evidence_ids, "truncated": res.dropped_ids,
+                        "dropped_diagrams": res.dropped_diagrams, "checks": res.checks,
                         "n_sources": res.n_sources, "costs": res.costs, "rounds": [
                             {"round": lg.round, "checker": lg.checker, "status": lg.status, "issues": lg.issues,
                              "reverts": lg.reverts, "autofix": len(lg.autofix)} for lg in res.rounds]})
