@@ -1,18 +1,18 @@
 canonical,alias,status,reason,evidence,label,critique,labeler
-GPT-6 Luna,gpt-6-luna,approved,표기 차이만(대소문자·띄어쓰기·하이픈·점),it:1043,,,
-GPT-6.1 Sol,GPT-6.1-sol,approved,표기 차이만(대소문자·띄어쓰기·하이픈·점),it:1048,,,
-OpenRig,openrig,approved,표기 차이만(대소문자·띄어쓰기·하이픈·점),rp:mvschwarz/openrig,,,
-MAI 코드 1.1 플래시,MAI-코드-1.1 플래시,approved,표기 차이만(대소문자·띄어쓰기·하이픈·점),it:1161,,,
-터미널-벤치 2.1,터미널벤치 2.1,approved,표기 차이만(대소문자·띄어쓰기·하이픈·점),it:1205,,,
-GPT-6 Luna,GPT-6 루나,approved,음차·약어 사전(brief.yaml aliases.transliteration),it:1172 it:1180 it:1198 it:1245,,,
-GPT-6 Astra,GPT-6 아스트라,approved,음차·약어 사전(brief.yaml aliases.transliteration),it:1148 it:1163 it:1223 it:1237 it:1245,,,
-Mistral,미스트랄,approved,음차·약어 사전(brief.yaml aliases.transliteration),it:1198,,,
-Codex,코덱스,approved,음차·약어 사전(brief.yaml aliases.transliteration),it:1193 it:1223 it:1225,,,
-Claude Opus 5.5,클로드 오퍼스 5.5,approved,음차·약어 사전(brief.yaml aliases.transliteration),it:1163 it:1245,,,
-GPT-6.1 Sol,GPT-6.1 솔,approved,음차·약어 사전(brief.yaml aliases.transliteration),it:1223,,,
-Gemini 3.8 Flash,제미나이 3.8 플래시,approved,음차·약어 사전(brief.yaml aliases.transliteration),it:1245,,,
-Claude,클로드,approved,음차·약어 사전(brief.yaml aliases.transliteration),it:1185 it:1204 it:1206 it:1221 it:1231,,,
-Gemini,제미나이,approved,음차·약어 사전(brief.yaml aliases.transliteration),it:1170 it:1182 it:1230,,,
-DeepSeek,딥시크,approved,음차·약어 사전(brief.yaml aliases.transliteration),it:1196,,,
-Claude Haiku 5.5,클로드 하이쿠 5.5,approved,음차·약어 사전(brief.yaml aliases.transliteration),it:1180,,,
-Datasette,datasette.io,rejected,rapidfuzz 90,it:1047 it:1049,,,
+GPT-6 Luna,gpt-6-luna,approved,표기 차이만(대소문자·띄어쓰기·하이픈·점),it:1043,correct,,opus-5.5
+GPT-6.1 Sol,GPT-6.1-sol,approved,표기 차이만(대소문자·띄어쓰기·하이픈·점),it:1048,correct,,opus-5.5
+OpenRig,openrig,approved,표기 차이만(대소문자·띄어쓰기·하이픈·점),rp:mvschwarz/openrig,correct,,opus-5.5
+MAI 코드 1.1 플래시,MAI-코드-1.1 플래시,approved,표기 차이만(대소문자·띄어쓰기·하이픈·점),it:1161,correct,,opus-5.5
+터미널-벤치 2.1,터미널벤치 2.1,approved,표기 차이만(대소문자·띄어쓰기·하이픈·점),it:1205,correct,,opus-5.5
+GPT-6 Luna,GPT-6 루나,approved,음차·약어 사전(brief.yaml aliases.transliteration),it:1172 it:1180 it:1198 it:1245,correct,,opus-5.5
+GPT-6 Astra,GPT-6 아스트라,approved,음차·약어 사전(brief.yaml aliases.transliteration),it:1148 it:1163 it:1223 it:1237 it:1245,correct,,opus-5.5
+Mistral,미스트랄,approved,음차·약어 사전(brief.yaml aliases.transliteration),it:1198,correct,,opus-5.5
+Codex,코덱스,approved,음차·약어 사전(brief.yaml aliases.transliteration),it:1193 it:1223 it:1225,correct,,opus-5.5
+Claude Opus 5.5,클로드 오퍼스 5.5,approved,음차·약어 사전(brief.yaml aliases.transliteration),it:1163 it:1245,correct,,opus-5.5
+GPT-6.1 Sol,GPT-6.1 솔,approved,음차·약어 사전(brief.yaml aliases.transliteration),it:1223,correct,,opus-5.5
+Gemini 3.8 Flash,제미나이 3.8 플래시,approved,음차·약어 사전(brief.yaml aliases.transliteration),it:1245,correct,,opus-5.5
+Claude,클로드,approved,음차·약어 사전(brief.yaml aliases.transliteration),it:1185 it:1204 it:1206 it:1221 it:1231,correct,,opus-5.5
+Gemini,제미나이,approved,음차·약어 사전(brief.yaml aliases.transliteration),it:1170 it:1182 it:1230,correct,,opus-5.5
+DeepSeek,딥시크,approved,음차·약어 사전(brief.yaml aliases.transliteration),it:1196,correct,,opus-5.5
+Claude Haiku 5.5,클로드 하이쿠 5.5,approved,음차·약어 사전(brief.yaml aliases.transliteration),it:1180,correct,,opus-5.5
+Datasette,datasette.io,rejected,rapidfuzz 90,it:1047 it:1049,correct,,opus-5.5
