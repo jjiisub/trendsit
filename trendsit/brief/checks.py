@@ -218,7 +218,12 @@ def _numbers_ok(text: str, ids: list[str], pack: dict[str, list[EvidenceItem]]) 
     src = _ev_text(ids, pack)
     vals = number_values(src)
     out = []
-    for f in figures(plain(text)):
+    body = plain(text)
+    for f in figures(body):
+        # 영문 이름 바로 뒤 숫자(단위 없음)는 버전·제품 이름이지 측정값이 아님: "Claude Haiku 5.5", "Gemini 4.1"(3차 재실행 Haiku
+        # 도식 제목 '5.5' 오탐으로 반려 3회)
+        if re.search(rf"[A-Za-z]\s{re.escape(f)}(?![\d.]|\s?(%|배|x|×|점|달러|초|ms))", body):
+            continue
         try:
             v = float(f.replace(",", ""))
         except ValueError:

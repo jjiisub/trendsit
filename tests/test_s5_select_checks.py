@@ -469,3 +469,11 @@ def test_g7_concept_without_explanation_is_dropped():
                        Concept(term="MoE", desc="입력마다 전문가 일부만 켜서 계산량을 줄이는 구조")])
     fixed, fixes = checks.autofix(p, CFG, {})
     assert [c.term for c in fixed.concepts] == ["MoE"] and any(f["loc"] == "concepts" for f in fixes)
+
+
+def test_version_after_english_name_is_not_a_measurement():
+    p = page(title="Claude Haiku 5.5 가격 정리", summary="Claude Haiku 5.5가 GDPval에서 1620점을 기록했다.")
+    msgs = [i.comment for i in checks.run_checks(p, pack(), 2, CFG, {}).issues if i.type == "number_mismatch"]
+    assert not any("'5.5'" in m for m in msgs)
+    p2 = page(summary="정확도가 Haiku 5.5% 높아졌다.")  # 단위가 붙으면 측정값
+    assert any("'5.5'" in i.comment for i in checks.run_checks(p2, pack(), 2, CFG, {}).issues)

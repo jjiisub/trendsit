@@ -152,15 +152,15 @@
  },
  "w41-claude-haiku-5-5": {
   "week": "2026-W41",
-  "numbers": [],
-  "events": [],
-  "code_warnings": [
-   "누락 의심(같은 근거 문장의 같은 단위 값 3개 이상, 같은 지표 비교인지 확인): it:1180#q4 점 3개, it:1144#q6 $ 3개"
+  "numbers": [
+   "Claude Haiku GDPval-AA v2.1 점수 1620점으로 3개 모델 중 최고"
   ],
-  "needed_numbers": 1,
-  "needed_events": 0,
-  "labeler": "opus-5.5",
-  "critique": "누락: 구간별 입력·출력 가격(100K 이하 $0.10/$0.50, 초과 $0.50/$2.50)이 angle의 핵심, 도식이 빠짐(⚠ numbers[0])"
+  "events": [],
+  "code_warnings": [],
+  "needed_numbers": null,
+  "needed_events": null,
+  "labeler": null,
+  "critique": null
  },
  "w41-decision-api-spec": {
   "week": "2026-W41",
@@ -197,7 +197,9 @@
   "numbers": [],
   "events": [],
   "code_warnings": [
-   "누락 의심(같은 근거 문장의 같은 단위 값 3개 이상, 같은 지표 비교인지 확인): it:1225#q3 % 3개, it:1105#q4 % 3개, it:1225#q4 % 5개, it:1105#q5 % 3개"
+   "누락 의심(같은 근거 문장의 같은 단위 값 3개 이상, 같은 지표 비교인지 확인): it:1225#q3 % 3개, it:1105#q4 % 3개, it:1225#q4 % 5개, it:1105#q5 % 3개",
+   "누락 의심: points[2] 안에 같은 단위 값 3개 이상(% 1/80/95), 같은 지표면 numbers",
+   "누락 의심: points[3] 안에 같은 단위 값 3개 이상(% 10/92/66/25/17), 같은 지표면 numbers"
   ],
   "needed_numbers": 1,
   "needed_events": 0,
