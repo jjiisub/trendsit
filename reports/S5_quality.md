@@ -269,6 +269,9 @@ judge 판정: **잠정**(사람 라벨 없음. `eval/labels/writer.csv`를 채�
 
 - 모든 항목 judge ↔ 라벨 80% 이상(COMMON 2). 다만 라벨이 잡은 요약 범위 부풀림(GPT-6.1 Sol), "앞선다"(Mistral)는 judge가 여전히 놓침
 
+## 설계 결정 C-23(사용자 확정, 2026-10-10): writer Q1 해석
+첫 point는 이번 주 사건(출시·발표)이어도 된다. angle의 핵심은 summary 첫 문장 또는 첫 두 point 안이면 Q1 통과. 채점표(`eval/rubrics/writer.md` Q1)·writer.md·critic.md를 이 해석으로 바꿨다. 아래 "실제 실행" 표의 Sonnet 5.5·Solar Mini 4 Q1 fail은 재실행하지 않아 C-23 전 judge 결과다(3차 리뷰 라벨은 C-23 적용으로 Q1 19/20)
+
 ## 실제 실행(2026-W40 + 2026-W41, 관문 B 대상 주)
 
 > `scripts/s5_gate_b.py`가 붙인 절. 라벨이 필요한 항목은 2차 라벨(D1-3, 리뷰 세션 opus-5.5) 전 잠정.

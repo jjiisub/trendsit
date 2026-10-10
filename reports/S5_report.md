@@ -1,6 +1,6 @@
 # S5 리포트: 주간 브리핑
 
-> 한 줄 요약: `trendsit weekly --week W`가 한 주의 글·영상·레포를 묶고(과거 대조 포함) 편집장이 토픽을 고르고 작성자 ⇄ 코드 검사·검수자가 근거 id 달린 토픽 페이지를 만들어 칠판에 run_id로 쌓는다. PR #9 리뷰 두 차례(R1~R18, F1~F12, C-20~C-22) 반영 뒤 W40·W41 20토픽 작성 실패 0. 2차 라벨(이전 출력) 통과 12/20, 바뀐 10토픽 재실행 뒤 judge(잠정) 원자 사실 17/20 토픽 100%(미달), Q1~Q4 90~100%, 코드 문체 위반 0.
+> 한 줄 요약: `trendsit weekly --week W`가 한 주의 글·영상·레포를 묶고(과거 대조 포함) 편집장이 토픽을 고르고 작성자 ⇄ 코드 검사·검수자가 근거 id 달린 토픽 페이지를 만들어 칠판에 run_id로 쌓는다. PR #9 리뷰 세 차례(R1~R18, F1~F12, G1~G8, C-20~C-23) 반영 뒤 W40·W41 20토픽 작성 실패 0. 3차 리뷰 라벨 통과 15/20, 6토픽 재실행 뒤 judge(잠정) 원자 사실 19/20 토픽 100%(미달 1), Q1~Q4 90~100%, 코드 문체 위반 2(Haiku ⚠), 표현 선택 누락 2(미달).
 
 ## 진행 체크리스트
 - [x] 0 환경 점검·정리(5.0) + handoff 묶음 커밋 + README 맞춤
@@ -13,7 +13,8 @@
 - [x] 7 weekly + 저장 + 실행 요약(5.9, 5.10)
 - [x] 8 관문 B(**W40 + W41**, 멈춤 지점 결정 7), 리포트, PR
 - [x] 9 PR #9 리뷰 반영(R1~R18, C-20, C-21 수정, judge 보정) → W40·W41 재실행
-- [x] 10 반영 확인 리뷰(2차) 반영(F1~F12, C-22) → 10토픽 재실행 → **반영 확인 리뷰 대기**
+- [x] 10 반영 확인 리뷰(2차) 반영(F1~F12, C-22) → 10토픽 재실행
+- [x] 11 반영 확인 리뷰(3차) 반영(G1~G8, C-23) → 6토픽 재실행 → **반영 확인 리뷰 대기**
 
 ## 0단계: 환경 점검·정리 (2026-10-09 13:30, LLM 0원)
 
@@ -312,6 +313,46 @@ pytest 실패 5건(0단계 시점, 모두 handoff 묶음이 원인): 새 역할 
   - Sonnet 5.5 Q1: 첫 point가 벤치 점수(angle은 토큰 설계). 충실성은 37/37로 고쳐짐
 - 재실행하지 않은 10토픽의 ⚠는 이전 규칙으로 저장된 값이라, 읽기본·export가 없는 도식을 가리키는 위치를 "빠진 도식(numbers[1])"로 보여 준다(`briefing.visible_checks`, LLM 0원). 새로 쓰는 토픽은 "빠진 도식: 제목"
 
+## 반영 확인 리뷰(3차) 반영 (2026-10-10)
+
+> 설계 세션 3차 리뷰(issuecomment-6093197231): 라벨 통과 15/20. G1~G8과 설계 결정 C-23(사용자 확정). 6토픽만 재실행. 시점 스냅숏 `eval/labels/s5_r3/`(행별 라벨 없이 집계만 받음, README에 집계)
+
+### 설계 결정 C-23(사용자 확정): Q1 해석
+첫 point는 이번 주 사건(출시·발표)이어도 된다. angle의 핵심은 summary 첫 문장 또는 첫 두 point 안. writer.md·critic.md·writer 채점표 Q1과 F7 경고(이제 summary 첫 문장 + 첫 두 point 기준)를 이 해석으로. F7은 반려로 올리지 않고 경고로 유지
+
+### 질문 2: LlamaIndex "ParseBench 3 처리 영역" grep
+작성자에게 준 근거에 있음: `vd:274@816` 영상 핵심 포인트 "ParseBench 벤치마크와 고정확도·저비용·초저지연 3가지 처리 영역 구분"(digest key_point). 검수·judge의 근거 원문(전사 앞뒤 30초 + 화면 판독)에는 이 줄이 없었다 → `raw_evidence`에 영상 핵심 포인트·구간 이름을 넣음. 재실행 judge 18/18
+
+### 지적 처리
+| # | 처리 | 확인 |
+|---|---|---|
+| G1 | C-23 문구, F7 경고 기준(요약 첫 문장 + 첫 두 point) | `test_f7_*` |
+| G2 | 코드 경고: 한 point 안에 같은 단위 값 3개 이상인데 그 point에 붙은 도식이 없으면 "누락 의심: points[i]"(차원·개수 단위 제외 그대로) | `test_g2_*` |
+| G3 | 근거가 "100만 토큰당/per 1M/MTok"인데 본문이 "토큰당"만이면 반려. 영문 이름 끝 받침 뒤 가·는·를·와 금지(예 "Anthropic가") | `test_g3_*` |
+| G4 | critic 함정 "다른 조건 값 비교", writer.md "같은 조건의 값끼리, 요약 수치는 그 point와 같은 조건" | 재실행 |
+| G5 | critic 절차 0: 요약·개요 문장마다 point 대조(point에 없는 사실·이유는 이슈) | 재실행 |
+| G6 | 원인: 작성자가 contributions를 비움 → R12 반려 → 수정 역할이 목록 위치 "contributions"에 add했지만 합치기가 번호 없는 목록 add를 받지 않았고(알 수 없는 위치), 값도 채널 없는 문장(두 채널을 한 문장에). 합치기가 목록 add를 받고, 채널 없는 문장은 refs가 한 채널이면 그 채널로. writer_revise.md에 채널마다 1문장 예시 | `test_g6_*`, 재실행 OpenRig github·text 2문장 |
+| G7 | 풀이 15자 미만 개념은 코드가 뺌. writer.md "한 point는 한 출처(발표)", critic 함정 "서로 다른 출처를 한 point에" | `test_g7_*` |
+| G8 | F5 규칙 그대로(재실행) | 재실행 |
+| 추가 | (재실행에서 발견) 영문 이름 바로 뒤 숫자(단위 없음, "Claude Haiku 5.5")를 측정값으로 대조해 반려하던 오탐 → 버전으로 보고 뺌. writer_revise max_tokens 1500 → 3000(Haiku 수정이 두 번 잘려 실패, 10/10 재실행 중 writer_revise 39회 중 4회 잘림) | `test_version_after_english_name_*` |
+
+### 6토픽 재실행 결과(judge, 잠정)
+현재판: W40 `20261010-123148-weekly-8839`, W41 `20261010-124834-weekly-75b1`(Haiku는 세 번 돌린 판 중 원자 사실 29/29인 판을 현재판으로 둠: 캐시 없는 판 27/28, max_tokens 올린 판 23/24)
+
+| 항목 | 3차 리뷰(라벨) | 6토픽 재실행 뒤 judge | 문턱값 | 판정 |
+|---|---|---|---|---|
+| 근거 충실성 | 17/20 | **19/20**(재실행 6토픽 모두 100%, 남은 1은 재실행 안 한 Solar 25/26) | 모든 토픽 | 미달(잠정) |
+| Q1 / Q2 / Q3 / Q4 | 19(C-23) · - · - · 19 | 18 · 18 · 20 · 20(Q1 미달 2는 재실행 안 한 Sonnet·Solar의 이전 judge, C-23 전 채점) | 90% | 통과(잠정) |
+| 코드 문체 정규식(최종판) | 0 | **2**(Haiku 요약·개요 "…출시."로 끝남, 같은 이슈 2회 → ⚠로 발행) | 0 | 미달 |
+| 표현 선택 | 누락 2 | 누락 2 그대로(아래) | 누락 ≤1 | 미달(잠정) |
+| 선별 검증(C-22) | 2/2 | 2/2 | 100% | 통과 |
+
+- 고쳐진 것: LlamaIndex 18/18(근거 원문에 핵심 포인트), Claude Code 스킬 23/23(요약·개요 인과·포인트 밖 수치 없어짐, Q2는 요약·개요 문장 반복으로 judge 실패), textGrain 18/18(요약 조건 섞임 없어짐), OpenRig 24/24·contributions 2채널, 코딩 에이전트 발표 23/23
+- 남은 것(같은 실패 반복, 결정 필요)
+  - **도식 누락 2**: G2 경고는 textGrain points[3](10/92/66/25/17%)에서 떴으나 검수자가 missing_diagram을 내지 않고 통과. F7 때와 같은 양상(검수자가 코드 경고를 따르지 않음). 다음 수단은 이 경고를 코드 반려로 올리는 것(G2 조건은 F7보다 좁아 오탐이 적을 것으로 봄)
+  - **Haiku 요약 "…출시."**: 코드가 두 라운드 반려했으나 수정 역할이 명사형으로 다시 냄 → ⚠. 세 번 돌려 모두 요약·개요 문체 또는 사실 1건이 남음
+  - 코딩 에이전트 발표 요약 첫 문장 주어 없음(F5·G7 반복), 이번엔 ⚠ overview·points[0]·points[1]
+
 ## 관문 B (1차 반영 뒤 W40 + W41 전체 재실행, 잠정, 2차 반영 결과는 위 절)
 자세한 표: `reports/S5_quality.md`(끝 절 "실제 실행"), 최종판 judge 원자료 `reports/S5_brief/gate_b_final_judge.json`, 읽기본 `reports/S5_brief/briefing_2026-W40.md`·`briefing_2026-W41.md`. 현재판 run: W40 `20261010-082349-weekly-8cdc`(묶기부터 `20261010-073230-weekly-d33d` + 토픽 단위 재실행), W41 `20261010-082802-weekly-b543`(묶기부터 `20261010-075543-weekly-fd8a` + 토픽 단위 재실행).
 
@@ -382,7 +423,8 @@ pytest 실패 5건(0단계 시점, 모두 handoff 묶음이 원인): 새 역할 
 | google/gemini-3.8-flash(judge) | 133 | 40 | 613,742 | 136,008 | $0.33 |
 | 합계(기록) | | | | | **$2.57** / 상한 $3.00 |
 - PR #9 첫 제출 때 키 기준: 단계 $5.31 − S5 시작 때 $2.46 = 약 $2.85 / $3.00
-- PR #9 리뷰 반영 뒤(상한 4.00, 사용자 승인): 키 기준 단계 $5.94 − $2.46 = **약 $3.48 / $4.00**. 리뷰 반영 몫 약 $0.63(judge 보정 2회·최종 judge 2회 약 $0.35, W40·W41 재실행과 토픽 단위 재실행 약 $0.25). 단계 합계 $5.94 / $20
+- 3차 반영 뒤: 키 기준 단계 $6.27 − $2.46 = **약 $3.81 / $4.00**(남은 몫 약 $0.19). 단계 합계 $6.27 / $20
+- PR #9 리뷰 1차 반영 뒤(상한 4.00, 사용자 승인): 키 기준 단계 $5.94 − $2.46 = 약 $3.48 / $4.00. 리뷰 반영 몫 약 $0.63(judge 보정 2회·최종 judge 2회 약 $0.35, W40·W41 재실행과 토픽 단위 재실행 약 $0.25). 단계 합계 $5.94 / $20
 - 큰 몫: W41·W40 글 카드 재생성 $0.68, 작성·검수 반복 실행(버그 수정 재실행 포함) 약 $0.9, judge $0.33
 
 ## 스펙과 다르게 한 것
@@ -433,22 +475,22 @@ pytest 실패 5건(0단계 시점, 모두 handoff 묶음이 원인): 새 역할 
 | 10 | 묶기 테스트가 경로 규칙을 다시 구현 / A14 예외(중간) | 실제 build_pairs 테스트 추가(이름 경로·회사 이름 제외). A14 예외(라벨이 가리키는 실행)는 일치율 재현에 필요해 유지 |
 | 11 | relation_label 미저장, 별칭 부분 치환, critic 실패를 pass로 기록, 묶기부터 다시 돌릴 때 이어 오기, 미사용 설정·코드 상수, ENFORCED_FIELDS 선언, 숫자 다른 표기 자동 승인(낮음) | relation_label 저장(마이그레이션 34), 단어 경계 치환, 검수 실패는 판정 기록 안 함(attention), 묶기부터면 이어 오지 않음, broad_keywords·alias_decide_max를 brief.yaml로, ReviewVerdict ENFORCED_FIELDS에 status·attention, 숫자 다른 표기는 자동 승인 안 함. 미사용 설정(linkage, auto_approve, per_point_max, runtime)은 스펙 초안 칸이라 남김 |
 
-## 관문 A (`bash scripts/verify_s5.sh`, 2026-10-10 12:05, 반영 확인 리뷰 2차 반영 뒤)
+## 관문 A (`bash scripts/verify_s5.sh`, 2026-10-10 13:20, 반영 확인 리뷰 3차 반영 뒤)
 ```
 PASS A1 verify_s0~s4 종료 코드 0, PASS 73개
-PASS A2 ruff 0, pytest 527 passed in 165.92s (0:02:45), 건너뜀 0
+PASS A2 ruff 0, pytest 532 passed in 184.78s (0:03:04), 건너뜀 0
 PASS A3 check-config OK 설정 9개, 역할 15개, budget S5 있음, 역할 md 5개(decide, editor_select, writer, writer_revise, critic) 섹션 검사 포함
-PASS A4 공통 수정 5.1(명사 예외, ImageError 계열, 중첩 ImageFile 거부, ClassVar, 예산 기준값 위치, 수치 모듈) + 출력 잘림 감지 (19 passed in 0.58s)
-PASS A5 근거 목록(자격, 근거 id 형식, 입력 상한과 뺀 근거) (3 passed, 10 deselected in 0.19s)
-PASS A6 정규화(표기 차이만 자동 승인, 숫자·버전 다른 쌍 후보 아님, name_pairs 전역 미반영) (8 passed, 5 deselected in 1.16s)
-PASS A7 묶기(채널 넘는 조건, confidence 미달, 평균 연결, 레포만 묶음, 1개짜리, 재실행 run 보존) (16 passed in 0.95s)
-PASS A8 선별 검증(리드 1, 개수 범위, 범위 밖 합치기·나누기 거부, relation은 과거 대조 후보 안, 입력 순서 cluster_id, reason 값·채널 수 대조, 재시도·대체, 점수 동점은 관심 유사도(C-21 수정), 영상 자리(C-20)) (21 passed, 30 deselected in 1.32s)
-PASS A9 코드 검사(…, + F1 문장마다 '~다', F3 누락 경고, F7 angle 경고, F11 금지어) (23 passed, 31 deselected)
-PASS A10 라운드(…, + 원자 사실 0개 판정 거부, 도식은 코드 확인 오류만 뺌(F2)) (6 passed, 45 deselected)
-PASS A11 저장(마이그레이션 30~35, 재실행 run 보존·current_run_id, topic_evidence = 최종판 refs, 토픽 수준 확인 필요) (2 passed, 24 deselected in 1.62s)
-PASS A12 실행 요약 JSON 형식과 표에서 다시 계산한 값 일치 (1 passed, 9 deselected in 1.38s)
-PASS A13 저장값만으로 예시 JSON 토픽 칸(매핑 함수 초안: numbers·events·og 출처 origin·checks) (2 passed, 8 deselected in 1.31s)
+PASS A4 공통 수정 5.1(명사 예외, ImageError 계열, 중첩 ImageFile 거부, ClassVar, 예산 기준값 위치, 수치 모듈) + 출력 잘림 감지 (19 passed in 0.71s)
+PASS A5 근거 목록(자격, 근거 id 형식, 입력 상한과 뺀 근거) (3 passed, 10 deselected in 0.23s)
+PASS A6 정규화(표기 차이만 자동 승인, 숫자·버전 다른 쌍 후보 아님, name_pairs 전역 미반영) (8 passed, 5 deselected in 1.38s)
+PASS A7 묶기(채널 넘는 조건, confidence 미달, 평균 연결, 레포만 묶음, 1개짜리, 재실행 run 보존) (16 passed in 0.90s)
+PASS A8 선별 검증(리드 1, 개수 범위, 범위 밖 합치기·나누기 거부, relation은 과거 대조 후보 안, 입력 순서 cluster_id, reason 값·채널 수 대조, 재시도·대체, 점수 동점은 관심 유사도(C-21 수정), 영상 자리(C-20)) (21 passed, 35 deselected in 1.44s)
+PASS A9 코드 검사(수치 대조 값 비교·제목·도식 칸까지·단위 환산 미허용, 막대 단위·빈 단위·라벨 단위, anchor, 도식 상한, 금지어·전망형, contributions 채널, points 자르기, 음차 정본, 자동 수정은 반려 아님, 경고) (26 passed, 32 deselected in 1.10s)
+PASS A10 라운드(상한 3, 코드 반려도 셈, 같은 이슈 2회 check, 지적 안 된 칸 되돌림, 1부터 센 위치 바로잡기, 원자 사실 0개 판정 거부, 도식은 코드 확인 오류만 뺌, 목록 위치 add·채널 없는 기여 문장) (7 passed, 49 deselected in 4.87s)
+PASS A11 저장(마이그레이션 30~35, 재실행 run 보존·current_run_id, topic_evidence = 최종판 refs, 토픽 수준 확인 필요) (2 passed, 25 deselected in 3.23s)
+PASS A12 실행 요약 JSON 형식과 표에서 다시 계산한 값 일치 (1 passed, 10 deselected in 2.30s)
+PASS A13 저장값만으로 예시 JSON 토픽 칸(매핑 함수 초안: numbers·events·og 출처 origin·checks) (2 passed, 9 deselected in 1.93s)
 PASS A14 README S5 상태, S5_report 체크리스트, reports/eval 역할·모델별 최신 1개(+ 라벨 기준 실행)
 ```
-- 전체 실행은 A1~A14 PASS(pytest 527 passed, 건너뜀 0). 그 뒤 A9·A10의 테스트 범위에 F1·F2·F3·F7·F11 테스트를 넣고 두 항목만 다시 돌려 PASS(위 두 줄)
+- A9·A10에 F·G 테스트(F1·F2·F3·F7·F11, G2·G3·G6·G7, 버전 숫자 오탐) 포함
 - 이전 제출(10/09 21:03)의 A14 FAIL은 사용자가 파일을 지운 뒤 커밋(`42d7687`)
