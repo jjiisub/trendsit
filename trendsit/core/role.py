@@ -160,8 +160,23 @@ def lint_body(rel: str, body: str) -> list[ConfigError]:
 
 
 def role_files(root: Path = ROOT) -> list[Path]:
-    """검사 대상: roles/*.md + 채점자 역할 eval/judge.md."""
-    return sorted((root / "roles").glob("*.md")) + [p for p in [root / "eval" / "judge.md"] if p.exists()]
+    """검사 대상: roles/*.md + 채점자 역할 eval/judge*.md(S5 judge_facts 포함)."""
+    return sorted((root / "roles").glob("*.md")) + sorted((root / "eval").glob("judge*.md"))
+
+
+def nested_image_fields(cls: type[BaseModel], prefix: str = "", top: bool = True) -> list[str]:
+    """최상위가 아닌 자리의 ImageFile 칸(목록 안, 하위 모델 안). 메시지 조립은 최상위 칸만 이미지로 보낸다."""
+    out = []
+    for name, f in cls.model_fields.items():
+        path = f"{prefix}{name}"
+        ann = f.annotation
+        args = [ann, *getattr(ann, "__args__", ())]
+        for a in args:
+            if a is ImageFile and (not top or a is not ann):
+                out.append(path)
+            elif isinstance(a, type) and issubclass(a, BaseModel) and a is not ImageFile:
+                out += nested_image_fields(a, f"{path}.", top=False)
+    return out
 
 
 def check_roles(models: ModelsConfig, root: Path = ROOT) -> list[ConfigError]:
@@ -173,6 +188,9 @@ def check_roles(models: ModelsConfig, root: Path = ROOT) -> list[ConfigError]:
             errors.append(e)
             continue
         errors += lint_body(_rel(path, root), role.body)
+        for f in nested_image_fields(role.input_cls):
+            errors.append(ConfigError(_rel(path, root), "input",
+                                      f"이미지 칸 '{f}'이 최상위가 아님(최상위 ImageFile만 이미지로 전달됨)"))
     return errors
 
 
@@ -214,6 +232,7 @@ def run_role(role: Role, inp: RoleInput, ctx: Ctx) -> RoleOutput:
     alias = ctx.model or role.spec.model
     messages = initial_messages(role, inp)
     last_error = ""
+    truncated = False
     for attempt in range(ROLE_RETRIES + 1):
         try:
             res = ctx.llm.chat(alias, messages, schema=role.output_cls, max_tokens=role.spec.max_tokens,
@@ -229,12 +248,19 @@ def run_role(role: Role, inp: RoleInput, ctx: Ctx) -> RoleOutput:
                                           detail=enforce_detail(out, {"attempt": attempt + 1}))
             return out
         last_error = res.parse_error or "알 수 없는 검증 오류"
-        ctx.last_step_id = record_llm(ctx, role, res, text=f"스키마 검증 실패 ({attempt + 1}회)",
-                                      error=last_error, detail={"attempt": attempt + 1})
-        messages = [*messages, {"role": "assistant", "content": res.content or ""},
-                    {"role": "user", "content": f"직전 출력이 스키마 검증에 실패함: {last_error}\n"
-                                                "위 오류를 고친 JSON 하나로만 다시 출력할 것."}]
-    raise RoleFailed(f"{role.name}: 스키마 검증 {ROLE_RETRIES + 1}회 실패 ({last_error})")
+        cut = res.tokens_out is not None and res.tokens_out >= role.spec.max_tokens  # 출력 잘림(COMMON 6.1-9)
+        if cut:
+            last_error = f"출력 잘림(max_tokens {role.spec.max_tokens} 도달): {last_error}"
+        ctx.last_step_id = record_llm(ctx, role, res, text=f"{'출력 잘림' if cut else '스키마 검증 실패'} ({attempt + 1}회)",
+                                      error=last_error, detail={"attempt": attempt + 1, "truncated": cut})
+        if cut and truncated:  # 잘림은 한 번만 다시(같은 길이로 또 잘리면 더 돌려도 같음)
+            break
+        truncated = truncated or cut
+        retry = ("직전 출력이 길이 상한에서 잘림. 각 칸의 분량 규칙을 지켜 더 짧은 JSON 하나로 다시 출력할 것."
+                 if cut else f"직전 출력이 스키마 검증에 실패함: {last_error}\n위 오류를 고친 JSON 하나로만 다시 출력할 것.")
+        messages = [*initial_messages(role, inp), {"role": "user", "content": retry}] if cut else [
+            *messages, {"role": "assistant", "content": res.content or ""}, {"role": "user", "content": retry}]
+    raise RoleFailed(f"{role.name}: 스키마 검증 실패 ({last_error})")
 
 
 def run(role: Role, inp: RoleInput, ctx: Ctx) -> RoleOutput:

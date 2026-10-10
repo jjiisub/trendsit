@@ -1,0 +1,31 @@
+{
+ "input": {
+  "a": {
+   "id": "it:864",
+   "source": "text",
+   "text": "요약: 구글이 에이전트 작업 능력을 강화한 차세대 플래그십 모델 '제미나이 4 아르곤'을 공개했다. 출력 토큰 한도가 100만 토큰으로 확장되었고, 18개 주요 벤치마크 중 13개 부문에서 1위를 차지했다. 독립 평가 기관 AAII에서는 3위권으로 평가받았으며, 프로모션 기간 공격적인 API 가격을 제시했다.\n등장 이름: 구글, 제미나이 4 아르곤, GPT-6 아스트라, 클로드 오퍼스 5.5, 아티피셜 애널리시스, 페이블 5.1\n키워드: agent, coding-agent, eval, frontier-release, ai-industry",
+   "title": "구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\"",
+   "url": null
+  },
+  "b": {
+   "id": "it:1",
+   "source": "text",
+   "text": "요약: OpenAI가 GPT-6 모델 스위트(Astra, Sol, Luna)의 선택 기준과 운영 가이드를 공개했다. 각 모델의 가격 구조와 용도, 프롬프트 캐싱을 통한 비용 절감(최대 95%), 그리고 응답 시간 최적화를 위한 Fast mode 활용법을 제시한다.\n등장 이름: OpenAI, GPT-6, GPT-6Astra, GPT-6.1Sol, GPT-6Luna, Codex\n키워드: frontier-release, dev-practice, reasoning",
+   "title": "A model guide for the GPT-6 family",
+   "url": null
+  },
+  "shared": {
+   "keywords": [
+    "frontier-release"
+   ],
+   "aliases": [
+    "gpt6astra"
+   ],
+   "similarity": 0.69
+  }
+ },
+ "expect": {
+  "same": false
+ },
+ "note": "제미나이 4 아르곤 기사(GPT-6 아스트라 언급) ↔ GPT-6 모델 안내"
+}

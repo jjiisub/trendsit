@@ -1,0 +1,157 @@
+{
+ "input": {
+  "loc_lines": [
+   "title: DeepSeek Harness 데스크톱 앱 오픈소스 공개",
+   "summary: DeepSeek가 맥·윈도우용 데스크톱 앱 DeepSeek Harness를 ==오픈소스 공개 프리뷰==로 출시했다. 쟁점은 단일 인터페이스 통합과 플러그인 기반 확장 전략이다.",
+   "overview: DeepSeek가 맥OS와 윈도우용 데스크톱 앱 DeepSeek Harness v0.2 프리뷰를 공개 프리뷰 및 오픈소스로 출시했다. 채팅·코딩·문서 작업을 단일 인터페이스에서 처리하고, ‘모든 것이 플러그인’ 구조로 도구와 인터페이스를 확장하는 것이 핵심이다. 공식 API 사용자의 약 60%가 서드파티 플러그인을 사용 중이며, 플러그인 마켓과 멀티 에이전트 협력 기능을 추가할 계획이다.",
+   "points[0]: DeepSeek Harness가 전 세계 공개 프리뷰 및 오픈소스로 출시됨 (refs it:1012#q1)",
+   "points[1]: 맥OS와 윈도우용 v0.2 프리뷰로, 채팅·코딩·문서 작업을 단일 인터페이스에서 처리함 (refs it:185#q1, it:185#q2)",
+   "points[2]: ==‘모든 것이 플러그인’ 구조로, 사용자 인터페이스까지 플러그인으로 확장 가능함== (refs it:185#q4)",
+   "points[3]: Creator 모드에서 채팅으로 플러그인을 생성하고, 예약 작업·실행 추적·런타임 정보 검사를 지원함 (refs it:1012#q2, it:1012#q4, it:1012#q5)",
+   "points[4]: 공식 API 사용자의 약 60%가 서드파티 플러그인을 사용 중이며, 플러그인 마켓·멀티 에이전트 협력·장기 메모리·GUI 자동화 추가를 계획함, 이용약관 조항에 따른 조치로 미국 사용자부터 적용 (refs it:185#q5, it:185#q6)",
+   "concepts[0]: Creator mode - 채팅을 통해 플러그인을 생성하는 모드임",
+   "concepts[1]: Automation Task - 반복 작업을 예약할 수 있는 플러그인임"
+  ],
+  "previous": {
+   "log": "포인트 5개, 수치 그룹 0개, 근거 id 12개",
+   "attention": false,
+   "points": [
+    {
+     "text": "DeepSeek Harness가 전 세계 공개 프리뷰 및 오픈소스로 출시됨",
+     "refs": [
+      "it:1012#q1"
+     ],
+     "check": false
+    },
+    {
+     "text": "맥OS와 윈도우용 v0.2 프리뷰로, 채팅·코딩·문서 작업을 단일 인터페이스에서 처리함",
+     "refs": [
+      "it:185#q1",
+      "it:185#q2"
+     ],
+     "check": false
+    },
+    {
+     "text": "==‘모든 것이 플러그인’ 구조로, 사용자 인터페이스까지 플러그인으로 확장 가능함==",
+     "refs": [
+      "it:185#q4"
+     ],
+     "check": false
+    },
+    {
+     "text": "Creator 모드에서 채팅으로 플러그인을 생성하고, 예약 작업·실행 추적·런타임 정보 검사를 지원함",
+     "refs": [
+      "it:1012#q2",
+      "it:1012#q4",
+      "it:1012#q5"
+     ],
+     "check": false
+    },
+    {
+     "text": "공식 API 사용자의 약 60%가 서드파티 플러그인을 사용 중이며, 플러그인 마켓·멀티 에이전트 협력·장기 메모리·GUI 자동화 추가를 계획함, 이용약관 조항에 따른 조치로 미국 사용자부터 적용",
+     "refs": [
+      "it:185#q5",
+      "it:185#q6"
+     ],
+     "check": false
+    }
+   ],
+   "numbers": [],
+   "events": [],
+   "contributions": [],
+   "concepts": [
+    {
+     "term": "Creator mode",
+     "desc": "채팅을 통해 플러그인을 생성하는 모드임"
+    },
+    {
+     "term": "Automation Task",
+     "desc": "반복 작업을 예약할 수 있는 플러그인임"
+    }
+   ],
+   "overview": "DeepSeek가 맥OS와 윈도우용 데스크톱 앱 DeepSeek Harness v0.2 프리뷰를 공개 프리뷰 및 오픈소스로 출시했다. 채팅·코딩·문서 작업을 단일 인터페이스에서 처리하고, ‘모든 것이 플러그인’ 구조로 도구와 인터페이스를 확장하는 것이 핵심이다. 공식 API 사용자의 약 60%가 서드파티 플러그인을 사용 중이며, 플러그인 마켓과 멀티 에이전트 협력 기능을 추가할 계획이다.",
+   "summary": "DeepSeek가 맥·윈도우용 데스크톱 앱 DeepSeek Harness를 ==오픈소스 공개 프리뷰==로 출시했다. 쟁점은 단일 인터페이스 통합과 플러그인 기반 확장 전략이다.",
+   "title": "DeepSeek Harness 데스크톱 앱 오픈소스 공개"
+  },
+  "issues": [
+   {
+    "loc": "points[4]",
+    "type": "unsupported",
+    "evidence_id": null,
+    "comment": "points[4]의 '이용약관 조항에 따른 조치로 미국 사용자부터 적용'이 근거 원문에 없음",
+    "hint": "근거에 있는 내용만 남기거나 삭제",
+    "idx": 0
+   }
+  ],
+  "evidence": [
+   {
+    "id": "it:1012#q1",
+    "source": "GeekNews",
+    "text": "DeepSeek Harness is now in public preview worldwide and open source, with composable plugins that extend what agents can do.\n주장: DeepSeek Harness가 전 세계 공개 프리뷰 및 오픈소스로 출시되었으며, 에이전트 기능을 확장하는 조합 가능한 플러그인을 제공한다.",
+    "title": "DeepSeek Harness, 맥·윈도우용 데스크톱 앱 공개",
+    "url": "https://news.hada.io/topic?id=34656"
+   },
+   {
+    "id": "it:185#q1",
+    "source": "AI타임스",
+    "text": "딥시크는 지난달 29일 맥OS와 윈도우용 ‘딥시크 하네스(DeepSeek Harness)’ v0.2 프리뷰를 출시했다.\n수치: 출시된 딥시크 하네스 버전 [v0.2]\n주장: 딥시크가 맥OS와 윈도우용 데스크톱 앱 '딥시크 하네스' v0.2 프리뷰를 출시하며, 채팅·코딩·문서 작업을 단일 인터페이스에서 처리하는 기능을 제공한다.",
+    "title": "딥시크, 데스크톱 앱 '딥시크 하네스' 출시...\"챗·코딩·문서 통합\"",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=215933"
+   },
+   {
+    "id": "it:1012#q2",
+    "source": "GeekNews",
+    "text": "Install plugins, or create them through chat in “Creator mode”, to extend tools, skills, and the interface.\n주장: Creator 모드를 통한 플러그인 생성, 문서/스프레드시트/코드 처리, 예약 작업 플러그인, 실행 추적 및 런타임 정보 검사가 주요 기능이다.",
+    "title": "DeepSeek Harness, 맥·윈도우용 데스크톱 앱 공개",
+    "url": "https://news.hada.io/topic?id=34656"
+   },
+   {
+    "id": "it:185#q2",
+    "source": "AI타임스",
+    "text": "오픈AI나 앤트로픽처럼 대화와 코드 작성, 다양한 업무를 단일 인터페이스로 집약해 문서와 스프레드시트, PDF를 업로드해 내용을 정리하거나 데이터를 분석하고 차트와 슬라이드를 만드는 것은 물론, 프로젝트의 코드를 수정하고 실행하는 작업까지 하나의 대화에서 처리할 수 있다.",
+    "title": "딥시크, 데스크톱 앱 '딥시크 하네스' 출시...\"챗·코딩·문서 통합\"",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=215933"
+   },
+   {
+    "id": "it:1012#q4",
+    "source": "GeekNews",
+    "text": "Enable the Scheduled tasks plugin to start tasks anytime and run recurring work on schedule.",
+    "title": "DeepSeek Harness, 맥·윈도우용 데스크톱 앱 공개",
+    "url": "https://news.hada.io/topic?id=34656"
+   },
+   {
+    "id": "it:185#q4",
+    "source": "AI타임스",
+    "text": "딥시크 하네스의 핵심 특징은 ‘모든 것이 플러그인(Everything is a plugin)’이라는 구조다. 개별 도구뿐 아니라 제품의 사용자 인터페이스까지 플러그인으로 확장할 수 있도록 설계했다.\n주장: 하네스는 '모든 것이 플러그인' 구조로 설계되어 사용자 인터페이스까지 플러그인으로 확장할 수 있다.",
+    "title": "딥시크, 데스크톱 앱 '딥시크 하네스' 출시...\"챗·코딩·문서 통합\"",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=215933"
+   },
+   {
+    "id": "it:1012#q5",
+    "source": "GeekNews",
+    "text": "Inspect execution traces and detailed runtime information to troubleshoot issues with tool calls and task execution.",
+    "title": "DeepSeek Harness, 맥·윈도우용 데스크톱 앱 공개",
+    "url": "https://news.hada.io/topic?id=34656"
+   },
+   {
+    "id": "it:185#q5",
+    "source": "AI타임스",
+    "text": "딥시크는 공식 API를 통해 하네스를 사용하는 사용자 가운데 약 60%가 서드파티 플러그인을 사용하고 있다고 밝혔다.\n수치: 서드파티 플러그인 사용 비율 [약 60%]\n주장: 사용자의 약 60%가 서드파티 플러그인을 사용 중이며, 향후 플러그인 마켓 구축, 보안 강화, 멀티 에이전트 협력, 장기 메모리 및 GUI 자동화 기능 추가를 계획하고 있다.",
+    "title": "딥시크, 데스크톱 앱 '딥시크 하네스' 출시...\"챗·코딩·문서 통합\"",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=215933"
+   },
+   {
+    "id": "it:185#q6",
+    "source": "AI타임스",
+    "text": "또 샌드박스와 보안을 강화하고 여러 에이전트가 협력하는 기능을 개선하는 한편, 장기 메모리와 브라우저 및 GUI 자동화, 원격·모바일 접속, 세션 공유와 협업 기능 등을 추가할 예정이다.",
+    "title": "딥시크, 데스크톱 앱 '딥시크 하네스' 출시...\"챗·코딩·문서 통합\"",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=215933"
+   }
+  ],
+  "aliases": []
+ },
+ "expect": {
+  "action": "edit"
+ },
+ "note": "이슈 delete(오류를 심음)"
+}

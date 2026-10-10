@@ -1,0 +1,137 @@
+{
+ "input": {
+  "plan": {
+   "rank": 1,
+   "angle": "오픈웨이트 멀티모달 임베딩의 온디바이스 적용",
+   "relation": {
+    "type": "new",
+    "topic_id": null
+   }
+  },
+  "evidence": [
+   {
+    "id": "it:1111#q1",
+    "source": "Google DeepMind Blog",
+    "text": "Today, we’re launching EmbeddingGemma 2, expanding beyond text to unify code, images, video, and audio in a shared embedding space.\n주장: EmbeddingGemma 2는 텍스트를 넘어 코드, 이미지, 비디오, 오디오를 통합하는 오픈소스(Apache 2.0) 멀티모달 임베딩 모델로, 740M 파라미터 규모로 온디바이스 추론에 최적화되어 있다.",
+    "title": "EmbeddingGemma 2: an open, lightweight multimodal embedding model",
+    "url": "https://deepmind.google/blog/embeddinggemma-2-an-open-lightweight-multimodal-embedding-model/"
+   },
+   {
+    "id": "it:1132#q1",
+    "source": "GeekNews",
+    "text": "Today, we’re launching EmbeddingGemma 2, expanding beyond text to unify code, images, video, and audio in a shared embedding space.\n주장: EmbeddingGemma 2는 텍스트를 넘어 코드, 이미지, 비디오, 오디오를 통합하는 멀티모달 임베딩 모델로, Gemma 4 아키텍처 기반 740M 파라미터 규모이며 Apache 2.0 라이선스로 공개되었다.",
+    "title": "EmbeddingGemma 2 - 개방형 경량 멀티모달 임베딩 모델",
+    "url": "https://news.hada.io/topic?id=34907"
+   },
+   {
+    "id": "it:1183#q1",
+    "source": "AI타임스",
+    "text": "구글은 6일(현지시간) 스마트폰과 PC 같은 소비자 기기에서 직접 실행할 수 있는 경량 멀티모달 임베딩 모델 ‘임베딩젬마 2(EmbeddingGemma 2)’를 공개했다.\n주장: 구글이 Gemma 4 기반 740M 매개변수 오픈웨이트 멀티모달 임베딩 모델 EmbeddingGemma 2를 온디바이스용으로 공개했다.",
+    "title": "구글, 온디바이스 ‘임베딩젬마 2’ 공개…텍스트·이미지·음성 통합 처리",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=216031"
+   },
+   {
+    "id": "it:1045#q1",
+    "source": "Simon Willison's Weblog",
+    "text": "I really appreciate that EmbeddingGemma 2 is under the Apache 2.0 license.\n주장: EmbeddingGemma 2의 Apache 2.0 라이선스를 긍정적으로 평가하며, 임베딩 모델은 폐쇄적·호스팅 전용 모델보다 오픈웨이트가 적합하다고 주장",
+    "title": "EmbeddingGemma 2",
+    "url": "https://simonwillison.net/2026/Oct/6/hn-49983751/"
+   },
+   {
+    "id": "it:1111#q2",
+    "source": "Google DeepMind Blog",
+    "text": "Built on the Gemma 4 architecture and released under a commercially permissive Apache 2.0 license, EmbeddingGemma 2 has 740 million parameters, making it optimal for on-device inference.\n수치: 모델 파라미터 수 [740 million parameters]",
+    "title": "EmbeddingGemma 2: an open, lightweight multimodal embedding model",
+    "url": "https://deepmind.google/blog/embeddinggemma-2-an-open-lightweight-multimodal-embedding-model/"
+   },
+   {
+    "id": "it:1132#q2",
+    "source": "GeekNews",
+    "text": "Built on the Gemma 4 architecture and released under a commercially permissive Apache 2.0 license, EmbeddingGemma 2 has 740 million parameters, making it optimal for on-device inference.\n수치: 모델 파라미터 수 [740 million parameters]",
+    "title": "EmbeddingGemma 2 - 개방형 경량 멀티모달 임베딩 모델",
+    "url": "https://news.hada.io/topic?id=34907"
+   },
+   {
+    "id": "it:1183#q2",
+    "source": "AI타임스",
+    "text": "임베딩젬마 2는 ‘젬마 4(Gemma 4)’ 아키텍처를 기반으로 개발된 7억4000만(740M) 매개변수 모델이다. 아파치 2.0 라이선스로 공개돼 상업적 활용도 가능하다.\n수치: 모델 규모 [7억4000만(740M) 매개변수]",
+    "title": "구글, 온디바이스 ‘임베딩젬마 2’ 공개…텍스트·이미지·음성 통합 처리",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=216031"
+   },
+   {
+    "id": "it:1045#q2",
+    "source": "Simon Willison's Weblog",
+    "text": "For embedding models in particular, I don't think it makes sense to use a closed, proprietary, hosted-only model.",
+    "title": "EmbeddingGemma 2",
+    "url": "https://simonwillison.net/2026/Oct/6/hn-49983751/"
+   },
+   {
+    "id": "it:1111#q3",
+    "source": "Google DeepMind Blog",
+    "text": "Achieves leading scores among sub-1B multimodal embedders for its size across benchmarks like MTEB (Massive Text Embedding Benchmark) Code and MAEB (Massive Audio Embedding Benchmark), while matching\n주장: 1B 미만 멀티모달 임베더 중 MTEB Code 및 MAEB 벤치마크에서 상위권 점수를 기록하며, 텍스트·비전·오디오 작업에서 더 큰 모델들과匹敵하거나 우월한 성능을 보인다.",
+    "title": "EmbeddingGemma 2: an open, lightweight multimodal embedding model",
+    "url": "https://deepmind.google/blog/embeddinggemma-2-an-open-lightweight-multimodal-embedding-model/"
+   },
+   {
+    "id": "it:1132#q3",
+    "source": "GeekNews",
+    "text": "Achieves leading scores among sub-1B multimodal embedders for its size across benchmarks like MTEB (Massive Text Embedding Benchmark) Code and MAEB (Massive Audio Embedding Benchmark), while matching\n주장: 1B 미만 멀티모달 임베더 중 MTEB Code와 MAEB 벤치마크에서 선도적인 점수를 기록하며, 텍스트·비전·오디오 작업에서 더 큰 모델들과匹敵하거나 우월한 성능을 보인다.",
+    "title": "EmbeddingGemma 2 - 개방형 경량 멀티모달 임베딩 모델",
+    "url": "https://news.hada.io/topic?id=34907"
+   },
+   {
+    "id": "it:1183#q3",
+    "source": "AI타임스",
+    "text": "구글은 임베딩젬마 2가 최대 8192토큰의 컨텍스트를 지원한다고 설명했다. 이는 전작보다 4배 늘어난 규모다.\n수치: 최대 컨텍스트 길이 [8192 토큰]\n수치: 전작 대비 컨텍스트 증가폭 [4배]\n주장: 컨텍스트 길이가 전작 대비 4배 늘어난 8192토큰을 지원한다.",
+    "title": "구글, 온디바이스 ‘임베딩젬마 2’ 공개…텍스트·이미지·음성 통합 처리",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=216031"
+   },
+   {
+    "id": "it:1045#q3",
+    "source": "Simon Willison's Weblog",
+    "text": "Most applications of embedding models involve calculating thousands or even millions of embedding vectors and storing them for later comparison.\n주장: 임베딩 모델은 대량 벡터 저장·비교가 핵심이라, 프로프라이어티 모델은 서비스 중단 시 재계산 비용이 발생해 리스크가 큼",
+    "title": "EmbeddingGemma 2",
+    "url": "https://simonwillison.net/2026/Oct/6/hn-49983751/"
+   },
+   {
+    "id": "it:1111#q4",
+    "source": "Google DeepMind Blog",
+    "text": "Using Matryoshka Representation Learning (MRL), developers can dynamically truncate output vectors from 768 dimensions down to 512, 256, or 128 dimensions.\n수치: 기본 출력 벡터 차원 [768 dimensions]\n수치: MRL로 축소 가능한 벡터 차원 [512, 256, or 128 dimensions]\n주장: MRL을 통해 벡터 차원을 축소하여 저장 공간을 절감할 수 있으며, 양자화 시 Pixel 11 Pro에서 텍스트 전용 모델은 약 191MB, 멀티모달 전체 모델은 약 567MB의 RAM을 사용한다.",
+    "title": "EmbeddingGemma 2: an open, lightweight multimodal embedding model",
+    "url": "https://deepmind.google/blog/embeddinggemma-2-an-open-lightweight-multimodal-embedding-model/"
+   },
+   {
+    "id": "it:1132#q4",
+    "source": "GeekNews",
+    "text": "Using Matryoshka Representation Learning (MRL), developers can dynamically truncate output vectors from 768 dimensions down to 512, 256, or 128 dimensions.\n수치: 기본 출력 벡터 차원 [768 dimensions]\n수치: MRL로 축소 가능한 벡터 차원 [512, 256, or 128 dimensions]\n주장: MRL을 통해 벡터 차원을 축소하여 저장 공간을 절감할 수 있으며, 양자화 시 Google Pixel 11 Pro에서 텍스트 전용 ~191MB, 멀티모달 ~567MB의 RAM으로 동작하고 8K 토큰 컨텍스트를 지원한다.",
+    "title": "EmbeddingGemma 2 - 개방형 경량 멀티모달 임베딩 모델",
+    "url": "https://news.hada.io/topic?id=34907"
+   },
+   {
+    "id": "it:1183#q4",
+    "source": "AI타임스",
+    "text": "MTEB 코드에서 78.68점을 기록해 전작의 68.76점보다 9.92점 올랐다.\n수치: MTEB 코드 벤치마크 점수 [78.68 점]\n수치: 전작 MTEB 코드 벤치마크 점수 [68.76 점]\n수치: 전작 대비 MTEB 코드 점수 상승폭 [9.92 점]\n주장: MTEB 코드 벤치마크에서 전작보다 9.92점 높은 78.68점을 기록했다.",
+    "title": "구글, 온디바이스 ‘임베딩젬마 2’ 공개…텍스트·이미지·음성 통합 처리",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=216031"
+   },
+   {
+    "id": "it:1045#q4",
+    "source": "Simon Willison's Weblog",
+    "text": "If your model is proprietary, the vendor is likely someday going to decide to stop offering that model. They'll have a better model to replace it, but you still need to pay to re-calculate those",
+    "title": "EmbeddingGemma 2",
+    "url": "https://simonwillison.net/2026/Oct/6/hn-49983751/"
+   },
+   {
+    "id": "it:1111#q5",
+    "source": "Google DeepMind Blog",
+    "text": "With quantization, on a Google Pixel 11 Pro, EmbeddingGemma 2 requires as little as ~191MB active RAM for text-only weights and ~567MB for the full multimodal model.\n수치: 텍스트 전용 가중치 활성 RAM 사용량 (Pixel 11 Pro) [~191MB active RAM]\n수치: 멀티모달 전체 모델 활성 RAM 사용량 (Pixel 11 Pro) [~567MB active RAM]",
+    "title": "EmbeddingGemma 2: an open, lightweight multimodal embedding model",
+    "url": "https://deepmind.google/blog/embeddinggemma-2-an-open-lightweight-multimodal-embedding-model/"
+   }
+  ],
+  "previous": null,
+  "aliases": []
+ },
+ "expect": {},
+ "note": "2026-W41 실제 토픽 입력(run 20261009-193346-weekly-b3fc)"
+}

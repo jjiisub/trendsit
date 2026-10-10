@@ -1,0 +1,31 @@
+{
+ "input": {
+  "a": {
+   "id": "it:9001",
+   "source": "text",
+   "text": "요약: claude-mem이 v13.34.0~v13.34.2를 내고 세션 압축 기억 저장을 개선했다.\n등장 이름: claude-mem, Claude Code, thedotmack\n키워드: coding-agent",
+   "title": "claude-mem v13.34 릴리스: Claude Code 세션 기억 플러그인",
+   "url": null
+  },
+  "b": {
+   "id": "rp:thedotmack/claude-mem",
+   "source": "github",
+   "text": "요약: Claude Code 세션을 압축해 기억으로 저장하는 플러그인. 릴리스 v13.34.0~v13.34.2(2026-10-06)\n등장 이름: claude-mem, thedotmack/claude-mem\n키워드: ",
+   "title": "thedotmack/claude-mem",
+   "url": null
+  },
+  "shared": {
+   "keywords": [
+    "coding-agent"
+   ],
+   "aliases": [
+    "claudemem"
+   ],
+   "similarity": 0.74
+  }
+ },
+ "expect": {
+  "same": true
+ },
+ "note": "같은 레포를 다룬 글 ↔ 레포(합성)"
+}

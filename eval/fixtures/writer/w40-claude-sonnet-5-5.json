@@ -1,0 +1,123 @@
+{
+ "input": {
+  "plan": {
+   "rank": 6,
+   "angle": "중급 모델의 성능-가격 균형과 컨텍스트 확장",
+   "relation": {
+    "type": "new",
+    "topic_id": null
+   }
+  },
+  "evidence": [
+   {
+    "id": "og:162#q1",
+    "source": "Simon Willison's Weblog",
+    "text": "Introducing Claude Sonnet 5.5, the second model in the Claude 5.5 family. It’s a clear upgrade over Claude Sonnet 5, runs 30%+ faster, and costs up to 30% less for most work.\n수치: Sonnet 5.5 출력 속도 향상(Sonnet 5 대비) [30%+]\n수치: Sonnet 5.5 비용 절감(대부분 작업, 최대) [30%]\n주장: Sonnet 5.5는 Sonnet 5와 동일 가격으로, 대부분 작업에서 최대 30% 저렴하고 30%+ 빠름",
+    "title": "Claude Sonnet 5.5",
+    "url": "https://www.anthropic.com/claude-sonnet-5-5"
+   },
+   {
+    "id": "it:924#q1",
+    "source": "AI타임스",
+    "text": "앤트로픽이 차세대 모델 라인업의 두 번째 주자인 '클로드 소네트 5.5(Claude Sonnet 5.5)'를 출시했다.\n주장: 앤트로픽이 클로드 소네트 5.5를 출시했으며, 전작 대비 출력 속도가 30% 이상 빨라지고 동일 작업당 비용이 최대 30% 절감됐다.",
+    "title": "앤트로픽, '클로드 소네트 5.5' 공개…오퍼스급 지능에 최강 가성비",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=215734"
+   },
+   {
+    "id": "it:951#q1",
+    "source": "AI타임스",
+    "text": "앤트로픽이 ‘클로드 소네트 5.5(Claude Sonnet 5.5)’의 기습 출시를 준비하고 있다는 정황이 잇따라 나오고 있다.\n주장: 앤트로픽이 클로드 소네트 5.5의 기습 출시를 준비 중",
+    "title": "앤트로픽, '클로드 소네트 5.5' 출시 임박...오픈AI '데브데이' 견제하나",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=215700"
+   },
+   {
+    "id": "og:162#q2",
+    "source": "Simon Willison's Weblog",
+    "text": "Sonnet 5.5 is priced the same as Sonnet 5 at $2 per million input tokens, $10 per million output tokens, and $0.20 per million tokens for cache reads, but it typically needs far fewer tokens to do the same work. In our testing, it costs up to 30% less per task than its predecessor.\n수치: Sonnet 5.5 입력 토큰 가격 [$2 per million input tokens]\n수치: Sonnet 5.5 출력 토큰 가격 [$10 per million output tokens]\n수치: Sonnet 5.5 캐시 읽기 가격 [$0.20 per million tokens]",
+    "title": "Claude Sonnet 5.5",
+    "url": "https://www.anthropic.com/claude-sonnet-5-5"
+   },
+   {
+    "id": "it:924#q2",
+    "source": "AI타임스",
+    "text": "28일(현지시간) 발표에 따르면, 소네트 5.5는 이전 세대인 '소네트 5' 대비 출력이 30% 이상 빨라졌으며, 압도적인 작업 처리 효율성 덕분에 동일 작업당 비용을 최대 30% 절감했다.\n수치: 출력 속도 향상률 [30%]\n수치: 동일 작업당 비용 절감률 [30%]",
+    "title": "앤트로픽, '클로드 소네트 5.5' 공개…오퍼스급 지능에 최강 가성비",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=215734"
+   },
+   {
+    "id": "it:951#q2",
+    "source": "AI타임스",
+    "text": "현재까지 알려진 사양을 보면 소네트 5.5는 최대 100만 토큰의 컨텍스트 창과 최대 12만8000 토큰의 출력을 지원할 것으로 예상된다.\n수치: 컨텍스트 창 크기 [100만 토큰]\n수치: 최대 출력 크기 [12만8000 토큰]\n주장: 소네트 5.5는 100만 토큰 컨텍스트와 12만8000 토큰 출력을 지원하며, 토큰당 가격은 입력 2달러, 출력 10달러, 캐시 0.20달러로 추정",
+    "title": "앤트로픽, '클로드 소네트 5.5' 출시 임박...오픈AI '데브데이' 견제하나",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=215700"
+   },
+   {
+    "id": "og:162#q3",
+    "source": "Simon Willison's Weblog",
+    "text": "Claude Haiku 5.5, built for high-volume and cost-sensitive applications, will join the Claude 5.5 family in the coming weeks.\n주장: Haiku 5.5는 몇 주 안에 Claude 5.5 패밀리로 합류 예정",
+    "title": "Claude Sonnet 5.5",
+    "url": "https://www.anthropic.com/claude-sonnet-5-5"
+   },
+   {
+    "id": "it:924#q3",
+    "source": "AI타임스",
+    "text": "터미널 환경의 복잡한 작업을 평가하는 '터미널벤치 4.0'에서 70.6%의 점수를 기록했다.\n수치: 터미널벤치 4.0 점수 [70.6%]\n주장: 터미널벤치 4.0에서 70.6%를 기록해 전작 소네트 5(10.3%)와 최상위 모델 오퍼스 5.5(66.4%)를 모두 상회했다.",
+    "title": "앤트로픽, '클로드 소네트 5.5' 공개…오퍼스급 지능에 최강 가성비",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=215734"
+   },
+   {
+    "id": "it:951#q3",
+    "source": "AI타임스",
+    "text": "입력 토큰은 100만개당 2달러, 출력 토큰은 100만개당 10달러, 캐시 읽기는 100만개당 0.20달러 수준으로 추정된다.\n수치: 입력 토큰 100만개당 가격 [2 달러]\n수치: 출력 토큰 100만개당 가격 [10 달러]\n수치: 캐시 읽기 100만개당 가격 [0.20 달러]",
+    "title": "앤트로픽, '클로드 소네트 5.5' 출시 임박...오픈AI '데브데이' 견제하나",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=215700"
+   },
+   {
+    "id": "og:162#q4",
+    "source": "Simon Willison's Weblog",
+    "text": "On several evaluations, Sonnet 5.5 at Max effort even performs comparably to Opus 5.5.\n주장: 여러 평가에서 Sonnet 5.5(Max effort)가 Opus 5.5와 동등한 성능을 보임",
+    "title": "Claude Sonnet 5.5",
+    "url": "https://www.anthropic.com/claude-sonnet-5-5"
+   },
+   {
+    "id": "it:924#q4",
+    "source": "AI타임스",
+    "text": "이는 전작인 소네트 5가 기록했던 10.3%를 무려 7배 이상 뛰어넘는 수치이며, 최상위 모델인 '오퍼스 5.5(66.4%)'마저 제친 기록이다.\n수치: 소네트 5 터미널벤치 4.0 점수 [10.3%]\n수치: 오퍼스 5.5 터미널벤치 4.0 점수 [66.4%]",
+    "title": "앤트로픽, '클로드 소네트 5.5' 공개…오퍼스급 지능에 최강 가성비",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=215734"
+   },
+   {
+    "id": "it:951#q4",
+    "source": "AI타임스",
+    "text": "AI 모델 레지스트리 서비스 드라이드(Droid) 최신 버전인 0.228.0 내부에 이미 ‘claude-sonnet-5-5’ 식별자가 피처 플래그 형태로 포함된 것으로 알려졌다.\n수치: 드라이드(Droid) 최신 버전 [0.228.0]\n주장: 드라이드 0.228.0에 'claude-sonnet-5-5' 식별자가 포함되어 출시 임박 정황",
+    "title": "앤트로픽, '클로드 소네트 5.5' 출시 임박...오픈AI '데브데이' 견제하나",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=215700"
+   },
+   {
+    "id": "og:162#q5",
+    "source": "Simon Willison's Weblog",
+    "text": "The most interesting thing about Sonnet 5.5 is that it's now the model used for the free tier on claude.ai. OpenAI's ChatGPT free tier uses Luna 5.6, which means Anthropic currently have a much more capable free offering.\n주장: Sonnet 5.5가 claude.ai 무료 티어 모델이며, ChatGPT 무료 티어(Luna 5.6)보다 더 높은 성능 제공",
+    "title": "Claude Sonnet 5.5",
+    "url": "https://simonwillison.net/2026/Sep/28/claude-sonnet-5-5/"
+   },
+   {
+    "id": "it:951#q5",
+    "source": "AI타임스",
+    "text": "소네트 5.5가 공개되면 최근 출시된 오픈AI의 'GPT-6 솔' 및 '루나'와 개발 및 코딩 작업에서 어떤 차이를 보일지가 주요 관심사가 될 것으로 보인다.\n주장: 소네트 5.5와 오픈AI GPT-6 솔, 루나의 코딩 작업 성능 비교가 관심사",
+    "title": "앤트로픽, '클로드 소네트 5.5' 출시 임박...오픈AI '데브데이' 견제하나",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=215700"
+   },
+   {
+    "id": "it:951",
+    "source": "AI타임스",
+    "text": "요약: 앤트로픽이 클로드 소네트 5.5의 기습 출시를 준비하고 있으며, 100만 토큰 컨텍스트와 12만8000 토큰 출력을 지원할 것으로 예상된다. 토큰당 가격은 입력 2달러, 출력 10달러, 캐시 0.20달러 수준으로 추정되며, 드라이드 0.228.0에 모델 식별자가 포함되어 출시 임박 정황이 포착됐다.",
+    "title": "앤트로픽, '클로드 소네트 5.5' 출시 임박...오픈AI '데브데이' 견제하나",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=215700"
+   }
+  ],
+  "previous": null,
+  "aliases": []
+ },
+ "expect": {},
+ "note": "2026-W40 실제 토픽 입력(run 20261009-192905-weekly-3ecc)"
+}

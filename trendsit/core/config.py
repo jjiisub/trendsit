@@ -9,6 +9,7 @@ from typing import Annotated, Any, Literal
 import yaml
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator, model_validator
 
+from .config_brief import BriefConfig
 from .config_video import VideoConfig
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -282,6 +283,7 @@ FILES: dict[str, type[BaseModel]] = {
     "filter.yaml": FilterConfig,  # S2
     "deep.yaml": DeepConfig,  # S3
     "video.yaml": VideoConfig,  # S4
+    "brief.yaml": BriefConfig,  # S5
 }
 
 

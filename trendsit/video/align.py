@@ -1,7 +1,6 @@
 """대조(V8): 판독한 수치가 그 프레임의 발화와 앞뒤 30초 segments에 있는지. 없으면 slide_only_facts.
 
-수치는 값으로 정규화해 비교한다(쉼표, K/M/B, %, x/배, 소수점, 영어 수사 one~ninety·hundred·thousand·million·billion).
-"1.2M"이 화면에 있고 발화가 "one point two million"이면 같은 수치다.
+수치 정규화는 공통 모듈 core/numbers.py. "1.2M"이 화면에 있고 발화가 "one point two million"이면 같은 수치다.
 """
 
 from __future__ import annotations
@@ -10,22 +9,9 @@ import re
 from dataclasses import dataclass, field
 from typing import Any
 
-from ..core.artifacts_video import CheckNumber, Frame, Segment, SlideOnlyFact, SlideReading
+from ..core.artifacts_video import SLIDE_KINDS_FACT, CheckNumber, Frame, Segment, SlideOnlyFact, SlideReading
+from ..core.numbers import number_values, reading_value, same
 
-# 크기 단위. 한 글자는 대문자(K는 소문자도)만: 소문자 m·b·t는 미터·바이트·톤일 수 있다
-MAGNITUDE = {"k": 1e3, "K": 1e3, "M": 1e6, "B": 1e9, "T": 1e12, "bn": 1e9, "BN": 1e9, "mn": 1e6, "MN": 1e6,
-             "thousand": 1e3, "million": 1e6, "billion": 1e9, "trillion": 1e12,
-             "천": 1e3, "만": 1e4, "억": 1e8, "조": 1e12, "천만": 1e7, "백만": 1e6, "천억": 1e11}
-# 숫자 + 선택 크기 단위. 한 글자 단위는 뒤에 글자가 이어지면 단위가 아님(5ms, 3Mbps). '2만큼'의 만은 크기가 아님
-_NUM = re.compile(
-    r"(?<![\w.])(\d{1,3}(?:,\d{3})+|\d+)(?:\.(\d+))?"
-    r"(?:\s*((?i:thousand|million|billion|trillion))\b|(bn|mn|BN|MN|[KMBT]|k)(?![A-Za-z])|\s*(천만|백만|천억|[천만억조])(?!큼))?")
-SMALL = {w: i for i, w in enumerate(
-    "zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen "
-    "seventeen eighteen nineteen".split())}
-TENS = {"twenty": 20, "thirty": 30, "forty": 40, "fifty": 50, "sixty": 60, "seventy": 70, "eighty": 80, "ninety": 90}
-SCALES = {"thousand": 1e3, "million": 1e6, "billion": 1e9, "trillion": 1e12}
-TOL = 1e-6
 # 수치가 아닌 판독(md가 금지해도 모델이 넣는 것): 단위 없는 연도, 이름에 붙은 버전(Opus 4.6), 슬라이드·쪽 번호
 _YEAR = re.compile(r"^(19|20)\d{2}$")
 _BARE = re.compile(r"^\d+(\.\d+)?$")
@@ -44,129 +30,52 @@ def not_a_fact(value: str, unit: str, what: str) -> str | None:
     return None
 
 
-def _digits(text: str) -> list[tuple[float, bool]]:
-    """(값, 크기 단위가 붙었는지)."""
+DENSE_FRAME = 10  # 한 프레임 수치가 이만큼 이상이면 표·대시보드로 보고 낮은 순위(S5 P4-1)
+_TOKEN = re.compile(r"[A-Za-z][A-Za-z0-9.\-]{3,}")
+
+
+def _squash(word: str) -> str:
+    return re.sub(r"[^a-z0-9]", "", word.lower())
+
+
+def _unit_kind(text: str) -> str:
+    t = text.strip().lower()
+    if "%" in t or "퍼센트" in t or "percent" in t:
+        return "%"
+    if t.endswith(("x", "×", "배")) or "times" in t:
+        return "x"
+    if "$" in t or "달러" in t or "dollar" in t:
+        return "$"
+    return ""
+
+
+def _spoken_numbers(text: str) -> list[tuple[str, str]]:
+    """발화 속 (값 표기, 단위 종류). 숫자 표기와 바로 뒤 단위만 본다(수사는 값만 있어 교정 후보로 쓰지 않음)."""
     out = []
-    for m in _NUM.finditer(text):
-        whole, frac, word, letter, ko = m.groups()
-        v = float(whole.replace(",", "") + (f".{frac}" if frac else ""))
-        suffix = (word.lower() if word else None) or letter or ko
-        out.append((v * MAGNITUDE.get(suffix, 1), bool(suffix)))
+    for m in re.finditer(r"\$?\d+(?:[.,]\d+)*\s*(%|퍼센트|percent|x|배|times|달러|dollars?)?", text):
+        out.append((m.group().strip(), _unit_kind(m.group())))
     return out
 
 
-def _digits_values(text: str) -> list[float]:
-    return [v for v, _s in _digits(text)]
+def spoken_variant(what: str, value: str, unit: str, spoken: str) -> str:
+    """같은 대상을 발화가 다른 값으로 말했는지(잘못 들음, 예: 'Sweebench Pro 88%' ↔ 화면 SWE-Bench Pro 80.3%).
+    what의 이름 토큰(4자 이상 영문)이 발화 토큰과 비슷하고(rapidfuzz 85 이상, 기호 무시), 그 뒤 60자 안에 단위 종류가
+    같은 다른 숫자가 있으면 그 값을 돌려준다. 없으면 빈 문자열."""
+    from rapidfuzz import fuzz
 
-
-def _word_cat(w: str) -> str | None:
-    if w in SMALL:
-        return "unit"
-    if w in TENS:
-        return "tens"
-    if w == "hundred":
-        return "hundred"
-    if w in SCALES:
-        return "scale"
-    return "and" if w == "and" else None
-
-
-def _follows(prev: str | None, cat: str, w: str) -> bool:
-    """수사 묶음이 이어지는지. 'two three', 'twenty twenty', 'five and ten'은 따로 센다."""
-    if prev is None:
-        return True
-    if prev == "unit":
-        return cat in ("hundred", "scale")
-    if prev == "tens":
-        return (cat == "unit" and 1 <= SMALL[w] <= 9) or cat == "scale"
-    if prev == "hundred":
-        return cat in ("unit", "tens", "scale")
-    return cat in ("unit", "tens")  # scale, and 다음
-
-
-def _word_values(text: str) -> list[float]:
-    """영어 수사 → 값. 'one point two million' = 1.2e6, 'twenty five' = 25, 'two hundred and fifty' = 250,
-    'point three five' = 0.35. 'and'는 hundred·thousand 뒤에서만 잇는다."""
-    toks = re.findall(r"[a-z]+", text.lower())
-    out: list[float] = []
-    total = current = 0.0
-    prev: str | None = None
-
-    def flush() -> None:
-        nonlocal total, current, prev
-        if prev is not None:
-            out.append(total + current)
-        total = current = 0.0
-        prev = None
-
-    i = 0
-    while i < len(toks):
-        w = toks[i]
-        if w == "point" and i + 1 < len(toks) and SMALL.get(toks[i + 1], 10) < 10:
-            value = total + current if prev is not None else 0.0
-            i += 1
-            digits = ""
-            while i < len(toks) and SMALL.get(toks[i], 10) < 10:
-                digits += str(SMALL[toks[i]])
-                i += 1
-            value += float(f"0.{digits}")
-            if i < len(toks) and toks[i] in SCALES:
-                value *= SCALES[toks[i]]
-                i += 1
-            out.append(value)
-            total = current = 0.0
-            prev = None
+    kind = _unit_kind(f"{value}{unit}")
+    if not kind:
+        return ""
+    names = [_squash(t) for t in _TOKEN.findall(what)]
+    names = [n for n in names if len(n) >= 4]
+    for m in _TOKEN.finditer(spoken):
+        w = _squash(m.group())
+        if len(w) < 4 or not any(fuzz.ratio(w, n) >= 85 for n in names):
             continue
-        cat = _word_cat(w)
-        if cat is None or (cat == "and" and prev not in ("hundred", "scale")):
-            flush()
-            i += 1
-            continue
-        if cat == "and":
-            prev = "and"
-            i += 1
-            continue
-        if not _follows(prev, cat, w):
-            flush()
-        if cat == "unit":
-            current += SMALL[w]
-        elif cat == "tens":
-            current += TENS[w]
-        elif cat == "hundred":
-            current = (current or 1) * 100
-        else:
-            total += (current or 1) * SCALES[w]
-            current = 0.0
-        prev = cat
-        i += 1
-    flush()
-    return out
-
-
-def number_values(text: str) -> list[float]:
-    """글 안의 모든 수치 값(숫자 표기 + 영어 수사)."""
-    return _digits_values(text) + _word_values(text)
-
-
-def reading_value(value: str, unit: str) -> float | None:
-    """판독 값 하나 → 수. 값에 크기 단위가 없고 unit이 크기 단위(K, M, B, million, 만, 억 등)면 곱한다."""
-    nums = _digits(value)
-    if nums:
-        v, has_suffix = nums[0]
-    else:
-        words = _word_values(value)
-        if not words:
-            return None
-        v, has_suffix = words[0], False
-    head = (unit or "").strip().split(" ")[0]
-    head = head.lower() if head.lower() in SCALES else head
-    if not has_suffix and head in MAGNITUDE:
-        v *= MAGNITUDE[head]
-    return v
-
-
-def same(a: float, b: float) -> bool:
-    return abs(a - b) <= TOL * max(1.0, abs(a), abs(b))
+        for v, k in _spoken_numbers(spoken[m.end():m.end() + 60]):
+            if k == kind and not any(same(a, b) for a in number_values(v) for b in number_values(value)):
+                return v
+    return ""
 
 
 @dataclass
@@ -191,12 +100,14 @@ def align(readings: list[tuple[Frame, SlideReading]], segments: list[Segment], i
     seen: set[tuple[float, str, str]] = set()
     for frame, reading in readings:
         sec = round(frame.t)
-        spoken = number_values(spoken_window(frame, segments, window)) if spoken_usable else []
+        window_text = spoken_window(frame, segments, window) if spoken_usable else ""
+        spoken = number_values(window_text) if spoken_usable else []
+        dense = len(reading.numbers) >= DENSE_FRAME
         for n in reading.numbers:
             if n.confidence == "check":
                 res.checks.append(CheckNumber(sec=sec, value=n.value, unit=n.unit, what=n.what, frame=frame.path))
                 continue
-            why = not_a_fact(n.value, n.unit, n.what)
+            why = (f"kind={n.kind}" if n.kind not in SLIDE_KINDS_FACT else None) or not_a_fact(n.value, n.unit, n.what)
             if why:
                 res.excluded.append({"sec": sec, "value": n.value, "unit": n.unit, "what": n.what, "why": why})
                 continue
@@ -212,5 +123,8 @@ def align(readings: list[tuple[Frame, SlideReading]], segments: list[Segment], i
                 res.matched.append({"sec": sec, "value": n.value, "unit": n.unit, "what": n.what})
                 continue
             res.slide_only.append(SlideOnlyFact(fact=n.what, value=n.value, unit=n.unit, sec=sec,
-                                                evidence=f"vd:{item_id}@{sec}", confidence=n.confidence))
+                                                evidence=f"vd:{item_id}@{sec}", confidence=n.confidence, dense=dense,
+                                                spoken_value=spoken_variant(n.what, n.value, n.unit, window_text)))
+    # 표·대시보드 프레임의 수치는 뒤로(같은 무리 안에서는 시각 순서 유지)
+    res.slide_only.sort(key=lambda f: f.dense)
     return res

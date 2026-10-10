@@ -1,0 +1,31 @@
+{
+ "input": {
+  "a": {
+   "id": "it:8",
+   "source": "text",
+   "text": "요약: OpenAI는 GPT-6 Astra의 지능에 근접하면서도 가격은 5분의 1인 GPT-6.1 Sol을 출시했다. 코딩, 컴퓨터 사용, 전문 업무 등 다양한 에이전트 작업에서 GPT-6 Sol 대비 성능이 크게 향상되었으며, 특히 캐시 입력 비용이 $0.10/백만 토큰으로 저렴하다. 해당 모델은 ChatGPT Work, Codex, API에서 즉시 사용 가능하다.\n등장 이름: OpenAI, GPT-6.1 Sol, GPT-6 Sol, GPT-6 Astra, DeepSWE v1.1, OSWorld 2.0, Terminal-Bench Science 0.1, ChatGPT Work, Codex\n키워드: agent, coding-agent, eval, frontier-release, reasoning",
+   "title": "Introducing GPT-6.1 Sol",
+   "url": null
+  },
+  "b": {
+   "id": "it:981",
+   "source": "text",
+   "text": "요약: OpenAI 공식 블로그에 따르면 GPT-6.1 Sol은 GPT-6 Astra에 가까운 지능을 표준 입력·출력 토큰 가격의 5분의 1로 제공하며, 캐시된 입력은 100만 토큰당 $0.10(표준 입력 대비 95% 절감)이다. DeepSWE v1.1에서 Astra와 대등한 성능을 약 5분의 1 비용으로, OSWorld 2.0에서 GPT-6 Sol보다 7%포인트 높은 성능을 절반 미만 비용으로 기록했다. 오늘부터 ChatGPT Work·Codex에서 이용 가능하며 API에서는 gpt-6.1-sol로 제공된다.\n등장 이름: OpenAI, GPT-6.1 Sol, GPT-6 Astra, GPT-6 Sol, DeepSWE v1.1, OSWorld 2.0, ChatGPT Work, Codex\n키워드: frontier-release, coding-agent, agent, eval, reasoning",
+   "title": "OpenAI, GPT-6.1 Sol 공개",
+   "url": null
+  },
+  "shared": {
+   "keywords": [
+    "frontier-release"
+   ],
+   "aliases": [
+    "gpt6.1sol"
+   ],
+   "similarity": 0.84
+  }
+ },
+ "expect": {
+  "same": true
+ },
+ "note": "같은 발표(OpenAI 공식 글 ↔ GeekNews 소개)"
+}

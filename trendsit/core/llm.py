@@ -20,6 +20,7 @@ from . import images
 from .budget import Budget
 from .cache import Cache, cache_key
 from .config import ModelsConfig, get_secret
+from .errors import LLMError
 
 # 요청 본문 중 OpenAI SDK의 정식 인자. 나머지(provider, reasoning, usage)는 extra_body
 SDK_FIELDS = ("model", "messages", "max_tokens", "temperature", "response_format", "tools", "tool_choice")
@@ -27,10 +28,6 @@ SDK_FIELDS = ("model", "messages", "max_tokens", "temperature", "response_format
 _DROP_KEYS = {"title", "default", "maxLength", "minLength", "pattern", "format", "maxItems", "minItems",
               "minimum", "maximum", "exclusiveMinimum", "exclusiveMaximum"}
 _TAIL_FIELDS = ("log", "attention")
-
-
-class LLMError(Exception):
-    pass
 
 
 @dataclass

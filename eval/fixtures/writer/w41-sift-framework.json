@@ -1,0 +1,88 @@
+{
+ "input": {
+  "plan": {
+   "rank": 8,
+   "angle": "코딩 에이전트 하네스 진화와 검증 비용",
+   "relation": {
+    "type": "new",
+    "topic_id": null
+   }
+  },
+  "evidence": [
+   {
+    "id": "og:1238#q1",
+    "source": "AI타임스",
+    "text": "We introduce Recursive Self Improvement via Fast Tree-search (SIFT)\n주장: SIFT는 LLM-as-a-judge 신호로 후보 패치 비교·탐색을 유도하고, 비싼 다운스트림 평가는 유망한 노드에만 수행",
+    "title": "MIT·사카나, 자가 진화 AI 에이전트 'SIFT' 발표...'검증 비용 병목' 해결",
+    "url": "https://arxiv.org/abs/2609.19526"
+   },
+   {
+    "id": "og:1238#q2",
+    "source": "AI타임스",
+    "text": "Expensive downstream task evaluations are reserved only for the most promising nodes.",
+    "title": "MIT·사카나, 자가 진화 AI 에이전트 'SIFT' 발표...'검증 비용 병목' 해결",
+    "url": "https://arxiv.org/abs/2609.19526"
+   },
+   {
+    "id": "og:1238#q3",
+    "source": "AI타임스",
+    "text": "SIFT outperforms existing tree-search based self-evolution frameworks on the full Polyglot benchmark with significantly lower resource requirements in terms of CPU hours, wall clock time, and API cost.\n주장: SIFT는 Polyglot 벤치마크에서 기존 트리 탐색 기반 자가 진화 프레임워크보다 높은 성능, CPU 시간·벽시계 시간·API 비용 현저히 낮음",
+    "title": "MIT·사카나, 자가 진화 AI 에이전트 'SIFT' 발표...'검증 비용 병목' 해결",
+    "url": "https://arxiv.org/abs/2609.19526"
+   },
+   {
+    "id": "it:1238",
+    "source": "AI타임스",
+    "text": "요약: MIT와 사카나 AI는 코딩 에이전트의 하네스만 진화시켜 검증 비용을 줄이는 프레임워크 SIFT를 공개했다. Polyglot 벤치마크에서 5시간 이내, 약 42 CPU 시간과 150달러 비용으로 35.1%의 정확도를 달성했으며, LLM 심사자 활용 시 성능이 향상되었다.\n요약: MIT와 사카나 AI는 코딩 에이전트의 하네스만 진화시켜 검증 비용을 줄이는 프레임워크 SIFT를 공개했다. Polyglot 벤치마크에서 5시간 이내, 약 42 CPU 시간과 150달러 비용으로 35.1%의 정확도를 달성했으며, LLM 심사자 활용 시 성능이 향상되었다.",
+    "title": "MIT·사카나, 자가 진화 AI 에이전트 'SIFT' 발표...'검증 비용 병목' 해결",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=215967"
+   },
+   {
+    "id": "it:1238#q1",
+    "source": "AI타임스",
+    "text": "MIT와 사카나 AI 연구진은 최근 코딩 에이전트가 스스로 자신의 지침과 도구, 코드를 수정하면서 더 나은 버전을 찾아갈 수 있도록 하는 새로운 프레임워크 ‘SIFT(Recursive Self-Improvement via Fast Tree Search)’를 온라인 아카이브를 통해 공개했다.\n주장: MIT와 사카나 AI가 코딩 에이전트의 하네스(프롬프트, 도구, 제어 로직)만 진화시켜 검증 비용을 줄이는 프레임워크 SIFT를 공개했다.",
+    "title": "MIT·사카나, 자가 진화 AI 에이전트 'SIFT' 발표...'검증 비용 병목' 해결",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=215967"
+   },
+   {
+    "id": "it:1238#q2",
+    "source": "AI타임스",
+    "text": "작업을 직접 수행하는 하위 코딩 모델을 매번 재학습하는 대신, 이를 감싸는 프롬프트와 도구, 제어 로직 등 에이전트 하네스(Harness)만을 진화시켜 값비싼 벤치마크 평가를 모두 수행하지 않고도 유망한 변경 사항을 빠르게 골라내는 것이 핵심이다.",
+    "title": "MIT·사카나, 자가 진화 AI 에이전트 'SIFT' 발표...'검증 비용 병목' 해결",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=215967"
+   },
+   {
+    "id": "it:1238#q3",
+    "source": "AI타임스",
+    "text": "연구진은 폴리글롯(Polyglot) 코딩 벤치마크에서 SIFT를 테스트한 결과, 한 번의 실행에서 35.1%의 정확도를 5시간 이내에 달성했다고 밝혔다.\n수치: Polyglot 벤치마크 정확도 [35.1%]\n수치: 실행 소요 시간 [5시간]\n주장: SIFT는 Polyglot 벤치마크에서 5시간 이내, 약 42 CPU 시간과 150달러 비용으로 35.1%의 정확도를 달성했다.",
+    "title": "MIT·사카나, 자가 진화 AI 에이전트 'SIFT' 발표...'검증 비용 병목' 해결",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=215967"
+   },
+   {
+    "id": "it:1238#q4",
+    "source": "AI타임스",
+    "text": "이때 사용한 자원은 약 42 CPU 시간과 API 비용 150달러 수준이었다.\n수치: 사용 자원 [42 CPU 시간]\n수치: API 비용 [150달러]",
+    "title": "MIT·사카나, 자가 진화 AI 에이전트 'SIFT' 발표...'검증 비용 병목' 해결",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=215967"
+   },
+   {
+    "id": "it:1238#q5",
+    "source": "AI타임스",
+    "text": "o3-미니를 사용한 실험에서 SIFT는 35.1%의 정확도를 기록했지만, 심사자를 제거한 SIFT는 29.8%에 그쳤다.\n수치: LLM 심사자 포함 시 정확도 [35.1%]\n수치: LLM 심사자 제거 시 정확도 [29.8%]\n주장: LLM 심사자를 활용하면 정확도가 35.1%로, 심사자를 제거한 경우(29.8%)보다 높다.",
+    "title": "MIT·사카나, 자가 진화 AI 에이전트 'SIFT' 발표...'검증 비용 병목' 해결",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=215967"
+   },
+   {
+    "id": "it:1238#q6",
+    "source": "AI타임스",
+    "text": "연구진이 제시한 핵심은 코딩 에이전트가 스스로 발전하는 과정에서 모든 후보를 비싼 방식으로 시험할 필요는 없다는 것이다.",
+    "title": "MIT·사카나, 자가 진화 AI 에이전트 'SIFT' 발표...'검증 비용 병목' 해결",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=215967"
+   }
+  ],
+  "previous": null,
+  "aliases": []
+ },
+ "expect": {},
+ "note": "2026-W41 실제 토픽 입력(run 20261009-193346-weekly-b3fc)"
+}

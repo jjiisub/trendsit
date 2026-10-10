@@ -33,7 +33,7 @@ from ..core.budget import BudgetExceeded, PriceUnknown
 from ..core.config_video import VideoConfig
 from ..core.context import Ctx
 from ..core.db import KST
-from ..core.images import ImageError, ImageFile
+from ..core.images import ImageFile
 from ..core.llm import LLMError
 from ..core.role import RoleFailed, load_role, run_role
 from . import store
@@ -107,7 +107,7 @@ def read_slides(media: MediaResult, ctx: Ctx) -> tuple[list[tuple[Frame, SlideRe
         try:
             r = run_role(role, SlideInput(image=ImageFile(path=str(path)), sec=round(f.t),
                                           spoken_text=f.spoken_text), ctx)
-        except (RoleFailed, LLMError, ImageError) as e:
+        except (RoleFailed, LLMError) as e:  # ImageError는 LLMError 계열
             stats["failed"] += 1
             _step(ctx, f"{round(f.t)}초 판독 실패", attention=True, error=str(e), role="video_slide")
             out.append((f, None))

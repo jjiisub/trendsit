@@ -1,0 +1,29 @@
+{
+ "input": {
+  "a": {
+   "id": "it:18",
+   "source": "text",
+   "text": "요약: Google DeepMind가 새로운 프런티어 모델 Gemini 4 Argon을 제한적으로 공개했다. 이 모델은 최대 1M 토큰의 출력 한도를 지원하며, 소프트웨어 엔지니어링 및 사이버 보안 방어 분야에서 높은 벤치마크 점수를 기록했다.\n등장 이름: Gemini 4 Argon, Google DeepMind, Fairwind Program, DeepSWE v1.1, CWE-bench v1, 3.8 Flash Cyber\n키워드: frontier-release, coding-agent, ai-security, eval, reasoning",
+   "title": "Gemini 4 Argon: our next era of frontier intelligence",
+   "url": null
+  },
+  "b": {
+   "id": "it:864",
+   "source": "text",
+   "text": "요약: 구글이 에이전트 작업 능력을 강화한 차세대 플래그십 모델 '제미나이 4 아르곤'을 공개했다. 출력 토큰 한도가 100만 토큰으로 확장되었고, 18개 주요 벤치마크 중 13개 부문에서 1위를 차지했다. 독립 평가 기관 AAII에서는 3위권으로 평가받았으며, 프로모션 기간 공격적인 API 가격을 제시했다.\n등장 이름: 구글, 제미나이 4 아르곤, GPT-6 아스트라, 클로드 오퍼스 5.5, 아티피셜 애널리시스, 페이블 5.1\n키워드: agent, coding-agent, eval, frontier-release, ai-industry",
+   "title": "구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\"",
+   "url": null
+  },
+  "shared": {
+   "keywords": [
+    "frontier-release"
+   ],
+   "aliases": [],
+   "similarity": 0.71
+  }
+ },
+ "expect": {
+  "same": true
+ },
+ "note": "Gemini 4 Argon ↔ 제미나이 4 아르곤(음차)"
+}

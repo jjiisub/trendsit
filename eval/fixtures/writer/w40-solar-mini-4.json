@@ -1,0 +1,109 @@
+{
+ "input": {
+  "plan": {
+   "rank": 8,
+   "angle": "소형 MoE 모델의 로컬 실행 최적화",
+   "relation": {
+    "type": "new",
+    "topic_id": null
+   }
+  },
+  "evidence": [
+   {
+    "id": "it:1034#q1",
+    "source": "GeekNews",
+    "text": "Solar Mini 4는 업스테이지가 독자적으로 사전학습하고 에이전트 작업에 최적화한 모델입니다. 총 35B 파라미터 중 토큰당 3B만 활성화하는 MoE 구조로 높은 효율성을 제공합니다.\n수치: 총 파라미터 수 [35B]\n수치: 토큰당 활성화 파라미터 수 [3B]\n주장: Solar Mini 4는 총 35B 파라미터 중 3B만 활성화하는 MoE 구조로, Artificial Analysis Intelligence Index v4.3.2에서 활성 3B 모델 중 가장 높은 24.1점을 기록했다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": "https://news.hada.io/topic?id=34738"
+   },
+   {
+    "id": "it:860#q1",
+    "source": "AI타임스",
+    "text": "업스테이지가 1일 소형언어모델(sLM) '솔라 미니 4'를 출시하고, 솔라 LLM을 '프로'와 '미니'로 나누는 투트랙 전략을 본격화한다.\n주장: 업스테이지가 MoE 구조의 소형 언어 모델 '솔라 미니 4'를 출시하며 프로·미니 투트랙 전략을 시작했다.",
+    "title": "업스테이지, sLM '솔라 미니 4' 출시... '프로·미니' 투트랙 본격화",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=215826"
+   },
+   {
+    "id": "it:1034#q2",
+    "source": "GeekNews",
+    "text": "Artificial Analysis Intelligence Index v4.3.2에서 24.1점을 기록해, 비교 대상인 활성 3B 모델 가운데 가장 높은 결과를 보였습니다.\n수치: Artificial Analysis Intelligence Index v4.3.2 점수 [24.1점]",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": "https://news.hada.io/topic?id=34738"
+   },
+   {
+    "id": "it:860#q2",
+    "source": "AI타임스",
+    "text": "솔라 미니 4는 전체 350억(35B) 매개변수 규모에 전문가 혼합(MoE) 구조를 적용, 추론 시 30억(3B) 매개변수만 활성화함으로써 응답 속도를 높이고 운영 비용을 낮췄다.\n수치: 전체 매개변수 규모 [350억(35B)]\n수치: 추론 시 활성화 매개변수 [30억(3B)]",
+    "title": "업스테이지, sLM '솔라 미니 4' 출시... '프로·미니' 투트랙 본격화",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=215826"
+   },
+   {
+    "id": "it:1034#q3",
+    "source": "GeekNews",
+    "text": "실제 SaaS 도구를 활용해 업무를 수행하는 AutomationBench-AA에서 22.3%를 기록했으며, 별도의 τ³-Banking 평가에서는 47.2점을 기록했습니다.\n수치: AutomationBench-AA 점수 [22.3%]\n수치: τ³-Banking 점수 [47.2점]\n주장: 에이전트 작업 성능 지표인 AutomationBench-AA에서 22.3%, τ³-Banking에서 47.2점을 기록했다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": "https://news.hada.io/topic?id=34738"
+   },
+   {
+    "id": "it:860#q3",
+    "source": "AI타임스",
+    "text": "아티피셜 애널리시스의 인텔리전스 인덱스(AAII)에서는 종합 24점을 기록하며 활성 매개변수 30억 규모 모델 중 최고 점수를 받았다.\n수치: AAII 종합 점수 [24점]\n주장: 솔라 미니 4는 AAII에서 24점을 기록해 활성 매개변수 3B급 모델 중 최고 점수를 얻었고, 동급 및 일부 상위 모델보다 높은 성능을 보였다.",
+    "title": "업스테이지, sLM '솔라 미니 4' 출시... '프로·미니' 투트랙 본격화",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=215826"
+   },
+   {
+    "id": "it:1034#q4",
+    "source": "GeekNews",
+    "text": "정가 기준 100만 토큰당 입력 $0.10, 캐시 입력 $0.01, 출력 $0.40에 제공합니다.\n수치: 입력 가격 [$0.10 100만 토큰당]\n수치: 캐시 입력 가격 [$0.01 100만 토큰당]\n수치: 출력 가격 [$0.40 100만 토큰당]\n주장: 100만 토큰당 입력 $0.10, 출력 $0.40의 API 가격으로 제공되며, 동일 에이전트 작업 1,000세트 완료 비용은 MiMo-V2.5보다 약 43% 낮다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": "https://news.hada.io/topic?id=34738"
+   },
+   {
+    "id": "it:860#q4",
+    "source": "AI타임스",
+    "text": "솔라 미니 4는 알리바바 '큐원 3.6-35B-A3B', 엔비디아 '네모트론 3.5 라이트닝' 등 동급 모델을 앞섰으며, 활성 매개변수가 더 많은 엔비디아 '네모트론 3 울트라', 구글 '젬마 4 31B', 샤오미 '미모 V2.5'와도 대등하거나 높은 점수를 기록했다.",
+    "title": "업스테이지, sLM '솔라 미니 4' 출시... '프로·미니' 투트랙 본격화",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=215826"
+   },
+   {
+    "id": "it:1034#q5",
+    "source": "GeekNews",
+    "text": "정가로 계산한 1,000세트의 완료 비용은 Solar Mini 4가 $1.25, MiMo-V2.5가 $2.20으로, Solar Mini 4가 약 43% 낮았습니다.\n수치: Solar Mini 4 에이전트 작업 완료 비용 [$1.25 1,000세트]\n수치: MiMo-V2.5 에이전트 작업 완료 비용 [$2.20 1,000세트]\n수치: MiMo-V2.5 대비 비용 절감률 [43%]",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": "https://news.hada.io/topic?id=34738"
+   },
+   {
+    "id": "it:860#q5",
+    "source": "AI타임스",
+    "text": "특히 양자화를 적용하면 GPU 1장으로 구동할 수 있어 온프레미스 환경에서도 사용 가능하다고 덧붙였다.\n수치: 양자화 적용 시 구동 가능 GPU 수 [1장 GPU]\n주장: 양자화 적용 시 GPU 1장으로 구동되어 온프레미스 환경 사용이 가능하다.",
+    "title": "업스테이지, sLM '솔라 미니 4' 출시... '프로·미니' 투트랙 본격화",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=215826"
+   },
+   {
+    "id": "it:1034#q6",
+    "source": "GeekNews",
+    "text": "온프레미스에서는 양자화 모델을 기준으로 H100 80GB 한 장부터 배포할 수 있습니다.\n수치: 최소 배포 사양 [H100 80GB]\n주장: 양자화 모델 기준 H100 80GB 한 장에서 온프레미스 배포가 가능하다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": "https://news.hada.io/topic?id=34738"
+   },
+   {
+    "id": "it:860",
+    "source": "AI타임스",
+    "text": "요약: 업스테이지가 MoE 구조의 소형 언어 모델 '솔라 미니 4'를 출시했다. 전체 35B 매개변수 중 추론 시 3B만 활성화하여 속도와 비용 효율을 높였으며, AAII 벤치마크에서 24점을 기록해 동급 모델 중 최고 점수를 달성했다. 양자화 시 GPU 1장으로 구동 가능해 온프레미스 환경 적용이 가능하다.",
+    "title": "업스테이지, sLM '솔라 미니 4' 출시... '프로·미니' 투트랙 본격화",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=215826"
+   },
+   {
+    "id": "it:1034",
+    "source": "GeekNews",
+    "text": "요약: 업스테이지가 에이전트 작업에 최적화된 MoE 모델 Solar Mini 4를 발표했다. 총 35B 파라미터 중 3B만 활성화하는 구조로, Artificial Analysis Intelligence Index에서 활성 3B 모델 중 최고 점수를 기록했다. 100만 토큰당 입력 $0.10, 출력 $0.40의 가격으로 제공되며, H100 80GB 한 장에서 온프레미스 배포가 가능하다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": "https://news.hada.io/topic?id=34738"
+   }
+  ],
+  "previous": null,
+  "aliases": []
+ },
+ "expect": {},
+ "note": "2026-W40 실제 토픽 입력(run 20261009-192905-weekly-3ecc)"
+}

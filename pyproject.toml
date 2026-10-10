@@ -10,6 +10,7 @@ dependencies = [
     "httpx>=0.27",
     "feedparser>=6.0.14",
     "trafilatura>=2.3.1",
+    "rapidfuzz>=3.14.6",
 ]
 
 # 스펙별 선택 묶음(COMMON 9장): S2~S3 = embed, S4 = video. 각 묶음이 한 줄씩 추가하고 병합 때 uv lock 재생성

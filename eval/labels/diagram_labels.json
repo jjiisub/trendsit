@@ -1,0 +1,231 @@
+{
+ "w40-gpt-6-1-sol": {
+  "week": "2026-W40",
+  "numbers": [],
+  "events": [],
+  "code_warnings": [
+   "누락 의심: numbers가 비었는데 근거에 같은 단위 값 3개 이상(% 5, 100만 토큰당 4)"
+  ],
+  "needed_numbers": 0,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "같은 지표 값 3개 없음(경고 오탐)"
+ },
+ "w40-gemini-4-argon": {
+  "week": "2026-W40",
+  "numbers": [
+   "DeepSWE v1.1에서 Gemini 4 Argon 77.9%로 SOTA"
+  ],
+  "events": [],
+  "code_warnings": [],
+  "needed_numbers": 1,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "적절"
+ },
+ "w40-openai-dots": {
+  "week": "2026-W40",
+  "numbers": [],
+  "events": [],
+  "code_warnings": [
+   "누락 의심: numbers가 비었는데 근거에 같은 단위 값 3개 이상(개 4)"
+  ],
+  "needed_numbers": 0,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "불필요(경고 오탐)"
+ },
+ "w40-claude-sonnet-5-5": {
+  "week": "2026-W40",
+  "numbers": [
+   "Claude Sonnet 5.5 터미널벤치 4.0 점수 70.6%로 3개 모델 중 최고",
+   "Claude Sonnet 5.5 GDPval-AA 1844점으로 Opus 5.5와 대등"
+  ],
+  "events": [],
+  "code_warnings": [
+   "핵심 의심: 다룰 축(angle '오퍼스급 지능과 가성비 사이의 컨텍스트·출력 토큰 설계')의 낱말(가성비, 사이, 설계, 오퍼스급, 지능, 출력, 컨텍스트, 토큰)이 첫 point에 없음"
+  ],
+  "needed_numbers": null,
+  "needed_events": null,
+  "labeler": null,
+  "critique": null
+ },
+ "w40-decision-api": {
+  "week": "2026-W40",
+  "numbers": [],
+  "events": [],
+  "code_warnings": [
+   "단위 확인 필요: numbers[0].items[0] 값 150의 근거 단위를 찾지 못함(그룹 단위 ms)",
+   "단위 확인 필요: numbers[0].items[1] 값 1600의 근거 단위를 찾지 못함(그룹 단위 ms)"
+  ],
+  "needed_numbers": 0,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "불필요(150ms·1.6초 2개, 단위 환산 필요)"
+ },
+ "w40-solar-mini-4": {
+  "week": "2026-W40",
+  "numbers": [],
+  "events": [],
+  "code_warnings": [
+   "누락 의심(같은 근거 문장의 같은 단위 값 3개 이상, 같은 지표 비교인지 확인): it:1034#q4 100만 토큰당 3개",
+   "핵심 의심: 다룰 축(angle 'GPU 한 장 실행 가능한 MoE 소형 모델의 에이전트 최적화')의 낱말(gpu, moe, 소형, 실행, 에이전트, 최적화)이 첫 point에 없음"
+  ],
+  "needed_numbers": null,
+  "needed_events": null,
+  "labeler": null,
+  "critique": null
+ },
+ "w40-deepseek-harness": {
+  "week": "2026-W40",
+  "numbers": [],
+  "events": [],
+  "code_warnings": [],
+  "needed_numbers": 0,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "불필요"
+ },
+ "w40-muse-gadgets": {
+  "week": "2026-W40",
+  "numbers": [],
+  "events": [],
+  "code_warnings": [],
+  "needed_numbers": 0,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "불필요"
+ },
+ "w40-claude-code-skills": {
+  "week": "2026-W40",
+  "numbers": [],
+  "events": [],
+  "code_warnings": [],
+  "needed_numbers": 0,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "불필요: 글쓴이 환경의 스킬·에이전트·도구 개수는 비교 대상 아님. 코드 경고 \"약개\" 단위 파싱 버그"
+ },
+ "w40-llamaindex-context": {
+  "week": "2026-W40",
+  "numbers": [],
+  "events": [],
+  "code_warnings": [],
+  "needed_numbers": 0,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "불필요"
+ },
+ "w41-mistral-large-4": {
+  "week": "2026-W41",
+  "numbers": [],
+  "events": [],
+  "code_warnings": [
+   "누락 의심: numbers가 비었는데 근거에 같은 단위 값 3개 이상(% 5, 100만개당 3)"
+  ],
+  "needed_numbers": 0,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "선택(AAII 38·38·39는 그려도 되지만 없어도 됨)"
+ },
+ "w41-gpt6-intelligent-ui": {
+  "week": "2026-W41",
+  "numbers": [],
+  "events": [],
+  "code_warnings": [],
+  "needed_numbers": 0,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "불필요"
+ },
+ "w41-embeddinggemma-2": {
+  "week": "2026-W41",
+  "numbers": [],
+  "events": [],
+  "code_warnings": [
+   "누락 의심: numbers가 비었는데 근거에 같은 단위 값 3개 이상(dimensions 4, 점 3)"
+  ],
+  "needed_numbers": 0,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "선택(전작 대비 2값), 차원 경고는 오탐"
+ },
+ "w41-claude-haiku-5-5": {
+  "week": "2026-W41",
+  "numbers": [
+   "Claude Haiku 5.5 GDPval-AA v2.1 점수 1620점으로 3개 모델 중 최고"
+  ],
+  "events": [],
+  "code_warnings": [],
+  "needed_numbers": null,
+  "needed_events": null,
+  "labeler": null,
+  "critique": null
+ },
+ "w41-decision-api-spec": {
+  "week": "2026-W41",
+  "numbers": [],
+  "events": [],
+  "code_warnings": [],
+  "needed_numbers": 0,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "불필요"
+ },
+ "w41-openai-rogue-agent": {
+  "week": "2026-W41",
+  "numbers": [],
+  "events": [],
+  "code_warnings": [],
+  "needed_numbers": 0,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "불필요(날짜 2개 + 월)"
+ },
+ "w41-openai-math-results": {
+  "week": "2026-W41",
+  "numbers": [],
+  "events": [],
+  "code_warnings": [],
+  "needed_numbers": 0,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "불필요"
+ },
+ "w41-openai-textgrain": {
+  "week": "2026-W41",
+  "numbers": [],
+  "events": [],
+  "code_warnings": [
+   "누락 의심(같은 근거 문장의 같은 단위 값 3개 이상, 같은 지표 비교인지 확인): it:1225#q3 % 3개, it:1105#q4 % 3개, it:1225#q4 % 5개, it:1105#q5 % 3개",
+   "누락 의심: points[2] 안에 같은 단위 값 3개 이상(% 1/80/95), 같은 지표면 numbers",
+   "누락 의심: points[3] 안에 같은 단위 값 3개 이상(% 10/92/66/25/17), 같은 지표면 numbers"
+  ],
+  "needed_numbers": 1,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "누락: 치환율별 탐지율 92→66→17(같은 조건·같은 단위 3개)이 points[2]의 핵심인데 도식이 빠짐(⚠ numbers[0], 이전 출력에서는 적절)"
+ },
+ "w41-openrig-orchestrator": {
+  "week": "2026-W41",
+  "numbers": [],
+  "events": [],
+  "code_warnings": [],
+  "needed_numbers": 0,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "불필요"
+ },
+ "w41-agent-coding-talks": {
+  "week": "2026-W41",
+  "numbers": [],
+  "events": [],
+  "code_warnings": [
+   "누락 의심: events가 비었는데 근거에 날짜 다른 사건 후보 3개"
+  ],
+  "needed_numbers": 0,
+  "needed_events": 0,
+  "labeler": "opus-5.5",
+  "critique": "불필요: 사건 날짜 흐름이 아님(경고 오탐)"
+ }
+}

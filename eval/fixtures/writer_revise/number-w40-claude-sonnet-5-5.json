@@ -1,0 +1,196 @@
+{
+ "input": {
+  "loc_lines": [
+   "title: Claude Sonnet 5.5 출시: Opus급 성능, 동일 가격",
+   "summary: Anthropic이 Sonnet 5.5를 출시했다. ==중급 모델이 Opus급 성능에 근접하면서 가격은 동일==하다.",
+   "overview: Anthropic이 Claude 5.5 패밀리의 두 번째 모델인 Sonnet 5.5를 출시했다. 전작 대비 출력 속도 30%+ 향상과 동일 작업당 최대 30% 비용 절감을 달성했으며, 터미널벤치 4.0에서 70.6%로 Opus 5.5(66.4%)를 상회했다. 토큰당 가격은 Sonnet 5와 동일하지만, 같은 작업을 더 적은 토큰으로 처리해 실질 비용이 줄어든다. 100만 토큰 컨텍스트와 12만8000 토큰 출력을 지원하며, claude.ai 무료 티어 모델로 지정됐다.",
+   "points[0]: Sonnet 5.5가 Sonnet 5 대비 출력 속도 45%+ 향상, 동일 작업당 비용 최대 30% 절감 (refs og:162#q1, it:924#q2)",
+   "points[1]: ==터미널벤치 4.0에서 70.6%로 전작 Sonnet 5(10.3%)와 Opus 5.5(66.4%)를 모두 상회== (refs it:924#q3, it:924#q4)",
+   "points[2]: 토큰당 가격은 Sonnet 5와 동일(입력 $2, 출력 $10, 캐시 읽기 $0.20 / 100만 토큰)이나, 같은 작업을 더 적은 토큰으로 처리해 비용 절감 (refs og:162#q2, it:951#q3)",
+   "points[3]: 최대 100만 토큰 컨텍스트 창과 12만8000 토큰 최대 출력 지원 (refs it:951#q2)",
+   "points[4]: claude.ai 무료 티어 모델로 지정, ChatGPT 무료 티어(Luna 5.6)보다 높은 성능 제공 (refs og:162#q5)",
+   "points[5]: 여러 평가에서 Max effort 설정 시 Opus 5.5와 동등한 성능 기록, Haiku 5.5는 몇 주 내 5.5 패밀리 합류 예정 (refs og:162#q4, og:162#q3)",
+   "numbers[0] (anchor 2): Sonnet 5.5가 터미널벤치 4.0에서 Opus 5.5와 전작을 모두 상회 / context: 터미널 환경의 복잡한 작업을 평가하는 터미널벤치 4.0 점수 비교 [it:924#q3, it:924#q4]",
+   "numbers[0].items[0]: Sonnet 5.5 = 70.6 (it:924#q3)",
+   "numbers[0].items[1]: Opus 5.5 = 66.4 (it:924#q4)",
+   "numbers[0].items[2]: Sonnet 5 = 10.3 (it:924#q4)"
+  ],
+  "previous": {
+   "log": "포인트 6개, 수치 그룹 1개, 근거 id 12개",
+   "attention": false,
+   "points": [
+    {
+     "text": "Sonnet 5.5가 Sonnet 5 대비 출력 속도 45%+ 향상, 동일 작업당 비용 최대 30% 절감",
+     "refs": [
+      "og:162#q1",
+      "it:924#q2"
+     ],
+     "check": false
+    },
+    {
+     "text": "==터미널벤치 4.0에서 70.6%로 전작 Sonnet 5(10.3%)와 Opus 5.5(66.4%)를 모두 상회==",
+     "refs": [
+      "it:924#q3",
+      "it:924#q4"
+     ],
+     "check": false
+    },
+    {
+     "text": "토큰당 가격은 Sonnet 5와 동일(입력 $2, 출력 $10, 캐시 읽기 $0.20 / 100만 토큰)이나, 같은 작업을 더 적은 토큰으로 처리해 비용 절감",
+     "refs": [
+      "og:162#q2",
+      "it:951#q3"
+     ],
+     "check": false
+    },
+    {
+     "text": "최대 100만 토큰 컨텍스트 창과 12만8000 토큰 최대 출력 지원",
+     "refs": [
+      "it:951#q2"
+     ],
+     "check": false
+    },
+    {
+     "text": "claude.ai 무료 티어 모델로 지정, ChatGPT 무료 티어(Luna 5.6)보다 높은 성능 제공",
+     "refs": [
+      "og:162#q5"
+     ],
+     "check": false
+    },
+    {
+     "text": "여러 평가에서 Max effort 설정 시 Opus 5.5와 동등한 성능 기록, Haiku 5.5는 몇 주 내 5.5 패밀리 합류 예정",
+     "refs": [
+      "og:162#q4",
+      "og:162#q3"
+     ],
+     "check": false
+    }
+   ],
+   "numbers": [
+    {
+     "anchor": 2,
+     "group": "terminalbench",
+     "title": "Sonnet 5.5가 터미널벤치 4.0에서 Opus 5.5와 전작을 모두 상회",
+     "context": "터미널 환경의 복잡한 작업을 평가하는 터미널벤치 4.0 점수 비교 [it:924#q3, it:924#q4]",
+     "unit": "%",
+     "items": [
+      {
+       "label": "Sonnet 5.5",
+       "value": "70.6",
+       "ref": "it:924#q3",
+       "baseline": false,
+       "emphasis": true
+      },
+      {
+       "label": "Opus 5.5",
+       "value": "66.4",
+       "ref": "it:924#q4",
+       "baseline": false,
+       "emphasis": false
+      },
+      {
+       "label": "Sonnet 5",
+       "value": "10.3",
+       "ref": "it:924#q4",
+       "baseline": true,
+       "emphasis": false
+      }
+     ]
+    }
+   ],
+   "events": [],
+   "contributions": [],
+   "concepts": [],
+   "overview": "Anthropic이 Claude 5.5 패밀리의 두 번째 모델인 Sonnet 5.5를 출시했다. 전작 대비 출력 속도 30%+ 향상과 동일 작업당 최대 30% 비용 절감을 달성했으며, 터미널벤치 4.0에서 70.6%로 Opus 5.5(66.4%)를 상회했다. 토큰당 가격은 Sonnet 5와 동일하지만, 같은 작업을 더 적은 토큰으로 처리해 실질 비용이 줄어든다. 100만 토큰 컨텍스트와 12만8000 토큰 출력을 지원하며, claude.ai 무료 티어 모델로 지정됐다.",
+   "summary": "Anthropic이 Sonnet 5.5를 출시했다. ==중급 모델이 Opus급 성능에 근접하면서 가격은 동일==하다.",
+   "title": "Claude Sonnet 5.5 출시: Opus급 성능, 동일 가격"
+  },
+  "issues": [
+   {
+    "loc": "points[0]",
+    "type": "number_mismatch",
+    "evidence_id": "og:162#q1",
+    "comment": "points[0]의 수치가 근거와 다름",
+    "hint": "근거 표기 그대로",
+    "idx": 0
+   }
+  ],
+  "evidence": [
+   {
+    "id": "og:162#q1",
+    "source": "Simon Willison's Weblog",
+    "text": "Introducing Claude Sonnet 5.5, the second model in the Claude 5.5 family. It’s a clear upgrade over Claude Sonnet 5, runs 30%+ faster, and costs up to 30% less for most work.\n수치: Sonnet 5.5 출력 속도 향상(Sonnet 5 대비) [30%+]\n수치: Sonnet 5.5 비용 절감(대부분 작업, 최대) [30%]\n주장: Sonnet 5.5는 Sonnet 5와 동일 가격으로, 대부분 작업에서 최대 30% 저렴하고 30%+ 빠름",
+    "title": "Claude Sonnet 5.5",
+    "url": "https://www.anthropic.com/claude-sonnet-5-5"
+   },
+   {
+    "id": "og:162#q2",
+    "source": "Simon Willison's Weblog",
+    "text": "Sonnet 5.5 is priced the same as Sonnet 5 at $2 per million input tokens, $10 per million output tokens, and $0.20 per million tokens for cache reads, but it typically needs far fewer tokens to do the same work. In our testing, it costs up to 30% less per task than its predecessor.\n수치: Sonnet 5.5 입력 토큰 가격 [$2 per million input tokens]\n수치: Sonnet 5.5 출력 토큰 가격 [$10 per million output tokens]\n수치: Sonnet 5.5 캐시 읽기 가격 [$0.20 per million tokens]",
+    "title": "Claude Sonnet 5.5",
+    "url": "https://www.anthropic.com/claude-sonnet-5-5"
+   },
+   {
+    "id": "it:924#q2",
+    "source": "AI타임스",
+    "text": "28일(현지시간) 발표에 따르면, 소네트 5.5는 이전 세대인 '소네트 5' 대비 출력이 30% 이상 빨라졌으며, 압도적인 작업 처리 효율성 덕분에 동일 작업당 비용을 최대 30% 절감했다.\n수치: 출력 속도 향상률 [30%]\n수치: 동일 작업당 비용 절감률 [30%]",
+    "title": "앤트로픽, '클로드 소네트 5.5' 공개…오퍼스급 지능에 최강 가성비",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=215734"
+   },
+   {
+    "id": "it:951#q2",
+    "source": "AI타임스",
+    "text": "현재까지 알려진 사양을 보면 소네트 5.5는 최대 100만 토큰의 컨텍스트 창과 최대 12만8000 토큰의 출력을 지원할 것으로 예상된다.\n수치: 컨텍스트 창 크기 [100만 토큰]\n수치: 최대 출력 크기 [12만8000 토큰]\n주장: 소네트 5.5는 100만 토큰 컨텍스트와 12만8000 토큰 출력을 지원하며, 토큰당 가격은 입력 2달러, 출력 10달러, 캐시 0.20달러로 추정",
+    "title": "앤트로픽, '클로드 소네트 5.5' 출시 임박...오픈AI '데브데이' 견제하나",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=215700"
+   },
+   {
+    "id": "og:162#q3",
+    "source": "Simon Willison's Weblog",
+    "text": "Claude Haiku 5.5, built for high-volume and cost-sensitive applications, will join the Claude 5.5 family in the coming weeks.\n주장: Haiku 5.5는 몇 주 안에 Claude 5.5 패밀리로 합류 예정",
+    "title": "Claude Sonnet 5.5",
+    "url": "https://www.anthropic.com/claude-sonnet-5-5"
+   },
+   {
+    "id": "it:924#q3",
+    "source": "AI타임스",
+    "text": "터미널 환경의 복잡한 작업을 평가하는 '터미널벤치 4.0'에서 70.6%의 점수를 기록했다.\n수치: 터미널벤치 4.0 점수 [70.6%]\n주장: 터미널벤치 4.0에서 70.6%를 기록해 전작 소네트 5(10.3%)와 최상위 모델 오퍼스 5.5(66.4%)를 모두 상회했다.",
+    "title": "앤트로픽, '클로드 소네트 5.5' 공개…오퍼스급 지능에 최강 가성비",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=215734"
+   },
+   {
+    "id": "it:951#q3",
+    "source": "AI타임스",
+    "text": "입력 토큰은 100만개당 2달러, 출력 토큰은 100만개당 10달러, 캐시 읽기는 100만개당 0.20달러 수준으로 추정된다.\n수치: 입력 토큰 100만개당 가격 [2 달러]\n수치: 출력 토큰 100만개당 가격 [10 달러]\n수치: 캐시 읽기 100만개당 가격 [0.20 달러]",
+    "title": "앤트로픽, '클로드 소네트 5.5' 출시 임박...오픈AI '데브데이' 견제하나",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=215700"
+   },
+   {
+    "id": "og:162#q4",
+    "source": "Simon Willison's Weblog",
+    "text": "On several evaluations, Sonnet 5.5 at Max effort even performs comparably to Opus 5.5.\n주장: 여러 평가에서 Sonnet 5.5(Max effort)가 Opus 5.5와 동등한 성능을 보임",
+    "title": "Claude Sonnet 5.5",
+    "url": "https://www.anthropic.com/claude-sonnet-5-5"
+   },
+   {
+    "id": "it:924#q4",
+    "source": "AI타임스",
+    "text": "이는 전작인 소네트 5가 기록했던 10.3%를 무려 7배 이상 뛰어넘는 수치이며, 최상위 모델인 '오퍼스 5.5(66.4%)'마저 제친 기록이다.\n수치: 소네트 5 터미널벤치 4.0 점수 [10.3%]\n수치: 오퍼스 5.5 터미널벤치 4.0 점수 [66.4%]",
+    "title": "앤트로픽, '클로드 소네트 5.5' 공개…오퍼스급 지능에 최강 가성비",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=215734"
+   },
+   {
+    "id": "og:162#q5",
+    "source": "Simon Willison's Weblog",
+    "text": "The most interesting thing about Sonnet 5.5 is that it's now the model used for the free tier on claude.ai. OpenAI's ChatGPT free tier uses Luna 5.6, which means Anthropic currently have a much more capable free offering.\n주장: Sonnet 5.5가 claude.ai 무료 티어 모델이며, ChatGPT 무료 티어(Luna 5.6)보다 더 높은 성능 제공",
+    "title": "Claude Sonnet 5.5",
+    "url": "https://simonwillison.net/2026/Sep/28/claude-sonnet-5-5/"
+   }
+  ],
+  "aliases": []
+ },
+ "expect": {
+  "action": "edit"
+ },
+ "note": "이슈 number(오류를 심음)"
+}

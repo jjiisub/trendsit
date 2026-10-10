@@ -13,21 +13,13 @@ from trendsit.core.artifacts import Document, JudgeInput, JudgeResult, RepoOneli
 from trendsit.core.config import ROOT
 from trendsit.core.context import Ctx
 from trendsit.core.role import load_role, run_role
+from trendsit.core.style import EVAL_ENDINGS, EVAL_WORDS, ends_as_sentence, is_haeyo
 from trendsit.core.textclean import clean_markdown
 
 RUBRICS = ROOT / "eval" / "rubrics"
 JUDGE_ROLE = "eval/judge.md"
 
-# 공통 문체 검사 (skills/style_ko.md)
-HAEYO = re.compile(r"(요|세요|어요|아요|에요|예요|해요|죠)[.!?…]*$")
-# "요"로 끝나는 명사(명사형 끝말이라 해요체가 아님). "필요해요"처럼 뒤에 어미가 붙으면 HAEYO가 그대로 잡는다
-NOUN_YO = re.compile(r"(필요|중요|주요|개요|수요|강요|소요)[.!?…]*$")
-EVAL_ENDINGS = ("눈에 띈다", "핵심이다", "주목할 만하다", "공통 교훈이다", "주목할 만한", "눈여겨볼")
-# 평가어(근거 없는 수식). 레포 설명, 포인트에서 쓰지 않는다
-EVAL_WORDS = ("혁신적", "강력한", "놀라운", "최고의", "획기적", "뛰어난", "완벽한", "최첨단", "차세대", "혁명적",
-              "압도적", "탁월한", "손쉬운", "쉽고 빠르게", "간편한", "똑똑한")
-# 명사형이 아닌 문장 끝: "~다", "~요", "~까", 마침표 등
-SENTENCE_END = re.compile(r"(다|요|까|죠|니다|네)[.!?…]*$|[.!?]$")
+# 공통 문체 검사 (skills/style_ko.md): 정규식은 trendsit/core/style.py 한 곳에서(위에서 가져옴)
 
 # 관문 B 문턱값 (S0_TASK 7장). 채점표 항목 이름 기준
 # 관문 B 문턱값. 질문별 통과율(코드 채점 통과분 중). repo_oneliner: S0_ADDENDUM 1.7 (Q1 10/10, Q2·Q3 9/10 이상)
@@ -59,7 +51,7 @@ def style_checks(output: dict[str, Any]) -> list[dict[str, Any]]:
     checks = []
     for key, text in _strings(output):
         sentences = [s.strip() for s in re.split(r"(?<=[.!?])\s+|\n", text) if s.strip()]
-        bad = [s for s in sentences if HAEYO.search(s) and not NOUN_YO.search(s)]
+        bad = [s for s in sentences if is_haeyo(s)]
         checks.append(check(f"해요체 없음({key})", not bad, "; ".join(bad)[:120]))
         ev = [e for e in EVAL_ENDINGS if e in text]
         checks.append(check(f"평가형 마무리 없음({key})", not ev, ", ".join(ev)))
@@ -79,7 +71,7 @@ def code_repo_oneliner(inp: dict[str, Any], out: dict[str, Any], expect: dict[st
     in_source = _norm(basis) in _norm(readme) or _norm(basis) in _norm(inp.get("description") or "")
     checks = [
         check("길이 상한", len(line) <= expect.get("max_len", 60), f"{len(line)}자"),
-        check("명사형 끝", not SENTENCE_END.search(line), line[-8:]),
+        check("명사형 끝", not ends_as_sentence(line), line[-8:]),
         check("평가어 없음", not [w for w in EVAL_WORDS if w in line],
               ", ".join(w for w in EVAL_WORDS if w in line)),
         # basis는 README에 있는 구절 그대로여야 한다(공백 정규화 후 부분 문자열)
@@ -118,6 +110,8 @@ REENFORCE: dict[str, Any] = {}
 # 코드 소유 칸(S4 설계 결정 D2-1, S2~S3 결정 Q1): 규칙이 문자열로 확정 판정되어 enforce가 고친 값이 곧 정답인 칸.
 # 통과 판정은 이 칸만 enforce 후 값으로 바꾼 출력으로 한다. 원래 출력 점수는 모델 품질로 따로 기록. role → 칸 목록
 ENFORCED_FIELDS: dict[str, tuple[str, ...]] = {}
+# 원자 사실 judge(S5 관문 B 근거 충실성): role → judge md 경로. llm_grade가 질문 채점 뒤 한 번 더 부른다
+FACT_JUDGES: dict[str, str] = {}
 # S2~S3 역할은 칸 목록을 출력 클래스의 ENFORCED_FIELDS(ClassVar)에 선언하고 여기에 등록한다(한 곳에서만 정함)
 ENFORCED_FIELDS["repo_oneliner"] = RepoOneliner.ENFORCED_FIELDS
 
@@ -186,7 +180,8 @@ def judge_input(inp: RoleInput, out: dict[str, Any]) -> JudgeInput:
 
 
 def llm_grade(role: str, inp: RoleInput, out: dict[str, Any], ctx: Ctx) -> dict[str, Any]:
-    """역할 무관한 채점자(eval/judge.md) + 역할별 채점표(includes)를 1회 실행."""
+    """역할 무관한 채점자(eval/judge.md) + 역할별 채점표(includes)를 1회 실행. FACT_JUDGES 역할은 원자 사실 judge도 1회."""
+    out_full = out
     judge = load_role(JUDGE_ROLE, ctx.models, extra_includes=(str(rubric_path(role).relative_to(ROOT)),))
     judge_ctx = replace(ctx, model=None)  # 채점자는 항상 judge 별칭
     result: JudgeResult = run_role(judge, judge_input(inp, out), judge_ctx)  # type: ignore[assignment]
@@ -195,9 +190,16 @@ def llm_grade(role: str, inp: RoleInput, out: dict[str, Any], ctx: Ctx) -> dict[
     verdicts = {v.question: {"verdict": v.verdict, "critique": v.critique} for v in result.verdicts}
     scores = {s.criterion: {"score": s.score, "reason": s.reason} for s in result.scores}
     missing = [q for q in questions if q not in verdicts]
-    return {"verdicts": {q: verdicts[q] for q in questions if q in verdicts},
-            "scores": {c: scores[c] for c in criteria if c in scores}, "missing": missing,
-            "judge_prompt_hash": judge.prompt_hash, "judge_step_id": judge_ctx.last_step_id}
+    out = {"verdicts": {q: verdicts[q] for q in questions if q in verdicts},
+           "scores": {c: scores[c] for c in criteria if c in scores}, "missing": missing,
+           "judge_prompt_hash": judge.prompt_hash, "judge_step_id": judge_ctx.last_step_id}
+    if role in FACT_JUDGES:  # S5: 원자 사실 judge(근거 충실성은 코드가 지지율을 셈)
+        fj = load_role(FACT_JUDGES[role], ctx.models)
+        facts = run_role(fj, judge_input(inp, out_full), judge_ctx)
+        atoms = [a.model_dump() for a in facts.atoms]  # type: ignore[attr-defined]
+        out["facts"] = {"total": len(atoms), "supported": sum(a["supported"] for a in atoms),
+                        "unsupported": [a for a in atoms if not a["supported"]], "step_id": judge_ctx.last_step_id}
+    return out
 
 
 def model_agreement(results: list[dict[str, Any]], owned_fields: tuple[str, ...] = ()) -> dict[str, str]:
@@ -275,3 +277,4 @@ def _load(module: str) -> None:
 
 _load("graders_text")  # S2~S3
 _load("graders_video")  # S4
+_load("graders_brief")  # S5

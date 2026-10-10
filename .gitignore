@@ -11,3 +11,6 @@ __pycache__/
 data/*
 !data/trendsit-example.json
 !data/make_data.py
+
+# impl-workflow 런 디렉터리(증적·원장). 남길 것은 reports/로 옮긴다
+.workflow/

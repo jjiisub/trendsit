@@ -1,0 +1,102 @@
+{
+ "input": {
+  "plan": {
+   "rank": 9,
+   "angle": "프런티어 모델의 수학 연구 성과",
+   "relation": {
+    "type": "new",
+    "topic_id": null
+   }
+  },
+  "evidence": [
+   {
+    "id": "it:1102#q1",
+    "source": "OpenAI News",
+    "text": "We’re releasing a broad range of new mathematical results produced by an internal frontier model.\n주장: OpenAI 내부 프런티어 모델이 생성한 새로운 수학 결과들을 공개한다.",
+    "title": "Sharing AI progress in mathematics",
+    "url": "https://openai.com/index/sharing-ai-progress-in-mathematics"
+   },
+   {
+    "id": "it:1156#q1",
+    "source": "AI타임스",
+    "text": "오픈AI는 미공개 프론티어 모델에 약 4000개의 고난도 수학 연구 문제를 제시하고, 그 과정에서 나온 의미 있는 성과를 722편의 연구 원고(manuscript)로 정리해 6일(현지시간) 공개했습니다.\n수치: 제시된 고난도 수학 연구 문제 수 [4000개]\n수치: 정리된 연구 원고 수 [722편]\n주장: 오픈AI가 미공개 프론티어 모델로 4000개 수학 문제를 풀고 722편의 원고를 공개했으며, 일부는 Lean으로 형식화했다.",
+    "title": "[10월8일] “수학 문제 4000개에 AI 투입해 성과”…오픈AI가 보여준 과학연구의 변화",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=216072"
+   },
+   {
+    "id": "it:1102#q2",
+    "source": "OpenAI News",
+    "text": "For this release, we’re publishing the results in a GitHub repository, with protocols for paper revisions and citations.\n주장: 결과는 GitHub 저장소에 공개되며, Lean으로 검증 가능한 증명 형식화도 함께 제공한다.",
+    "title": "Sharing AI progress in mathematics",
+    "url": "https://openai.com/index/sharing-ai-progress-in-mathematics"
+   },
+   {
+    "id": "it:1156#q2",
+    "source": "AI타임스",
+    "text": "증명을 컴퓨터가 검증할 수 있는 프로그래밍 언어인 '린(Lean)'으로 형식화한 자료와 연구 과정에 사용한 연산량, 문제 풀이 시도에 관한 통계도 함께 공개했습니다.",
+    "title": "[10월8일] “수학 문제 4000개에 AI 투입해 성과”…오픈AI가 보여준 과학연구의 변화",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=216072"
+   },
+   {
+    "id": "it:1102#q3",
+    "source": "OpenAI News",
+    "text": "As part of our GitHub repository, we are sharing formalizations of many of the proofs in Lean, a programming language that allows mathematical proofs to be checked by a computer.",
+    "title": "Sharing AI progress in mathematics",
+    "url": "https://openai.com/index/sharing-ai-progress-in-mathematics"
+   },
+   {
+    "id": "it:1156#q3",
+    "source": "AI타임스",
+    "text": "오픈AI에 따르면 이번 결과 하나를 만드는 데 평균적으로 챗GPT 프로의 약 3시간에 해당하는 추론 연산량이 사용됐습니다.\n수치: 결과 하나당 평균 추론 연산량 (챗GPT 프로 기준) [3시간]\n주장: 연구 결과 하나를 도출하는 데 챗GPT 프로 기준 약 3시간 분량의 추론 연산량이 사용됐다.",
+    "title": "[10월8일] “수학 문제 4000개에 AI 투입해 성과”…오픈AI가 보여준 과학연구의 변화",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=216072"
+   },
+   {
+    "id": "it:1102#q4",
+    "source": "OpenAI News",
+    "text": "These include 10 summaries of the model’s reasoning, estimations of compute spent in terms of Pro usage on ChatGPT, and statistics about the number of attempted problems.\n수치: 모델 추론 요약 개수 [10]\n주장: 모델 추론 요약 10개와 컴퓨트 사용량 등 상세 정보를 공개하며, 결과 1개당 평균 컴퓨트 사용량은 ChatGPT Pro thinking 약 3시간에 해당한다.",
+    "title": "Sharing AI progress in mathematics",
+    "url": "https://openai.com/index/sharing-ai-progress-in-mathematics"
+   },
+   {
+    "id": "it:1156#q4",
+    "source": "AI타임스",
+    "text": "오픈AI도 일부 결과에 오류가 있을 수 있으며 추가 검증이 필요하다고 밝혔습니다.\n주장: 오픈AI는 공개된 결과 중 일부에 오류가 있을 수 있어 추가 검증이 필요하다고 밝혔다.",
+    "title": "[10월8일] “수학 문제 4000개에 AI 투입해 성과”…오픈AI가 보여준 과학연구의 변화",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=216072"
+   },
+   {
+    "id": "it:1102#q5",
+    "source": "OpenAI News",
+    "text": "The average result used the equivalent compute of roughly three hours of ChatGPT Pro thinking.\n수치: 결과 1개당 평균 ChatGPT Pro thinking 사용 시간 [three hours]",
+    "title": "Sharing AI progress in mathematics",
+    "url": "https://openai.com/index/sharing-ai-progress-in-mathematics"
+   },
+   {
+    "id": "it:1156#q5",
+    "source": "AI타임스",
+    "text": "오픈AI는 지난 7월부터 프론티어 AI를 과학자와 슈퍼컴퓨터, 시뮬레이션, 연구 시설에 연결해 \"수십 년의 과학적 진보를 수년으로 압축하는 것\"을 목표로 제시해 왔습니다.\n주장: 오픈AI는 AI를 연구 인프라와 연결해 과학적 진보를 압축하는 것을 목표로 삼고 있다.",
+    "title": "[10월8일] “수학 문제 4000개에 AI 투입해 성과”…오픈AI가 보여준 과학연구의 변화",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=216072"
+   },
+   {
+    "id": "it:1102",
+    "source": "OpenAI News",
+    "text": "요약: OpenAI가 내부 프런티어 모델로 생성한 새로운 수학 결과들을 GitHub 저장소에 공개했다. Lean 기반 증명 형식화와 함께 모델 추론 요약 10개, 컴퓨트 사용량 등 상세 정보도 제공한다. 결과 1개당 평균 컴퓨트 사용량은 ChatGPT Pro thinking 약 3시간에 해당한다.",
+    "title": "Sharing AI progress in mathematics",
+    "url": "https://openai.com/index/sharing-ai-progress-in-mathematics"
+   },
+   {
+    "id": "it:1156",
+    "source": "AI타임스",
+    "text": "요약: 오픈AI가 미공개 프론티어 모델을 활용해 4000개의 고난도 수학 문제를 연구하고 722편의 원고를 공개했다. 결과 하나당 챗GPT 프로 기준 약 3시간의 추론 연산량이 투입되었으며, 일부 증명은 Lean으로 형식화했다. 오픈AI는 일부 결과에 오류가 있을 수 있어 추가 검증이 필요하다고 밝혔다.",
+    "title": "[10월8일] “수학 문제 4000개에 AI 투입해 성과”…오픈AI가 보여준 과학연구의 변화",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=216072"
+   }
+  ],
+  "previous": null,
+  "aliases": []
+ },
+ "expect": {},
+ "note": "2026-W41 실제 토픽 입력(run 20261009-193346-weekly-b3fc)"
+}

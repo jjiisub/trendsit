@@ -29,16 +29,30 @@ class Ctx:
     resources: dict[str, Any] = field(default_factory=dict)  # 도구가 쓰는 자원(fetcher 등). 파이프라인이 넣는다
 
 
+def budget_state_path(data_dir: Path | None) -> Path:
+    """예산 기준값 파일. 기본 data 폴더를 쓰면 작업 폴더 밖 공용 위치(~/.config/trendsit/)에 둔다(S5 5.1-3).
+    worktree나 다른 작업 폴더도 같은 기준값을 본다. 처음 옮길 때 기존 data/budget_state.json(10/7 기준값)을 그대로 복사."""
+    if data_dir is not None:  # 테스트·임시 폴더는 그 안에
+        return data_dir / "budget_state.json"
+    shared = config.SECRET_FILE.parent / "budget_state.json"
+    old = config.ROOT / "data" / "budget_state.json"
+    if not shared.exists() and old.exists():
+        shared.parent.mkdir(parents=True, exist_ok=True)
+        shared.write_text(old.read_text())
+    return shared
+
+
 def open_ctx(kind: str | None, *, spec: str | None = None, no_cache: bool = False, model: str | None = None,
              note: str | None = None, data_dir: Path | None = None, transport: Transport | None = None,
              key_status: bool = True) -> Ctx:
+    state_path = budget_state_path(data_dir)
     data_dir = data_dir or config.ROOT / "data"
     spec = config.current_spec(spec)
     models = config.load("models.yaml")
     budget_cfg = config.load("budget.yaml")
     db = DB(data_dir / "trendsit.db")
     llm = LLMClient(models, cache=Cache(data_dir / "cache"), transport=transport)
-    budget = Budget(budget_cfg, spec, db, data_dir / "budget_state.json",
+    budget = Budget(budget_cfg, spec, db, state_path,
                     key_status=llm.key_status if key_status else None,
                     prices=PriceBook(data_dir / "prices.json"))
     llm.budget = budget

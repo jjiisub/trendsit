@@ -1,0 +1,29 @@
+{
+ "input": {
+  "a": {
+   "id": "it:162",
+   "source": "text",
+   "text": "요약: Anthropic 공식 발표 기준으로 Claude Sonnet 5.5는 Sonnet 5보다 30%+ 빠르고 대부분 작업에서 최대 30% 저렴하며, 가격은 Sonnet 5와 동일(입력 $2/출력 $10/캐시 읽기 $0.20 per M tokens)하다. 여러 평가에서 Max effort 시 Opus 5.5와 동등한 성능을 보이며, claude.ai 무료 티어에 적용되어 ChatGPT 무료 티어(Luna 5.6)보다 더 높은 성능을 제공한다. Haiku 5.5는 몇 주 안에 출시될 예정이다.\n등장 이름: Claude Sonnet 5.5, Anthropic, Sonnet 5, Opus 5.5, claude.ai, ChatGPT, Luna 5.6, Haiku 5.5, GPT-6 Luna\n키워드: frontier-release, eval, coding-agent",
+   "title": "Claude Sonnet 5.5",
+   "url": null
+  },
+  "b": {
+   "id": "it:876",
+   "source": "text",
+   "text": "요약: AWS가 아마존 베드록을 통해 앤트로픽의 최신 모델(클로드 오퍼스 5, 소넷 5)을 서울 리전에서 제공하여 데이터 국외 반출 없이 활용할 수 있게 됐다. 삼성물산, HD한국조선해양, 한화솔루션 등 국내 기업들은 이를 통해 업무 효율을 개선하고 있다.\n등장 이름: AWS, 아마존 베드록, 앤트로픽, 클로드 오퍼스 5, 클로드 소넷 5, 삼성물산, HD한국조선해양, 한화솔루션\n키워드: agent, coding-agent, frontier-release, ai-industry",
+   "title": "AWS, 서울 리전서 최신 '클로드' 모델 제공...\"데이터 국경 안 넘는다\"",
+   "url": null
+  },
+  "shared": {
+   "keywords": [
+    "frontier-release"
+   ],
+   "aliases": [],
+   "similarity": 0.72
+  }
+ },
+ "expect": {
+  "same": false
+ },
+ "note": "Claude Sonnet 5.5 ↔ 클로드 오퍼스 5·소넷 5"
+}

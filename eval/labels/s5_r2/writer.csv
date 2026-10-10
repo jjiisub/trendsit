@@ -1,0 +1,21 @@
+topic_id,week,status,judge_Q1,judge_Q2,judge_Q3,judge_Q4,judge_facts,Q0_pass,Q1_pass,Q2_pass,Q3_pass,Q4_pass,label,critique,labeler
+w40-gpt-6-1-sol,2026-W40,checked,pass,pass,pass,pass,22/22,pass,pass,pass,pass,pass,pass,"통과. 요약 범위 부풀림 고쳐짐. ⚠ points[4]는 원문의 ""최대 추론 강도"" 조건이 빠진 정도",opus-5.5
+w40-gemini-4-argon,2026-W40,checked,pass,pass,pass,pass,27/27,pass,pass,pass,pass,pass,pass,통과. 파생 수치 제목 고쳐짐. ⚠ numbers[1]은 빠진 도식을 가리켜 읽는 사람이 위치를 못 찾음,opus-5.5
+w40-openai-dots,2026-W40,passed,pass,pass,pass,pass,24/24,pass,pass,pass,pass,pass,pass,통과,opus-5.5
+w40-claude-sonnet-5-5,2026-W40,passed,pass,pass,pass,pass,44/45,fail,pass,pass,pass,pass,fail,"개요 끝 문장 ""…탑재가 오퍼스급 지능과 가성비 사이의 컨텍스트·출력 토큰 설계에 반영됐다""는 angle을 그대로 옮긴 근거 밖 인과(judge도 지적). angle 자체가 억지스러움",opus-5.5
+w40-decision-api,2026-W40,checked,pass,pass,pass,pass,30/30,pass,pass,pass,pass,pass,pass,통과. 출시와 프리뷰 단계를 개요에 함께 적어 모순 해소,opus-5.5
+w40-solar-mini-4,2026-W40,passed,fail,fail,pass,pass,28/28,pass,fail,pass,pass,fail,fail,"개요가 명사형(""제공함."", ""낮음."")으로 끝남(개요는 ""~다"" 규칙, 코드 검사가 놓침). 첫 point가 여전히 투트랙 전략이라 angle(GPU 한 장·에이전트 최적화)이 첫 point에 없음",opus-5.5
+w40-deepseek-harness,2026-W40,passed,pass,pass,pass,pass,22/22,pass,pass,pass,pass,pass,pass,통과,opus-5.5
+w40-muse-gadgets,2026-W40,passed,pass,pass,pass,pass,25/25,pass,pass,pass,pass,pass,pass,통과,opus-5.5
+w40-claude-code-skills,2026-W40,checked,pass,pass,pass,pass,18/18,pass,pass,fail,pass,pass,fail,요약 둘째 문장(스킬 약 50개·에이전트 약 20개·도구 약 60개)은 어떤 point에도 없고 글쓴이 환경의 예시를 일반 사실처럼 씀. 요약은 포인트에 있는 사실만,opus-5.5
+w40-llamaindex-context,2026-W40,passed,pass,pass,pass,pass,13/15,fail,fail,pass,pass,pass,fail,"요약 첫 문장에 주어가 없고 발표자(Jerry Liu) 주장을 사실처럼 씀(""RAG 구조가 … 분리되고""). 개요의 ParseBench 3영역·개념 ""에이전트 하네스"" 풀이는 근거 밖(judge도 지적)",opus-5.5
+w41-mistral-large-4,2026-W41,passed,pass,pass,pass,pass,29/29,pass,pass,pass,pass,pass,pass,통과. 사이버 지수 과장 빠짐,opus-5.5
+w41-gpt6-intelligent-ui,2026-W41,passed,pass,pass,pass,pass,20/20,pass,pass,pass,pass,pass,pass,"통과. ""답변 시작 44%"" 그대로",opus-5.5
+w41-embeddinggemma-2,2026-W41,passed,pass,pass,pass,pass,28/28,pass,pass,pass,pass,pass,pass,통과. MRL 개념 고쳐짐,opus-5.5
+w41-claude-haiku-5-5,2026-W41,checked,pass,pass,pass,pass,23/23,pass,pass,pass,pass,pass,pass,"통과(토크나이저 인과 빠짐). 요약 ""쟁점이다"", 개요 ""핵심 변화다""는 평가형에 가까움. 구간별 가격 도식은 빠짐(표현 선택 누락)",opus-5.5
+w41-decision-api-spec,2026-W41,checked,pass,pass,pass,pass,23/23,pass,pass,pass,fail,fail,fail,"요약 첫 문장이 명사형(""가짐."")으로 끝남(코드 검사가 놓침). ""Jev는 4.2센트""에 단위 기준(100만 토큰당인지)이 없어 비교가 안 됨. 후속 토픽 장면(지난 토픽 언급)은 좋음",opus-5.5
+w41-openai-rogue-agent,2026-W41,passed,pass,pass,pass,pass,17/17,pass,pass,pass,pass,pass,pass,"통과. 제목이 ""가능성""으로 맞춰짐",opus-5.5
+w41-openai-math-results,2026-W41,passed,pass,pass,pass,pass,21/21,fail,pass,pass,pass,pass,fail,"요약 ""4000개 수학 문제를 풀고 722편""은 근거(""4000개를 제시해 722편"")와 다름. points[0]은 맞게 씀",opus-5.5
+w41-openai-textgrain,2026-W41,checked,pass,pass,pass,pass,18/18,pass,pass,pass,pass,pass,pass,통과. 다만 이전에 맞았던 탐지율 도식(92→66→17)이 빠짐(표현 선택 누락),opus-5.5
+w41-openrig-orchestrator,2026-W41,checked,pass,fail,pass,pass,22/22,pass,pass,fail,pass,pass,fail,"contributions가 여전히 github 한 줄(text 채널 누락, ⚠ contributions로 표시는 됨). R12 자동 수정이 채널 문장을 만들지 못함",opus-5.5
+w41-agent-coding-talks,2026-W41,checked,pass,pass,pass,pass,23/23,pass,fail,pass,pass,pass,fail,"요약 첫 문장에 주어(누가)가 없고 발표 3편의 주장을 사실처럼 씀(""…가속시키는 가운데"", ""핵심 축으로 부상""). points[1]에 코드베이스 부패와 고용 72%라는 서로 관계없는 사실을 한 문장에",opus-5.5

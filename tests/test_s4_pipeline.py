@@ -185,7 +185,7 @@ def test_segment_text_expires_but_digest_stays(tmp_path):
 
 # ---------- A12 마이그레이션 대역 ----------
 def test_s4_migrations_in_band_and_only_video_tables():
-    s4 = {n: sql for n, sql in migrations.MIGRATIONS.items() if n >= 20}
+    s4 = {n: sql for n, sql in migrations.MIGRATIONS.items() if 20 <= n <= 29}  # S5부터 30~39 대역이 뒤에 붙음
     assert s4 and all(20 <= n <= 29 for n in s4)
     for n, sql in migrations.MIGRATIONS.items():
         made = re.findall(r"CREATE TABLE IF NOT EXISTS (\w+)", sql)

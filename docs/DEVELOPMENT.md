@@ -63,6 +63,7 @@ GITHUB_TOKEN=...             # 선택. 픽스처 README 수집에만
 - 출력 스키마 칸 순서: 인용·이유 칸 먼저, 결론 칸 나중, `log`, `attention` 맨 끝(모델에 넘기는 스키마에서 코드가 정렬)
 - 코드 규칙은 출력 클래스의 `enforce(inp, ctx)`에(S1 리뷰 M2). `run_role`/`run_agent`가 스키마 검증 뒤, 저장 전에 부른다. 칸은 `self.fix(칸, 값, 규칙)`으로 바꿔 step detail의 `enforced`에 `{field, before, after, rule}`가 남게 한다. `eval`은 원래 출력(통과 판정)과 enforce 후 출력(보고용)을 둘 다 기록. `role --replay`는 입력이 없어 enforce 전 출력을 낸다(원래 step에는 enforce 후가 저장됨)
 - 코드 소유 칸(`graders.ENFORCED_FIELDS`, 예: video_summary의 `name_pairs`): 규칙이 문자열로 확정 판정되는 칸은 그 칸만 enforce 후 값으로 통과 판정(`code_pass_basis`). 원래 출력 점수는 모델 품질로 따로. 이 칸을 선언한 역할은 원래 출력이 코드 채점에 실패해도 enforce 후 출력이 통과하면 그 출력을 judge가 채점(`judged_output`)
+- 점수 세 가지를 나란히 적는다(S5 5.1-5): **원래 출력**(`code_pass`, 모델 품질) / **통과 판정**(`code_pass_basis`, 코드 소유 칸만 enforce 후) / **enforce 후**(`code_pass_enforced`, 저장되는 출력 전체). judge가 보는 출력은 통과 판정과 다를 수 있다: 원래 출력이 코드 채점을 통과하면 원래 출력, 아니면 **enforce 후 전체**(코드 소유 칸 밖의 품질 정리까지 반영된 출력). 그래서 judge 통과율은 통과 판정 출력이 아니라 `judged_output`에 적힌 출력 기준이다
 - 채점자(`eval/judge.md`)는 역할 무관. 역할별 질문(`Q<n>`)과 보고용 점수표는 `eval/rubrics/<역할>.md`에 두고 includes로 붙인다
 
 ## 수집 (S1)

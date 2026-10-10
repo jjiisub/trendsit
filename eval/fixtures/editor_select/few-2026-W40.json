@@ -1,0 +1,147 @@
+{
+ "input": {
+  "candidates": [
+   {
+    "id": "c288",
+    "source": "cluster",
+    "text": "임시 이름: Introducing dots\n채널별 수: text 3\n근거 수: 24\n점수: 3319.0\n항목:\n- it:10 [text] Introducing dots | OpenAI는 GPT-6 Astra 기반의 상시 작동 에이전트 'Dots'를 공개했다. | relevance high\n- it:986 [text] OpenAI Dots - 상시 작동하는 AI 에이전트 공개 | OpenAI 공식 블로그 원문에 따르면 dots는 GPT‑6 Astra 기반 상시 작동 에이전트로, 자체 클라우드 컴퓨터를 갖추고 24시간 내내 사용자의 목표를 향해 일한다. | relevance high\n- it:893 [text] 오픈AI, 24시간 자율 에이전트 '닷츠' 공개…소비자용 아닌 B2B 승부수 | 오픈AI가 데브데이 2026에서 24시간 상시 가동되는 자율형 AI 에이전트 서비스 '닷츠'를 공개했다. | relevance high\n과거 대조 후보: 없음",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "c289",
+    "source": "cluster",
+    "text": "임시 이름: Gemini 4 Argon: our next era of frontier intelligence\n채널별 수: text 3\n근거 수: 26\n점수: 3319.0\n항목:\n- it:864 [text] 구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\" | 구글이 에이전트 작업 능력을 강화한 차세대 모델 제미나이 4 아르곤을 공개했다. | relevance high\n- it:997 [text] 제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대 | 구글 공식 블로그 원문 기준으로, 제미나이 4 아르곤은 출시 기념 특가로 입력 토큰 1M당 2달러, 출력 토큰 1M당 10달러에 제공되며 캐시 입력은 95% 할인된다. | relevance high\n- it:18 [text] Gemini 4 Argon: our next era of frontier intelligence | Google DeepMind가 새로운 프런티어 모델 Gemini 4 Argon을 제한적으로 출시한다고 발표했다. | relevance high\n과거 대조 후보: 없음",
+    "title": "Gemini 4 Argon: our next era of frontier intelligence",
+    "url": null
+   },
+   {
+    "id": "c290",
+    "source": "cluster",
+    "text": "임시 이름: Introducing GPT-6.1 Sol\n채널별 수: text 4\n근거 수: 26\n점수: 3319.0\n항목:\n- it:895 [text] \"아스트라급 지능을 5분의 1 가격에\"…오픈AI, 'GPT-6.1 솔' 공개 | 오픈AI가 에이전트 기반 코딩과 업무 자동화에 특화된 모델 GPT-6.1 솔을 출시했다. | relevance high\n- it:981 [text] OpenAI, GPT-6.1 Sol 공개 | OpenAI 공식 블로그에 따르면 GPT-6.1 Sol은 GPT-6 Astra에 가까운 지능을 표준 입력·출력 토큰 가격의 5분의 1로 제공하며, 캐시된 입력은 100만 토큰당 $0.10(표준 입력 대비 95% 절감)이다. | relevance high\n- it:8 [text] Introducing GPT-6.1 Sol | OpenAI가 GPT-6 Sol의 업그레이드 버전인 GPT-6.1 Sol을 출시했다. | relevance high\n- it:158 [text] GPT 6.1 Sol: Near-Astra intelligence for a fifth of the price |  | relevance low\n과거 대조 후보: 없음",
+    "title": "Introducing GPT-6.1 Sol",
+    "url": null
+   }
+  ],
+  "recent_topics": [],
+  "keyword_trend": [
+   {
+    "keyword": "agent",
+    "this_week": 150,
+    "last_week": 12
+   },
+   {
+    "keyword": "ai-general",
+    "this_week": 253,
+    "last_week": 0
+   },
+   {
+    "keyword": "ai-industry",
+    "this_week": 119,
+    "last_week": 0
+   },
+   {
+    "keyword": "ai-security",
+    "this_week": 18,
+    "last_week": 1
+   },
+   {
+    "keyword": "coding-agent",
+    "this_week": 51,
+    "last_week": 5
+   },
+   {
+    "keyword": "dev-practice",
+    "this_week": 29,
+    "last_week": 0
+   },
+   {
+    "keyword": "eval",
+    "this_week": 39,
+    "last_week": 4
+   },
+   {
+    "keyword": "frontier-release",
+    "this_week": 85,
+    "last_week": 1
+   },
+   {
+    "keyword": "mcp-tools",
+    "this_week": 22,
+    "last_week": 2
+   },
+   {
+    "keyword": "multimodal",
+    "this_week": 27,
+    "last_week": 1
+   },
+   {
+    "keyword": "open-weight",
+    "this_week": 27,
+    "last_week": 0
+   },
+   {
+    "keyword": "rag-search",
+    "this_week": 10,
+    "last_week": 2
+   },
+   {
+    "keyword": "reasoning",
+    "this_week": 24,
+    "last_week": 0
+   }
+  ],
+  "repo_cards": [],
+  "limits": {
+   "min_topics": 4,
+   "max_topics": 10,
+   "lead": 1
+  },
+  "previous_errors": []
+ },
+ "expect": {
+  "candidates": [
+   {
+    "cluster_id": 288,
+    "members": [
+     "it:10",
+     "it:986",
+     "it:893"
+    ],
+    "past": []
+   },
+   {
+    "cluster_id": 289,
+    "members": [
+     "it:864",
+     "it:997",
+     "it:18"
+    ],
+    "past": []
+   },
+   {
+    "cluster_id": 290,
+    "members": [
+     "it:895",
+     "it:981",
+     "it:8",
+     "it:158"
+    ],
+    "past": []
+   }
+  ],
+  "sites": [
+   "OpenAI News",
+   "Anthropic News",
+   "Google DeepMind Blog",
+   "GeekNews",
+   "Simon Willison's Weblog",
+   "AI타임스",
+   "Tech Bridge",
+   "GitHub Trending",
+   "추적 레포 릴리스"
+  ],
+  "max_topics": 10
+ },
+ "note": "후보 부족 주(3개): 있는 만큼만 + attention"
+}

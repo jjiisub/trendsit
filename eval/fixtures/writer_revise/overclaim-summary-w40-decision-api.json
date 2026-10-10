@@ -1,0 +1,149 @@
+{
+ "input": {
+  "loc_lines": [
+   "title: 오픈AI Decision API, 판단 전용 아키텍처 공개",
+   "summary: 기술 역사상 가장 빠른 행보다. 오픈AI가 Luna 기반 Decision API를 출시하여 정해진 선택지 중 하나를 반환하는 ==판단 전용 기능==을 제공한다. 쟁점은 이 API가 외부 개발자 도구를 넘어 자사 에이전트 안전성 제어에 내장된다는 아키텍처적 의미다.",
+   "overview: 오픈AI가 DevDay 2026에서 GPT-6 Luna 기반 Decision API를 제한적 프리뷰로 공개했다. 이 API는 채팅이 아닌 사전 정의된 답변과 신뢰도 점수를 반환하는 판단 전용 구조로, 자사 에이전트 시스템의 안전성 제어에 직접 활용될 예정이다. 향후 AI 에이전트 아키텍처는 계획·대화 담당 LLM과 실시간 검증·선택 담당 판단 전용 AI, 정책 시스템이 결합된 다층 제어 구조로 재편될 것으로 예상된다.",
+   "points[0]: Decision API는 채팅 모델이 아니라 개발자가 미리 정한 선택지 중 하나를 신뢰도 점수와 함께 반환하는 판단 전용 구조임 (refs og:982#q2, it:854#q1)",
+   "points[1]: 가장 작고 저렴한 Luna 모델을 기반으로 하며, 응답은 150ms로 GPT-6 Luna(1.6초)보다 빠름 (refs og:982#q1, og:982#q4)",
+   "points[2]: 외부 개발자용 도구 출시를 넘어, 오픈AI 자사 에이전트 시스템의 ==안전성 제어 및 오작동 방지 장치==로 활용하겠다는 점이 주목됨 (refs it:854#q3)",
+   "points[3]: 구조와 역할이 타입세이프 AI의 판단 전용 모델 Jev와 사실상 동일하며, 콘텐츠 분류·요청 라우팅·에이전트 다음 행동 선택에 적합함 (refs it:854#q4, og:982#q3)",
+   "points[4]: 현재 제한된 프리뷰 단계이며, 정식 출시는 며칠 내로 예정됨 (refs og:982#q5)",
+   "concepts[0]: Decision API - 긴 답변 생성 대신 개발자가 미리 정한 선택지 중 하나를 신뢰도 점수와 함께 반환하는 판단 전용 API",
+   "concepts[1]: Luna - 오픈AI 현재 라인업에서 가장 작고 저렴한 모델"
+  ],
+  "previous": {
+   "log": "포인트 5개, 수치 그룹 1개, 개념 2개, 근거 id 10개",
+   "attention": false,
+   "points": [
+    {
+     "text": "Decision API는 채팅 모델이 아니라 개발자가 미리 정한 선택지 중 하나를 신뢰도 점수와 함께 반환하는 판단 전용 구조임",
+     "refs": [
+      "og:982#q2",
+      "it:854#q1"
+     ],
+     "check": false
+    },
+    {
+     "text": "가장 작고 저렴한 Luna 모델을 기반으로 하며, 응답은 150ms로 GPT-6 Luna(1.6초)보다 빠름",
+     "refs": [
+      "og:982#q1",
+      "og:982#q4"
+     ],
+     "check": false
+    },
+    {
+     "text": "외부 개발자용 도구 출시를 넘어, 오픈AI 자사 에이전트 시스템의 ==안전성 제어 및 오작동 방지 장치==로 활용하겠다는 점이 주목됨",
+     "refs": [
+      "it:854#q3"
+     ],
+     "check": false
+    },
+    {
+     "text": "구조와 역할이 타입세이프 AI의 판단 전용 모델 Jev와 사실상 동일하며, 콘텐츠 분류·요청 라우팅·에이전트 다음 행동 선택에 적합함",
+     "refs": [
+      "it:854#q4",
+      "og:982#q3"
+     ],
+     "check": false
+    },
+    {
+     "text": "현재 제한된 프리뷰 단계이며, 정식 출시는 며칠 내로 예정됨",
+     "refs": [
+      "og:982#q5"
+     ],
+     "check": false
+    }
+   ],
+   "numbers": [],
+   "events": [],
+   "contributions": [],
+   "concepts": [
+    {
+     "term": "Decision API",
+     "desc": "긴 답변 생성 대신 개발자가 미리 정한 선택지 중 하나를 신뢰도 점수와 함께 반환하는 판단 전용 API"
+    },
+    {
+     "term": "Luna",
+     "desc": "오픈AI 현재 라인업에서 가장 작고 저렴한 모델"
+    }
+   ],
+   "overview": "오픈AI가 DevDay 2026에서 GPT-6 Luna 기반 Decision API를 제한적 프리뷰로 공개했다. 이 API는 채팅이 아닌 사전 정의된 답변과 신뢰도 점수를 반환하는 판단 전용 구조로, 자사 에이전트 시스템의 안전성 제어에 직접 활용될 예정이다. 향후 AI 에이전트 아키텍처는 계획·대화 담당 LLM과 실시간 검증·선택 담당 판단 전용 AI, 정책 시스템이 결합된 다층 제어 구조로 재편될 것으로 예상된다.",
+   "summary": "기술 역사상 가장 빠른 행보다. 오픈AI가 Luna 기반 Decision API를 출시하여 정해진 선택지 중 하나를 반환하는 ==판단 전용 기능==을 제공한다. 쟁점은 이 API가 외부 개발자 도구를 넘어 자사 에이전트 안전성 제어에 내장된다는 아키텍처적 의미다.",
+   "title": "오픈AI Decision API, 판단 전용 아키텍처 공개"
+  },
+  "issues": [
+   {
+    "loc": "summary",
+    "type": "overclaim",
+    "evidence_id": null,
+    "comment": "summary의 '기술 역사상 가장 빠른 행보'가 근거에 없는 평가",
+    "hint": "근거가 말한 정도로",
+    "idx": 0
+   }
+  ],
+  "evidence": [
+   {
+    "id": "it:854#q1",
+    "source": "AI타임스",
+    "text": "오픈AI는 29일(현지시간) 개발자 행사 ‘데브데이 2026’에서 일반적인 대화형 AI처럼 긴 답변을 생성하는 대신, 개발자가 미리 정해놓은 선택지 가운데 하나를 골라주는 ‘디시전스 API를 출시했다.\n주장: 오픈AI가 GPT-6 루나 기반의 디시전스 API를 출시하여 정해진 선택지 중 하나를 반환하는 판단 전용 기능을 제공한다.",
+    "title": "오픈AI, 자체 에이전트에 ‘디시전스 API’ 적용...아키텍처 판도 바뀐다",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=215835"
+   },
+   {
+    "id": "og:982#q1",
+    "source": "GeekNews",
+    "text": "The company’s new Decisions API is based on the company’s Luna model — the smallest and most affordable model in its current lineup.\n주장: Decision API는 가장 작고 저렴한 Luna 모델을 기반으로 한다",
+    "title": "OpenAI, Jev와 경쟁할 Luna 기반 Decision API 공개",
+    "url": "https://thenewstack.io/openai-decision-api-luna/"
+   },
+   {
+    "id": "og:982#q2",
+    "source": "GeekNews",
+    "text": "The core idea behind these decision models is that they are explicitly not chat models; instead, they return a set of predefined answers with confidence scores.\n주장: Decision 모델은 채팅이 아닌 사전 정의된 답변과 신뢰도 점수를 반환하며, 콘텐츠 분류·요청 라우팅·에이전트 다음 행동 선택에 적합하다",
+    "title": "OpenAI, Jev와 경쟁할 Luna 기반 Decision API 공개",
+    "url": "https://thenewstack.io/openai-decision-api-luna/"
+   },
+   {
+    "id": "it:854#q3",
+    "source": "AI타임스",
+    "text": "가장 주목되는 점은 단순한 외부 개발자용 도구 출시를 넘어, 오픈AI가 자사 에이전트 시스템 내부의 안전성 제어 및 오작동 방지 장치로 이 모델을 활용하겠다는 것이다.\n주장: 오픈AI는 디시전스 API를 자사 에이전트 시스템의 안전성 제어 및 오작동 방지 장치로 활용한다.",
+    "title": "오픈AI, 자체 에이전트에 ‘디시전스 API’ 적용...아키텍처 판도 바뀐다",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=215835"
+   },
+   {
+    "id": "og:982#q3",
+    "source": "GeekNews",
+    "text": "This makes this kind of model ideal for classifying content, routing requests, or choosing an agent’s next action from a limited set of choices.",
+    "title": "OpenAI, Jev와 경쟁할 Luna 기반 Decision API 공개",
+    "url": "https://thenewstack.io/openai-decision-api-luna/"
+   },
+   {
+    "id": "it:854#q4",
+    "source": "AI타임스",
+    "text": "디시전스 API의 구조와 역할은 타입세이프 AI가 선보인 판단 전용 모델 '제브(Jev)'와 사실상 동일하다.\n주장: 디시전스 API의 구조와 역할은 타입세이프 AI의 판단 전용 모델 '제브(Jev)'와 유사하다.",
+    "title": "오픈AI, 자체 에이전트에 ‘디시전스 API’ 적용...아키텍처 판도 바뀐다",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=215835"
+   },
+   {
+    "id": "og:982#q4",
+    "source": "GeekNews",
+    "text": "OpenAI says its model returns results in 150 milliseconds, compared to GPT-6 Luna, which would take 1.6 seconds.\n수치: Decision API 응답 시간 [150 milliseconds]\n수치: GPT-6 Luna 응답 시간 [1.6 seconds]\n주장: Decision API는 150ms로 응답해 GPT-6 Luna(1.6초)보다 빠르다",
+    "title": "OpenAI, Jev와 경쟁할 Luna 기반 Decision API 공개",
+    "url": "https://thenewstack.io/openai-decision-api-luna/"
+   },
+   {
+    "id": "og:982#q5",
+    "source": "GeekNews",
+    "text": "For now, the new API is available in limited preview, and the broad release is planned for the coming days.\n주장: 현재 제한된 프리뷰 단계이며, 정식 출시가 며칠 내로 예정되어 있다",
+    "title": "OpenAI, Jev와 경쟁할 Luna 기반 Decision API 공개",
+    "url": "https://thenewstack.io/openai-decision-api-luna/"
+   }
+  ],
+  "aliases": []
+ },
+ "expect": {
+  "action": "edit"
+ },
+ "note": "이슈 overclaim-summary(오류를 심음)"
+}

@@ -233,3 +233,4 @@ def _merge(module: str) -> None:
 _merge("artifacts_text")  # S2~S3
 _merge("artifacts_repo")  # S2~S3
 _merge("artifacts_video")  # S4
+_merge("artifacts_brief")  # S5

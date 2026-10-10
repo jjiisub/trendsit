@@ -31,11 +31,12 @@ core_rules:
 - 인용(quotes): 글의 주된 내용을 담은 문장을 고른다. 부수 내용(행사 안내, 구독 권유, 저자 소개)은 고르지 않는다. 한 글자도 바꾸지 않고 옮겨야 한다. 코드가 본문과 글자 그대로 대조해 없으면 지우기 때문이다. 긴 문장은 앞뒤를 잘라 200자 안의 연속된 부분만 옮긴다
 - 수치(numbers): quote 안에 있는 숫자만, 그 quote에 적힌 표기 그대로(예: "35%", "1.2억 달러"). 계산하거나 단위를 바꾸지 않는다
 - 주장(claims): 글이 말하는 핵심 주장, 각자 근거 quote 번호를 단다. quote로 뒷받침되지 않는 주장은 쓰지 않는다
-- 요약(summary): quotes와 claims에 있는 내용만으로 2~3문장. 평가나 전망을 덧붙이지 않는다
+- 요약(summary)·주장(claims): quotes 안의 내용만으로 쓴다. 본문의 다른 곳에 있어도 quotes에 없는 고유명사(벤치마크, 기관, 인물), 결과·효과 서술, 이유는 쓰지 않는다. 검수와 브리핑이 quotes만 근거로 쓰기 때문에 quotes 밖 내용은 출처를 댈 수 없다. 꼭 필요한 내용이면 그 문장을 quotes에 먼저 넣는다. 단위와 방향은 quote 표기 그대로("100만 토큰당"을 "토큰당"으로 줄이지 않는다). summary는 2~3문장, 평가나 전망을 덧붙이지 않는다
 - keywords: 입력 목록의 id 중 이 글의 주제에 해당하는 것만. 목록 밖 id를 만들지 않는다
 - is_curation: 다른 글을 소개하거나 요약하는 글이면 true(GeekNews 소개 글, 뉴스레터, 링크 모음, 다른 글을 인용해 짧게 덧붙인 블로그). 자기 회사의 발표를 직접 쓴 공식 블로그, 직접 취재한 기사는 false
 - origin_candidates: 이 글의 수치·주장의 출처일 가능성이 있는 링크 번호(논문, 공식 블로그, 보도자료, 레포 우선). 관련 없는 링크는 넣지 않는다
 - relevance: 기술 동향 브리핑에 넣을 가치. high = 키워드 주제의 새 발표·기법·수치가 중심 / mid = 키워드와 관련은 있으나 부수적이거나 소식 수준 / low = 키워드 밖이거나 홍보·고객 사례·행사 안내
+- 고객 사례 홍보 글: 어느 회사가 AI 제품(ChatGPT, Codex, Claude 등)을 도입해 효과를 봤다는 글은 공식 블로그에 실려도 relevance low다. 새 모델·기능·기법이 아니라 판매처의 도입 사례라 브리핑 독자가 얻을 기술 정보가 없기 때문이다. 글이 도입 사례를 빌려 새 기능이나 측정 방법을 처음 발표하면 그 발표를 기준으로 판단한다
 - needs_original: 수치나 핵심 주장의 출처가 이 글이 아니라 본문 밖 링크(원본)에 있으면 true. 큐레이션 글이 다른 글의 수치를 옮겼거나, 기사가 논문·발표를 인용했을 때다. 글 자체가 원본(공식 발표)이거나 확인할 수치·주장이 없으면 false
 
 ## 출력
@@ -70,5 +71,17 @@ core_rules:
 입력: title "Anthropic, 에이전트 평가 결과 공개", source_kind curation(GeekNews), `<document id="it:777" source="GeekNews">Anthropic이 에이전트 코딩 평가에서 성공률 62%를 기록했다고 블로그에 밝혔음. 이전 모델보다 15%p 높음. ...</document>`, links[1] = {url: "https://www.anthropic.com/news/...", kind: "공식 블로그", role: "origin_candidate"}
 출력: `{"quotes": [{"n": 1, "text": "Anthropic이 에이전트 코딩 평가에서 성공률 62%를 기록했다고 블로그에 밝혔음."}, {"n": 2, "text": "이전 모델보다 15%p 높음."}], "numbers": [{"quote_n": 1, "value": "62%", "unit": "", "what": "에이전트 코딩 평가 성공률"}, {"quote_n": 2, "value": "15%p", "unit": "", "what": "이전 모델 대비 상승폭"}], "claims": [{"quote_ns": [1, 2], "text": "에이전트 코딩 평가 성공률 62%, 이전 모델보다 15%p 상승"}], "summary": "GeekNews가 Anthropic 블로그의 에이전트 코딩 평가 결과를 소개했다. 성공률은 62%로 이전 모델보다 15%p 높다.", "entities": ["Anthropic"], "keywords": ["coding-agent", "eval"], "is_curation": true, "origin_candidates": [1], "relevance_reason": "코딩 에이전트 평가 수치가 중심", "relevance": "high", "needs_original_reason": "수치 출처가 원문 블로그(링크 1)", "needs_original": true, "log": "큐레이션, 수치 2개, 원본 확인 필요", "attention": false}`
 GeekNews 글의 수치는 원문을 옮긴 것이므로 원본과 대조해야 한다. 같은 내용을 Anthropic 블로그가 직접 썼다면 is_curation과 needs_original은 false다.
+</example>
+<example>
+함정: 인용 밖 내용을 요약에 씀
+입력: title "에이전트가 쓴 테스트는 무엇을 증명하나", `<document id="it:6" source="GeekNews">… 버그를 잡는 능력이 3분의 1로 줄고, 버그를 이게 맞는 동작입니다라고 단언하는 테스트가 8배로 늘었어요. … METR이 올해 2월에 스스로 단서를 달았습니다. …</document>`
+틀린 출력(일부): quotes는 테스트 실험 문장 두 개뿐인데 `"summary": "… METR 후속 실험은 AI의 생산성 효과가 기존 보고보다 낮아졌음을 보여준다."`
+맞는 출력(일부): `{"quotes": [{"n": 1, "text": "버그를 잡는 능력이 3분의 1로 줄고, 버그를 이게 맞는 동작입니다라고 단언하는 테스트가 8배로 늘었어요."}], "summary": "버그 있는 코드를 주고 단위 테스트를 만들게 하면 버그를 잡는 능력이 3분의 1로 줄고, 버그를 정답으로 단언하는 테스트가 8배로 늘었다."}`
+METR 내용을 쓰려면 그 문장을 quotes에 먼저 넣어야 한다. 넣더라도 본문의 "근거가 약해졌다"를 "효과가 낮아졌다"로 바꾸면 방향이 뒤집힌다.
+</example>
+<example>
+함정: 공식 블로그의 고객 사례 홍보(relevance low)
+입력: title "LegalOn halves Codex costs while maintaining development speed", source_kind primary, `<document id="it:950" source="OpenAI">LegalOn, a legal tech company, adopted Codex across its engineering team and cut costs by half …</document>`
+출력(일부): `{"relevance_reason": "고객사의 Codex 도입 사례 홍보, 새 기능·기법 없음", "relevance": "low", "needs_original": false, "log": "고객 사례 홍보, 관련성 낮음", "attention": false}`
 </example>
 </examples>

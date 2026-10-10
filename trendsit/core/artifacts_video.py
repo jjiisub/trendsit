@@ -127,6 +127,14 @@ class SlideNumber(_Strict):
     value: str = Field(description="ocr_text 안의 문자열 그대로(예: '1.2M', '35%'). check면 보이는 만큼만")
     unit: str = Field(description="단위나 기호(%, ms, 배, $ 등). 없으면 빈 문자열")
     what: str = Field(description="무엇의 수치인지 화면 표현 그대로 짧게(예: 'p95 latency')")
+    # 기본값 claim: S4 때 저장한 판독(kind 없음)을 읽을 때 S4와 같은 동작. 모델 출력 스키마에는 필수 칸으로 나간다
+    kind: Literal["claim", "ui", "example", "version", "axis"] = Field(
+        default="claim",
+        description="claim: 발표가 주장하는 결과·측정값 / ui: 화면 캡처 속 UI 글자(버튼, 메뉴, 설정 값) / "
+                    "example: 예시 입력·코드·가상의 값 / version: 버전·모델 이름 속 숫자 / axis: 축 눈금·범례")
+
+
+SLIDE_KINDS_FACT = ("claim",)  # slide_only 후보가 되는 kind(S5 P4-1). 나머지는 excluded로 기록
 
 
 class SlideReading(RoleOutput):
@@ -161,6 +169,8 @@ class SlideOnlyFact(_Strict):
     sec: int
     evidence: str = Field(description="근거 id vd:{item_id}@{sec}")
     confidence: Literal["high", "low"]
+    dense: bool = Field(default=False, description="한 프레임 수치 10개 이상(표·대시보드): 낮은 순위")
+    spoken_value: str = Field(default="", description="발화에서 같은 대상을 다른 값으로 말함(잘못 들음 교정 후보). 없으면 빈 문자열")
 
 
 class CheckNumber(_Strict):
@@ -231,6 +241,9 @@ def _norm(text: str) -> str:
 
 
 class VideoSummary(RoleOutput):
+    # 표기 쌍은 코드 소유 칸(S4 설계 결정 D2-1): 규칙이 문자열로 확정되어 enforce 후 값이 정답. 채점기 등록은 graders_video
+    ENFORCED_FIELDS = ("name_pairs",)
+
     name_pairs: list[NamePair]
     key_points: list[KeyPoint]
     timeline: list[TimelineEntry]
@@ -271,7 +284,8 @@ class VideoSummary(RoleOutput):
         out = out.fix("key_points", points, "근거 id가 구간 밖이거나 쓸 수 없는 전사만 근거인 포인트 정리")
         capped = [kp if len(kp.evidence) <= MAX_EVIDENCE else kp.model_copy(update={"evidence": kp.evidence[:MAX_EVIDENCE]})
                   for kp in out.key_points]
-        out = out.fix("key_points", capped, f"포인트 근거 {MAX_EVIDENCE}개 초과 → 앞 {MAX_EVIDENCE}개만")
+        # 근거 상한은 코드 소유 규칙(S4 D2-2, S5 P4-6): 넘침은 통과 판정에서 실패로 보지 않고 모델 일치율로 기록
+        out = out.fix("key_points", capped, f"포인트 근거 {MAX_EVIDENCE}개 초과 → 앞 {MAX_EVIDENCE}개만", owned=True)
         out = out.fix("timeline", [t for t in out.timeline if lo <= t.sec <= hi], "타임라인 초는 처리 구간 안")
         out = out.fix("chapters", [c for c in out.chapters if 0 <= c.sec <= inp.duration_sec], "챕터 초는 영상 길이 안")
         if not usable and not inp.slides:

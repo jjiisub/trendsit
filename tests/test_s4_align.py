@@ -5,7 +5,8 @@ from __future__ import annotations
 import pytest
 
 from trendsit.core.artifacts_video import Frame, Segment, SlideNumber, SlideReading
-from trendsit.video.align import align, number_values, reading_value
+from trendsit.core.numbers import number_values, reading_value
+from trendsit.video.align import align
 
 
 def frame(t: float, spoken: str = "", idx: int | None = None) -> Frame:

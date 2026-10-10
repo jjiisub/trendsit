@@ -347,6 +347,7 @@ def main(argv: list[str] | None = None) -> int:
     # 스펙별 명령(COMMON 9장): 각 파일의 register(sub). 여기에는 등록 한 줄씩만. 없는 모듈은 건너뜀
     _register(sub, "cli_text")  # S2~S3
     _register(sub, "cli_video")  # S4
+    _register(sub, "cli_brief")  # S5
 
     args = p.parse_args(argv)
     try:
