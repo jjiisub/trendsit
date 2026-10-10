@@ -90,33 +90,33 @@ def _set(page: TopicPage, loc: str, text: str) -> TopicPage:
     return page.model_copy(update={"points": pts})
 
 
-def autofix(page: TopicPage, cfg: BriefConfig, canon: dict[str, str],
-            channels: set[str] | None = None, n_sources: int | None = None,
-            translit: list[tuple[re.Pattern[str], str]] | None = None) -> tuple[TopicPage, list[dict[str, Any]]]:
-    hl = cfg.write.highlights
-    fixes: list[dict[str, Any]] = []
-    # 00) points 개수 초과: 중요도 순이라 뒤에서 자른다. 잘린 포인트에 붙은 도식도 뺌(리뷰 R4, SIFT 소스 1개에 4개)
-    if n_sources is not None:
-        hi = cfg.write.points_for(n_sources)[1]
-        if len(page.points) > hi:
-            fixes.append({"loc": "points", "rule": f"points {len(page.points)}개 → {hi}개(근거 소스 {n_sources}개, 뒤에서 자름)",
-                          "before": [p.text for p in page.points[hi:]], "after": []})
-            page = page.model_copy(update={"points": page.points[:hi],
-                                           "numbers": [g for g in page.numbers if g.anchor <= hi],
-                                           "events": [g for g in page.events if g.anchor <= hi]})
-    # 0) contributions: 근거 채널이 2개 이상일 때만, 그 채널만, 채널마다 1문장(넘치는 것은 뺌)
-    if channels is not None and page.contributions:
-        keep, seen = [], set()
-        for c in page.contributions:
-            if len(channels) >= 2 and c.channel in channels and c.channel not in seen:
-                keep.append(c)
-                seen.add(c.channel)
-        if keep != page.contributions:
-            fixes.append({"loc": "contributions", "rule": f"근거 채널 {sorted(channels)}에 맞게 contributions 정리",
-                          "before": [c.model_dump() for c in page.contributions], "after": [c.model_dump() for c in keep]})
-            page = page.model_copy(update={"contributions": keep})
-    # 0-1) 도식 그리는 조건(skills/diagrams.md): 맞지 않는 그룹은 빼고 포인트 문장만 남김
-    #   numbers: 값 3개 이상 / 또는 값 2개 + baseline + summary에 그 값이나 라벨이 나옴. events: 3개 이상 / 또는 2개 + flow_is_point
+def _cut_points(page: TopicPage, n_sources: int, hi: int, fixes: list[dict[str, Any]]) -> TopicPage:
+    """points 개수 초과: 중요도 순이라 뒤에서 자른다. 잘린 포인트에 붙은 도식도 뺌(리뷰 R4, SIFT 소스 1개에 4개)."""
+    if len(page.points) <= hi:
+        return page
+    fixes.append({"loc": "points", "rule": f"points {len(page.points)}개 → {hi}개(근거 소스 {n_sources}개, 뒤에서 자름)",
+                  "before": [p.text for p in page.points[hi:]], "after": []})
+    return page.model_copy(update={"points": page.points[:hi], "numbers": [g for g in page.numbers if g.anchor <= hi],
+                                   "events": [g for g in page.events if g.anchor <= hi]})
+
+
+def _fit_contributions(page: TopicPage, channels: set[str], fixes: list[dict[str, Any]]) -> TopicPage:
+    """contributions: 근거 채널이 2개 이상일 때만, 그 채널만, 채널마다 1문장(넘치는 것은 뺌)."""
+    keep, seen = [], set()
+    for c in page.contributions:
+        if len(channels) >= 2 and c.channel in channels and c.channel not in seen:
+            keep.append(c)
+            seen.add(c.channel)
+    if keep == page.contributions:
+        return page
+    fixes.append({"loc": "contributions", "rule": f"근거 채널 {sorted(channels)}에 맞게 contributions 정리",
+                  "before": [c.model_dump() for c in page.contributions], "after": [c.model_dump() for c in keep]})
+    return page.model_copy(update={"contributions": keep})
+
+
+def _drop_undrawable(page: TopicPage, fixes: list[dict[str, Any]]) -> TopicPage:
+    """도식 그리는 조건(skills/diagrams.md): 맞지 않는 그룹은 빼고 포인트 문장만 남김.
+    numbers: 값 3개 이상 / 또는 값 2개 + baseline + summary에 그 값이나 라벨이 나옴. events: 3개 이상 / 또는 2개 + flow_is_point"""
     def drawable(g: Any) -> bool:
         if len(g.items) >= 3:
             return True
@@ -126,12 +126,16 @@ def autofix(page: TopicPage, cfg: BriefConfig, canon: dict[str, str],
 
     nums = [g for g in page.numbers if drawable(g)]
     evs = [g for g in page.events if len(g.items) >= 3 or (len(g.items) == 2 and g.flow_is_point)]
-    if len(nums) != len(page.numbers) or len(evs) != len(page.events):
-        fixes.append({"loc": "numbers/events", "rule": "그리는 조건에 맞지 않는 도식 뺌(값 2개·사건 2개 등)",
-                      "before": [g.title for g in [*page.numbers, *page.events]],
-                      "after": [g.title for g in [*nums, *evs]]})
-        page = page.model_copy(update={"numbers": nums, "events": evs})
-    # 1) 별칭 → 정본(긴 표기부터, 단어 경계가 애매한 한글은 그대로 치환)
+    if len(nums) == len(page.numbers) and len(evs) == len(page.events):
+        return page
+    fixes.append({"loc": "numbers/events", "rule": "그리는 조건에 맞지 않는 도식 뺌(값 2개·사건 2개 등)",
+                  "before": [g.title for g in [*page.numbers, *page.events]], "after": [g.title for g in [*nums, *evs]]})
+    return page.model_copy(update={"numbers": nums, "events": evs})
+
+
+def _canonical_names(page: TopicPage, canon: dict[str, str], translit: list[tuple[re.Pattern[str], str]],
+                     fixes: list[dict[str, Any]]) -> TopicPage:
+    """별칭 → 정본(긴 표기부터, 단어 경계가 애매한 한글은 그대로 치환), 음차 표기 → 정본(띄어쓰기·하이픈 무관, F10)."""
     for loc, text in [*_text_slots(page), ("title", page.title)]:
         new = text
         for alias in sorted(canon, key=len, reverse=True):
@@ -139,12 +143,16 @@ def autofix(page: TopicPage, cfg: BriefConfig, canon: dict[str, str],
             pat = rf"(?<![A-Za-z0-9]){re.escape(alias)}(?![A-Za-z0-9])"
             if alias and re.search(pat, new) and canon[alias] not in new:
                 new = re.sub(pat, canon[alias], new)
-        for tp, target in translit or []:  # 음차 표기 → 정본(띄어쓰기·하이픈 무관, F10)
+        for tp, target in translit:
             new = tp.sub(target, new)
         if new != text:
             fixes.append({"loc": loc, "rule": "별칭 표기를 정본으로", "before": text, "after": new})
             page = _set(page, loc, new)
-    # 2) 공백·문장부호: 겹친 공백, 문장부호 앞 공백, 같은 부호 반복
+    return page
+
+
+def _tidy_spacing(page: TopicPage, fixes: list[dict[str, Any]]) -> TopicPage:
+    """공백·문장부호: 겹친 공백, 문장부호 앞 공백, 같은 부호 반복."""
     for loc, text in [*_text_slots(page), ("title", page.title)]:
         new = re.sub(r"\s{2,}", " ", text).strip()
         new = re.sub(r"\s+([,.;:])", r"\1", new)
@@ -152,7 +160,11 @@ def autofix(page: TopicPage, cfg: BriefConfig, canon: dict[str, str],
         if new != text:
             fixes.append({"loc": loc, "rule": "공백·문장부호 정리", "before": text, "after": new})
             page = _set(page, loc, new)
-    # 3) 형광: 칸별 상한(summary 1, overview 1, 포인트당 1), 페이지 상한(page 최대값). 넘치면 뒤쪽부터 제거
+    return page
+
+
+def _cap_highlights(page: TopicPage, hl: Any, fixes: list[dict[str, Any]]) -> TopicPage:
+    """형광: 칸별 상한(summary 1, overview 1, 포인트당 1), 페이지 상한(page 최대값). 넘치면 뒤쪽부터 제거."""
     limits = {"summary": hl.summary, "overview": hl.overview}
     total = 0
     for loc, text in _text_slots(page):
@@ -165,7 +177,21 @@ def autofix(page: TopicPage, cfg: BriefConfig, canon: dict[str, str],
             fixes.append({"loc": loc, "rule": f"형광 {len(marks)}개 → {keep}개(뒤쪽부터 제거)", "before": text, "after": new})
             page = _set(page, loc, new)
         total += min(len(marks), keep)
-    return page, fixes
+    return page
+
+
+def autofix(page: TopicPage, cfg: BriefConfig, canon: dict[str, str],
+            channels: set[str] | None = None, n_sources: int | None = None,
+            translit: list[tuple[re.Pattern[str], str]] | None = None) -> tuple[TopicPage, list[dict[str, Any]]]:
+    fixes: list[dict[str, Any]] = []
+    if n_sources is not None:
+        page = _cut_points(page, n_sources, cfg.write.points_for(n_sources)[1], fixes)
+    if channels is not None and page.contributions:
+        page = _fit_contributions(page, channels, fixes)
+    page = _drop_undrawable(page, fixes)
+    page = _canonical_names(page, canon, translit or [], fixes)
+    page = _tidy_spacing(page, fixes)
+    return _cap_highlights(page, cfg.write.highlights, fixes), fixes
 
 
 # ---------- 반려 ----------
@@ -207,7 +233,8 @@ def _numbers_ok(text: str, ids: list[str], pack: dict[str, list[EvidenceItem]],
     return out
 
 
-def check(page: TopicPage, pack: dict[str, list[EvidenceItem]], n_sources: int, cfg: BriefConfig) -> list[Issue]:
+def _check_counts(page: TopicPage, n_sources: int, cfg: BriefConfig) -> list[Issue]:
+    """필수 칸, summary·overview 문장 수, points 개수, 짧은 point, refs 개수."""
     w = cfg.write
     issues: list[Issue] = []
     for name in ("title", "summary", "overview"):
@@ -231,30 +258,28 @@ def check(page: TopicPage, pack: dict[str, list[EvidenceItem]], n_sources: int, 
         if not 1 <= len(p.refs) <= cfg.evidence.max_refs_per_point:
             issues.append(_issue(loc, "wrong_ref", f"{loc} refs {len(p.refs)}개(1~{cfg.evidence.max_refs_per_point})",
                                  "그 문장을 받치는 근거 id만"))
-    # refs 실재
-    def refs_exist(loc: str, ids: list[str]) -> None:
-        for r in ids:
-            if r not in pack:
-                issues.append(_issue(loc, "wrong_ref", f"{loc}의 근거 id {r}가 이 토픽 근거 목록에 없음",
-                                     "근거 목록의 id만", evidence_id=r))
+    return issues
+
+
+def _check_refs(page: TopicPage, pack: dict[str, list[EvidenceItem]]) -> list[Issue]:
+    """refs 실재, 근거 채널이 2개 이상이면 채널마다 contributions 1문장(리뷰 R12, OpenRig: github 한 줄뿐이고 text 빠짐)."""
+    issues = []
     for name, i, field_, ids in page_refs(page):
-        refs_exist(f"{name}[{i}]" + (".context" if field_ == "context" else ""), ids)
-    # 근거 채널이 2개 이상이면 채널마다 1문장(리뷰 R12, OpenRig: github 한 줄뿐이고 text 빠짐)
+        loc = f"{name}[{i}]" + (".context" if field_ == "context" else "")
+        issues += [_issue(loc, "wrong_ref", f"{loc}의 근거 id {r}가 이 토픽 근거 목록에 없음", "근거 목록의 id만", evidence_id=r)
+                   for r in ids if r not in pack]
     channels = {it.channel for items in pack.values() for it in items}
     missing = sorted(channels - {c.channel for c in page.contributions}) if len(channels) >= 2 else []
     if missing:
         issues.append(_issue("contributions", "format", f"근거 채널 {sorted(channels)} 중 {missing}의 contributions 문장이 없음",
                              "채널마다 그 채널 근거가 더한 것 1문장(근거 id 포함)"))
-    # 수치 대조(단위 환산 없이 값 비교)
-    for i, p in enumerate(page.points):
-        for f, near in _numbers_ok(p.text, p.refs, pack):
-            issues.append(_issue(f"points[{i}]", "number_mismatch",
-                                 f"points[{i}]의 '{f}'가 {', '.join(p.refs)}에 없음" + (f". 근거의 가까운 값은 {near}" if near else ""),
-                                 "근거 표기 그대로", evidence_id=p.refs[0] if p.refs else None))
-    # refs가 없는 칸(제목, 요약, 개요, 개념)은 토픽 근거 전체, 도식 제목·context·사건 글과 기여는 그 칸의 근거로(리뷰 R3-c:
-    # 도식 제목 "3.7%p 높음" 같은 파생 수치가 대조 밖이었음)
-    all_ids = list(pack)
-    slots: list[tuple[str, str, list[str]]] = [(n, getattr(page, n), all_ids) for n in ("title", "summary", "overview")]
+    return issues
+
+
+def _number_slots(page: TopicPage, all_ids: list[str]) -> list[tuple[str, str, list[str]]]:
+    """수치를 대조할 칸 (위치, 글, 근거 id들). refs가 없는 칸(제목, 요약, 개요, 개념)은 토픽 근거 전체, 도식 제목·context·사건 글과
+    기여는 그 칸의 근거로(리뷰 R3-c: 도식 제목 "3.7%p 높음" 같은 파생 수치가 대조 밖이었음)."""
+    slots = [(n, getattr(page, n), all_ids) for n in ("title", "summary", "overview")]
     slots += [(f"concepts[{i}]", c.desc, all_ids) for i, c in enumerate(page.concepts)]
     for g_i, g in enumerate(page.numbers):
         ids = [it.ref for it in g.items] + REF.findall(g.context)
@@ -263,8 +288,19 @@ def check(page: TopicPage, pack: dict[str, list[EvidenceItem]], n_sources: int, 
         ids = [it.ref for it in g.items if it.ref] + REF.findall(g.context)
         slots += [(f"events[{g_i}].title", g.title, ids), (f"events[{g_i}].context", REF.sub("", g.context), ids)]
         slots += [(f"events[{g_i}].items[{j}]", it.text, [it.ref]) for j, it in enumerate(g.items) if it.ref]
-    slots += [(f"contributions[{i}]", c.text, c.refs) for i, c in enumerate(page.contributions)]
-    for loc, text, ids in slots:
+    return slots + [(f"contributions[{i}]", c.text, c.refs) for i, c in enumerate(page.contributions)]
+
+
+def _check_numbers(page: TopicPage, pack: dict[str, list[EvidenceItem]]) -> list[Issue]:
+    """수치 대조(단위 환산 없이 값 비교): points, 그 밖의 칸, 막대 항목 값."""
+    issues = []
+    for i, p in enumerate(page.points):
+        for f, near in _numbers_ok(p.text, p.refs, pack):
+            issues.append(_issue(f"points[{i}]", "number_mismatch",
+                                 f"points[{i}]의 '{f}'가 {', '.join(p.refs)}에 없음" + (f". 근거의 가까운 값은 {near}" if near else ""),
+                                 "근거 표기 그대로", evidence_id=p.refs[0] if p.refs else None))
+    all_ids = list(pack)
+    for loc, text, ids in _number_slots(page, all_ids):
         for f, near in _numbers_ok(text, ids, pack):
             issues.append(_issue(loc, "number_mismatch", f"{loc}의 '{f}'가 {'이 토픽 근거' if ids is all_ids else ', '.join(ids)}에 없음"
                                  + (f". 근거의 가까운 값은 {near}" if near else ""),
@@ -276,11 +312,16 @@ def check(page: TopicPage, pack: dict[str, list[EvidenceItem]], n_sources: int, 
                 issues.append(_issue(f"numbers[{g_i}].items[{it_i}]", "number_mismatch",
                                      f"numbers[{g_i}].items[{it_i}] 값 '{it.value}'가 {it.ref}에 없음", "근거 표기 그대로",
                                      evidence_id=it.ref))
-    # 도식 칸
+    return issues
+
+
+def _check_diagram_slots(page: TopicPage, cfg: BriefConfig) -> list[Issue]:
+    """도식 칸 구조: 그룹 상한, anchor, title·context, 항목 2~6개, 한 포인트에 도식 하나."""
+    issues: list[Issue] = []
     n_points = len(page.points)
     anchors = [g.anchor for g in page.numbers] + [g.anchor for g in page.events]
-    for name, groups, cap in (("numbers", page.numbers, w.diagrams.numbers_groups_max),
-                              ("events", page.events, w.diagrams.events_groups_max)):
+    for name, groups, cap in (("numbers", page.numbers, cfg.write.diagrams.numbers_groups_max),
+                              ("events", page.events, cfg.write.diagrams.events_groups_max)):
         if len(groups) > cap:
             issues.append(_issue(name, "overuse", f"{name} {len(groups)}그룹(최대 {cap})", "가장 중요한 것만"))
         for g_i, g in enumerate(groups):
@@ -294,13 +335,21 @@ def check(page: TopicPage, pack: dict[str, list[EvidenceItem]], n_sources: int, 
                 issues.append(_issue(loc, "format", f"{loc} 항목 {len(g.items)}개(2~6)", ""))
     if len(anchors) != len(set(anchors)):
         issues.append(_issue("numbers", "format", f"한 포인트에 도식 둘 이상(anchor {anchors})", "한 포인트에 도식 하나"))
-    # 4차 리뷰 H1(a): 요약·개요의 수치는 points·numbers에 있는 값만(Claude Code 스킬 "스킬 약 50개·에이전트 약 20개" 3회째)
+    return issues
+
+
+def _check_summary_numbers(page: TopicPage) -> list[Issue]:
+    """4차 리뷰 H1(a): 요약·개요의 수치는 points·numbers에 있는 값만(Claude Code 스킬 "스킬 약 50개·에이전트 약 20개" 3회째)."""
     body_pack = {"points": [EvidenceItem("points", "page", "text", "quote", " ".join(
         [plain(p.text) for p in page.points] + [f"{it.value} {it.label}" for g in page.numbers for it in g.items]), {})]}
-    for name in ("summary", "overview"):
-        for f, _near in _numbers_ok(getattr(page, name), ["points"], body_pack, with_units=True):
-            issues.append(_issue(name, "unsupported", f"{name}의 수치 '{f}'가 points·numbers에 없음",
-                                 "요약·개요는 points에 있는 사실만(수치를 쓰려면 먼저 point에)"))
+    return [_issue(name, "unsupported", f"{name}의 수치 '{f}'가 points·numbers에 없음",
+                   "요약·개요는 points에 있는 사실만(수치를 쓰려면 먼저 point에)")
+            for name in ("summary", "overview") for f, _near in _numbers_ok(getattr(page, name), ["points"], body_pack, with_units=True)]
+
+
+def _check_units_dates(page: TopicPage, cfg: BriefConfig) -> list[Issue]:
+    """빈 단위, 그룹 안 단위 섞임, 사건 날짜 형식·근거, concepts 상한."""
+    issues: list[Issue] = []
     for g_i, g in enumerate(page.numbers):
         if not g.unit.strip("() \t"):  # 빈 단위(Jeff·Jeeves 정확도 "()", 리뷰 R3-b)
             issues.append(_issue(f"numbers[{g_i}]", "format", f"numbers[{g_i}] 단위가 비어 있음",
@@ -315,26 +364,26 @@ def check(page: TopicPage, pack: dict[str, list[EvidenceItem]], n_sources: int, 
                 issues.append(_issue(f"events[{g_i}].items[{it_i}]", "format", f"날짜 '{it.date}'가 YYYY-MM-DD가 아님", ""))
             if not it.ref and not it.topic_id:
                 issues.append(_issue(f"events[{g_i}].items[{it_i}]", "wrong_ref", "사건에 근거 id나 지난 토픽 id가 없음", ""))
-    if len(page.concepts) > w.concepts_max:
-        issues.append(_issue("concepts", "format", f"concepts {len(page.concepts)}개(최대 {w.concepts_max})", ""))
-    # 명사형 칸: 포인트, 소스별 기여, 개념 풀이(skills/style_ko.md). 요약·개요는 "~다"
-    for loc, text in [*[(f"points[{i}]", p.text) for i, p in enumerate(page.points)],
-                      *[(f"contributions[{i}]", c.text) for i, c in enumerate(page.contributions)],
-                      *[(f"concepts[{i}]", c.desc) for i, c in enumerate(page.concepts)]]:
+    if len(page.concepts) > cfg.write.concepts_max:
+        issues.append(_issue("concepts", "format", f"concepts {len(page.concepts)}개(최대 {cfg.write.concepts_max})", ""))
+    return issues
+
+
+def _check_style(page: TopicPage) -> list[Issue]:
+    """문체(skills/style_ko.md): 명사형 칸이 문장으로 끝남, 요약·개요는 문장마다 "~다"(반영 확인 리뷰 F1), 해요체·평가어."""
+    issues: list[Issue] = []
+    notes = [(f"points[{i}]", p.text) for i, p in enumerate(page.points)]
+    notes += [(f"contributions[{i}]", c.text) for i, c in enumerate(page.contributions)]
+    notes += [(f"concepts[{i}]", c.desc) for i, c in enumerate(page.concepts)]
+    for loc, text in notes:
         if ends_as_sentence(plain(text)):
             issues.append(_issue(loc, "format", f"{loc}이 문장으로 끝남('…{plain(text)[-12:]}')", "명사형 끝(~함, ~임, 명사)"))
-    # 요약·개요는 문장마다 "~다"(마지막 문장만 보던 것을 고침, 반영 확인 리뷰 F1: Solar 개요 "…제공함. …낮음. …전환된다.")
     for name in ("summary", "overview"):
         for sent in sentences(plain(getattr(page, name))):
             if not sent.strip().rstrip(".").endswith("다"):
                 issues.append(_issue(name, "format", f"{name}의 문장이 '~다'로 끝나지 않음('…{sent.strip()[-12:]}')",
                                      "요약·개요는 문장마다 평서체 '~다'(명사형 '~함', '~음' 아님)"))
-    # 금지어
-    texts = [("title", page.title), ("summary", page.summary), ("overview", page.overview)]
-    texts += [(f"points[{i}]", p.text) for i, p in enumerate(page.points)]
-    texts += [(f"contributions[{i}]", c.text) for i, c in enumerate(page.contributions)]
-    texts += [(f"concepts[{i}]", c.desc) for i, c in enumerate(page.concepts)]
-    for loc, text in texts:
+    for loc, text in [("title", page.title), ("summary", page.summary), ("overview", page.overview), *notes]:
         t = plain(text)
         bad = ["해요체"] if any(is_haeyo(s) for s in sentences(t)) else []
         bad += [e for e in EVAL_ENDINGS if e in t]
@@ -344,6 +393,12 @@ def check(page: TopicPage, pack: dict[str, list[EvidenceItem]], n_sources: int, 
             issues.append(_issue(loc, "format", f"{loc} 금지 표현: {', '.join(bad)}",
                                  "평가어·해요체를 빼고 사실로 끝맺음(예: '…확장하는 것이 핵심이다' → '…확장하는 구조다'). 그 문장만 고친 새 값을 낸다"))
     return issues
+
+
+def check(page: TopicPage, pack: dict[str, list[EvidenceItem]], n_sources: int, cfg: BriefConfig) -> list[Issue]:
+    return [*_check_counts(page, n_sources, cfg), *_check_refs(page, pack), *_check_numbers(page, pack),
+            *_check_diagram_slots(page, cfg), *_check_summary_numbers(page), *_check_units_dates(page, cfg),
+            *_check_style(page)]
 
 
 # ---------- 경고 ----------

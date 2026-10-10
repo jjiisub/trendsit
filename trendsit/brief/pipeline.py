@@ -23,79 +23,75 @@ from . import aliases as al
 from . import cluster as cl
 from . import select as sel
 from . import write as wr
-from .evidence import week_evidence
+from .evidence import WeekEvidence, week_evidence
 from .weekly import set_run_week, stage_cluster
 
 STEPS = ("cluster", "select", "write", "review")
 ROLES = ("decide", "editor_select", "writer", "writer_revise", "critic")
 
 
-def run_weekly(week: str, ctx: Ctx, from_step: str = "cluster", only_topic: str | None = None,
-               embedder: Any = None, cfg: BriefConfig | None = None, until: str | None = None) -> dict[str, Any]:
-    """from_step부터 until까지(없으면 끝까지). until=select면 선별까지, write면 초안 + 코드 검사까지(검수자 없음)."""
-    from ..filter.embed import make_embedder
-
-    cfg = cfg or config.load("brief.yaml")
-    db, tr = ctx.db, ctx.tracer
-    assert tr is not None
-    run_id = tr.run_id
-    set_run_week(db, run_id, week)
-    flt = config.load("filter.yaml")
-    embedder = embedder or make_embedder("real", flt)
-    interests = embed_interests(embedder, flt)
-    dur: dict[str, float] = {}
-    t0 = time.monotonic()
-    src = (db.conn.execute("SELECT current_run_id FROM weeks WHERE week=?", (week,)).fetchone() or [None])[0]
-    if from_step != "cluster" and not src:
-        raise ValueError(f"{week}: 이어 갈 현재판 run이 없음(--from-step cluster부터)")
+def _cluster_phase(week: str, ctx: Ctx, cfg: BriefConfig, embedder: Any, interests: list[tuple[str, list[float]]],
+                   from_step: str, src: str | None, dur: dict[str, float]) -> tuple[WeekEvidence, al.AliasTable, str]:
+    """묶기 단계. cluster부터면 새로 묶고, 아니면 src run의 근거·묶음을 이어 받는다. 반환: (근거, 별칭 표, 묶음이 든 run)."""
+    db = ctx.db
     if from_step == "cluster":
-        stage = stage_cluster(week, ctx, cfg, embedder, set_current=False, interests=interests)
-        ev, table, cluster_run = stage.evidence, stage.aliases, run_id
         from .report import write_cluster_report, write_label_sheets
 
+        stage = stage_cluster(week, ctx, cfg, embedder, set_current=False, interests=interests)
         write_cluster_report(stage, cfg, note="weekly 실행의 묶기 단계")
         if not ctx.stopped:  # 멈춘 run은 그 주 라벨 시트 행을 덮지 않음(판정 못 한 쌍의 줄이 빠지지 않게)
             write_label_sheets(stage)
         dur |= {"evidence": stage.seconds["evidence"] + stage.seconds["normalize"], "cluster": stage.seconds["cluster"]}
-    else:
-        ev = week_evidence(db, week)
-        table = al.decided_table(db, list(ev.members.values()), cfg)
-        cl.score_video_relevance(list(ev.members.values()), embedder, interests, cfg.evidence.video_relevance_high)
-        r = db.conn.execute("SELECT summary_json FROM runs WHERE id=?", (src,)).fetchone()
-        cluster_run = (json.loads(r["summary_json"]) if r and r["summary_json"] else {}).get("cluster_run") or src
-    tr.step(kind="code", role="weekly", text=f"{week} weekly 시작: {from_step}부터", detail={
-        "from_step": from_step, "source_run": src, "cluster_run": cluster_run})
-    if ctx.stopped:  # 묶기 중 예산 초과: 현재판은 그대로, 선별부터는 시작하지 않음
-        return _close(ctx, week, t0, dur)
-    # ---------- select ----------
-    t1 = time.monotonic()
+        return stage.evidence, stage.aliases, stage.run_id
+    ev = week_evidence(db, week)
+    table = al.decided_table(db, list(ev.members.values()), cfg)
+    cl.score_video_relevance(list(ev.members.values()), embedder, interests, cfg.evidence.video_relevance_high)
+    r = db.conn.execute("SELECT summary_json FROM runs WHERE id=?", (src,)).fetchone()
+    return ev, table, (json.loads(r["summary_json"]) if r and r["summary_json"] else {}).get("cluster_run") or src
+
+
+def _select_phase(ctx: Ctx, week: str, ev: WeekEvidence, cfg: BriefConfig, embedder: Any,
+                  interests: list[tuple[str, list[float]]], cluster_run: str, from_step: str,
+                  src: str | None) -> list[sel.Applied] | None:
+    """선별 단계. write·review부터면 src run의 계획을 이어 받는다. 선별 중 예산 초과면 None(대체 계획을 저장하지 않고 멈춤)."""
+    db, tr = ctx.db, ctx.tracer
+    assert tr is not None
     sims = cl.interest_similarity(db, list(ev.members.values()), embedder, interests)
     cands = sel.load_candidates(db, cluster_run, ev, cfg.select.max_candidates, sims)
-    sites = [r["name"] for r in db.conn.execute("SELECT name FROM sources") if r["name"]]
-    if from_step in ("cluster", "select"):
-        sres = sel.select(ctx, cands, ev, cfg, sites)
-        if ctx.stopped:  # 선별 중 예산 초과: 대체 계획을 저장하지 않고 멈춤
-            return _close(ctx, week, t0, dur)
-        sel.save(db, sres, run_id, week)
-        plan = sres.plan
-        topics = sres.topics
-        tr.step(kind="code", role="editor_select",
-                text=f"후보 {len(cands)}개 중 {len(topics)}개 선정, 후속 {sum(t.relation_type == 'follow_up' for t in topics)}"
-                     + (" (대체 계획)" if sres.source == "fallback" else ""),
-                attention=sres.source == "fallback" or bool(sres.reason_mismatch),
-                detail={"errors_by_try": sres.errors_by_try, "reason_mismatch": sres.reason_mismatch,
-                        "source": sres.source, "reconciled": sres.reconciled})
-    else:
+    if from_step not in ("cluster", "select"):
         row = db.conn.execute("SELECT plan_json, source FROM briefing_plans WHERE run_id=? ORDER BY id DESC LIMIT 1",
                               (src,)).fetchone()
-        plan = BriefingPlan.model_validate_json(row["plan_json"])
-        topics = sel.apply(plan, cands, week, db)
-        sel.save_plan(db, run_id, week, row["source"], row["plan_json"], topics)
-    dur["select"] = round(time.monotonic() - t1, 1)
-    if until == "select":
-        topics = []
-    # ---------- write + review ----------
-    t2 = time.monotonic()
+        topics = sel.apply(BriefingPlan.model_validate_json(row["plan_json"]), cands, week, db)
+        sel.save_plan(db, tr.run_id, week, row["source"], row["plan_json"], topics)
+        return topics
+    sres = sel.select(ctx, cands, ev, cfg, [r["name"] for r in db.conn.execute("SELECT name FROM sources") if r["name"]])
+    if ctx.stopped:
+        return None
+    sel.save(db, sres, tr.run_id, week)
+    tr.step(kind="code", role="editor_select",
+            text=f"후보 {len(cands)}개 중 {len(sres.topics)}개 선정, 후속 {sum(t.relation_type == 'follow_up' for t in sres.topics)}"
+                 + (" (대체 계획)" if sres.source == "fallback" else ""),
+            attention=sres.source == "fallback" or bool(sres.reason_mismatch),
+            detail={"errors_by_try": sres.errors_by_try, "reason_mismatch": sres.reason_mismatch,
+                    "source": sres.source, "reconciled": sres.reconciled})
+    return sres.topics
+
+
+def _log_topic(tr: Any, t: sel.Applied, res: wr.TopicResult) -> None:
+    tr.step(kind="code", role="writer",
+            text=f"{t.topic_id}: {res.status}, {res.final_round}라운드" + (f", 확인 필요 {res.attention[0]}" if res.attention else ""),
+            attention=res.status != "passed" or bool(res.attention),
+            detail={"topic_id": t.topic_id, "evidence": res.evidence_ids, "truncated": res.dropped_ids,
+                    "dropped_diagrams": res.dropped_diagrams, "checks": res.checks,
+                    "n_sources": res.n_sources, "costs": res.costs, "rounds": [
+                        {"round": lg.round, "checker": lg.checker, "status": lg.status, "issues": lg.issues,
+                         "reverts": lg.reverts, "autofix": len(lg.autofix)} for lg in res.rounds]})
+
+
+def _write_phase(ctx: Ctx, topics: list[sel.Applied], ev: WeekEvidence, table: al.AliasTable, cfg: BriefConfig,
+                 from_step: str, src: str | None, only_topic: str | None, until: str | None) -> list[wr.TopicResult]:
+    """토픽마다 작성 + 검수 + 저장. 예산 초과로 멈추면 거기서 끝낸다."""
+    db = ctx.db
     results = []
     for t in topics:
         if only_topic and t.topic_id != only_topic:
@@ -111,24 +107,49 @@ def run_weekly(week: str, ctx: Ctx, from_step: str = "cluster", only_topic: str 
             if isinstance(e, (BudgetExceeded, PriceUnknown)):
                 ctx.stopped = f"{type(e).__name__}: {e}"
             res = wr.TopicResult(t, "failed", None, [], [], [], [], 0, attention=[f"작성 중 오류: {type(e).__name__}: {e}"[:300]])
-        wr.save(db, res, run_id)
+        wr.save(db, res, ctx.tracer.run_id)  # type: ignore[union-attr]
         results.append(res)
-        tr.step(kind="code", role="writer",
-                text=f"{t.topic_id}: {res.status}, {res.final_round}라운드" + (f", 확인 필요 {res.attention[0]}" if res.attention else ""),
-                attention=res.status != "passed" or bool(res.attention),
-                detail={"topic_id": t.topic_id, "evidence": res.evidence_ids, "truncated": res.dropped_ids,
-                        "dropped_diagrams": res.dropped_diagrams, "checks": res.checks,
-                        "n_sources": res.n_sources, "costs": res.costs, "rounds": [
-                            {"round": lg.round, "checker": lg.checker, "status": lg.status, "issues": lg.issues,
-                             "reverts": lg.reverts, "autofix": len(lg.autofix)} for lg in res.rounds]})
+        _log_topic(ctx.tracer, t, res)
         if ctx.stopped:
             break
+    return results
+
+
+def run_weekly(week: str, ctx: Ctx, from_step: str = "cluster", only_topic: str | None = None,
+               embedder: Any = None, cfg: BriefConfig | None = None, until: str | None = None) -> dict[str, Any]:
+    """from_step부터 until까지(없으면 끝까지). until=select면 선별까지, write면 초안 + 코드 검사까지(검수자 없음)."""
+    from ..filter.embed import make_embedder
+
+    cfg = cfg or config.load("brief.yaml")
+    db, tr = ctx.db, ctx.tracer
+    assert tr is not None
+    set_run_week(db, tr.run_id, week)
+    flt = config.load("filter.yaml")
+    embedder = embedder or make_embedder("real", flt)
+    interests = embed_interests(embedder, flt)
+    dur: dict[str, float] = {}
+    t0 = time.monotonic()
+    src = (db.conn.execute("SELECT current_run_id FROM weeks WHERE week=?", (week,)).fetchone() or [None])[0]
+    if from_step != "cluster" and not src:
+        raise ValueError(f"{week}: 이어 갈 현재판 run이 없음(--from-step cluster부터)")
+    ev, table, cluster_run = _cluster_phase(week, ctx, cfg, embedder, interests, from_step, src, dur)
+    tr.step(kind="code", role="weekly", text=f"{week} weekly 시작: {from_step}부터", detail={
+        "from_step": from_step, "source_run": src, "cluster_run": cluster_run})
+    if ctx.stopped:  # 묶기 중 예산 초과: 현재판은 그대로, 선별부터는 시작하지 않음
+        return _close(ctx, week, t0, dur)
+    t1 = time.monotonic()
+    topics = _select_phase(ctx, week, ev, cfg, embedder, interests, cluster_run, from_step, src)
+    if topics is None:
+        return _close(ctx, week, t0, dur)
+    dur["select"] = round(time.monotonic() - t1, 1)
+    t2 = time.monotonic()
+    results = _write_phase(ctx, [] if until == "select" else topics, ev, table, cfg, from_step, src, only_topic, until)
     dur["write_review"] = round(time.monotonic() - t2, 1)
     if ctx.stopped:
         return _close(ctx, week, t0, dur, len(results))
     if only_topic and from_step != "cluster":  # 묶기부터 새로 했으면 원본 토픽과 맞지 않아 이어 오지 않음
-        carry_over(db, src, run_id, keep={only_topic})
-    save_topic_embeddings(db, run_id, embedder, results)
+        carry_over(db, src, tr.run_id, keep={only_topic})
+    save_topic_embeddings(db, tr.run_id, embedder, results)
     return _close(ctx, week, t0, dur, len(results), until)
 
 

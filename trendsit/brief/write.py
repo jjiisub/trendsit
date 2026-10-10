@@ -19,21 +19,13 @@ from ..core import config
 from ..core.artifacts import Document
 from ..core.artifacts_brief import (
     AliasLine,
-    Concept,
-    Contribution,
     CriticInput,
-    EventGroup,
-    EventItem,
     IndexedIssue,
-    NumberGroup,
-    NumberItem,
     PlanBrief,
-    Point,
     PreviousTopic,
     Relation,
     ReviewVerdict,
     TopicPage,
-    TopicPageRevision,
     WriterInput,
     WriterLimits,
     WriterReviseInput,
@@ -47,13 +39,8 @@ from ..core.role import RoleFailed, load_role, run_role
 from . import checks
 from .aliases import AliasTable, to_original, translit_pattern
 from .evidence import EvidenceItem, Member, cap_pack, pack_index
+from .revision import LOC, apply_revision, normalize_loc, top_loc
 from .select import Applied
-
-LOC = re.compile(r"^(title|summary|overview)$|^(points|numbers|events|contributions|concepts)\[(\d+)\]")
-LIST_LOC = re.compile(r"^(points|numbers|events|contributions|concepts)$")
-SUB_LOC = re.compile(r"^(numbers|events)\[(\d+)\]\.(items|context|title|unit)(?:\[(\d+)\])?$")
-FIELD_TYPES: dict[str, type] = {"points": Point, "numbers": NumberGroup, "events": EventGroup,
-                                "contributions": Contribution, "concepts": Concept}
 
 
 @dataclass
@@ -181,105 +168,6 @@ def refs_of(page: TopicPage) -> list[str]:
     return list(dict.fromkeys(r for *_, refs in slots for r in refs))
 
 
-# ---------- 수정 합치기 ----------
-def top_loc(loc: str) -> str:
-    m = LOC.match(loc.strip())
-    if not m:
-        return loc.strip()
-    return m.group(1) or f"{m.group(2)}[{m.group(3)}]"
-
-
-def normalize_loc(page: TopicPage, loc: str) -> str:
-    """모델이 위치를 1부터 세면(마지막 다음 번호, 예: 항목 2개인데 [2]) 0부터로 바로잡는다. 그 밖은 그대로."""
-    m = LOC.match(loc.strip())
-    if not m or m.group(1):
-        return loc
-    name, idx = m.group(2), int(m.group(3))
-    n = len(getattr(page, name))
-    if n and idx == n:
-        return loc.replace(f"{name}[{idx}]", f"{name}[{idx - 1}]", 1)
-    return loc
-
-
-def apply_revision(prev: TopicPage, rev: TopicPageRevision, allowed: set[str]) -> tuple[TopicPage, int, list[str]]:
-    """지적된 위치(최상위 칸 기준)만 합친다. 그 밖의 변경은 되돌림(세어 반환). 삭제는 뒤 번호부터."""
-    data = prev.model_dump()
-    reverts, notes, deletes = 0, [], []
-    for ch in rev.changed:
-        loc = top_loc(ch.loc if ch.action == "add" else normalize_loc(prev, ch.loc))
-        whole = {a for a in allowed if LIST_LOC.match(a)}  # 목록 전체가 지적되면 그 목록의 항목 변경은 허용
-        if loc not in allowed and loc.split("[")[0] not in whole and not (
-                ch.action == "add" and loc.split("[")[0] in {a.split("[")[0] for a in allowed}):
-            reverts += 1
-            notes.append(f"지적 안 된 위치 {ch.loc} 변경 되돌림")
-            continue
-        if LIST_LOC.match(loc) and ch.action == "add":  # 목록 위치에 더하기(번호 없이 "contributions"): 끝에 붙임(G6)
-            loc = f"{loc}[{len(data[loc])}]"
-        m = LOC.match(loc)
-        if not m and LIST_LOC.match(loc) and ch.action == "delete":
-            if loc == "points":  # 포인트 전체 삭제는 받지 않음(필수 칸)
-                notes.append("points 전체 삭제는 받지 않음")
-                continue
-            data[loc] = []  # 칸 전체 비우기(예: numbers 그룹을 문장으로 옮길 때)
-            continue
-        if not m:
-            notes.append(f"알 수 없는 위치 {ch.loc}")
-            continue
-        sub = SUB_LOC.match(normalize_loc(prev, ch.loc).strip())
-        if sub and not m.group(1):  # 하위 위치: numbers[i].items[j] / numbers[i].context·title / events[i].items[j]
-            name, i, field_, j = sub.group(1), int(sub.group(2)), sub.group(3), sub.group(4)
-            if i >= len(data[name]):
-                notes.append(f"{ch.loc}: 위치 없음")
-                continue
-            group = data[name][i]
-            if j is not None and field_ == "items":
-                k = int(j)
-                if ch.action == "delete" and k < len(group["items"]):
-                    group["items"].pop(k)
-                elif isinstance(ch.value, NumberItem if name == "numbers" else EventItem) and k < len(group["items"]):
-                    group["items"][k] = ch.value.model_dump()
-                else:
-                    notes.append(f"{ch.loc}: 값 형식이 항목이 아님")
-            elif j is None and field_ in ("context", "title", "unit") and isinstance(ch.value, str):
-                group[field_] = ch.value
-            else:
-                notes.append(f"{ch.loc}: 바꿀 수 없는 하위 위치")
-            continue
-        if m.group(1):
-            if ch.action == "edit" and isinstance(ch.value, str):
-                data[m.group(1)] = ch.value
-            continue
-        name, idx = m.group(2), int(m.group(3))
-        if ch.action == "delete":
-            deletes.append((name, idx))
-            continue
-        val = ch.value
-        if isinstance(val, str) and name == "points":
-            val = Point(text=val, refs=data[name][idx]["refs"] if idx < len(data[name]) else [])
-        if name == "contributions" and isinstance(val, Point):
-            # 채널 없이 낸 기여 문장(OpenRig 재실행: 두 채널을 한 문장에, 반영 확인 리뷰 G6). refs가 한 채널이면 그 채널로
-            chans = {"video" if r.startswith("vd:") else "github" if r.startswith("rp:") else "text" for r in val.refs}
-            if len(chans) == 1:
-                val = Contribution(channel=chans.pop(), text=val.text, refs=val.refs)  # type: ignore[arg-type]
-            else:
-                notes.append(f"{ch.loc}: 기여 문장이 채널 {sorted(chans)}를 한 문장에 섞음(채널마다 1문장)")
-                continue
-        if not isinstance(val, FIELD_TYPES[name]):
-            notes.append(f"{ch.loc}: 값 형식이 {FIELD_TYPES[name].__name__}가 아님")
-            continue
-        if ch.action == "edit" and idx < len(data[name]):
-            data[name][idx] = val.model_dump()
-        else:
-            data[name].append(val.model_dump())
-    for name, idx in sorted(deletes, key=lambda x: -x[1]):
-        if idx < len(data[name]):
-            data[name].pop(idx)
-    try:
-        return TopicPage.model_validate(data), reverts, notes
-    except ValueError as e:  # 하위 위치에 형식이 다른 값: 이 수정은 버림
-        return prev, reverts, [*notes, f"합친 판이 스키마에 맞지 않아 이 수정 버림: {str(e)[:100]}"]
-
-
 # ---------- 루프 ----------
 def _call(role: Any, inp: Any, ctx: Ctx, costs: dict[str, float], key: str) -> tuple[Any | None, str | None, int | None]:
     """역할 1회. 실패는 (None, 이유). 사용액은 이 호출 동안 늘어난 session_cost로 역할별 합산."""
@@ -292,6 +180,159 @@ def _call(role: Any, inp: Any, ctx: Ctx, costs: dict[str, float], key: str) -> t
     return out, err, ctx.last_step_id
 
 
+def _canon_translit(table: AliasTable, ms: list[Member], cfg: BriefConfig) -> tuple[dict[str, str], list[tuple[re.Pattern[str], str]]]:
+    """코드가 고칠 정본 표기: 별칭 → 정본, 이 토픽 이름의 한글 음차 표기(GPT-6 루나, 딥시크-V4.1 플래시)도 정본으로(리뷰 R11, F10).
+    근거가 모두 한글 음차뿐인 이름(클로드 소네트 5.5)도 사전으로 되돌린 영문 표기가 정본."""
+    tl = cfg.aliases.transliteration
+    translit = []
+    for name in sorted({n for m in ms for n in m.entities if n.strip()}):
+        target = to_original(table.canonical(name), tl)
+        if (pat := translit_pattern(target, tl)) is not None:
+            translit.append((pat, target))
+    return {a: c.canonical for c in alias_lines(table, ms) for a in c.aliases}, translit
+
+
+def _run_critic(ctx: Ctx, res: TopicResult, topic: Applied, winp: WriterInput, pack: dict[str, list[EvidenceItem]],
+                pg: TopicPage, rnd: int, warns: list[str]) -> tuple[Any, str | None, int | None]:
+    """refs 근거를 앞에, 나머지 토픽 근거를 뒤에(근거 원문). overview·summary·title은 토픽 근거 전체가 기준이다."""
+    # 요약만 있는 id(카드 summary)는 원문이 아니라 빼고 준다(리뷰 R1: 요약·개요가 요약과 대조되던 문제)
+    raw_ids = [e for e in pack if not all(it.kind == "summary" for it in pack[e])]
+    order = [e for e in refs_of(pg) if e in raw_ids] + [e for e in raw_ids if e not in refs_of(pg)]
+    window_sec = config.load("video.yaml").align_window_sec
+    evid = [Document(id=e, source=pack[e][0].source.get("site") or pack[e][0].channel,
+                     title=pack[e][0].source.get("title"), text=raw_evidence(ctx.db, e, pack[e], window_sec)) for e in order]
+    cinp = CriticInput(loc_lines=loc_lines(pg), page=pg, evidence=evid, angle=topic.angle, previous=winp.previous,
+                       code_warnings=warns, round=rnd)
+    critic = load_role("critic", ctx.models)
+    out = _call(critic, cinp, ctx, res.costs, "critic")
+    # 원자 사실 0개로 통과 = 대조를 건너뛴 판정(W40 재실행 3토픽, 출력 49토큰). 한 번 다시 부르고, 또 비면 검수 실패
+    if out[0] is not None and not out[0].atoms and pg.points:
+        res.attention.append("검수자가 원자 사실 0개로 판정(대조 건너뜀), 다시 부름")
+        again = cinp.model_copy(update={"code_warnings": [*warns, "직전 판정이 원자 사실 0개: 모든 문장을 원자 사실로 나눠 대조"]})
+        out = _call(critic, again, ctx, res.costs, "critic")
+        if out[0] is not None and not out[0].atoms:
+            out = (None, "원자 사실 0개 판정 반복", out[2])
+    return out
+
+
+def _critic_log(rnd: int, v: ReviewVerdict, step_id: int | None) -> RoundLog:
+    return RoundLog(rnd, "critic", v.status, [i.model_dump() for i in v.issues], step_id=step_id,
+                    fact_support=v.fact_support.model_dump())
+
+
+def _live_issues(issues: list[Any], seen: dict[tuple[str, str], int], check_locs: set[str], repeat: int) -> list[Any]:
+    """같은 위치·같은 유형이 두 번 남으면 확정(check) 후 제외. 라운드 사이 반복만 센다(같은 라운드 안의 중복 이슈는 한 번으로, 리뷰 지적 1)."""
+    for key in dict.fromkeys((top_loc(it.loc), it.type) for it in issues):
+        seen[key] = seen.get(key, 0) + 1
+    live = []
+    for it in issues:
+        key = (top_loc(it.loc), it.type)
+        if seen[key] >= repeat:
+            check_locs.add(key[0])
+        else:
+            live.append(it)
+    return live
+
+
+def _revise(ctx: Ctx, res: TopicResult, reviser: Any, aliases: list[AliasLine], page: TopicPage, live: list[Any],
+            flagged: set[str], pack: dict[str, list[EvidenceItem]]) -> tuple[TopicPage, dict[str, Any], int | None] | None:
+    """지적된 칸만 고친 새 판과 그 원래 출력·step_id. 수정 호출이 실패하면 None."""
+    ids = {x.evidence_id for x in live} | {r for loc in flagged for r in _loc_refs(page, loc)}
+    rinp = WriterReviseInput(loc_lines=loc_lines(page), previous=page,
+                             issues=[IndexedIssue(idx=i, **x.model_dump()) for i, x in enumerate(live)],
+                             evidence=evidence_docs({k: v for k, v in pack.items() if k in ids}), aliases=aliases)
+    rev, err, rsid = _call(reviser, rinp, ctx, res.costs, "writer_revise")
+    if rev is None:
+        res.attention.append(f"수정 실패: {err}")
+        return None
+    new, reverts, notes = apply_revision(page, rev, flagged)
+    res.rounds[-1].reverts = reverts
+    res.attention += notes[:3]
+    return new, rev.model_dump(), rsid
+
+
+def _rounds(ctx: Ctx, res: TopicResult, topic: Applied, winp: WriterInput, pack: dict[str, list[EvidenceItem]],
+            cfg: BriefConfig, fixers: tuple[Any, Any], page: TopicPage, sid: int | None,
+            review: bool) -> tuple[TopicPage, set[str], dict[str, str]]:
+    """초안 → 코드 검사 → 검수 → 수정을 max_rounds까지. 반환: (마지막 판, 확인 필요 위치, 위치별 마지막 이슈)."""
+    seen: dict[tuple[str, str], int] = {}
+    check_locs: set[str] = set()
+    last_issue: dict[str, str] = {}  # 위치 → 마지막 이슈 원문(뺀 도식 표)
+    reviser = load_role("writer_revise", ctx.models)
+    raw_page: dict[str, Any] | None = page.raw_dump()
+    for rnd in range(1, cfg.review.max_rounds + 1):
+        cr = checks.run_checks(page, pack, res.n_sources, cfg, *fixers)
+        page = cr.page
+        res.pages.append((rnd, page, raw_page, sid))
+        issues = cr.issues
+        log = RoundLog(rnd, "code", "reject" if issues else "pass", [i.model_dump() for i in issues], cr.autofix, cr.warnings, sid)
+        if not issues and review:
+            res.rounds.append(log)
+            verdict, err, vsid = _run_critic(ctx, res, topic, winp, pack, page, rnd, cr.warnings)
+            if verdict is None:  # 검수 실패: 코드 검사만 통과한 판 + attention(검수 판정은 기록하지 않음)
+                res.attention.append(f"검수 실패: {err}")
+                res.status, res.page, res.final_round = "passed", page, rnd
+                break
+            log = _critic_log(rnd, verdict, vsid)
+            issues = verdict.issues if verdict.status == "reject" else []
+        res.rounds.append(log)
+        if not issues:
+            res.status, res.page, res.final_round = "passed", page, rnd
+            break
+        # 위치 번호를 1부터 센 이슈는 0부터로(검수자가 contributions[2]로 두 번째 항목을 가리킨 사례)
+        issues = [i.model_copy(update={"loc": normalize_loc(page, i.loc)}) for i in issues]
+        last_issue |= {top_loc(it.loc): f"{log.checker} {it.type}: {it.comment}" for it in issues}
+        live = _live_issues(issues, seen, check_locs, cfg.review.same_issue_repeat_to_check)
+        flagged = {top_loc(i.loc) for i in live}
+        revised = None if rnd == cfg.review.max_rounds or not live else _revise(ctx, res, reviser, winp.aliases, page, live,
+                                                                               flagged, pack)
+        if revised is None:
+            check_locs |= flagged
+            res.final_round = rnd
+            break
+        page, raw_page, sid = revised
+    else:
+        res.final_round = cfg.review.max_rounds
+    return page, check_locs, last_issue
+
+
+def _critic_unseen_pages(ctx: Ctx, res: TopicResult, topic: Applied, winp: WriterInput, pack: dict[str, list[EvidenceItem]],
+                         final: TopicPage, check_locs: set[str], cfg: BriefConfig) -> None:
+    """코드 반려만 이어져 검수자가 한 번도 보지 않고 끝난 판(리뷰 지적 2): 발행 전 한 번 검수, 이슈 위치는 check."""
+    rnd = res.final_round or cfg.review.max_rounds
+    verdict, _err, vsid = _run_critic(ctx, res, topic, winp, pack, final, rnd, [])
+    if verdict is not None:
+        res.rounds.append(_critic_log(rnd, verdict, vsid))
+        if verdict.status == "reject":
+            check_locs |= {top_loc(normalize_loc(final, i.loc)) for i in verdict.issues}
+
+
+def _drop_code_bad_diagrams(res: TopicResult, final: TopicPage, pack: dict[str, list[EvidenceItem]], cfg: BriefConfig,
+                            last_issue: dict[str, str], check_locs: set[str]) -> tuple[TopicPage, dict[str, str]]:
+    """도식을 빼는 것은 코드가 최종판에서 확인한 형식·수치 오류(단위 섞임, 값 불일치, 빈 단위)일 때만(반영 확인 리뷰 F2: 검수자의
+    의미 지적만 남은 맞는 도식까지 지워 Haiku 구간 가격·textGrain 탐지율이 빠졌음). 의미 지적만 남으면 두고 ⚠.
+    반환: (도식을 뺀 판, 위치 → 뺀 뒤의 위치 이름)."""
+    code_bad = {(m.group(1), int(m.group(2))) for i in checks.check(final, pack, res.n_sources, cfg)
+                if (m := re.match(r"^(numbers|events)\[(\d+)\]", i.loc))}
+    renamed: dict[str, str] = {}
+    upd: dict[str, Any] = {}
+    for name in ("numbers", "events") if code_bad else ():
+        keep = []
+        for i, g in enumerate(getattr(final, name)):
+            loc = f"{name}[{i}]"
+            if (name, i) in code_bad:
+                renamed[loc] = f"빠진 도식: {g.title}"
+                res.dropped_diagrams.append({"group": loc, "title": g.title, "issue": last_issue.get(loc, "")})
+                check_locs.add(loc)
+            else:
+                renamed[loc] = f"{name}[{len(keep)}]"
+                keep.append(g)
+        if len(keep) != len(getattr(final, name)):
+            upd[name] = keep
+            res.attention.append(f"형식·수치 오류가 남은 {name} 도식 {len(getattr(final, name)) - len(keep)}개 뺌")
+    return (final.model_copy(update=upd) if upd else final), renamed
+
+
 def write_topic(ctx: Ctx, topic: Applied, members: dict[str, Member], table: AliasTable, cfg: BriefConfig,
                 review: bool = True, draft: TopicPage | None = None) -> TopicResult:
     """draft를 주면 작성자를 부르지 않고 그 초안부터 검사·검수(--from-step review)."""
@@ -299,15 +340,6 @@ def write_topic(ctx: Ctx, topic: Applied, members: dict[str, Member], table: Ali
     kept, dropped = cap_pack(ms, cfg.evidence.max_tokens_per_topic)
     pack = pack_index(kept)
     n_sources = len({it.member for it in kept})
-    canon = {a: c.canonical for c in alias_lines(table, ms) for a in c.aliases}
-    # 이 토픽 이름의 한글 음차 표기(GPT-6 루나, 딥시크-V4.1 플래시)도 정본으로 고친다(리뷰 R11, F10). 근거가 모두 한글
-    # 음차뿐인 이름(클로드 소네트 5.5)도 사전으로 되돌린 영문 표기가 정본
-    tl = cfg.aliases.transliteration
-    translit = []
-    for name in sorted({n for m in ms for n in m.entities if n.strip()}):
-        target = to_original(table.canonical(name), tl)
-        if (pat := translit_pattern(target, tl)) is not None:
-            translit.append((pat, target))
     res = TopicResult(topic, "failed", None, [], [], list(pack), dropped, n_sources, costs={},
                       member_by_id={i: v[0].member for i, v in pack.items()})
     if not pack:
@@ -317,137 +349,16 @@ def write_topic(ctx: Ctx, topic: Applied, members: dict[str, Member], table: Ali
                                       relation=Relation(type=topic.relation_type, topic_id=topic.relation_topic_id)),
                        evidence=evidence_docs(pack), previous=previous_topic(ctx.db, topic.relation_topic_id),
                        aliases=alias_lines(table, ms), limits=writer_limits(cfg, n_sources))
-    if draft is None:
-        writer = load_role("writer", ctx.models)
-        page, err, sid = _call(writer, winp, ctx, res.costs, "writer")
-    else:
-        page, err, sid = draft, None, None
+    page, err, sid = (draft, None, None) if draft is not None else _call(load_role("writer", ctx.models), winp, ctx, res.costs, "writer")
     if page is None or not page.points:
         res.attention.append(f"작성 실패: {err or '포인트 없음'}")
         ctx.tracer.step(kind="code", role="writer", text=f"{topic.topic_id}: 작성 실패", attention=True, error=err)
         return res
-    critic = load_role("critic", ctx.models)
-    window_sec = config.load("video.yaml").align_window_sec
-    reviser = load_role("writer_revise", ctx.models)
-    seen: dict[tuple[str, str], int] = {}
-    check_locs: set[str] = set()
-    last_issue: dict[str, str] = {}  # 위치 → 마지막 이슈 원문(뺀 도식 표)
-    critic_seen = False
-
-    def run_critic(pg: TopicPage, rnd: int, warns: list[str]) -> tuple[Any, str | None, int | None]:
-        """refs 근거를 앞에, 나머지 토픽 근거를 뒤에(근거 원문). overview·summary·title은 토픽 근거 전체가 기준이다."""
-        nonlocal critic_seen
-        # 요약만 있는 id(카드 summary)는 원문이 아니라 빼고 준다(리뷰 R1: 요약·개요가 요약과 대조되던 문제)
-        raw_ids = [e for e in pack if not all(it.kind == "summary" for it in pack[e])]
-        order = [e for e in refs_of(pg) if e in raw_ids] + [e for e in raw_ids if e not in refs_of(pg)]
-        evid = [Document(id=e, source=pack[e][0].source.get("site") or pack[e][0].channel,
-                         title=pack[e][0].source.get("title"), text=raw_evidence(ctx.db, e, pack[e], window_sec)) for e in order]
-        cinp = CriticInput(loc_lines=loc_lines(pg), page=pg, evidence=evid, angle=topic.angle, previous=winp.previous,
-                           code_warnings=warns, round=rnd)
-        out = _call(critic, cinp, ctx, res.costs, "critic")
-        # 원자 사실 0개로 통과 = 대조를 건너뛴 판정(W40 재실행 3토픽, 출력 49토큰). 한 번 다시 부르고, 또 비면 검수 실패
-        if out[0] is not None and not out[0].atoms and pg.points:
-            res.attention.append("검수자가 원자 사실 0개로 판정(대조 건너뜀), 다시 부름")
-            again = cinp.model_copy(update={"code_warnings": [*warns, "직전 판정이 원자 사실 0개: 모든 문장을 원자 사실로 나눠 대조"]})
-            out = _call(critic, again, ctx, res.costs, "critic")
-            if out[0] is not None and not out[0].atoms:
-                out = (None, "원자 사실 0개 판정 반복", out[2])
-        critic_seen = critic_seen or out[0] is not None
-        return out
-    raw_page: dict[str, Any] | None = page.raw_dump()
-    for rnd in range(1, cfg.review.max_rounds + 1):
-        cr = checks.run_checks(page, pack, n_sources, cfg, canon, translit)
-        page = cr.page
-        res.pages.append((rnd, page, raw_page, sid))
-        issues = cr.issues
-        log = RoundLog(rnd, "code", "reject" if issues else "pass", [i.model_dump() for i in issues], cr.autofix,
-                       cr.warnings, sid)
-        if not issues and review:
-            res.rounds.append(log)
-            verdict, err, vsid = run_critic(page, rnd, cr.warnings)
-            if verdict is None:  # 검수 실패: 코드 검사만 통과한 판 + attention(검수 판정은 기록하지 않음)
-                res.attention.append(f"검수 실패: {err}")
-                res.status, res.page, res.final_round = "passed", page, rnd
-                break
-            v: ReviewVerdict = verdict
-            log = RoundLog(rnd, "critic", v.status, [i.model_dump() for i in v.issues], step_id=vsid,
-                           fact_support=v.fact_support.model_dump())
-            issues = v.issues if v.status == "reject" else []
-        res.rounds.append(log)
-        if not issues:
-            res.status, res.page, res.final_round = "passed", page, rnd
-            break
-        # 위치 번호를 1부터 센 이슈는 0부터로(검수자가 contributions[2]로 두 번째 항목을 가리킨 사례)
-        issues = [i.model_copy(update={"loc": normalize_loc(page, i.loc)}) for i in issues]
-        for it in issues:
-            last_issue[top_loc(it.loc)] = f"{log.checker} {it.type}: {it.comment}"
-        # 같은 위치·같은 유형이 두 번 남으면 확정(check) 후 제외
-        # 라운드 사이 반복만 센다(같은 라운드 안의 중복 이슈는 한 번으로, 리뷰 지적 1)
-        live = []
-        for key in dict.fromkeys((top_loc(it.loc), it.type) for it in issues):
-            seen[key] = seen.get(key, 0) + 1
-        for it in issues:
-            key = (top_loc(it.loc), it.type)
-            if seen[key] >= cfg.review.same_issue_repeat_to_check:
-                check_locs.add(key[0])
-            else:
-                live.append(it)
-        if rnd == cfg.review.max_rounds or not live:
-            check_locs |= {top_loc(i.loc) for i in live}
-            res.final_round = rnd
-            break
-        flagged = {top_loc(i.loc) for i in live}
-        rinp = WriterReviseInput(loc_lines=loc_lines(page), previous=page, issues=[IndexedIssue(idx=i, **x.model_dump()) for i, x in enumerate(live)],
-                                 evidence=[d for d in evidence_docs({k: v for k, v in pack.items()
-                                                                     if k in {x.evidence_id for x in live} | set(
-                                     r for loc in flagged for r in _loc_refs(page, loc))})],
-                                 aliases=winp.aliases)
-        rev, err, rsid = _call(reviser, rinp, ctx, res.costs, "writer_revise")
-        if rev is None:
-            res.attention.append(f"수정 실패: {err}")
-            check_locs |= flagged
-            res.final_round = rnd
-            break
-        raw_page = rev.model_dump()
-        page, reverts, notes = apply_revision(page, rev, flagged)
-        res.rounds[-1].reverts = reverts
-        if notes:
-            res.attention += notes[:3]
-        sid = rsid
-    else:
-        res.final_round = cfg.review.max_rounds
+    page, check_locs, last_issue = _rounds(ctx, res, topic, winp, pack, cfg, _canon_translit(table, ms, cfg), page, sid, review)
     final = res.page or page
-    if review and not critic_seen and res.status != "passed":
-        # 코드 반려만 이어져 검수자가 한 번도 보지 않고 끝난 판(리뷰 지적 2): 발행 전 한 번 검수, 이슈 위치는 check
-        verdict, _err, vsid = run_critic(final, res.final_round or cfg.review.max_rounds, [])
-        if verdict is not None:
-            res.rounds.append(RoundLog(res.final_round or cfg.review.max_rounds, "critic", verdict.status,
-                                       [i.model_dump() for i in verdict.issues], step_id=vsid,
-                                       fact_support=verdict.fact_support.model_dump()))
-            if verdict.status == "reject":
-                check_locs |= {top_loc(normalize_loc(final, i.loc)) for i in verdict.issues}
-    # 도식을 빼는 것은 코드가 최종판에서 확인한 형식·수치 오류(단위 섞임, 값 불일치, 빈 단위)일 때만(반영 확인 리뷰 F2:
-    # 검수자의 의미 지적만 남은 맞는 도식까지 지워 Haiku 구간 가격·textGrain 탐지율이 빠졌음). 의미 지적만 남으면 두고 ⚠
-    code_bad = {(m.group(1), int(m.group(2))) for i in checks.check(final, pack, n_sources, cfg)
-                if (m := re.match(r"^(numbers|events)\[(\d+)\]", i.loc))}
-    renamed: dict[str, str] = {}
-    if code_bad:
-        upd: dict[str, Any] = {}
-        for name in ("numbers", "events"):
-            keep = []
-            for i, g in enumerate(getattr(final, name)):
-                loc = f"{name}[{i}]"
-                if (name, i) in code_bad:
-                    renamed[loc] = f"빠진 도식: {g.title}"
-                    res.dropped_diagrams.append({"group": loc, "title": g.title, "issue": last_issue.get(loc, "")})
-                    check_locs.add(loc)
-                else:
-                    renamed[loc] = f"{name}[{len(keep)}]"
-                    keep.append(g)
-            if len(keep) != len(getattr(final, name)):
-                upd[name] = keep
-                res.attention.append(f"형식·수치 오류가 남은 {name} 도식 {len(getattr(final, name)) - len(keep)}개 뺌")
-        final = final.model_copy(update=upd)
+    if review and not any(lg.checker == "critic" for lg in res.rounds) and res.status != "passed":
+        _critic_unseen_pages(ctx, res, topic, winp, pack, final, check_locs, cfg)
+    final, renamed = _drop_code_bad_diagrams(res, final, pack, cfg, last_issue, check_locs)
     if check_locs:
         pts = [p.model_copy(update={"check": True}) if f"points[{i}]" in check_locs else p for i, p in enumerate(final.points)]
         final = final.model_copy(update={"points": pts})

@@ -136,6 +136,27 @@ md_dup=$(grep -n '<data>' roles/*.md
          awk 'length($0) > 20' roles/writer.md | grep -Fxf skills/diagrams.md -f skills/style_ko.md
          grep -nE '4~10|0\.55|0\.6|2~3|3~6|3~4' roles/editor_select.md roles/decide.md roles/writer.md)
 if [ -z "$md_dup" ]; then pass B10 "<data> 문장 0, writer.md와 diagrams·style_ko 같은 줄 0, editor_select·decide·writer의 설정 숫자 0"; else fail B10 "$(echo "$md_dup" | head -2 | tr '\n' ' ')"; fi
+# B4 파일·함수 크기: trendsit/**/*.py 500줄 이하, check·autofix·warnings(checks.py)·write_topic(write.py)·run_weekly(pipeline.py) 각 60줄 이하
+big=$(find trendsit -name '*.py' -print0 | xargs -0 wc -l | awk '$2 != "total" && $1 > 500 {print $2 ":" $1}')
+longfn=$(uv run --quiet python - <<'PY'
+import ast
+want = {"trendsit/brief/checks.py": ("check", "autofix", "warnings"), "trendsit/brief/write.py": ("write_topic",),
+        "trendsit/brief/pipeline.py": ("run_weekly",)}
+for path, names in want.items():
+    for n in ast.walk(ast.parse(open(path, encoding="utf-8").read())):
+        if isinstance(n, ast.FunctionDef) and n.name in names and n.end_lineno - n.lineno + 1 > 60:
+            print(f"{path}:{n.name}:{n.end_lineno - n.lineno + 1}")
+PY
+)
+if [ -z "$big$longfn" ]; then pass B4 "500줄 넘는 trendsit/**/*.py 0개, 5개 함수 모두 60줄 이하"; else fail B4 "$big $longfn"; fi
+# B5 순 줄 수(S5-1a 병합 커밋 bed7887 기준): trendsit/와 roles/·skills/ 모두 삭제 > 추가
+b5=""
+for paths in "trendsit/" "roles/ skills/"; do
+  stat=$(git diff --shortstat bed7887 -- $paths)
+  ins=$(echo "$stat" | sed -nE 's/.* ([0-9]+) insertion.*/\1/p'); del=$(echo "$stat" | sed -nE 's/.* ([0-9]+) deletion.*/\1/p')
+  [ "${del:-0}" -gt "${ins:-0}" ] && b5="$b5 [$paths +${ins:-0}/-${del:-0}]" || { b5="FAIL"; break; }
+done
+if [ "$b5" != "FAIL" ]; then pass B5 "순 감소(bed7887 기준)$b5"; else fail B5 "순 감소 아님: $stat ($paths)"; fi
 # A18 효과 없는 설정 키 0(S5-1a 5.7 표): yaml은 주석을 떼고, 스키마(core/config*.py)는 필드 정의 줄에서 찾는다
 DEAD='auto_approve|linkage|per_point_max|runtime|weekly_target_minutes|lang|channel_handle|why|paths|video_max_minutes|frames_per_slide_video'
 dead=$(for f in config/*.yaml; do sed 's/#.*//' "$f" | grep -nE "(^|[[:space:]{,-])($DEAD):" | sed "s#^#$f:#"; done
