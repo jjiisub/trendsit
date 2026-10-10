@@ -3,7 +3,7 @@
 번호 → SQL. 적용 기록은 schema_migrations 표에 남기고, 등록된 번호 중 기록에 없는 것을 오름차순으로 하나씩 적용한다.
 빈 번호를 허용하므로 두 브랜치가 각자 대역에 추가해도 병합 때 겹치지 않는다.
 
-번호 대역(COMMON 9장): 1~9 = S0~S1, 10~19 = S2~S3, 20~29 = S4, 30~39 = S5. 다른 대역끼리는 서로 의존하지 않는다.
+번호 대역(COMMON 9장): 1~9 = S0~S1, 10~19 = S2~S3, 20~29 = S4, 30~39 = S5, 40~49 = S6. 다른 대역끼리는 서로 의존하지 않는다.
 대역별 등록은 아래 각 묶음 자리에. S4 몫은 S4 브랜치가 자기 자리에 추가한다.
 """
 
@@ -230,6 +230,22 @@ register(34, """
 # 35: 토픽 수준 "확인 필요" 위치 목록(PR #9 리뷰 R4: summary·overview·concepts·numbers에 남은 이슈가 화면에 안 보였음)
 register(35, """
     ALTER TABLE topics ADD COLUMN checks_json TEXT;
+    """)
+
+
+# ---------- S6 (40~49) ----------
+# 40: weeks.status에 published, published_at 열(S6b 5.6). SQLite는 CHECK를 못 바꾸므로 표 재생성(새 표 → 복사 → 이름 바꿈).
+# 번호 하나가 한 트랜잭션이라 중간에 실패하면 되돌려진다
+register(40, """
+    CREATE TABLE weeks_new (
+        week TEXT PRIMARY KEY, start_day TEXT NOT NULL, end_day TEXT NOT NULL,
+        status TEXT NOT NULL CHECK(status IN ('open','clustered','selected','written','done','failed','published')),
+        current_run_id TEXT, published_at TEXT
+    );
+    INSERT INTO weeks_new(week, start_day, end_day, status, current_run_id)
+        SELECT week, start_day, end_day, status, current_run_id FROM weeks;
+    DROP TABLE weeks;
+    ALTER TABLE weeks_new RENAME TO weeks;
     """)
 
 

@@ -53,7 +53,12 @@ def cmd_weekly(args: argparse.Namespace) -> int:
     from .brief.pipeline import run_weekly
     from .core import config
     from .core.context import open_ctx
+    from .core.db import open_db
 
+    published = open_db().conn.execute("SELECT 1 FROM weeks WHERE week=? AND status='published'", (args.week,)).fetchone()
+    if published and not args.force:
+        print("발행된 주: --force로 다시 실행", file=sys.stderr)
+        return 2
     until = getattr(args, "step", None)  # select/write/review 단계 명령
     until = until if until in ("select", "write") else None
     from_step = args.from_step
@@ -91,6 +96,7 @@ def register(sub: Any) -> None:
                    help="앞 단계는 이 주의 현재판 run에서 읽고 새 run으로 이어서")
     w.add_argument("--topic", help="한 토픽만(write·review)")
     w.add_argument("--no-cache", action="store_true")
+    w.add_argument("--force", action="store_true", help="발행된 주도 다시 실행(발행은 publish로 따로)")
     w.add_argument("--spec")
     w.set_defaults(fn=cmd_weekly)
     for step, help_ in (("select", "편집장 선별까지(현재판 묶기에서)"), ("write", "작성자 초안 + 코드 검사까지(검수자 없음)"),
@@ -99,6 +105,7 @@ def register(sub: Any) -> None:
         sp.add_argument("--week", type=_week, required=True)
         sp.add_argument("--topic")
         sp.add_argument("--no-cache", action="store_true")
+        sp.add_argument("--force", action="store_true", help="발행된 주도 다시 실행")
         sp.add_argument("--spec")
         sp.set_defaults(fn=cmd_weekly, step=step, from_step=step)
     c = sub.add_parser("cluster", help="주간 묶기(S5): 근거 목록 → 표기 정규화 → 묶기 → 과거 대조 → 묶기 리포트")
