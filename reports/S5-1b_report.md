@@ -120,6 +120,24 @@
 - findings 승계: 002-I01(`fetch_page` 깊이 재계산, 금지 구조 필요), 002-I02(리포트 장이 비어 있는 채 grep PASS, 런 뒤 채우는 장) — 둘 다 이번 명세 범위 밖으로 처리하지 않음
 - 거부: 예산 초과(사용자 승인), video_summary(사용자 결정), COMMON.md(main 쪽 변경). optional 목록은 6-1과 SUMMARY
 
+## 8-1. PR 리뷰 반영(리뷰 세션 2026-10-11, code-findings-1 R1-01)
+- **R1-01(High)**: 수정 라운드를 거친 토픽의 포인트가 거의 전부 ⚠로 발행됐다. `points[].check`는 코드 소유인데 `apply_revision`이 수정자 출력의 `Point.check`를 그대로 저장했다. main에서는 수정자가 `previous` JSON의 `check: false`를 베꼈지만, 5.3 렌더 중복 제거로 그 값을 못 보게 되면서 `check: true`를 내기 시작했다
+- 수정(impl-workflow 런 `003-s5-1b`, 리뷰 3회): check가 들어오는 세 입구에서 코드만 정하게 했다
+  - 수정 합치기: `apply_revision`이 편집·추가로 들어오는 `Point`의 check를 false로(`revision.py`)
+  - 이어 온 초안: `--from-step review` 초안은 enforce를 거치지 않으므로 `write_topic` 들머리에서 check를 false로(중간 라운드 저장 행·검수자 입력 `[확인 필요]`에도 남지 않게)
+  - 최종 판: `check = points[i] ∈ check_locs`로 덮어쓰기(전에는 켜기만 했다)
+  - 테스트 3개: 수정 합치기(편집·추가), 최종 판이 check_locs만 따름, 이어 온 초안의 옛 check가 첫 라운드에 없음. 각각 수정 전 코드에서 실패하는 것을 확인
+- **현재판 0원 정정(사용자 결정 A)**: 코드 수정 뒤 W40 `20261011-000337-weekly-3d01`·W41 `20261011-000535-weekly-7772`의 토픽별 최종 판(최종 판 round = `final_round`, 20토픽 모두) `points[i].check`를 `topics.checks_json`에 `points[i]`가 있을 때만 true로 맞췄다. LLM 호출·재실행 없음
+  - 정정 전 DB 백업(sha256 앞 16 `605c64beb66c5b10`). 바뀐 토픽 14/20, 다시 돌리면 0
+  - 확인: 토픽마다 포인트 text·refs가 바이트 그대로이고, 포인트 check 밖 칸은 같다(왕복 직렬화 일치 확인 뒤 비교). 정정 뒤 포인트 ⚠ 위치 == `checks_json`의 `points[i]`(W40 gpt-6-1-sol points[4], devday points[0], llamaindex points[0], W41 agent-slop points[1])
+  - 읽기본 `reports/S5_brief/briefing_2026-W4{0,1}.md` 재생성: ⚠ W40 46 → 10, W41 37 → 5. 차이는 "⚠ " 표시뿐이다
+  - 관문 B(10장)는 글이 바뀌지 않으므로 그대로다
+- 리뷰 중 나온 기존 결함(bed7887부터 같은 구조, 단순화 스펙 밖이라 고치지 않음, 리뷰 세션 판단):
+  - check_locs·같은 이슈 반복 집계가 그 라운드 번호로 고정돼, 같은 라운드나 이후에 앞 포인트가 지워지거나 잘리면 다른 포인트에 붙거나 없는 위치(읽기본 "⚠ points[n]")를 가리킨다. numbers·events의 anchor도 따라가지 않는다
+  - 원본 run의 final_round가 1이면 round 1 행이 최종판으로 덮여 있어 `--from-step review`가 작성자 초안이 아닌 판에서 시작한다
+  - 수정 위치 정규식 `LOC`에 끝 표시가 없어 `points[0].refs`에 문자열을 주면 포인트 text가 그 값으로 바뀐다
+  - `apply_revision` 79줄(5.4는 함수 5개만 지정, 이 함수는 옮기기만 함)
+
 ## 9. 줄 수 전후 (`bed7887` → 이 브랜치)
 | | 전 | 후 |
 |---|---|---|
