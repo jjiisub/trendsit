@@ -17,7 +17,7 @@ from pathlib import Path
 
 from trendsit.collect.video import contract
 from trendsit.collect.video.process import Overrides, media_process
-from trendsit.collect.video.settings import load_video_config
+from trendsit.core import config
 from trendsit.core.artifacts_video import FRAME_PRIORITY, VideoQueueItem
 from trendsit.core.config import ROOT
 
@@ -35,7 +35,7 @@ def main() -> int:
     ap.add_argument("--res", type=int)
     args = ap.parse_args()
     item = VideoQueueItem(video_id=args.video_id, mode=args.mode, reason="픽스처 저장")
-    r = media_process(item, load_video_config(), ROOT / "data/media",
+    r = media_process(item, config.load("video.yaml"), ROOT / "data/media",
                       overrides=Overrides(frames=args.frames, frames_res=args.res))
     problems = contract.check(r, check_files=True)
     if problems:

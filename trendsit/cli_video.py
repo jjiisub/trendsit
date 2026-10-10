@@ -41,7 +41,7 @@ def _queue(args: argparse.Namespace) -> list[Any]:
 
 def cmd_run(args: argparse.Namespace) -> int:
     from .collect.video.process import Overrides
-    from .collect.video.settings import load_video_config
+    from .core import config
     from .core.artifacts_video import MediaResult
     from .core.budget import BudgetExceeded, PriceUnknown
     from .core.context import open_ctx
@@ -57,7 +57,7 @@ def cmd_run(args: argparse.Namespace) -> int:
     if media is not None and (len(items) != 1 or items[0].video_id != media.video_id or items[0].mode != media.mode):
         print("--from-json은 같은 영상, 같은 mode 하나에만", file=sys.stderr)
         return 2
-    cfg = load_video_config()
+    cfg = config.load("video.yaml")
     ctx = open_ctx(None, spec=_spec(args), no_cache=args.no_cache, model=args.model)
     overrides = Overrides(frames=args.frames, frames_res=args.res, lang=args.lang)
     results, code = [], 0

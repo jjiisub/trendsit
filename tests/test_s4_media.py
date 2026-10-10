@@ -21,8 +21,8 @@ from trendsit.collect.video import contract, cues, source
 from trendsit.collect.video import frames as fr
 from trendsit.collect.video import transcribe as tr
 from trendsit.collect.video.process import Deps, MediaSkipped, media_process, resolve_span
-from trendsit.collect.video.settings import check_video_config, load_video_config
 from trendsit.collect.video.workspace import Workspace, purge
+from trendsit.core import config
 from trendsit.core.artifacts_video import MediaResult, VideoQueueItem
 from trendsit.core.config_video import FRAME_CAP_MAX
 
@@ -37,10 +37,11 @@ mac_video = pytest.mark.skipif(
 
 
 def cfg():
-    return load_video_config()
+    return config.load("video.yaml")
 
 
 def write_video_yaml(tmp_path: Path, mutate) -> Path:
+    shutil.copytree(ROOT / "config", tmp_path, dirs_exist_ok=True)  # check_all은 설정 파일 전체를 읽음
     data = yaml.safe_load((ROOT / "config/video.yaml").read_text(encoding="utf-8"))
     mutate(data)
     (tmp_path / "video.yaml").write_text(yaml.safe_dump(data, allow_unicode=True), encoding="utf-8")
@@ -49,7 +50,7 @@ def write_video_yaml(tmp_path: Path, mutate) -> Path:
 
 # ---------- A3 설정 ----------
 def test_video_config_ok():
-    assert check_video_config() == []
+    assert config.check_all() == []
     c = cfg()
     assert c.modes.get("whisper+slides").frames_cap <= FRAME_CAP_MAX
     assert c.modes.get("whisper").frames == "off"
@@ -63,7 +64,7 @@ def test_video_config_ok():
     (lambda d: d.update(max_span_sec=10), "max_span_sec"),
 ])
 def test_video_config_bad_points_to_path(tmp_path, mutate, path):
-    errors = check_video_config(write_video_yaml(tmp_path, mutate))
+    errors = [e for e in config.check_all(write_video_yaml(tmp_path, mutate)) if e.file == "video.yaml"]
     assert errors and errors[0].file == "video.yaml"
     assert errors[0].path == path, errors[0]
 

@@ -13,7 +13,7 @@ import json
 import sys
 from pathlib import Path
 
-from trendsit.collect.video.settings import load_video_config
+from trendsit.core import config
 from trendsit.core.artifacts_video import MediaResult, SlideReading, VideoQueueItem
 from trendsit.core.config import ROOT
 from trendsit.core.db import DB
@@ -39,7 +39,7 @@ def build(db: DB, media: MediaResult, readings: list, window: int) -> dict:
 
 
 def main(queue_path: str) -> int:
-    cfg = load_video_config()
+    cfg = config.load("video.yaml")
     db = DB(ROOT / "data/trendsit.db")
     OUT.mkdir(parents=True, exist_ok=True)
     items = [VideoQueueItem.model_validate(x) for x in json.loads(Path(queue_path).read_text(encoding="utf-8"))]
