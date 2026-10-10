@@ -402,15 +402,16 @@ def test_budget_stop_write(week, monkeypatch, tmp_path, capsys):
     assert calls == ["writer", "critic", "writer"]
 
 
-def test_budget_stop_select(week, monkeypatch, tmp_path, capsys):
+@pytest.mark.parametrize("exc", ["BudgetExceeded", "PriceUnknown"])
+def test_budget_stop_select(week, monkeypatch, tmp_path, capsys, exc):
     from trendsit.brief import select as sel
-    from trendsit.core.budget import PriceUnknown
+    from trendsit.core import budget
 
     ctx, _ = week
     before = tuple(ctx.db.conn.execute("SELECT status, current_run_id FROM weeks").fetchone())
-    calls = stub_run_role(monkeypatch, sel, lambda n, role: PriceUnknown("모델 단가 없음"))
+    calls = stub_run_role(monkeypatch, sel, lambda n, role: getattr(budget, exc)("상한"))
     assert run_cmd(ctx, monkeypatch, tmp_path) == 1
-    assert_stopped(ctx, tmp_path, capsys, before, "PriceUnknown: 모델 단가 없음")
+    assert_stopped(ctx, tmp_path, capsys, before, f"{exc}: 상한")
     assert calls == ["editor_select"] and ctx.llm.transport.calls == 0
     assert ctx.db.conn.execute("SELECT COUNT(*) FROM topics WHERE run_id=?", (ctx.tracer.run_id,)).fetchone()[0] == 0
 
@@ -433,6 +434,7 @@ def test_budget_stop_cluster(week, monkeypatch, tmp_path, capsys):
     assert calls == ["decide", "decide"] and ctx.llm.transport.calls == 1
     assert ctx.db.conn.execute("SELECT COUNT(*) FROM cluster_pairs WHERE run_id=? AND decided=1", (run_id,)).fetchone()[0] == 1
     assert ctx.db.conn.execute("SELECT COUNT(*) FROM topics WHERE run_id=?", (run_id,)).fetchone()[0] == 0
+    assert not (tmp_path / "labels").exists()  # 멈춘 run은 라벨 시트를 쓰지 않음
 
 
 def _status_of(ctx, cids, monkeypatch, fail) -> dict:
@@ -451,9 +453,10 @@ def test_summary_status_failed(week, monkeypatch):
     from trendsit.core.role import RoleFailed
 
     ctx, cids = week
+    before = tuple(ctx.db.conn.execute("SELECT status, current_run_id FROM weeks").fetchone())
     summary = _status_of(ctx, cids, monkeypatch, lambda n, role: RoleFailed("출력 검증 실패"))
     assert summary["status"] == "failed" and summary["write"] == {"topics": 4, "failed": 4}
-    assert ctx.db.conn.execute("SELECT status FROM weeks").fetchone()[0] == "failed"
+    assert tuple(ctx.db.conn.execute("SELECT status, current_run_id FROM weeks").fetchone()) == before  # 현재판 그대로
 
 
 def test_summary_status_partial(week, monkeypatch):

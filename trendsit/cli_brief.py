@@ -28,9 +28,10 @@ def cmd_cluster(args: argparse.Namespace) -> int:
         stage = stage_cluster(args.week, ctx, use_llm=not args.no_llm)
         path = write_cluster_report(stage, config.load("brief.yaml"),
                                     note=args.note or "")
-        write_label_sheets(stage)
         if ctx.stopped:
             status = "stopped"
+        else:  # 멈춘 run은 그 주 라벨 시트 행을 덮지 않음
+            write_label_sheets(stage)
     except Exception:
         status = "failed"
         raise
@@ -62,7 +63,8 @@ def cmd_weekly(args: argparse.Namespace) -> int:
     try:
         summary = run_weekly(args.week, ctx, from_step=from_step, only_topic=getattr(args, "topic", None), until=until)
         status = "ok" if summary["status"] == "done" else summary["status"]
-        if not ctx.stopped:  # 멈춘 run의 읽기본이 직전 현재판의 읽기본을 덮지 않게
+        all_failed = not until and summary["status"] == "failed"  # 현재판이 바뀌지 않음(pipeline._close)
+        if not ctx.stopped and not all_failed:  # 멈추거나 전부 실패한 run의 읽기본이 직전 현재판의 읽기본을 덮지 않게
             path = write_briefing_md(ctx.db, args.week, ctx.tracer.run_id)
     except Exception:
         status = "failed"
@@ -73,6 +75,9 @@ def cmd_weekly(args: argparse.Namespace) -> int:
                      ensure_ascii=False))
     if ctx.stopped:
         print(f"run {ctx.tracer.run_id}, {ctx.stopped}", file=sys.stderr)
+        return 1
+    if all_failed:
+        print(f"run {ctx.tracer.run_id}, 토픽 전부 실패(0개 포함): 현재판 그대로", file=sys.stderr)
         return 1
     print(f"run {ctx.tracer.run_id}, 브리핑 읽기본 {path}")
     return 0

@@ -54,7 +54,8 @@ def run_weekly(week: str, ctx: Ctx, from_step: str = "cluster", only_topic: str 
         from .report import write_cluster_report, write_label_sheets
 
         write_cluster_report(stage, cfg, note="weekly 실행의 묶기 단계")
-        write_label_sheets(stage)
+        if not ctx.stopped:  # 멈춘 run은 그 주 라벨 시트 행을 덮지 않음(판정 못 한 쌍의 줄이 빠지지 않게)
+            write_label_sheets(stage)
         dur |= {"evidence": stage.seconds["evidence"] + stage.seconds["normalize"], "cluster": stage.seconds["cluster"]}
     else:
         ev = week_evidence(db, week)
@@ -143,7 +144,8 @@ def run_weekly(week: str, ctx: Ctx, from_step: str = "cluster", only_topic: str 
 
 
 def _close(ctx: Ctx, week: str, t0: float, dur: dict[str, float], n_topics: int = 0, until: str | None = None) -> dict[str, Any]:
-    """실행 요약을 계산해 저장하고, 멈추지 않았으면 이 run을 그 주 현재판으로 올린다. weeks.status는 요약 상태에서 따온다."""
+    """실행 요약을 계산해 저장하고, 멈추지 않았고 전부 실패도 아니면(until 단계 명령은 그대로) 이 run을 그 주 현재판으로
+    올린다. weeks.status는 요약 상태에서 따온다."""
     db, tr = ctx.db, ctx.tracer
     assert tr is not None
     run_id = tr.run_id
@@ -153,9 +155,9 @@ def _close(ctx: Ctx, week: str, t0: float, dur: dict[str, float], n_topics: int 
     summary = compute_summary(db, run_id)
     with db.conn:
         db.conn.execute("UPDATE runs SET summary_json=? WHERE id=?", (json.dumps(summary, ensure_ascii=False), run_id))
-        if not ctx.stopped:
+        if not ctx.stopped and (until or summary["status"] != "failed"):
             status = ({"select": "selected", "write": "written"}[until] if until
-                      else {"done": "done", "partial": "written", "failed": "failed"}[summary["status"]])
+                      else {"done": "done", "partial": "written"}[summary["status"]])
             db.conn.execute("UPDATE weeks SET status=?, current_run_id=? WHERE week=?", (status, run_id, week))
     return summary
 
