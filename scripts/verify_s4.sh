@@ -9,20 +9,16 @@ trap 'rm -rf "$TMP"' EXIT
 EXTRA=()
 [ "$(uname -s)" = "Darwin" ] && EXTRA=(--extra video)
 
-pass() { echo "PASS $1 $2"; }
-fail() { echo "FAIL $1 $2"; FAILED=1; }
-pt() {
-  local id=$1 desc=$2; shift 2
-  local out
-  out=$(uv run --quiet "${EXTRA[@]}" pytest -q "$@" 2>&1 | tail -1)
-  if [[ "$out" == *passed* && "$out" != *failed* && "$out" != *error* ]]; then pass "$id" "$desc ($out)"; else fail "$id" "$desc: $out"; fi
-}
+source scripts/verify_common.sh
 
 # A1 회귀
 for s in 0 1; do
+  [ -n "${VERIFY_NESTED:-}" ] && continue
   if bash "scripts/verify_s$s.sh" >"$TMP/s$s" 2>&1; then :; else fail A1 "verify_s$s.sh: $(grep '^FAIL' "$TMP/s$s" | head -2 | tr '\n' ' ')"; fi
 done
-grep -q '^FAIL' "$TMP/s0" "$TMP/s1" || pass A1 "verify_s0.sh $(grep -c '^PASS' "$TMP/s0")개, verify_s1.sh $(grep -c '^PASS' "$TMP/s1")개 전부 PASS"
+if [ -n "${VERIFY_NESTED:-}" ]; then
+  echo "SKIP A1 verify_s5가 s0·s1을 이미 실행함"
+elif ! grep -q '^FAIL' "$TMP/s0" "$TMP/s1"; then pass A1 "verify_s0.sh $(grep -c '^PASS' "$TMP/s0")개, verify_s1.sh $(grep -c '^PASS' "$TMP/s1")개 전부 PASS"; fi
 
 # A2 정적 검사, 테스트(맥 전용은 mac_video 표시 하나로만 건너뜀)
 if uv run --quiet "${EXTRA[@]}" ruff check . >"$TMP/ruff" 2>&1 && uv run --quiet "${EXTRA[@]}" pytest -q -rs >"$TMP/pt" 2>&1; then

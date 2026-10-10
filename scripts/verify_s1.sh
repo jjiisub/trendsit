@@ -7,18 +7,12 @@ FAILED=0
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 
-pass() { echo "PASS $1 $2"; }
-fail() { echo "FAIL $1 $2"; FAILED=1; }
-# pytest 묶음 하나를 항목 하나로: $1=항목 $2=설명 $3...=pytest 인자
-pt() {
-  local id=$1 desc=$2; shift 2
-  local out
-  out=$(uv run --quiet pytest -q "$@" 2>&1 | tail -1)
-  if [[ "$out" == *passed* && "$out" != *failed* && "$out" != *error* ]]; then pass "$id" "$desc ($out)"; else fail "$id" "$desc: $out"; fi
-}
+source scripts/verify_common.sh
 
 # ---------- 1b 공통: 회귀, 정적 검사 ----------
-if bash scripts/verify_s0.sh >"$TMP/s0" 2>&1; then
+if [ -n "${VERIFY_NESTED:-}" ]; then
+  echo "SKIP A1 verify_s5가 s0·s1을 이미 실행함"
+elif bash scripts/verify_s0.sh >"$TMP/s0" 2>&1; then
   pass A1 "verify_s0.sh 전부 PASS ($(grep -c '^PASS' "$TMP/s0")개)"
 else
   fail A1 "verify_s0.sh: $(grep '^FAIL' "$TMP/s0" | head -2 | tr '\n' ' ')"

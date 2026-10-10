@@ -9,14 +9,7 @@ TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
 EXTRA=(--extra video --extra embed)  # 건너뜀 0은 두 extra 모두에서(리뷰 R16)
 
-pass() { echo "PASS $1 $2"; }
-fail() { echo "FAIL $1 $2"; FAILED=1; }
-pt() {
-  local id=$1 desc=$2; shift 2
-  local out
-  out=$(uv run --quiet "${EXTRA[@]}" pytest -q "$@" 2>&1 | tail -1)
-  if [[ "$out" == *passed* && "$out" != *failed* && "$out" != *error* ]]; then pass "$id" "$desc ($out)"; else fail "$id" "$desc: $out"; fi
-}
+source scripts/verify_common.sh
 
 # A1 회귀: 종료 코드로 판정(리뷰 R16)
 if [ "$FAST" = 1 ]; then
@@ -24,7 +17,8 @@ if [ "$FAST" = 1 ]; then
 else
   a1_bad=""
   for s in 0 1 2 3 4; do
-    bash "scripts/verify_s$s.sh" >"$TMP/s$s" 2>&1 || a1_bad="$a1_bad s$s"
+    # s1~s4는 s0·s1 회귀를 다시 부르므로 VERIFY_NESTED로 건너뛰게 해 s0~s4가 각각 한 번만 돈다(단독 실행 판정은 그대로)
+    VERIFY_NESTED=1 bash "scripts/verify_s$s.sh" >"$TMP/s$s" 2>&1 || a1_bad="$a1_bad s$s"
   done
   if [ -n "$a1_bad" ]; then
     fail A1 "종료 코드 실패:${a1_bad} / $(grep -h '^FAIL' "$TMP"/s[0-4] | head -3 | tr '\n' ' ')"
@@ -108,4 +102,32 @@ fi
 pt A19 "예산 초과 시 멈춤(write·select·cluster 도중 BudgetExceeded: 현재판 불변, run stopped, 종료 코드 1, 남은 일 시작 0)" tests/test_s5_weekly.py -k budget_stop
 pt A20 "실행 요약 상태(전부 실패 failed, 일부 partial, 예산 stopped)" -k summary_status
 pt A21 "read_more 열쇠(fetch_page가 저장한 열쇠로 찾음: github 대문자, http, arxiv pdf)" -k read_more_page_key
+# A22 지운 코드가 없음(S5-1a 5.8)
+gone=$(uv run --quiet python - <<'PY'
+from trendsit.core.artifacts import RoleOutput  # noqa: F401
+from trendsit.core.artifacts_brief import BriefingPlan, FactCheck, ReviewVerdict, TopicPage, TopicPageRevision
+from trendsit.core.artifacts_text import CollectionPlan
+from trendsit.core.artifacts_video import SlideReading
+print(" ".join(c.__name__ for c in (BriefingPlan, TopicPage, TopicPageRevision, ReviewVerdict, FactCheck, SlideReading, CollectionPlan)
+               if "fallback" in vars(c)))
+PY
+)
+gone="$gone$([ -e trendsit/collect/video/settings.py ] && echo ' settings.py')"
+gone="$gone $(grep -rnE --include='*.py' 'def (as_dicts|have_tools)\b' trendsit | head -2 | tr '\n' ' ')"
+gone="$gone $(grep -nE 'def score\(.*trend|키워드 추세|def save\(.*truncated' trendsit/brief/cluster.py | tr '\n' ' ')"
+gone="$gone $(grep -nE 'def sources_index.*tuple' trendsit/brief/briefing.py)"
+if [ -z "$(echo "$gone" | tr -d ' ')" ]; then pass A22 "fallback() 7개, collect/video/settings.py, F-18 이름 모두 없음"; else fail A22 "남아 있음: $gone"; fi
+
+# A23 trendsit/ 순 줄 수 감소(a259b99 기준)
+stat=$(git diff --shortstat a259b99 -- trendsit/)
+ins=$(echo "$stat" | sed -nE 's/.* ([0-9]+) insertion.*/\1/p'); del=$(echo "$stat" | sed -nE 's/.* ([0-9]+) deletion.*/\1/p')
+if [ "${del:-0}" -gt "${ins:-0}" ]; then pass A23 "trendsit/ 추가 ${ins:-0}줄 < 삭제 ${del:-0}줄"; else fail A23 "순 감소 아님: $stat"; fi
+
+# A24 리포트·README
+if [ -f reports/S5-1a_report.md ] && grep -q '\[x\]' reports/S5-1a_report.md && ! grep -q '\[ \]' reports/S5-1a_report.md \
+   && grep '현재 상태' README.md | grep -q 'S5-1a'; then
+  pass A24 "S5-1a_report 체크리스트 전부 [x], README 현재 상태에 S5-1a"
+else
+  fail A24 "reports/S5-1a_report.md 체크리스트 또는 README 현재 상태 줄"
+fi
 exit $FAILED
