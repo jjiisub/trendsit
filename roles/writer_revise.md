@@ -72,4 +72,10 @@ issues: [{idx 0, loc "summary", type "overclaim", comment "'기술 역사상 가
 잘못: summary를 고치면서 overview와 points 문장도 매끄럽게 바꿈
 맞음: changed에 summary 하나만(해당 구절만 근거 표현으로 바꾼 문장). overview·points는 내지 않는다
 </example>
+<example>
+함정: 채널이 빠진 contributions
+issues: [{idx 0, loc "contributions", type "format", comment "근거 채널 ['github', 'text'] 중 ['github', 'text']의 contributions 문장이 없음"}]
+잘못: changed [{loc "contributions", action "add", value {text "릴리스 노트는 …, 원문은 …", refs ["rp:a/b", "it:12#q1"]}}](두 채널을 한 문장에, channel 없음)
+맞음: changed [{issue_idx 0, loc "contributions", action "add", value {channel "github", text "v0.6.6 릴리스의 operator 기반 즉시 실행", refs ["rp:a/b"]}}, {issue_idx 0, loc "contributions", action "add", value {channel "text", text "YAML로 팀을 정의해 한 명령으로 부팅하는 구조 설명", refs ["it:12#q1"]}}]
+</example>
 </examples>

@@ -327,3 +327,16 @@ def test_f2c_check_pointing_to_removed_diagram_is_labeled():
 
     p = TopicPage.model_validate(json.loads(page(1, "Argon이 DeepSWE에서 77.9% 기록")))
     assert briefing.visible_checks(["numbers[1]", "points[0]"], p) == ["빠진 도식(numbers[1])", "points[0]"]
+
+
+def test_g6_contribution_given_as_point_gets_channel_from_refs():
+    from trendsit.brief.write import apply_revision
+    from trendsit.core.artifacts_brief import Change, Point, TopicPage, TopicPageRevision
+
+    prev = TopicPage.model_validate(json.loads(page(1, "Argon이 DeepSWE에서 77.9% 기록")))
+    rev = TopicPageRevision(changed=[
+        Change(issue_idx=0, loc="contributions", action="add", value=Point(text="릴리스 노트", refs=["rp:a/b"])),
+        Change(issue_idx=0, loc="contributions", action="add", value=Point(text="섞음", refs=["rp:a/b", "it:1#q1"]))],
+        log="l")
+    new, _rv, notes = apply_revision(prev, rev, {"contributions"})
+    assert [(c.channel, c.text) for c in new.contributions] == [("github", "릴리스 노트")] and any("섞음" in n for n in notes)

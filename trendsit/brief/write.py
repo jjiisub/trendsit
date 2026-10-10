@@ -160,6 +160,10 @@ def raw_evidence(db: DB, eid: str, items: list[EvidenceItem]) -> str:
                 if ocr:
                     parts.append("화면 판독: " + ocr)
         parts += [f"{it.text} {it.value or ''}{it.unit or ''}".strip() for it in items if it.kind == "slide_fact"]
+        # 작성자에게 준 영상 핵심 포인트·구간 이름도 검수·judge 입력에(반영 확인 리뷰 3차 질문 2: LlamaIndex "ParseBench
+        # 3가지 처리 영역"은 vd:274@816 핵심 포인트에 있었으나 앞뒤 30초 전사에 없어 근거 밖으로 판정됨)
+        parts += [f"영상 핵심 포인트: {it.text}" for it in items if it.kind == "claim"]
+        parts += [f"영상 구간: {it.text}" for it in items if it.kind == "timeline"]
         return "\n".join(parts)
     quotes = [it.text for it in items if it.kind in ("quote", "repo_field")]
     if quotes:
@@ -175,6 +179,10 @@ def refs_of(page: TopicPage) -> list[str]:
     ids += [r for c in page.contributions for r in c.refs]
     ids += [r for g in [*page.numbers, *page.events] for r in checks.REF.findall(g.context)]
     return list(dict.fromkeys(ids))
+
+
+def ref_channel(ref: str) -> str:
+    return "video" if ref.startswith("vd:") else "github" if ref.startswith("rp:") else "text"
 
 
 # ---------- 수정 합치기 ----------
@@ -209,6 +217,8 @@ def apply_revision(prev: TopicPage, rev: TopicPageRevision, allowed: set[str]) -
             reverts += 1
             notes.append(f"지적 안 된 위치 {ch.loc} 변경 되돌림")
             continue
+        if LIST_LOC.match(loc) and ch.action == "add":  # 목록 위치에 더하기(번호 없이 "contributions"): 끝에 붙임(G6)
+            loc = f"{loc}[{len(data[loc])}]"
         m = LOC.match(loc)
         if not m and LIST_LOC.match(loc) and ch.action == "delete":
             if loc == "points":  # 포인트 전체 삭제는 받지 않음(필수 칸)
@@ -250,6 +260,14 @@ def apply_revision(prev: TopicPage, rev: TopicPageRevision, allowed: set[str]) -
         val = ch.value
         if isinstance(val, str) and name == "points":
             val = Point(text=val, refs=data[name][idx]["refs"] if idx < len(data[name]) else [])
+        if name == "contributions" and isinstance(val, Point):
+            # 채널 없이 낸 기여 문장(OpenRig 재실행: 두 채널을 한 문장에, 반영 확인 리뷰 G6). refs가 한 채널이면 그 채널로
+            chans = {ref_channel(r) for r in val.refs}
+            if len(chans) == 1:
+                val = Contribution(channel=chans.pop(), text=val.text, refs=val.refs)  # type: ignore[arg-type]
+            else:
+                notes.append(f"{ch.loc}: 기여 문장이 채널 {sorted(chans)}를 한 문장에 섞음(채널마다 1문장)")
+                continue
         if not isinstance(val, FIELD_TYPES[name]):
             notes.append(f"{ch.loc}: 값 형식이 {FIELD_TYPES[name].__name__}가 아님")
             continue

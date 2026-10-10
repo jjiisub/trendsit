@@ -423,10 +423,13 @@ def test_f3_missing_diagram_warning_only_same_sentence_same_unit():
 
 
 def test_f7_angle_words_missing_from_first_point_warns():
-    p = page(points=[Point(text="업스테이지 투트랙 전략으로 사업 확대", refs=["it:1#q1"]), *page().points[1:]])
+    """C-23: summary 첫 문장과 첫 두 point 어디에도 angle 핵심 낱말이 없을 때만 경고."""
+    p = page(points=[Point(text="업스테이지 투트랙 전략으로 사업 확대", refs=["it:1#q1"]),
+                     Point(text="정확도 B 93.5%로 세 모델 중 가장 높음", refs=["it:1#q2"]), *page().points[2:]])
     w = checks.run_checks(p, pack(), 2, CFG, {}, angle="GPU 한 장 실행 가능한 MoE 소형 모델의 에이전트 최적화").warnings
     assert any(x.startswith("핵심 의심") for x in w)
-    ok = page(points=[Point(text="GPU 한 장에서 돌아가는 MoE 소형 모델", refs=["it:1#q1"]), *page().points[1:]])
+    ok = page(points=[Point(text="업스테이지 투트랙 전략으로 사업 확대", refs=["it:1#q1"]),
+                      Point(text="GPU 한 장에서 돌아가는 MoE 소형 모델", refs=["it:1#q1"]), *page().points[2:]])  # 둘째 point
     assert not any(x.startswith("핵심 의심") for x in checks.run_checks(
         ok, pack(), 2, CFG, {}, angle="GPU 한 장 실행 가능한 MoE 소형 모델의 에이전트 최적화").warnings)
 
@@ -434,3 +437,35 @@ def test_f7_angle_words_missing_from_first_point_warns():
 def test_f11_evaluative_endings():
     p = page(summary="Anthropic이 Haiku 5.5를 내놨다. 구간 가격이 다른 것이 쟁점이다.")
     assert any(i.loc == "summary" and "금지 표현" in i.comment for i in checks.run_checks(p, pack(), 2, CFG, {}).issues)
+
+
+def test_g2_point_with_three_same_unit_values_and_no_diagram_warns():
+    p = page(points=[Point(text="동의어 치환율 0·10·20%에서 탐지율 92%, 66%, 17%로 떨어짐", refs=["it:1#q2"]), *page().points[1:]])
+    w = checks.warnings(p, pack(), CFG)
+    assert any(x.startswith("누락 의심: points[0]") for x in w)
+    dims = page(points=[Point(text="차원 768, 512, 256개 지원", refs=["it:1#q2"]), *page().points[1:]])
+    assert not any(x.startswith("누락 의심: points[0]") for x in checks.warnings(dims, pack(), CFG))
+
+
+def test_g3_per_million_shortened_and_english_particle():
+    src = {"site": "S", "title": "t"}
+    pk = pack() | {"it:3#q1": [EvidenceItem("it:3#q1", "it:3", "text", "quote",
+                                            "Over 100K: $0.50 / $2.50 per million tokens.", src)]}
+    p = page(points=[*page().points, Point(text="10만 토큰 초과 시 입력/출력 토큰당 $0.50/$2.50 적용", refs=["it:3#q1"])])
+    issues = checks.run_checks(p, pk, 2, CFG, {}).issues
+    assert any(i.loc == "points[3]" and "100만 토큰당" in i.comment for i in issues)
+    ok = page(points=[*page().points, Point(text="10만 토큰 초과 시 100만 토큰당 $0.50/$2.50 적용", refs=["it:3#q1"])])
+    assert not any("토큰당" in i.comment for i in checks.run_checks(ok, pk, 2, CFG, {}).issues)
+    bad = page(summary="Anthropic가 Haiku를 내놨다.")
+    assert any("조사 'Anthropic가'" in i.comment for i in checks.run_checks(bad, pack(), 2, CFG, {}).issues)
+    fine = page(summary="Anthropic이 Claude를 내놨고 GPT가 뒤따랐다.")
+    assert not any("조사" in i.comment for i in checks.run_checks(fine, pack(), 2, CFG, {}).issues)
+
+
+def test_g7_concept_without_explanation_is_dropped():
+    from trendsit.core.artifacts_brief import Concept
+
+    p = page(concepts=[Concept(term="Agentic Batch Changes", desc="베타 출시된 기능"),
+                       Concept(term="MoE", desc="입력마다 전문가 일부만 켜서 계산량을 줄이는 구조")])
+    fixed, fixes = checks.autofix(p, CFG, {})
+    assert [c.term for c in fixed.concepts] == ["MoE"] and any(f["loc"] == "concepts" for f in fixes)
