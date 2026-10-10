@@ -104,11 +104,17 @@ gone=$(grep -rnwE --include='*.py' 'BAD_PARTICLE|CONCEPT_DESC_MIN|BARE_PER_TOKEN
 if [ -z "$gone" ]; then pass B2 "뺀 규칙 이름 11개 + SPECULATIVE(trendsit/brief/) 0건"; else fail B2 "남아 있음: $(echo "$gone" | head -2 | tr '\n' ' ')"; fi
 # B3 프롬프트 변경 범위: S5 역할 5개 밖은 md에서 `<data>` 문장 삭제 줄만, judge md는 불변. S5-1a A15(불변)를 대체
 bad=""
-for r in $(uv run --quiet python scripts/s5_1_prompts.py --diff reports/S5-1/prompts_before.json --roles); do
-  case $r in writer|writer_revise|critic|decide|editor_select) continue;; esac
-  extra=$(git diff -U0 bed7887 -- "roles/$r.md" | grep -E '^[-+][^-+]' | grep -vE '^-.*<data>' || true)
-  [ -z "$extra" ] || bad="$bad $r"
-done
+if uv run --quiet python scripts/s5_1_prompts.py --diff reports/S5-1/prompts_before.json --roles >"$TMP/b3roles" 2>&1; then
+  for r in $(cat "$TMP/b3roles"); do
+    case $r in writer|writer_revise|critic|decide|editor_select) continue;; esac
+    # 허용 집합: bed7887의 md에 `<data>` 문장이 있던 역할. 그 역할은 md에서 그 줄을 지운 것 말고는 diff가 없어야 한다
+    git show "bed7887:roles/$r.md" 2>/dev/null | grep -q '<data>' || { bad="$bad $r"; continue; }
+    extra=$(git diff -U0 bed7887 -- "roles/$r.md" | grep -E '^[-+][^-+]' | grep -vE '^-.*<data>' || true)
+    [ -z "$extra" ] || bad="$bad $r"
+  done
+else
+  bad=" (측정 스크립트 실패: $(head -1 "$TMP/b3roles"))"
+fi
 if [ -z "$bad" ] && git diff --quiet bed7887 -- eval/judge*.md; then
   pass B3 "프롬프트 변경 역할 = S5 역할 5개 + <data> 문장만 지운 역할, eval/judge*.md 차이 0"
 else

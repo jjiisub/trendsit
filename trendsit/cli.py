@@ -12,8 +12,8 @@ from typing import Any
 from .core import config
 from .core.budget import BudgetExceeded, PriceUnknown
 from .core.config import ROOT, ConfigError
-from .core.context import open_ctx, open_db
-from .core.db import KST
+from .core.context import open_ctx
+from .core.db import KST, open_db
 from .core.llm import LLMError
 from .core.role import Role, load_role, record_llm, role_path, run
 
@@ -210,7 +210,7 @@ def cmd_trace(args: argparse.Namespace) -> int:
 
 
 # ---------- 수집 (S1) ----------
-def _parse_date(text: str | None) -> date | None:
+def parse_date(text: str | None) -> date | None:
     return date.fromisoformat(text) if text else None
 
 
@@ -218,8 +218,8 @@ def cmd_collect(args: argparse.Namespace) -> int:
     from .collect.run import collect
 
     today = datetime.now(KST).date()
-    until = _parse_date(args.until) or today
-    since = _parse_date(args.since) or until - timedelta(days=1)
+    until = parse_date(args.until) or today
+    since = parse_date(args.since) or until - timedelta(days=1)
     if since > until:
         print("--since가 --until보다 늦음", file=sys.stderr)
         return 2
@@ -263,8 +263,8 @@ def cmd_items(args: argparse.Namespace) -> int:
 def cmd_report(args: argparse.Namespace) -> int:
     from .collect.report import build
 
-    until = _parse_date(args.until) or datetime.now(KST).date()
-    since = _parse_date(args.since) or until - timedelta(days=6)
+    until = parse_date(args.until) or datetime.now(KST).date()
+    since = parse_date(args.since) or until - timedelta(days=6)
     path, verdict = build(since, until)
     print(f"{path.relative_to(ROOT)}: 트렌딩 {verdict['trending']}개, 중복 {verdict['duplicates']}, "
           f"GeekNews 원문 확보율 {verdict['origin_rate']}, 본문 미달 {verdict['body_fail'] or '없음'}")

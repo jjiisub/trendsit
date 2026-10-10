@@ -16,7 +16,9 @@ import argparse
 import json
 import random
 import re
+import sqlite3
 import sys
+import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -120,7 +122,14 @@ def main() -> int:
     ap.add_argument("--weeks", nargs="+", required=True)
     args = ap.parse_args()
     cfg = config.load("brief.yaml")
-    db = DB(ROOT / "data" / "trendsit.db")
+    # 실제 DB는 읽기만(DB 클래스는 열 때 스키마·캐시를 쓰므로 읽기 전용 연결로 복사한 임시 DB를 연다)
+    tmp = tempfile.TemporaryDirectory()
+    src = sqlite3.connect(f"file:{ROOT / 'data' / 'trendsit.db'}?mode=ro", uri=True)
+    dst = sqlite3.connect(Path(tmp.name) / "trendsit.db")
+    src.backup(dst)
+    dst.close()
+    src.close()
+    db = DB(Path(tmp.name) / "trendsit.db")
     topics = [t for w in args.weeks for t in week_topics(db, w, cfg)]
     # writer
     for t in topics[:20]:

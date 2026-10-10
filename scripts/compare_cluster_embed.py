@@ -46,8 +46,7 @@ def main() -> int:
         cfg.cluster.embed_text = mode
         ev = week_evidence(ctx.db, args.week)
         table = al.decided_table(ctx.db, list(ev.members.values()), cfg)
-        cl.score_video_relevance(list(ev.members.values()), embedder, embed_interests(embedder, flt),
-                                 cfg.evidence.video_relevance_high)
+        cl.score_video_relevance(ev, embedder, embed_interests(embedder, flt), cfg)
         res = cl.cluster_week(ctx.db, ev, table, cfg, embedder, make_decider(ctx))
         owner = {k: i for i, c in enumerate(res.clusters) for k in c.members}
         tp = fp = fn = tn = 0

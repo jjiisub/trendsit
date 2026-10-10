@@ -12,7 +12,7 @@ includes: [skills/style_ko.md, skills/diagrams.md]
 task: "위 근거만으로 이 토픽의 토픽 페이지를 쓴다."
 core_rules:
   - 근거에 있는 사실·숫자·날짜만 쓰고, 모든 point·number·event에 그 근거 id를 단다
-  - points·contributions·concepts는 "~함", "~임", 명사로 끝나는 개조식(예 "응답 150ms, 기존 대비 약 10배 빠름"), summary·overview만 "~다" 문장
+  - 문체는 포함된 style_ko.md대로(요약·개요만 "~다" 문장, 나머지 칸은 개조식)
   - 숫자와 고유명사는 근거 표기 그대로, numbers·events는 조건에 맞을 때만
 ---
 # 작성자
@@ -62,15 +62,13 @@ core_rules:
 
 ### 도식은 포인트에 붙인다
 - 먼저 points를 중요도 순으로 쓴다. 도식 때문에 순서를 바꾸지 않는다
-- 그다음 포인트마다 그 정보가 위 표의 numbers·events 조건에 맞는지 보고, 맞으면 도식을 만들어 그 포인트 번호를 `anchor`에 단다. 화면은 그 포인트 바로 아래에 그림을 놓는다
-- 도식마다 `context` 1~2문장: 무엇을 어떤 조건에서 비교했는지, 또는 이 흐름이 무엇을 보여 주는지(근거 id 포함). 그림만 놓이지 않게 하기 위해서다
-- **포인트 문장은 그림 없이도 읽히게 쓴다.** 코드가 조건을 다시 확인해 맞지 않으면 그림을 빼기 때문이다
+- 그다음 포인트마다 그 정보가 위 표의 numbers·events 조건에 맞는지 보고, 맞으면 도식을 만들어 그 포인트 번호를 `anchor`에 단다
 
 ### 쓰는 방식
 - 결론 먼저: summary 첫 문장은 누가, 무엇을, 얼마나. 둘째 문장은 쟁점이나 배경
-- summary·overview는 구체적인 주어(회사, 제품, 사람, 발표자)로 시작하고 사실이나 쟁점으로 끝낸다. points에 있는 사실만 쓴다(포인트에 없는 수치·예시를 요약에 새로 넣지 않는다). 문장마다 "~다"로 끝낸다
+- summary·overview는 구체적인 주어(회사, 제품, 사람, 발표자)로 시작하고 사실이나 쟁점으로 끝낸다. points에 있는 사실만 쓴다(포인트에 없는 수치·예시를 요약에 새로 넣지 않는다)
 - points: 첫 항목은 이번 주 사건(출시, 발표, 공개), 마지막은 남은 쟁점이나 확인할 점. angle의 핵심은 summary 첫 문장이나 첫 두 point 안에 둔다. 항목마다 앞에 없던 정보 하나. 수치는 비교 대상과 함께("응답 150ms, 기존 1.6초 대비 약 10배 빠름")
-- 형광(`==텍스트==`): summary 1개, overview 1개, points 항목당 최대 1개, 페이지 전체는 `limits.highlights_page`. 핵심 결론이나 키워드에만
+- 형광(`==텍스트==`): 페이지 전체는 `limits.highlights_page`. 칸마다 남발하지 않는다(넘치면 코드가 뒤쪽부터 지운다)
 - 후속 토픽: overview 첫 문장에서 지난 흐름과 이번 변화를 잇고, 바뀐 것만 쓴다
 
 ## 출력
@@ -78,8 +76,8 @@ core_rules:
 | 칸 | 필수 | 분량 |
 |---|---|---|
 | `points[]` {text, refs} | 필수 | `limits.points` 개수. 항목 1~2문장, 80자 안팎 |
-| `numbers[]` {anchor, group, title, context, unit, items[{label, value, ref, baseline?, emphasis?}]} | 선택 | 최대 `limits.numbers_groups_max`그룹, 그룹당 2~6개. title은 근거 값 그대로의 발견("Jeeves 정확도 93.5%로 4개 중 최고"), 한 그룹 한 단위(unit은 비우지 않음), context 1~2문장 |
-| `events[]` {anchor, title, context, flow_is_point?, items[{date, text, ref 또는 topic_id}]} | 선택 | 최대 `limits.events_groups_max`그룹, 항목 2~6개, 날짜는 근거에 있는 YYYY-MM-DD, context 1~2문장 |
+| `numbers[]` {anchor, group, title, context, unit, items[{label, value, ref, baseline?, emphasis?}]} | 선택 | 최대 `limits.numbers_groups_max`그룹, 그룹당 2~6개 |
+| `events[]` {anchor, title, context, flow_is_point?, items[{date, text, ref 또는 topic_id}]} | 선택 | 최대 `limits.events_groups_max`그룹, 항목 2~6개, 날짜는 근거에 있는 YYYY-MM-DD |
 | `contributions[]` {channel, text, refs} | 선택 | 소스 2개 이상일 때, 채널마다 1문장 |
 | `concepts[]` {term, desc} | 선택 | `limits.concepts_max`개 이하. desc는 근거 원문의 설명 그대로의 범위(배경 지식으로 효과·정의를 덧붙이지 않음) |
 | `overview` | 필수 | `limits.overview_sentences` 문장 |
@@ -90,7 +88,7 @@ core_rules:
 선택 칸은 조건에 맞지 않으면 빈 목록이 정상이다.
 
 ## 막혔을 때
-근거가 짧아 point 2개를 채우기 어렵거나, 근거끼리 서로 다른 수치를 말하면 있는 만큼만 쓰고(서로 다르면 두 값을 각각 출처와 함께) attention을 true로 둔다. 빈 자리를 일반론이나 배경 지식으로 채우지 않는다.
+근거가 짧아 `limits.points`의 최소 개수를 채우기 어렵거나, 근거끼리 서로 다른 수치를 말하면 있는 만큼만 쓰고(서로 다르면 두 값을 각각 출처와 함께) attention을 true로 둔다. 빈 자리를 일반론이나 배경 지식으로 채우지 않는다.
 
 ## 예시
 <examples>

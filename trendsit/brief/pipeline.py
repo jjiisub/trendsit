@@ -45,7 +45,7 @@ def _cluster_phase(week: str, ctx: Ctx, cfg: BriefConfig, embedder: Any, interes
         return stage.evidence, stage.aliases, stage.run_id
     ev = week_evidence(db, week)
     table = al.decided_table(db, list(ev.members.values()), cfg)
-    cl.score_video_relevance(list(ev.members.values()), embedder, interests, cfg.evidence.video_relevance_high)
+    cl.score_video_relevance(ev, embedder, interests, cfg)
     r = db.conn.execute("SELECT summary_json FROM runs WHERE id=?", (src,)).fetchone()
     return ev, table, (json.loads(r["summary_json"]) if r and r["summary_json"] else {}).get("cluster_run") or src
 
@@ -123,7 +123,6 @@ def run_weekly(week: str, ctx: Ctx, from_step: str = "cluster", only_topic: str 
     cfg = cfg or config.load("brief.yaml")
     db, tr = ctx.db, ctx.tracer
     assert tr is not None
-    set_run_week(db, tr.run_id, week)
     flt = config.load("filter.yaml")
     embedder = embedder or make_embedder("real", flt)
     interests = embed_interests(embedder, flt)
@@ -132,6 +131,8 @@ def run_weekly(week: str, ctx: Ctx, from_step: str = "cluster", only_topic: str 
     src = (db.conn.execute("SELECT current_run_id FROM weeks WHERE week=?", (week,)).fetchone() or [None])[0]
     if from_step != "cluster" and not src:
         raise ValueError(f"{week}: 이어 갈 현재판 run이 없음(--from-step cluster부터)")
+    if from_step != "cluster":  # cluster부터면 stage_cluster가 한다
+        set_run_week(db, tr.run_id, week)
     ev, table, cluster_run = _cluster_phase(week, ctx, cfg, embedder, interests, from_step, src, dur)
     tr.step(kind="code", role="weekly", text=f"{week} weekly 시작: {from_step}부터", detail={
         "from_step": from_step, "source_run": src, "cluster_run": cluster_run})

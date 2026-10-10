@@ -24,9 +24,6 @@ def _plain(v: Any) -> Any:
 class RoleInput(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    # 모델에게 보여 주지 않는 칸(다른 칸과 같은 내용이라 코드만 쓰는 객체)
-    RENDER_SKIP: ClassVar[tuple[str, ...]] = ()
-
     # 도구 에이전트의 입력별 상한(코드가 지킴). 기본은 역할 md 설정 그대로
     def tool_names(self, names: list[str]) -> list[str]:
         """이 입력에서 허용할 도구(예: 레포 분석가 max_depth 1이면 일부만)."""

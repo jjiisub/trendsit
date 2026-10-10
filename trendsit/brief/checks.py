@@ -26,16 +26,13 @@ REF = re.compile(r"(?:it|og|vd|rp):[\w./#@:-]+")
 _SENT = re.compile(r"(?<=[.!?다])\s+")
 
 
-# 요약·개요 수치 대조(with_units)가 단위로 인정하는 낱말. 한 글자 영문은 단독일 때만
-UNIT_WORDS = ("%", "퍼센트", "포인트", "ms", "밀리초", "초", "sec", "$", "달러", "usd", "원", "배", "×", "tok/s", "토큰/초",
-              "분기", "시간", "hour", "개월", "분", "min", "개", "명", "회", "건")
-UNIT_LETTERS = ("s", "x", "h")
+# 요약·개요 수치 대조(with_units)가 단위로 인정하는 낱말(수 바로 뒤 [가-힣%]+ 로 닿는 것만)
+UNIT_WORDS = ("%", "퍼센트", "포인트", "밀리초", "초", "달러", "원", "배", "분기", "시간", "개월", "분", "개", "명", "회", "건")
 COUNT_UNITS = {"개", "명", "건", "회", "편", "종", "곳", "개국", "차원", "개월", "년"}
 
 
 def is_unit(text: str) -> bool:
-    t = (text or "").strip().lower()
-    return t in UNIT_LETTERS or t.startswith(UNIT_WORDS)
+    return (text or "").strip().startswith(UNIT_WORDS)
 
 
 def sentences(text: str) -> list[str]:

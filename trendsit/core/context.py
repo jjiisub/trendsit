@@ -9,7 +9,7 @@ from typing import Any
 from . import config
 from .budget import Budget, PriceBook
 from .cache import Cache
-from .db import DB
+from .db import DB, open_db
 from .llm import LLMClient, Transport
 from .trace import Tracer
 
@@ -40,10 +40,6 @@ def budget_state_path(data_dir: Path | None) -> Path:
         shared.parent.mkdir(parents=True, exist_ok=True)
         shared.write_text(old.read_text())
     return shared
-
-
-def open_db(data_dir: Path | None = None) -> DB:
-    return DB((data_dir or config.ROOT / "data") / "trendsit.db")
 
 
 def open_ctx(kind: str | None, *, spec: str | None = None, no_cache: bool = False, model: str | None = None,

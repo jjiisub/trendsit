@@ -12,10 +12,10 @@ from datetime import date
 from pathlib import Path
 from typing import Any
 
-from .cli import _parse_date
+from .cli import parse_date
 from .core import config
 from .core.config import ROOT
-from .core.context import open_db
+from .core.db import open_db
 from .core.trace import Tracer
 
 FILTER_REPORT = ROOT / "reports" / "S2_filter"
@@ -34,7 +34,7 @@ def cmd_rematch(args: argparse.Namespace) -> int:
 
     db = open_db()
     tracer = Tracer(db, "rematch", config.current_spec(args.spec, "S2"), note=f"rematch {_period(args)}".strip())
-    res = rematch(db, config.load("keywords.yaml"), _parse_date(args.since), _parse_date(args.until))
+    res = rematch(db, config.load("keywords.yaml"), parse_date(args.since), parse_date(args.until))
     tracer.step(kind="code", role="rematch", text=res.summary(), detail=res.__dict__)
     tracer.finish("ok")
     print(res.summary())
@@ -52,7 +52,7 @@ def cmd_filter(args: argparse.Namespace) -> int:
     status = "failed"
     try:
         embedder = make_embedder(args.embedder, cfg, args.device)
-        res = run_filter(db, cfg, embedder, tracer.run_id, _parse_date(args.since), _parse_date(args.until))
+        res = run_filter(db, cfg, embedder, tracer.run_id, parse_date(args.since), parse_date(args.until))
         dropped = res.decisions.get("low_similarity", 0)
         tracer.step(kind="code", role="filter", text=res.summary(),
                     detail={k: v for k, v in res.__dict__.items() if k != "rows"},
@@ -129,7 +129,7 @@ def cmd_summarize(args: argparse.Namespace) -> int:
                    note=f"summarize {_period(args)}".strip())
     status = "failed"
     try:
-        ids = targets(ctx.db, _parse_date(args.since), _parse_date(args.until), redo=args.redo, limit=args.limit)
+        ids = targets(ctx.db, parse_date(args.since), parse_date(args.until), redo=args.redo, limit=args.limit)
         res = run_summarize(ctx, ids, config.load("keywords.yaml"))
         ctx.tracer.step(kind="code", role="summarize", text=res.summary(), detail=res.__dict__,
                         attention=bool(res.stopped or res.fallback))

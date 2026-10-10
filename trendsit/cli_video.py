@@ -94,7 +94,7 @@ def cmd_run(args: argparse.Namespace) -> int:
 def cmd_purge(args: argparse.Namespace) -> int:
     from .collect.video.workspace import purge
     from .core import config
-    from .core.context import open_db
+    from .core.db import open_db
     from .video.store import expire_segment_text
 
     older = args.older_than if args.older_than is not None else config.load("video.yaml").retention_days
@@ -108,7 +108,7 @@ def cmd_purge(args: argparse.Namespace) -> int:
 
 
 def cmd_report(args: argparse.Namespace) -> int:
-    from .core.context import open_db
+    from .core.db import open_db
     from .video.report import runs_markdown
 
     text = runs_markdown(open_db(), args.since, args.until)

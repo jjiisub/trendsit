@@ -22,7 +22,7 @@ from ..core.artifacts import Document
 from ..core.artifacts_brief import DecideAnswer, DecideInput, PairShared
 from ..core.config_brief import BriefConfig
 from ..core.db import DB, now_kst
-from ..filter.embed import Embedder, best_interest, cosine, from_blob, to_blob
+from ..filter.embed import Embedder, cosine, from_blob, to_blob
 from .aliases import AliasTable, norm_key
 from .evidence import RELEVANCE_RANK, Member, WeekEvidence
 
@@ -113,17 +113,18 @@ def member_vectors(db: DB, members: Sequence[Member], embedder: Embedder, mode: 
     return vecs
 
 
-def score_video_relevance(members: Sequence[Member], embedder: Embedder, interests: list[tuple[str, list[float]]],
-                          high: float) -> dict[str, float]:
+def score_video_relevance(ev: WeekEvidence, embedder: Embedder, interests: list[tuple[str, list[float]]],
+                          cfg: BriefConfig) -> dict[str, float]:
     """영상 relevance(멈춤 지점 결정 4): digest 요약을 S2 관련성 필터와 같은 방식(관심사 설명 쿼리와의 코사인 최댓값)으로
     점수 매겨 high 이상이면 high, 아래면 mid. Member.relevance를 바꾸고 점수를 돌려준다."""
-    vids = [m for m in members if m.channel == "video"]
+    high = cfg.evidence.video_relevance_high
+    vids = [m for m in ev.members.values() if m.channel == "video"]
     if not vids:
         return {}
     docs = embedder.embed_docs([member_text(m) for m in vids])
     out = {}
     for m, v in zip(vids, docs, strict=True):
-        s = round(best_interest(v, interests)[0], 4)
+        s = round(max(cosine(v, q) for _k, q in interests), 4)
         m.relevance = "high" if s >= high else "mid"
         out[m.key] = s
     return out
@@ -136,7 +137,7 @@ def interest_similarity(db: DB, members: Sequence[Member], embedder: Embedder,
     if not members:
         return {}
     vecs = member_vectors(db, members, embedder, mode="card")
-    return {k: round(best_interest(v, interests)[0], 4) for k, v in vecs.items()}
+    return {k: round(max(cosine(v, q) for _k, q in interests), 4) for k, v in vecs.items()}
 
 
 # ---------- 쌍 ----------

@@ -114,8 +114,7 @@ def stage_cluster(week: str, ctx: Ctx, cfg: BriefConfig | None = None, embedder:
     t2 = time.monotonic()
     flt = config.load("filter.yaml")
     embedder = embedder or make_embedder("real", flt)
-    vrel = cl.score_video_relevance(list(ev.members.values()), embedder, interests or embed_interests(embedder, flt),
-                                    cfg.evidence.video_relevance_high)
+    vrel = cl.score_video_relevance(ev, embedder, interests or embed_interests(embedder, flt), cfg)
     if vrel:
         tr.step(kind="code", role="evidence",
                 text=f"영상 관련성 점수: high {sum(v >= cfg.evidence.video_relevance_high for v in vrel.values())}, "

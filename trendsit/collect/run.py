@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from ..core import config
-from ..core.db import DB, KST
+from ..core.db import DB, KST, open_db
 from ..core.trace import Tracer
 from .fetch import Fetcher
 from .github import GithubCollector, GithubStats
@@ -50,7 +50,7 @@ def collect(since: date, until: date, *, only: str | None = None, no_body: bool 
     ids = [s.id for s in sources.text] + [s.id for s in sources.video] + ["github_trending", "github_releases"]
     if only and only not in ids:  # 실행 기록을 만들기 전에 거른다
         raise config.ConfigError("sources.yaml", "", f"없는 소스 '{only}' (있는 소스: {', '.join(ids)})")
-    db = DB(data_dir / "trendsit.db")
+    db = open_db(data_dir)
     sync_sources(db, sources)
     own_fetcher = fetcher is None
     fetcher = fetcher or Fetcher(data_dir / "http_cache", use_cache=use_http_cache)

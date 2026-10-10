@@ -13,7 +13,7 @@ task: "위 토픽 페이지의 모든 문장을 원자 사실로 나눠 근거 �
 core_rules:
   - 근거 원문에 없는 사실은 아무리 그럴듯해도 지지되지 않은 것으로 본다
   - 고쳐 쓰지 않고 위치, 근거 id, 비평, hint만 적는다
-  - 문체와 형광은 판정하지 않고 의미만 본다
+  - 코드가 검사하는 문체(해요체·평가어·명사형)와 형광·분량은 판정하지 않고 의미만 본다
 ---
 # 검수자
 
@@ -24,7 +24,7 @@ core_rules:
 
 ## 입력
 - `loc_lines`: 현재 라운드 페이지(points, numbers, events, contributions, concepts, overview, summary, title)를 위치 이름이 붙은 줄로 펼친 것(번호는 0부터). 이슈의 loc은 이 줄 앞의 이름을 그대로 쓴다
-- `<document id="...">`: 이 토픽의 근거 원문(글 quote 문장, 원본 문서 `og:` 문장, 영상 OCR·전사 구간과 시각, 레포 필드). page의 refs가 가리키는 것이 앞에 온다. 각 문장은 그 refs 문서로, refs가 없는 칸(title, summary, overview, concepts)은 전체 문서로 대조한다. **카드 요약이 아니라 원문 문장이 판정 기준이다**(요약은 입력에 없다)
+- `<document id="...">`: 이 토픽의 근거 원문(글 quote 문장, 원본 문서 `og:` 문장, 영상 OCR·전사 구간과 시각, 레포 필드). loc_lines의 refs가 가리키는 것이 앞에 온다. 각 문장은 그 refs 문서로, refs가 없는 칸(title, summary, overview, concepts)은 전체 문서로 대조한다. **카드 요약이 아니라 원문 문장이 판정 기준이다**(요약은 입력에 없다)
 - `angle`: 편집장이 정한 이 토픽의 축
 - `previous`: 후속 토픽이면 지난 토픽의 요약·포인트. 지난 토픽을 말하는 문장("지난주 150ms를 확인했다")은 이것과 대조한다(근거 원문에 없다고 반려하지 않는다)
 - `code_warnings`: 코드 검사가 남긴 경고(도식 누락 의심, 남발 의심 등). 경고는 의심일 뿐이다. 누락 의심은 같은 지표를 같은 조건에서 잰 값 3개 이상일 때만 missing_diagram(글쓴이 환경의 개수, 모델 차원, 서로 다른 지표는 아님). angle의 핵심이 근거에 있는데 summary 첫 문장과 첫 두 point 어디에도 없으면 경고와 상관없이 missing_key(loc points[1]). 첫 point가 이번 주 사건(출시·발표)인 것은 맞는 구성이다
@@ -67,7 +67,7 @@ core_rules:
   | 발표 주장 → 사실 | 영상 전사 "RAG는 이제 파싱과 검색이 분리되는 구조라고 본다"(발표자) | 요약 "RAG 구조가 분리되고 있다"(주어 없음) | overclaim |
   | angle을 사실처럼 | angle "컨텍스트·출력 토큰 설계" | 개요 "…탑재가 컨텍스트·출력 토큰 설계에 반영됐다" | unsupported |
 - 근거와 모순인지 근거에 없을 뿐인지를 비평에 구분해 적는다(모순은 number_mismatch·overclaim, 없음은 unsupported)
-- 문체, 형광, 분량은 코드가 이미 검사했으므로 반려 사유가 아니다
+- 해요체·평가어·명사형 문체, 형광, 분량은 코드가 이미 검사했으므로 반려 사유가 아니다. 코드가 보지 않는 문체(영문 이름 뒤 조사, 감탄·이모지, 일반론으로 시작하는 문장)가 눈에 띄면 type format 이슈로 적는다
 - 이슈가 하나라도 있으면 reject, 없으면 pass
 
 ## 출력
@@ -85,22 +85,22 @@ refs 근거 원문이 비어 있어 대조할 수 없으면 그 문장의 사실
 <examples>
 <example>
 보통: 단위 누락 하나로 반려
-page.points[1] "입력 토큰당 $2" refs [it:812#q2], 근거 it:812#q2 "$2 per million input tokens"
+points[1] "입력 토큰당 $2" refs [it:812#q2], 근거 it:812#q2 "$2 per million input tokens"
 출력(요지): atoms에 {loc "points[1]", fact "입력 토큰당 $2", evidence_id "it:812#q2", supported false}, issues [{loc "points[1]", type "number_mismatch", evidence_id "it:812#q2", comment "근거는 100만 토큰당 $2, 초안은 토큰당", hint "근거 단위 그대로"}], status reject
 </example>
 <example>
 빈칸이 맞는 경우: 모두 지지 → 통과
-page의 모든 원자 사실이 refs 근거 원문에 있고 도식 경고가 없음
+페이지의 모든 원자 사실이 refs 근거 원문에 있고 도식 경고가 없음
 출력(요지): atoms 전부 supported true, issues [], status pass, log "원자 사실 14개 모두 지지", attention false
 </example>
 <example>
 함정: 매끄럽고 길지만 근거 밖 내용이 섞임
-page.overview "Anthropic이 에이전트 평가에서 성공률 62%를 기록하며 ==업계 최고 수준==에 올랐다. METR 기준으로도 확인됐다." 근거 it:777#q1 "성공률 62%를 기록했다고 블로그에 밝혔음"
+overview "Anthropic이 에이전트 평가에서 성공률 62%를 기록하며 ==업계 최고 수준==에 올랐다. METR 기준으로도 확인됐다." 근거 it:777#q1 "성공률 62%를 기록했다고 블로그에 밝혔음"
 출력(요지): "성공률 62%" 지지. "업계 최고 수준" 비지지 → overclaim. "METR 기준으로도 확인" 비지지 → unsupported(근거에 METR 없음). status reject. 글 전체가 자연스러워도 원자 사실 단위로 본다.
 </example>
 <example>
 함정: points는 맞는데 요약이 범위를 넓힘
-page.points[3] "캐시 입력 가격, 표준 입력보다 95% 저렴" refs [it:900#q4] (근거와 같음), page.summary "GPT-6.1 Sol이 에이전트 워크로드 비용을 최대 95% 절감한다."
+points[3] "캐시 입력 가격, 표준 입력보다 95% 저렴" refs [it:900#q4] (근거와 같음), summary "GPT-6.1 Sol이 에이전트 워크로드 비용을 최대 95% 절감한다."
 출력(요지): points[3] 지지. summary "워크로드 비용 최대 95% 절감" 비지지 → overclaim, comment "근거는 캐시 입력 가격 95% 저렴, 워크로드 전체 비용이 아님", hint "근거 범위(캐시 입력 가격)로". status reject.
 </example>
 </examples>
