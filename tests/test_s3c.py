@@ -47,7 +47,7 @@ ONELINER = response(json.dumps({"basis": "x", "oneliner": "로컬 LLM 실행 도
 def ctx(tmp_path):
     def make(llm_responses):
         c = make_ctx(tmp_path, FakeTransport(llm_responses), spec_cap=1.0)
-        c.resources.update(fetcher=fetcher_for(FixtureTransport("repo_tools")), today=date(2026, 10, 8),
+        c.resources.update(github_fetcher=fetcher_for(FixtureTransport("repo_tools")), today=date(2026, 10, 8),
                            github_headers={})
         db = c.db
         for name, stars, kws, status in (("ollama/ollama", 300, {"open-weight": "title"}, "pass"),
@@ -180,7 +180,7 @@ def test_commits_404_does_not_count_as_zero(tmp_path):
              "https://api.github.com/repos/gone/repo/contributors?per_page=100&anon=1":
                  (404, "application/json", '{"message": "Not Found"}')}
     c = make_ctx(tmp_path, FakeTransport([]))
-    c.resources.update(fetcher=fetcher_for(FixtureTransport("repo_tools", extra=extra)), today=date(2026, 10, 8),
+    c.resources.update(github_fetcher=fetcher_for(FixtureTransport("repo_tools", extra=extra)), today=date(2026, 10, 8),
                        github_headers={})
     h = hype_check(c, "gone/repo", TrendingStats(week=WEEK, stars_this_week=HYPE_STARS_WEEK + 1), None)
     assert h.flags == [] and not h.force_check and "404" in h.note
@@ -202,7 +202,7 @@ REAL = {"active": "NVIDIA/OpenShell", "release": "tile-ai/tilelang", "small": "p
 def real_state():
     from types import SimpleNamespace
 
-    return SimpleNamespace(extras={"fetcher": fetcher_for(FixtureTransport("repo_tools")), "github_headers": {},
+    return SimpleNamespace(extras={"github_fetcher": fetcher_for(FixtureTransport("repo_tools")), "github_headers": {},
                                    "today": date(2026, 10, 8)})
 
 
@@ -274,7 +274,7 @@ def test_r1_all_github_tools_fail_403(ctx):
                                              {"fact": "이번 주 글 it:1에서 언급", "tool": "search_items"}],
                                    why_trending="이번 주 릴리스", signal="release", attention=False))])
     deny = {u: 403 for u in FixtureTransport("repo_tools").index if "ollama/ollama" in u}
-    c.resources["fetcher"] = fetcher_for(FixtureTransport("repo_tools", override=deny))
+    c.resources["github_fetcher"] = fetcher_for(FixtureTransport("repo_tools", override=deny))
     run_repo_analysis(c, [QueueItem("ollama/ollama", 2, "트렌딩")], WEEK, config.load("keywords.yaml"))
     assert [r["ok"] for r in c.resources["tool_results"]] == [False, False, True]
     saved = json.loads(c.db.conn.execute("SELECT card_json FROM repo_cards").fetchone()[0])

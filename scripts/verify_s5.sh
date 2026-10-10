@@ -96,4 +96,5 @@ else
 fi
 pt A19 "예산 초과 시 멈춤(write·select·cluster 도중 BudgetExceeded: 현재판 불변, run stopped, 종료 코드 1, 남은 일 시작 0)" tests/test_s5_weekly.py -k budget_stop
 pt A20 "실행 요약 상태(전부 실패 failed, 일부 partial, 예산 stopped)" -k summary_status
+pt A21 "read_more 열쇠(fetch_page가 저장한 열쇠로 찾음: github 대문자, http, arxiv pdf)" -k read_more_page_key
 exit $FAILED

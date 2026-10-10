@@ -50,7 +50,7 @@ def main() -> None:
     token = get_secret("GITHUB_TOKEN")
     headers = {"Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28",
                **({"Authorization": f"Bearer {token}"} if token else {})}
-    state = SimpleNamespace(extras={"fetcher": Fetcher(None, use_cache=False, transport=rec),
+    state = SimpleNamespace(extras={"github_fetcher": Fetcher(None, use_cache=False, transport=rec),
                                     "github_headers": headers, "today": date.fromisoformat(a.today)})
     for name in a.repos:
         for fn, args in ((github_repo, RepoArgs(name=name)), (recent_commits, CommitsArgs(name=name, days=7)),

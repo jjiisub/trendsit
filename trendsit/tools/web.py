@@ -132,7 +132,9 @@ def read_more(args: ReadMoreArgs, state: Any) -> ToolOutput:
     언제 쓰나: 확인할 수치가 첫 조각에 없고 소제목으로 보아 뒤에 있을 것 같을 때.
     언제 쓰지 않나: 아직 fetch_page로 열지 않은 문서, 없는 조각 번호.
     인자 예: {"doc": "https://openai.com/index/...", "part": 2}"""
-    text = resources(state)["fetched_pages"].get(norm_url(args.doc))
+    from ..core.artifacts_text import page_key
+
+    text = resources(state)["fetched_pages"].get(page_key(args.doc))
     if text is None:
         raise ToolRejected("아직 fetch_page로 열지 않은 문서")
     parts = (len(text) - 1) // HEAD_CHARS + 1
