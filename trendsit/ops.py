@@ -15,7 +15,7 @@ import subprocess
 import sys
 import time
 from collections.abc import Callable, Iterator
-from contextlib import contextmanager
+from contextlib import contextmanager, suppress
 from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Any
@@ -44,7 +44,16 @@ def run_subprocess(cmd: list[str], timeout: float | None = None) -> tuple[int, s
         os.killpg(p.pid, signal.SIGKILL)
         out, err = p.communicate()
         return TIMEOUT_CODE, out or "", f"{err or ''}\n시간 초과: {timeout:g}초 넘겨 끝냄"
+    except BaseException:  # SIGTERM(on_sigterm의 SystemExit)·Ctrl-C: 하위 프로세스 그룹을 남기지 않고 올려 보냄(잠금·runs 마감은 호출한 쪽 finally)
+        with suppress(ProcessLookupError):
+            os.killpg(p.pid, signal.SIGKILL)
+        p.wait()
+        raise
     return p.returncode, out, err
+
+
+def on_sigterm(signum: int, frame: Any) -> None:
+    raise SystemExit(128 + signal.SIGTERM)
 
 
 def publish(db: DB, week: str, runner: Build = run_subprocess) -> int:
@@ -176,34 +185,40 @@ def nightly(db: DB, cfg: OpsConfig, *, day: date | None = None, now: datetime | 
         if not got:
             return _skipped(db, "nightly", _tag(today - timedelta(days=1)),
                             {"days": [], "steps": [], "cost_usd": 0.0})
-        days = [day] if day else catchup_days(db, cfg, today)
-        tr = Tracer(db, "nightly", _tag(days[-1] if days else today - timedelta(days=1)),
-                    (f"nightly {days[0]}~{days[-1]}" if days else "nightly 범위 없음") + _pull_note())
-        log = StepLog(runner, data_dir / "logs" / "ops" / f"{today.isoformat()}-nightly.log", cfg)
-        status = "failed"
-        try:
-            if days:
-                first, last = days[0], days[-1]
-                shared = ["--spec", _tag(last)]
-                log.step("collect", None, ["collect", "--since", str(first - timedelta(days=1)), "--until", str(today), *shared])
-                log.step("filter", None, ["filter", "--since", str(first), "--until", str(last), *shared])
-                log.step("summarize", None, ["summarize", "--since", str(first), "--until", str(last), *shared])
-            for d in days:
-                tag = ["--spec", _tag(d)]
-                log.step("plan", d, ["plan", "run", "--day", str(d), *tag])
-                log.step("deep_text", d, ["deep", "text", "--day", str(d), *tag])
-                _queue_step(log, d, tag, data_dir, "video")
-                _queue_step(log, d, tag, data_dir, "repo_analyze")
-            status = "ok" if all(s["exit"] == 0 for s in log.steps) else "partial"
-        finally:
-            started = db.conn.execute("SELECT started_at FROM runs WHERE id=?", (tr.run_id,)).fetchone()[0]
-            # 호출 단위(steps) 기준: timeout으로 끝나지 못한 run의 비용도 잡고, 이 nightly의 시작~끝 구간만 센다
-            cost = db.conn.execute("SELECT COALESCE(SUM(s.cost_usd),0) FROM steps s JOIN runs r ON r.id=s.run_id "
-                                   "WHERE r.spec LIKE 'RUN-%' AND s.t>=? AND s.t<=?", (started, now_kst())).fetchone()[0]
-            summary: dict[str, Any] = {"days": [d.isoformat() for d in days], "steps": log.steps, "cost_usd": round(cost, 4)}
-            if day:
-                summary["manual"] = True
-            _close_run(db, tr, status, summary | _pull_summary())
+        return _nightly_locked(db, cfg, day, now, runner, data_dir)
+
+
+def _nightly_locked(db: DB, cfg: OpsConfig, day: date | None, now: datetime, runner: Runner, data_dir: Path) -> int:
+    """잠금을 쥔 채로 부른다(nightly, ops weekly의 앞 단계)."""
+    today = now.date()
+    days = [day] if day else catchup_days(db, cfg, today)
+    tr = Tracer(db, "nightly", _tag(days[-1] if days else today - timedelta(days=1)),
+                (f"nightly {days[0]}~{days[-1]}" if days else "nightly 범위 없음") + _pull_note())
+    log = StepLog(runner, data_dir / "logs" / "ops" / f"{today.isoformat()}-nightly.log", cfg)
+    status = "failed"
+    try:
+        if days:
+            first, last = days[0], days[-1]
+            shared = ["--spec", _tag(last)]
+            log.step("collect", None, ["collect", "--since", str(first - timedelta(days=1)), "--until", str(today), *shared])
+            log.step("filter", None, ["filter", "--since", str(first), "--until", str(last), *shared])
+            log.step("summarize", None, ["summarize", "--since", str(first), "--until", str(last), *shared])
+        for d in days:
+            tag = ["--spec", _tag(d)]
+            log.step("plan", d, ["plan", "run", "--day", str(d), *tag])
+            log.step("deep_text", d, ["deep", "text", "--day", str(d), *tag])
+            _queue_step(log, d, tag, data_dir, "video")
+            _queue_step(log, d, tag, data_dir, "repo_analyze")
+        status = "ok" if all(s["exit"] == 0 for s in log.steps) else "partial"
+    finally:
+        started = db.conn.execute("SELECT started_at FROM runs WHERE id=?", (tr.run_id,)).fetchone()[0]
+        # 호출 단위(steps) 기준: timeout으로 끝나지 못한 run의 비용도 잡고, 이 nightly의 시작~끝 구간만 센다
+        cost = db.conn.execute("SELECT COALESCE(SUM(s.cost_usd),0) FROM steps s JOIN runs r ON r.id=s.run_id "
+                               "WHERE r.spec LIKE 'RUN-%' AND s.t>=? AND s.t<=?", (started, now_kst())).fetchone()[0]
+        summary: dict[str, Any] = {"days": [d.isoformat() for d in days], "steps": log.steps, "cost_usd": round(cost, 4)}
+        if day:
+            summary["manual"] = True
+        _close_run(db, tr, status, summary | _pull_summary())
     bad = [s for s in log.steps if s["exit"] != 0]
     print(f"nightly {status}: 날 {len(days)}개, 단계 {len(log.steps)}개 중 실패 {len(bad)}개")
     for s in bad:
@@ -251,7 +266,7 @@ def _pull_summary() -> dict[str, Any]:
 # ---------- weekly ----------
 def weekly(db: DB, cfg: OpsConfig, *, week: str | None = None, now: datetime | None = None,
            runner: Runner = run_subprocess, data_dir: Path | None = None, wait_sec: float | None = None) -> int:
-    """지난 ISO 주차 weekly → 성공하면 publish. --force는 쓰지 않는다(C-8). 0 성공·이미 발행, 1 실패, 3 잠금 못 얻음."""
+    """nightly 따라잡기 → 지난 ISO 주차 weekly → 성공하면 publish. --force는 쓰지 않는다(C-8). 0 성공·이미 발행, 1 실패, 3 잠금 못 얻음."""
     now = (now or datetime.now(KST)).astimezone(KST)
     data_dir = data_dir or ROOT / "data"
     week = week or iso_week(now.date() - timedelta(days=7))
@@ -270,6 +285,8 @@ def weekly(db: DB, cfg: OpsConfig, *, week: str | None = None, now: datetime | N
                 log.note(f"이미 발행: {week}")
                 status, code = "ok", 0
             else:
+                # 일요일 분처럼 아직 안 돈 날을 먼저 따라잡는다(같은 잠금 안). 단계 실패가 있어도 weekly는 진행
+                _nightly_locked(db, cfg, None, now, runner, data_dir)
                 wk, _ = log.step("weekly", None, ["weekly", "--week", week, "--spec", spec])
                 if wk == 0:
                     t0 = time.monotonic()

@@ -12,25 +12,25 @@
 `trendsit ops nightly`(따라잡기 범위의 날마다 수집 → 필터 → 요약 → 계획 → 글·영상·레포 분석, 한 단계가 실패해도 다음 단계 계속), `ops weekly`(지난 ISO 주차 브리핑 → 성공하면 `publish`), `publish --week W`(사이트 빌드 → `weeks.status='published'`)가 동작하고, 잠금(flock)·멱등 재실행·비용 꼬리표 `RUN-<주차>`(주당 $1.50)·main 전용 실행 폴더·launchd plist 2개가 갖춰졌다. launchd 등록은 하지 않았다(README 명령으로 사용자가). 워크플로우 안 유료 호출 0회.
 
 ## 2. 관문 A 결과
-`bash scripts/verify_s6b.sh`(= `.workflow/gate.sh`) FAIL 0줄, 약 12초(A4 라운드 최종 실행).
+`bash scripts/verify_s6b.sh`(= `.workflow/gate.sh`) FAIL 0줄, 약 12초(D1 라운드 최종 실행).
 
 ```
 PASS A1 ruff: All checks passed!
-PASS B1 따라잡기 범위(이전 행 없음, 이어서, 10일 밀림, 범위 빔, --day, C-1) (7 passed, 24 deselected in 0.24s)
-PASS B2 단계 순서·인자·--spec 주차 꼬리표·video만 --extra video·빈 큐면 video 없음 (2 passed, 29 deselected in 0.36s)
-PASS B3 부분 실패: 나머지 단계 계속, 종료 코드 1, partial, summary_json 칸 (5 passed, 26 deselected in 0.22s)
-PASS B4 잠금: nightly 즉시 종료 코드 3·skipped·days [], weekly 대기 상한 뒤 3 (3 passed, 28 deselected in 1.55s)
-PASS B5 계획 후보에서 digest 있는 영상, 그 주 repo_card 있는 레포 제외 (2 passed, 29 deselected in 0.19s)
+PASS B1 따라잡기 범위(이전 행 없음, 이어서, 10일 밀림, 범위 빔, --day, C-1) (7 passed, 36 deselected in 0.25s)
+PASS B2 단계 순서·인자·--spec 주차 꼬리표·video만 --extra video·빈 큐면 video 없음 (2 passed, 41 deselected in 0.21s)
+PASS B3 부분 실패: 나머지 단계 계속, 종료 코드 1, partial, summary_json 칸 (5 passed, 38 deselected in 0.23s)
+PASS B4 잠금: nightly 즉시 종료 코드 3·skipped·days [], weekly 대기 상한 뒤 3 (3 passed, 40 deselected in 1.56s)
+PASS B5 계획 후보에서 digest 있는 영상, 그 주 repo_card 있는 레포 제외 (2 passed, 41 deselected in 0.21s)
 PASS B6 비용 꼬리표 RUN-주차 상한, 틀린 형식·없는 스펙 거부 (7 passed, 4 deselected in 0.19s)
 PASS B7 마이그레이션 40: 행·current_run_id 보존, published 저장, 다른 값 CHECK 실패 (1 passed in 0.02s)
-PASS B8 publish: done 주 빌드 0 → published, 빌드 1 → 상태 그대로, open 주 → 2 (1 passed, 10 deselected in 0.16s)
+PASS B8 publish: done 주 빌드 0 → published, 빌드 1 → 상태 그대로, open 주 → 2 (1 passed, 10 deselected in 0.17s)
 PASS B9 published 주 weekly 거부 2·행 수 그대로, --force는 실행 (3 passed, 8 deselected in 0.21s)
-PASS B10 ops weekly: 지난 주 계산, 실패 시 발행 없음, 이미 발행이면 아무것도 안 함, --force 없음 (8 passed, 23 deselected in 0.23s)
-PASS A2 ops 테스트 전체(CLI 연결 포함) (43 passed in 2.57s)
+PASS B10 ops weekly: 지난 주 계산, 실패 시 발행 없음, 이미 발행이면 아무것도 안 함, --force 없음 (9 passed, 34 deselected in 0.25s)
+PASS A2 ops 테스트 전체(CLI 연결 포함) (55 passed in 2.90s)
 PASS B11 임시 저장소: setup 두 번에 worktree 1개·data·site 링크, 래퍼(pull 실패에도 실행·종료 코드 전달·main 아니면 3), plist lint·경로·시각
 PASS B12 임시 예약 파일 없음, README 자동 실행 절, check-config의 ops.yaml 검증, 리포트 8장
 ```
-게이트 밖에서 전체 `uv run pytest -q`: 589 passed. 이전 스펙 `verify_s0~s5.sh`는 돌리지 않았다(무겁고 명세 게이트 밖). `verify_s5.sh`의 B7 `--help` 스냅숏은 의도대로 달라진다(6장).
+게이트 밖에서 전체 `uv run pytest -q`: 601 passed. 이전 스펙 `verify_s0~s5.sh`는 돌리지 않았다(무겁고 명세 게이트 밖). `verify_s5.sh`의 B7 `--help` 스냅숏은 의도대로 달라진다(6장).
 
 ## 3. 관문 B 결과
 해당 없음(LLM 역할 변경 없음, 명세 7장).
@@ -65,6 +65,11 @@ PASS B12 임시 예약 파일 없음, README 자동 실행 절, check-config의 
 | 5.11 비용 초과는 단계 실패(1)로 기록 | 실제로는 `plan run`이 `BudgetExceeded`를 규칙 기반 대체 계획으로 처리해 종료 코드 0을 돌려주므로(`cli_text.cmd_plan`) 그 단계는 실패로 기록되지 않음. ops 코드는 바꾸지 않음(NG: 기존 로직 변경 없음) | 명세의 5.7·5.11 서술과 기존 `plan` 동작이 어긋남. 기획이 정할 것 |
 | 5.2 nightly `cost_usd` (F21) | `runs.cost_usd` 합이 아니라 호출 기록(`steps.cost_usd`) 중 RUN 꼬리표이고 이 nightly 시작~끝 구간인 것의 합 | timeout으로 끝나지 못한 run의 비용도 잡으려고 |
 | 5.2 실패 이유 `error` (F05) | stdout·stderr에서 `BudgetExceeded`·`상한 초과` 줄을 먼저 찾고, 없으면 마지막 줄 | 실제 명령이 예산 메시지를 stdout에 쓰기도 함 |
+| 5.3 `ops weekly`는 weekly → publish (F34/F42, 사용자 결정) | 같은 잠금 안에서 weekly 전에 nightly 따라잡기(기본 범위)를 먼저 실행(범위가 비면 바로 넘어감, nightly 단계 실패가 있어도 weekly는 진행). nightly 쪽 runs 행은 따로 남음 | 일요일 분이 월요일 07:00 weekly 때 아직 안 돌아 빠지는 것 방지 |
+| 5.9 래퍼 흐름 (F41, F47) | 래퍼가 ops 잠금(`data/locks/ops.lock`, 같은 flock)이 이미 잡혀 있으면 `git pull`·`uv sync`를 건너뛰고 로그 한 줄 뒤 ops 실행. `git pull`에는 `GIT_HTTP_LOW_SPEED_LIMIT=1000`·`TIME=60` | 실행 중인 ops의 코드·환경을 바꾸지 않고, 멈춘 pull이 무인 실행을 막지 않게 |
+| 5.11 종료 처리 (F46) | `ops`가 SIGTERM을 받으면 `SystemExit(143)`를 올려 하위 프로세스 그룹을 SIGKILL·회수한 뒤 `finally`(잠금 해제, runs 행 `failed` 마감)가 돌게 함 | launchd·kill로 끊겨도 잠금·기록이 남지 않게 |
+| 5.1 ops.yaml 검증 (F51) | 정수 칸은 strict 양의 정수(bool·0·음수·실수·문자열 거부), `start_day`는 날짜 또는 YYYY-MM-DD 문자열만(정수·datetime 거부) | `check-config`가 틀린 값을 잡도록 |
+| 5.9 setup (F44, F11/F43) | 작업 폴더가 main 체크아웃 상태면 한 줄 한국어 안내로 종료(코드 1). README에 임시 예약 plist `rm` 한 줄과 "setup 뒤 작업 폴더에서 main 체크아웃 불가, main 작업은 임시 worktree로" 한 줄 | git 원문 오류 대신 안내 |
 
 ## 6. 남은 문제, 다음 스펙 제안
 - **추적 파일 `data/` 밖 이동은 S6a 결정 사항.** main에 `data/` 아래 추적 파일 2개(`data/make_data.py`, `data/trendsit-example.json`)가 있어, 실행 폴더에서 `data/`를 작업 폴더로 링크하면 git이 그 파일들을 지워진 상태로 본다. main이 둘 중 하나를 바꾸면 `git pull --ff-only`가 실패한다(임시 저장소 실험, sparse-checkout·skip-worktree·assume-unchanged로는 못 막음). 명세대로 옛 코드로 계속 실행하되, 실패를 조용히 넘기지 않게 했다: `run_ops.sh`가 `TRENDSIT_PULL_FAILED=1`을 세우고 `ops`가 그 값을 보면 runs 행 `note`에 "git pull 실패: 옛 코드로 실행"을 붙이고 `summary_json.pull_failed=true`를 남긴다(종료 코드는 그대로, 래퍼 로그에도 줄이 남음). 방식 근거: 새 파일·새 저장소 없이 래퍼-ops 사이 환경 변수 하나로 사람이 보는 runs 표에 남기는 가장 단순한 길이고, 종료 코드를 바꾸면 C-6(종료 코드 0 ⇔ 모든 단계 0)과 어긋난다

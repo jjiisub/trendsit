@@ -17,6 +17,7 @@ from trendsit.deep.plan import repo_candidates, video_candidates
 
 CFG = OpsConfig(start_day=date(2026, 10, 12), max_catchup_days=7, weekly_lock_wait_min=1, step_timeout_min=60,
                 video_timeout_min=240, weekly_timeout_min=120)
+NO_CATCHUP = CFG.model_copy(update={"start_day": date(2030, 1, 1)})  # 따라잡을 날이 없는 설정(weekly만 보는 테스트)
 PREFIX = ["uv", "run", "python", "-m", "trendsit"]
 REPO_Q = [{"full_name": "o/fresh", "max_depth": 2, "reason": "계획"}]
 VIDEO_Q = [{"video_id": "VIDEO000001", "mode": "captions", "start_sec": None, "end_sec": None, "reason": "r"}]
@@ -230,7 +231,7 @@ def test_b4_weekly_waits_then_gives_up(db, tmp_path, monkeypatch):
     fake = Fake(db)
     with ops.ops_lock(tmp_path):
         t0 = time.monotonic()
-        code = ops.weekly(db, CFG, now=at(2026, 10, 19, 7), runner=fake, data_dir=tmp_path, wait_sec=1)
+        code = ops.weekly(db, NO_CATCHUP, now=at(2026, 10, 19, 7), runner=fake, data_dir=tmp_path, wait_sec=1)
         waited = time.monotonic() - t0
     assert code == 3 and fake.cmds == [] and 0.9 <= waited < 3
     row = db.conn.execute("SELECT status, note FROM runs WHERE kind='ops-weekly'").fetchone()
@@ -251,7 +252,7 @@ def test_b4_weekly_gets_lock_released_while_waiting(db, tmp_path, monkeypatch):
     t = threading.Thread(target=hold)
     t.start()
     started.wait()
-    code = ops.weekly(db, CFG, now=at(2026, 10, 19, 7), runner=Fake(db), data_dir=tmp_path, wait_sec=3)
+    code = ops.weekly(db, NO_CATCHUP, now=at(2026, 10, 19, 7), runner=Fake(db), data_dir=tmp_path, wait_sec=3)
     t.join()
     assert code == 0
 
@@ -306,7 +307,7 @@ def test_b5_removed_repos_do_not_take_candidate_slots(db):
 ])
 def test_b10_previous_iso_week(db, tmp_path, now, week):
     fake = Fake(db)
-    assert ops.weekly(db, CFG, now=now, runner=fake, data_dir=tmp_path) == 0
+    assert ops.weekly(db, NO_CATCHUP, now=now, runner=fake, data_dir=tmp_path) == 0
     assert tail(fake.cmds[0]) == ["weekly", "--week", week, "--spec", f"RUN-{week}"]
     assert fake.cmds[1] == ["python3", "site_src/build.py"]
     assert db.conn.execute("SELECT status FROM weeks WHERE week=?", (week,)).fetchone()[0] == "published"
@@ -315,7 +316,7 @@ def test_b10_previous_iso_week(db, tmp_path, now, week):
 
 def test_b10_weekly_failure_does_not_publish(db, tmp_path):
     fake = Fake(db, fail={"weekly"})
-    assert ops.weekly(db, CFG, now=at(2026, 10, 19, 7), runner=fake, data_dir=tmp_path) == 1
+    assert ops.weekly(db, NO_CATCHUP, now=at(2026, 10, 19, 7), runner=fake, data_dir=tmp_path) == 1
     assert [tail(c)[0] for c in fake.cmds] == ["weekly"]  # 빌드 호출 없음
     row = db.conn.execute("SELECT status, summary_json FROM runs WHERE kind='ops-weekly'").fetchone()
     assert row[0] == "failed" and json.loads(row[1])["steps"][0]["exit"] == 1
@@ -323,7 +324,7 @@ def test_b10_weekly_failure_does_not_publish(db, tmp_path):
 
 def test_b10_unfinished_week_is_not_published(db, tmp_path):
     fake = Fake(db, weekly_status="written")  # 일부 토픽만 끝난 주
-    assert ops.weekly(db, CFG, now=at(2026, 10, 19, 7), runner=fake, data_dir=tmp_path) == 1
+    assert ops.weekly(db, NO_CATCHUP, now=at(2026, 10, 19, 7), runner=fake, data_dir=tmp_path) == 1
     assert fake.cmds[-1] != ["python3", "site_src/build.py"]
     assert db.conn.execute("SELECT status FROM weeks").fetchone()[0] == "written"
 
@@ -334,7 +335,7 @@ def test_b10_build_failure_returns_1(db, tmp_path):
             return (1, "", "빌드 실패") if cmd[0] == "python3" else super().__call__(cmd, timeout)
 
     fake = BuildFails(db)
-    assert ops.weekly(db, CFG, now=at(2026, 10, 19, 7), runner=fake, data_dir=tmp_path) == 1
+    assert ops.weekly(db, NO_CATCHUP, now=at(2026, 10, 19, 7), runner=fake, data_dir=tmp_path) == 1
     assert db.conn.execute("SELECT status FROM weeks").fetchone()[0] == "done"
 
 
@@ -343,7 +344,7 @@ def test_b10_already_published_does_nothing(db, tmp_path):
                     "VALUES ('2026-W42','2026-10-12','2026-10-18','published','2026-10-19T07:10:00+09:00')")
     db.conn.commit()
     fake = Fake(db)
-    assert ops.weekly(db, CFG, now=at(2026, 10, 19, 7), runner=fake, data_dir=tmp_path) == 0
+    assert ops.weekly(db, NO_CATCHUP, now=at(2026, 10, 19, 7), runner=fake, data_dir=tmp_path) == 0
     assert fake.cmds == []
     assert "이미 발행" in (tmp_path / "logs" / "ops" / "2026-10-19-weekly.log").read_text()
 
@@ -420,7 +421,7 @@ def test_b3_timeouts_per_step_and_timeout_is_a_failed_step(db, tmp_path):
 
 def test_b10_weekly_timeout_value(db, tmp_path):
     fake = Fake(db)
-    ops.weekly(db, CFG, now=at(2026, 10, 19, 7), runner=fake, data_dir=tmp_path)
+    ops.weekly(db, NO_CATCHUP, now=at(2026, 10, 19, 7), runner=fake, data_dir=tmp_path)
     assert fake.timeouts[0] == 120 * 60
 
 
@@ -439,7 +440,7 @@ def test_pull_failure_is_recorded(db, tmp_path, monkeypatch):
     run_night(db, tmp_path, at(2026, 10, 14))
     row = nightly_rows(db)[-1]
     assert row["summary"]["pull_failed"] is True and "git pull 실패" in row["note"]
-    ops.weekly(db, CFG, now=at(2026, 10, 19, 7), runner=Fake(db), data_dir=tmp_path)
+    ops.weekly(db, NO_CATCHUP, now=at(2026, 10, 19, 7), runner=Fake(db), data_dir=tmp_path)
     w = db.conn.execute("SELECT note, summary_json FROM runs WHERE kind='ops-weekly'").fetchone()
     assert "git pull 실패" in w[0] and json.loads(w[1])["pull_failed"] is True
 
@@ -472,3 +473,65 @@ def test_b3_cost_counts_unfinished_runs_within_window_only(db, tmp_path):
 
     run_night(db, tmp_path, at(2026, 10, 13), Killed(db))
     assert nightly_rows(db)[-1]["summary"]["cost_usd"] == pytest.approx(0.3)
+
+
+# ---------- ops weekly: nightly 따라잡기를 먼저 ----------
+def test_b10_weekly_catches_up_nightly_first_then_weekly(db, tmp_path):
+    fake = Fake(db, fail={"collect"})  # nightly 단계가 실패해도 weekly는 진행
+    code = ops.weekly(db, CFG, now=at(2026, 10, 19, 7), runner=fake, data_dir=tmp_path)  # 일요일(18) 미처리
+    names = fake.names()
+    assert code == 0 and names.index("collect") < names.index("plan run") < names.index("weekly")
+    assert names[-2:] == ["weekly", "python3"] or names[-1] == "python3"
+    assert nightly_rows(db)[-1]["summary"]["days"][-1] == "2026-10-18" and nightly_rows(db)[-1]["status"] == "partial"
+    assert db.conn.execute("SELECT status FROM weeks").fetchone()[0] == "published"
+    # 범위가 비면 바로 weekly
+    fake2 = Fake(db)
+    ops.weekly(db, CFG, week="2026-W43", now=at(2026, 10, 19, 7), runner=fake2, data_dir=tmp_path)
+    assert fake2.names()[0] == "weekly"
+
+
+# ---------- SIGTERM ----------
+def test_sigterm_kills_child_group_and_cleans_up(db, tmp_path):
+    import os
+    import signal
+    import threading
+
+    class Hang(Fake):
+        def __call__(self, cmd, timeout=None):
+            if tail(cmd)[:2] == ["plan", "run"]:
+                threading.Timer(0.3, os.kill, (os.getpid(), signal.SIGTERM)).start()
+                return ops.run_subprocess(["bash", "-c", "echo $$ >%s; sleep 30 & wait" % (tmp_path / "pid")], timeout=20)
+            return super().__call__(cmd, timeout)
+
+    old = signal.signal(signal.SIGTERM, ops.on_sigterm)
+    try:
+        t0 = time.monotonic()
+        with pytest.raises(SystemExit) as e:
+            run_night(db, tmp_path, at(2026, 10, 13), Hang(db))
+    finally:
+        signal.signal(signal.SIGTERM, old)
+    assert e.value.code == 143 and time.monotonic() - t0 < 10
+    assert nightly_rows(db)[-1]["status"] == "failed"  # runs 행 마감
+    with ops.ops_lock(tmp_path) as got:  # 잠금 해제
+        assert got
+    pid = int((tmp_path / "pid").read_text())
+    with pytest.raises(ProcessLookupError):
+        os.kill(pid, 0)  # 하위 프로세스 그룹도 끝남
+
+
+# ---------- ops.yaml 엄격 검증 ----------
+@pytest.mark.parametrize("field,bad", [
+    ("max_catchup_days", True), ("max_catchup_days", 0), ("max_catchup_days", -1), ("max_catchup_days", 1.5),
+    ("max_catchup_days", "7"), ("step_timeout_min", False), ("weekly_lock_wait_min", 0),
+    ("start_day", 20261012), ("start_day", "10/12"), ("start_day", None),
+])
+def test_ops_config_strict(field, bad):
+    import yaml
+    from pydantic import ValidationError
+
+    ok = {"start_day": "2026-10-12", "max_catchup_days": 7, "weekly_lock_wait_min": 240, "step_timeout_min": 60,
+          "video_timeout_min": 240, "weekly_timeout_min": 120}
+    OpsConfig.model_validate(ok)
+    OpsConfig.model_validate(yaml.safe_load("start_day: 2026-10-12\n") | ok | {"start_day": date(2026, 10, 12)})  # YAML 날짜
+    with pytest.raises(ValidationError):
+        OpsConfig.model_validate(ok | {field: bad})

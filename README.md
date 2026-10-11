@@ -86,10 +86,13 @@ uv run python -m trendsit video purge --older-than 7                            
 ```bash
 bash scripts/setup_run_worktree.sh        # 실행 폴더 만들기(두 번 돌려도 같음). 이 작업 폴더는 main이 아닌 브랜치여야 함
 launchctl bootout gui/$(id -u)/com.trendsit.collect-temp    # 임시 수집 예약 해제(이 예약은 이 스펙에서 대체됨)
+rm ~/Library/LaunchAgents/com.trendsit.collect-temp.plist   # 로그인 때 다시 등록되지 않게 plist도 지움
 cp ops/launchd/com.trendsit.*.plist ~/Library/LaunchAgents/
 launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.trendsit.nightly.plist
 launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.trendsit.weekly.plist
 ```
+- setup 뒤에는 이 작업 폴더에서 `git checkout main`을 할 수 없다(실행 폴더가 main을 씀). main 작업은 임시 worktree(`git worktree add`)로
+- `ops weekly`는 같은 잠금 안에서 먼저 nightly 따라잡기를 한 뒤 브리핑·발행한다(일요일 분이 빠지지 않게). `ops`는 SIGTERM을 받으면 하위 프로세스를 끝내고 잠금·실행 기록을 정리한다
 - 로그: `data/logs/ops/<날짜>-nightly.log`, `<날짜>-weekly.log`(단계 출력 전체), `data/logs/ops/launchd.log`. 단계별 종료 코드·시간·오류는 실행 기록의 `runs.summary_json`(`kind='nightly'`)
 - 종료 코드: 0 성공, 1 단계 실패(나머지 단계는 계속 돔), 2 거부(발행된 주의 `weekly`·`cluster`, 발행 대상이 아닌 주, 어제 이후 날의 `ops nightly --day`), 3 잠금을 못 얻음·실행 폴더가 main 아님(다음 예약이 다시 시도)
 - 손 실행: `uv run python -m trendsit ops nightly [--day 2026-10-12]`, `ops weekly [--week 2026-W42]`, `publish --week 2026-W42`. 실패한 날은 자동 재시도하지 않으니 `ops nightly --day D`로 다시. 발행된 주를 다시 쓰려면 `weekly --week W --force` 뒤 `publish --week W`

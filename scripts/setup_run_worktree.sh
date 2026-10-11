@@ -7,6 +7,10 @@ WORK=$(cd "${1:-$HOME/Claude/projects/trendsit}" && pwd)
 RUN=${2:-$HOME/Claude/projects/trendsit-run}
 
 if [ ! -e "$RUN/.git" ]; then
+  if [ "$(git -C "$WORK" rev-parse --abbrev-ref HEAD)" = main ]; then
+    echo "작업 폴더($WORK)가 main을 체크아웃 중: 다른 브랜치로 바꾼 뒤 다시 실행(실행 폴더가 main을 써야 함)" >&2
+    exit 1
+  fi
   git -C "$WORK" worktree add -q "$RUN" main
   # data/에는 추적 파일(예시 JSON 등)이 있어 링크와 겹친다. 실행 폴더의 data/는 지우고 작업 폴더 것을 링크한다
   rm -rf "$RUN/data"

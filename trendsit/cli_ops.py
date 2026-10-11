@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import signal
 from datetime import date
 from typing import Any
 
@@ -26,8 +27,9 @@ def cmd_publish(args: argparse.Namespace) -> int:
 def cmd_ops(args: argparse.Namespace) -> int:
     from .core import config
     from .core.db import open_db
-    from .ops import nightly, weekly
+    from .ops import nightly, on_sigterm, weekly
 
+    signal.signal(signal.SIGTERM, on_sigterm)  # launchd 종료·kill에도 잠금 해제와 runs 행 마감이 돌게
     cfg = config.load("ops.yaml")
     if args.ops_cmd == "nightly":
         return nightly(open_db(), cfg, day=args.day)

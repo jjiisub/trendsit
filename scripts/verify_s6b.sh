@@ -55,11 +55,26 @@ b11() {
   grep -rq 'git pull 실패' "$T/work/data/logs/ops" || { echo "pull 실패가 로그에 없음"; return 1; }
   UV_FAKE_EXIT=7 PATH="$T/bin:$PATH" bash "$T/run/scripts/run_ops.sh" nightly >/dev/null 2>&1
   [ $? = 7 ] || { echo "ops 종료 코드를 그대로 돌려주지 않음"; return 1; }
+  # 잠금이 잡혀 있으면 pull·sync는 건너뛰고 ops만 실행(ops가 대기·종료 코드 3을 처리)
+  : >"$T/uv.log"
+  python3 -c 'import fcntl, sys, time
+f = open(sys.argv[1], "a"); fcntl.flock(f, fcntl.LOCK_EX); time.sleep(8)' "$T/work/data/locks/ops.lock" &
+  local holder=$!
+  sleep 1
+  PATH="$T/bin:$PATH" bash "$T/run/scripts/run_ops.sh" nightly >/dev/null 2>&1
+  kill "$holder" 2>/dev/null; wait "$holder" 2>/dev/null
+  grep -q 'ops nightly' "$T/uv.log" && ! grep -q 'sync' "$T/uv.log" && grep -rq '잠금 사용 중' "$T/work/data/logs/ops" ||
+    { echo "잠금이 잡힌 때 pull·sync 건너뜀 + ops 실행이 아님"; return 1; }
   git -C "$T/run" checkout -q -b not-main
   : >"$T/uv.log"
   PATH="$T/bin:$PATH" bash "$T/run/scripts/run_ops.sh" nightly >/dev/null 2>&1
   [ $? = 3 ] && [ ! -s "$T/uv.log" ] || { echo "main이 아닐 때 종료 코드 3·미실행이 아님"; return 1; }
   grep -rq '실행 폴더가 main 아님' "$T/work/data/logs/ops" || { echo "main 아님이 로그에 없음"; return 1; }
+  # 작업 폴더가 main이면 setup은 한 줄 안내로 거부
+  git -C "$T/work" checkout -q main
+  if out=$(bash scripts/setup_run_worktree.sh "$T/work" "$T/run2" 2>&1) || [[ "$out" != *"main을 체크아웃 중"* || -e "$T/run2" ]]; then
+    echo "작업 폴더가 main일 때 setup이 거부하지 않음: $out"; return 1
+  fi
   # plist
   for job in nightly weekly; do
     f=ops/launchd/com.trendsit.$job.plist
