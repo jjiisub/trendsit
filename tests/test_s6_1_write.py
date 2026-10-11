@@ -427,3 +427,36 @@ def test_pack_index_groups_by_exact_id():
     items = [EvidenceItem("it:1#s1", "it:1", "text", "sentence", "a", {}), EvidenceItem("it:1#s2", "it:1", "text", "sentence", "b", {})]
     idx = pack_index(items)
     assert set(idx) == {"it:1#s1", "it:1#s2"}
+
+
+# ---------- 006-A2-2: 머리 타일·페이지 상한 초과가 최종판에서 지워짐(C-2·C-3) ----------
+def test_drop_code_bad_sections_strips_excess_visual_sections_and_flags_check():
+    from trendsit.brief.write import _drop_code_bad_sections
+
+    secs = [section(heading=f"절{i}", visual="tiles", tiles=[Tile(value="20", label="l", refs=["it:1#s1"])] * 2)
+            for i in range(6)]
+    check_locs: set[str] = set()
+    out = _drop_code_bad_sections(_result_stub(), page(sections=secs), pack(), CFG, {}, check_locs)
+    assert sum(1 for s in out.sections if s.visual != "none") == CFG.write.visuals_max
+    assert check_locs == {f"sections[{i}]" for i in range(CFG.write.visuals_max, 6)}
+
+
+def test_drop_code_bad_sections_strips_excess_slides():
+    from trendsit.brief.write import _drop_code_bad_sections
+
+    src = {"site": "GeekNews", "title": "t", "date": "2026-10-06"}
+    slide_pack = pack(**{f"sl:1@{i}": [EvidenceItem(f"sl:1@{i}", "it:1", "video", "slide_read", "판독", src)]
+                         for i in range(3)})
+    secs = [section(heading=f"절{i}", slide=f"sl:1@{i}", slide_caption="c") for i in range(3)]
+    out = _drop_code_bad_sections(_result_stub(), page(sections=secs), slide_pack, CFG, {}, set())
+    assert sum(1 for s in out.sections if s.slide) == CFG.write.slides_max
+
+
+def test_drop_code_bad_sections_removes_mismatched_head_tile():
+    from trendsit.brief.write import _drop_code_bad_sections
+
+    p = page(head_tiles=[Tile(value="8192 토큰", label="컨텍스트", refs=["it:1#s1"])])
+    res = _result_stub()
+    out = _drop_code_bad_sections(res, p, pack(), CFG, {}, set())
+    assert out.head_tiles == []
+    assert any("타일" in a for a in res.attention)

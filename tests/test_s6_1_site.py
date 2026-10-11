@@ -188,26 +188,15 @@ def test_backup_cli_rejects_bad_tag_and_missing_db(tmp_path, monkeypatch):
 # ---------- A9: build 토픽(v2 픽스처, 5.8) ----------
 @pytest.fixture(scope="module")
 def site_v2(tmp_path_factory):
-    # llamaindex 토픽의 슬라이드 이미지는 data/slides/에서 build가 복사한다(5.6). 실제 data/slides/를 건드리지
-    # 않게(006-A1-17) 임시 루트에서 build.ROOT를 바꿔 in-process로 빌드한다(subprocess면 ROOT를 못 바꿈)
+    # llamaindex 토픽의 슬라이드 이미지는 --data 파일 옆 slides/에서 build가 복사한다(5.6, 006-A2-6).
+    # tests/fixtures/s6_1/slides/에 커밋된 이미지를 그대로 쓴다(실제 data/slides/는 안 건드림).
     sys.path.insert(0, str(ROOT / "site_src"))
     import build as b
 
-    tmp_root = tmp_path_factory.mktemp("s6_1_v2_root")
-    names = ["S-bRN-avZ4Q_208.jpg", "S-bRN-avZ4Q_422.jpg"]
-    slides_dir = tmp_root / "data" / "slides"
-    slides_dir.mkdir(parents=True)
-    for n in names:
-        (slides_dir / n).write_bytes(b"\xff\xd8\xff\xdb" + b"\x00" * 16)
-    old_root = b.ROOT
-    b.ROOT = tmp_root
-    try:
-        out = tmp_path_factory.mktemp("s6_1_v2") / "site"
-        n = b.build(str(V2_FIXTURE), str(out))
-        assert n > 0
-        yield out
-    finally:
-        b.ROOT = old_root
+    out = tmp_path_factory.mktemp("s6_1_v2") / "site"
+    n = b.build(str(V2_FIXTURE), str(out))
+    assert n > 0
+    yield out
 
 
 def _topic_html(site_v2, tid):

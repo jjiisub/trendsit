@@ -261,6 +261,12 @@
        "slide": true
       }
      ],
+     "slide": {
+      "sec": 920,
+      "title": "호출 비용 비교 표",
+      "caption": "라우터 구조와 비용 비교(5.9 슬라이드·영상 타임라인 토픽)",
+      "image": "slides/V1xxxxxxxxx_920.jpg"
+     },
      "check": false
     }
    ],
@@ -399,7 +405,16 @@
     "type": "follow_up",
     "topic_id": "w39-gone"
    },
-   "head_tiles": [],
+   "head_tiles": [
+    {
+     "value": "1건",
+     "label": "소개된 설정 방식",
+     "note": "",
+     "refs": [
+      "s1"
+     ]
+    }
+   ],
    "sections": [
     {
      "heading": "설정 파일 하나로 모든 옵션을 선언",
@@ -449,7 +464,24 @@
    "relation": {
     "type": "new"
    },
-   "head_tiles": [],
+   "head_tiles": [
+    {
+     "value": "2.4배",
+     "label": "처리량 증가",
+     "note": "이전 대비",
+     "refs": [
+      "s1"
+     ]
+    },
+    {
+     "value": "30%",
+     "label": "메모리 감소",
+     "note": "",
+     "refs": [
+      "s3"
+     ]
+    }
+   ],
    "sections": [
     {
      "heading": "처리량 비교",
@@ -573,7 +605,32 @@
    "relation": {
     "type": "new"
    },
-   "head_tiles": [],
+   "head_tiles": [
+    {
+     "value": "1",
+     "label": "포인트 하나",
+     "note": "",
+     "refs": [
+      "s1"
+     ]
+    },
+    {
+     "value": "2",
+     "label": "포인트 둘",
+     "note": "",
+     "refs": [
+      "s2"
+     ]
+    },
+    {
+     "value": "3",
+     "label": "포인트 합",
+     "note": "",
+     "refs": [
+      "s1"
+     ]
+    }
+   ],
    "sections": [
     {
      "heading": "포인트 하나",
@@ -652,7 +709,28 @@
        ]
       }
      ],
-     "visual": null,
+     "visual": {
+      "type": "table",
+      "title": "비교 표",
+      "note": "",
+      "columns": [
+       "구분",
+       "값"
+      ],
+      "rows": [
+       [
+        "항목 A",
+        "10"
+       ],
+       [
+        "항목 B",
+        "20"
+       ]
+      ],
+      "refs": [
+       "s1"
+      ]
+     },
      "slide": null,
      "video_secs": [],
      "check": false
@@ -696,7 +774,27 @@
        ]
       }
      ],
-     "visual": null,
+     "visual": {
+      "type": "tiles",
+      "items": [
+       {
+        "value": "10",
+        "label": "지표 A",
+        "note": "",
+        "refs": [
+         "s1"
+        ]
+       },
+       {
+        "value": "20",
+        "label": "지표 B",
+        "note": "",
+        "refs": [
+         "s1"
+        ]
+       }
+      ]
+     },
      "slide": null,
      "video_secs": [],
      "check": false

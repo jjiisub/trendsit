@@ -80,8 +80,8 @@ def test_a3_sections_order_visual_after_first_paragraph_and_source_numbers(site)
     secs = [e["id"] for e in d.find("section", "dsec")]
     assert secs == ["sec-0", "sec-1", "sec-2", "sec-3", "sec-4"]
     figs = d.find("figure")
-    assert [tuple(c for c in f["cls"] if c != "dg") for f in figs] == [("dg-bars",), ("dg-events",)]
-    assert inside(figs[0], id_="sec-1") and inside(figs[1], id_="sec-2")
+    assert [tuple(c for c in f["cls"] if c != "dg") for f in figs] == [("dg-bars",), ("dg-events",), ("simg",)]
+    assert inside(figs[0], id_="sec-1") and inside(figs[1], id_="sec-2") and inside(figs[2], id_="sec-4")
     p1 = [e for e in d.els if inside(e, id_="sec-1")]
     assert next(i for i, e in enumerate(p1) if "dp" in e["cls"]) < next(i for i, e in enumerate(p1) if e["tag"] == "figure")
     assert d.find("ol", "vgo") and inside(d.find("ol", "vgo")[0], id_="sec-4")  # 영상 구간이 있는 절 아래
@@ -379,6 +379,8 @@ def test_f50_literal_markup_text_in_data_is_kept_and_passes_m1(site, tmp_path):
     import io
 
     sys.path.insert(0, str(ROOT / "site_src"))
+    import shutil
+
     import check
 
     data = json.loads(FIXTURE.read_text(encoding="utf-8"))
@@ -386,6 +388,7 @@ def test_f50_literal_markup_text_in_data_is_kept_and_passes_m1(site, tmp_path):
     t["sections"][0]["paragraphs"][0]["text"] = 'HTML 태그 `<span class="x">`를 쓰고 &amp; 문제 &#x27; 확인'
     p = tmp_path / "s.json"
     p.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+    shutil.copytree(FIXTURE.parent / "slides", tmp_path / "slides")  # w41-long의 슬라이드는 --data 옆 slides/(5.9)
     out = tmp_path / "site"
     assert run_build(p, out).returncode == 0
     html = (out / "topic/w41-one/index.html").read_text(encoding="utf-8")
@@ -431,6 +434,8 @@ def test_f59_build_restores_old_site_when_site_missing(tmp_path):
 
 # ---------- F39 수집 URL 스킴 ----------
 def test_f39_only_http_urls_become_links(tmp_path):
+    import shutil
+
     data = json.loads(FIXTURE.read_text(encoding="utf-8"))
     t = next(t for t in data["topics"] if t["id"] == "w41-one")
     t["sources"][0]["url"] = "javascript:alert(1)"
@@ -439,6 +444,7 @@ def test_f39_only_http_urls_become_links(tmp_path):
     data["sources"][0]["url"] = "vbscript:x"
     p = tmp_path / "s.json"
     p.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+    shutil.copytree(FIXTURE.parent / "slides", tmp_path / "slides")  # w41-long의 슬라이드는 --data 옆 slides/(5.9)
     out = tmp_path / "site"
     assert run_build(p, out).returncode == 0
     pages = "".join(f.read_text(encoding="utf-8") for f in out.rglob("*.html"))

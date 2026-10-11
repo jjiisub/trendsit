@@ -25,6 +25,7 @@ from ..core.artifacts_brief import (
     PreviousTopic,
     Relation,
     ReviewVerdict,
+    Section,
     TopicPage,
     WriterInput,
     WriterLimits,
@@ -263,11 +264,13 @@ def _critic_unseen_pages(ctx: Ctx, res: TopicResult, topic: Applied, winp: Write
 
 def _drop_code_bad_sections(res: TopicResult, final: TopicPage, pack: dict[str, list[EvidenceItem]], cfg: BriefConfig,
                             last_issue: dict[str, str], check_locs: set[str]) -> TopicPage:
-    """형식·수치 오류가 최종판에도 남은 절은 visual만 none으로 비우고 단락은 둔다(의미 지적만 남으면 그대로 두고 ⚠)."""
-    bad_secs = {int(m.group(1)) for i in checks.check(final, pack, res.n_sources, cfg)
+    """형식·수치 오류가 남은 절은 visual만 비우고(단락은 둠), 근거와 다른 머리 타일은 빼고, 페이지 상한(visuals_max·
+    slides_max) 초과는 뒤에서부터 줄인다(C-2·C-3. head_tiles_max는 스키마 max_length가 이미 막음)."""
+    issues = checks.check(final, pack, res.n_sources, cfg)
+    bad_secs = {int(m.group(1)) for i in issues
                if (m := re.match(r"^sections\[(\d+)\]", i.loc)) and ".paragraphs" not in i.loc and ".heading" not in i.loc}
-    if not bad_secs:
-        return final
+    bad_tiles = {int(m.group(1)) for i in issues if i.type in ("number_mismatch", "wrong_ref")
+                if (m := re.match(r"^head_tiles\[(\d+)\]$", i.loc))}
     secs = list(final.sections)
     for idx in bad_secs:
         loc = f"sections[{idx}]"
@@ -275,28 +278,51 @@ def _drop_code_bad_sections(res: TopicResult, final: TopicPage, pack: dict[str, 
         check_locs.add(loc)
         secs[idx] = secs[idx].model_copy(update={"visual": "none", "bars": None, "table": None, "tiles": [], "events": None,
                                                   "slide": None, "slide_caption": ""})
-    res.attention.append(f"형식·수치 오류가 남은 시각 요소 {len(bad_secs)}개 뺌(절 단락은 유지)")
-    return final.model_copy(update={"sections": secs})
+    if bad_secs:
+        res.attention.append(f"형식·수치 오류가 남은 시각 요소 {len(bad_secs)}개 뺌(절 단락은 유지)")
+    w = cfg.write  # 페이지 상한(visuals_max·slides_max) 초과는 뒤에서부터 줄임(C-3, head_tiles_max는 스키마가 막음)
+    visual_idx = [i for i, s in enumerate(secs) if s.visual != "none"]
+    for i in visual_idx[w.visuals_max:]:
+        secs[i] = secs[i].model_copy(update={"visual": "none", "bars": None, "table": None, "tiles": [], "events": None})
+        check_locs.add(f"sections[{i}]")
+    slide_idx = [i for i, s in enumerate(secs) if s.slide]
+    for i in slide_idx[w.slides_max:]:
+        secs[i] = secs[i].model_copy(update={"slide": None, "slide_caption": ""})
+        check_locs.add(f"sections[{i}]")
+    n_excess = max(0, len(visual_idx) - w.visuals_max) + max(0, len(slide_idx) - w.slides_max)
+    if n_excess:
+        res.attention.append(f"페이지 상한 초과로 시각 요소 {n_excess}개 뺌")
+    tiles = [t for i, t in enumerate(final.head_tiles) if i not in bad_tiles]
+    if bad_tiles:
+        res.attention.append(f"근거와 다른 머리 타일 {len(bad_tiles)}개 뺌")
+    return final.model_copy(update={"sections": secs, "head_tiles": tiles})
 
 
 def _scrub_pack_refs(res: TopicResult, final: TopicPage, pack: dict[str, list[EvidenceItem]]) -> tuple[TopicPage, set[str]]:
-    """최종판 저장 직전 안전망(C-1): 라운드를 다 거친 뒤에도 pack 밖 refs가 남으면 지운다(남은 지적만으로는 이미
-    못 고쳤으므로, 가짜 출처로 발행되는 것보다 그 칸을 비우는 쪽을 택한다)."""
-    secs = list(final.sections)
+    """저장 직전 안전망(C-1): 남은 pack 밖 refs를 지운다(가짜 출처보다 빈 칸이 낫다). 빈 refs가 되는 단락은 단락째
+    빼고(절이 통째로 비면 절째), 표·타일·막대도 비면 시각 요소째 뺀다(export C-2의 refs=[] 전체 중단 방지, 006-A2-3)."""
+    secs: list[Section] = []
     touched: set[str] = set()
-    for i, s in enumerate(secs):
+    dropped = 0
+    for i, s in enumerate(final.sections):
         upd: dict[str, Any] = {}
         paras = [p.model_copy(update={"refs": kept}) if (kept := [r for r in p.refs if r in pack]) != p.refs else p
                  for p in s.paragraphs]
+        paras = [p for p in paras if p.refs]
+        if not paras:
+            dropped += 1
+            continue
         if paras != list(s.paragraphs):
             upd["paragraphs"] = paras
         if s.tiles:
-            tiles = [t.model_copy(update={"refs": kept}) if (kept := [r for r in t.refs if r in pack]) != t.refs else t
-                     for t in s.tiles]
-            if tiles != list(s.tiles):
-                upd["tiles"] = tiles
+            tiles2 = [t for t in s.tiles if all(r in pack for r in t.refs)]
+            if tiles2 != list(s.tiles):
+                upd["tiles"] = tiles2
+                if len(tiles2) < 2:
+                    upd["visual"], upd["tiles"] = "none", []
         if s.table is not None and (kept := [r for r in s.table.refs if r in pack]) != s.table.refs:
-            upd["table"] = s.table.model_copy(update={"refs": kept})
+            upd["table"] = s.table.model_copy(update={"refs": kept}) if kept else None
+            upd["visual"] = s.visual if kept else "none"
         if s.bars is not None and any(it.ref not in pack for it in s.bars.items):
             upd["visual"], upd["bars"] = "none", None
         if s.events is not None:
@@ -306,11 +332,13 @@ def _scrub_pack_refs(res: TopicResult, final: TopicPage, pack: dict[str, list[Ev
         if s.slide and s.slide not in pack:
             upd["slide"], upd["slide_caption"] = None, ""
         if upd:
-            secs[i] = s.model_copy(update=upd)
+            s = s.model_copy(update=upd)
             touched.add(f"sections[{i}]")
+        secs.append(s)
     tiles = [t for t in final.head_tiles if all(r in pack for r in t.refs)]
-    if touched or len(tiles) != len(final.head_tiles):
-        res.attention.append("pack 밖 근거 id를 최종판에서 지움(C-1)")
+    if touched or dropped or len(tiles) != len(final.head_tiles):
+        msg = "pack 밖 근거 id를 최종판에서 지움(C-1)"
+        res.attention.append(f"{msg}, 근거 없는 절 {dropped}개 뺌" if dropped else msg)
         return final.model_copy(update={"sections": secs, "head_tiles": tiles}), touched
     return final, touched
 
@@ -373,6 +401,9 @@ def write_topic(ctx: Ctx, topic: Applied, members: dict[str, Member], table: Ali
     if review and not any(lg.checker == "critic" for lg in res.rounds) and res.status != "passed":
         _critic_unseen_pages(ctx, res, topic, winp, pack, final, check_locs, cfg)
     final, check_locs = _finalize_page(res, final, pack, cfg, last_issue, check_locs, ms, slide_candidates, timeline_secs)
+    if not final.sections:  # 근거 정리로 절이 모두 비면 격리(토픽 단위, export C-2 전체 중단 방지)
+        res.status, res.page, res.attention = "failed", None, res.attention + ["근거 정리 뒤 남은 절 없음, 작성 실패"]
+        return res
     secs = [s.model_copy(update={"check": f"sections[{i}]" in check_locs}) for i, s in enumerate(final.sections)]
     final = final.model_copy(update={"sections": secs})
     if check_locs:

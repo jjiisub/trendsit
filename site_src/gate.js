@@ -114,6 +114,10 @@ function gateInBrowser([weights, tokens]) {
   for (let i = 1; i < hs.length; i++) if (hs[i] > hs[i - 1] + 1) skip++;
   g.headingSkips = skip + (hs[0] === 1 ? 0 : 1);
   g.titleAttrs = document.querySelectorAll('[title]:not(link)').length;
+  // S6-1 5.9: 표는 자신만 가로로 스크롤(overflow-x), 이미지는 로드됨, 375에서 타일 글자 안 잘림
+  g.cmptOverflowBad = [...document.querySelectorAll('.cmpt-wrap')].filter((el) => !['auto', 'scroll'].includes(getComputedStyle(el).overflowX)).length;
+  g.imgBad = [...document.querySelectorAll('img')].filter((img) => img.complete && img.naturalWidth === 0).length;
+  g.tileOverflowBad = [...document.querySelectorAll('.tiles .tile-v, .tiles .tile-l, .tiles .tile-s')].filter((el) => el.scrollWidth > el.clientWidth + 1).length;
   return g;
 }
 
@@ -192,7 +196,7 @@ async function behavior(browser, longTopic, homePath) {
   }
   await page.close();
   // 탭: 기본은 토픽, #repos면 레포
-  const panel = (pg) => pg.evaluate(() => ({ topics: getComputedStyle(document.querySelector('#panel-topics')).display, repos: getComputedStyle(document.querySelector('#panel-repos')).display }));
+  const panel = (pg) => pg.evaluate(() => ({ topics: getComputedStyle(document.querySelector('#panel-topics')).visibility, repos: getComputedStyle(document.querySelector('#panel-repos')).visibility }));
   page = await ctx.newPage();
   await page.goto(base + homePath, { waitUntil: 'networkidle' });
   b.tabDefault = await panel(page);
@@ -222,16 +226,17 @@ async function miniBar(browser, longTopic) {
   return { miniTop, miniScrolled };
 }
 
-// D-1·D-40·C-10: 두 탭 중 어느 쪽을 눌러도 스크롤 위치가 거의 같고(.tabs 바로 위 0높이 앵커) .nav가 가려지지 않음.
+// D-1·D-40·C-10: 두 탭을 실제로 눌렀을 때 스크롤 위치가 거의 같고(.tabs 바로 위 0높이 앵커) .nav가 가려지지 않음.
 // behavior()와 독립된 컨텍스트에서(같은 컨텍스트를 더 오래 잡고 있으면 미니 바 view-timeline 측정에 영향이 있었음)
-async function tabAnchorScroll(browser, homePath) {
-  const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+async function tabAnchorScroll(browser, homePath, viewport) {
+  const ctx = await browser.newContext({ viewport, isMobile: viewport.width < 768, hasTouch: viewport.width < 768 });
   const page = await ctx.newPage();
   const scrollState = () => ({ y: Math.round(window.scrollY), navTop: Math.round(document.querySelector('.nav').getBoundingClientRect().top) });
-  await page.goto(base + homePath + '#topics', { waitUntil: 'networkidle' });
+  await page.goto(base + homePath, { waitUntil: 'networkidle' });
+  await page.click('.tb-t');
   await sleep(50);
   const topics = await page.evaluate(scrollState);
-  await page.goto(base + homePath + '#repos', { waitUntil: 'networkidle' });
+  await page.click('.tb-r');
   await sleep(50);
   const repos = await page.evaluate(scrollState);
   await ctx.close();
@@ -244,12 +249,13 @@ async function tabAnchorScroll(browser, homePath) {
   await gates(chromium, 'chromium', [[375, 812, true], [768, 1024, false], [1280, 900, false]], out.gates, out.external);
   const longTopic = (pages.find((p) => p.longTopic) || pages.find((p) => p.topic)).path;
   out.behavior = await behavior(chromium, longTopic, pages[0].path);
-  out.behavior.tabScroll = await tabAnchorScroll(chromium, pages[0].path);
+  out.behavior.tabScroll = await tabAnchorScroll(chromium, pages[0].path, { width: 1280, height: 900 });
   Object.assign(out.behavior, await miniBar(chromium, longTopic));
   await chromium.close();
   const webkit = await pw.webkit.launch();
   await gates(webkit, 'webkit', [[375, 812, true], [1280, 900, false]], out.gates, out.external);
   out.touch = await touch(webkit, pages.find((p) => p.topic).path);
+  out.tabScrollMobile = await tabAnchorScroll(webkit, pages[0].path, { width: 375, height: 812 });
   await webkit.close();
   out.tokens = TOKENS;
   process.stdout.write(JSON.stringify(out));

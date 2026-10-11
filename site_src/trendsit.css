@@ -41,15 +41,17 @@ code.ic{font-family:inherit;font-size:.94em;background:var(--c-track);border-rad
 
 /* ---------- 홈: 탭(토픽 / 트렌딩 레포). :target + :has, JS 없음 ---------- */
 /* #topics·#repos 앵커는 .tabs 바로 위 0높이 요소: 탭을 눌러도 .nav가 가려지지 않고(scroll-margin-top), 두 탭의
-   스크롤 위치가 거의 같다(D-1·D-40, C-10) */
-.tab-anchor{display:block;height:0;scroll-margin-top:var(--sticky-offset)}
+   스크롤 위치가 거의 같다(D-1·D-40, C-10). 패널 두 개를 같은 grid 칸에 겹쳐 두고 안 보이는 쪽은 visibility만
+   끈다(display:none이면 짧은 패널로 바뀔 때 전체 높이가 줄어 스크롤이 0으로 튕김) */
+.tab-anchor{display:block;height:0;scroll-margin-top:calc(var(--sp-12) * 5)} /* nav+주차 머리보다 넉넉하게: 스크롤 0 유지 */
 .tabs{display:flex;gap:var(--sp-1);position:sticky;top:0;z-index:var(--z-tabs);background:var(--c-bg);border-bottom:1px solid var(--c-line);
   margin:var(--sp-3) calc(-1 * var(--gutter)) 0;padding:0 var(--gutter)}
 .tabs a{display:inline-flex;align-items:center;min-height:var(--target-lg);padding:0 var(--sp-3);text-decoration:none;color:var(--c-muted)}
 .tabs a:first-child{padding-left:0}
 .tabs a:hover{color:var(--c-title)}
-.has-tabs .panel{display:none;margin-top:var(--sp-4);scroll-margin-top:64px}
-.has-tabs:not(:has(#repos:target)) #panel-topics,.has-tabs:has(#repos:target) #panel-repos{display:block}
+.has-tabs .panels{display:grid}
+.has-tabs .panel{grid-area:1/1;visibility:hidden;margin-top:var(--sp-4);scroll-margin-top:64px}
+.has-tabs:not(:has(#repos:target)) #panel-topics,.has-tabs:has(#repos:target) #panel-repos{visibility:visible}
 .has-tabs:not(:has(#repos:target)) .tb-t,.has-tabs:has(#repos:target) .tb-r{color:var(--c-title);font-weight:var(--fw-medium);box-shadow:inset 0 -2px 0 var(--c-title)}
 .has-tabs .panel>.sec-t{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)} /* 탭이 제목 역할 */
 .sec-d{margin-top:var(--sp-1)}

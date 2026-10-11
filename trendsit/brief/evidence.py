@@ -284,7 +284,7 @@ def cap_pack(members: list[Member], max_tokens: int) -> tuple[list[EvidenceItem]
                       key=lambda m: (m.channel in seen_channels, RELEVANCE_RANK.get(m.relevance, 3), m.key))
         for m in turn:
             g = queues[m.key].pop(0)
-            cost = sum(estimate_tokens(x.as_dict()) for x in g)
+            cost = sum(estimate_tokens(_line(x) or "") for x in g)
             if total + cost <= max_tokens:
                 kept += g
                 total += cost

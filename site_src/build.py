@@ -591,7 +591,7 @@ def build_into(out):
         if f.is_file():
             shutil.copyfile(f, out / f.name)
     shutil.copytree(static / "fonts", out / "assets" / "fonts")
-    slides_src = ROOT / "data" / "slides"
+    slides_src = C.data_dir / "slides"
     for t in C.d["topics"]:
         for s in t["sections"]:
             if s.get("slide"):
@@ -625,6 +625,7 @@ def build(data_path, out_path):
         load(d)
     except (OSError, ValueError, BuildError) as e:
         raise BuildError(f"site.json을 읽을 수 없음({data_path}): {e}") from e
+    C.data_dir = pathlib.Path(data_path).resolve().parent  # 슬라이드는 --data 파일 옆 slides/(기본값이면 data/slides/, 기존과 같음)
     out = pathlib.Path(out_path).resolve()  # 실행 폴더에서는 site가 작업 폴더로 가는 링크
     out.parent.mkdir(parents=True, exist_ok=True)
     old = out.with_name(out.name + ".old")

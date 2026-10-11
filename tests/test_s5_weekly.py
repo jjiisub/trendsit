@@ -7,6 +7,7 @@ import json
 import pytest
 
 from tests.conftest import FakeTransport, make_ctx, response
+from trendsit import export
 from trendsit.brief import briefing, pipeline, report
 from trendsit.brief.weekly import stage_cluster
 from trendsit.core import config
@@ -563,3 +564,26 @@ def test_briefing_md_untitled_source(week, monkeypatch):
     ctx.db.conn.execute("UPDATE items SET title=NULL WHERE id=1")
     text = briefing.write_briefing_md(ctx.db, "2026-W41").read_text()
     assert "`it:1#q1` ?" in text
+
+
+def test_scrub_empties_topic_isolates_failure_not_whole_export(week):
+    """006-A2-3: refs가 전부 pack 밖이라 수정으로도 못 고치면 그 토픽만 failed(export C-2 전체 중단 방지), 나머지는 계속."""
+    sections = [{"heading": f"{TITLES[1]} {n}번째 절", "paragraphs": [{"text": f"{TITLES[1]} 관련 사실 {n}이다.",
+                "refs": ["it:999#q1"]}], "visual": "none", "bars": None, "table": None, "tiles": [], "events": None,
+                "slide": None, "slide_caption": "", "video_secs": [], "check": False} for n in range(1, 4)]
+    bad_page = json.dumps({"head_tiles": [], "sections": sections, "summary": "모델이 공개됐다. 쟁점이 있다.",
+                           "title": TITLES[1], "log": "l", "attention": False}, ensure_ascii=False)
+    ctx, cids = week
+    responses = [plan(cids), bad_page, revision([]), verdict([])]
+    for i in (2, 3, 4):
+        responses += [page(i, f"{TITLES[i]} 근거 문장 요약 정리했다"), verdict([])]
+    ctx.llm.transport.responses = [response(r) for r in responses]
+    ctx.tracer = Tracer(ctx.db, "weekly", "S0")
+    summary = pipeline.run_weekly("2026-W41", ctx, from_step="select", embedder=HashEmbedder(), cfg=CFG)
+    run_id = ctx.tracer.run_id
+    t1 = ctx.db.conn.execute("SELECT status FROM topics WHERE run_id=? AND rank=1", (run_id,)).fetchone()
+    assert t1["status"] == "failed"
+    assert summary["status"] == "partial" and summary["write"]["failed"] == 1
+    site = export.build(ctx.db, with_week="2026-W41")
+    assert all(t["id"] != "w41-model-1" for t in site["topics"])  # 실패 토픽은 export에 없음(격리)
+    assert any(t["title"] == TITLES[2] for t in site["topics"])  # 다른 토픽은 그대로 발행
