@@ -77,7 +77,6 @@ def mdhm(ts):
 
 
 SEP = ' <span class="sep">/</span> '
-CHK = '<span class="chk">확인 필요</span>'
 
 
 def meta_line(parts):
@@ -117,8 +116,8 @@ def channel_counts(t):
 
 
 def shown_checks(t):
-    """화면에 표시할 확인 필요 위치(포인트 밖): overview, summary, concepts[i]. '빠진 도식: …' 등은 표시 안 함."""
-    return [c for c in t.get("checks", []) if c in ("overview", "summary") or re.fullmatch(r"concepts\[\d+\]", c)]
+    """화면에 표시할 확인 필요 위치(절 밖): summary, title. '빠진 시각 요소: …' 등은 표시 안 함."""
+    return [c for c in t.get("checks", []) if c in ("summary", "title")]
 
 
 # ---------------------------------------------------------------- 페이지 틀
@@ -147,6 +146,12 @@ def write(rel, content):
     path = C.out / rel
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(content, encoding="utf-8")
+
+
+def write_bytes(rel, content):
+    path = C.out / rel
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(content)
 
 
 def week_path(w):
@@ -187,8 +192,8 @@ def with_end(raw, tail):
     return f'{rich(raw[:start])}<span class="nb-end">{rich(raw[start:])}&nbsp;{tail}</span>'
 
 
-def point_html(t, p, ctr):
-    return with_end(p["text"], cites(t, p["refs"], ctr) + (CHK if p.get("check") else ""))
+def para_html(t, p, ctr, chk=""):
+    return f'<p class="dp">{with_end(p["text"], cites(t, p["refs"], ctr) + chk)}</p>'
 
 
 def bar_value(it, unit):
@@ -207,17 +212,35 @@ def bars_html(t, g, ctr):
         for it, n in zip(g["items"], nums))
     src = ""
     if g.get("ref") in C.srcs:
-        src = f'<p class="dg-s">{esc(g["caption"]) if g.get("caption") else "출처"} {cite(t, g["ref"], ctr)}</p>'
+        src = f'<p class="dg-s">출처 {cite(t, g["ref"], ctr)}</p>'
     return f'<figure class="dg dg-bars"><figcaption class="dg-t">{esc(g["title"])}</figcaption>{ctx_p(g)}<div class="bars">{rows}</div>{src}</figure>'
 
 
-EVIDENCE_ID_RE = re.compile(r"\s*\[\s*it:\d+#q\d+(?:\s*,\s*it:\d+#q\d+)*\s*\]")
+EVIDENCE_ID_RE = re.compile(r"\s*\[\s*(?:it|og|vd|rp|sl):[\w./#@:-]+(?:\s*,\s*(?:it|og|vd|rp|sl):[\w./#@:-]+)*\s*\]")
 
 
 def ctx_p(g):
     """도식 설명 끝의 내부 근거 id([it:8#q2] 등)는 공개 화면에 내지 않는다."""
     ctx = EVIDENCE_ID_RE.sub("", g.get("context") or "").strip()
     return f'<p class="dg-c">{rich(ctx)}</p>' if ctx else ""
+
+
+def table_html(g):
+    heads = "".join(f"<th>{esc(c)}</th>" for c in g["columns"])
+    rows = "".join("<tr>" + "".join(f"<{'th scope=\"row\"' if i == 0 else 'td'}>{esc(c)}</{'th' if i == 0 else 'td'}>"
+                                    for i, c in enumerate(row)) + "</tr>" for row in g["rows"])
+    note = f'<p class="dg-s">{esc(g["note"])}</p>' if g.get("note") else ""
+    return (f'<figure class="dg dg-table"><figcaption class="dg-t">{esc(g["title"])}</figcaption>'
+            f'<div class="cmpt-wrap"><table class="cmpt"><thead><tr>{heads}</tr></thead><tbody>{rows}</tbody></table></div>{note}</figure>')
+
+
+def tile_html(x, t, ctr):
+    return (f'<div class="tile"><span class="tile-v">{rich(x["value"])}</span><span class="tile-l">{esc(x["label"])}</span>'
+            f'<span class="tile-s">{esc(x.get("note") or "")}</span><span class="tile-x">{cites(t, x["refs"], ctr)}</span></div>')
+
+
+def tiles_wrap_html(items, t, ctr):
+    return f'<div class="tiles n{len(items)}">' + "".join(tile_html(x, t, ctr) for x in items) + "</div>"
 
 
 def events_html(t, g, ctr):
@@ -233,24 +256,42 @@ def events_html(t, g, ctr):
             '<p class="dg-s">출처는 항목마다 번호로, 날짜는 각 출처 기준</p></figure>')
 
 
-def video_html(g):
-    rows = "".join(f'<li class="{"slide" if m.get("slide") else ""}"><span class="vt-t">{esc(m["t"])}</span>'
-                   f'<span class="vt-x">{rich(m["text"])}{" (슬라이드)" if m.get("slide") else ""}</span></li>' for m in g["marks"])
-    return f'<figure class="dg dg-video"><figcaption class="dg-t">{esc(g["title"])}</figcaption><ol class="vtl" aria-label="영상 타임라인">{rows}</ol></figure>'
+def visual_html(t, sec, ctr):
+    v = sec.get("visual")
+    if not v:
+        return ""
+    if v["type"] == "bars":
+        return bars_html(t, v, ctr)
+    if v["type"] == "table":
+        return table_html(v)
+    if v["type"] == "tiles":
+        return f'<figure class="dg dg-tiles">{tiles_wrap_html(v["items"], t, ctr)}</figure>'
+    if v["type"] == "events":
+        return events_html(t, v, ctr)
+    return ""
 
 
-def diagram_slots(t):
-    """도식의 자리(포인트 번호 1부터). numbers·events는 anchor, 영상 타임라인은 그 영상을 처음 인용한 포인트(없으면 마지막). 같은 자리는 수치 → 사건 → 타임라인."""
-    n = len(t["points"])
-    slots = {}
-    for g in t.get("diagrams", []):
-        if g["type"] == "video":
-            at = next((i + 1 for i, p in enumerate(t["points"]) if g["ref"] in p["refs"]), n)
-            order = 2
-        else:
-            at, order = min(max(g.get("anchor", n), 1), n), 0 if g["type"] == "bars" else 1
-        slots.setdefault(at, []).append((order, g))
-    return {k: [g for _, g in sorted(v, key=lambda x: x[0])] for k, v in slots.items()}
+def slide_html(s, video_url):
+    sl = s.get("slide")
+    if not sl:
+        return ""
+    url = video_url
+    cap_parts = [esc(sl["title"])] if sl.get("title") else []
+    if sl.get("caption"):
+        cap_parts.append(esc(sl["caption"]))
+    time_link = f'<a href="{esc(url)}&t={sl["sec"]}s">{esc(mmss(sl["sec"]))}</a>' if url and link(url) else esc(mmss(sl["sec"]))
+    cap = meta_line([time_link, *cap_parts])
+    return (f'<figure class="simg"><img src="/assets/slides/{esc(sl["image"].split("/")[-1])}" width="960" height="540" '
+            f'loading="lazy" alt="슬라이드: {esc(sl.get("title") or "")}"><figcaption>{cap}</figcaption></figure>')
+
+
+def video_secs_html(s, video_url):
+    secs = s.get("video_secs") or []
+    if not secs or not video_url:
+        return ""
+    rows = "".join(f'<li class="{"vx" if m.get("slide") else ""}"><a href="{esc(video_url)}&t={m["sec"]}s">{mmss(m["sec"])}</a> '
+                   f'{rich(m.get("label", ""))}</li>' for m in secs)
+    return f'<ol class="vgo" aria-label="영상 구간">{rows}</ol>'
 
 
 # ---------------------------------------------------------------- 토픽
@@ -263,13 +304,15 @@ def follow_html(t):
     return f'<p class="follow">지난 흐름 <a href="{topic_path(prev)}">{esc(wk)} ‘{esc(prev["title"])}’</a></p>'
 
 
-def topic_meta(t):
+def topic_meta(t, read_min=None, link_check=False):
     n = channel_counts(t)
     parts = [f'<span class="chs">{" / ".join(f"{C.chl[c]} {n[c]}" for c in CH_ORDER if n[c])}</span>']
     if t.get("relation", {}).get("type") == "follow_up":
         parts.append('<span class="fu">후속</span>')
     if t.get("has_check"):
-        parts.append('<span class="fu">확인 필요</span>')
+        parts.append('<a class="fu" href="#chk-1">확인 필요</a>' if link_check else '<span class="fu">확인 필요</span>')
+    if read_min is not None:
+        parts.append(f"약 {read_min}분")
     return f'<p class="tmeta meta">{meta_line(parts)}</p>'
 
 
@@ -308,22 +351,43 @@ def video_timeline_html(s):
     return f'<ol class="vtl" aria-label="영상 타임라인">{rows}</ol>'
 
 
+def topic_read_minutes(t):
+    chars = len(re.sub(r"\s", "", plain(t["title"]))) + len(re.sub(r"\s", "", plain(t["summary"])))
+    for s in t["sections"]:
+        chars += sum(len(re.sub(r"\s", "", plain(p["text"]))) for p in s["paragraphs"])
+    return max(1, math.ceil(chars / 500))
+
+
+def video_url_of(t):
+    return next((s["url"] for s in t["sources"] if s["channel"] == "video" and link(s.get("url"))), None)
+
+
+def section_html(t, s, idx, chk_ctr, video_url, ctr):
+    chk = ""
+    if s.get("check"):
+        chk = f'<span class="chk" id="chk-{next(chk_ctr)}">확인 필요</span>'
+    paras = s["paragraphs"]
+    inner = para_html(t, paras[0], ctr, chk) if paras else ""
+    inner += visual_html(t, s, ctr)
+    inner += "".join(para_html(t, p, ctr) for p in paras[1:])
+    inner += slide_html(s, video_url)
+    inner += video_secs_html(s, video_url)
+    return f'<section class="dsec" id="sec-{idx}"><h2 class="dsec-t">{esc(s["heading"])}</h2>{inner}</section>'
+
+
 def render_topic(t):
     C.srcs = {s["id"]: s for s in t["sources"]}
     C.nums = src_order(t)
     ctr = iter(range(1, 10**6))
     w = C.weeks[t["week"]]
     checks = shown_checks(t)
-    mark = lambda loc: CHK if loc in checks else ""  # noqa: E731
-    slots = diagram_slots(t)
-    pts = ""
-    for i, p in enumerate(t["points"], 1):
-        figs = "".join(bars_html(t, g, ctr) if g["type"] == "bars" else events_html(t, g, ctr) if g["type"] == "events" else video_html(g)
-                       for g in slots.get(i, []))
-        pts += f'<li id="pt-{i}" class="pt"><p class="pt-x">{point_html(t, p, ctr)}</p>{figs}</li>'
-    cc = "".join(f'<dt>{esc(c["term"])}</dt><dd>{rich(c["desc"])}{mark(f"concepts[{i}]")}</dd>' for i, c in enumerate(t.get("concepts", [])))
-    cb = "".join(f'<dt>{esc(C.chl.get(c["channel"], c["channel"]))}</dt><dd>{rich(c["text"])}</dd>' for c in t.get("contributions", []))
-    sec = lambda cls, hid, title, inner: f'<section class="sec {cls}" aria-labelledby="{hid}"><h2 class="sec-t" id="{hid}">{title}</h2>{inner}</section>'  # noqa: E731
+    video_url = video_url_of(t)
+    chk_ctr = iter(range(1, 10**6))
+    # 문서 순서대로 번호를 매긴다(제목·요약이 절보다 먼저 와서 ⚠면 #chk-1이 그쪽을 가리켜야 함)
+    title_chk = f'<span class="chk" id="chk-{next(chk_ctr)}">확인 필요</span>' if "title" in checks else ""
+    summary_chk = f'<span class="chk" id="chk-{next(chk_ctr)}">확인 필요</span>' if "summary" in checks else ""
+    secs_html = "".join(section_html(t, s, i, chk_ctr, video_url, ctr) for i, s in enumerate(t["sections"]))
+    tiles = tiles_wrap_html(t["head_tiles"], t, ctr) if t.get("head_tiles") else ""
     pn = ""
     ids = w["topic_ids"]
     i = ids.index(t["id"])
@@ -332,16 +396,15 @@ def render_topic(t):
                                     f'<span class="pn-t">{esc(C.topics[tid]["title"])}</span></a>')
         pn = ('<nav class="pn" aria-label="같은 주 토픽">' + (nav_link(ids[i - 1], "pn-prev", "이전 토픽") if i else "<span></span>")
               + (nav_link(ids[i + 1], "pn-next", "다음 토픽") if i + 1 < len(ids) else "") + "</nav>")
+    read_min = topic_read_minutes(t)
     body = (
         f'<main class="wrap topic"><article><div class="mini" aria-hidden="true"><span class="mini-t">{esc(t["title"])}</span>'
         f'<a class="mini-s" href="#h-src" tabindex="-1">출처 {len(t["sources"])}</a></div>'
         f'<p class="back meta"><a href="{week_path(w)}">{esc(w["label"])} 브리핑</a></p>'
-        f'<h1 class="tt ttl">{esc(t["title"])}</h1><p class="ts">{rich(t["summary"])}{mark("summary")}</p>{topic_meta(t)}{follow_html(t)}'
-        + sec("sec-ov", "h-ov", "개요", f'<p class="ov">{rich(t["overview"])}{mark("overview")}</p>')
-        + sec("sec-pt", "h-pt", "핵심 포인트", f'<ol class="pts">{pts}</ol>')
-        + (sec("sec-cc", "h-cc", "핵심 개념", f'<dl class="cc">{cc}</dl>') if cc else "")
-        + (sec("sec-cb", "h-cb", "소스별로 더한 것", f'<dl class="cb">{cb}</dl>') if cb else "")
-        + source_list(t) + pn + "</article></main>")
+        f'<h1 class="tt ttl">{esc(t["title"])}{title_chk}</h1><p class="ts">{rich(t["summary"])}{summary_chk}</p>'
+        f'{topic_meta(t, read_min, link_check=True)}{follow_html(t)}'
+        + (f'<div class="tiles-wrap">{tiles}</div>' if tiles else "")
+        + secs_html + source_list(t) + pn + "</article></main>")
     return page(f'{plain(t["title"])} - TrendsIT', body, "briefing", topic_path(t), plain(t["summary"])[:120])
 
 
@@ -349,8 +412,8 @@ def render_topic(t):
 def read_minutes(w):
     chars = 0
     for tid in w["topic_ids"]:
-        t = C.topics[tid]
-        chars += sum(len(re.sub(r"\s", "", plain(x))) for x in (t["title"], t["summary"], t["overview"], *(p["text"] for p in t["points"])))
+        chars += sum(len(re.sub(r"\s", "", plain(x))) for x in (C.topics[tid]["title"], C.topics[tid]["summary"]))
+        chars += sum(len(re.sub(r"\s", "", plain(p["text"]))) for s in C.topics[tid]["sections"] for p in s["paragraphs"])
     return max(1, math.ceil(chars / 500))
 
 
@@ -527,6 +590,14 @@ def build_into(out):
         if f.is_file():
             shutil.copyfile(f, out / f.name)
     shutil.copytree(static / "fonts", out / "assets" / "fonts")
+    slides_src = ROOT / "data" / "slides"
+    for t in C.d["topics"]:
+        for s in t["sections"]:
+            if s.get("slide"):
+                fname = s["slide"]["image"].split("/")[-1]
+                src = slides_src / fname
+                if src.is_file():
+                    write_bytes(f"assets/slides/{fname}", src.read_bytes())
     for i, w in enumerate(C.d["weeks"]):
         write(f'week/{w["id"]}/index.html', render_week(w, week_path(w)))
         if i == 0:

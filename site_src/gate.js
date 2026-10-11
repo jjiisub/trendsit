@@ -41,7 +41,7 @@ function gateInBrowser([weights, tokens]) {
   }
   g.lowContrast = low.slice(0, 10);
   g.lowContrastN = low.length;
-  const bodySel = '.it-s, .ts, .ov, .pt-x, .cc dd, .cb dd, .rp-w';
+  const bodySel = '.it-s, .ts, .dp, .rp-w';
   const bad = [];
   for (const el of document.querySelectorAll(bodySel)) {
     const cs = getComputedStyle(el);
@@ -85,7 +85,7 @@ function gateInBrowser([weights, tokens]) {
   };
   g.hlMidBreaks = [];
   for (const m of document.querySelectorAll('mark.hl')) g.hlMidBreaks.push(...midBreaks(m));
-  const pt = document.querySelector('.sec-pt');
+  const pt = document.querySelector('.dsec');
   g.pointsTop = pt ? Math.round(pt.getBoundingClientRect().top + window.scrollY) : null;
   const small = [];
   for (const a of document.querySelectorAll('a.ref')) {
@@ -145,7 +145,7 @@ async function touch(browser, topicPath) {
   const ctx = await browser.newContext({ viewport: { width: 375, height: 812 }, isMobile: true, hasTouch: true });
   const page = await ctx.newPage();
   await page.goto(base + topicPath, { waitUntil: 'networkidle' });
-  const first = page.locator('.pt-x a.ref').first();
+  const first = page.locator('.dp a.ref').first();
   const href = await first.getAttribute('href');
   await first.tap();
   await page.waitForTimeout(200);
@@ -163,7 +163,7 @@ async function behavior(browser, longTopic, homePath) {
   b.cites = nCites;
   if (nCites >= 2) {
     // 화면 안에 함께 보이는 인용 번호들(마우스가 정확히 올라간 시각부터 재려고 좌표로 움직임)
-    await page.evaluate(() => { const r = document.querySelector('.pt-x .cite > .ref').getBoundingClientRect(); window.scrollTo(0, window.scrollY + r.top - 150); });
+    await page.evaluate(() => { const r = document.querySelector('.dp .cite > .ref').getBoundingClientRect(); window.scrollTo(0, window.scrollY + r.top - 150); });
     await sleep(100);
     const pos = await page.evaluate(() => [...document.querySelectorAll('.cite > .ref')].map((a, i) => { const r = a.getBoundingClientRect(); return { i, x: r.x + r.width / 2, y: r.y + r.height / 2, ok: r.top > 0 && r.bottom < innerHeight }; }).filter((p) => p.ok));
     const A = pos[0];
