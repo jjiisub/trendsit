@@ -121,7 +121,8 @@ a13() {
     [ "${n:-0}" = 0 ] || { echo "eval/fixtures/$d/가 비어 있지 않음(런 뒤 재생성 대상)"; return 1; }
   done
   local ids
-  ids=$(grep -rnlE '\boverview\b|\bconcepts\b' trendsit --include='*.py' | grep -v __pycache__ || true)
+  # 주석 한 줄짜리(마이그레이션 번호의 역사적 맥락 설명 등)는 식별자가 아니라 빼고 본다
+  ids=$(grep -rnE '\boverview\b|\bconcepts\b' trendsit --include='*.py' | grep -v __pycache__ | grep -vE '^[^:]+:[0-9]+:\s*#' || true)
   [ -z "$ids" ] || { echo "trendsit/에 overview·concepts 식별자가 남음: $ids"; return 1; }
   grep -q 'it:{item_id}#s{n}' docs/handoff/CONTRACTS.md || { echo "CONTRACTS.md에 it:#s 행 없음"; return 1; }
   return 0
