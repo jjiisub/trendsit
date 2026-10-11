@@ -22,6 +22,32 @@ help_all() {
   done
 }
 
+# S5-1 스냅숏 호환(S6a D-20): 스냅숏의 명령이 지금도 있고, 그 help의 옵션(-x, --xxx 토큰)이 지금 help에도 모두 있다. 새 명령·옵션·문구 변경은 허용
+# $1=스냅숏, $2=지금 help(help_all 출력). 사라진 명령·옵션을 출력하고, 있으면 종료 코드 1
+help_compat() {
+  python3 - "$1" "$2" <<'PY'
+import re
+import sys
+
+
+def blocks(path):
+    out, cur = {}, None
+    for line in open(path, encoding="utf-8"):
+        if line.startswith("$ trendsit"):
+            cur = out.setdefault(line.strip(), set())
+        elif cur is not None:
+            cur.update(re.findall(r"(?<![\w-])--?[A-Za-z][\w-]*", line))
+    return out
+
+
+old, new = blocks(sys.argv[1]), blocks(sys.argv[2])
+gone = [f"명령 {k[2:-7]}" for k in old if k not in new]
+gone += [f"{k[2:-7]} {opt}" for k, opts in old.items() if k in new for opt in sorted(opts - new[k])]
+print(", ".join(gone))
+sys.exit(1 if gone else 0)
+PY
+}
+
 # A1 회귀: 종료 코드로 판정(리뷰 R16)
 if [ "$FAST" = 1 ]; then
   echo "SKIP A1 --fast: verify_s0~s4 재실행 생략(A2 전체 pytest가 s0~s4 테스트 포함)"
@@ -129,12 +155,12 @@ else
   fail B3 "허용 밖 변경:${bad} / judge md 차이 $(git diff --stat bed7887 -- eval/judge*.md | tail -1)"
   fail A15 "B3과 같은 판정"
 fi
-if help_all >"$TMP/help.txt" 2>&1 && diff -q "$TMP/help.txt" reports/S5-1/help_before.txt >/dev/null; then
-  pass B7 "CLI --help 전부 불변(S5-1a 스냅숏)"
+if help_all >"$TMP/help.txt" 2>&1 && help_gone=$(help_compat reports/S5-1/help_before.txt "$TMP/help.txt"); then
+  pass B7 "CLI --help: S5-1a 스냅숏의 명령·옵션이 하나도 사라지지 않음(추가 허용)"
   pass A17 "B7과 같은 판정"
 else
   fail A17 "B7과 같은 판정"
-  fail B7 "--help 차이: $(diff "$TMP/help.txt" reports/S5-1/help_before.txt | head -2 | tr '\n' ' ')"
+  fail B7 "사라진 명령·옵션: ${help_gone:-help 실행 실패}"
 fi
 # B6 관문 B 금지 표현 목록 불변(checks.SPECULATIVE는 코드에서 빠졌고 scripts/s5_gate_b.py 상수가 S5-1a 병합본 값과 같아야 함)
 if uv run --quiet python -c "

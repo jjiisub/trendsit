@@ -309,7 +309,7 @@ def test_b10_previous_iso_week(db, tmp_path, now, week):
     fake = Fake(db)
     assert ops.weekly(db, NO_CATCHUP, now=now, runner=fake, data_dir=tmp_path) == 0
     assert tail(fake.cmds[0]) == ["weekly", "--week", week, "--spec", f"RUN-{week}"]
-    assert fake.cmds[1] == ["python3", "site_src/build.py"]
+    assert fake.cmds[1][-3:] == ["export", "--with-week", week] and fake.cmds[2] == ["python3", "site_src/build.py"]  # export → 빌드
     assert db.conn.execute("SELECT status FROM weeks WHERE week=?", (week,)).fetchone()[0] == "published"
     assert not any("--force" in c for c in fake.cmds)  # C-8
 
@@ -481,7 +481,7 @@ def test_b10_weekly_catches_up_nightly_first_then_weekly(db, tmp_path):
     code = ops.weekly(db, CFG, now=at(2026, 10, 19, 7), runner=fake, data_dir=tmp_path)  # 일요일(18) 미처리
     names = fake.names()
     assert code == 0 and names.index("collect") < names.index("plan run") < names.index("weekly")
-    assert names[-2:] == ["weekly", "python3"]
+    assert names[-3:] == ["weekly", "export", "python3"]
     assert nightly_rows(db)[-1]["summary"]["days"][-1] == "2026-10-18" and nightly_rows(db)[-1]["status"] == "partial"
     assert db.conn.execute("SELECT status FROM weeks").fetchone()[0] == "published"
     # 범위가 비면 바로 weekly

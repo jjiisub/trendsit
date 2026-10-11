@@ -80,7 +80,7 @@ def test_b8_publish_success_and_build_failure_and_not_ready(tmp_path):
     assert ops.publish(db, "2026-W41", build(0)) == 0
     status, at = week_row(db)
     assert status == "published" and at and "T" in at
-    assert calls[0] == ["python3", "site_src/build.py"]
+    assert calls[-2][-3:] == ["export", "--with-week", "2026-W41"] and calls[-1] == ["python3", "site_src/build.py"]  # export 먼저, 다음 빌드
 
     first = at
     assert ops.publish(db, "2026-W41", build(0)) == 0  # 다시 발행: published_at만 갱신

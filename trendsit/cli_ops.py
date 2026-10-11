@@ -1,10 +1,13 @@
-"""S6b 명령(COMMON 9장: 스펙별 파일의 register): publish, ops nightly, ops weekly."""
+"""S6b 명령(COMMON 9장: 스펙별 파일의 register): publish, ops nightly, ops weekly. S6a: export."""
 
 from __future__ import annotations
 
 import argparse
 import signal
+import sqlite3
+import sys
 from datetime import date
+from pathlib import Path
 from typing import Any
 
 from .cli_brief import _week
@@ -24,6 +27,19 @@ def cmd_publish(args: argparse.Namespace) -> int:
     return publish(open_db(), args.week)
 
 
+def cmd_export(args: argparse.Namespace) -> int:
+    from .core.config import ROOT
+    from .core.db import open_db
+    from .export import ExportError, export
+
+    try:
+        export(open_db(), Path(args.out) if args.out else ROOT / "data" / "site.json", args.with_week)
+    except (ExportError, sqlite3.Error) as e:
+        print(f"export 실패: {e}", file=sys.stderr)
+        return 1
+    return 0
+
+
 def cmd_ops(args: argparse.Namespace) -> int:
     from .core import config
     from .core.db import open_db
@@ -40,6 +56,11 @@ def register(sub: Any) -> None:
     p = sub.add_parser("publish", help="주간 브리핑 발행(S6b): 사이트 빌드 후 weeks.status published")
     p.add_argument("--week", type=_week, required=True)
     p.set_defaults(fn=cmd_publish)
+
+    e = sub.add_parser("export", help="사이트 데이터(S6a): DB → data/site.json(발행된 주만). 실패하면 기존 파일을 그대로 둔다")
+    e.add_argument("--out", help="기본: data/site.json")
+    e.add_argument("--with-week", type=_week, help="아직 발행 전인 이 주도 담는다(publish가 사용)")
+    e.set_defaults(fn=cmd_export)
 
     o = sub.add_parser("ops", help="자동 실행(S6b): launchd가 부르는 nightly, weekly")
     os_ = o.add_subparsers(dest="ops_cmd", required=True)

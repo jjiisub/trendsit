@@ -28,6 +28,7 @@ from .core.trace import Tracer
 # 명령 하나를 (종료 코드, 표준 출력, 표준 오류)로. 테스트는 이 자리에 가짜 실행기를 넣는다. timeout(초)을 넘기면 종료 코드 124
 Runner = Callable[[list[str], float | None], tuple[int, str, str]]
 Build = Callable[[list[str]], tuple[int, str, str]]
+EXPORT_CMD = ["uv", "run", "python", "-m", "trendsit", "export"]  # publish가 --with-week <주>를 붙임: 아직 done인 그 주도 site.json에 담는다
 BUILD_CMD = ["python3", "site_src/build.py"]
 TIMEOUT_CODE = 124
 
@@ -58,16 +59,17 @@ def on_sigterm(signum: int, frame: Any) -> None:
 
 
 def publish(db: DB, week: str, runner: Build = run_subprocess) -> int:
-    """사이트 빌드 → weeks.status 'published', published_at. 0 성공, 1 빌드 실패, 2 대상 아님."""
+    """export → 사이트 빌드 → weeks.status 'published', published_at. 0 성공, 1 export·빌드 실패, 2 대상 아님."""
     row = db.conn.execute("SELECT status FROM weeks WHERE week=?", (week,)).fetchone()
     if row is None or row["status"] not in ("done", "published"):
         print(f"발행 불가: {week} 상태 {row['status'] if row else '없음'} (done 또는 published만)", file=sys.stderr)
         return 2
-    code, out, err = runner(BUILD_CMD)
-    if code != 0:
-        last = next((x for x in reversed((err or out).strip().splitlines()) if x.strip()), "")
-        print(f"사이트 빌드 실패(종료 코드 {code}): {last[:200]}", file=sys.stderr)
-        return 1
+    for name, cmd in (("export", [*EXPORT_CMD, "--with-week", week]), ("사이트 빌드", BUILD_CMD)):
+        code, out, err = runner(cmd)
+        if code != 0:
+            last = next((x for x in reversed((err or out).strip().splitlines()) if x.strip()), "")
+            print(f"{name} 실패(종료 코드 {code}): {last[:200]}", file=sys.stderr)
+            return 1
     with db.conn:
         db.conn.execute("UPDATE weeks SET status='published', published_at=? WHERE week=?", (now_kst(), week))
     print(f"발행: {week}")
