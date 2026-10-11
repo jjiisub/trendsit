@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 from pydantic import ValidationError
 
@@ -298,6 +300,32 @@ def test_render_no_page_dup():
                                                     evidence_id=None, comment="c", hint="h")])
     assert render_data(critic).count(sentence) == 1 and render_data(revise).count(sentence) == 1
     assert critic.page is p and revise.previous is p
+
+
+def test_ensure_frame_generates_960x540_and_skips_if_exists(tmp_path, monkeypatch):
+    import subprocess
+
+    monkeypatch.setattr(slides, "SLIDES_DIR", tmp_path / "slides")
+    monkeypatch.setattr(slides, "MEDIA_ROOT", tmp_path / "media")
+    media_dir = tmp_path / "media" / "V1xxxxxxxxx"
+    media_dir.mkdir(parents=True)
+    media = media_dir / "media.mp4"
+    subprocess.run(["ffmpeg", "-y", "-f", "lavfi", "-i", "testsrc=duration=10:size=320x240:rate=5", media], check=True,
+                   capture_output=True)
+    path = slides.ensure_frame("V1xxxxxxxxx", 3)
+    assert path is not None and Path(path).is_file()
+    out = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=width,height",
+                          "-of", "csv=p=0", path], capture_output=True, text=True)
+    assert out.stdout.strip() == "960,540"
+    mtime_before = Path(path).stat().st_mtime
+    path2 = slides.ensure_frame("V1xxxxxxxxx", 3)
+    assert path2 == path and Path(path).stat().st_mtime == mtime_before  # 재실행 시 재생성 안 함
+
+
+def test_ensure_frame_missing_media_returns_none(tmp_path, monkeypatch):
+    monkeypatch.setattr(slides, "SLIDES_DIR", tmp_path / "slides")
+    monkeypatch.setattr(slides, "MEDIA_ROOT", tmp_path / "media")
+    assert slides.ensure_frame("no-such-video", 5) is None
 
 
 def test_pack_index_groups_by_exact_id():

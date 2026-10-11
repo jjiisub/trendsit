@@ -493,6 +493,26 @@ def test_editor_select_fallback_reason_tells_call_failure_from_validation(week, 
     assert "호출 실패" in log and "검증 실패" not in log
 
 
+# ---------- A6: 잘림(D-42) → no_visuals 재시도 ----------
+def test_writer_truncation_retries_with_no_visuals(week, monkeypatch):
+    from trendsit.brief import write as wr
+    from trendsit.core.role import RoleFailed
+
+    ctx, cids = week
+    responses = [plan(cids), page(1, "Argon이 DeepSWE에서 77.9% 기록"), verdict([])]
+    for i in (2, 3, 4):
+        responses += [page(i, f"{TITLES[i]} 근거 문장 요약 정리"), verdict([])]
+    ctx.llm.transport.responses = [response(r) for r in responses]
+    calls = stub_run_role(monkeypatch, wr, lambda n, role: RoleFailed("writer: 스키마 검증 실패 (출력 잘림(max_tokens 4500 도달): x)")
+                          if n == 1 else None)
+    ctx.tracer = Tracer(ctx.db, "weekly", "S0")
+    pipeline.run_weekly("2026-W41", ctx, from_step="select", embedder=HashEmbedder(), cfg=CFG)
+    run_id = ctx.tracer.run_id
+    t1 = ctx.db.conn.execute("SELECT status FROM topics WHERE run_id=? AND rank=1", (run_id,)).fetchone()
+    assert t1["status"] in ("passed", "checked")  # 잘림 뒤 no_visuals 재시도로 회복(C-5: 토픽당 호출 ≤4)
+    assert calls[0] == "writer" and calls[1] == "writer"  # 1회 실패(잘림) + 1회 성공(no_visuals), 토픽 1
+
+
 def test_briefing_md_untitled_source(week, monkeypatch):
     """제목이 NULL인 근거가 있어도 읽기본이 멈추지 않고 '?'로 적는다(F-33)."""
     ctx, cids = week
