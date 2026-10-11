@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Any
@@ -93,6 +94,11 @@ def _repos(db: DB, week: str, run_id: str, topics: list[dict[str, Any]]) -> list
     return out
 
 
+def _page_checks(t: dict[str, Any]) -> list[str]:
+    """포인트 밖에서 화면에 표시되는 확인 필요 위치(build의 shown_checks와 같은 규칙)."""
+    return [c for c in t.get("checks", []) if c in ("overview", "summary") or re.fullmatch(r"concepts\[\d+\]", c)]
+
+
 # ---------- 실행 기록(5.6) ----------
 def _hm(ts: str) -> str:
     return ts[11:16]
@@ -102,7 +108,7 @@ def _minutes(start: str, end: str | None) -> float | None:
     return round((datetime.fromisoformat(end) - datetime.fromisoformat(start)).total_seconds() / 60, 1) if end else None
 
 
-def _weekly_counts(db: DB, run_id: str, summary: dict[str, Any], published: int) -> dict[str, Any]:
+def _weekly_counts(db: DB, run_id: str, summary: dict[str, Any], published: int, needs_check: int) -> dict[str, Any]:
     c: dict[str, Any] = {}
     sel, past, rev = summary.get("select") or {}, (summary.get("cluster") or {}).get("past"), summary.get("review") or {}
     if "candidates" in sel:
@@ -114,7 +120,7 @@ def _weekly_counts(db: DB, run_id: str, summary: dict[str, Any], published: int)
     c["evidence_ids"] = db.conn.execute("SELECT COUNT(DISTINCT evidence_id) FROM topic_evidence WHERE run_id=?", (run_id,)).fetchone()[0]
     if rev.get("rounds"):
         c["review"] = {"passed_first": rev["rounds"].get("1", 0), "rejected": rev.get("code_rejects", 0) + rev.get("critic_rejects", 0),
-                       "needs_check": rev.get("check_points", 0)}
+                       "needs_check": needs_check}
     c["published"] = published
     return c
 
@@ -124,14 +130,22 @@ def _weekly_summary(c: dict[str, Any]) -> str:
     return f"토픽 {c['published']}개 발행" + (f", 검수 반려 {rev['rejected']}회, 확인 필요 {rev['needs_check']}문장" if rev else "")
 
 
-def _run(db: DB, r: Any, published: dict[str, int]) -> dict[str, Any]:
+def _night_week(r: Any, summary: dict[str, Any]) -> str:
+    """매일 수집의 주차: 처리한 마지막 날이 속한 ISO 주(02:00 실행은 어제까지를 처리하므로 기록이 없으면 시작일의 전날)."""
+    days = summary.get("days")
+    d = date.fromisoformat(days[-1]) if days else date.fromisoformat(r["started_at"][:10]) - timedelta(days=1)
+    y, w, _ = d.isocalendar()
+    return week_id(f"{y}-W{w:02d}")
+
+
+def _run(db: DB, r: Any, published: dict[str, tuple[int, int]]) -> dict[str, Any]:
     """runs 행 하나. 주간은 steps 표(역할 문장, 확인 표시), 매일은 summary_json.steps(단계, 종료 코드)."""
     summary = _json(r["summary_json"]) or {}
     out: dict[str, Any] = {"id": r["id"], "kind": r["kind"], "at": r["started_at"], "duration_min": _minutes(r["started_at"], r["finished_at"]),
                            "status": r["status"], "cost_usd": round(r["cost_usd"], 4)}
     if r["kind"] == "weekly":
         out["week"] = week_id(r["week"])
-        out["counts"] = _weekly_counts(db, r["id"], summary, published[r["week"]])
+        out["counts"] = _weekly_counts(db, r["id"], summary, *published[r["week"]])
         out["summary"] = _weekly_summary(out["counts"])
         steps = []
         for s in db.conn.execute("SELECT t, role, text, attention, detail FROM steps WHERE run_id=? AND text IS NOT NULL ORDER BY seq", (r["id"],)):
@@ -142,6 +156,7 @@ def _run(db: DB, r: Any, published: dict[str, int]) -> dict[str, Any]:
             steps.append(step)
         out["steps"] = steps
     else:
+        out["week"] = _night_week(r, summary)
         steps = summary.get("steps") or []
         bad = [s for s in steps if s.get("exit")]
         out["summary"] = f"날 {len(summary.get('days') or [])}개, 단계 {len(steps)}개 중 실패 {len(bad)}개"
@@ -150,8 +165,8 @@ def _run(db: DB, r: Any, published: dict[str, int]) -> dict[str, Any]:
     return out
 
 
-def _runs(db: DB, weeks: list[dict[str, Any]], counts: dict[str, int]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
-    published = {w["_db_week"]: counts[w["_db_week"]] for w in weeks}
+def _runs(db: DB, weeks: list[dict[str, Any]], counts: dict[str, tuple[int, int]]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    published = counts  # 주 → (발행 토픽 수, 화면에 표시되는 확인 필요 수)
     ids = [w["_run_id"] for w in weeks]
     marks = ",".join("?" * len(ids))
     rows = db.conn.execute(f"SELECT * FROM runs WHERE kind='nightly' OR id IN ({marks}) ORDER BY started_at DESC", ids).fetchall()
@@ -160,12 +175,12 @@ def _runs(db: DB, weeks: list[dict[str, Any]], counts: dict[str, int]) -> tuple[
     rws = []
     for w in weeks:
         wk = w["_db_week"]
-        nights = [r for r in runs if r["kind"] == "nightly" and w["_start"].isoformat() <= r["at"][:10] <= w["_end"].isoformat()]
+        nights = [r for r in runs if r["kind"] == "nightly" and r["week"] == w["id"]]
         c = by_id[w["_run_id"]].get("counts", {})
         rev = c.get("review", {})
         rws.append({"week": w["id"], "label": w["label"], "range": w["range"], "nightly": len(nights),
                     "nightly_failed": sum(r["status"] != "ok" for r in nights), "collected": sum(w["collected"].values()),
-                    "candidates": c.get("candidates"), "published": published[wk], "rejected": rev.get("rejected"),
+                    "candidates": c.get("candidates"), "published": published[wk][0], "rejected": rev.get("rejected"),
                     "needs_check": rev.get("needs_check")})
     return runs, [{k: v for k, v in r.items() if v is not None} for r in rws]
 
@@ -237,7 +252,7 @@ def build(db: DB, with_week: str | None = None) -> dict[str, Any]:
         approx = db.conn.execute("SELECT EXISTS(SELECT 1 FROM repo_trending t JOIN runs x ON x.id=t.run_id WHERE t.week=? AND x.note=?)",
                                  (wk, APPROX_NOTE)).fetchone()[0]
         members[wk] = _used_members(db, wk, r["current_run_id"])
-        counts[wk] = len(ts)
+        counts[wk] = (len(ts), sum(bool(p.get("check")) for t in ts for p in t["points"]) + sum(len(_page_checks(t)) for t in ts))
         cited = {(s["channel"], s["url"] or s["title"]) for t in ts for s in t["sources"]}
         weeks.append({"id": week_id(wk), "label": label, "range": rng, "start": start.isoformat(), "end": end.isoformat(),
                       "published_at": r["published_at"] or now_kst(), "collected": collected, "topic_ids": [t["id"] for t in ts],
