@@ -215,6 +215,7 @@ def test_f69_github_collected_counts_repo_trending(tmp_path):
     site = build(make_db(tmp_path))
     gh = next(s for s in site["sources"] if s["id"] == "github_trending")
     assert gh["weeks"]["2026-w41"]["collected"] == 1  # items에는 없고 repo_trending 행(그 주)만 있음
+    assert "daily" not in gh  # 요일별 원천이 없으니 [0]*7로 collected와 어긋나지 않게 칸을 두지 않음
 
 
 # ---------- A11 ----------

@@ -210,7 +210,7 @@ def _sources(db: DB, weeks: list[dict[str, Any]], members: dict[str, set[tuple[s
                                      (s["id"], w["_start"].isoformat(), w["_end"].isoformat())).fetchone()[0]
             used = sum(1 for _, src in members[w["_db_week"]] if src == s["id"])
             entry["weeks"][w["id"]] = {"collected": n, "failed_days": failed, "used_in_topics": used}
-            if n:  # 요일별(월~일) 수집 수
+            if n and s["id"] != "github_trending":  # 요일별(월~일) 수집 수. repo_trending에는 요일이 없어 칸을 두지 않음
                 daily = [0] * 7
                 for (day,) in db.conn.execute("SELECT day FROM items WHERE source_id=? AND week=? AND day IS NOT NULL", (s["id"], w["_db_week"])):
                     daily[date.fromisoformat(day).weekday()] += 1
