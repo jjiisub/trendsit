@@ -14,7 +14,7 @@
 
 ## 2. 관문 A 결과
 `bash scripts/verify_s6a.sh`(= `.workflow/gate.sh`), 약 50초. 마지막 실행 FAIL 0줄(원문은 `.workflow/005-s6a/A1-impl.md`). 항목: A0 ruff, A1·A2·A11(export·주차·W40 근사), A14(data/ 정리·B7/A17), A3·A4(도식·번호·확인 필요), A5~A10(check.py --fixture), A12(발행·원자 교체), A13(문서).
-게이트 밖 전체 `uv run pytest -q`: 626 passed. 실데이터 사본(W40·W41을 임시 DB 사본에서 published 처리)으로 export → 임시 폴더 빌드 → `check.py` 12/12 통과(Chromium·WebKit 관문 9, 동작 포함).
+게이트 밖 전체 `uv run pytest -q`: 626 passed. 실데이터 사본(W40·W41을 임시 DB 사본에서 published 처리)으로 export → 임시 폴더 빌드 → `check.py` 13/13 통과(Chromium·WebKit 관문 9, 동작 포함).
 
 ## 3. 관문 B 결과
 없음(LLM 역할 변경 없음).
@@ -32,7 +32,7 @@
 - 영상 타임라인(`type: video`, `marks`)은 `export_topic`이 만들지 않아 실데이터에는 없고 픽스처로만 검증한다(빌드는 지원)
 - `check.py`의 "예시"·"동작 안 함" 검사는 site.json 본문 문자열을 뺀 화면 문구에만 적용(실제 글에 "예시"가 흔히 나옴)
 - Python 3.12 f-string 문법(따옴표 중첩)을 `build.py`에서 씀. 시스템 `python3`은 3.14라 문제 없음
-- `esc()`는 원문에 이미 들어 있는 `&#x27;` 같은 엔티티를 풀어 한 번만 이스케이프(실데이터에서 그대로 찍히는 것이 보여 고침)
+- `esc()`는 원문에 이미 들어 있는 `&#x27;` 같은 엔티티를 풀어 한 번만 이스케이프하고, `nb_tokens`는 태그와 엔티티(`&#x27;` `&quot;` `&amp;` `&lt;`)를 건드리지 않는다(처음 구현은 엔티티 속 `x27`·`quot`를 토큰으로 감싸 화면에 글자로 찍혔음, 실데이터 사본 38건 → 0건). check.py M-1이 렌더된 글자에 엔티티·마크업 조각이 보이면 실패시킨다
 - 매일 수집의 비용은 `summary_json.cost_usd`, 소스는 `sources.yaml`에 있는 것만(daily 칸 포함), `nightly_failed`는 partial·failed·stopped만
 - ruff는 `docs/reference`(디자인 시안 복사본, E702 등)를 `--extend-exclude`로 뺌(pyproject 변경 없이)
 
@@ -42,6 +42,13 @@
 - `BUILD_CMD`는 `[sys.executable, "site_src/build.py"]`(run_ops.sh가 `uv run python -m trendsit`으로 부르므로 venv의 3.12). bare `python3`는 launchd 최소 PATH에서 3.9일 수 있어 build.py 문법(3.12)이 안 맞음
 - **기존 테스트 2개 파일 수정**(예산 "변경하는 기존 파일 ≤ 8"에 테스트가 안 세어져 있음): `tests/test_ops.py`·`tests/test_ops_publish.py`가 publish의 호출 순서를 "빌드 1번"으로 단언하고 있어 "export → 빌드"로 고침(약화 아님, 순서를 더 엄격히 확인)
 - 관문 9의 7번(토큰 밖 색)은 `shoot.py`가 허용하던 `rgb(0,0,0)`·흰색 추가를 빼고 tokens.css 색 10개만 허용(통과함)
+
+- **C-5 "예시" 검사는 화면 문구만**: 실데이터 본문에 "예시"가 흔해(브리핑 글 자체) 사이트 전체 0회는 불가능해서 site.json 본문 문자열은 빼고 화면이 만든 문구만 검사한다(리뷰 F26 rejected)
+- **`site/` 교체는 rename 두 번**(F30 rejected): 실행 폴더에서 `site`가 링크라 링크 교체 방식은 쓰지 않았고, 두 번째 rename이 실패하면 이전 사이트를 되돌린다
+- **매일 수집 runs의 steps에는 `t`가 없다**: 원천(`summary_json.steps`)에 시각이 없어 칸을 뺐다(D-11 "못 만드는 칸은 뺌"). build는 `t`가 없으면 시각 열을 그리지 않는다
+- **`.gitignore` 두 줄(`/site.tmp-*`, `/site.old`)**: 명세 3.1 0번이 정한 변경 밖이지만 build의 임시 폴더 이름 때문에 필요(F32 수용)
+- **실행 1건 화면**: `.rail`은 명세 5.6대로 steps의 역할 문장, counts는 키-값(`.kv`)으로 보인다
+- `weeks[].start·end`는 쓰는 곳이 없어 내보내지 않는다. 키워드 관련 토픽·`used_in_topics`는 사이트에 실린 토픽만 센다
 
 ## 6. 남은 문제, 다음 스펙 제안
 - 원자 교체는 `rename` 두 번(옛 폴더 → .old, 새 폴더 → site)이라 그 사이 수 ms는 `site/`가 없다. 정적 서버가 그 요청에 404를 줄 수 있음(발행은 월요일 한 번)

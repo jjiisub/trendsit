@@ -127,7 +127,7 @@ def test_a1_structure_and_only_published(tmp_path):
     assert {t["week"] for t in site["topics"]} == {"2026-w41"} and {r["week"] for r in site["repos"]} == {"2026-w41"}
     assert {r["id"] for r in site["runs"]} == {"n1", "n-skip", "r41"}  # 발행 안 된 주(W42)의 nightly(n-w42)는 C-1에 따라 뺀다
     w = site["weeks"][0]
-    assert w == {"id": "2026-w41", "label": "10월 2주차", "range": "10.5 ~ 10.11", "start": "2026-10-05", "end": "2026-10-11",
+    assert w == {"id": "2026-w41", "label": "10월 2주차", "range": "10.5 ~ 10.11",
                  "published_at": "2026-10-12T07:10:00+09:00", "collected": {"text": 2, "video": 0, "github": 0},
                  "topic_ids": ["w41-a", "w41-b"], "topic_count": 2, "source_count": 3, "trending_approx": False}
     t = {x["id"]: x for x in site["topics"]}
@@ -154,7 +154,8 @@ def test_a1_structure_and_only_published(tmp_path):
     assert [s["role"] for s in run["steps"]] == ["writer", "critic"] and run["steps"][1]["attention"] is True
     assert run["steps"][1]["detail"]["draft"] == "초안" and "detail" not in run["steps"][0]
     night = next(r for r in site["runs"] if r["id"] == "n1")
-    assert night["cost_usd"] == 0.1 and night["week"] == "2026-w41" and night["summary"] == "날 1개, 단계 2개 중 실패 1개"  # 비용은 summary_json 값 and night["steps"][1] == {"role": "plan", "text": "2026-10-06 계획 실패", "attention": True}
+    assert night["cost_usd"] == 0.1 and night["week"] == "2026-w41" and night["summary"] == "날 1개, 단계 2개 중 실패 1개"  # 비용은 summary_json 값
+    assert night["steps"][1] == {"role": "plan", "text": "2026-10-06 계획 실패", "attention": True}  # 매일 수집 steps에는 시각 t가 없다(원천 없음)
     assert site["run_weeks"] == [{"week": "2026-w41", "label": "10월 2주차", "range": "10.5 ~ 10.11", "nightly": 2, "nightly_failed": 1,  # 건너뜀(skipped)은 실패로 세지 않음
                                   "collected": 2, "candidates": 9, "published": 2, "rejected": 1, "needs_check": 1}]
 
@@ -284,3 +285,15 @@ def test_a11_failure_leaves_db_unchanged(tmp_path, monkeypatch):
     with pytest.raises(Exception, match="x"):
         tm.run(db, "2026-W40", lambda url: (html, None))
     assert snap() == before
+
+
+def test_f33_keywords_and_used_members_only_for_exported_topics(tmp_path):
+    db = make_db(tmp_path)
+    db.conn.execute("DELETE FROM topic_pages WHERE topic_id='w41-b'")  # 작성 실패(페이지 없음): 사이트에서 빠진다
+    db.conn.execute("INSERT INTO topic_evidence(run_id, topic_id, evidence_id, member, field, idx) VALUES ('r41','w41-b','it:3#q1','it:3','point',0)")
+    db.conn.execute("UPDATE items SET week='2026-W41' WHERE id=3")  # 빠진 토픽만 쓰는 글(키워드 agent도 가짐)
+    db.conn.commit()
+    site = build(db)
+    assert [t["id"] for t in site["topics"]] == ["w41-a"]
+    assert next(i for i in site["keywords"]["items"] if i["id"] == "agent")["topics"] == ["w41-a"]  # w41-b는 없음
+    assert next(s for s in site["sources"] if s["id"] == "geeknews")["weeks"]["2026-w41"]["used_in_topics"] == 2  # it:3은 빠진 토픽만 씀

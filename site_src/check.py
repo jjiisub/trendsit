@@ -1,4 +1,4 @@
-# TrendsIT 사이트 검증(S6a). 실행: python3 site_src/check.py [--fixture | --site DIR --data FILE]
+# TrendsIT 사이트 검증(S6a). 실행: uv run python site_src/check.py [--fixture | --site DIR --data FILE]
 # 정적 검사(C-3~C-5, 링크, 글꼴·CSS, 관리 화면) → 관문 9(Chromium·WebKit) + 동작(툴팁, 탭, 미니 바)은 gate.js(Node, 전역 playwright-core).
 # 인자 없이 돌리면 site/(실데이터)를 data/site.json 기준으로, --fixture면 tests/fixtures/site/site.json을 임시 폴더에 빌드해서 같은 기준으로 검사.
 # 하나라도 실패하면 종료 코드 1(실패 목록을 끝에 다시 출력). 브라우저 측정 도구를 못 찾으면 그것도 실패(건너뛰지 않음).
@@ -91,8 +91,8 @@ def static_checks(site, data, pages):
           all((site / p).exists() for p in ("index.html", "sources/index.html", "keywords/index.html", "runs/index.html", "runs/weeks/index.html"))
           and any(f.parent.parent.parent.name == "runs" for f in files), f"html {len(files)}개")
     broken = [f"{page_url(site, f)} 중첩 어긋남 {p.mismatch}" for f, p in pages.items() if p.mismatch or p.open]
-    broken += [f"{page_url(site, f)} 본문에 마크업 조각 노출" for f, p in pages.items() if re.search(r'class="|<span|</span', "".join(p.text))]
-    check("M-1 마크업 무결성: 태그 중첩 어긋남 0, 본문 글자에 class=·<span 노출 0", not broken, "; ".join(broken[:3]))
+    broken += [f"{page_url(site, f)} 본문에 마크업 조각·엔티티 노출" for f, p in pages.items() if re.search(r'class="|<span|</span|&#\w+;|&(?:quot|amp|lt|gt);', "".join(p.text))]
+    check("M-1 마크업 무결성: 태그 중첩 어긋남 0, 본문 글자에 class=·<span·엔티티(&#x27; &quot; &amp;) 노출 0", not broken, "; ".join(broken[:3]))
     # C-3 내부 링크의 대상 파일·앵커
     bad = []
     for f, p in pages.items():

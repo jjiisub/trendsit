@@ -219,16 +219,17 @@ def _sources(db: DB, weeks: list[dict[str, Any]], members: dict[str, set[tuple[s
     return out
 
 
-def _used_members(db: DB, week: str, run_id: str) -> set[tuple[str, str]]:
+def _used_members(db: DB, week: str, run_id: str, topic_ids: list[str]) -> set[tuple[str, str]]:
     """그 주 토픽이 근거로 쓴 (구성원, 소스). 구성원 it:글 / vd:영상 → items.source_id, rp:레포 → github_trending."""
     src = {f"it:{r['id']}": r["source_id"] for r in db.conn.execute("SELECT id, source_id FROM items WHERE week=?", (week,))}
     src |= {f"vd:{r['video_id']}": r["source_id"] for r in db.conn.execute(
         "SELECT v.video_id, i.source_id FROM videos v JOIN items i ON i.id=v.item_id WHERE i.week=?", (week,))}
-    members = [r[0] for r in db.conn.execute("SELECT DISTINCT member FROM topic_evidence WHERE run_id=?", (run_id,))]
+    marks = ",".join("?" * len(topic_ids))  # 사이트에 실린(export된) 토픽만
+    members = [r[0] for r in db.conn.execute(f"SELECT DISTINCT member FROM topic_evidence WHERE run_id=? AND topic_id IN ({marks})", (run_id, *topic_ids))]
     return {(m, "github_trending" if m.startswith("rp:") else src[m]) for m in members if m.startswith("rp:") or m in src}
 
 
-def _keywords(db: DB, weeks: list[dict[str, Any]], run_ids: list[str]) -> dict[str, Any]:
+def _keywords(db: DB, weeks: list[dict[str, Any]], run_ids: list[str], topic_ids: list[str]) -> dict[str, Any]:
     recent = sorted(w["_db_week"] for w in weeks)[-4:]
     marks = ",".join("?" * len(recent))
     mentions: dict[tuple[str, str], int] = {}
@@ -240,7 +241,7 @@ def _keywords(db: DB, weeks: list[dict[str, Any]], run_ids: list[str]) -> dict[s
     for r in db.conn.execute(
             f"SELECT DISTINCT k.keyword_id, e.topic_id FROM topic_evidence e JOIN item_keywords k ON "
             f"e.member = 'it:' || k.item_id OR e.member IN (SELECT 'vd:' || video_id FROM videos WHERE item_id=k.item_id) "
-            f"WHERE e.run_id IN ({rmarks}) ORDER BY e.topic_id", run_ids):
+            f"WHERE e.run_id IN ({rmarks}) AND e.topic_id IN ({','.join('?' * len(topic_ids))}) ORDER BY e.topic_id", [*run_ids, *topic_ids]):
         topics.setdefault(r["keyword_id"], []).append(r["topic_id"])
     items = [{"id": k.id, "name": k.canonical, "aliases": list(k.aliases), "mentions": [mentions.get((k.id, wk), 0) for wk in recent],
               "topics": topics.get(k.id, [])} for k in config.load("keywords.yaml").keywords]
@@ -262,10 +263,10 @@ def build(db: DB, with_week: str | None = None) -> dict[str, Any]:
         collected = {c: db.conn.execute("SELECT COUNT(*) FROM items WHERE week=? AND channel=?", (wk, c)).fetchone()[0] for c in CHANNELS}
         approx = db.conn.execute("SELECT EXISTS(SELECT 1 FROM repo_trending t JOIN runs x ON x.id=t.run_id WHERE t.week=? AND x.note=?)",
                                  (wk, APPROX_NOTE)).fetchone()[0]
-        members[wk] = _used_members(db, wk, r["current_run_id"])
+        members[wk] = _used_members(db, wk, r["current_run_id"], [t["id"] for t in ts])
         counts[wk] = (len(ts), sum(bool(p.get("check")) for t in ts for p in t["points"]) + sum(len(_page_checks(t)) for t in ts))
         cited = {(s["channel"], s["url"] or s["title"]) for t in ts for s in t["sources"]}
-        weeks.append({"id": week_id(wk), "label": label, "range": rng, "start": start.isoformat(), "end": end.isoformat(),
+        weeks.append({"id": week_id(wk), "label": label, "range": rng,
                       "published_at": r["published_at"] or now_kst(), "collected": collected, "topic_ids": [t["id"] for t in ts],
                       "topic_count": len(ts), "source_count": len(cited), "trending_approx": bool(approx),
                       "_db_week": wk, "_run_id": r["current_run_id"], "_start": start, "_end": end})
@@ -277,7 +278,7 @@ def build(db: DB, with_week: str | None = None) -> dict[str, Any]:
                  "channel_labels": {"text": "글", "video": "영상", "github": "GitHub"},
                  "channel_labels_topic": {"text": "글", "video": "영상", "github": "레포"}},
         "weeks": weeks, "topics": topics, "repos": repos,
-        "sources": _sources(db, weeks, members), "keywords": _keywords(db, weeks, [w["_run_id"] for w in weeks]),
+        "sources": _sources(db, weeks, members), "keywords": _keywords(db, weeks, [w["_run_id"] for w in weeks], [t["id"] for t in topics]),
         "runs": runs, "run_weeks": run_weeks,
     }
     for w in weeks:

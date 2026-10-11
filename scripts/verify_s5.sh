@@ -22,7 +22,7 @@ help_all() {
   done
 }
 
-# S5-1 스냅숏 호환(S6a D-20): 스냅숏의 명령이 지금도 있고, 그 help의 옵션(-x, --xxx 토큰)이 지금 help에도 모두 있다. 새 명령·옵션·문구 변경은 허용
+# S5-1 스냅숏 호환(S6a D-20): 스냅숏의 명령이 지금도 있고, 그 help의 옵션 줄의 -x, --xxx 토큰이 지금 help에도 모두 있다. 새 명령·옵션·문구 변경은 허용
 # $1=스냅숏, $2=지금 help(help_all 출력). 사라진 명령·옵션을 출력하고, 있으면 종료 코드 1
 help_compat() {
   python3 - "$1" "$2" <<'PY'
@@ -36,7 +36,8 @@ def blocks(path):
         if line.startswith("$ trendsit"):
             cur = out.setdefault(line.strip(), set())
         elif cur is not None:
-            cur.update(re.findall(r"(?<![\w-])--?[A-Za-z][\w-]*", line))
+            if re.match(r" {1,6}-", line):  # 옵션 줄(들여쓴 줄 맨 앞이 -x/--xxx)만. 설명 문장 속 --xxx는 옵션이 아님
+                cur.update(re.findall(r"(?<![\w-])--?[A-Za-z][\w-]*", re.split(r"\s{2,}", line.strip())[0]))
     return out
 
 

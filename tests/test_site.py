@@ -291,3 +291,65 @@ def test_f12_second_rename_failure_restores_old_site(tmp_path, monkeypatch):
         b.build(FIXTURE, out)
     monkeypatch.undo()
     assert tree_hash(out) == before and [p.name for p in tmp_path.iterdir()] == ["site"]
+
+
+# ---------- F25 엔티티 ----------
+def test_f25_entities_survive_token_wrapping(site):
+    b = load_build()
+    out = b.rich('He said "hi" & it\'s <b> 43점')
+    assert "&quot;" in out and "&amp;" in out and "&#x27;" in out and "&lt;b&gt;" in out
+    assert not re.search(r'&#?<span|&[a-z]*<span class="nb">(?:quot|amp|lt|gt|x27)', out)
+    html = (site / "topic/w41-mid/index.html").read_text(encoding="utf-8")
+    visible = Dom(html)
+    assert not any(re.search(r"&#\w+;|&(?:quot|amp|lt|gt);", e["text"]) for e in visible.els)  # 파싱한 글자에 엔티티가 그대로 보이면 안 됨
+
+
+def test_f25_checker_flags_exposed_entity(site, tmp_path):
+    import contextlib
+    import io
+    import shutil
+
+    sys.path.insert(0, str(ROOT / "site_src"))
+    import check
+
+    bad = tmp_path / "site"
+    shutil.copytree(site, bad)
+    f = bad / "topic/w41-mid/index.html"
+    f.write_text(f.read_text(encoding="utf-8").replace("it</span>&#x27;s", "it</span>&amp;#<span>x27</span>;s"), encoding="utf-8")
+    check.results.clear()
+    pages = {p: check.parse(p) for p in sorted(bad.rglob("*.html"))}
+    with contextlib.redirect_stdout(io.StringIO()):
+        check.static_checks(bad, json.loads(FIXTURE.read_text(encoding="utf-8")), pages)
+    assert "M-1" in [n.split()[0] for n, ok, _ in check.results if not ok]
+
+
+# ---------- F39 수집 URL 스킴 ----------
+def test_f39_only_http_urls_become_links(tmp_path):
+    data = json.loads(FIXTURE.read_text(encoding="utf-8"))
+    t = next(t for t in data["topics"] if t["id"] == "w41-one")
+    t["sources"][0]["url"] = "javascript:alert(1)"
+    t["sources"][0]["origin"] = "data:text/html,x"
+    data["repos"][0]["url"] = "javascript:void(0)"
+    data["sources"][0]["url"] = "vbscript:x"
+    p = tmp_path / "s.json"
+    p.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+    out = tmp_path / "site"
+    assert run_build(p, out).returncode == 0
+    pages = "".join(f.read_text(encoding="utf-8") for f in out.rglob("*.html"))
+    assert not re.search(r'href="(?:javascript|data|vbscript):', pages)
+    html = (out / "topic/w41-one/index.html").read_text(encoding="utf-8")
+    assert "새 설정 방식 소개" in html and "원문 열기" not in html  # 글자는 남고 링크만 빠짐
+    assert 'href="https://' in (out / "topic/w41-mid/index.html").read_text(encoding="utf-8")
+
+
+# ---------- F29 실행 1건: 레일 = steps의 역할 문장, counts = 키-값 ----------
+def test_f29_run_page_rail_is_steps_and_counts_are_kv(site):
+    d = dom(site, "runs/2026-w41/r41")
+    rail = d.find("ol", "rail")
+    assert len(rail) == 1 and len([e for e in d.find("li") if inside(e, cls="rail")]) == 3  # 픽스처 steps 3개
+    html = (site / "runs/2026-w41/r41/index.html").read_text(encoding="utf-8")
+    assert "1차 반려: 수치가 근거와 단위가 달라 수정 요청" in html and html.count('class="check">확인 필요') == 1
+    kv = html[html.index('<dl class="kv">', html.index("요약")):]
+    assert all(x in kv for x in ("<dt>후보</dt><dd>9</dd>", "<dt>선정</dt><dd>3</dd>", "<dt>근거 id</dt><dd>41</dd>", "<dt>1차 통과</dt><dd>2</dd>",
+                                 "<dt>반려</dt><dd>1</dd>", "<dt>확인 필요</dt><dd>3</dd>", "<dt>발행</dt><dd>3</dd>"))
+    assert html.count("<h2>반려 비교</h2>") == 1 and "<h3>초안</h3>" in html

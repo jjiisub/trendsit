@@ -39,7 +39,9 @@ a14() {
   n=$(help_compat reports/S5-1/help_before.txt "$TMP/help_now.txt") || { echo "현재 CLI에서 사라진 것: $n"; return 1; }
   grep -v -e '--spec' "$TMP/help_now.txt" >"$TMP/help_fake.txt"
   help_compat reports/S5-1/help_before.txt "$TMP/help_fake.txt" >/dev/null && { echo "옵션을 지운 가짜 help가 통과함"; return 1; }
-  help_compat reports/S5-1/help_before.txt "$TMP/help_now.txt" >/dev/null || return 1
+  # 설명 문장 속 --xxx는 옵션이 아니다(옵션 줄에서만 추출)
+  { cat reports/S5-1/help_before.txt; printf '$ trendsit check-config --help\n                        설명에 나오는 --no-such-flag 같은 말\n'; } >"$TMP/help_prose.txt"
+  help_compat "$TMP/help_prose.txt" "$TMP/help_now.txt" >/dev/null || { echo "설명 문장 속 --xxx를 옵션으로 셈"; return 1; }
   return 0
 }
 if out=$(a14 2>&1); then pass A14 "data/ 추적 파일 0, example/에 두 파일(내용 해시 동일), 예시 경로 문자열 0, data·site 링크 무시, B7·A17 호환 판정(현재 PASS, 가짜 FAIL)"; else fail A14 "$out"; fi
@@ -50,7 +52,7 @@ pt F01 "끝 어절 묶기는 원문 어절 단위(43점·\`코드\`조사·==형
 pt A4 "확인 필요 표기(C-9 개수, 포인트는 .nb-end 안, 홈 메타 / 확인 필요)" tests/test_site.py -k "a4_"
 
 # ---------- S-3: check.py(정적 + 관문 9 + 동작), 발행 연결 ----------
-if python3 site_src/check.py --fixture >"$TMP/check" 2>&1; then c_rc=0; else c_rc=$?; fi
+if uv run --quiet python site_src/check.py --fixture >"$TMP/check" 2>&1; then c_rc=0; else c_rc=$?; fi
 for id in A5 A6 A7 A8 A9 A10; do
   lines=$(grep -E "^(PASS|FAIL) $id " "$TMP/check")
   if [ -n "$lines" ] && ! echo "$lines" | grep -q '^FAIL'; then pass "$id" "check.py --fixture: $(echo "$lines" | head -1 | cut -c6-200)"; else fail "$id" "check.py --fixture: ${lines:-결과 줄 없음} / $(grep -E '^(FAIL|실패)' "$TMP/check" | head -2 | tr '\n' ' ')"; fi
