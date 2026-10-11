@@ -91,6 +91,7 @@ cp ops/launchd/com.trendsit.*.plist ~/Library/LaunchAgents/
 launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.trendsit.nightly.plist
 launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.trendsit.weekly.plist
 ```
+- `ops weekly`가 잠금 대기 초과·전원 꺼짐으로 못 돈 주는 자동 재시도가 없다. `uv run python -m trendsit ops weekly --week W`로 손 실행
 - setup 뒤에는 이 작업 폴더에서 `git checkout main`을 할 수 없다(실행 폴더가 main을 씀). main 작업은 임시 worktree(`git worktree add`)로
 - `ops weekly`는 같은 잠금 안에서 먼저 nightly 따라잡기를 한 뒤 브리핑·발행한다(일요일 분이 빠지지 않게). `ops`는 SIGTERM을 받으면 하위 프로세스를 끝내고 잠금·실행 기록을 정리한다
 - 로그: `data/logs/ops/<날짜>-nightly.log`, `<날짜>-weekly.log`(단계 출력 전체), `data/logs/ops/launchd.log`. 단계별 종료 코드·시간·오류는 실행 기록의 `runs.summary_json`(`kind='nightly'`)

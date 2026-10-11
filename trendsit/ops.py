@@ -41,11 +41,12 @@ def run_subprocess(cmd: list[str], timeout: float | None = None) -> tuple[int, s
     try:
         out, err = p.communicate(timeout=timeout)
     except subprocess.TimeoutExpired:
-        os.killpg(p.pid, signal.SIGKILL)
+        with suppress(ProcessLookupError, PermissionError):
+            os.killpg(p.pid, signal.SIGKILL)
         out, err = p.communicate()
         return TIMEOUT_CODE, out or "", f"{err or ''}\n시간 초과: {timeout:g}초 넘겨 끝냄"
     except BaseException:  # SIGTERM(on_sigterm의 SystemExit)·Ctrl-C: 하위 프로세스 그룹을 남기지 않고 올려 보냄(잠금·runs 마감은 호출한 쪽 finally)
-        with suppress(ProcessLookupError):
+        with suppress(ProcessLookupError, PermissionError):
             os.killpg(p.pid, signal.SIGKILL)
         p.wait()
         raise
@@ -136,8 +137,11 @@ class StepLog:
         t0 = time.monotonic()
         code, out, err = self.runner(cmd, self.timeout(name))
         sec = round(time.monotonic() - t0, 1)
+        text = out + err
+        if text and not text.endswith("\n"):
+            text += "\n"
         with self.path.open("a", encoding="utf-8") as f:
-            f.write(f"== {now_kst()} {' '.join(cmd)}\n{out}{err}== 종료 코드 {code}, {sec}초\n")
+            f.write(f"== {now_kst()} {' '.join(cmd)}\n{text}== 종료 코드 {code}, {sec}초\n")
         return code, out, err, sec
 
     def note(self, text: str) -> None:
@@ -149,6 +153,11 @@ class StepLog:
         if code != 0:
             step["error"] = _error_line(out, err)
         self.steps.append(step)
+
+    def skip(self, name: str, day: date, reason: str) -> None:
+        """실행하지 않은 단계를 실패로 기록(이후 단계가 앞 단계 결과에 기대는 경우)."""
+        self.steps.append({"name": name, "day": day.isoformat(), "exit": 1, "sec": 0.0, "error": reason})
+        self.note(f"{name} {day}: {reason}")
 
     def step(self, name: str, day: date | None, args: list[str], extra: tuple[str, ...] = ()) -> tuple[int, str]:
         code, out, err, sec = self.run(["uv", "run", *extra, "python", "-m", "trendsit", *args], name)
@@ -196,6 +205,7 @@ def _nightly_locked(db: DB, cfg: OpsConfig, day: date | None, now: datetime, run
                 (f"nightly {days[0]}~{days[-1]}" if days else "nightly 범위 없음") + _pull_note())
     log = StepLog(runner, data_dir / "logs" / "ops" / f"{today.isoformat()}-nightly.log", cfg)
     status = "failed"
+    tried: list[date] = []  # 실제로 단계를 시작한 날. 중간에 끊기면 시작 못 한 날은 다음 밤 범위에 남는다
     try:
         if days:
             first, last = days[0], days[-1]
@@ -204,23 +214,27 @@ def _nightly_locked(db: DB, cfg: OpsConfig, day: date | None, now: datetime, run
             log.step("filter", None, ["filter", "--since", str(first), "--until", str(last), *shared])
             log.step("summarize", None, ["summarize", "--since", str(first), "--until", str(last), *shared])
         for d in days:
+            tried.append(d)
             tag = ["--spec", _tag(d)]
-            log.step("plan", d, ["plan", "run", "--day", str(d), *tag])
+            plan_code, _ = log.step("plan", d, ["plan", "run", "--day", str(d), *tag])
             log.step("deep_text", d, ["deep", "text", "--day", str(d), *tag])
-            _queue_step(log, d, tag, data_dir, "video")
-            _queue_step(log, d, tag, data_dir, "repo_analyze")
+            for name in ("video", "repo_analyze"):
+                if plan_code != 0:  # 계획이 없거나 옛 계획이면 이전 큐를 다시 쓰게 되므로 건너뜀
+                    log.skip(name, d, "plan 실패로 건너뜀")
+                else:
+                    _queue_step(log, d, tag, data_dir, name)
         status = "ok" if all(s["exit"] == 0 for s in log.steps) else "partial"
     finally:
         started = db.conn.execute("SELECT started_at FROM runs WHERE id=?", (tr.run_id,)).fetchone()[0]
         # 호출 단위(steps) 기준: timeout으로 끝나지 못한 run의 비용도 잡고, 이 nightly의 시작~끝 구간만 센다
         cost = db.conn.execute("SELECT COALESCE(SUM(s.cost_usd),0) FROM steps s JOIN runs r ON r.id=s.run_id "
                                "WHERE r.spec LIKE 'RUN-%' AND s.t>=? AND s.t<=?", (started, now_kst())).fetchone()[0]
-        summary: dict[str, Any] = {"days": [d.isoformat() for d in days], "steps": log.steps, "cost_usd": round(cost, 4)}
+        summary: dict[str, Any] = {"days": [d.isoformat() for d in tried], "steps": log.steps, "cost_usd": round(cost, 4)}
         if day:
             summary["manual"] = True
         _close_run(db, tr, status, summary | _pull_summary())
     bad = [s for s in log.steps if s["exit"] != 0]
-    print(f"nightly {status}: 날 {len(days)}개, 단계 {len(log.steps)}개 중 실패 {len(bad)}개")
+    print(f"nightly {status}: 날 {len(tried)}개, 단계 {len(log.steps)}개 중 실패 {len(bad)}개")
     for s in bad:
         print(f"  실패 {s['name']} {s['day'] or ''}: {s['error']}", file=sys.stderr)
     return 0 if status == "ok" else 1

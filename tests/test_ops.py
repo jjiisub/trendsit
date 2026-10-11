@@ -481,7 +481,7 @@ def test_b10_weekly_catches_up_nightly_first_then_weekly(db, tmp_path):
     code = ops.weekly(db, CFG, now=at(2026, 10, 19, 7), runner=fake, data_dir=tmp_path)  # 일요일(18) 미처리
     names = fake.names()
     assert code == 0 and names.index("collect") < names.index("plan run") < names.index("weekly")
-    assert names[-2:] == ["weekly", "python3"] or names[-1] == "python3"
+    assert names[-2:] == ["weekly", "python3"]
     assert nightly_rows(db)[-1]["summary"]["days"][-1] == "2026-10-18" and nightly_rows(db)[-1]["status"] == "partial"
     assert db.conn.execute("SELECT status FROM weeks").fetchone()[0] == "published"
     # 범위가 비면 바로 weekly
@@ -535,3 +535,36 @@ def test_ops_config_strict(field, bad):
     OpsConfig.model_validate(yaml.safe_load("start_day: 2026-10-12\n") | ok | {"start_day": date(2026, 10, 12)})  # YAML 날짜
     with pytest.raises(ValidationError):
         OpsConfig.model_validate(ok | {field: bad})
+
+
+def test_b3_plan_failure_skips_queue_steps_that_day(db, tmp_path):
+    fake = Fake(db, fail={"plan"}, queue={"2026-10-12": VIDEO_Q}, repos={"2026-10-12": REPO_Q})
+    code, _ = run_night(db, tmp_path, at(2026, 10, 13), fake)
+    assert code == 1
+    assert not any(n in ("video run", "plan show") for n in fake.names()) and "repo-analyze" not in fake.names()
+    steps = nightly_rows(db)[-1]["summary"]["steps"]
+    skipped = [x for x in steps if x.get("error") == "plan 실패로 건너뜀"]
+    assert [x["name"] for x in skipped] == ["video", "repo_analyze"] and all(x["exit"] == 1 for x in skipped)
+    assert "deep_text" in [x["name"] for x in steps]  # 글 분석은 그대로 시도
+
+
+def test_b1_interrupted_nightly_records_only_started_days(db, tmp_path):
+    class Killed(Fake):
+        def __call__(self, cmd, timeout=None):
+            if tail(cmd)[:2] == ["plan", "run"] and "2026-10-13" in cmd:
+                raise SystemExit(143)  # SIGTERM
+            return super().__call__(cmd, timeout)
+
+    with pytest.raises(SystemExit):
+        run_night(db, tmp_path, at(2026, 10, 15), Killed(db))
+    row = nightly_rows(db)[-1]
+    assert row["status"] == "failed" and row["summary"]["days"] == ["2026-10-12", "2026-10-13"]
+    run_night(db, tmp_path, at(2026, 10, 15))  # 시작 못 한 14일은 다음 범위에 남음
+    assert nightly_rows(db)[-1]["summary"]["days"] == ["2026-10-14"]
+
+
+def test_step_log_separates_last_output_line_from_exit_marker(db, tmp_path):
+    run_night(db, tmp_path, at(2026, 10, 13), type("NoNl", (Fake,), {
+        "__call__": lambda self, cmd, timeout=None: (0, "개행 없는 출력", "") if tail(cmd)[0] == "collect" else Fake.__call__(self, cmd, timeout)})(db))
+    log = (tmp_path / "logs" / "ops" / "2026-10-13-nightly.log").read_text()
+    assert "개행 없는 출력\n== 종료 코드 0" in log

@@ -33,7 +33,16 @@ b11() {
       mkdir -p data scripts && echo '{}' >data/example.json && cp "$repo/scripts/run_ops.sh" scripts/ &&
       git add -A && git commit -q -m init && git push -q origin main && git checkout -q -b dev
   ) >/dev/null 2>&1 || { echo "임시 저장소 준비 실패"; return 1; }
-  printf '#!/bin/bash\necho "$@ PULL=${TRENDSIT_PULL_FAILED:-}" >>"%s/uv.log"\n[ "${1:-}" = run ] && exit "${UV_FAKE_EXIT:-0}"\nexit 0\n' "$T" >"$T/bin/uv"
+  cat >"$T/bin/uv" <<STUB
+#!/bin/bash
+echo "\$@ PULL=\${TRENDSIT_PULL_FAILED:-}" >>"$T/uv.log"
+if [ "\${UV_FAKE_HANG:-}" = 1 ] && [ "\${1:-}" = run ]; then   # SIGTERM을 받으면 기록하고 끝나는 ops 흉내
+  trap 'echo TERM >>"$T/term.log"; exit 143' TERM
+  sleep 15 & wait \$!
+fi
+[ "\${1:-}" = run ] && exit "\${UV_FAKE_EXIT:-0}"
+exit 0
+STUB
   chmod +x "$T/bin/uv"
   local out
   out=$(bash scripts/setup_run_worktree.sh "$T/work" "$T/run" 2>&1) || { echo "setup 1회차 실패: $out"; return 1; }
@@ -55,6 +64,12 @@ b11() {
   grep -rq 'git pull 실패' "$T/work/data/logs/ops" || { echo "pull 실패가 로그에 없음"; return 1; }
   UV_FAKE_EXIT=7 PATH="$T/bin:$PATH" bash "$T/run/scripts/run_ops.sh" nightly >/dev/null 2>&1
   [ $? = 7 ] || { echo "ops 종료 코드를 그대로 돌려주지 않음"; return 1; }
+  # 래퍼가 ops를 exec하므로 래퍼에 보낸 SIGTERM이 ops(여기서는 가짜 uv)에 그대로 닿는다
+  UV_FAKE_HANG=1 PATH="$T/bin:$PATH" bash "$T/run/scripts/run_ops.sh" nightly >/dev/null 2>&1 &
+  local wrapper=$!
+  sleep 1.5
+  kill -TERM "$wrapper" 2>/dev/null; wait "$wrapper" 2>/dev/null
+  [ -f "$T/term.log" ] || { echo "래퍼에 보낸 SIGTERM이 ops에 닿지 않음"; return 1; }
   # 잠금이 잡혀 있으면 pull·sync는 건너뛰고 ops만 실행(ops가 대기·종료 코드 3을 처리)
   : >"$T/uv.log"
   python3 -c 'import fcntl, sys, time

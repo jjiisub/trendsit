@@ -34,7 +34,5 @@ else
   uv sync --extra video --extra embed >>"$log" 2>&1 || say "uv sync 실패: 기존 환경으로 계속"
 fi
 say "ops $job 시작 ($(git rev-parse --short HEAD))"
-uv run python -m trendsit ops "$job"
-code=$?
-say "ops $job 종료 코드 $code"
-exit $code
+# exec: launchd의 SIGTERM이 ops까지 닿게(uv run은 신호를 자식에 전달함). 종료 코드와 단계 기록은 ops 로그·runs 행에 남음
+exec uv run python -m trendsit ops "$job"
