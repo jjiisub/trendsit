@@ -67,8 +67,16 @@
 
 - **기획에 넘길 것(C1 #1)**: 레포 목록 원천은 명세 5.1이 "repo_trending(그 주 마지막 수집 run)"인데, `repo_trending`은 `(week, full_name)` upsert라 주에 수집 run 행이 여럿 섞여 있다. 구현은 run을 가리지 않고 그 주의 모든 수집 run 행을 쓴다. 명세 글자대로(마지막 run만)면 실데이터 W41 레포가 0개가 된다(마지막 run의 레포 9개는 카드·한 줄 설명이 없어 빠짐). "그 주 누적 + 카드·설명 있는 것"으로 명세를 고칠지 정해야 한다
 
-## 7. 런 뒤 단계 (워크플로우 밖, 구현 세션)
-이 리포트 작성 시점에는 하지 않았다(실제 DB·사이트 불변, 유료 호출 0 약속). ① `uv run python scripts/trending_monthly.py --week 2026-W40` ② `trendsit publish --week 2026-W40`, `--week 2026-W41` ③ `python3 site_src/check.py` ④ trendsit.jiseop.com WebKit 375 캡처(홈·토픽 1개).
+## 7. 런 뒤 단계 (워크플로우 밖, 2026-10-11 13:44~13:46)
+자동 모드가 실제 DB 쓰기를 막아 ①②는 사용자가 터미널에서 직접 실행했다(명령은 명세 그대로).
+- ① `scripts/trending_monthly.py --week 2026-W40`: "근사 목록 10개 저장(월간 23개 중 뒤 주 레포 제외 뒤 상위)". runs `20261011-134409-collect-35c2`(note `trending monthly approx`) + oneliner run `20261011-134409-role-d397` **$0.0020**(S6a 상한 $0.10). stars_this_week NULL
+- ② `publish --week 2026-W40` → 13:44:35, `--week 2026-W41` → 13:44:50 published. 공개 사이트 trendsit.jiseop.com이 새 디자인으로 바뀜: html **31쪽**(홈·주차 2·토픽 20·소스·키워드·실행 기록), 예시 사이트 전부 교체
+- ③ `check.py`(실사이트 site/): **14/14 통과**(C-3~C-7, M-1·M-2, A5~A7, A8 Chromium 21건, A9 WebKit 375 터치 14건, A10)
+- ④ 공개 주소 WebKit 375(모바일·터치) 캡처, 세 쪽 모두 200·가로 넘침 0(scrollWidth 375)
+  - 홈: `reports/S6a/webkit375_home.png`
+  - 홈 레포 탭(`#repos`): `reports/S6a/webkit375_home-repos.png`
+  - 토픽 `w41-claude-haiku-5-5`: `reports/S6a/webkit375_topic.png`
+- 정리 전 DB 백업은 자동 모드가 같이 막아 만들지 못했다. 바뀐 것은 repo_trending W40 10행·repo_oneliners·runs 2행·weeks 2행 상태다
 
 ## 8. impl-workflow SUMMARY 요약
 라운드 A1 구현 완료, 게이트(`verify_s6a.sh`) 통과. 변경 기존 파일 8(`.gitignore`, `README.md`, `scripts/verify_s5.sh`, `site_src/build.py`, `site_src/check.py`, `trendsit/ops.py`, `trendsit/cli_ops.py`, `style.css` 삭제) + 목록 밖 4(`tests/test_ops.py`, `tests/test_ops_publish.py`, `docs/reference/s6_design/drafts/common.py`·`shoot.py`의 `# ruff: noqa`) = 12로 예산 ≤ 8 초과(테스트 2는 5장, drafts 2는 F47), 새 파일 14, 옮긴 파일 2, 새 의존성 0, `build.py` 566줄(≤ 1050).
