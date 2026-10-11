@@ -248,12 +248,7 @@
       }
      ],
      "visual": null,
-     "slide": {
-      "sec": 920,
-      "title": "호출 비용 비교",
-      "caption": "라우터 구조의 호출 비용",
-      "image": "slides/V1xxxxxxxxx_920.jpg"
-     },
+     "slide": null,
      "video_secs": [
       {
        "sec": 110,

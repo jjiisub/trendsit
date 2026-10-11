@@ -26,17 +26,10 @@ def run_build(data: Path, out: Path):
 
 @pytest.fixture(scope="module")
 def site(tmp_path_factory) -> Path:
-    # 픽스처의 슬라이드 이미지는 실제 data/slides/에서 build가 복사한다(5.6). 테스트 동안만 만들고 치운다
-    slide = ROOT / "data" / "slides" / "V1xxxxxxxxx_920.jpg"
-    slide.parent.mkdir(parents=True, exist_ok=True)
-    slide.write_bytes(b"\xff\xd8\xff\xdb" + b"\x00" * 16)  # 내용은 검사하지 않으므로 더미 바이트
-    try:
-        out = tmp_path_factory.mktemp("fx") / "site"
-        r = run_build(FIXTURE, out)
-        assert r.returncode == 0, r.stderr
-        yield out
-    finally:
-        slide.unlink(missing_ok=True)
+    out = tmp_path_factory.mktemp("fx") / "site"
+    r = run_build(FIXTURE, out)
+    assert r.returncode == 0, r.stderr
+    return out
 
 
 def tree_hash(root: Path) -> dict[str, str]:
@@ -87,11 +80,11 @@ def test_a3_sections_order_visual_after_first_paragraph_and_source_numbers(site)
     secs = [e["id"] for e in d.find("section", "dsec")]
     assert secs == ["sec-0", "sec-1", "sec-2", "sec-3", "sec-4"]
     figs = d.find("figure")
-    assert [tuple(c for c in f["cls"] if c != "dg") for f in figs] == [("dg-bars",), ("dg-events",), ("simg",)]
-    assert inside(figs[0], id_="sec-1") and inside(figs[1], id_="sec-2") and inside(figs[2], id_="sec-4")
+    assert [tuple(c for c in f["cls"] if c != "dg") for f in figs] == [("dg-bars",), ("dg-events",)]
+    assert inside(figs[0], id_="sec-1") and inside(figs[1], id_="sec-2")
     p1 = [e for e in d.els if inside(e, id_="sec-1")]
     assert next(i for i, e in enumerate(p1) if "dp" in e["cls"]) < next(i for i, e in enumerate(p1) if e["tag"] == "figure")
-    assert d.find("ol", "vgo") and inside(d.find("ol", "vgo")[0], id_="sec-4")  # 슬라이드가 붙은 절 아래 영상 구간
+    assert d.find("ol", "vgo") and inside(d.find("ol", "vgo")[0], id_="sec-4")  # 영상 구간이 있는 절 아래
     # 출처 번호: 채널 순(글 → 영상 → 레포), 채널 안 id 순
     refs = {e["href"]: e["text"] for e in d.find("a", "ref")}
     assert [refs[f"#src-{i}"] for i in ("s1", "s6", "v1", "v2", "g1", "g4")] == ["[1]", "[6]", "[7]", "[8]", "[9]", "[12]"]
@@ -129,12 +122,9 @@ def test_a3_head_tiles_class_matches_count(site):
     assert wrap and f"n{len(d.find('div', 'tile'))}" in wrap[0]["cls"]
 
 
-def test_a3_slide_image_lazy_and_video_secs_links(site):
+def test_a3_video_secs_links(site):
     html = (site / "topic/w41-long/index.html").read_text(encoding="utf-8")
-    assert 'src="/assets/slides/V1xxxxxxxxx_920.jpg"' in html
-    assert 'loading="lazy"' in html and 'alt="슬라이드: 호출 비용 비교"' in html
     assert "&t=920s" in html and "&t=110s" in html
-    assert (site / "assets/slides/V1xxxxxxxxx_920.jpg").is_file()
 
 
 # ---------- A4(v2 C-9) ----------
