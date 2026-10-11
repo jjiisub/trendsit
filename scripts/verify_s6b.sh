@@ -29,9 +29,12 @@ b11() {
   local T=$TMP/b11 repo=$PWD
   mkdir -p "$T/bin" && git init -q --bare "$T/origin.git" && git clone -q "$T/origin.git" "$T/work" 2>/dev/null || return 1
   (
+    # data/는 실제 저장소처럼 git 추적 파일 0개로 둔다(A14). data/example.json은 커밋 뒤에 만들어 추적되지 않게(실행
+    # 폴더처럼 fetch+reset --hard를 쓰므로, data가 추적 경로면 reset이 심볼릭 링크를 지우고 실제 폴더로 되돌림)
     cd "$T/work" && git config user.email t@t && git config user.name t && git checkout -q -b main &&
-      mkdir -p data scripts && echo '{}' >data/example.json && cp "$repo/scripts/run_ops.sh" scripts/ &&
-      git add -A && git commit -q -m init && git push -q origin main && git checkout -q -b dev
+      mkdir -p scripts && cp "$repo/scripts/run_ops.sh" scripts/ &&
+      git add scripts && git commit -q -m init && git push -q origin main && git checkout -q -b dev &&
+      mkdir -p data && echo '{}' >data/example.json
   ) >/dev/null 2>&1 || { echo "임시 저장소 준비 실패"; return 1; }
   cat >"$T/bin/uv" <<STUB
 #!/bin/bash
@@ -52,16 +55,16 @@ STUB
     [ -L "$T/run/$n" ] && [ "$(readlink "$T/run/$n")" = "$T/work/$n" ] || { echo "$n 링크 아님"; return 1; }
   done
   [ -f "$T/run/data/example.json" ] && [ "$(git -C "$T/run" rev-parse --abbrev-ref HEAD)" = main ] || { echo "data 링크 안의 파일 또는 main 체크아웃 확인 실패"; return 1; }
-  # 래퍼: pull 성공 / pull 실패(origin 끊김)에도 ops 실행, 종료 코드는 ops의 것, main 아니면 3
+  # 래퍼: 동기화 성공 / 동기화 실패(origin 끊김)에도 ops 실행, 종료 코드는 ops의 것, main 아니면 3
   PATH="$T/bin:$PATH" bash "$T/run/scripts/run_ops.sh" nightly >/dev/null 2>&1 || { echo "래퍼가 정상 경로에서 실패"; return 1; }
   git -C "$T/run" remote set-url origin "$T/nonexistent.git"
-  PATH="$T/bin:$PATH" bash "$T/run/scripts/run_ops.sh" weekly >/dev/null 2>&1 || { echo "pull 실패 때 ops를 실행하지 않음"; return 1; }
+  PATH="$T/bin:$PATH" bash "$T/run/scripts/run_ops.sh" weekly >/dev/null 2>&1 || { echo "동기화 실패 때 ops를 실행하지 않음"; return 1; }
   grep -q 'run python -m trendsit ops nightly' "$T/uv.log" && grep -q 'run python -m trendsit ops weekly' "$T/uv.log" ||
     { echo "uv run ... ops <job> 호출 기록 없음"; return 1; }
   grep -q 'ops nightly PULL=$' "$T/uv.log" && grep -q 'ops weekly PULL=1$' "$T/uv.log" ||
-    { echo "pull 실패가 ops에 알려지지 않음(TRENDSIT_PULL_FAILED) 또는 성공인데 표시됨"; return 1; }
+    { echo "동기화 실패가 ops에 알려지지 않음(TRENDSIT_PULL_FAILED) 또는 성공인데 표시됨"; return 1; }
   grep -q 'sync --extra video --extra embed' "$T/uv.log" || { echo "uv sync에 video·embed 묶음이 없음"; return 1; }
-  grep -rq 'git pull 실패' "$T/work/data/logs/ops" || { echo "pull 실패가 로그에 없음"; return 1; }
+  grep -rq 'git 동기화 실패' "$T/work/data/logs/ops" || { echo "동기화 실패가 로그에 없음"; return 1; }
   UV_FAKE_EXIT=7 PATH="$T/bin:$PATH" bash "$T/run/scripts/run_ops.sh" nightly >/dev/null 2>&1
   [ $? = 7 ] || { echo "ops 종료 코드를 그대로 돌려주지 않음"; return 1; }
   # 래퍼가 ops를 exec하므로 래퍼에 보낸 SIGTERM이 ops(여기서는 가짜 uv)에 그대로 닿는다
@@ -106,7 +109,7 @@ f = open(sys.argv[1], "a"); fcntl.flock(f, fcntl.LOCK_EX); time.sleep(8)' "$T/wo
     [ "$(plutil -extract StartCalendarInterval.Minute raw -o - $w)" = 0 ] || { echo "weekly 시각이 월 07:00이 아님"; return 1; }
   return 0
 }
-if msg=$(b11); then pass B11 "임시 저장소: setup 두 번에 worktree 1개·data·site 링크, 래퍼(pull 실패에도 실행·종료 코드 전달·main 아니면 3), plist lint·경로·시각"; else fail B11 "$msg"; fi
+if msg=$(b11); then pass B11 "임시 저장소: setup 두 번에 worktree 1개·data·site 링크, 래퍼(동기화 실패에도 실행·종료 코드 전달·main 아니면 3), plist lint·경로·시각"; else fail B11 "$msg"; fi
 
 # B12 정리·문서
 b12() {

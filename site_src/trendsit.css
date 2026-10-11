@@ -40,13 +40,16 @@ code.ic{font-family:inherit;font-size:.94em;background:var(--c-track);border-rad
 .foot{margin-top:var(--sp-10);padding:var(--sp-4) 0 var(--sp-10);border-top:1px solid var(--c-line);display:grid;gap:var(--sp-1)}
 
 /* ---------- 홈: 탭(토픽 / 트렌딩 레포). :target + :has, JS 없음 ---------- */
+/* #topics·#repos 앵커는 .tabs 바로 위 0높이 요소: 탭을 눌러도 .nav가 가려지지 않고(scroll-margin-top), 두 탭의
+   스크롤 위치가 거의 같다(D-1·D-40, C-10) */
+.tab-anchor{display:block;height:0;scroll-margin-top:var(--sticky-offset)}
 .tabs{display:flex;gap:var(--sp-1);position:sticky;top:0;z-index:var(--z-tabs);background:var(--c-bg);border-bottom:1px solid var(--c-line);
   margin:var(--sp-3) calc(-1 * var(--gutter)) 0;padding:0 var(--gutter)}
 .tabs a{display:inline-flex;align-items:center;min-height:var(--target-lg);padding:0 var(--sp-3);text-decoration:none;color:var(--c-muted)}
 .tabs a:first-child{padding-left:0}
 .tabs a:hover{color:var(--c-title)}
 .has-tabs .panel{display:none;margin-top:var(--sp-4);scroll-margin-top:64px}
-.has-tabs .panel:target,.has-tabs:not(:has(.panel:target)) #topics{display:block}
+.has-tabs:not(:has(#repos:target)) #panel-topics,.has-tabs:has(#repos:target) #panel-repos{display:block}
 .has-tabs:not(:has(#repos:target)) .tb-t,.has-tabs:has(#repos:target) .tb-r{color:var(--c-title);font-weight:var(--fw-medium);box-shadow:inset 0 -2px 0 var(--c-title)}
 .has-tabs .panel>.sec-t{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)} /* 탭이 제목 역할 */
 .sec-d{margin-top:var(--sp-1)}
@@ -69,12 +72,8 @@ code.ic{font-family:inherit;font-size:.94em;background:var(--c-track);border-rad
 .rp:first-child{border-top:none}
 .rp-h{color:var(--c-title);display:flex;justify-content:space-between;align-items:baseline;gap:var(--sp-3)}
 .rp-n{font-size:var(--fs-md);font-weight:var(--fw-medium);color:var(--c-title);overflow-wrap:anywhere}
-.rp-s{display:inline-flex;align-items:baseline;gap:var(--sp-1);white-space:nowrap}
-.rp-sl{font-size:var(--fs-xs);color:var(--c-muted)}
-.rp-sv{font-size:var(--fs-md);font-weight:var(--fw-medium);color:var(--c-title);font-variant-numeric:tabular-nums}
 .rp-w{margin-top:var(--sp-2)}
-.rp-m,.rp-rel{margin-top:var(--sp-1)}
-.sig{color:var(--c-muted)}
+.rp-m{margin-top:var(--sp-1)}
 
 /* ---------- 토픽: 머리 ---------- */
 .topic{padding-bottom:var(--sp-12)}
@@ -153,7 +152,6 @@ code.ic{font-family:inherit;font-size:.94em;background:var(--c-track);border-rad
 .cc dd,.cb dd{margin-top:var(--sp-1)}
 
 /* ---------- 출처 ---------- */
-.src-g{font-size:var(--fs-ui);margin:var(--sp-4) 0 var(--sp-1)}
 .srcs{display:grid;gap:var(--sp-3)}
 .src{display:grid;grid-template-columns:32px 1fr;gap:var(--sp-1);scroll-margin-top:var(--sticky-offset)}
 .src-n{color:var(--c-muted);font-variant-numeric:tabular-nums;font-size:var(--fs-sm);line-height:calc(var(--fs-base) * var(--lh-body))}

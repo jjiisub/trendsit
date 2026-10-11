@@ -87,6 +87,12 @@ class DB:
                 self.conn.execute(f"ALTER TABLE steps ADD COLUMN {name} {kind}")
         self.migrate(migrations)
 
+    def backup(self, dest: Path) -> None:
+        """sqlite3 Connection.backup으로 WAL 포함 일관 사본을 만든다(원본은 바뀌지 않음, S6-1 D-35)."""
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        with sqlite3.connect(dest) as dst:
+            self.conn.backup(dst)
+
     def migrate(self, migrations: dict[int, str] | None = None) -> list[int]:
         """등록된 마이그레이션 중 아직 적용하지 않은 것을 적용한다(core/migrations.py). 적용한 번호를 돌려준다."""
         from .migrations import apply_all

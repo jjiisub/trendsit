@@ -274,24 +274,38 @@ def topic_meta(t):
 
 
 def source_list(t):
-    out = ""
-    for ch in CH_ORDER:
-        ss = sorted((s for s in t["sources"] if s["channel"] == ch), key=lambda s: C.nums[s["id"]])
-        if not ss:
-            continue
-        items = ""
-        for s in ss:
-            title = esc(s.get("title") or s["id"])
-            anchor = f'<a href="{esc(s["url"])}">{title}</a>' if link(s.get("url")) else title
-            meta = " / ".join(x for x in (s.get("site"), md(s.get("date"))) if x)
-            origin = ""
-            if link(s.get("origin")):
-                shown = re.sub(r"^https?://", "", s["origin"])
-                origin = f'<p class="meta">원본 <a href="{esc(s["origin"])}">{esc(shown[:70])}</a></p>'
-            items += (f'<li id="src-{esc(s["id"])}" class="src"><span class="src-n">[{C.nums[s["id"]]}]</span>'
-                      f'<div><p class="src-t">{anchor}</p><p class="meta">{esc(meta)}</p>{origin}</div></li>')
-        out += f'<h3 class="src-g">{C.chl[ch]} {len(ss)}</h3><ol class="srcs">{items}</ol>'
+    """채널 머리 없이 화면 번호 순으로 한 목록(QA-11). 영상 출처는 그 아래 전체 타임라인(5.8)."""
+    items = ""
+    for s in sorted(t["sources"], key=lambda s: C.nums[s["id"]]):
+        title = esc(s.get("title") or s["id"])
+        anchor = f'<a href="{esc(s["url"])}">{title}</a>' if link(s.get("url")) else title
+        meta = " / ".join(x for x in (C.chl[s["channel"]], s.get("site"), md(s.get("date"))) if x)
+        origin = ""
+        if link(s.get("origin")):
+            shown = re.sub(r"^https?://", "", s["origin"])
+            origin = f'<p class="meta">원본 <a href="{esc(s["origin"])}">{esc(shown[:70])}</a></p>'
+        tl = video_timeline_html(s) if s["channel"] == "video" else ""
+        items += (f'<li id="src-{esc(s["id"])}" class="src"><span class="src-n">[{C.nums[s["id"]]}]</span>'
+                  f'<div><p class="src-t">{anchor}</p><p class="meta">{esc(meta)}</p>{origin}{tl}</div></li>')
+    out = f'<ol class="srcs">{items}</ol>'
     return f'<section class="sec sources" aria-labelledby="h-src"><h2 class="sec-t" id="h-src">출처</h2>{out}</section>'
+
+
+def mmss(sec):
+    m, s = divmod(int(sec), 60)
+    return f"{m}:{s:02d}"
+
+
+def video_timeline_html(s):
+    """영상 출처 아래 전체 타임라인(5.8). v1 토픽 데이터에는 timeline 칸이 없어 없으면 빈 글자."""
+    marks = s.get("timeline") or []
+    if not marks or not link(s.get("url")):
+        return ""
+    rows = "".join(f'<li class="{"slide" if m.get("slide") else ""}"><span class="vt-t">'
+                   f'<a href="{esc(s["url"])}&t={m["sec"]}s">{mmss(m["sec"])}</a></span>'
+                   f'<span class="vt-x">{rich(m.get("label", ""))}{" (슬라이드)" if m.get("slide") else ""}</span></li>'
+                   for m in marks)
+    return f'<ol class="vtl" aria-label="영상 타임라인">{rows}</ol>'
 
 
 def render_topic(t):
@@ -341,17 +355,21 @@ def read_minutes(w):
 
 
 def repo_html(r):
+    """신호 글자를 메타 줄로(QA-14): 이번 주 별 / 신호 / 관련 토픽을 ' / '로(가운뎃점 없음). needs_check는 .check 유지."""
     name = esc(r["name"])
     name = f'<a href="{esc(r["url"])}">{name}</a>' if link(r.get("url")) else name
-    stars = f'<span class="rp-s"><span class="rp-sl">이번 주 별</span> <span class="rp-sv">{esc(r["stars_7d"])}</span></span>' if r.get("stars_7d") else ""
-    sig = ""
+    what = f'<p class="rp-w">{esc(r["what"])}</p>' if r.get("what") else ""
+    parts = []
+    if r.get("stars_7d"):
+        parts.append(f"이번 주 별 {esc(r['stars_7d'])}")
     if r.get("signal"):
         label = esc(C.signals.get(r["signal"], r["signal"]))
-        sig = f'<p class="rp-m meta"><span class="{"check" if r["signal"] == "needs_check" else "sig"}">{label}</span></p>'
+        parts.append(f'<span class="check">{label}</span>' if r["signal"] == "needs_check" else label)
     rel = C.topics.get(r.get("topic_id"))
-    rel = f'<p class="rp-rel meta">관련 토픽 <a href="{topic_path(rel)}">{esc(rel["title"])}</a></p>' if rel else ""
-    what = f'<p class="rp-w">{esc(r["what"])}</p>' if r.get("what") else ""
-    return f'<li class="rp"><p class="rp-h"><span class="rp-n">{name}</span>{stars}</p>{what}{sig}{rel}</li>'
+    if rel:
+        parts.append(f'관련 토픽 <a href="{topic_path(rel)}">{esc(rel["title"])}</a>')
+    meta = f'<p class="rp-m meta">{meta_line(parts)}</p>' if parts else ""
+    return f'<li class="rp"><p class="rp-h"><span class="rp-n">{name}</span></p>{what}{meta}</li>'
 
 
 def render_week(w, path):
@@ -370,9 +388,10 @@ def render_week(w, path):
         f'<main class="wrap home has-tabs"><section class="whead"><h1 class="wtitle">{esc(w["label"])}</h1>'
         f'<p class="meta">{meta_line([esc(w["range"]), f"토픽 {w["topic_count"]}", f"소스 {w["source_count"]}", f"약 {read_minutes(w)}분"])}</p>'
         + (f'<p class="meta">{prev_link.replace("<a ", "<a class=\"prev\" ")}</p>' if prev else "")
-        + f'</section><nav class="tabs" aria-label="이번 주 섹션"><a class="tb-t" href="#topics">주요 토픽 {len(ts)}</a><a class="tb-r" href="#repos">트렌딩 레포 {len(repos)}</a></nav>'
-        f'<div class="panels"><section class="panel" id="topics" aria-labelledby="topics-t"><h2 class="sec-t" id="topics-t">주요 토픽 <span class="cnt">{len(ts)}</span></h2><ol class="list">{items}</ol></section>'
-        f'<section class="panel" id="repos" aria-labelledby="repos-t"><h2 class="sec-t" id="repos-t">트렌딩 레포 <span class="cnt">{len(repos)}</span></h2>{repo_body}</section></div>'
+        + '</section><span class="tab-anchor" id="topics"></span><span class="tab-anchor" id="repos"></span>'
+        f'<nav class="tabs" aria-label="이번 주 섹션"><a class="tb-t" href="#topics">주요 토픽 {len(ts)}</a><a class="tb-r" href="#repos">트렌딩 레포 {len(repos)}</a></nav>'
+        f'<div class="panels"><section class="panel" id="panel-topics" aria-labelledby="topics-t"><h2 class="sec-t" id="topics-t">주요 토픽 <span class="cnt">{len(ts)}</span></h2><ol class="list">{items}</ol></section>'
+        f'<section class="panel" id="panel-repos" aria-labelledby="repos-t"><h2 class="sec-t" id="repos-t">트렌딩 레포 <span class="cnt">{len(repos)}</span></h2>{repo_body}</section></div>'
         f'<footer class="foot meta">{prev_link}<p>발행 {mdhm(w["published_at"])}</p></footer></main>')
     return page(f'TrendsIT {w["label"]}', body, "briefing", path, f'{w["label"]} 기술 동향 브리핑, 토픽 {len(ts)}개')
 
@@ -415,11 +434,17 @@ def render_sources():
                     todo + table(["이름", "채널", "상태", "이번 주 수집", "토픽에 쓰인 수", "마지막 수집"], rows, nums=(3, 4)))
 
 
+KEYWORD_TOPIC_LINKS_MAX = 5
+
+
 def render_keywords():
     kw = C.d["keywords"]
     rows = []
     for k in kw["items"]:
-        links = ", ".join(f'<a href="{topic_path(C.topics[i])}">{esc(C.topics[i]["title"])}</a>' for i in k["topics"] if i in C.topics) or "-"
+        ids = [i for i in k["topics"] if i in C.topics]
+        shown = ", ".join(f'<a href="{topic_path(C.topics[i])}">{esc(C.topics[i]["title"])}</a>' for i in ids[:KEYWORD_TOPIC_LINKS_MAX])
+        extra = len(ids) - KEYWORD_TOPIC_LINKS_MAX
+        links = (shown + (f', 외 {extra}개' if extra > 0 else "")) if ids else "-"
         rows.append([esc(k["name"]), esc(", ".join(k["aliases"])) or "-", SEP.join(str(m) for m in k["mentions"]), links])
     first, last = C.weeks.get(kw["weeks"][0]), C.weeks.get(kw["weeks"][-1])
     span = f'{esc(first["label"])}부터 {esc(last["label"])}까지, 왼쪽이 오래된 주' if first and last else "최근 주차 순"
@@ -466,8 +491,12 @@ def render_run(r):
     kv = [("시작", mdhm(r["at"])), ("걸린 시간", minutes_text(r["duration_min"])), ("상태", STATUS_LABELS.get(r["status"], r["status"])),
           ("비용", f"${cost:.4f}" if cost and cost < 0.1 else f"${cost or 0:.2f}"), ("요약", r["summary"])]
     inner = '<dl class="kv">' + "".join(f"<dt>{k}</dt><dd>{esc(v)}</dd>" for k, v in kv) + "</dl>"
+    if r.get("fallback_select"):  # C-30: 선별이 대체 계획(점수 순)으로 돈 run
+        inner += '<p class="meta">선별 대체 계획(점수 순)</p>'
     c = r.get("counts") or {}
     rev = c.get("review") or {}
+    if c:  # D-37: 이 주 발행 n개 / 이 실행이 쓴 토픽 m개
+        inner += f'<p class="meta">이 주 발행 {c.get("published", 0)}개 / 이 실행이 쓴 토픽 {c.get("written", 0)}개</p>'
     cells = [("후보", c.get("candidates")), ("선정", c.get("selected")), ("근거 id", c.get("evidence_ids")), ("1차 통과", rev.get("passed_first")),
              ("반려", rev.get("rejected")), ("확인 필요", rev.get("needs_check")), ("발행", c.get("published"))]
     inner += '<dl class="kv">' + "".join(f"<dt>{k}</dt><dd>{v}</dd>" for k, v in cells if v is not None) + "</dl>" if c else ""
@@ -475,7 +504,8 @@ def render_run(r):
         rel = c["related"]
         inner += f'<p class="meta">과거 대조: 후속 {rel["follow_up"]} {SEP} 신규 {rel["new"]} {SEP} 중복 {rel["duplicate"]}</p>'
     if r.get("steps"):  # 단계 레일: steps의 역할 문장(확인이 필요한 단계만 .check)
-        lis = "".join(f'<li><span class="k">{esc(" ".join(x for x in (s.get("t"), s.get("role")) if x))}</span><span class="v">{esc(s["text"])}</span>'
+        lis = "".join(f'<li><span class="k">{esc(" ".join(x for x in (s.get("t"), s.get("role")) if x))}</span>'
+                      f'<span class="v">{esc(s["text"] + (" (대체 계획)" if s.get("fallback") else ""))}</span>'
                       + ('<span class="check">확인 필요</span>' if s.get("attention") else "") + "</li>" for s in r["steps"])
         inner += f'<h2>단계 기록</h2><ol class="rail">{lis}</ol>'
     cmps = [s["detail"] for s in r.get("steps") or [] if s.get("detail")]

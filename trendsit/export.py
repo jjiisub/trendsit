@@ -118,6 +118,7 @@ def _weekly_counts(db: DB, run_id: str, summary: dict[str, Any], published: int,
     if "selected" in sel:
         c["selected"] = sel["selected"]
     c["evidence_ids"] = db.conn.execute("SELECT COUNT(DISTINCT evidence_id) FROM topic_evidence WHERE run_id=?", (run_id,)).fetchone()[0]
+    c["written"] = db.conn.execute("SELECT COUNT(*) FROM steps WHERE run_id=? AND role='writer' AND kind='code'", (run_id,)).fetchone()[0]
     if rev.get("rounds"):
         c["review"] = {"passed_first": rev["rounds"].get("1", 0), "rejected": rev.get("code_rejects", 0) + rev.get("critic_rejects", 0),
                        "needs_check": needs_check}
@@ -147,6 +148,9 @@ def _run(db: DB, r: Any, published: dict[str, tuple[int, int]]) -> dict[str, Any
         out["week"] = week_id(r["week"])
         out["counts"] = _weekly_counts(db, r["id"], summary, *published[r["week"]])
         out["summary"] = _weekly_summary(out["counts"])
+        plan_row = db.conn.execute("SELECT source FROM briefing_plans WHERE run_id=? ORDER BY id DESC LIMIT 1", (r["id"],)).fetchone()
+        if plan_row and plan_row["source"] == "fallback":  # D-37-인접(C-30): 선별이 대체 계획으로 돈 run
+            out["fallback_select"] = True
         steps = []
         for s in db.conn.execute("SELECT t, role, text, attention, detail FROM steps WHERE run_id=? AND text IS NOT NULL ORDER BY seq", (r["id"],)):
             step: dict[str, Any] = {"role": s["role"], "text": s["text"], "t": _hm(s["t"]), "attention": bool(s["attention"])}
@@ -160,8 +164,16 @@ def _run(db: DB, r: Any, published: dict[str, tuple[int, int]]) -> dict[str, Any
         steps = summary.get("steps") or []
         bad = [s for s in steps if s.get("exit")]
         out["summary"] = f"날 {len(summary.get('days') or [])}개, 단계 {len(steps)}개 중 실패 {len(bad)}개"
-        out["steps"] = [{"role": s["name"], "text": (f"{s['day']} " if s.get("day") else "") + (s.get("error") or f"성공, {s.get('sec', 0)}초"),
-                         "attention": bool(s.get("exit"))} for s in steps]
+        out_steps = []
+        for s in steps:
+            step: dict[str, Any] = {"role": s["name"], "text": (f"{s['day']} " if s.get("day") else "") + (s.get("error") or f"성공, {s.get('sec', 0)}초"),
+                                    "attention": bool(s.get("exit"))}
+            if s.get("name") == "plan" and s.get("day"):  # C-30: 그날 계획이 대체 계획(점수 순)으로 돈 경우
+                plan_row = db.conn.execute("SELECT source FROM plans WHERE day=? ORDER BY id DESC LIMIT 1", (s["day"],)).fetchone()
+                if plan_row and plan_row["source"] == "fallback":
+                    step["fallback"] = True
+            out_steps.append(step)
+        out["steps"] = out_steps
     return out
 
 

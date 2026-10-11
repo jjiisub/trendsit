@@ -150,8 +150,8 @@ def test_a1_structure_and_only_published(tmp_path):
     assert kw["weeks"] == ["2026-w41"] and next(i for i in kw["items"] if i["id"] == "agent")["mentions"] == [1]
     assert next(i for i in kw["items"] if i["id"] == "agent")["topics"] == ["w41-a", "w41-b"]
     run = next(r for r in site["runs"] if r["id"] == "r41")
-    assert run["counts"] == {"candidates": 9, "related": {"follow_up": 1, "new": 1, "duplicate": 0}, "selected": 2, "evidence_ids": 4,
-                             "review": {"passed_first": 1, "rejected": 1, "needs_check": 1}, "published": 2}  # 확인 필요는 화면에 표시되는 수(w41-b points[0])
+    assert run["counts"] == {"candidates": 9, "related": {"follow_up": 1, "new": 1, "duplicate": 0}, "selected": 2, "evidence_ids": 4, "written": 0,
+                             "review": {"passed_first": 1, "rejected": 1, "needs_check": 1}, "published": 2}  # written(D-37)은 steps(writer,code) 행이 없어 0. 확인 필요는 화면에 표시되는 수(w41-b points[0])
     assert [s["role"] for s in run["steps"]] == ["writer", "critic"] and run["steps"][1]["attention"] is True
     assert run["steps"][1]["detail"]["draft"] == "초안" and "detail" not in run["steps"][0]
     night = next(r for r in site["runs"] if r["id"] == "n1")

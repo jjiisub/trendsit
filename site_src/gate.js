@@ -200,7 +200,7 @@ async function behavior(browser, longTopic, homePath) {
   b.miniScrolled = await page.evaluate(() => { const m = document.querySelector('.mini'); if (!m) return null; const r = m.getBoundingClientRect(); return { visibility: getComputedStyle(m).visibility, top: Math.round(r.top), height: Math.round(r.height), scrollY: Math.round(window.scrollY) }; });
   await page.close();
   // 탭: 기본은 토픽, #repos면 레포
-  const panel = (pg) => pg.evaluate(() => ({ topics: getComputedStyle(document.querySelector('#topics')).display, repos: getComputedStyle(document.querySelector('#repos')).display }));
+  const panel = (pg) => pg.evaluate(() => ({ topics: getComputedStyle(document.querySelector('#panel-topics')).display, repos: getComputedStyle(document.querySelector('#panel-repos')).display }));
   page = await ctx.newPage();
   await page.goto(base + homePath, { waitUntil: 'networkidle' });
   b.tabDefault = await panel(page);
@@ -213,12 +213,29 @@ async function behavior(browser, longTopic, homePath) {
   return b;
 }
 
+// D-1·D-40·C-10: 두 탭 중 어느 쪽을 눌러도 스크롤 위치가 거의 같고(.tabs 바로 위 0높이 앵커) .nav가 가려지지 않음.
+// behavior()와 독립된 컨텍스트에서(같은 컨텍스트를 더 오래 잡고 있으면 미니 바 view-timeline 측정에 영향이 있었음)
+async function tabAnchorScroll(browser, homePath) {
+  const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  const page = await ctx.newPage();
+  const scrollState = () => ({ y: Math.round(window.scrollY), navTop: Math.round(document.querySelector('.nav').getBoundingClientRect().top) });
+  await page.goto(base + homePath + '#topics', { waitUntil: 'networkidle' });
+  await sleep(50);
+  const topics = await page.evaluate(scrollState);
+  await page.goto(base + homePath + '#repos', { waitUntil: 'networkidle' });
+  await sleep(50);
+  const repos = await page.evaluate(scrollState);
+  await ctx.close();
+  return { topics, repos, diff: Math.abs(topics.y - repos.y) };
+}
+
 (async () => {
   const out = { gates: [], external: [] };
   const chromium = await pw.chromium.launch();
   await gates(chromium, 'chromium', [[375, 812, true], [768, 1024, false], [1280, 900, false]], out.gates, out.external);
   const longTopic = (pages.find((p) => p.longTopic) || pages.find((p) => p.topic)).path;
   out.behavior = await behavior(chromium, longTopic, pages[0].path);
+  out.behavior.tabScroll = await tabAnchorScroll(chromium, pages[0].path);
   await chromium.close();
   const webkit = await pw.webkit.launch();
   await gates(webkit, 'webkit', [[375, 812, true], [1280, 900, false]], out.gates, out.external);
