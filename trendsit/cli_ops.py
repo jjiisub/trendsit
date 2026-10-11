@@ -44,7 +44,7 @@ def cmd_backup(args: argparse.Namespace) -> int:
     import re
 
     from .core.config import ROOT
-    from .core.db import KST, open_db
+    from .core.db import KST
 
     if args.tag and not re.fullmatch(r"[\w-]+", args.tag):
         print(f"backup: --tag는 글자·숫자·_·-만 ({args.tag})", file=sys.stderr)
@@ -57,14 +57,17 @@ def cmd_backup(args: argparse.Namespace) -> int:
     if dest.exists():
         print(f"backup: 같은 이름이 있음 ({dest})", file=sys.stderr)
         return 1
-    db = open_db()
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    src_conn = sqlite3.connect(src)  # open_db()는 스키마·마이그레이션을 적용함: 원본을 그대로 두려면 직접 연다(C-11)
     try:
-        db.backup(dest)
+        with sqlite3.connect(dest) as dst_conn:
+            src_conn.backup(dst_conn)
     except (OSError, sqlite3.Error) as e:
         print(f"backup: {e}", file=sys.stderr)
+        dest.unlink(missing_ok=True)
         return 1
     finally:
-        db.conn.close()
+        src_conn.close()
     print(str(dest))
     return 0
 

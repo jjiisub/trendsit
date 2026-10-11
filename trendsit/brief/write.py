@@ -383,11 +383,11 @@ def write_topic(ctx: Ctx, topic: Applied, members: dict[str, Member], table: Ali
         used = (sid or 0) - before_sid  # role.py가 쓴 LLM 시도 수(step id 증가분, 스키마 재시도 포함)
         if page is None and err and "출력 잘림" in err and used <= 2:  # D-42·C-5: 기본 호출이 2회 안이었을 때만 no_visuals 1회 더
             res.attention.append("작성 잘림, no_visuals로 재시도")
+            res.no_visuals = True  # 시도했음을 바로 기록(detail.no_visuals, 성공 여부와 무관)
             winp2 = winp.model_copy(update={"no_visuals": True})
             page, err2, sid = _call(load_role("writer", ctx.models), winp2, ctx, res.costs, "writer")
             if page is not None:
                 winp = winp2
-                res.no_visuals = True
             err = err2 if page is None else err
     if page is None or not page.sections:
         # pipeline._log_topic이 토픽마다 steps(writer,code) 행을 하나 남긴다(D-37 counts.written). 여기서 또

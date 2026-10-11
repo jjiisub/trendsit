@@ -143,6 +143,28 @@ def test_backup_creates_consistent_copy_without_touching_original(tmp_path, monk
     assert copy.conn.execute("SELECT id FROM runs").fetchone()[0] == "x"
 
 
+def test_backup_cli_does_not_apply_migrations_to_original(tmp_path, monkeypatch):
+    """006-A2-21: open_db()는 원본에 스키마·마이그레이션을 적용함(C-11 위반 위험). cmd_backup은 원본을 날 것으로만
+    열어야 한다: 트렌드싯 스키마가 전혀 없는 파일도(마이그레이션이 ALTER를 시도하면 실패) 그대로 백업된다."""
+    import sqlite3
+
+    from trendsit import cli_ops
+    from trendsit.core import config as cfgmod
+
+    monkeypatch.setattr(cfgmod, "ROOT", tmp_path)
+    (tmp_path / "data").mkdir()
+    sqlite3.connect(tmp_path / "data" / "trendsit.db").execute("CREATE TABLE t(x)").connection.commit()
+    before = (tmp_path / "data" / "trendsit.db").read_bytes()
+
+    class Args:
+        tag = None
+
+    assert cli_ops.cmd_backup(Args()) == 0
+    assert (tmp_path / "data" / "trendsit.db").read_bytes() == before  # steps 테이블이 생기지 않음(원본 불변)
+    dest = next((tmp_path / "data" / "backup").iterdir())
+    assert sqlite3.connect(dest).execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall() == [("t",)]
+
+
 def test_backup_cli_rejects_existing_name(tmp_path, monkeypatch):
     from trendsit import cli_ops
     from trendsit.core import config as cfgmod

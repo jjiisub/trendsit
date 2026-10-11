@@ -180,6 +180,20 @@ def test_a1_with_week_includes_unpublished_week_and_export_failures_keep_file(tm
     assert out.read_text() == before
 
 
+def test_weekly_counts_written_ignores_budget_stop_record_without_topic_id(tmp_path):
+    """006-A2-35: role.py가 예산 초과 때 남기는 중단 기록(detail에 topic_id 없음)은 counts.written에 안 셈(이중 집계 방지)."""
+    from trendsit.export import _weekly_counts
+
+    db = DB(tmp_path / "t.db")
+    db.conn.execute("INSERT INTO runs(id, kind, started_at) VALUES ('r','weekly','2026-10-12T00:00:00+09:00')")
+    db.conn.execute("INSERT INTO steps(run_id, seq, t, role, kind, detail) VALUES ('r', 1, 't', 'writer', 'code', ?)",
+                    (json.dumps({"topic_id": "w41-a"}),))
+    db.conn.execute("INSERT INTO steps(run_id, seq, t, role, kind, detail) VALUES ('r', 2, 't', 'writer', 'code', ?)",
+                    (json.dumps({"attempt": 1}),))  # role.py의 BudgetExceeded 중단 기록(topic_id 없음)
+    c = _weekly_counts(db, "r", {}, 0, 0)
+    assert c["written"] == 1
+
+
 def test_topic_ref_slots_covers_tiles_table_events_not_just_paragraphs():
     """006-A1-15: C-2가 단락 refs만 보지 않고 head_tiles·table·tiles·events도 봄."""
     from trendsit.export import _topic_ref_slots

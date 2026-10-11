@@ -134,7 +134,9 @@ def _weekly_counts(db: DB, run_id: str, summary: dict[str, Any], published: int,
     if "selected" in sel:
         c["selected"] = sel["selected"]
     c["evidence_ids"] = db.conn.execute("SELECT COUNT(DISTINCT evidence_id) FROM topic_evidence WHERE run_id=?", (run_id,)).fetchone()[0]
-    c["written"] = db.conn.execute("SELECT COUNT(*) FROM steps WHERE run_id=? AND role='writer' AND kind='code'", (run_id,)).fetchone()[0]
+    # 006-A2-35: 예산 초과로 멈출 때 role.py가 남기는 중단 기록(detail에 topic_id 없음)은 세지 않음(이중 집계 방지)
+    c["written"] = db.conn.execute("SELECT COUNT(*) FROM steps WHERE run_id=? AND role='writer' AND kind='code' "
+                                   "AND json_extract(detail,'$.topic_id') IS NOT NULL", (run_id,)).fetchone()[0]
     if rev.get("rounds"):
         c["review"] = {"passed_first": rev["rounds"].get("1", 0), "rejected": rev.get("code_rejects", 0) + rev.get("critic_rejects", 0),
                        "needs_check": needs_check}

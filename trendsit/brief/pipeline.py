@@ -272,7 +272,6 @@ def compute_summary(db: DB, run_id: str) -> dict[str, Any]:
     drops, drops_by = _drop_counts(plan, fallback)
     issue_types, autofixes, reverts = _review_counts(db, run_id, verdicts)
     check_points = _check_points(db, run_id, topics)
-    writers = _detail(db, run_id, "writer")
     cost = {k: round(float(db.conn.execute("SELECT COALESCE(SUM(cost_usd),0) FROM steps WHERE run_id=? AND role=?",
                                            (run_id, k)).fetchone()[0] or 0), 6) for k in ROLES}
     cost["total"] = round(sum(cost.values()), 6)
@@ -282,8 +281,7 @@ def compute_summary(db: DB, run_id: str) -> dict[str, Any]:
         "week": week, "model": _model(db, run_id), "status": "stopped" if end.get("stopped") else run_status(topics),
         "cluster_run": cluster_run,
         "evidence": {"items": ev.get("counts", {"text": 0, "video": 0, "github": 0}),
-                     "excluded": ev.get("excluded", {"no_card": 0, "no_digest": 0, "irrelevant_repo": 0}),
-                     "truncated_topics": sum(1 for w in writers if w.get("no_visuals"))},
+                     "excluded": ev.get("excluded", {"no_card": 0, "no_digest": 0, "irrelevant_repo": 0})},
         "aliases": {"candidates": norm.get("counts", {}).get("candidates", 0),
                     "auto_approved": norm.get("counts", {}).get("auto_approved", 0),
                     "decide_calls": len(norm.get("decide", []))},
