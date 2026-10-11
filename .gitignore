@@ -1,4 +1,6 @@
 /site
+/site.tmp-*
+/site.old
 .DS_Store
 *.log
 .env

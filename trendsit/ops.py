@@ -11,6 +11,7 @@ import fcntl
 import json
 import os
 import signal
+import sqlite3
 import subprocess
 import sys
 import time
@@ -24,12 +25,13 @@ from .collect.text import iso_week
 from .core.config import ROOT, OpsConfig
 from .core.db import DB, KST, now_kst
 from .core.trace import Tracer
+from .export import ExportError
+from .export import export as export_site
 
 # 명령 하나를 (종료 코드, 표준 출력, 표준 오류)로. 테스트는 이 자리에 가짜 실행기를 넣는다. timeout(초)을 넘기면 종료 코드 124
 Runner = Callable[[list[str], float | None], tuple[int, str, str]]
 Build = Callable[[list[str]], tuple[int, str, str]]
-EXPORT_CMD = ["uv", "run", "python", "-m", "trendsit", "export"]  # publish가 --with-week <주>를 붙임: 아직 done인 그 주도 site.json에 담는다
-BUILD_CMD = ["python3", "site_src/build.py"]
+BUILD_CMD = [sys.executable, "site_src/build.py"]  # trendsit을 부른 python(uv의 venv, 3.12). 최소 PATH의 /usr/bin/python3(3.9)로는 build.py 문법이 안 맞음
 TIMEOUT_CODE = 124
 
 
@@ -59,17 +61,31 @@ def on_sigterm(signum: int, frame: Any) -> None:
 
 
 def publish(db: DB, week: str, runner: Build = run_subprocess) -> int:
-    """export → 사이트 빌드 → weeks.status 'published', published_at. 0 성공, 1 export·빌드 실패, 2 대상 아님."""
+    """export → 사이트 빌드 → weeks.status 'published', published_at. 0 성공, 1 export·빌드 실패, 2 대상 아님.
+
+    아직 done인 그 주도 담아야 해서 export는 공개 CLI가 아니라 여기서 함수로 부른다(with_week). 결과는 임시 파일로 받아
+    그 파일로 빌드하고, 성공했을 때만 data/site.json으로 바꾼다(실패하면 미발행 주가 site.json에 남지 않음).
+    """
     row = db.conn.execute("SELECT status FROM weeks WHERE week=?", (week,)).fetchone()
     if row is None or row["status"] not in ("done", "published"):
         print(f"발행 불가: {week} 상태 {row['status'] if row else '없음'} (done 또는 published만)", file=sys.stderr)
         return 2
-    for name, cmd in (("export", [*EXPORT_CMD, "--with-week", week]), ("사이트 빌드", BUILD_CMD)):
-        code, out, err = runner(cmd)
+    final = db.path.parent / "site.json"
+    tmp = final.with_name(final.name + ".new")
+    try:
+        try:
+            export_site(db, tmp, week)
+        except (ExportError, sqlite3.Error) as e:
+            print(f"export 실패: {e}", file=sys.stderr)
+            return 1
+        code, out, err = runner([*BUILD_CMD, "--data", str(tmp)])
         if code != 0:
             last = next((x for x in reversed((err or out).strip().splitlines()) if x.strip()), "")
-            print(f"{name} 실패(종료 코드 {code}): {last[:200]}", file=sys.stderr)
+            print(f"사이트 빌드 실패(종료 코드 {code}): {last[:200]}", file=sys.stderr)
             return 1
+        os.replace(tmp, final)
+    finally:
+        tmp.unlink(missing_ok=True)
     with db.conn:
         db.conn.execute("UPDATE weeks SET status='published', published_at=? WHERE week=?", (now_kst(), week))
     print(f"발행: {week}")

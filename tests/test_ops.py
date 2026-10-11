@@ -70,6 +70,16 @@ class Fake:
         return [" ".join(t[:2]) if t[0] in ("plan", "deep", "video") else t[0] for t in map(tail, self.cmds)]
 
 
+EXPORTS: list = []
+
+
+@pytest.fixture(autouse=True)
+def stub_export(monkeypatch):
+    """publish의 export는 함수 호출이라(실제 export는 tests/test_export.py가 검증) 가짜로 바꾸고 호출 기록만 남긴다."""
+    EXPORTS.clear()
+    monkeypatch.setattr(ops, "export_site", lambda db, out, with_week=None: (EXPORTS.append(with_week), out.write_text("{}")))
+
+
 @pytest.fixture
 def db(tmp_path):
     return DB(tmp_path / "t.db")
@@ -309,7 +319,7 @@ def test_b10_previous_iso_week(db, tmp_path, now, week):
     fake = Fake(db)
     assert ops.weekly(db, NO_CATCHUP, now=now, runner=fake, data_dir=tmp_path) == 0
     assert tail(fake.cmds[0]) == ["weekly", "--week", week, "--spec", f"RUN-{week}"]
-    assert fake.cmds[1][-3:] == ["export", "--with-week", week] and fake.cmds[2] == ["python3", "site_src/build.py"]  # export → 빌드
+    assert EXPORTS == [week] and fake.cmds[1][:-2] == ops.BUILD_CMD and fake.cmds[1][-2] == "--data"  # export(그 주 포함) → 빌드
     assert db.conn.execute("SELECT status FROM weeks WHERE week=?", (week,)).fetchone()[0] == "published"
     assert not any("--force" in c for c in fake.cmds)  # C-8
 
@@ -325,14 +335,14 @@ def test_b10_weekly_failure_does_not_publish(db, tmp_path):
 def test_b10_unfinished_week_is_not_published(db, tmp_path):
     fake = Fake(db, weekly_status="written")  # 일부 토픽만 끝난 주
     assert ops.weekly(db, NO_CATCHUP, now=at(2026, 10, 19, 7), runner=fake, data_dir=tmp_path) == 1
-    assert fake.cmds[-1] != ["python3", "site_src/build.py"]
+    assert not EXPORTS and fake.cmds[-1][: len(ops.BUILD_CMD)] != ops.BUILD_CMD
     assert db.conn.execute("SELECT status FROM weeks").fetchone()[0] == "written"
 
 
 def test_b10_build_failure_returns_1(db, tmp_path):
     class BuildFails(Fake):
         def __call__(self, cmd, timeout=None):
-            return (1, "", "빌드 실패") if cmd[0] == "python3" else super().__call__(cmd, timeout)
+            return (1, "", "빌드 실패") if cmd[: len(ops.BUILD_CMD)] == ops.BUILD_CMD else super().__call__(cmd, timeout)
 
     fake = BuildFails(db)
     assert ops.weekly(db, NO_CATCHUP, now=at(2026, 10, 19, 7), runner=fake, data_dir=tmp_path) == 1
@@ -481,7 +491,7 @@ def test_b10_weekly_catches_up_nightly_first_then_weekly(db, tmp_path):
     code = ops.weekly(db, CFG, now=at(2026, 10, 19, 7), runner=fake, data_dir=tmp_path)  # 일요일(18) 미처리
     names = fake.names()
     assert code == 0 and names.index("collect") < names.index("plan run") < names.index("weekly")
-    assert names[-3:] == ["weekly", "export", "python3"]
+    assert names[-2:] == ["weekly", ops.BUILD_CMD[0]]
     assert nightly_rows(db)[-1]["summary"]["days"][-1] == "2026-10-18" and nightly_rows(db)[-1]["status"] == "partial"
     assert db.conn.execute("SELECT status FROM weeks").fetchone()[0] == "published"
     # 범위가 비면 바로 weekly

@@ -53,6 +53,15 @@ def test_b6_listed_spec_still_works(tmp_path):
     assert budget_for(tmp_path, DB(tmp_path / "t.db"), "S5").spec_cap == 6.0
 
 
+EXPORTS: list = []
+
+
+@pytest.fixture(autouse=True)
+def stub_export(monkeypatch):
+    EXPORTS.clear()
+    monkeypatch.setattr(ops, "export_site", lambda db, out, with_week=None: (EXPORTS.append(with_week), out.write_text("{}")))
+
+
 def weeks_db(tmp_path, status):
     db = DB(tmp_path / "t.db")
     db.conn.execute("INSERT INTO weeks(week, start_day, end_day, status, current_run_id) "
@@ -80,7 +89,8 @@ def test_b8_publish_success_and_build_failure_and_not_ready(tmp_path):
     assert ops.publish(db, "2026-W41", build(0)) == 0
     status, at = week_row(db)
     assert status == "published" and at and "T" in at
-    assert calls[-2][-3:] == ["export", "--with-week", "2026-W41"] and calls[-1] == ["python3", "site_src/build.py"]  # export 먼저, 다음 빌드
+    assert calls[-1][:-2] == ops.BUILD_CMD and calls[-1][-2] == "--data" and EXPORTS[-1] == "2026-W41"  # export(그 주 포함) 먼저, 다음 빌드
+    assert (tmp_path / "site.json").read_text() == "{}" and not (tmp_path / "site.json.new").exists()  # 성공 때만 site.json 교체
 
     first = at
     assert ops.publish(db, "2026-W41", build(0)) == 0  # 다시 발행: published_at만 갱신
@@ -151,3 +161,17 @@ def test_b9_cluster_force_clears_published_at(tmp_path, monkeypatch):
     with pytest.raises(RuntimeError):
         cli.main(["cluster", "--week", "2026-W41", "--force"])
     assert tuple(week_row(db)) == ("done", None)
+
+
+def test_publish_export_failure_leaves_status_and_site_json(tmp_path, monkeypatch):
+    from trendsit.export import ExportError
+
+    def boom(db, out, with_week=None):
+        out.write_text("부분")
+        raise ExportError("published 주가 없음")
+
+    monkeypatch.setattr(ops, "export_site", boom)
+    (tmp_path / "site.json").write_text("옛 것")
+    db = weeks_db(tmp_path, "done")
+    assert ops.publish(db, "2026-W41", lambda cmd: pytest.fail("빌드를 부르면 안 됨")) == 1
+    assert tuple(week_row(db)) == ("done", None) and (tmp_path / "site.json").read_text() == "옛 것" and not (tmp_path / "site.json.new").exists()

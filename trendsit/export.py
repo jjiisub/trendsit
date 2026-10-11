@@ -54,11 +54,11 @@ def _topics(db: DB, week: str, run_id: str) -> list[dict[str, Any]]:
     """그 주 현재판 토픽을 rank 순으로. 작성 실패(페이지 없음)는 뺀다. C-2: 모든 포인트의 refs가 그 토픽 출처 안에 있어야 함."""
     srcs = sources_index(db, week)
     out = []
-    for r in db.conn.execute("SELECT topic_id FROM topics WHERE run_id=? AND status!='failed' ORDER BY rank", (run_id,)):
-        try:
-            t = export_topic(db, run_id, r["topic_id"], srcs)
-        except KeyError:
-            continue
+    # 작성 실패(최종 페이지 없음)는 SQL로 거르고, 그 밖의 오류는 숨기지 않고 올린다
+    rows = db.conn.execute("SELECT t.topic_id FROM topics t WHERE t.run_id=? AND t.status!='failed' AND EXISTS "
+                           "(SELECT 1 FROM topic_pages p WHERE p.run_id=t.run_id AND p.topic_id=t.topic_id) ORDER BY t.rank", (run_id,))
+    for r in rows.fetchall():
+        t = export_topic(db, run_id, r["topic_id"], srcs)
         ids = {s["id"] for s in t["sources"]}
         for i, p in enumerate(t["points"]):
             if not p["refs"] or not set(p["refs"]) <= ids:
@@ -142,7 +142,7 @@ def _run(db: DB, r: Any, published: dict[str, tuple[int, int]]) -> dict[str, Any
     """runs 행 하나. 주간은 steps 표(역할 문장, 확인 표시), 매일은 summary_json.steps(단계, 종료 코드)."""
     summary = _json(r["summary_json"]) or {}
     out: dict[str, Any] = {"id": r["id"], "kind": r["kind"], "at": r["started_at"], "duration_min": _minutes(r["started_at"], r["finished_at"]),
-                           "status": r["status"], "cost_usd": round(r["cost_usd"], 4)}
+                           "status": r["status"], "cost_usd": round(summary["cost_usd"] if r["kind"] == "nightly" and "cost_usd" in summary else r["cost_usd"], 4)}  # 매일 수집은 하위 프로세스 run이 비용을 가져 summary_json.cost_usd(숫자)에. 주간의 그 칸은 단계별 dict
     if r["kind"] == "weekly":
         out["week"] = week_id(r["week"])
         out["counts"] = _weekly_counts(db, r["id"], summary, *published[r["week"]])
@@ -171,6 +171,8 @@ def _runs(db: DB, weeks: list[dict[str, Any]], counts: dict[str, tuple[int, int]
     marks = ",".join("?" * len(ids))
     rows = db.conn.execute(f"SELECT * FROM runs WHERE kind='nightly' OR id IN ({marks}) ORDER BY started_at DESC", ids).fetchall()
     runs = [_run(db, r, published) for r in rows]
+    ids_ok = {w["id"] for w in weeks}
+    runs = [r for r in runs if r["kind"] != "nightly" or r["week"] in ids_ok]  # C-1: 발행 주의 nightly만(명세 5.1 표의 "전부"보다 C-1이 앞)
     by_id = {r["id"]: r for r in runs}
     rws = []
     for w in weeks:
@@ -179,7 +181,7 @@ def _runs(db: DB, weeks: list[dict[str, Any]], counts: dict[str, tuple[int, int]
         c = by_id[w["_run_id"]].get("counts", {})
         rev = c.get("review", {})
         rws.append({"week": w["id"], "label": w["label"], "range": w["range"], "nightly": len(nights),
-                    "nightly_failed": sum(r["status"] != "ok" for r in nights), "collected": sum(w["collected"].values()),
+                    "nightly_failed": sum(r["status"] in ("partial", "failed", "stopped") for r in nights), "collected": sum(w["collected"].values()),
                     "candidates": c.get("candidates"), "published": published[wk][0], "rejected": rev.get("rejected"),
                     "needs_check": rev.get("needs_check")})
     return runs, [{k: v for k, v in r.items() if v is not None} for r in rws]
@@ -188,7 +190,11 @@ def _runs(db: DB, weeks: list[dict[str, Any]], counts: dict[str, tuple[int, int]
 # ---------- 소스(5.1) ----------
 def _sources(db: DB, weeks: list[dict[str, Any]], members: dict[str, set[tuple[str, str]]]) -> list[dict[str, Any]]:
     out = []
+    yaml = config.load("sources.yaml")  # 원천은 sources.yaml: 거기서 지운 소스는 DB 표에 남아 있어도 내보내지 않는다(github는 고정 id 둘)
+    known = {s.id for s in yaml.text} | {s.id for s in yaml.video} | {"github_trending", "github_releases"}
     for s in db.conn.execute("SELECT * FROM sources ORDER BY channel, name"):
+        if s["id"] not in known:
+            continue
         cfg = _json(s["config_json"])
         cfg = cfg if isinstance(cfg, dict) else {}
         entry: dict[str, Any] = {"id": s["id"], "name": s["name"], "type": s["kind"], "channel": s["channel"],
@@ -201,6 +207,11 @@ def _sources(db: DB, weeks: list[dict[str, Any]], members: dict[str, set[tuple[s
                                      (s["id"], w["_start"].isoformat(), w["_end"].isoformat())).fetchone()[0]
             used = sum(1 for _, src in members[w["_db_week"]] if src == s["id"])
             entry["weeks"][w["id"]] = {"collected": n, "failed_days": failed, "used_in_topics": used}
+            if n:  # 요일별(월~일) 수집 수
+                daily = [0] * 7
+                for (day,) in db.conn.execute("SELECT day FROM items WHERE source_id=? AND week=? AND day IS NOT NULL", (s["id"], w["_db_week"])):
+                    daily[date.fromisoformat(day).weekday()] += 1
+                entry.setdefault("daily", {})[w["id"]] = daily
         last = db.conn.execute("SELECT t, n_new, status, error FROM fetch_log WHERE source_id=? ORDER BY t DESC, id DESC LIMIT 1", (s["id"],)).fetchone()
         entry["last"] = {"at": last["t"], "count": last["n_new"], "status": last["status"]} if last else None
         entry["last_error"] = last["error"] if last and last["status"] != "ok" and last["error"] else None

@@ -33,7 +33,7 @@ def cmd_export(args: argparse.Namespace) -> int:
     from .export import ExportError, export
 
     try:
-        export(open_db(), Path(args.out) if args.out else ROOT / "data" / "site.json", args.with_week)
+        export(open_db(), Path(args.out) if args.out else ROOT / "data" / "site.json")
     except (ExportError, sqlite3.Error) as e:
         print(f"export 실패: {e}", file=sys.stderr)
         return 1
@@ -59,7 +59,6 @@ def register(sub: Any) -> None:
 
     e = sub.add_parser("export", help="사이트 데이터(S6a): DB → data/site.json(발행된 주만). 실패하면 기존 파일을 그대로 둔다")
     e.add_argument("--out", help="기본: data/site.json")
-    e.add_argument("--with-week", type=_week, help="아직 발행 전인 이 주도 담는다(publish가 사용)")
     e.set_defaults(fn=cmd_export)
 
     o = sub.add_parser("ops", help="자동 실행(S6b): launchd가 부르는 nightly, weekly")

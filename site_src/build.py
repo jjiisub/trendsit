@@ -167,20 +167,23 @@ def cites(t, refs, ctr):
     return "".join(cite(t, r, ctr) for r in refs if r in C.srcs)
 
 
-def with_end(body, tail):
-    """마지막 어절 + &nbsp; + tail(인용 등)을 nb-end로 묶어 번호만 다음 줄로 넘어가지 않게. 마지막 어절이 한 음절이면 앞 어절까지."""
-    m = re.search(r"(\S+)$", body)
-    if m and re.fullmatch(r"[가-힣][.,]?", m.group(1)):
-        m2 = re.search(r"(\S+\s\S+)$", body)
-        if m2 and "<" not in m2.group(1) and ">" not in m2.group(1):
-            m = m2
-    if m and not body.endswith(">"):
-        return body[: m.start()] + f'<span class="nb-end">{m.group(1)}&nbsp;{tail}</span>'
-    return f'{body}<span class="nb-end">&nbsp;{tail}</span>'
+def with_end(raw, tail):
+    """원문 끝 어절 + &nbsp; + tail(인용 등)을 nb-end로 묶어 번호만 다음 줄로 넘어가지 않게. 마지막 어절이 한 음절이면 앞 어절까지.
+    어절은 rich 변환 전의 원문에서 고른다(변환 뒤 HTML에서 고르면 <span class=...> 속을 잘라 마크업이 깨짐).
+    ==형광==·`코드` 안의 공백은 끊는 자리가 아니고, 끝 덩어리가 24자를 넘으면 묶지 않고 인용만 붙인다."""
+    raw = raw.strip()
+    spans = [m.span() for m in re.finditer(r"==.+?==|`[^`]+`", raw)]
+    cuts = [m.end() for m in re.finditer(r"\s+", raw) if not any(a < m.start() < b for a, b in spans)]
+    start = cuts[-1] if cuts else 0
+    if re.fullmatch(r"[가-힣][.,]?", raw[start:]):
+        start = cuts[-2] if len(cuts) > 1 else 0
+    if len(raw) - start > 24:
+        return f'{rich(raw)}<span class="nb-end">&nbsp;{tail}</span>'
+    return f'{rich(raw[:start])}<span class="nb-end">{rich(raw[start:])}&nbsp;{tail}</span>'
 
 
 def point_html(t, p, ctr):
-    return with_end(rich(p["text"]), cites(t, p["refs"], ctr) + (CHK if p.get("check") else ""))
+    return with_end(p["text"], cites(t, p["refs"], ctr) + (CHK if p.get("check") else ""))
 
 
 def bar_value(it, unit):
@@ -521,9 +524,15 @@ def build(data_path, out_path):
         os.chmod(tmp, 0o755)
         old = out.with_name(out.name + ".old")
         shutil.rmtree(old, ignore_errors=True)
-        if out.exists():
+        had = out.exists()
+        if had:
             out.rename(old)
-        tmp.rename(out)
+        try:
+            tmp.rename(out)
+        except BaseException:
+            if had:
+                old.rename(out)  # 두 번째 rename이 실패하면 이전 사이트를 되돌린다
+            raise
         shutil.rmtree(old, ignore_errors=True)
     except BaseException:
         shutil.rmtree(tmp, ignore_errors=True)

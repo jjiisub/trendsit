@@ -46,6 +46,7 @@ if out=$(a14 2>&1); then pass A14 "data/ 추적 파일 0, example/에 두 파일
 
 # ---------- S-2: 사이트 빌드 ----------
 pt A3 "도식 배치(C-8)·출처 번호(채널 순·id 순)·#src-id 앵커·타임라인이 첫 영상 인용 포인트 아래" tests/test_site.py -k "a3_"
+pt F01 "끝 어절 묶기는 원문 어절 단위(43점·\`코드\`조사·==형광==됨에서 마크업 정상), check.py가 깨진 마크업을 잡음" tests/test_site.py -k "f01_"
 pt A4 "확인 필요 표기(C-9 개수, 포인트는 .nb-end 안, 홈 메타 / 확인 필요)" tests/test_site.py -k "a4_"
 
 # ---------- S-3: check.py(정적 + 관문 9 + 동작), 발행 연결 ----------
@@ -55,7 +56,7 @@ for id in A5 A6 A7 A8 A9 A10; do
   if [ -n "$lines" ] && ! echo "$lines" | grep -q '^FAIL'; then pass "$id" "check.py --fixture: $(echo "$lines" | head -1 | cut -c6-200)"; else fail "$id" "check.py --fixture: ${lines:-결과 줄 없음} / $(grep -E '^(FAIL|실패)' "$TMP/check" | head -2 | tr '\n' ' ')"; fi
 done
 if [ "$c_rc" = 0 ]; then pass C-all "check.py --fixture 종료 코드 0(C-3·C-4·C-5·C-6·C-7 포함): $(tail -1 "$TMP/check")"; else fail C-all "check.py --fixture 종료 코드 $c_rc: $(grep -E '^FAIL' "$TMP/check" | head -2 | tr '\n' ' ')"; fi
-pt A12 "발행 연결(export → 빌드 순서), 빌드 실패 시 site/ 바이트 그대로·status 그대로, 깨진 입력·렌더 중 실패에도 site/ 불변(C-10), 정적 검사가 위반을 잡아냄" tests/test_site.py -k "a12_ or c10_ or a5_to_a7"
+pt A12 "발행 연결(export → 빌드 순서), 빌드 실패 시 site/ 바이트 그대로·status 그대로, 깨진 입력·렌더 중 실패에도 site/ 불변(C-10), 정적 검사가 위반을 잡아냄" tests/test_site.py -k "a12_ or c10_ or a5_to_a7 or f12_"
 pt A2b "ops 테스트(publish 순서 변경 반영)" tests/test_ops.py tests/test_ops_publish.py
 pt A-all "S6a 테스트 전체(export·site)" tests/test_export.py tests/test_site.py
 

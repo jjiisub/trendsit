@@ -33,10 +33,13 @@
 - `check.py`의 "예시"·"동작 안 함" 검사는 site.json 본문 문자열을 뺀 화면 문구에만 적용(실제 글에 "예시"가 흔히 나옴)
 - Python 3.12 f-string 문법(따옴표 중첩)을 `build.py`에서 씀. 시스템 `python3`은 3.14라 문제 없음
 - `esc()`는 원문에 이미 들어 있는 `&#x27;` 같은 엔티티를 풀어 한 번만 이스케이프(실데이터에서 그대로 찍히는 것이 보여 고침)
+- 매일 수집의 비용은 `summary_json.cost_usd`, 소스는 `sources.yaml`에 있는 것만(daily 칸 포함), `nightly_failed`는 partial·failed·stopped만
 - ruff는 `docs/reference`(디자인 시안 복사본, E702 등)를 `--extend-exclude`로 뺌(pyproject 변경 없이)
 
 ## 5. 스펙과 다르게 한 것 (모두 명세 갱신은 기획 몫)
-- **`export --with-week`(명세에 없는 옵션 하나)**: `publish`는 status를 'published'로 바꾸기 전에 export·빌드를 돌려야(S6b C-3) 하는데, export는 published 주만 담으므로 아직 `done`인 그 주를 담을 방법이 필요했다. 상태를 먼저 바꿨다 되돌리는 안은 중간에 죽으면 "발행됐는데 사이트에 없음"이 남아 거부했다
+- **발행 직전의 주를 export에 담는 내부 인자(`export.export(db, out, with_week)`)**: `publish`는 status를 바꾸기 전에 export·빌드를 돌려야(S6b C-3) 하는데 export는 published 주만 담는다. 공개 CLI 옵션으로 열면 C-1을 우회할 수 있어(리뷰 F04) CLI에는 두지 않고 `ops.publish`가 함수로 직접 부른다. 결과는 `data/site.json.new`로 받아 그 파일로 빌드하고 성공했을 때만 `data/site.json`으로 바꾼다. 이 때문에 publish의 export는 실행기(runner)를 거치지 않는다
+- **`runs`는 발행 주의 nightly만(C-1 우선)**: 명세 5.1 표의 "`kind='nightly'` 전부"와 C-1("runs는 그 주들 것만")이 충돌해 C-1을 따름. 명세 보완 필요
+- `BUILD_CMD`는 `[sys.executable, "site_src/build.py"]`(run_ops.sh가 `uv run python -m trendsit`으로 부르므로 venv의 3.12). bare `python3`는 launchd 최소 PATH에서 3.9일 수 있어 build.py 문법(3.12)이 안 맞음
 - **기존 테스트 2개 파일 수정**(예산 "변경하는 기존 파일 ≤ 8"에 테스트가 안 세어져 있음): `tests/test_ops.py`·`tests/test_ops_publish.py`가 publish의 호출 순서를 "빌드 1번"으로 단언하고 있어 "export → 빌드"로 고침(약화 아님, 순서를 더 엄격히 확인)
 - 관문 9의 7번(토큰 밖 색)은 `shoot.py`가 허용하던 `rgb(0,0,0)`·흰색 추가를 빼고 tokens.css 색 10개만 허용(통과함)
 

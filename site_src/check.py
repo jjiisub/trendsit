@@ -23,6 +23,7 @@ ROOT = SRC.parent
 FIXTURE = ROOT / "tests" / "fixtures" / "site" / "site.json"
 FORBIDDEN_TEXT = ("동작 안 함", "예시")
 OPS_BANNED = ("button", "form", "input", "select", "textarea")
+VOID = {"meta", "link", "br", "img", "input", "hr", "source"}
 results = []
 
 
@@ -35,9 +36,12 @@ class Page(HTMLParser):
     def __init__(self):
         super().__init__(convert_charrefs=True)
         self.tags, self.links, self.ids, self.titles, self.text, self.classes, self.pn = {}, [], set(), 0, [], [], []
+        self.open, self.mismatch = [], 0  # 태그 중첩 어긋남 수
 
     def handle_starttag(self, tag, attrs):
         a = dict(attrs)
+        if tag not in VOID:
+            self.open.append(tag)
         self.tags[tag] = self.tags.get(tag, 0) + 1
         if "id" in a:
             self.ids.add(a["id"])
@@ -50,6 +54,17 @@ class Page(HTMLParser):
         for k in ("href", "src"):
             if a.get(k) is not None:
                 self.links.append((tag, a.get("rel", ""), k, a[k]))
+
+    def handle_endtag(self, tag):
+        if tag in VOID:
+            return
+        if self.open and self.open[-1] == tag:
+            self.open.pop()
+        else:
+            self.mismatch += 1
+            if tag in self.open:
+                while self.open.pop() != tag:
+                    pass
 
     def handle_data(self, data):
         self.text.append(data)
@@ -75,6 +90,9 @@ def static_checks(site, data, pages):
     check("A7 페이지 존재: 홈, 소스, 키워드, 실행 기록(주차별·이번 주차·1건)",
           all((site / p).exists() for p in ("index.html", "sources/index.html", "keywords/index.html", "runs/index.html", "runs/weeks/index.html"))
           and any(f.parent.parent.parent.name == "runs" for f in files), f"html {len(files)}개")
+    broken = [f"{page_url(site, f)} 중첩 어긋남 {p.mismatch}" for f, p in pages.items() if p.mismatch or p.open]
+    broken += [f"{page_url(site, f)} 본문에 마크업 조각 노출" for f, p in pages.items() if re.search(r'class="|<span|</span', "".join(p.text))]
+    check("M-1 마크업 무결성: 태그 중첩 어긋남 0, 본문 글자에 class=·<span 노출 0", not broken, "; ".join(broken[:3]))
     # C-3 내부 링크의 대상 파일·앵커
     bad = []
     for f, p in pages.items():
@@ -95,6 +113,10 @@ def static_checks(site, data, pages):
     weeks = data["weeks"]
     oldest = site / "week" / weeks[-1]["id"] / "index.html"
     first = [oldest] + ([site / "index.html"] if len(weeks) == 1 else [])
+    absent = [f"{page_url(site, f)}" for f in [*first, *(site / "week" / w["id"] / "index.html" for w in weeks), *(site / "topic" / t["id"] / "index.html" for t in data["topics"])] if f not in pages]
+    if absent:  # site.json과 site/가 어긋남(예: 발행 중 실패로 한쪽만 바뀜): 트레이스백 대신 실패로 기록
+        check("A5 링크 규칙", False, f"data에는 있고 site/에는 없는 페이지: {', '.join(absent[:3])}")
+        return
     ok1 = all("지난 주차" not in "".join(pages[f].text) for f in first)
     ok2 = all(any(h == f'/week/{weeks[i + 1]["id"]}/' for _, _, _, h in pages[site / "week" / w["id"] / "index.html"].links)
               for i, w in enumerate(weeks[:-1]))
@@ -189,9 +211,10 @@ def pick_pages(data):
     most = max(ts, key=lambda t: len(t["sources"]))
     pages = [{"name": "home", "path": "/"}]
     pages += [{"name": f'topic {t["id"]}', "path": f'/topic/{t["id"]}/', "topic": True, "longTopic": t is most} for t in chosen]
-    run = next(r for r in data["runs"] if r["kind"] == "weekly" and r.get("week"))
-    pages += [{"name": "sources", "path": "/sources/"}, {"name": "keywords", "path": "/keywords/"},
-              {"name": "run", "path": f'/runs/{run["week"]}/{run["id"]}/'}]
+    run = next((r for r in data["runs"] if r["kind"] == "weekly" and r.get("week")), None)
+    pages += [{"name": "sources", "path": "/sources/"}, {"name": "keywords", "path": "/keywords/"}]
+    if run:
+        pages.append({"name": "run", "path": f'/runs/{run["week"]}/{run["id"]}/'})
     return pages
 
 
@@ -274,8 +297,11 @@ def main():
         else:
             data = json.loads(data_path.read_text(encoding="utf-8"))
             pages = {f: parse(f) for f in sorted(site.rglob("*.html"))}
-            static_checks(site, data, pages)
-            browser_checks(site, data)
+            for step in (lambda: static_checks(site, data, pages), lambda: browser_checks(site, data)):
+                try:
+                    step()
+                except Exception as e:  # noqa: BLE001 - 어긋난 입력에서도 트레이스백 대신 실패 목록으로
+                    check("검사 실행", False, f"{type(e).__name__}: {e}")
     finally:
         if tmp:
             shutil.rmtree(tmp, ignore_errors=True)

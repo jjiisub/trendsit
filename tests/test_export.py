@@ -54,6 +54,8 @@ def make_db(tmp_path: Path, published: tuple[str, ...] = ("2026-W41",)) -> DB:
     INSERT INTO sources(id, channel, kind, name, feed, enabled, config_json) VALUES
       ('geeknews','text','curation','GeekNews','https://news.hada.io/rss','1','{"note":"큐레이션"}'),
       ('github_trending','github','trending','GitHub Trending','https://github.com/trending?since=weekly','1','{"url":"https://github.com/trending"}');
+    INSERT INTO sources(id, channel, kind, name, feed, enabled, config_json) VALUES
+      ('ghost','text','curation','yaml에 없는 소스','https://ghost.example/rss','1','{}');
     INSERT INTO items(id, source_id, channel, external_id, url, title, day, week) VALUES
       (1,'geeknews','text','e1','https://example.com/1','글 하나','2026-10-06','2026-W41'),
       (2,'geeknews','text','e2','https://example.com/2','글 둘','2026-10-07','2026-W41'),
@@ -86,6 +88,12 @@ def make_db(tmp_path: Path, published: tuple[str, ...] = ("2026-W41",)) -> DB:
                   (run, 2, "2026-10-12T07:11:00+09:00", "critic", "llm", "1차 반려", 1,
                    json.dumps({"draft": "초안", "evidence": "근거", "fixed": "수정"}, ensure_ascii=False)))
     c.execute("INSERT INTO runs(id, kind, spec, started_at, finished_at, status, summary_json) VALUES "
+              "('n-skip','nightly','RUN-2026-W41','2026-10-08T02:00:00+09:00','2026-10-08T02:00:01+09:00','skipped',?)",
+              (json.dumps({"days": [], "steps": [], "cost_usd": 0.0}),))
+    c.execute("INSERT INTO runs(id, kind, spec, started_at, finished_at, status, summary_json) VALUES "
+              "('n-w42','nightly','RUN-2026-W42','2026-10-14T02:00:00+09:00','2026-10-14T02:06:00+09:00','ok',?)",
+              (json.dumps({"days": ["2026-10-13"], "steps": [], "cost_usd": 0.0}),))  # 발행 안 된 주의 nightly
+    c.execute("INSERT INTO runs(id, kind, spec, started_at, finished_at, status, summary_json) VALUES "
               "('n1','nightly','RUN-2026-W41','2026-10-07T02:00:00+09:00','2026-10-07T02:06:00+09:00','partial',?)",
               (json.dumps({"days": ["2026-10-06"], "cost_usd": 0.1, "steps": [
                   {"name": "collect", "day": None, "exit": 0, "sec": 3.2},
@@ -117,7 +125,7 @@ def test_a1_structure_and_only_published(tmp_path):
     # C-1: 발행 주(W41)만. W40 주·토픽·레포·실행은 없음
     assert [w["id"] for w in site["weeks"]] == ["2026-w41"]
     assert {t["week"] for t in site["topics"]} == {"2026-w41"} and {r["week"] for r in site["repos"]} == {"2026-w41"}
-    assert {r["id"] for r in site["runs"]} == {"n1", "r41"}
+    assert {r["id"] for r in site["runs"]} == {"n1", "n-skip", "r41"}  # 발행 안 된 주(W42)의 nightly(n-w42)는 C-1에 따라 뺀다
     w = site["weeks"][0]
     assert w == {"id": "2026-w41", "label": "10월 2주차", "range": "10.5 ~ 10.11", "start": "2026-10-05", "end": "2026-10-11",
                  "published_at": "2026-10-12T07:10:00+09:00", "collected": {"text": 2, "video": 0, "github": 0},
@@ -130,7 +138,9 @@ def test_a1_structure_and_only_published(tmp_path):
         assert all(p["refs"] and set(p["refs"]) <= ids for p in x["points"])
     assert [(r["name"], r["stars_7d"], r["signal"], r["what"], r["topic_id"]) for r in site["repos"]] == [
         ("a/b", "+1.6k", "release", "에이비 도구", "w41-a")]
+    assert "ghost" not in {s["id"] for s in site["sources"]}  # sources.yaml에 없는 소스는 제외
     gk = next(s for s in site["sources"] if s["id"] == "geeknews")
+    assert gk["daily"] == {"2026-w41": [0, 1, 1, 0, 0, 0, 0]}  # 10.6(화), 10.7(수)
     assert gk["weeks"] == {"2026-w41": {"collected": 2, "failed_days": 1, "used_in_topics": 2}}
     assert gk["last"] == {"at": "2026-10-07T02:00:00+09:00", "count": 0, "status": "failed"} and gk["last_error"] == "시간 초과"
     assert gk["note"] == "큐레이션" and gk["enabled"] is True
@@ -144,8 +154,8 @@ def test_a1_structure_and_only_published(tmp_path):
     assert [s["role"] for s in run["steps"]] == ["writer", "critic"] and run["steps"][1]["attention"] is True
     assert run["steps"][1]["detail"]["draft"] == "초안" and "detail" not in run["steps"][0]
     night = next(r for r in site["runs"] if r["id"] == "n1")
-    assert night["week"] == "2026-w41" and night["summary"] == "날 1개, 단계 2개 중 실패 1개" and night["steps"][1] == {"role": "plan", "text": "2026-10-06 계획 실패", "attention": True}
-    assert site["run_weeks"] == [{"week": "2026-w41", "label": "10월 2주차", "range": "10.5 ~ 10.11", "nightly": 1, "nightly_failed": 1,
+    assert night["cost_usd"] == 0.1 and night["week"] == "2026-w41" and night["summary"] == "날 1개, 단계 2개 중 실패 1개"  # 비용은 summary_json 값 and night["steps"][1] == {"role": "plan", "text": "2026-10-06 계획 실패", "attention": True}
+    assert site["run_weeks"] == [{"week": "2026-w41", "label": "10월 2주차", "range": "10.5 ~ 10.11", "nightly": 2, "nightly_failed": 1,  # 건너뜀(skipped)은 실패로 세지 않음
                                   "collected": 2, "candidates": 9, "published": 2, "rejected": 1, "needs_check": 1}]
 
 
@@ -175,11 +185,11 @@ def test_a1_cli_exit_codes(tmp_path, monkeypatch):
 
     monkeypatch.setattr("trendsit.core.db.open_db", lambda *a, **k: make_db(tmp_path))
     out = tmp_path / "o" / "site.json"
-    assert cmd_export(SimpleNamespace(out=str(out), with_week=None)) == 0 and out.exists()
+    assert cmd_export(SimpleNamespace(out=str(out))) == 0 and out.exists()
     (tmp_path / "e").mkdir()
     monkeypatch.setattr("trendsit.core.db.open_db", lambda *a, **k: DB(tmp_path / "e" / "empty.db"))
     out2 = tmp_path / "o2.json"
-    assert cmd_export(SimpleNamespace(out=str(out2), with_week=None)) == 1 and not out2.exists()
+    assert cmd_export(SimpleNamespace(out=str(out2))) == 1 and not out2.exists()
 
 
 # ---------- A2 ----------
@@ -200,13 +210,26 @@ def test_a2_stars_text():
 
 
 # ---------- A11 ----------
+def monthly():
+    from trendsit.collect.github import parse_trending
+
+    html = (ROOT / "tests/fixtures/site/trending_monthly.html").read_text(encoding="utf-8")  # 실제 월간 페이지에서 저장한 앞 13행
+    return html, [r["full_name"] for r in parse_trending(html)]
+
+
+def counts(db):
+    return [db.conn.execute(f"SELECT COUNT(*) FROM {t}").fetchone()[0] for t in ("runs", "repo_trending", "repos", "repo_oneliners")]
+
+
 def test_a11_trending_monthly_approx(tmp_path):
     tm = _spec("scripts/trending_monthly.py", "trending_monthly")
-    html = (ROOT / "tests/fixtures/site/trending_monthly.html").read_text(encoding="utf-8")
+    html, names13 = monthly()
+    assert len(names13) == 13
     db = make_db(tmp_path, published=("2026-W40", "2026-W41"))
-    # 다른 주(W41)에 이미 있는 m2, m5는 뺀다
-    for name in ("org2/m2", "org5/m5"):
+    # 대상 주(W40) 뒤의 주(W41)에 이미 있는 두 레포는 뺀다. 앞선 주(W39)에 있는 레포는 빼지 않는다
+    for name in (names13[1], names13[4]):
         db.conn.execute("INSERT INTO repo_trending(week, full_name, rank, run_id) VALUES ('2026-W41',?,9,'x')", (name,))
+    db.conn.execute("INSERT INTO repo_trending(week, full_name, rank, run_id) VALUES ('2026-W39',?,9,'x')", (names13[0],))
     db.conn.commit()
     calls = []
 
@@ -214,32 +237,50 @@ def test_a11_trending_monthly_approx(tmp_path):
         calls.append(url)
         return html, None
 
-    code, names = tm.run(db, "2026-W40", fetch)
+    code, todo = tm.run(db, "2026-W40", fetch)
     rows = db.conn.execute("SELECT * FROM repo_trending WHERE week='2026-W40' ORDER BY rank").fetchall()
+    want = [n for i, n in enumerate(names13) if i not in (1, 4)][:10]
     assert code == 0 and len(calls) == 1 and calls[0].endswith("since=monthly")
     assert len(rows) == 10 and [r["rank"] for r in rows] == list(range(1, 11))
-    assert [r["full_name"] for r in rows] == names == [f"org{i}/m{i}" for i in (1, 3, 4, 6, 7, 8, 9, 10, 11, 12)]
-    assert all(r["stars_this_week"] is None for r in rows) and rows[0]["stars_total"] == 1234
+    assert [r["full_name"] for r in rows] == todo == want and want[0] == names13[0]
+    assert all(r["stars_this_week"] is None for r in rows) and rows[0]["stars_total"] > 0
     note = db.conn.execute("SELECT kind, note FROM runs WHERE id=?", (rows[0]["run_id"],)).fetchone()
     assert tuple(note) == ("collect", "trending monthly approx")
-    # 두 번 실행해도 행 수 같음(받지도 않음)
-    assert tm.run(db, "2026-W40", fetch) == (0, []) and len(calls) == 1
-    assert db.conn.execute("SELECT COUNT(*) FROM repo_trending WHERE week='2026-W40'").fetchone()[0] == 10
-    # export: trending_approx, 별 없이(stars_7d null), 한 줄 설명이 있는 레포만
-    for name, one in (("org1/m1", "하나"), ("org3/m3", "셋")):
-        db.conn.execute("INSERT INTO repo_oneliners VALUES (?,?,?,?,?)", (name, "h", json.dumps({"oneliner": one}), "m", "2026-10-11"))
+    # 두 번 실행해도 행 수 같음(받지도 않음). oneliner가 없는 레포는 계속 돌려준다
+    before = counts(db)
+    assert tm.run(db, "2026-W40", fetch) == (0, want) and len(calls) == 1 and counts(db) == before
+    # 일부만 oneliner가 채워진 뒤 다시 돌리면 나머지만 돌려줌(중간 실패 복구)
+    for name in want[:3]:
+        db.conn.execute("INSERT INTO repo_oneliners VALUES (?,?,?,?,?)", (name, "h", json.dumps({"oneliner": f"{name} 설명"}), "m", "2026-10-11"))
     db.conn.commit()
+    assert tm.run(db, "2026-W40", fetch) == (0, want[3:])
+    # export: trending_approx, 별 없이(stars_7d null), 한 줄 설명이 있는 레포만
     site = build(db)
     w40 = next(w for w in site["weeks"] if w["id"] == "2026-w40")
     assert w40["trending_approx"] is True and not next(w for w in site["weeks"] if w["id"] == "2026-w41")["trending_approx"]
     r40 = [r for r in site["repos"] if r["week"] == "2026-w40" and not r["topic_id"]]  # 토픽 근거 레포(a/b)는 따로 포함
-    assert [(r["name"], r["stars_7d"], r["what"]) for r in r40] == [("org1/m1", None, "하나"), ("org3/m3", None, "셋")]
+    assert [(r["name"], r["stars_7d"]) for r in r40] == [(n, None) for n in want[:3]]
 
 
-def test_a11_failure_leaves_db_unchanged(tmp_path):
+def test_a11_failure_leaves_db_unchanged(tmp_path, monkeypatch):
     tm = _spec("scripts/trending_monthly.py", "trending_monthly2")
     db = make_db(tmp_path)
-    before = [db.conn.execute(f"SELECT COUNT(*) FROM {t}").fetchone()[0] for t in ("runs", "repo_trending", "repos")]
+    before = counts(db) + [db.conn.execute("SELECT COUNT(*) FROM runs WHERE kind='role'").fetchone()[0]]
+
+    def snap():
+        return counts(db) + [db.conn.execute("SELECT COUNT(*) FROM runs WHERE kind='role'").fetchone()[0]]
+
     for result in ((None, "HTTP 500"), ("<html>빈 페이지</html>", None)):
         assert tm.run(db, "2026-W40", lambda url, r=result: r) == (1, [])
-    assert [db.conn.execute(f"SELECT COUNT(*) FROM {t}").fetchone()[0] for t in ("runs", "repo_trending", "repos")] == before
+        assert snap() == before
+        # main()도: 받기 실패면 LLM 실행 기록(runs 행)을 만들지 않고 종료 1
+        monkeypatch.setattr("trendsit.core.db.open_db", lambda *a, **k: db)
+        monkeypatch.setattr("trendsit.core.context.open_ctx", lambda *a, **k: pytest.fail("open_ctx를 부르면 안 됨"))
+        assert tm.main(["--week", "2026-W40"], fetch=lambda url, r=result: r) == 1
+        assert snap() == before
+    # 저장 도중 실패하면 runs 행도 남지 않음(한 트랜잭션)
+    html, _ = monthly()
+    db.conn.execute("CREATE TRIGGER boom BEFORE INSERT ON repo_trending BEGIN SELECT RAISE(ABORT, 'x'); END")
+    with pytest.raises(Exception, match="x"):
+        tm.run(db, "2026-W40", lambda url: (html, None))
+    assert snap() == before

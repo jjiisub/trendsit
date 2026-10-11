@@ -14,7 +14,6 @@ import pytest
 
 from tests.test_export import make_db
 from trendsit import ops
-from trendsit.export import export
 
 ROOT = Path(__file__).resolve().parents[1]
 BUILD = ROOT / "site_src" / "build.py"
@@ -197,31 +196,98 @@ def test_c10_bad_input_keeps_site_untouched(site, tmp_path):
 
 def test_a12_publish_runs_export_then_build_and_failure_keeps_site(tmp_path):
     db = make_db(tmp_path, published=())
-    site_dir, data = tmp_path / "site", tmp_path / "site.json"
+    site_dir, data = tmp_path / "site", tmp_path / "site.json"  # data = DB와 같은 폴더의 site.json(= publish가 쓰는 위치)
     calls: list[str] = []
     corrupt = {"on": False}
 
     def runner(cmd):
-        if cmd[: len(ops.EXPORT_CMD)] == ops.EXPORT_CMD:
-            calls.append("export")
-            export(db, data, cmd[-1])
-            if corrupt["on"]:
-                data.write_text("{ 깨짐", encoding="utf-8")
-            return 0, "", ""
-        assert cmd == ops.BUILD_CMD
-        calls.append("build")
-        r = run_build(data, site_dir)
+        assert cmd[: len(ops.BUILD_CMD)] == ops.BUILD_CMD and cmd[-2] == "--data"
+        calls.append("build:" + Path(cmd[-1]).name)
+        assert Path(cmd[-1]).is_file()  # export가 먼저 끝나 있음
+        if corrupt["on"]:
+            Path(cmd[-1]).write_text("{ 깨짐", encoding="utf-8")
+        r = run_build(Path(cmd[-1]), site_dir)
         return r.returncode, r.stdout, r.stderr
 
     assert ops.publish(db, "2026-W41", runner) == 0
-    assert calls == ["export", "build"]
+    assert calls == ["build:site.json.new"] and ops.BUILD_CMD[0] == sys.executable  # 시스템 python3가 아니라 trendsit을 부른 python
     row = db.conn.execute("SELECT status, published_at FROM weeks WHERE week='2026-W41'").fetchone()
     assert row["status"] == "published" and (site_dir / "week/2026-w41/index.html").is_file()
     assert (site_dir / "topic/w41-a/index.html").is_file()
-    before = tree_hash(site_dir)
-    # 다음 주 발행에서 build가 실패하면: site/ 바이트 그대로, 상태 그대로(done)
+    assert [w["id"] for w in json.loads(data.read_text(encoding="utf-8"))["weeks"]] == ["2026-w41"] and not (tmp_path / "site.json.new").exists()
+    before, data_before = tree_hash(site_dir), data.read_bytes()
+    # 다음 주 발행에서 build가 실패하면: site/ 바이트 그대로, 상태 그대로(done), data/site.json에 미발행 주가 남지 않음
     corrupt["on"] = True
     assert ops.publish(db, "2026-W40", runner) == 1
-    assert tree_hash(site_dir) == before
+    assert tree_hash(site_dir) == before and data.read_bytes() == data_before and not (tmp_path / "site.json.new").exists()
     assert db.conn.execute("SELECT status FROM weeks WHERE week='2026-W40'").fetchone()[0] == "done"
-    assert calls == ["export", "build", "export", "build"]
+    assert calls == ["build:site.json.new"] * 2
+
+
+# ---------- F01 끝 어절 묶기: 원문 어절 단위 ----------
+def load_build():
+    sys.path.insert(0, str(ROOT / "site_src"))
+    import build as b
+
+    return b
+
+
+@pytest.mark.parametrize("raw,expect", [
+    ("AAII 벤치마크 43점", '<span class="nb">AAII</span> 벤치마크 <span class="nb-end"><span class="nb">43</span>점&nbsp;T</span>'),
+    ("설치는 `uv`로", '설치는 <span class="nb-end"><code class="ic">uv</code>로&nbsp;T</span>'),
+    ("처리량이 ==2배 늘어==됨", '처리량이 <span class="nb-end"><mark class="hl">2배 늘어</mark>됨&nbsp;T</span>'),
+    ("정확도 ==93.5%==가", '정확도 <span class="nb-end"><mark class="hl"><span class="nb">93.5%</span></mark>가&nbsp;T</span>'),
+    ("성능이 더 큼", '성능이 <span class="nb-end">더 큼&nbsp;T</span>'),  # 한 음절이면 앞 어절까지
+    ("한 단어", '한 <span class="nb-end">단어&nbsp;T</span>'),
+    ("==아주 긴 형광 구절이 끝까지 이어지는 문장 끝부분==", '<mark class="hl">아주 긴 형광 구절이 끝까지 이어지는 문장 끝부분</mark><span class="nb-end">&nbsp;T</span>'),  # 24자 넘으면 인용만
+])
+def test_f01_with_end_uses_raw_words(raw, expect):
+    assert load_build().with_end(raw, "T") == expect
+
+
+def test_f01_no_broken_markup_in_real_shaped_points(site):
+    html = (site / "topic/w41-mid/index.html").read_text(encoding="utf-8")
+    assert not re.search(r"<\w+ <", html) and 'class="nb">' not in re.sub(r"<[^>]+>", "", html)
+    assert ChkWalk(html).stack == []  # 태그가 어긋나면 스택이 비지 않음
+    assert '<span class="nb-end"><span class="nb">43</span>점&nbsp;' in html
+
+
+def test_f01_checker_catches_broken_markup(site, tmp_path):
+    import contextlib
+    import io
+    import shutil
+
+    sys.path.insert(0, str(ROOT / "site_src"))
+    import check
+
+    bad = tmp_path / "site"
+    shutil.copytree(site, bad)
+    f = bad / "topic/w41-mid/index.html"
+    f.write_text(f.read_text(encoding="utf-8").replace('<span class="nb-end"><span class="nb">43</span>', '<span <span class="nb-end">class="nb">43</span>'), encoding="utf-8")  # 옛 with_end가 만들던 깨진 모양
+    check.results.clear()
+    pages = {p: check.parse(p) for p in sorted(bad.rglob("*.html"))}
+    with contextlib.redirect_stdout(io.StringIO()):
+        check.static_checks(bad, json.loads(FIXTURE.read_text(encoding="utf-8")), pages)
+    assert [n.split()[0] for n, ok, _ in check.results if not ok] == ["M-1"]
+
+
+# ---------- F12 두 번째 rename 실패 시 이전 사이트 복구 ----------
+def test_f12_second_rename_failure_restores_old_site(tmp_path, monkeypatch):
+    b = load_build()
+    out = tmp_path / "site"
+    assert b.build(FIXTURE, out) > 0
+    before = tree_hash(out)
+    real = Path.rename
+    calls = {"n": 0}
+
+    def flaky(self, target):
+        calls["n"] += 1
+        if calls["n"] == 2:
+            raise OSError("두 번째 rename 실패")
+        return real(self, target)
+
+    monkeypatch.setattr(Path, "rename", flaky)
+    with pytest.raises(OSError):
+        b.build(FIXTURE, out)
+    monkeypatch.undo()
+    assert tree_hash(out) == before and [p.name for p in tmp_path.iterdir()] == ["site"]
