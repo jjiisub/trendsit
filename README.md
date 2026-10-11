@@ -3,9 +3,9 @@
 > 글, 유튜브 발표 영상, GitHub 트렌드를 매주 모아 **출처가 달린 기술 동향 브리핑**을 만드는 개인용 AI 에이전트. 매주 여러 곳을 돌며 확인하던 시간을 한 페이지로 줄인다.
 
 [![CI](https://github.com/jjiisub/trendsit/actions/workflows/ci.yml/badge.svg)](https://github.com/jjiisub/trendsit/actions/workflows/ci.yml)
-[예시 사이트](https://trendsit.jiseop.com) · 위키(준비 중) · [프로젝트 맥락](docs/CONTEXT.md)
+[사이트](https://trendsit.jiseop.com) · 위키(준비 중) · [프로젝트 맥락](docs/CONTEXT.md)
 
-> 현재 상태(2026-10-11): **S0~S5 구현 완료(S5 병합).** 글 6곳·유튜브·GitHub 트렌딩 수집, 글 1차 요약과 원본 추적, 레포 분석, 영상 전사와 슬라이드 판독까지 동작한다. 수집은 임시 예약(`com.trendsit.collect-temp`)으로 돌고 있고, S6b의 launchd(`com.trendsit.nightly`·`weekly`)로 바꾸는 것은 사용자가 "자동 실행"대로 등록할 때다. 주간 브리핑(묶기 → 편집장 선별 → 작성자 ⇄ 코드 검사·검수자 → 저장)은 `weekly` 명령으로 돈다. W40·W41 결과는 `reports/S5_brief/briefing_<주>.md`(읽기본)에서 볼 수 있고, 사이트 연결은 S6. **S5-1a 정리 반영**(예산 초과 시 멈춤·종료 코드 1, `read_more` 조회 열쇠, 효과 없는 설정 키·죽은 코드 삭제, 프롬프트·코드 검사 결과 불변, 리뷰 대기). **S5-1b 단순화 반영**(코드 검사 규칙을 넓고 자주 걸리는 것만 남기고 지엽 규칙은 역할 md로, 중복 코드·중복 md 문장 정리, 작성자 입력 `limits`, 긴 함수 쪼개기. W40·W41 재실행 관문 B 근거 충실성 20/20·오병합 0, 리뷰 대기. 편집장 영상 자리 불안정은 리뷰 확인 항목). 예시 사이트는 예시 데이터로 만든 화면이다. **S6b 자동 실행 구현**(`ops nightly`·`ops weekly`·`publish`, main 전용 실행 폴더, launchd 두 개 plist, 임시 수집 예약 대체. launchd 등록은 아래 "자동 실행"대로 사용자가).
+> 현재 상태(2026-10-11): **S0~S5 구현 완료(S5 병합).** 글 6곳·유튜브·GitHub 트렌딩 수집, 글 1차 요약과 원본 추적, 레포 분석, 영상 전사와 슬라이드 판독까지 동작한다. 수집은 임시 예약(`com.trendsit.collect-temp`)으로 돌고 있고, S6b의 launchd(`com.trendsit.nightly`·`weekly`)로 바꾸는 것은 사용자가 "자동 실행"대로 등록할 때다. 주간 브리핑(묶기 → 편집장 선별 → 작성자 ⇄ 코드 검사·검수자 → 저장)은 `weekly` 명령으로 돈다. W40·W41 결과는 `reports/S5_brief/briefing_<주>.md`(읽기본)에서 볼 수 있고, 사이트 연결은 S6. **S5-1a 정리 반영**(예산 초과 시 멈춤·종료 코드 1, `read_more` 조회 열쇠, 효과 없는 설정 키·죽은 코드 삭제, 프롬프트·코드 검사 결과 불변, 리뷰 대기). **S5-1b 단순화 반영**(코드 검사 규칙을 넓고 자주 걸리는 것만 남기고 지엽 규칙은 역할 md로, 중복 코드·중복 md 문장 정리, 작성자 입력 `limits`, 긴 함수 쪼개기. W40·W41 재실행 관문 B 근거 충실성 20/20·오병합 0, 리뷰 대기. 편집장 영상 자리 불안정은 리뷰 확인 항목). **S6a 사이트 구현**(`export`로 DB → `data/site.json`, 디자인 시스템 v1로 홈·주차·토픽·소스·키워드·실행 기록을 빌드, `publish`가 export → 빌드, `site_src/check.py`로 관문 9 검증. 실제 데이터 발행은 런 뒤 단계). **S6b 자동 실행 구현**(`ops nightly`·`ops weekly`·`publish`, main 전용 실행 폴더, launchd 두 개 plist, 임시 수집 예약 대체. launchd 등록은 아래 "자동 실행"대로 사용자가).
 
 ## 1. 왜 만들었나
 - 개발자로 일하며 새 기술을 따라가려면 블로그, 뉴스, 발표 영상, GitHub를 매주 따로 돌아야 했다(주 3시간 안팎)
@@ -97,11 +97,21 @@ launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.trendsit.weekly.plis
 - 로그: `data/logs/ops/<날짜>-nightly.log`, `<날짜>-weekly.log`(단계 출력 전체), `data/logs/ops/launchd.log`. 단계별 종료 코드·시간·오류는 실행 기록의 `runs.summary_json`(`kind='nightly'`)
 - 종료 코드: 0 성공, 1 단계 실패(나머지 단계는 계속 돔), 2 거부(발행된 주의 `weekly`·`cluster`, 발행 대상이 아닌 주, 어제 이후 날의 `ops nightly --day`), 3 잠금을 못 얻음·실행 폴더가 main 아님(다음 예약이 다시 시도)
 - 손 실행: `uv run python -m trendsit ops nightly [--day 2026-10-12]`, `ops weekly [--week 2026-W42]`, `publish --week 2026-W42`. 실패한 날은 자동 재시도하지 않으니 `ops nightly --day D`로 다시. 발행된 주를 다시 쓰려면 `weekly --week W --force` 뒤 `publish --week W`
+### 사이트 (S6a)
+발행된(`published`) 주만 사이트에 나온다. `publish --week W`가 `export`(DB → `data/site.json`) → `site_src/build.py`(→ `site/`) 순서로 부르고, 둘 중 하나가 실패하면 상태를 바꾸지 않는다. 빌드는 임시 폴더에 다 만든 뒤 `site/`를 한 번에 바꿔 실패해도 이전 사이트가 그대로 나간다. 글꼴은 Pretendard 400·500을 직접 호스팅하고 CSS는 내용 해시가 붙은 파일 하나다(사이트에 JS 없음, 외부 요청 없음). 디자인 규칙은 `docs/reference/s6_design/DESIGN.md`.
+```bash
+uv run python -m trendsit export [--out data/site.json]     # 발행된 주만. published 주가 없거나 출처 번호가 어긋나면 종료 1(기존 파일 유지)
+uv run python site_src/build.py [--data data/site.json] [--out site]   # 표준 라이브러리만
+uv run python site_src/check.py [--fixture]                      # 정적 검사 + 관문 9(Chromium·WebKit) + 동작. 인자 없으면 site/(실데이터), --fixture는 픽스처 빌드
+uv run python scripts/trending_monthly.py --week 2026-W40   # W40 월간 트렌딩 근사 목록(1회, repo_oneliner 약 $0.01)
+```
+브라우저 측정은 전역 playwright-core(`@playwright/cli`에 포함)와 Node로 한다. 못 찾으면 브라우저 항목은 건너뛰지 않고 실패한다.
+
 그 밖의 명령: 수집 항목 보기 `items [--week 2026-W40] [--status pass]`, 기록된 호출 다시 실행 `role --replay <step_id> [--model 별칭]`, 평가 `eval <역할> [--model 별칭]`, 실행 기록 보기 `trace <run_id>`. 전체 명령표와 동작 방식은 [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
 
 ## 5. 사용 예시 / 결과물
 - 지금 나오는 것: 레포 한 줄 설명. 예) `encode/httpx` → "Python용 동기·비동기 API와 HTTP/2 지원, 내장 CLI를 갖춘 HTTP 클라이언트 라이브러리"
-- 최종 결과물(주간 브리핑)의 모습은 [예시 사이트](https://trendsit.jiseop.com)에서 볼 수 있다(예시 데이터). 실제 브리핑은 S5 이후
+- 최종 결과물(주간 브리핑)은 [사이트](https://trendsit.jiseop.com)에서 본다(발행된 주만)
 
 ## 6. 성과와 평가
 스펙마다 갱신한다. 품질은 `eval`의 코드 채점 + LLM 채점(judge), 비용은 `cost` 기준.
@@ -153,8 +163,8 @@ scripts/     관문 A 확인 스크립트(verify_s<n>.sh) 등
 ops/         자동 실행 launchd plist(ops/launchd/). 실행 래퍼와 폴더 준비는 scripts/run_ops.sh, setup_run_worktree.sh
 reports/     스펙별 리포트와 품질 리포트
 docs/        CONTEXT(전체 맥락), handoff(스펙), reference(에이전트 명세 등)
-site_src/    예시 사이트 빌드 코드
-data/        실행 기록 DB, 캐시(git 제외), 예시 사이트 데이터(출력 계약)
+site_src/    사이트 빌드(build.py), 검증(check.py, gate.js), 디자인 CSS·글꼴(static/fonts), 예시 데이터(example/)
+data/        실행 기록 DB, 캐시, export 결과(site.json)(git 제외)
 ```
 
 ## 10. 로드맵 / 한계
@@ -165,7 +175,7 @@ data/        실행 기록 DB, 캐시(git 제외), 예시 사이트 데이터(�
 - [x] S4 영상 분석가(로컬 전사 + 슬라이드 판독, 맥)
 - [x] S5 주간 브리핑: 묶기, 선별, 작성 ⇄ 검수(관문 B 잠정, 근거 충실성 3토픽 미달)
 - [x] S6b 자동 실행: 매일 02:00 분석, 월 07:00 브리핑·발행, main 전용 실행 폴더(launchd 등록은 사용자)
-- [ ] S6a 공개: 사이트를 실제 데이터로 연결(export, 도식 렌더)
+- [x] S6a 사이트: DB → export → 디자인 시스템 v1 빌드, publish 연결(실제 발행은 런 뒤 단계)
 - [ ] 9주차 이후: 로컬 모델 전환, 자연어 추적 관리, 쌓인 브리핑 Q&A
 
 알려진 한계

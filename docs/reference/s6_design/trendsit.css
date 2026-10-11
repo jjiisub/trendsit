@@ -1,0 +1,240 @@
+/* TrendsIT 컴포넌트 v1 (S6). tokens.css 다음에 불러온다. 정적 HTML + CSS, JS 없음.
+   순서: 기본 → 조판 유틸 → 레이아웃·내비 → 홈(주차 머리, 탭, 토픽 목록, 레포 목록) → 토픽(머리, 섹션, 포인트, 인용·툴팁, 도식, 개념, 출처, 이전·다음, 미니 바) → 관리(밀도 높은 표 등) */
+
+/* ---------- 기본 ---------- */
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--c-bg);color:var(--c-text);font-family:var(--font);font-size:var(--fs-base);font-weight:var(--fw-regular);
+  line-height:var(--lh-body);letter-spacing:0;word-break:keep-all;overflow-wrap:anywhere}
+a{color:inherit;text-decoration:underline;text-decoration-color:var(--c-line-strong);text-underline-offset:3px;text-decoration-thickness:1px}
+a:hover{text-decoration-color:var(--c-text)}
+:focus-visible{outline:2px solid var(--c-title);outline-offset:2px;border-radius:2px}
+ol,ul{list-style:none}
+h1,h2,h3,h4,.ttl{color:var(--c-title);font-weight:var(--fw-regular);word-break:keep-all;text-wrap:balance;overflow-wrap:break-word}
+
+/* ---------- 조판 유틸 ---------- */
+.nb,.nb-end{white-space:nowrap}             /* 숫자·영문 토큰, 마지막 어절 + 인용 번호 */
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.meta{color:var(--c-muted);font-size:var(--fs-sm);font-variant-numeric:tabular-nums}
+.sep{color:var(--c-muted)}                  /* 메타 구분자 " / " */
+mark.hl{background:linear-gradient(transparent 56%,var(--c-hl) 56%);color:inherit;font-weight:inherit;padding:0 1px;
+  word-break:keep-all;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+code.ic{font-family:inherit;font-size:.94em;background:var(--c-track);border-radius:var(--radius-s);padding:0 var(--sp-1);white-space:nowrap}
+.check{display:inline-block;font-size:var(--fs-xs);line-height:20px;padding:0 var(--sp-2);border:1px solid var(--c-muted);
+  border-radius:var(--radius-s);color:var(--c-title);white-space:nowrap}
+.ts,.ov,.pt-x,.it-s,.cc dd,.cb dd{text-wrap:pretty}
+
+/* ---------- 레이아웃·상단 내비 ---------- */
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 var(--gutter)}
+.nav{display:flex;gap:var(--sp-5);align-items:center;padding-top:var(--sp-3);font-size:var(--fs-ui)}
+.nav a{display:inline-flex;align-items:center;min-height:var(--target-lg);text-decoration:none;color:var(--c-muted)}
+.nav a:hover{color:var(--c-title)}
+.nav a[aria-current]{color:var(--c-title);box-shadow:inset 0 -2px 0 var(--c-title)}
+.nav .wordmark{font-size:var(--fs-lg);margin-right:auto} /* 워드마크는 내비와 같은 회색: 브랜드보다 내용이 먼저 */
+
+/* ---------- 홈: 주차 머리 ---------- */
+.whead{padding:var(--sp-6) 0 var(--sp-3)}
+.wtitle{font-size:var(--fs-3xl);line-height:var(--lh-tight);font-weight:var(--fw-medium);font-variant-numeric:tabular-nums}
+.whead .meta{margin-top:var(--sp-1)}
+.prev{color:var(--c-muted)}
+.foot{margin-top:var(--sp-10);padding:var(--sp-4) 0 var(--sp-10);border-top:1px solid var(--c-line);display:grid;gap:var(--sp-1)}
+
+/* ---------- 홈: 탭(토픽 / 트렌딩 레포). :target + :has, JS 없음 ---------- */
+.tabs{display:flex;gap:var(--sp-1);position:sticky;top:0;z-index:var(--z-tabs);background:var(--c-bg);border-bottom:1px solid var(--c-line);
+  margin:var(--sp-3) calc(-1 * var(--gutter)) 0;padding:0 var(--gutter)}
+.tabs a{display:inline-flex;align-items:center;min-height:var(--target-lg);padding:0 var(--sp-3);text-decoration:none;color:var(--c-muted)}
+.tabs a:first-child{padding-left:0}
+.tabs a:hover{color:var(--c-title)}
+.has-tabs .panel{display:none;margin-top:var(--sp-4);scroll-margin-top:64px}
+.has-tabs .panel:target,.has-tabs:not(:has(.panel:target)) #topics{display:block}
+.has-tabs:not(:has(#repos:target)) .tb-t,.has-tabs:has(#repos:target) .tb-r{color:var(--c-title);font-weight:var(--fw-medium);box-shadow:inset 0 -2px 0 var(--c-title)}
+.has-tabs .panel>.sec-t{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)} /* 탭이 제목 역할 */
+.sec-d{margin-top:var(--sp-1)}
+.cnt{color:var(--c-muted);font-weight:var(--fw-medium);font-variant-numeric:tabular-nums}
+
+/* ---------- 홈: 토픽 목록 (리드는 순서로만 구분) ---------- */
+.list{margin-top:var(--sp-2)}
+.list .it{padding:var(--sp-5) 0;border-top:1px solid var(--c-line)}
+.list .it:first-child{border-top:none}
+.it-t{font-size:var(--fs-xl);line-height:var(--lh-title);font-weight:var(--fw-medium)}
+.it-t a{text-decoration:none}
+.it-t a:hover{text-decoration:underline}
+.it-s{margin-top:var(--sp-2)}
+.tmeta{margin-top:var(--sp-2);font-size:var(--fs-xs)}
+.fu{color:var(--c-muted)}
+
+/* ---------- 홈: 트렌딩 레포 ---------- */
+.rp-list{margin-top:var(--sp-2)}
+.rp{padding:var(--sp-4) 0;border-top:1px solid var(--c-line)}
+.rp:first-child{border-top:none}
+.rp-h{color:var(--c-title);display:flex;justify-content:space-between;align-items:baseline;gap:var(--sp-3)}
+.rp-n{font-size:var(--fs-md);font-weight:var(--fw-medium);color:var(--c-title);overflow-wrap:anywhere}
+.rp-s{display:inline-flex;align-items:baseline;gap:var(--sp-1);white-space:nowrap}
+.rp-sl{font-size:var(--fs-xs);color:var(--c-muted)}
+.rp-sv{font-size:var(--fs-md);font-weight:var(--fw-medium);color:var(--c-title);font-variant-numeric:tabular-nums}
+.rp-w{margin-top:var(--sp-2)}
+.rp-m,.rp-rel{margin-top:var(--sp-1)}
+.sig{color:var(--c-muted)}
+
+/* ---------- 토픽: 머리 ---------- */
+.topic{padding-bottom:var(--sp-12)}
+.back{padding-top:var(--sp-4)}
+.back a{display:inline-flex;align-items:center;min-height:var(--target-lg)}
+.tt{font-size:var(--fs-2xl);line-height:1.35;font-weight:var(--fw-medium);margin-top:var(--sp-1)}
+.ts{margin-top:var(--sp-3)}
+.follow{margin-top:var(--sp-2);font-size:var(--fs-sm);color:var(--c-muted)}
+.follow a{color:var(--c-text)}
+
+/* ---------- 토픽: 섹션과 포인트 ---------- */
+.sec{margin-top:var(--sp-7);padding-top:var(--sp-5);border-top:1px solid var(--c-line)}
+.sec-t{font-size:var(--fs-lg);line-height:var(--lh-title)}
+.sec .sec-t{margin-bottom:var(--sp-3)}
+.pt{padding:var(--sp-3) 0;border-top:1px solid var(--c-line)}
+.pt:first-child{border-top:none;padding-top:0}
+
+/* ---------- 인용 번호와 출처 툴팁 ---------- */
+.ref{display:inline-block;min-width:var(--target);min-height:var(--target);line-height:var(--target);text-align:center;
+  font-size:var(--fs-xs);color:var(--c-muted);text-decoration:none;font-variant-numeric:tabular-nums}
+.ref:hover{color:var(--c-title);text-decoration:underline}
+.cite{white-space:nowrap;scroll-margin-top:var(--sticky-offset)}
+.tip{display:none}
+/* 마우스 + CSS 앵커 위치 지원에서만. 터치·미지원은 번호를 누르면 출처 목록으로 이동 */
+@supports (anchor-name:--a) and (position-try-fallbacks:flip-block){
+ @media (hover:hover) and (pointer:fine){
+  .cite{anchor-scope:--cite}
+  .cite>.ref{anchor-name:--cite}
+  .tip{display:grid;gap:var(--sp-1);position:fixed;position-anchor:--cite;position-area:bottom span-right;
+    position-try-fallbacks:bottom span-left,top span-right,top span-left;margin:var(--sp-2) 0;
+    width:max-content;max-width:min(340px,calc(100vw - 32px));padding:var(--sp-3) var(--sp-4);
+    background:var(--c-bg);border:1px solid var(--c-line-strong);border-radius:var(--radius-m);box-shadow:0 6px 20px rgb(0 0 0 / .08);
+    white-space:normal;word-break:keep-all;font-size:var(--fs-sm);line-height:var(--lh-meta);text-align:left;z-index:var(--z-tip);
+    opacity:0;visibility:hidden;
+    transition:opacity var(--tip-fade) ease var(--tip-linger),visibility 0s linear calc(var(--tip-linger) + var(--tip-fade))}
+  .cite:hover>.tip,.cite:focus-within>.tip{opacity:1;visibility:visible;
+    transition:opacity .12s ease var(--tip-in),visibility 0s linear var(--tip-in)}
+  .cite:focus-within>.tip{transition-delay:0s,0s}
+  /* 한 번에 하나: 다른 인용에 올리거나 포커스하면 남아 있던 카드는 즉시 닫힘 */
+  body:has(.cite:hover) .cite:not(:hover)>.tip,
+  body:has(.cite:focus-within):not(:has(.cite:hover)) .cite:not(:focus-within)>.tip{opacity:0;visibility:hidden;transition:none}
+  .tip-m{font-size:var(--fs-xs);color:var(--c-muted)}
+  .tip-t{color:var(--c-title);font-weight:var(--fw-medium)}
+  .tip-a{display:flex;flex-wrap:wrap;gap:var(--sp-1) var(--sp-4);margin-top:var(--sp-1);font-size:var(--fs-xs)}
+  .tip-a a{color:var(--c-text);min-height:var(--target);display:inline-flex;align-items:center}
+  .tip-a a:hover{color:var(--c-title)}
+  .tip-no{color:var(--c-muted);min-height:var(--target);display:inline-flex;align-items:center}
+ }
+}
+@media (prefers-reduced-motion:reduce){.tip{transition:visibility 0s linear var(--tip-linger) !important}}
+
+/* ---------- 도식: 포인트 아래 캡션형 ---------- */
+.dg{margin:var(--sp-3) 0 var(--sp-1);padding:var(--sp-4);background:var(--c-panel);border-radius:var(--radius-m)}
+.dg-t{font-size:var(--fs-ui);font-weight:var(--fw-medium);color:var(--c-title);line-height:var(--lh-meta)}
+.dg-c{font-size:var(--fs-sm);color:var(--c-muted);margin-top:var(--sp-1)}
+.dg-s{font-size:var(--fs-xs);color:var(--c-muted);margin-top:var(--sp-2)}
+/* 수치 막대 */
+.bars{margin-top:var(--sp-3);display:grid;gap:var(--sp-2)}
+.bar-row{display:grid;grid-template-columns:1fr auto;grid-template-areas:"l v" "b b";gap:var(--sp-1) var(--sp-2);font-size:var(--fs-sm)}
+.bar-l{grid-area:l}
+.bar-v{grid-area:v;font-variant-numeric:tabular-nums}
+.bar-track{grid-area:b;height:8px;background:var(--c-track);border-radius:var(--radius-s);overflow:hidden}
+.bar-fill{display:block;height:100%;background:var(--c-bar);border-radius:var(--radius-s)}
+.bar-row.em .bar-fill{background:var(--c-title)}
+.bar-row.em .bar-l,.bar-row.em .bar-v{color:var(--c-title)}
+.bar-row.base .bar-fill{background:var(--c-line-strong)}
+/* 사건 흐름 */
+.events{margin-top:var(--sp-3);display:grid;gap:var(--sp-2);font-size:var(--fs-sm)}
+.events li{display:grid;grid-template-columns:44px 1fr;gap:var(--sp-2)}
+.ev-d{color:var(--c-muted);font-variant-numeric:tabular-nums}
+.ev-prev{font-size:var(--fs-xs);color:var(--c-muted)}
+
+/* ---------- 핵심 개념, 소스별 기여 ---------- */
+.cc dt,.cb dt{color:var(--c-title);margin-top:var(--sp-3)}
+.cc dt:first-child,.cb dt:first-child{margin-top:0}
+.cc dd,.cb dd{margin-top:var(--sp-1)}
+
+/* ---------- 출처 ---------- */
+.src-g{font-size:var(--fs-ui);margin:var(--sp-4) 0 var(--sp-1)}
+.srcs{display:grid;gap:var(--sp-3)}
+.src{display:grid;grid-template-columns:32px 1fr;gap:var(--sp-1);scroll-margin-top:var(--sticky-offset)}
+.src-n{color:var(--c-muted);font-variant-numeric:tabular-nums;font-size:var(--fs-sm);line-height:calc(var(--fs-base) * var(--lh-body))}
+.src:target{background:var(--c-panel);border-radius:var(--radius-s)}
+.src-t{overflow-wrap:anywhere}
+/* 영상 타임라인(영상 출처 아래) */
+.vtl{margin-top:var(--sp-2);display:grid;gap:var(--sp-1);font-size:var(--fs-sm)}
+.vtl li{display:grid;grid-template-columns:48px 1fr;gap:var(--sp-2)}
+.vt-t{font-variant-numeric:tabular-nums;color:var(--c-muted)}
+.vtl li.slide .vt-x{font-weight:var(--fw-medium);color:var(--c-title)}
+
+/* ---------- 같은 주 이전·다음 토픽 ---------- */
+.pn{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-4);margin-top:var(--sp-10);padding-top:var(--sp-5);border-top:1px solid var(--c-line)}
+.pn a{display:grid;gap:var(--sp-1);align-content:start;text-decoration:none;padding:var(--sp-2) 0;min-height:var(--target-lg)}
+.pn a:hover .pn-t{text-decoration:underline}
+.pn-next{text-align:right}
+.pn-k{font-size:var(--fs-xs);color:var(--c-muted)}
+.pn-t{color:var(--c-title);font-weight:var(--fw-medium);text-wrap:balance}
+
+/* ---------- 미니 바(PC 상세): 제목이 화면 위로 빠질 때 불투명한 바가 위에서 내려옴 ---------- */
+.mini{display:none}
+@media (min-width:1024px){
+ @supports (animation-timeline:view()) and (timeline-scope:--tt){
+  article{timeline-scope:--tt}
+  .tt{view-timeline:--tt block}
+  .mini{display:flex;justify-content:space-between;align-items:center;gap:var(--sp-4);position:sticky;top:0;z-index:var(--z-mini);
+    height:var(--target-lg);margin-bottom:calc(-1 * var(--target-lg));background:var(--c-bg);border-bottom:1px solid var(--c-line);font-size:var(--fs-sm);
+    animation:mini-slide linear both;animation-timeline:--tt;animation-range:exit 0% exit 100%}
+  @keyframes mini-slide{from{transform:translateY(-100%);visibility:hidden}to{transform:none;visibility:visible}}
+  .mini-t{color:var(--c-title);font-weight:var(--fw-medium);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .mini-s{color:var(--c-muted);white-space:nowrap}
+ }
+}
+
+/* ---------- PC ---------- */
+@media (min-width:1024px){
+ .top .nav{max-width:var(--maxw);margin:0 auto}
+ .tabs{margin:var(--sp-3) 0 0;padding:0;gap:var(--sp-2)}
+ .tabs a{font-size:var(--fs-md);padding:0 var(--sp-1)}
+}
+
+/* ==========================================================
+   관리 화면(Operate 모드): 같은 토큰, 밀도만 높임. 조작 요소(버튼·폼·명령 안내) 없음
+   ========================================================== */
+.ops{--fs-cell:var(--fs-sm)}
+.ops .ph{padding:var(--sp-6) 0 var(--sp-2)}
+.ops .ph h1{font-size:var(--fs-2xl);line-height:var(--lh-tight);font-weight:var(--fw-medium)}
+.ops .ph .meta{margin-top:var(--sp-1)}
+.ops h2{font-size:var(--fs-lg);line-height:var(--lh-title);margin:var(--sp-8) 0 var(--sp-2)}
+/* 이번 주 확인할 것 한 줄 */
+.todo{margin-top:var(--sp-3);padding:var(--sp-3) var(--sp-4);background:var(--c-panel);border-radius:var(--radius-m)}
+.todo b{font-weight:var(--fw-medium);color:var(--c-title)}
+/* 표: 좁은 화면은 표만 가로 스크롤(페이지는 넘치지 않음) */
+.dtable-wrap{overflow-x:auto;margin:0 calc(-1 * var(--gutter));padding:0 var(--gutter)}
+.dtable{border-collapse:collapse;width:100%;overflow-wrap:normal;font-size:var(--fs-cell);line-height:var(--lh-meta);font-variant-numeric:tabular-nums}
+.dtable th,.dtable td{padding:var(--sp-2) var(--sp-3);border-bottom:1px solid var(--c-line);text-align:left;vertical-align:top}
+.dtable th:first-child,.dtable td:first-child{padding-left:0}
+.dtable thead th{color:var(--c-muted);font-weight:var(--fw-regular);white-space:nowrap}
+.dtable tbody th{color:var(--c-title);font-weight:var(--fw-regular);min-width:9em} /* 좁은 화면: 첫 열을 지키고 표만 가로 스크롤 */
+.dtable .num{text-align:right;white-space:nowrap}
+.dtable .dim{color:var(--c-muted)}
+.dtable .nw{white-space:nowrap}
+.dtable .wide{min-width:16em} /* 근거·메모처럼 긴 글 열 */
+/* 상태는 글자로. 확인이 필요한 상태만 .check 테두리 */
+.state{white-space:nowrap}
+.state.quiet{color:var(--c-muted)}
+/* 단계 레일: 수집 / 후보 / 발행 ... */
+.rail{display:flex;flex-wrap:wrap;margin-top:var(--sp-3);font-size:var(--fs-sm)}
+.rail li{display:grid;gap:0;padding:0 var(--sp-4);border-left:1px solid var(--c-line)}
+.rail li:first-child{padding-left:0;border-left:none}
+.rail .k{color:var(--c-muted)}
+.rail .v{font-size:var(--fs-xl);color:var(--c-title);font-variant-numeric:tabular-nums}
+/* 키-값(실행 1건 머리) */
+.kv{display:grid;grid-template-columns:max-content 1fr;gap:var(--sp-1) var(--sp-4);margin-top:var(--sp-3);font-size:var(--fs-sm)}
+.kv dt{color:var(--c-muted)}
+/* 반려 비교: 초안 / 근거 / 수정 */
+.cmp{display:grid;gap:var(--sp-3);margin-top:var(--sp-3)}
+.cmp>div{padding:var(--sp-3) var(--sp-4);background:var(--c-panel);border-radius:var(--radius-m);font-size:var(--fs-sm)}
+.cmp h3{font-size:var(--fs-xs);color:var(--c-muted);margin-bottom:var(--sp-1)}
+@media (min-width:1024px){
+ .ops{--maxw:960px}
+ .cmp{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .dtable-wrap{margin:0;padding:0}
+}

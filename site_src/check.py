@@ -1,449 +1,319 @@
-# TrendsIT 예시 사이트 검증 (docs/03_TASK.md 5.4). 실행: python3 site_src/check.py
-# 스크린샷: 전역 Playwright(npm root -g 아래)가 있으면 site_src/shots/에 저장하고 가로 스크롤을 잰다.
-import hashlib
+# TrendsIT 사이트 검증(S6a). 실행: uv run python site_src/check.py [--fixture | --site DIR --data FILE]
+# 정적 검사(C-3~C-5, 링크, 글꼴·CSS, 관리 화면) → 관문 9(Chromium·WebKit) + 동작(툴팁, 탭, 미니 바)은 gate.js(Node, 전역 playwright-core).
+# 인자 없이 돌리면 site/(실데이터)를 data/site.json 기준으로, --fixture면 tests/fixtures/site/site.json을 임시 폴더에 빌드해서 같은 기준으로 검사.
+# 하나라도 실패하면 종료 코드 1(실패 목록을 끝에 다시 출력). 브라우저 측정 도구를 못 찾으면 그것도 실패(건너뛰지 않음).
+import argparse
+import functools
+import glob
+import html
+import http.server
 import json
-import os
 import pathlib
 import re
 import shutil
 import subprocess
 import sys
 import tempfile
-import time
-import urllib.request
+import threading
+import urllib.parse
+from html.parser import HTMLParser
 
 SRC = pathlib.Path(__file__).resolve().parent
 ROOT = SRC.parent
-SITE = ROOT / "site"
-SHOTS = SRC / "shots"
-DATA = json.loads((ROOT / "data" / "trendsit-example.json").read_text(encoding="utf-8"))
-PORT = 8799
-
-ALLOWED_COLORS = {
-    "#ffffff", "#f7f8f9", "#f3f4f5", "#eeeff1", "#dcdee3", "#d1d3d8", "#b0b3ba",
-    "#868b94", "#555d6d", "#2a3038", "#1a1c20", "#ffd5c0", "#fff",
-}
-NAMED_COLORS = {
-    "red", "blue", "green", "yellow", "orange", "purple", "pink", "black", "white", "gray", "grey",
-    "navy", "teal", "lime", "aqua", "cyan", "magenta", "fuchsia", "maroon", "olive", "silver", "brown", "gold",
-}
-FONT_HOSTS = ("https://fonts.googleapis.com", "https://fonts.gstatic.com")
-
+FIXTURE = ROOT / "tests" / "fixtures" / "site" / "site.json"
+FORBIDDEN_TEXT = ("동작 안 함", "예시")
+OPS_BANNED = ("button", "form", "input", "select", "textarea")
+VOID = {"meta", "link", "br", "img", "input", "hr", "source"}
 results = []
 
 
 def check(name, ok, detail=""):
     results.append((name, ok, detail))
-    print(("PASS " if ok else "FAIL ") + name + (f"  ({detail})" if detail else ""))
+    print(("PASS " if ok else "FAIL ") + name + (f"  ({detail})" if detail else ""), flush=True)
 
 
-def skip(name, detail):
-    print(f"SKIP {name}  ({detail})")
+class Page(HTMLParser):
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.tags, self.links, self.ids, self.titles, self.text, self.classes, self.pn = {}, [], set(), 0, [], [], []
+        self.open, self.mismatch = [], 0  # 태그 중첩 어긋남 수
 
+    def handle_starttag(self, tag, attrs):
+        a = dict(attrs)
+        if tag not in VOID:
+            self.open.append(tag)
+        self.tags[tag] = self.tags.get(tag, 0) + 1
+        if "id" in a:
+            self.ids.add(a["id"])
+        if "title" in a and tag != "link":
+            self.titles += 1
+        if "class" in a:
+            self.classes.append((tag, a["class"].split()))
+        if tag == "a" and {"pn-prev", "pn-next"} & set(a.get("class", "").split()):
+            self.pn.append(a["href"])
+        for k in ("href", "src"):
+            if a.get(k) is not None:
+                self.links.append((tag, a.get("rel", ""), k, a[k]))
 
-def html_files():
-    return sorted(SITE.rglob("*.html"))
-
-
-def read(p):
-    return p.read_text(encoding="utf-8")
-
-
-def url_of(p):
-    rel = p.relative_to(SITE).as_posix()
-    return "/" + rel[: -len("index.html")]
-
-
-def snapshot():
-    return {p.relative_to(SITE).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(SITE.rglob("*")) if p.is_file()}
-
-
-# ---------------------------------------------------------------- 1. 결정적 빌드
-def build():
-    subprocess.run([sys.executable, str(SRC / "build.py")], check=True, stdout=subprocess.DEVNULL)
-
-
-build()
-a = snapshot()
-build()
-b = snapshot()
-check("빌드 두 번 결과 동일", a == b, f"{len(a)}개 파일")
-
-RUN_DETAILS = [f'/runs/{r["week"]}/{r["id"]}/' for r in DATA["runs"]]
-PAGES = (["/", "/week/2026-w39/", "/week/2026-w40/"] + [f'/topic/{t["id"]}/' for t in DATA["topics"]]
-         + ["/sources/", "/keywords/", "/runs/", "/runs/weeks/", "/runs/2026-w40/", "/runs/2026-w39/"] + RUN_DETAILS + ["/assets/style.css"]
-         + ["/favicon.ico", "/favicon.svg", "/favicon-16.png", "/favicon-32.png", "/favicon-48.png", "/apple-touch-icon.png", "/icon-512.png", "/og-image.png"])
-SITE_URL = "https://trendsit.jiseop.com"
-SEP = '<span class="sr-sep"> / </span>'
-
-# ---------------------------------------------------------------- 2. 로컬 서버 200
-server = subprocess.Popen(
-    [sys.executable, "-m", "http.server", str(PORT), "--bind", "127.0.0.1", "--directory", str(SITE)],
-    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-)
-try:
-    for _ in range(50):
-        try:
-            urllib.request.urlopen(f"http://127.0.0.1:{PORT}/", timeout=1)
-            break
-        except Exception:
-            time.sleep(0.1)
-    bad = []
-    for u in PAGES:
-        try:
-            code = urllib.request.urlopen(f"http://127.0.0.1:{PORT}{u}", timeout=5).status
-        except Exception as e:
-            code = getattr(e, "code", str(e))
-        if code != 200:
-            bad.append(f"{u}={code}")
-    check(f"로컬 서버 모든 페이지 200 ({len(PAGES)}개)", not bad, ", ".join(bad))
-
-    # ------------------------------------------------------------ 3. 내부 링크
-    broken = []
-    for p in html_files():
-        s = read(p)
-        ids = set(re.findall(r'\bid="([^"]+)"', s))
-        for href in re.findall(r'(?:href|src)="(/[^"]*|#[^"]*)"', s):
-            if href.startswith("#"):
-                if href[1:] not in ids:
-                    broken.append(f"{url_of(p)} {href}")
-                continue
-            path, _, frag = href.partition("#")
-            path = path.split("?", 1)[0]
-            target = SITE / path.lstrip("/")
-            if path.endswith("/"):
-                target = target / "index.html"
-            if not target.is_file():
-                broken.append(f"{url_of(p)} {href}")
-            elif frag and f'id="{frag}"' not in read(target):
-                broken.append(f"{url_of(p)} {href}")
-    check("내부 링크 깨짐 0건", not broken, "; ".join(broken[:10]))
-
-    # ------------------------------------------------------------ 4~6. 홈, 형광 밑줄, 토픽
-    topics = {t["id"]: t for t in DATA["topics"]}
-    for wi, w in enumerate(DATA["weeks"]):
-        pages = [SITE / "week" / w["id"] / "index.html"] + ([SITE / "index.html"] if wi == 0 else [])
-        for p in pages:
-            s = read(p)
-            u = url_of(p)
-            check(f"{u} 리드 카드 정확히 1개", s.count('class="lead row"') == 1)
-            ids = re.findall(r'class="item row" href="/topic/([^/]+)/"', s)
-            want = [t["id"] for t in sorted((topics[i] for i in w["topic_ids"]), key=lambda t: t["rank"]) if not t.get("lead")]
-            check(f"{u} 목록이 rank 순", ids == want, f"{ids}")
-            repo_names = re.findall(r'class="rname"[^>]*>([^<]+)<', s)
-            want_r = [r["name"] for r in DATA["repos"] if r["week"] == w["id"]]
-            check(f"{u} 레포가 그 주차 것만 ({len(want_r)}개)", repo_names == want_r, f"{len(repo_names)}개")
-            sums = re.findall(r'<p class="(?:lead-s|item-s)">(.*?)</p>', s)
-            over = [x[:20] for x in sums if x.count('<mark class="hl">') > 1]
-            check(f"{u} 토픽 요약마다 형광 1개 이하", len(sums) == len(w["topic_ids"]) and not over, f"요약 {len(sums)}개")
-
-    for t in DATA["topics"]:
-        p = SITE / "topic" / t["id"] / "index.html"
-        s = read(p)
-        u = url_of(p)
-        n_hl = s.count('<mark class="hl">')
-        check(f"{u} 형광 밑줄 4개 이하", n_hl <= 4, f"{n_hl}개")
-        check(f"{u} 요약 재수록 없음", t["summary"].replace("==", "")[:30] not in s.split("<body>", 1)[1].replace('<mark class="hl">', "").replace("</mark>", ""))
-        check(f"{u} 소스 연결도 있음", s.count('<div class="graph">') == 1 and s.count("<svg") == 2)
-        want = {k: sum(1 for g in t.get("diagrams", []) if g["type"] == k) for k in ("bars", "video", "events")}
-        got = {k: s.count(f'class="sec diag-{k}"') for k in want}
-        check(f"{u} 도식이 데이터와 일치", want == got, f"{got}")
-        num = {x["id"]: i + 1 for i, x in enumerate(t["sources"])}
-        pts = re.findall(r'<li class="pt">(.*?)</li>', s)
-        ok = len(pts) == len(t["points"])
-        detail = ""
-        for p_html, pt in zip(pts, t["points"]):
-            got_refs = [int(x) for x in re.findall(r'href="#src-(\d+)">\[\1\]', p_html)]
-            if got_refs != [num[r] for r in pt["refs"]]:
-                ok, detail = False, f"refs {got_refs}"
-            if bool(pt.get("check")) != ("확인 필요" in p_html):
-                ok, detail = False, "확인 필요 표시 불일치"
-        src_ids = re.findall(r'<li id="src-(\d+)" class="src">', s)
-        if src_ids != [str(i + 1) for i in range(len(t["sources"]))]:
-            ok, detail = False, f"출처 목록 {src_ids}"
-        check(f"{u} 출처 번호와 확인 필요 표시", ok, detail)
-        check(f"{u} title", f"<title>{t['title'].replace('==', '')} | TrendsIT</title>" in s)
-
-    # ------------------------------------------------------------ 관리 화면 (5.4 추가 항목)
-    def page_of(u):
-        return read(SITE / u.lstrip("/") / "index.html")
-
-    s = page_of("/sources/")
-    groups = re.findall(r'<h2 class="sgroup-h"><span>([^<]+)</span>(?:' + re.escape(SEP) + r')?<span class="sgroup-n">(\d+)개 / (\d+)건</span>', s)
-    check("소스: 채널 묶음 합계 글 41 / 영상 3 / GitHub 11", [(g[0], g[2]) for g in groups] == [("글", "41"), ("영상", "3"), ("GitHub", "11")], f"{groups}")
-    check("소스: \"토픽에 29건\"", "수집 55건, 토픽에 쓰인 것 29건" in s)
-    check("소스: 확인할 것 2개 (블로그 A 실패, 2주째 안 쓰인 소스 4개)",
-          "확인할 것 2개" in s and '예시 블로그 A: <mark class="hl">10.2 수집 실패</mark>, 다음 날 정상' in s
-          and "2주째 토픽에 쓰이지 않은 소스 4곳 (블로그 3, 뉴스레터 1)</span>: <mark class=\"hl\">끄거나 키워드 필터 추가 검토</mark>" in s)
-    check("소스: 7일 막대 9줄 + 꺼짐 1줄", s.count('<li class="srow">') == 9 and s.count('<li class="srow off">') == 1
-          and s.count('class="days"') == 9 and len(re.findall(r'<i class="d', s.split('class="slegend"')[0])) == 63)
-
-    k = page_of("/keywords/")
-    cands = re.findall(r'<li class="cand">(.*?)</li>', k)
-    check("키워드: 후보 3개, 승인/거절 버튼 비활성", len(cands) == 3 and all(c.count("disabled") == 2 and "승인" in c and "거절" in c for c in cands))
-    check("키워드: 최근 거절 1줄", k.count('<p class="rejline">최근 거절: Luna') == 1)
-    order = re.findall(r'<div class="kw-h"><h3>([^<]+)</h3>', k)
-    items = DATA["keywords"]["items"]
-    want = [items[i]["name"] for i in sorted(range(len(items)), key=lambda i: (-items[i]["mentions"][-1], i))]
-    check("키워드: 8개가 이번 주 언급 많은 순", order == want and len(order) == 8, f"{order}")
-    check("키워드: 가지에 후보 3개 점선, Luna 취소선", k.count('<li class="pend"><i class="br dashed">') == 3 and '<s class="lv">Luna</s>' in k)
-
-    r = page_of("/runs/")
-    no_url = lambda h: re.sub(r'<meta property="og:url"[^>]*>', "", h)
-    check("실행 기록: 메뉴 링크가 /runs/, 10월 1주차 메인", 'href="/runs/" class="on"' in r and "10월 1주차 실행 기록</h1>" in r and no_url(r) == no_url(page_of("/runs/2026-w40/")))
-    check("실행 기록: 봐야 할 판단 3개", "봐야 할 판단 3개" in r and r.count('class="att"') == 3)
-    rail = re.findall(r'<div class="rl-h"><span>[^<]+</span>(?:' + re.escape(SEP) + r')?<b>([^<]+)</b></div><div class="rl-s">([^<]*)</div>', r)
-    nums = [re.search(r"\d+", b).group() for b, _ in rail]
-    check("실행 기록: 단계 레일 55, 9, 6, 6, 5(반려 1), 6", nums == ["55", "9", "6", "6", "5", "6"] and "반려 1회" in rail[4][1], f"{rail}")
-    check("실행 기록: 실행 8개 목록", r.count('class="runrow"') == 8 and "이 주의 실행 8번" in r)
-    w = page_of("/runs/weeks/")
-    wk = re.findall(r'<li>(<a class="wk"|<div class="wk")', w)
-    w38 = w.split("9월 3주차")[1] if "9월 3주차" in w else ""
-    check("실행 기록: 상위에 3주, 9월 3주차는 승인 모드 + 링크 없음",
-          len(wk) == 3 and wk[2] == '<div class="wk"' and '<span class="badge">승인 모드</span>' in w38 and "/runs/2026-w38/" not in w)
-    bad = []
-    for u in RUN_DETAILS:
-        h = page_of(u)
-        wid = u.split("/")[2]
-        if not ('href="/runs/weeks/"' in h and f'href="/runs/{wid}/"' in h and h.count('<div class="bc">') == 1):
-            bad.append(u)
-    check(f"실행 기록: 상세 {len(RUN_DETAILS)}개 모두 경로 줄로 위로 이동", len(RUN_DETAILS) == 16 and not bad, ", ".join(bad))
-    dd = page_of("/runs/2026-w40/weekly-2026-10-05/")
-    box = re.search(r'<div class="reject">(.*?)</div></span>', dd)
-    check("실행 기록: 10.5 주간 발행 상세에 반려 상자(초안, 근거, 수정)",
-          bool(box) and all(x in box.group(1) for x in ['class="rk">초안', 'class="rk">근거', 'class="rk">수정', "(GeekNews, 10.2)"]))
-    att_links = re.findall(r'class="att" href="([^"]+)"', r)
-    check("실행 기록: 봐야 할 판단 링크가 판단 줄로 이동", all("#step-" in a for a in att_links))
-
-    hl_over = []
-    for u in ["/sources/", "/keywords/", "/runs/", "/runs/2026-w39/", "/runs/weeks/"] + RUN_DETAILS:
-        n = page_of(u).count('<mark class="hl">')
-        if n > 4:
-            hl_over.append(f"{u}={n}")
-    check("관리 화면 형광 밑줄 화면당 4개 이하", not hl_over, ", ".join(hl_over))
-    notice = DATA["meta"]["notice"]
-    with_notice = [url_of(p) for p in html_files() if notice[:20] in read(p)]
-    check("맨 아래 예시 데이터 안내 문구 없음 (사용자 결정)", not with_notice, ", ".join(with_notice[:5]))
-
-    # ------------------------------------------------------------ 05_TASK: 문체, 2차 리뷰
-    haeyo = {}
-    for p in sorted(SITE.rglob("*")):
-        if p.is_file() and p.suffix in (".html", ".css", ".svg"):
-            for m in re.findall(r"[가-힣]+(?:어요|에요|해요|예요|까요|세요|돼요|줘요)", p.read_text(encoding="utf-8")):
-                haeyo[m] = haeyo.get(m, 0) + 1
-    check("문체: 해요체 0건 (05 2-3 grep)", not haeyo, f"{haeyo}")
-    fixed = {"/sources/": "예시 사이트라 동작 안 함", "/keywords/": "묶을 키워드: 판단 모델",
-             "/topic/w40-jev-race/": "굵은 선: 수치를 직접 준 소스 / 점선: 이어지는 지난 토픽",
-             "/runs/weeks/": "3주 발행 15개, 검수 반려 3회 / 0회 / 1회"}
-    miss = [u for u, t in fixed.items() if t not in page_of(u)]
-    check("문체: 화면 고정 문구 (02_DESIGN 10장 표)", not miss and "단계별 기록 없음 (예시 데이터 범위 밖)" in page_of("/runs/weeks/")
-          and "여러 표기를 한 키워드로 묶음. 다른 대상을 잘못 묶지 않는 것이 우선" in page_of("/keywords/"), ", ".join(miss))
-    n3 = page_of("/runs/2026-w40/nightly-2026-10-03/")
-    tabs = re.search(r'<div class="rtabs">(.*?)</div>', n3).group(1)
-    tab_txt = re.sub(r"<[^>]+>", "", tabs)
-    check("2차 리뷰: 매일 수집 실패는 맨 위 한 줄만, 로그에 수집기 줄 없음, 탭은 steps만",
-          n3.count('<p class="errline">') == 1 and "수집기" not in n3 and tab_txt == "전체 2 / 편집장 1 / 레포 분석가 1", tab_txt)
-    w39w = page_of("/runs/2026-w39/weekly-2026-09-28/")
-    check("2차 리뷰: 지난 주차 실행 상세는 \"이 주 수집\"", "<dd>이 주 수집 45건" in w39w and "이번 주" not in w39w.split("<body>")[1]
-          and "<dd>이번 주 수집 55건" in page_of("/runs/2026-w40/weekly-2026-10-05/") and "이번 주" not in page_of("/runs/2026-w39/").split("<body>")[1])
-
-    # ------------------------------------------------------------ 04_TASK: 파비콘, 공유 미리보기, 1차 리뷰
-    HEAD_TAGS = ['<link rel="icon" href="/favicon.ico" sizes="any">', '<link rel="icon" href="/favicon.svg" type="image/svg+xml">',
-                 '<link rel="apple-touch-icon" href="/apple-touch-icon.png">', '<meta name="theme-color" content="#ffffff">',
-                 '<meta name="description" content="', '<meta property="og:type" content="website">',
-                 '<meta property="og:site_name" content="TrendsIT">', '<meta property="og:title" content="',
-                 '<meta property="og:description" content="', '<meta property="og:url" content="',
-                 f'<meta property="og:image" content="{SITE_URL}/og-image.png">', '<meta name="twitter:card" content="summary_large_image">']
-    bad_head = []
-    for p in html_files():
-        h = read(p)
-        u = url_of(p)
-        miss = [t for t in HEAD_TAGS if h.count(t) != 1]
-        title = re.search(r"<title>([^<]*)</title>", h).group(1)
-        ogt = re.search(r'<meta property="og:title" content="([^"]*)">', h)
-        ogu = re.search(r'<meta property="og:url" content="([^"]*)">', h)
-        desc = re.search(r'<meta name="description" content="([^"]*)">', h)
-        ogd = re.search(r'<meta property="og:description" content="([^"]*)">', h)
-        if miss or not ogt or ogt.group(1) != title or not ogu or ogu.group(1) != SITE_URL + u or not desc or not desc.group(1) or not ogd or ogd.group(1) != desc.group(1):
-            bad_head.append(f"{u} {miss[:2]}")
-    check(f"head 태그가 모든 페이지에 한 번씩, og:url이 그 페이지 주소 ({len(html_files())}개)", not bad_head, "; ".join(bad_head[:5]))
-    import html as _html
-    descs = {
-        "/": f'{DATA["weeks"][0]["label"]} 기술 동향 브리핑. 토픽 {DATA["weeks"][0]["topic_count"]}개, 소스 {DATA["weeks"][0]["source_count"]}건',
-        "/week/2026-w39/": f'{DATA["weeks"][1]["label"]} 기술 동향 브리핑. 토픽 {DATA["weeks"][1]["topic_count"]}개, 소스 {DATA["weeks"][1]["source_count"]}건',
-        "/topic/w40-jev-race/": next(t for t in DATA["topics"] if t["id"] == "w40-jev-race")["summary"].replace("==", ""),
-        "/sources/": "로컬 AI가 매주 정리하는 개인 기술 브리핑 (예시 데이터)",
-    }
-    got = {u: _html.unescape(re.search(r'<meta name="description" content="([^"]*)">', page_of(u)).group(1)) for u in descs}
-    check("설명 문구 규칙 (홈/주차, 토픽 summary, 나머지 기본)", got == descs, f"{got}")
-
-    leftover = [url_of(p) for p in html_files() if "==" in read(p)]
-    check('형광: HTML에 "==" 남지 않음', not leftover, ", ".join(leftover[:5]))
-
-    GLUE = [r"\d(?:지난|영상|레포|GitHub|확인|판단|정상|일부|편집장|작성자|검수자|수집기|이번|다음|예시)", r"(?:정상|일부 실패)판단",
-            r"브리핑소스", r"키워드실행", r"TrendsIT브리핑", r"데이터TrendsIT", r"(?:확정|후보)(?:후보|거절)", r"\d{1,2}:\d{2}[가-힣]",
-            r"(?:초안|근거|수정)(?:Pi|\")", r"\][A-Za-z가-힣]", r"[가-힣]\d+(?:\.\d+)?%"]
-    glued = []
-    for p in html_files():
-        body = read(p).split("<body>", 1)[1]
-        # 블록 경계는 텍스트 도구가 줄을 바꾸므로 줄바꿈으로, 나머지 태그는 지운다(인라인 항목 붙음만 잡는다)
-        body = re.sub(r"</?(?:div|p|li|ul|ol|dl|dt|dd|h[1-6]|section|nav|header|main|aside|br)\b[^>]*>", "\n", body)
-        text = _html.unescape(re.sub(r"<[^>]+>", "", body))
-        for g in GLUE:
-            for m in re.finditer(g, text):
-                glued.append(f"{url_of(p)}: …{text[max(0, m.start() - 8):m.end() + 6]}…")
-    check("붙어 읽히는 항목 없음 (태그를 지운 텍스트 기준)", not glued, " | ".join(glued[:8]))
-
-    w39 = page_of("/week/2026-w39/")
-    w40 = page_of("/")
-    check("지난 주차 문구: 이 주의 핵심 토픽 / 이 주 관심 분야 레포 / 이 주 수집",
-          all(x in w39 for x in ["이 주의 핵심 토픽", "이 주 수집", '<span class="m-only">이 주 </span>관심 분야 레포']) and "이번 주" not in w39.split("<body>")[1]
-          and all(x in w40 for x in ["이번 주 핵심 토픽", "이번 주 수집"]))
-    check('title: 지난 주차 "9월 4주차 브리핑 | TrendsIT", 최신 홈 "TrendsIT"',
-          "<title>9월 4주차 브리핑 | TrendsIT</title>" in w39 and "<title>TrendsIT</title>" in w40 and "<title>TrendsIT</title>" in page_of("/week/2026-w40/"))
-    check("헤더에 지난 주차 링크 (있을 때만)",
-          all('class="wprev u" href="/week/2026-w39/"' in page_of(u) for u in ["/", "/week/2026-w40/"]) and 'class="wprev' not in w39)
-
-    # ------------------------------------------------------------ 7. 색
-    css = (SITE / "assets" / "style.css").read_text(encoding="utf-8")
-    color_src = [("style.css", css)]
-    for p in html_files():
-        s = read(p)
-        for m in re.findall(r'style="([^"]*)"', s):
-            color_src.append((url_of(p) + " style", m))
-        for m in re.findall(r'(?:fill|stroke|stop-color|color)="([^"]*)"', s):
-            color_src.append((url_of(p) + " attr", m))
-        for m in re.findall(r"<style[^>]*>(.*?)</style>", s, re.S):
-            color_src.append((url_of(p) + " <style>", m))
-    bad_colors = set()
-    for where, text in color_src:
-        for hx in re.findall(r"#[0-9a-fA-F]{3,8}\b", text):
-            if hx.lower() not in ALLOWED_COLORS:
-                bad_colors.add(f"{where}:{hx}")
-        for fn in re.findall(r"\b(?:rgba?|hsla?|hwb|lab|lch|oklch|oklab|color)\(", text):
-            bad_colors.add(f"{where}:{fn}")
-        for word in re.findall(r"(?<![\w-])[a-zA-Z]+(?![\w-])", re.sub(r"var\([^)]*\)|--[\w-]+|\"[^\"]*\"", "", text)):
-            if word.lower() in NAMED_COLORS:
-                bad_colors.add(f"{where}:{word}")
-    if not color_src:
-        bad_colors.add("검사 대상 없음")
-    check("색 값은 토큰, #fff, transparent, none뿐 (유채색은 #ffd5c0 하나)", not bad_colors, ", ".join(sorted(bad_colors)[:10]))
-
-    # ------------------------------------------------------------ 8. 금지 CSS
-    all_css = [("style.css", css)] + [(w, t) for w, t in color_src if not w.endswith(" attr")]
-    bad_css = []
-    for where, text in all_css:
-        low = text.lower()
-        for pat, label in [
-            (r"box-shadow", "box-shadow"), (r"text-transform\s*:\s*uppercase", "uppercase"), (r"monospace", "monospace"),
-            (r"\banimation", "animation"), (r"@keyframes", "keyframes"), (r"\btransition", "transition"),
-        ]:
-            if re.search(pat, low):
-                bad_css.append(f"{where}:{label}")
-        for v in re.findall(r"border-radius\s*:\s*([^;}]+)", low):
-            for px in re.findall(r"([\d.]+)px", v):
-                if float(px) >= 999:
-                    bad_css.append(f"{where}:radius {v.strip()}")
-    for sel, decl in re.findall(r"([^{}]+)\{([^{}]*)\}", css):
-        if re.search(r"border-radius\s*:\s*50%", decl):
-            w_ = re.search(r"(?<![-\w])width\s*:\s*([\d.]+)px", decl)
-            h_ = re.search(r"(?<![-\w])height\s*:\s*([\d.]+)px", decl)
-            if not (w_ and h_ and float(w_.group(1)) <= 12 and float(h_.group(1)) <= 12):
-                bad_css.append(f"원형이 12px 초과 또는 크기 미지정: {sel.strip()}")
-    check("금지 CSS 없음 (그림자, 대문자, 고정폭, 애니메이션, 전환, 알약, 큰 원)", not bad_css, "; ".join(bad_css[:10]))
-
-    # ------------------------------------------------------------ 9. 외부 리소스
-    ext = []
-    for p in html_files():
-        s = read(p)
-        for tag, attr in [("link", "href"), ("script", "src"), ("img", "src"), ("iframe", "src"), ("source", "src"), ("image", "href")]:
-            for m in re.findall(rf"<{tag}\b[^>]*\b{attr}=\"([^\"]+)\"", s):
-                if re.match(r"(https?:)?//", m) and not m.startswith(FONT_HOSTS):
-                    ext.append(f"{url_of(p)} <{tag}> {m}")
-        if "<script" in s:
-            ext.append(f"{url_of(p)} <script> 있음")
-    for where, text in all_css:
-        for m in re.findall(r"@import\s+(?:url\()?['\"]?([^'\")\s;]+)", text) + re.findall(r"url\(\s*['\"]?([^'\")]+)", text):
-            if not m.startswith(FONT_HOSTS):
-                ext.append(f"{where} {m}")
-    check("외부 리소스는 Google Fonts뿐, 스크립트 없음", not ext, "; ".join(ext[:10]))
-
-    # ------------------------------------------------------------ 기타: lang, title
-    lt = [url_of(p) for p in html_files() if '<html lang="ko">' not in read(p) or not re.search(r"<title>[^<]*TrendsIT[^<]*</title>", read(p))]
-    check('모든 페이지 lang="ko"와 title에 TrendsIT', not lt, ", ".join(lt))
-
-    # ------------------------------------------------------------ 10. 가로 스크롤 + 스크린샷
-    def find_playwright():
-        roots = []
-        try:
-            roots.append(pathlib.Path(subprocess.run(["npm", "root", "-g"], capture_output=True, text=True, timeout=20).stdout.strip()))
-        except Exception:
-            pass
-        cli = shutil.which("playwright-cli")
-        if cli:  # .../lib/node_modules/@playwright/cli/... 에서 node_modules 루트를 찾는다
-            for parent in pathlib.Path(cli).resolve().parents:
-                if parent.name == "node_modules":
-                    roots.append(parent)
-                    break
-        for root in roots:
-            for rel in ("playwright", "@playwright/cli/node_modules/playwright", "@playwright/test/node_modules/playwright"):
-                if (root / rel / "package.json").is_file():
-                    return str(root / rel)
-        return None
-
-    pw = find_playwright()
-    if not pw:
-        skip("390px, 1280px 가로 스크롤 없음", "수동 확인 필요: Playwright 없음")
-    else:
-        SHOTS.mkdir(exist_ok=True)
-        shot_pages = {"/": "home", "/week/2026-w39/": "week-w39", "/topic/w40-jev-race/": "topic-w40-jev-race",
-                      "/topic/w40-measure/": "topic-w40-measure", "/topic/w40-browser-security/": "topic-w40-browser-security",
-                      "/sources/": "sources", "/keywords/": "keywords", "/runs/": "runs",
-                      "/runs/weeks/": "runs-weeks", "/runs/2026-w40/weekly-2026-10-05/": "run-weekly-2026-10-05",
-                      "/runs/2026-w40/nightly-2026-10-03/": "run-nightly-2026-10-03"}
-        js = """
-const { chromium } = require(process.env.PW);
-(async () => {
-  const pages = JSON.parse(process.env.PAGES), shots = JSON.parse(process.env.SHOT_PAGES);
-  const browser = await chromium.launch();
-  const out = [];
-  for (const width of [390, 1280]) {
-    const ctx = await browser.newContext({ viewport: { width, height: 900 }, deviceScaleFactor: 2 });
-    const page = await ctx.newPage();
-    for (const u of pages) {
-      if (u.endsWith('.css')) continue;
-      await page.goto(process.env.BASE + u, { waitUntil: 'networkidle' });
-      await page.evaluate(() => document.fonts.ready);
-      const r = await page.evaluate(() => ({ sw: document.documentElement.scrollWidth, iw: window.innerWidth,
-        font: document.fonts.check('16px "IBM Plex Sans KR"') }));
-      out.push({ u, width, ...r });
-      if (shots[u]) await page.screenshot({ path: `${process.env.SHOTS}/${shots[u]}-${width}.png`, fullPage: true });
-    }
-    await ctx.close();
-  }
-  await browser.close();
-  console.log(JSON.stringify(out));
-})().catch(e => { console.error(e); process.exit(1); });
-"""
-        with tempfile.NamedTemporaryFile("w", suffix=".cjs", delete=False) as f:
-            f.write(js)
-        env = dict(os.environ, PW=pw, PAGES=json.dumps(PAGES), SHOT_PAGES=json.dumps(shot_pages),
-                   BASE=f"http://127.0.0.1:{PORT}", SHOTS=str(SHOTS))
-        r = subprocess.run(["node", f.name], capture_output=True, text=True, env=env, timeout=300)
-        os.unlink(f.name)
-        if r.returncode != 0:
-            skip("390px, 1280px 가로 스크롤 없음", "수동 확인 필요: 브라우저 실행 실패 " + r.stderr.strip()[-200:])
+    def handle_endtag(self, tag):
+        if tag in VOID:
+            return
+        if self.open and self.open[-1] == tag:
+            self.open.pop()
         else:
-            rows = json.loads(r.stdout.strip().splitlines()[-1])
-            over = [f'{x["u"]}@{x["width"]} ({x["sw"]}>{x["iw"]})' for x in rows if x["sw"] > x["iw"]]
-            check(f"390px, 1280px 가로 스크롤 없음 ({len(rows)}회 측정)", not over, "; ".join(over))
-            nofont = sorted({x["u"] for x in rows if not x["font"]})
-            print(("INFO IBM Plex Sans KR 로드됨" if not nofont else f"INFO 웹폰트 미로드: {nofont}"))
-            print(f"INFO 스크린샷: {SHOTS}")
-finally:
-    server.terminate()
-    server.wait()
+            self.mismatch += 1
+            if tag in self.open:
+                while self.open.pop() != tag:
+                    pass
 
-failed = [n for n, ok, _ in results if not ok]
-print(f"\n{len(results) - len(failed)}/{len(results)} 통과")
-sys.exit(1 if failed else 0)
+    def handle_data(self, data):
+        self.text.append(data)
+
+
+def parse(path):
+    p = Page()
+    p.feed(path.read_text(encoding="utf-8"))
+    return p
+
+
+def page_url(site, f):
+    rel = f.relative_to(site).as_posix()
+    return "/" + rel[: -len("index.html")] if rel.endswith("index.html") else "/" + rel
+
+
+def is_internal(href):
+    return not re.match(r"^([a-z][a-z0-9+.-]*:|//)", href, re.I)
+
+
+def static_checks(site, data, pages):
+    files = sorted(site.rglob("*.html"))
+    check("A7 페이지 존재: 홈, 소스, 키워드, 실행 기록(주차별·이번 주차·1건)",
+          all((site / p).exists() for p in ("index.html", "sources/index.html", "keywords/index.html", "runs/index.html", "runs/weeks/index.html"))
+          and any(f.parent.parent.parent.name == "runs" for f in files), f"html {len(files)}개")
+    broken = [f"{page_url(site, f)} 중첩 어긋남 {p.mismatch}" for f, p in pages.items() if p.mismatch or p.open]
+    # 빌드가 만든 깨짐만: 엔티티가 태그로 쪼개짐(&#<span ..>x27</span>;). 데이터 원문 글자(<span, &amp;)는 &lt;span, &amp;amp;로 나가므로 걸리지 않음
+    broken += [f"{page_url(site, f)} 엔티티가 태그로 쪼개짐" for f in pages if re.search(r"&#?\w*<", f.read_text(encoding="utf-8"))]
+    check("M-1 마크업 무결성: 태그 중첩 어긋남 0, 엔티티가 태그로 쪼개진 곳 0", not broken, "; ".join(broken[:3]))
+    leak = [page_url(site, f) for f in pages if re.search(r"\[it:\d+|#q\d+", f.read_text(encoding="utf-8"))]
+    check("M-2 내부 근거 id([it:8#q2] 등) 노출 0", not leak, "; ".join(leak[:3]))
+    # C-3 내부 링크의 대상 파일·앵커
+    bad = []
+    for f, p in pages.items():
+        for tag, _rel, _k, href in p.links:
+            if not is_internal(href) or href == "":
+                continue
+            u = urllib.parse.urlparse(urllib.parse.urljoin("http://x" + page_url(site, f), href))
+            path = urllib.parse.unquote(u.path)
+            target = site / (path.lstrip("/") + ("index.html" if path.endswith("/") else ""))
+            if not target.is_file():
+                bad.append(f"{page_url(site, f)} → {href}")
+            elif u.fragment and target.suffix == ".html":
+                tp = pages.get(target) or parse(target)
+                if u.fragment not in tp.ids:
+                    bad.append(f"{page_url(site, f)} → {href}(앵커 없음)")
+    check("C-3 내부 링크 대상 파일·앵커 존재", not bad, "; ".join(bad[:4]))
+    # A5 링크 규칙(D-6)
+    weeks = data["weeks"]
+    oldest = site / "week" / weeks[-1]["id"] / "index.html"
+    first = [oldest] + ([site / "index.html"] if len(weeks) == 1 else [])
+    absent = [f"{page_url(site, f)}" for f in [*first, *(site / "week" / w["id"] / "index.html" for w in weeks), *(site / "topic" / t["id"] / "index.html" for t in data["topics"])] if f not in pages]
+    if absent:  # site.json과 site/가 어긋남(예: 발행 중 실패로 한쪽만 바뀜): 트레이스백 대신 실패로 기록
+        check("A5 링크 규칙", False, f"data에는 있고 site/에는 없는 페이지: {', '.join(absent[:3])}")
+        return
+    ok1 = all("지난 주차" not in "".join(pages[f].text) for f in first)
+    ok2 = all(any(h == f'/week/{weeks[i + 1]["id"]}/' for _, _, _, h in pages[site / "week" / w["id"] / "index.html"].links)
+              for i, w in enumerate(weeks[:-1]))
+    topics = {t["id"]: t for t in data["topics"]}
+    bad = []
+    for t in data["topics"]:
+        p = pages[site / "topic" / t["id"] / "index.html"]
+        rel = t.get("relation", {})
+        has_follow = any("follow" in c for _, c in p.classes)
+        want = rel.get("type") == "follow_up" and rel.get("topic_id") in topics
+        if has_follow != want or (want and f'/topic/{rel["topic_id"]}/' not in [h for _, _, _, h in p.links]):
+            bad.append(f'{t["id"]} follow={has_follow} 기대={want}')
+        wk = next(w for w in weeks if w["id"] == t["week"])
+        if any(h.split("/")[2] not in wk["topic_ids"] for h in p.pn):
+            bad.append(f'{t["id"]} 이전·다음이 다른 주로 이어짐')
+    check("A5 첫 주에 지난 주차 링크 없음, 대상 없는 follow_up은 링크 없음, 이전·다음은 같은 주 안", ok1 and ok2 and not bad,
+          "; ".join(bad[:3]) or ("" if ok1 and ok2 else f"지난 주차 링크 오류 첫 주 {ok1} 나머지 {ok2}"))
+    # C-4, A6 외부 요청·글꼴·CSS
+    css_files = sorted((site / "assets").glob("*.css"))
+    css = "\n".join(f.read_text(encoding="utf-8") for f in css_files)
+    ext = []
+    for f, p in pages.items():
+        if p.tags.get("script"):
+            ext.append(f"{page_url(site, f)} script {p.tags['script']}")
+        ext += [h for tag, rel, _k, h in p.links if tag in ("link", "script", "img", "source") and not is_internal(h)]
+    ext += re.findall(r"@import|url\(\s*[\"']?(?:https?:)?//[^)]*", css)
+    check("C-4 외부 요청 0: link·script·@import·url()에 http 없음, script 0", not ext, "; ".join(map(str, ext[:3])))
+    faces = re.findall(r"@font-face\{[^}]*\}", css)
+    weights = sorted(re.findall(r"font-weight:(\d+)", "".join(faces)))
+    names = [f.name for f in css_files]
+    googles = [f.name for f in [*files, *css_files] if re.search(r"fonts\.(googleapis|gstatic)", f.read_text(encoding="utf-8"))]
+    check("A6 @font-face 400·500 둘뿐, CSS 파일명에 해시, Google Fonts 문자열 0",
+          weights == ["400", "500"] and len(faces) == 2 and len(names) == 1 and re.fullmatch(r"trendsit\.[0-9a-f]{10}\.css", names[0])
+          and not googles and (site / "assets/fonts/Pretendard-Regular.woff2").is_file() and (site / "assets/fonts/Pretendard-Medium.woff2").is_file(),
+          f"faces {len(faces)} weights {weights} css {names} google {googles}")
+    # C-5, C-7(title 속성) 관리 화면 조작 요소, 문구
+    banned = [f"{page_url(site, f)} <{t}>" for f, p in pages.items() for t in OPS_BANNED if p.tags.get(t)]
+    check("C-5 button·form·input·select·textarea 0", not banned, "; ".join(banned[:3]))
+    own = [s for s in data_strings(data) if any(w in s for w in FORBIDDEN_TEXT)]
+    hits = []
+    for f, p in pages.items():
+        text = "".join(p.text)
+        for s in sorted(own, key=len, reverse=True):  # 브리핑 내용(데이터) 안의 단어는 뺀다: 화면이 만든 문구만 검사
+            text = text.replace(s, "")
+        hits += [f"{page_url(site, f)} '{w}'" for w in FORBIDDEN_TEXT if w in text]
+    check("A7 '동작 안 함'·'예시' 문구 0(사이트 전체, 데이터 본문 제외)", not hits, "; ".join(hits[:3]))
+    check("C-7 title 속성 0", not any(p.titles for p in pages.values()))
+
+
+def data_strings(data):
+    out = []
+
+    def walk(v):
+        if isinstance(v, str):
+            out.append(v.replace("==", "").replace("`", ""))
+            out.append(html.unescape(v))
+        elif isinstance(v, dict):
+            for x in v.values():
+                walk(x)
+        elif isinstance(v, list):
+            for x in v:
+                walk(x)
+    walk(data)
+    return out
+
+
+def find_playwright():
+    """(node, playwright-core 경로). 전역 @playwright/cli에 든 playwright-core를 npm root -g와 nvm 설치 폴더에서 찾는다."""
+    roots = []
+    if shutil.which("npm"):
+        r = subprocess.run(["npm", "root", "-g"], capture_output=True, text=True)
+        roots.append(r.stdout.strip())
+    roots += glob.glob(str(pathlib.Path.home() / ".nvm/versions/node/*/lib/node_modules"))
+    roots.append(str(pathlib.Path.home() / ".local/lib/node_modules"))
+    for root in roots:
+        pw = pathlib.Path(root) / "@playwright/cli/node_modules/playwright-core"
+        node = pathlib.Path(root).parent.parent / "bin" / "node"
+        node = str(node) if node.exists() else shutil.which("node")
+        if pw.is_dir() and node:
+            return node, str(pw)
+    return None, None
+
+
+def pick_pages(data):
+    """측정할 페이지: 홈, 토픽 3(제목이 가장 긴 것, 출처 가장 많은 것, 출처 가장 적은 것), 소스, 키워드, 실행 기록 1건."""
+    ts = data["topics"]
+    chosen = []
+    for key in (lambda t: len(t["title"]), lambda t: len(t["sources"]), lambda t: -len(t["sources"])):
+        t = next((t for t in sorted(ts, key=key, reverse=True) if t not in chosen), None)
+        if t:
+            chosen.append(t)
+    most = max(ts, key=lambda t: len(t["sources"]))
+    pages = [{"name": "home", "path": "/"}]
+    pages += [{"name": f'topic {t["id"]}', "path": f'/topic/{t["id"]}/', "topic": True, "longTopic": t is most} for t in chosen]
+    run = next((r for r in data["runs"] if r["kind"] == "weekly" and r.get("week")), None)
+    pages += [{"name": "sources", "path": "/sources/"}, {"name": "keywords", "path": "/keywords/"}]
+    if run:
+        pages.append({"name": "run", "path": f'/runs/{run["week"]}/{run["id"]}/'})
+    return pages
+
+
+def gate9(g, vh):
+    """gate.js 한 건 → 실패한 항목 이름 목록(관문 9의 9항목)."""
+    bad = []
+    for ok, name in ((g["overflow"] <= 0, "1 가로 넘침"), (g["lowContrastN"] == 0, "2 대비"), (g["bodyTextBadN"] == 0, "3 본문 크기·줄 간격"),
+                     (not g["hlMidBreaks"], "4 형광 끊김"), (g["smallRefs"] == 0, "6 인용 누를 영역"), (not g["colorsOff"], "7 토큰 밖 색"),
+                     (all(f[1] for f in g["fonts"]), "8 글꼴 로드"), (g["headingSkips"] == 0 and g["titleAttrs"] == 0, "9 제목 단계·title")):
+        if not ok:
+            bad.append(name)
+    return bad
+
+
+def browser_checks(site, data):
+    node, pw = find_playwright()
+    if not node:
+        check("A8 관문 9 Chromium", False, "playwright-core(전역 @playwright/cli)나 node를 찾지 못함: 브라우저 AC는 건너뛰지 않고 실패로 둔다")
+        check("A9 관문 9 WebKit", False, "같은 이유")
+        check("A10 동작", False, "같은 이유")
+        return
+    server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), functools.partial(type("Q", (http.server.SimpleHTTPRequestHandler,), {"log_message": lambda *a: None}), directory=str(site)))
+    threading.Thread(target=server.serve_forever, daemon=True).start()
+    base = f"http://127.0.0.1:{server.server_address[1]}"
+    pages = pick_pages(data)
+    try:
+        r = subprocess.run([node, str(SRC / "gate.js"), pw, base, json.dumps(pages), str(SRC / "tokens.css")], capture_output=True, text=True, timeout=600)
+    finally:
+        server.shutdown()
+    if r.returncode != 0:
+        for n in ("A8 관문 9 Chromium", "A9 관문 9 WebKit", "A10 동작"):
+            check(n, False, f"gate.js 실패(종료 {r.returncode}): {r.stderr.strip()[-300:]}")
+        return
+    out = json.loads(r.stdout)
+    for name, eng, aid in (("chromium", "Chromium 375·768·1280", "A8"), ("webkit", "WebKit 375(모바일·터치)·1280", "A9")):
+        bad = []
+        for e in (x for x in out["gates"] if x["browser"] == name):
+            miss = gate9(e["gate"], 812)
+            if e["topic"] and e["vw"] == 375 and not (e["gate"]["pointsTop"] is not None and e["gate"]["pointsTop"] < 812):
+                miss.append(f'5 핵심 포인트가 첫 화면 밖({e["gate"]["pointsTop"]})')
+            bad += [f'{e["vw"]} {e["page"]}: {m}' for m in miss]
+        n = sum(x["browser"] == name for x in out["gates"])
+        extra = ""
+        if name == "webkit":
+            t = out["touch"]
+            if not (t["hash"] == t["href"] and t["target"]):
+                bad.append(f'터치: 375에서 인용 번호를 눌러도 출처 목록으로 이동하지 않음({t})')
+            extra = f", 터치 {t['href']} → {t['hash']}"
+        check(f"{aid} 관문 9 {eng}: 페이지·화면 {n}건 × 9항목", not bad, "; ".join(bad[:5]) or f"전부 통과{extra}")
+    check("C-4 브라우저가 낸 요청이 모두 같은 서버(외부 요청 0)", not out["external"], "; ".join(out["external"][:3]))
+    b = out["behavior"]
+    ms = b.get("miniScrolled") or {}
+    problems = [m for ok, m in (
+        (b.get("cites", 0) >= 2, "인용이 2개 미만"), (b.get("early") is False, "툴팁이 0.15초 전에 보임"), (b.get("shown"), "0.15초 뒤에 안 보임"),
+        (b.get("lingers"), "벗어나자마자 닫힘(0.6초 유지 아님)"), (b.get("closed"), "1초 뒤에도 안 닫힘"), (b.get("only") == [b.get("expectOnly")], f'동시에 하나가 아님 {b.get("only")} 기대 {b.get("expectOnly")}'),
+        (b.get("miniTop") == "hidden", f'맨 위에서 미니 바가 보임({b.get("miniTop")})'),
+        (ms.get("visibility") == "visible" and 0 <= ms.get("top", -1) < ms.get("height", 0), f"제목이 빠져도 미니 바가 안 보임({ms})"),
+        (b["tabDefault"] == {"topics": "block", "repos": "none"}, f'기본 탭 {b["tabDefault"]}'),
+        (b["tabRepos"] == {"topics": "none", "repos": "block"}, f'#repos 탭 {b["tabRepos"]}'),
+        (b["tabClick"] == {"topics": "none", "repos": "block"}, f'탭 클릭 {b["tabClick"]}')) if not ok]
+    check("A10 동작(Chromium 1280): 툴팁 0.15초 뒤·0.6초 유지·1초 뒤 닫힘·동시에 하나, 탭(기본·#repos), 미니 바", not problems, "; ".join(problems))
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--fixture", action="store_true", help="픽스처를 임시 폴더에 빌드해서 검사")
+    ap.add_argument("--site", default=str(ROOT / "site"))
+    ap.add_argument("--data", default=str(ROOT / "data" / "site.json"))
+    a = ap.parse_args()
+    tmp = None
+    site, data_path = pathlib.Path(a.site), pathlib.Path(a.data)
+    if a.fixture:
+        tmp = pathlib.Path(tempfile.mkdtemp(prefix="check-site-"))
+        site, data_path = tmp / "site", FIXTURE
+        r = subprocess.run([sys.executable, str(SRC / "build.py"), "--data", str(FIXTURE), "--out", str(site)], capture_output=True, text=True)
+        check("픽스처 빌드", r.returncode == 0 and site.is_dir(), (r.stdout + r.stderr).strip().splitlines()[-1] if (r.stdout + r.stderr).strip() else "")
+    try:
+        if not site.is_dir() or not data_path.is_file():
+            check("검사 대상", False, f"{site} 또는 {data_path} 없음")
+        else:
+            data = json.loads(data_path.read_text(encoding="utf-8"))
+            pages = {f: parse(f) for f in sorted(site.rglob("*.html"))}
+            for step in (lambda: static_checks(site, data, pages), lambda: browser_checks(site, data)):
+                try:
+                    step()
+                except Exception as e:  # noqa: BLE001 - 어긋난 입력에서도 트레이스백 대신 실패 목록으로
+                    check("검사 실행", False, f"{type(e).__name__}: {e}")
+    finally:
+        if tmp:
+            shutil.rmtree(tmp, ignore_errors=True)
+    failed = [r for r in results if not r[1]]
+    print(f"\n{len(results) - len(failed)}/{len(results)} 통과")
+    for name, _, detail in failed:
+        print(f"실패: {name}  ({detail})")
+    return 1 if failed else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

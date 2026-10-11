@@ -1,0 +1,229 @@
+// 관문 9 측정 + 동작 검사(S6a). check.py가 부른다. 사이트에는 나가지 않음(측정 전용).
+// 사용: node gate.js <playwright-core 경로> <기준 URL> <페이지 JSON: [{name, path, topic}]> <tokens.css>
+// 출력(stdout): JSON {gates: [...], touch: {...}, behavior: {...}, external: [...]}. 판정은 check.py가 한다.
+const fs = require('fs');
+const pw = require(process.argv[2]);
+const base = process.argv[3];
+const pages = JSON.parse(process.argv[4]);
+const tokenCss = fs.readFileSync(process.argv[5], 'utf8');
+
+const hex2rgb = (h) => `rgb(${parseInt(h.slice(1, 3), 16)}, ${parseInt(h.slice(3, 5), 16)}, ${parseInt(h.slice(5, 7), 16)})`;
+const TOKENS = [...new Set(tokenCss.match(/--c-[a-z-]+:\s*#[0-9a-fA-F]{6}/g).map((s) => hex2rgb(s.slice(s.indexOf('#')))))];
+const WEIGHTS = ['400', '500'];
+
+// 관문 9의 9항목 측정(drafts/shoot.py의 GATE_JS, 이 사이트의 토큰·클래스에 맞게). 브라우저 안에서 실행
+function gateInBrowser([weights, tokens]) {
+  const vw = document.documentElement.clientWidth;
+  const g = {};
+  g.overflow = document.documentElement.scrollWidth - vw;
+  const parse = (c) => { const m = c.match(/[\d.]+/g); return m ? m.map(Number) : null; };
+  const lum = (rgb) => { const a = rgb.slice(0, 3).map((v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }); return 0.2126 * a[0] + 0.7152 * a[1] + 0.0722 * a[2]; };
+  const bgOf = (el) => { while (el) { const c = parse(getComputedStyle(el).backgroundColor); if (c && (c.length < 4 || c[3] > 0.5)) return c; el = el.parentElement; } return [255, 255, 255]; };
+  const low = [];
+  const wt = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  const seen = new Set();
+  while (wt.nextNode()) {
+    const t = wt.currentNode;
+    if (!t.textContent.trim()) continue;
+    const el = t.parentElement;
+    if (seen.has(el)) continue;
+    seen.add(el);
+    const cs = getComputedStyle(el);
+    const r = el.getBoundingClientRect();
+    if (r.width === 0 || cs.visibility === 'hidden' || el.closest('.sr, .tip')) continue;
+    const fs = parseFloat(cs.fontSize);
+    const fw = parseInt(cs.fontWeight);
+    const L1 = lum(parse(cs.color));
+    const L2 = lum(bgOf(el));
+    const ratio = (Math.max(L1, L2) + 0.05) / (Math.min(L1, L2) + 0.05);
+    const large = fs >= 24 || (fs >= 18.66 && fw >= 700);
+    if (ratio < (large ? 3 : 4.5)) low.push({ sel: el.className || el.tagName, ratio: +ratio.toFixed(2), text: t.textContent.trim().slice(0, 20) });
+  }
+  g.lowContrast = low.slice(0, 10);
+  g.lowContrastN = low.length;
+  const bodySel = '.it-s, .ts, .ov, .pt-x, .cc dd, .cb dd, .rp-w';
+  const bad = [];
+  for (const el of document.querySelectorAll(bodySel)) {
+    const cs = getComputedStyle(el);
+    const fs = parseFloat(cs.fontSize);
+    const lh = parseFloat(cs.lineHeight) / fs;
+    if (fs < 16 || lh < 1.5) bad.push({ sel: el.className, fs, lh: +lh.toFixed(2) });
+  }
+  g.bodyTextBadN = bad.length;
+  g.bodyTextBad = bad.slice(0, 5);
+  // 형광 구절이 단어 중간에서 끊긴 곳
+  const midBreaks = (root) => {
+    const res = [];
+    const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    const chars = [];
+    while (w.nextNode()) {
+      const n = w.currentNode;
+      if (n.parentElement.closest('.tip')) continue;
+      for (let i = 0; i < n.textContent.length; i++) {
+        const r = document.createRange();
+        r.setStart(n, i);
+        r.setEnd(n, i + 1);
+        const rc = r.getClientRects()[0];
+        chars.push({ ch: n.textContent[i], top: rc && rc.width > 0 ? Math.round(rc.top) : null });
+      }
+    }
+    let last = -1;
+    for (let i = 0; i < chars.length; i++) {
+      if (chars[i].top === null) continue;
+      if (last >= 0 && chars[i].top > chars[last].top + 4) {
+        let gap = false;
+        for (let j = last + 1; j < i; j++) if (/\s/.test(chars[j].ch)) gap = true;
+        const a = chars[last].ch;
+        const b = chars[i].ch;
+        if (!gap && !/\s/.test(a) && !/\s/.test(b) && !/[\-\/,.)\]·]/.test(a) && !/[(\[]/.test(b)) {
+          res.push(chars.slice(Math.max(0, last - 3), last + 1).map((c) => c.ch).join('') + '|' + chars.slice(i, i + 3).map((c) => c.ch).join(''));
+        }
+      }
+      last = i;
+    }
+    return res;
+  };
+  g.hlMidBreaks = [];
+  for (const m of document.querySelectorAll('mark.hl')) g.hlMidBreaks.push(...midBreaks(m));
+  const pt = document.querySelector('.sec-pt');
+  g.pointsTop = pt ? Math.round(pt.getBoundingClientRect().top + window.scrollY) : null;
+  const small = [];
+  for (const a of document.querySelectorAll('a.ref')) {
+    const r = a.getBoundingClientRect();
+    if (r.width < 24 || r.height < 24) small.push([Math.round(r.width), Math.round(r.height)]);
+  }
+  g.smallRefs = small.length;
+  const used = new Set();
+  for (const el of document.querySelectorAll('body, body *')) {
+    const cs = getComputedStyle(el);
+    for (const p of ['color', 'backgroundColor', 'borderTopColor', 'borderRightColor', 'borderBottomColor', 'borderLeftColor', 'outlineColor', 'textDecorationColor']) {
+      const v = cs[p];
+      if (!v || v === 'rgba(0, 0, 0, 0)') continue;
+      if (p.startsWith('border') && cs[p.replace('Color', 'Width')] === '0px') continue;
+      if (p === 'outlineColor' && (cs.outlineStyle === 'none' || cs.outlineWidth === '0px')) continue;
+      if (p === 'textDecorationColor' && cs.textDecorationLine === 'none') continue;
+      used.add(v);
+    }
+    // box-shadow 색(밑줄 역할). 검정 + 투명도(툴팁 그림자)는 색이 아니라 깊이 표현이라 뺀다
+    for (const m of (cs.boxShadow === 'none' ? [] : cs.boxShadow.match(/rgba?\([^)]*\)/g) || [])) if (!/^rgba\(0, 0, 0, [\d.]+\)$/.test(m)) used.add(m);
+  }
+  g.colorsOff = [...used].filter((c) => !tokens.includes(c));
+  g.fonts = weights.map((w) => [w, [...document.fonts].some((ff) => ff.family.replace(/["']/g, '') === 'Pretendard' && String(ff.weight) === w && ff.status === 'loaded')]);
+  const hs = [...document.querySelectorAll('h1, h2, h3, h4')].map((h) => +h.tagName[1]);
+  let skip = 0;
+  for (let i = 1; i < hs.length; i++) if (hs[i] > hs[i - 1] + 1) skip++;
+  g.headingSkips = skip + (hs[0] === 1 ? 0 : 1);
+  g.titleAttrs = document.querySelectorAll('[title]:not(link)').length;
+  return g;
+}
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const tipOn = (page, idx) => page.evaluate((i) => { const t = document.querySelectorAll('.cite > .tip')[i]; const cs = getComputedStyle(t); return cs.visibility === 'visible' && parseFloat(cs.opacity) > 0.5; }, idx);
+
+async function open(ctx, path, external) {
+  const page = await ctx.newPage();
+  page.on('request', (r) => { if (!r.url().startsWith(base) && !r.url().startsWith('data:')) external.push(r.url()); });
+  await page.goto(base + path, { waitUntil: 'networkidle' });
+  await page.evaluate(() => document.fonts.ready);
+  await page.waitForTimeout(100);
+  return page;
+}
+
+async function gates(browser, name, viewports, out, external) {
+  for (const [w, h, mobile] of viewports) {
+    const ctx = await browser.newContext({ viewport: { width: w, height: h }, isMobile: mobile, hasTouch: mobile });
+    for (const p of pages) {
+      const page = await open(ctx, p.path, external);
+      out.push({ browser: name, vw: w, page: p.name, topic: !!p.topic, gate: await page.evaluate(gateInBrowser, [WEIGHTS, TOKENS]) });
+      await page.close();
+    }
+    await ctx.close();
+  }
+}
+
+async function touch(browser, topicPath) {
+  const ctx = await browser.newContext({ viewport: { width: 375, height: 812 }, isMobile: true, hasTouch: true });
+  const page = await ctx.newPage();
+  await page.goto(base + topicPath, { waitUntil: 'networkidle' });
+  const first = page.locator('.pt-x a.ref').first();
+  const href = await first.getAttribute('href');
+  await first.tap();
+  await page.waitForTimeout(200);
+  const res = await page.evaluate((h) => ({ hash: location.hash, target: !!document.querySelector(h) && document.querySelector(h).classList.contains('src') }), href);
+  await ctx.close();
+  return { href, ...res };
+}
+
+async function behavior(browser, longTopic, homePath) {
+  const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  const b = {};
+  let page = await ctx.newPage();
+  await page.goto(base + longTopic, { waitUntil: 'networkidle' });
+  const nCites = await page.locator('.cite > .tip').count();
+  b.cites = nCites;
+  if (nCites >= 2) {
+    // 화면 안에 함께 보이는 인용 번호들(마우스가 정확히 올라간 시각부터 재려고 좌표로 움직임)
+    await page.evaluate(() => { const r = document.querySelector('.pt-x .cite > .ref').getBoundingClientRect(); window.scrollTo(0, window.scrollY + r.top - 150); });
+    await sleep(100);
+    const pos = await page.evaluate(() => [...document.querySelectorAll('.cite > .ref')].map((a, i) => { const r = a.getBoundingClientRect(); return { i, x: r.x + r.width / 2, y: r.y + r.height / 2, ok: r.top > 0 && r.bottom < innerHeight }; }).filter((p) => p.ok));
+    const A = pos[0];
+    await page.mouse.move(2, 2);
+    await sleep(300);
+    await page.mouse.move(A.x, A.y);
+    await sleep(60);
+    b.early = await tipOn(page, A.i); // 0.15초 전에는 숨김
+    await sleep(340);
+    b.shown = await tipOn(page, A.i);
+    const rect = await page.evaluate((i) => { const r = document.querySelectorAll('.cite > .tip')[i].getBoundingClientRect(); return { l: r.left - 8, r: r.right + 8, t: r.top - 8, b: r.bottom + 8 }; }, A.i);
+    const B = pos.find((p) => p.i !== A.i && !(p.x > rect.l && p.x < rect.r && p.y > rect.t && p.y < rect.b));
+    await page.mouse.move(2, 2);
+    await sleep(300);
+    b.lingers = await tipOn(page, A.i); // 벗어나도 0.6초 유지
+    await sleep(800);
+    b.closed = !(await tipOn(page, A.i)); // 1초 뒤 닫힘
+    if (B) {
+      await page.mouse.move(A.x, A.y);
+      await sleep(400);
+      await page.mouse.move(B.x, B.y);
+      await sleep(400);
+      b.expectOnly = B.i;
+      b.only = await page.evaluate(() => [...document.querySelectorAll('.cite > .tip')].map((t, i) => { const cs = getComputedStyle(t); return cs.visibility === 'visible' && parseFloat(cs.opacity) > 0.5 ? i : -1; }).filter((i) => i >= 0));
+    }
+  }
+  // 미니 바: 맨 위에서는 숨김, 제목이 위로 빠지면 보임
+  await page.mouse.move(2, 2);
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await sleep(150);
+  b.miniTop = await page.evaluate(() => { const m = document.querySelector('.mini'); return m ? getComputedStyle(m).visibility : null; });
+  await page.evaluate(() => window.scrollTo(0, 1400));
+  await sleep(300);
+  b.miniScrolled = await page.evaluate(() => { const m = document.querySelector('.mini'); if (!m) return null; const r = m.getBoundingClientRect(); return { visibility: getComputedStyle(m).visibility, top: Math.round(r.top), height: Math.round(r.height), scrollY: Math.round(window.scrollY) }; });
+  await page.close();
+  // 탭: 기본은 토픽, #repos면 레포
+  const panel = (pg) => pg.evaluate(() => ({ topics: getComputedStyle(document.querySelector('#topics')).display, repos: getComputedStyle(document.querySelector('#repos')).display }));
+  page = await ctx.newPage();
+  await page.goto(base + homePath, { waitUntil: 'networkidle' });
+  b.tabDefault = await panel(page);
+  await page.goto(base + homePath + '#repos', { waitUntil: 'networkidle' });
+  b.tabRepos = await panel(page);
+  await page.goto(base + homePath, { waitUntil: 'networkidle' });
+  await page.click('.tb-r');
+  b.tabClick = await panel(page);
+  await ctx.close();
+  return b;
+}
+
+(async () => {
+  const out = { gates: [], external: [] };
+  const chromium = await pw.chromium.launch();
+  await gates(chromium, 'chromium', [[375, 812, true], [768, 1024, false], [1280, 900, false]], out.gates, out.external);
+  const longTopic = (pages.find((p) => p.longTopic) || pages.find((p) => p.topic)).path;
+  out.behavior = await behavior(chromium, longTopic, pages[0].path);
+  await chromium.close();
+  const webkit = await pw.webkit.launch();
+  await gates(webkit, 'webkit', [[375, 812, true], [1280, 900, false]], out.gates, out.external);
+  out.touch = await touch(webkit, pages.find((p) => p.topic).path);
+  await webkit.close();
+  out.tokens = TOKENS;
+  process.stdout.write(JSON.stringify(out));
+})().catch((e) => { process.stderr.write(String(e && e.stack || e) + '\n'); process.exit(2); });

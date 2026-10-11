@@ -1,4 +1,6 @@
-site/
+/site
+/site.tmp-*
+/site.old
 .DS_Store
 *.log
 .env
@@ -7,10 +9,8 @@ __pycache__/
 .venv/
 .pytest_cache/
 .ruff_cache/
-# data/는 실행 기록과 캐시. 예시 사이트의 출력 계약 파일만 예외로 추적
-data/*
-!data/trendsit-example.json
-!data/make_data.py
+# data/는 실행 기록과 캐시. 실행 폴더에서는 data, site가 링크라 끝 슬래시 없이 둔다
+/data
 
 # impl-workflow 런 디렉터리(증적·원장). 남길 것은 reports/로 옮긴다
 .workflow/

@@ -1,0 +1,955 @@
+{
+ "meta": {
+  "product": "TrendsIT",
+  "generated_at": "2026-10-12",
+  "signal_labels": {
+   "trending": "트렌딩",
+   "rising": "급상승",
+   "release": "릴리스",
+   "needs_check": "확인 필요"
+  },
+  "channel_labels": {
+   "text": "글",
+   "video": "영상",
+   "github": "GitHub"
+  },
+  "channel_labels_topic": {
+   "text": "글",
+   "video": "영상",
+   "github": "레포"
+  }
+ },
+ "weeks": [
+  {
+   "id": "2026-w41",
+   "label": "10월 2주차",
+   "range": "10.5 ~ 10.11",
+   "published_at": "2026-10-12T07:10:00+09:00",
+   "collected": {
+    "text": 40,
+    "video": 3,
+    "github": 11
+   },
+   "topic_ids": [
+    "w41-long",
+    "w41-one",
+    "w41-mid"
+   ],
+   "topic_count": 3,
+   "source_count": 18,
+   "trending_approx": false
+  },
+  {
+   "id": "2026-w40",
+   "label": "10월 1주차",
+   "range": "9.28 ~ 10.4",
+   "published_at": "2026-10-05T07:10:00+09:00",
+   "collected": {
+    "text": 40,
+    "video": 3,
+    "github": 11
+   },
+   "topic_ids": [
+    "w40-base",
+    "w40-other"
+   ],
+   "topic_count": 2,
+   "source_count": 3,
+   "trending_approx": false
+  },
+  {
+   "id": "2026-w39",
+   "label": "9월 4주차",
+   "range": "9.21 ~ 9.27",
+   "published_at": "2026-09-28T07:10:00+09:00",
+   "collected": {
+    "text": 40,
+    "video": 3,
+    "github": 11
+   },
+   "topic_ids": [
+    "w39-first"
+   ],
+   "topic_count": 1,
+   "source_count": 1,
+   "trending_approx": true
+  }
+ ],
+ "topics": [
+  {
+   "id": "w41-long",
+   "week": "2026-w41",
+   "rank": 1,
+   "lead": true,
+   "title": "판단 모델 경쟁이 본격화되면서 결정 API와 추론형 판단, 로컬 실행 도구까지 한꺼번에 쏟아진 한 주",
+   "summary": "==Decision API==가 150ms 응답을 내세웠고, 추론형 모델은 정확도를 올리는 대신 지연이 늘었다. 쟁점은 ==정확도와 지연의 맞교환==이다.",
+   "relation": {
+    "type": "follow_up",
+    "topic_id": "w40-base",
+    "label": "10월 1주차 토픽의 후속"
+   },
+   "overview": "지난주 호환 서버에 이어 이번 주에는 상용 API와 오픈소스 모델이 나란히 나왔다. `jevcompat`는 응답 150ms, 정확도 86.6%에서 93.5%로 올랐다는 수치를 내놨고, ==빠르고 싸야 한다는 취지==와 부딪힌다는 비판도 나왔다.",
+   "points": [
+    {
+     "text": "Decision API 응답 150ms, 일반 모델(1.6초)보다 약 10배 빠름. 9월 29일 기준 제한적 프리뷰",
+     "refs": [
+      "s1",
+      "s2"
+     ],
+     "check": true
+    },
+    {
+     "text": "어려운 111문항에서는 ==86.5% 대 73.0%==로 차이가 더 큼",
+     "refs": [
+      "s2",
+      "v1"
+     ]
+    },
+    {
+     "text": "H100 기준 추론 없이 약 0.3초, 전체 추론 시 지연 중앙값 3.3초. 가중치, 학습 코드 MIT 공개",
+     "refs": [
+      "s3",
+      "g1"
+     ]
+    },
+    {
+     "text": "oh-my-jev: 서빙, 비교, 미세조정을 한곳에서 하는 CLI와 웹 UI. 정확도와 보정(ECE, Brier)까지 측정",
+     "refs": [
+      "s4",
+      "g2",
+      "g3"
+     ]
+    },
+    {
+     "text": "영상 발표에서는 라우터로 쓰는 구조와 호출 비용 비교를 소개",
+     "refs": [
+      "v2",
+      "s5",
+      "s6",
+      "g4"
+     ]
+    }
+   ],
+   "diagrams": [
+    {
+     "type": "bars",
+     "anchor": 2,
+     "title": "Jeeves가 4개 모델 중 정확도 최고",
+     "unit": "%",
+     "context": "같은 JevBench 231문항으로 잰 정확도. [it:8#q2]",
+     "items": [
+      {
+       "label": "Jeeves",
+       "value": "93.5%",
+       "emphasis": true
+      },
+      {
+       "label": "Jev",
+       "value": "86.6%"
+      },
+      {
+       "label": "Luna",
+       "value": "81.2%"
+      },
+      {
+       "label": "Orbit",
+       "value": 79
+      }
+     ],
+     "ref": "s2"
+    },
+    {
+     "type": "events",
+     "anchor": 2,
+     "title": "판단 모델 흐름 2주",
+     "context": "지난주 로컬 도구에서 이번 주 상용 API로.",
+     "items": [
+      {
+       "date": "2026-09-22",
+       "text": "Jev 사용 후기",
+       "topic_id": "w40-base"
+      },
+      {
+       "date": "2026-09-29",
+       "text": "Decision API 프리뷰",
+       "ref": "s1"
+      },
+      {
+       "date": "2026-10-02",
+       "text": "oh-my-jev 공개",
+       "ref": "s4"
+      }
+     ]
+    },
+    {
+     "type": "video",
+     "ref": "v1",
+     "title": "발표 타임라인",
+     "marks": [
+      {
+       "t": "01:50",
+       "text": "문제 제기",
+       "sec": 110
+      },
+      {
+       "t": "15:20",
+       "text": "호출 비용 비교",
+       "slide": true,
+       "sec": 920
+      }
+     ]
+    }
+   ],
+   "concepts": [
+    {
+     "term": "보정(calibration)",
+     "desc": "모델이 말한 확률과 실제로 맞을 확률이 얼마나 일치하는지. ECE로 잼"
+    },
+    {
+     "term": "p90 지연",
+     "desc": "요청 100개 중 90번째로 느린 응답 시간"
+    }
+   ],
+   "contributions": [
+    {
+     "channel": "text",
+     "text": "API 공개 내용과 벤치마크"
+    },
+    {
+     "channel": "video",
+     "text": "라우팅 적용 사례"
+    },
+    {
+     "channel": "github",
+     "text": "가중치와 학습 코드"
+    }
+   ],
+   "sources": [
+    {
+     "id": "s1",
+     "channel": "text",
+     "site": "GeekNews",
+     "title": "긴 토픽 글 1번, 제목이 조금 길어서 줄바꿈이 생기는 경우",
+     "date": "2026-10-01",
+     "url": "https://example.com/s1",
+     "origin": "https://origin.example.org/blog/original-post"
+    },
+    {
+     "id": "s2",
+     "channel": "text",
+     "site": "GeekNews",
+     "title": "긴 토픽 글 2번, 제목이 조금 길어서 줄바꿈이 생기는 경우",
+     "date": "2026-10-02",
+     "url": "https://example.com/s2"
+    },
+    {
+     "id": "s3",
+     "channel": "text",
+     "site": "GeekNews",
+     "title": "긴 토픽 글 3번, 제목이 조금 길어서 줄바꿈이 생기는 경우",
+     "date": "2026-10-03",
+     "url": "https://example.com/s3"
+    },
+    {
+     "id": "s4",
+     "channel": "text",
+     "site": "GeekNews",
+     "title": "긴 토픽 글 4번, 제목이 조금 길어서 줄바꿈이 생기는 경우",
+     "date": "2026-10-04",
+     "url": "https://example.com/s4"
+    },
+    {
+     "id": "s5",
+     "channel": "text",
+     "site": "GeekNews",
+     "title": "긴 토픽 글 5번, 제목이 조금 길어서 줄바꿈이 생기는 경우",
+     "date": "2026-10-05",
+     "url": "https://example.com/s5"
+    },
+    {
+     "id": "s6",
+     "channel": "text",
+     "site": "GeekNews",
+     "title": "긴 토픽 글 6번, 제목이 조금 길어서 줄바꿈이 생기는 경우",
+     "date": "2026-10-06",
+     "url": "https://example.com/s6"
+    },
+    {
+     "id": "v1",
+     "channel": "video",
+     "site": "Tech Bridge",
+     "title": "발표 영상: 판단 모델 라우팅",
+     "date": "2026-10-07",
+     "url": "https://example.com/v1"
+    },
+    {
+     "id": "v2",
+     "channel": "video",
+     "site": "Tech Bridge",
+     "title": "링크 없는 영상",
+     "date": "2026-10-08",
+     "url": null
+    },
+    {
+     "id": "g1",
+     "channel": "github",
+     "site": "GitHub",
+     "title": "org/repo-1",
+     "date": "2026-10-01",
+     "url": "https://github.com/org/repo-1"
+    },
+    {
+     "id": "g2",
+     "channel": "github",
+     "site": "GitHub",
+     "title": "org/repo-2",
+     "date": "2026-10-02",
+     "url": "https://github.com/org/repo-2"
+    },
+    {
+     "id": "g3",
+     "channel": "github",
+     "site": "GitHub",
+     "title": "org/repo-3",
+     "date": "2026-10-03",
+     "url": "https://github.com/org/repo-3"
+    },
+    {
+     "id": "g4",
+     "channel": "github",
+     "site": "GitHub",
+     "title": "org/repo-4",
+     "date": "2026-10-04",
+     "url": "https://github.com/org/repo-4"
+    }
+   ],
+   "channels": [
+    "github",
+    "text",
+    "video"
+   ],
+   "has_check": true,
+   "checks": [
+    "overview",
+    "points[0]",
+    "concepts[0]",
+    "빠진 도식: 응답 지연"
+   ]
+  },
+  {
+   "id": "w41-one",
+   "week": "2026-w41",
+   "rank": 2,
+   "lead": false,
+   "title": "출처가 하나뿐인 짧은 토픽",
+   "summary": "글 한 건이 ==새 설정 방식==을 소개했다.",
+   "relation": {
+    "type": "follow_up",
+    "topic_id": "w39-gone"
+   },
+   "overview": "한 글이 새 설정 방식을 소개했다. 자세한 비교는 없다.",
+   "points": [
+    {
+     "text": "설정 파일 하나로 모든 옵션을 선언",
+     "refs": [
+      "s1"
+     ]
+    },
+    {
+     "text": "기본값은 보수적으로 잡힘",
+     "refs": [
+      "s1"
+     ]
+    }
+   ],
+   "diagrams": [],
+   "concepts": [],
+   "contributions": [],
+   "sources": [
+    {
+     "id": "s1",
+     "channel": "text",
+     "site": "GeekNews",
+     "title": "새 설정 방식 소개",
+     "date": "2026-10-09",
+     "url": "https://example.com/s1"
+    }
+   ],
+   "channels": [
+    "text"
+   ],
+   "has_check": false,
+   "checks": []
+  },
+  {
+   "id": "w41-mid",
+   "week": "2026-w41",
+   "rank": 3,
+   "lead": false,
+   "title": "평범한 토픽, 수치 막대 하나",
+   "summary": "세 곳이 같은 수치를 다뤘다.",
+   "relation": {
+    "type": "new"
+   },
+   "overview": "세 출처가 같은 수치를 각자 다른 조건으로 보고했다.",
+   "points": [
+    {
+     "text": "처리량 2.4배 증가, 지연은 비슷",
+     "refs": [
+      "s1",
+      "s2"
+     ]
+    },
+    {
+     "text": "메모리 사용은 30% 감소",
+     "refs": [
+      "s3"
+     ]
+    },
+    {
+     "text": "레포는 MIT로 공개",
+     "refs": [
+      "g1"
+     ]
+    },
+    {
+     "text": "AAII 벤치마크 43점",
+     "refs": [
+      "s1"
+     ]
+    },
+    {
+     "text": "설치는 `uv`로",
+     "refs": [
+      "s2"
+     ]
+    },
+    {
+     "text": "처리량이 ==2배 늘어==됨",
+     "refs": [
+      "s3"
+     ]
+    },
+    {
+     "text": "정확도 ==93.5%==가",
+     "refs": [
+      "g1"
+     ]
+    },
+    {
+     "text": "그는 \"빠르다\"고 했고 it's 안정적 & 저렴 <b>",
+     "refs": [
+      "s1"
+     ]
+    }
+   ],
+   "diagrams": [
+    {
+     "type": "bars",
+     "anchor": 1,
+     "title": "처리량 비교",
+     "unit": "배",
+     "context": "같은 조건. [it:924#q3, it:924#q4]",
+     "items": [
+      {
+       "label": "이전",
+       "value": "1",
+       "baseline": true
+      },
+      {
+       "label": "이번",
+       "value": "2.4",
+       "emphasis": true
+      }
+     ],
+     "ref": "s1"
+    }
+   ],
+   "concepts": [],
+   "contributions": [],
+   "sources": [
+    {
+     "id": "s1",
+     "channel": "text",
+     "site": "GeekNews",
+     "title": "처리량 글 1",
+     "date": "2026-10-06",
+     "url": "https://example.com/s1"
+    },
+    {
+     "id": "s2",
+     "channel": "text",
+     "site": "GeekNews",
+     "title": "처리량 글 2",
+     "date": "2026-10-07",
+     "url": "https://example.com/s2"
+    },
+    {
+     "id": "s3",
+     "channel": "text",
+     "site": "GeekNews",
+     "title": "메모리 글",
+     "date": "2026-10-08",
+     "url": "https://example.com/s3"
+    },
+    {
+     "id": "g1",
+     "channel": "github",
+     "site": "GitHub",
+     "title": "org/fast",
+     "date": "2026-10-08",
+     "url": "https://github.com/org/fast"
+    }
+   ],
+   "channels": [
+    "github",
+    "text"
+   ],
+   "has_check": false,
+   "checks": []
+  },
+  {
+   "id": "w40-base",
+   "week": "2026-w40",
+   "rank": 1,
+   "lead": true,
+   "title": "지난 주의 기반 토픽",
+   "summary": "기반이 되는 토픽이다.",
+   "relation": {
+    "type": "new"
+   },
+   "overview": "개요 문단이다.",
+   "points": [
+    {
+     "text": "포인트 하나",
+     "refs": [
+      "s1"
+     ]
+    },
+    {
+     "text": "포인트 둘",
+     "refs": [
+      "s2"
+     ]
+    }
+   ],
+   "diagrams": [],
+   "concepts": [],
+   "contributions": [],
+   "sources": [
+    {
+     "id": "s1",
+     "channel": "text",
+     "site": "GeekNews",
+     "title": "기반 글 1",
+     "date": "2026-09-29",
+     "url": "https://example.com/s1"
+    },
+    {
+     "id": "s2",
+     "channel": "text",
+     "site": "GeekNews",
+     "title": "기반 글 2",
+     "date": "2026-09-30",
+     "url": "https://example.com/s2"
+    }
+   ],
+   "channels": [
+    "text"
+   ],
+   "has_check": false,
+   "checks": []
+  },
+  {
+   "id": "w40-other",
+   "week": "2026-w40",
+   "rank": 2,
+   "lead": false,
+   "title": "같은 주의 다른 토픽",
+   "summary": "다른 이야기다.",
+   "relation": {
+    "type": "new"
+   },
+   "overview": "개요다.",
+   "points": [
+    {
+     "text": "포인트",
+     "refs": [
+      "s1"
+     ]
+    }
+   ],
+   "diagrams": [],
+   "concepts": [],
+   "contributions": [],
+   "sources": [
+    {
+     "id": "s1",
+     "channel": "text",
+     "site": "GeekNews",
+     "title": "다른 글",
+     "date": "2026-10-01",
+     "url": "https://example.com/s1"
+    }
+   ],
+   "channels": [
+    "text"
+   ],
+   "has_check": false,
+   "checks": []
+  },
+  {
+   "id": "w39-first",
+   "week": "2026-w39",
+   "rank": 1,
+   "lead": false,
+   "title": "가장 오래된 주의 토픽",
+   "summary": "첫 주 토픽이다.",
+   "relation": {
+    "type": "new"
+   },
+   "overview": "개요다.",
+   "points": [
+    {
+     "text": "포인트",
+     "refs": [
+      "s1"
+     ]
+    }
+   ],
+   "diagrams": [],
+   "concepts": [],
+   "contributions": [],
+   "sources": [
+    {
+     "id": "s1",
+     "channel": "text",
+     "site": "GeekNews",
+     "title": "첫 주 글",
+     "date": "2026-09-22",
+     "url": "https://example.com/s1"
+    }
+   ],
+   "channels": [
+    "text"
+   ],
+   "has_check": false,
+   "checks": []
+  }
+ ],
+ "repos": [
+  {
+   "week": "2026-w40",
+   "name": "org/hot",
+   "stars_7d": "+1.6k",
+   "signal": "release",
+   "what": "빠른 처리 엔진. 1.0 릴리스",
+   "topic_id": "w40-base",
+   "url": "https://github.com/org/hot"
+  },
+  {
+   "week": "2026-w40",
+   "name": "org/hype",
+   "stars_7d": "+5.6k",
+   "signal": "needs_check",
+   "what": "README 말고는 내용이 거의 없는 도구",
+   "topic_id": null,
+   "url": "https://github.com/org/hype"
+  },
+  {
+   "week": "2026-w40",
+   "name": "org/nostars",
+   "stars_7d": null,
+   "signal": null,
+   "what": "별 정보가 없는 레포",
+   "topic_id": null,
+   "url": "https://github.com/org/nostars"
+  },
+  {
+   "week": "2026-w39",
+   "name": "org/monthly-a",
+   "stars_7d": null,
+   "signal": "trending",
+   "what": "월간 목록으로 대신한 레포 A",
+   "topic_id": null,
+   "url": "https://github.com/org/monthly-a"
+  },
+  {
+   "week": "2026-w39",
+   "name": "org/monthly-b",
+   "stars_7d": null,
+   "signal": "trending",
+   "what": "월간 목록으로 대신한 레포 B",
+   "topic_id": null,
+   "url": "https://github.com/org/monthly-b"
+  }
+ ],
+ "sources": [
+  {
+   "id": "geeknews",
+   "name": "GeekNews",
+   "type": "curation",
+   "channel": "text",
+   "url": "https://news.hada.io",
+   "enabled": true,
+   "note": "큐레이션",
+   "weeks": {
+    "2026-w41": {
+     "collected": 20,
+     "failed_days": 0,
+     "used_in_topics": 5
+    },
+    "2026-w40": {
+     "collected": 20,
+     "failed_days": 0,
+     "used_in_topics": 5
+    },
+    "2026-w39": {
+     "collected": 20,
+     "failed_days": 0,
+     "used_in_topics": 5
+    }
+   },
+   "last": {
+    "at": "2026-10-11T02:00:00+09:00",
+    "count": 3,
+    "status": "ok"
+   },
+   "last_error": null
+  },
+  {
+   "id": "anthropic",
+   "name": "Anthropic News",
+   "type": "primary",
+   "channel": "text",
+   "url": null,
+   "enabled": false,
+   "weeks": {
+    "2026-w41": {
+     "collected": 0,
+     "failed_days": 0,
+     "used_in_topics": 0
+    }
+   },
+   "last": null,
+   "last_error": null
+  },
+  {
+   "id": "techbridge",
+   "name": "Tech Bridge",
+   "type": "video",
+   "channel": "video",
+   "url": "https://www.youtube.com/@techbridge",
+   "enabled": true,
+   "weeks": {
+    "2026-w41": {
+     "collected": 4,
+     "failed_days": 2,
+     "used_in_topics": 1
+    }
+   },
+   "last": {
+    "at": "2026-10-11T02:00:00+09:00",
+    "count": 0,
+    "status": "failed"
+   },
+   "last_error": "시간 초과"
+  },
+  {
+   "id": "github_trending",
+   "name": "GitHub Trending",
+   "type": "trending",
+   "channel": "github",
+   "url": "https://github.com/trending",
+   "enabled": true,
+   "weeks": {
+    "2026-w41": {
+     "collected": 16,
+     "failed_days": 0,
+     "used_in_topics": 4
+    }
+   },
+   "last": {
+    "at": "2026-10-11T02:00:00+09:00",
+    "count": 5,
+    "status": "partial"
+   },
+   "last_error": "일부 레포 README 실패"
+  }
+ ],
+ "keywords": {
+  "weeks": [
+   "2026-w39",
+   "2026-w40",
+   "2026-w41"
+  ],
+  "items": [
+   {
+    "id": "agent",
+    "name": "AI 에이전트",
+    "aliases": [
+     "agent",
+     "에이전트"
+    ],
+    "mentions": [
+     3,
+     6,
+     9
+    ],
+    "topics": [
+     "w41-long",
+     "w40-base",
+     "w39-gone"
+    ]
+   },
+   {
+    "id": "mcp",
+    "name": "MCP",
+    "aliases": [],
+    "mentions": [
+     0,
+     0,
+     2
+    ],
+    "topics": []
+   }
+  ]
+ },
+ "runs": [
+  {
+   "id": "r41",
+   "kind": "weekly",
+   "week": "2026-w41",
+   "at": "2026-10-12T07:00:00+09:00",
+   "duration_min": 18.0,
+   "status": "ok",
+   "cost_usd": 0.0512,
+   "summary": "토픽 3개 발행, 검수 반려 1회, 확인 필요 3문장",
+   "counts": {
+    "candidates": 9,
+    "related": {
+     "follow_up": 2,
+     "new": 7,
+     "duplicate": 0
+    },
+    "selected": 3,
+    "evidence_ids": 41,
+    "review": {
+     "passed_first": 2,
+     "rejected": 1,
+     "needs_check": 3
+    },
+    "published": 3
+   },
+   "steps": [
+    {
+     "role": "writer",
+     "text": "포인트 5개, 근거 id 12개",
+     "t": "07:05",
+     "attention": false
+    },
+    {
+     "role": "critic",
+     "text": "1차 반려: 수치가 근거와 단위가 달라 수정 요청",
+     "t": "07:11",
+     "attention": true,
+     "detail": {
+      "topic_id": "w41-long",
+      "draft": "약 15,000토큰 분량",
+      "evidence": "약 15,000줄의 TypeScript",
+      "fixed": "약 15,000줄의 TypeScript"
+     }
+    },
+    {
+     "role": "weekly",
+     "text": "토픽 3개 발행",
+     "t": "07:18",
+     "attention": false
+    }
+   ]
+  },
+  {
+   "id": "r40",
+   "kind": "weekly",
+   "week": "2026-w40",
+   "at": "2026-10-05T07:00:00+09:00",
+   "duration_min": 0.6,
+   "status": "ok",
+   "cost_usd": 0.0,
+   "summary": "토픽 2개 발행",
+   "counts": {
+    "evidence_ids": 8,
+    "published": 2
+   },
+   "steps": []
+  },
+  {
+   "id": "r39",
+   "kind": "weekly",
+   "week": "2026-w39",
+   "at": "2026-09-28T07:00:00+09:00",
+   "duration_min": null,
+   "status": "running",
+   "cost_usd": 0,
+   "summary": "토픽 1개 발행",
+   "counts": {
+    "published": 1
+   },
+   "steps": []
+  },
+  {
+   "id": "n40",
+   "kind": "nightly",
+   "week": "2026-w40",
+   "at": "2026-10-03T02:00:00+09:00",
+   "duration_min": 6.0,
+   "status": "partial",
+   "cost_usd": 0.1,
+   "summary": "날 1개, 단계 2개 중 실패 1개",
+   "steps": [
+    {
+     "role": "collect",
+     "text": "성공, 3.2초",
+     "attention": false
+    },
+    {
+     "role": "plan",
+     "text": "2026-10-02 계획 실패",
+     "attention": true
+    }
+   ]
+  }
+ ],
+ "run_weeks": [
+  {
+   "week": "2026-w41",
+   "label": "10월 2주차",
+   "range": "10.5 ~ 10.11",
+   "nightly": 0,
+   "nightly_failed": 0,
+   "collected": 54,
+   "candidates": 9,
+   "published": 3,
+   "rejected": 1,
+   "needs_check": 3
+  },
+  {
+   "week": "2026-w40",
+   "label": "10월 1주차",
+   "range": "9.28 ~ 10.4",
+   "nightly": 1,
+   "nightly_failed": 1,
+   "collected": 54,
+   "published": 2
+  },
+  {
+   "week": "2026-w39",
+   "label": "9월 4주차",
+   "range": "9.21 ~ 9.27",
+   "nightly": 0,
+   "nightly_failed": 0,
+   "collected": 54,
+   "published": 1
+  }
+ ]
+}
