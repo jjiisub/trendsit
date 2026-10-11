@@ -1,9 +1,5 @@
 """작성자(1단) + 코드 검사 + 검수자 + 작성자 수정 루프(S6-1 5.5~5.6).
-라운드: 초안(1) → 반려 → 수정(2) → 반려 → 수정(3). 최대 max_rounds, 코드 반려도 셈.
-- 코드 검사가 반려하면 그 라운드는 검수자를 부르지 않는다(LLM 0원). 같은 이슈가 두 라운드(또는 마지막 라운드 뒤) 남으면
-  그 절(또는 summary) check=true, 토픽 status=checked
-- writer_revise는 고친 칸만 낸다. 지적되지 않은 위치를 바꾸면 코드가 되돌리고 횟수를 센다
-- 잘림(D-42): run_role이 1회 재시도 뒤에도 잘리면 같은 입력에 no_visuals=true로 1회 더(최대 호출 4회, C-5)
+라운드: 초안(1) → 반려 → 수정(2) → 반려 → 수정(3). 최대 max_rounds, 코드 반려도 셈. 코드 검사가 반려하면 그 라운드는 검수자를 부르지 않는다(LLM 0원). 같은 이슈가 두 라운드(또는 마지막 라운드 뒤) 남으면 그 절(또는 summary) check=true, 토픽 status=checked. writer_revise는 고친 칸만 낸다(지적 안 된 위치를 바꾸면 되돌리고 횟수를 셈). 잘림(D-42): run_role이 1회 재시도 뒤에도 잘리면 같은 입력에 no_visuals=true로 1회 더(최대 호출 4회, C-5).
 대체: writer 실패 → 토픽 제외(failed) / critic 실패 → 코드 통과판+attention / revise 실패 → 이전 판 유지"""
 
 from __future__ import annotations
@@ -237,6 +233,7 @@ def _rounds(ctx: Ctx, res: TopicResult, topic: Applied, winp: WriterInput, pack:
         last_issue |= {top_loc(it.loc): f"{log.checker} {it.type}: {it.comment}" for it in issues}
         live = _live_issues(issues, seen, check_locs, cfg.review.same_issue_repeat_to_check)
         flagged = {top_loc(i.loc) for i in live}
+        n_secs = len(page.sections)
         revised = None if rnd == cfg.review.max_rounds or not live else _revise(ctx, res, reviser, winp.aliases, page, live,
                                                                                flagged, pack)
         if revised is None:
@@ -244,6 +241,9 @@ def _rounds(ctx: Ctx, res: TopicResult, topic: Applied, winp: WriterInput, pack:
             res.final_round = rnd
             break
         page, raw_page, sid = revised
+        if len(page.sections) != n_secs:  # 006-A1-22: add/delete로 번호가 밀리면 옛 sections[i] 기록을 못 믿음
+            seen = {k: v for k, v in seen.items() if not k[0].startswith("sections[")}
+            check_locs -= {c for c in check_locs if c.startswith("sections[")}
     else:
         res.final_round = cfg.review.max_rounds
     return page, check_locs, last_issue

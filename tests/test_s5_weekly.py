@@ -217,6 +217,31 @@ def test_unresolved_diagram_issue_drops_the_group(week):
     assert checkers == ["code", "code", "critic"]
 
 
+def test_section_delete_resets_stale_check_tracking_for_shifted_sections(week):
+    """006-A1-22: 절 하나가 delete로 빠지면 뒤 절들의 번호가 밀린다. 삭제된 절의 (위치,유형) 카운트가 새로 그
+    번호를 받은 다른 절에 잘못 합쳐지면 한 번만 재등장해도 바로 check=true가 됨(오염). 번호가 바뀌면 카운트를
+    리셋해 그 절도 자기 몫의 2번 기회를 받아야 한다(round 2가 아니라 round 3에서 check)."""
+    ctx, cids = week
+    long = "매우 긴 제목" * 15  # heading_chars_max(70자) 초과
+    p1 = json.loads(page(1, "Argon이 DeepSWE에서 77.9% 기록했다", n_sections=4))
+    p1["sections"][0]["heading"] = long + " A"  # 삭제될 절(content A)
+    p1["sections"][1]["heading"] = long + " B"  # 살아남아 번호가 0으로 밀릴 절(content B)
+    responses = [plan(cids), json.dumps(p1, ensure_ascii=False),
+                 revision([{"issue_idx": 0, "loc": "sections[0]", "action": "delete", "value": None}]),
+                 revision([]), verdict([])]
+    for i in (2, 3, 4):
+        responses += [page(i, f"{TITLES[i]} 근거 문장 요약 정리했다"), verdict([])]
+    ctx.llm.transport.responses = [response(r) for r in responses]
+    ctx.tracer = Tracer(ctx.db, "weekly", "S0")
+    pipeline.run_weekly("2026-W41", ctx, from_step="select", embedder=HashEmbedder(), cfg=CFG)
+    run_id = ctx.tracer.run_id
+    t1 = ctx.db.conn.execute("SELECT status, final_round FROM topics WHERE run_id=? AND rank=1", (run_id,)).fetchone()
+    assert tuple(t1) == ("checked", 3)  # round 2에서 바로 check가 되면(=오염) final_round는 2
+    checks_json = json.loads(ctx.db.conn.execute("SELECT checks_json FROM topics WHERE run_id=? AND rank=1",
+                                                  (run_id,)).fetchone()[0])
+    assert checks_json == ["sections[0]"]  # content B가 밀려 받은 번호(삭제된 content A의 옛 번호와 같음)
+
+
 def test_same_issue_twice_within_one_round_is_not_repeat(week):
     """같은 라운드에 같은 (위치, 유형) 이슈가 2건이어도 한 번으로 센다(리뷰 지적 1): 고친 뒤 통과하면 passed."""
     ctx, cids = week
