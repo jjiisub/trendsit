@@ -167,6 +167,48 @@ def static_checks(site, data, pages):
         hits += [f"{page_url(site, f)} '{w}'" for w in FORBIDDEN_TEXT if w in text]
     check("A7 '동작 안 함'·'예시' 문구 0(사이트 전체, 데이터 본문 제외)", not hits, "; ".join(hits[:3]))
     check("C-7 title 속성 0", not any(p.titles for p in pages.values()))
+    # S6-1 5.9: 옛 섹션 제목, h3.src-g 제거 확인
+    old_titles = []
+    for f, p in pages.items():
+        text = "".join(p.text)
+        for s in sorted(own, key=len, reverse=True):
+            text = text.replace(s, "")
+        old_titles += [f"{page_url(site, f)} '{w}'" for w in ("개요", "핵심 포인트", "핵심 개념", "소스별로 더한 것") if w in text]
+    src_g = [page_url(site, f) for f, p in pages.items() if any(c == "src-g" for _, cls in p.classes for c in cls)]
+    check("A9 옛 섹션 제목(개요·핵심 포인트·핵심 개념·소스별로 더한 것) 0, h3.src-g 0", not old_titles and not src_g,
+          "; ".join((old_titles + src_g)[:3]))
+    # 슬라이드 img: /assets/slides/만이고 파일 존재
+    bad_img = []
+    for f, p in pages.items():
+        for tag, _rel, k, href in p.links:
+            if tag == "img" and k == "src":
+                if not href.startswith("/assets/slides/"):
+                    bad_img.append(f"{page_url(site, f)} img src {href}")
+                elif not (site / href.lstrip("/")).is_file():
+                    bad_img.append(f"{page_url(site, f)} img 파일 없음 {href}")
+    check("A9 슬라이드 img src는 /assets/slides/뿐이고 파일 존재", not bad_img, "; ".join(bad_img[:3]))
+    # .tiles 자식 수 1~4와 n{k} 클래스 일치
+    bad_tiles = []
+    for f, p in pages.items():
+        for tag, cls in p.classes:
+            if tag != "div" or "tiles" not in cls:
+                continue
+            n = next((c[1:] for c in cls if c.startswith("n") and c[1:].isdigit()), None)
+            if n is None or not 1 <= int(n) <= 4:
+                bad_tiles.append(f"{page_url(site, f)} .tiles 클래스 {cls}")
+    check("A9 .tiles 자식 수 1~4와 n{k} 클래스 일치", not bad_tiles, "; ".join(bad_tiles[:3]))
+    # C-9: .chk 수 = site.json의 확인 필요 수(절 check + 절 밖 summary/title)
+    topics = {t["id"]: t for t in data["topics"]}
+    bad_chk = []
+    for tid, t in topics.items():
+        f = site / "topic" / tid / "index.html"
+        if f not in pages:
+            continue
+        want = sum(1 for s in t["sections"] if s.get("check")) + sum(1 for c in t.get("checks", []) if c in ("summary", "title"))
+        got = sum(1 for _, cls in pages[f].classes if "chk" in cls)
+        if got != want:
+            bad_chk.append(f"{tid} got={got} want={want}")
+    check("C-9 .chk 수 = site.json의 확인 필요 수", not bad_chk, "; ".join(bad_chk[:3]))
 
 
 def data_strings(data):
