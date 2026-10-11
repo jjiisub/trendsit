@@ -273,6 +273,9 @@ class OpsConfig(Strict):
     start_day: date  # 따라잡기의 가장 이른 날
     max_catchup_days: int = Field(gt=0)
     weekly_lock_wait_min: int = Field(gt=0)  # 주간 실행이 밤 실행 끝을 기다리는 최대 시간(분)
+    step_timeout_min: int = Field(gt=0)  # 단계 하위 프로세스 상한(분). 넘기면 그 단계 실패로 기록하고 다음 단계로
+    video_timeout_min: int = Field(gt=0)  # video run 단계(큐 전체)
+    weekly_timeout_min: int = Field(gt=0)  # weekly 단계
 
 
 FILES: dict[str, type[BaseModel]] = {

@@ -7,6 +7,8 @@ import re
 import sys
 from typing import Any
 
+from .core.trace import Tracer
+
 WEEK = re.compile(r"^\d{4}-W\d{2}$")
 
 
@@ -16,11 +18,8 @@ def _week(v: str) -> str:
     return v
 
 
-def _guard_published(week: str, force: bool) -> int | None:
+def _guard_published(db: Any, week: str, force: bool) -> int | None:
     """발행된 주는 --force 없이 다시 쓰지 않는다(종료 코드 2). --force면 발행을 푼다(status done, published_at NULL: C-3)."""
-    from .core.db import open_db
-
-    db = open_db()
     if not db.conn.execute("SELECT 1 FROM weeks WHERE week=? AND status='published'", (week,)).fetchone():
         return None
     if not force:
@@ -37,9 +36,12 @@ def cmd_cluster(args: argparse.Namespace) -> int:
     from .core import config
     from .core.context import open_ctx
 
-    if (refused := _guard_published(args.week, getattr(args, "force", False))) is not None:
+    # 발행 검사는 명령이 쓰는 DB 연결로. 거부하면 runs 행을 만들지 않도록 실행 기록은 검사 뒤에 연다
+    ctx = open_ctx(None, spec=config.current_spec(args.spec, "S5"), no_cache=args.no_cache)
+    if (refused := _guard_published(ctx.db, args.week, getattr(args, "force", False))) is not None:
         return refused
-    ctx = open_ctx("weekly", spec=config.current_spec(args.spec, "S5"), no_cache=args.no_cache, note=f"cluster {args.week}")
+    if ctx.tracer is None:
+        ctx.tracer = Tracer(ctx.db, "weekly", ctx.spec, f"cluster {args.week}")
     status = "ok"
     try:
         stage = stage_cluster(args.week, ctx, use_llm=not args.no_llm)
@@ -71,14 +73,15 @@ def cmd_weekly(args: argparse.Namespace) -> int:
     from .core import config
     from .core.context import open_ctx
 
-    if (refused := _guard_published(args.week, getattr(args, "force", False))) is not None:
-        return refused
     until = getattr(args, "step", None)  # select/write/review 단계 명령
     until = until if until in ("select", "write") else None
     from_step = args.from_step
-    ctx = open_ctx("weekly", spec=config.current_spec(args.spec, "S5"), no_cache=args.no_cache,
-                   note=f"weekly {args.week} from {from_step}" + (f" until {until}" if until else "")
-                   + (f" topic {args.topic}" if getattr(args, "topic", None) else ""))
+    ctx = open_ctx(None, spec=config.current_spec(args.spec, "S5"), no_cache=args.no_cache)
+    if (refused := _guard_published(ctx.db, args.week, getattr(args, "force", False))) is not None:
+        return refused
+    if ctx.tracer is None:
+        ctx.tracer = Tracer(ctx.db, "weekly", ctx.spec, f"weekly {args.week} from {from_step}" + (f" until {until}" if until else "")
+                            + (f" topic {args.topic}" if getattr(args, "topic", None) else ""))
     status = "ok"
     try:
         summary = run_weekly(args.week, ctx, from_step=from_step, only_topic=getattr(args, "topic", None), until=until)

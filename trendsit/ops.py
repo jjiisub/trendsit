@@ -9,6 +9,8 @@ from __future__ import annotations
 
 import fcntl
 import json
+import os
+import signal
 import subprocess
 import sys
 import time
@@ -23,20 +25,29 @@ from .core.config import ROOT, OpsConfig
 from .core.db import DB, KST, now_kst
 from .core.trace import Tracer
 
-# 명령 하나를 실행해 (종료 코드, 표준 출력, 표준 오류)를 돌려준다. 테스트는 이 자리에 가짜 실행기를 넣는다
-Runner = Callable[[list[str]], tuple[int, str, str]]
+# 명령 하나를 (종료 코드, 표준 출력, 표준 오류)로. 테스트는 이 자리에 가짜 실행기를 넣는다. timeout(초)을 넘기면 종료 코드 124
+Runner = Callable[[list[str], float | None], tuple[int, str, str]]
+Build = Callable[[list[str]], tuple[int, str, str]]
 BUILD_CMD = ["python3", "site_src/build.py"]
+TIMEOUT_CODE = 124
 
 
-def run_subprocess(cmd: list[str]) -> tuple[int, str, str]:
+def run_subprocess(cmd: list[str], timeout: float | None = None) -> tuple[int, str, str]:
     try:
-        p = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+        # 새 세션으로 띄워 시간 초과 때 uv 아래 자식(python)까지 한 번에 끝낸다
+        p = subprocess.Popen(cmd, cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, start_new_session=True)
     except OSError as e:  # 실행 파일이 없는 경우 등
         return 127, "", f"{type(e).__name__}: {e}"
-    return p.returncode, p.stdout, p.stderr
+    try:
+        out, err = p.communicate(timeout=timeout)
+    except subprocess.TimeoutExpired:
+        os.killpg(p.pid, signal.SIGKILL)
+        out, err = p.communicate()
+        return TIMEOUT_CODE, out or "", f"{err or ''}\n시간 초과: {timeout:g}초 넘겨 끝냄"
+    return p.returncode, out, err
 
 
-def publish(db: DB, week: str, runner: Runner = run_subprocess) -> int:
+def publish(db: DB, week: str, runner: Build = run_subprocess) -> int:
     """사이트 빌드 → weeks.status 'published', published_at. 0 성공, 1 빌드 실패, 2 대상 아님."""
     row = db.conn.execute("SELECT status FROM weeks WHERE week=?", (week,)).fetchone()
     if row is None or row["status"] not in ("done", "published"):
@@ -103,13 +114,18 @@ def _error_line(out: str, err: str) -> str:
 class StepLog:
     """단계 실행 + 로그 파일 + steps 기록. summary_json.steps의 한 칸을 만든다."""
 
-    def __init__(self, runner: Runner, path: Path):
+    def __init__(self, runner: Runner, path: Path, cfg: OpsConfig):
         path.parent.mkdir(parents=True, exist_ok=True)
-        self.runner, self.path, self.steps = runner, path, []
+        self.runner, self.path, self.cfg, self.steps = runner, path, cfg, []
 
-    def run(self, cmd: list[str]) -> tuple[int, str, str, float]:
+    def timeout(self, name: str) -> float:
+        """단계별 상한(초). 영상은 구간 하나가 15분 안팎이라 길게, 주간 브리핑은 그다음, 나머지는 기본."""
+        minutes = {"video": self.cfg.video_timeout_min, "weekly": self.cfg.weekly_timeout_min}.get(name, self.cfg.step_timeout_min)
+        return minutes * 60
+
+    def run(self, cmd: list[str], name: str = "") -> tuple[int, str, str, float]:
         t0 = time.monotonic()
-        code, out, err = self.runner(cmd)
+        code, out, err = self.runner(cmd, self.timeout(name))
         sec = round(time.monotonic() - t0, 1)
         with self.path.open("a", encoding="utf-8") as f:
             f.write(f"== {now_kst()} {' '.join(cmd)}\n{out}{err}== 종료 코드 {code}, {sec}초\n")
@@ -126,7 +142,7 @@ class StepLog:
         self.steps.append(step)
 
     def step(self, name: str, day: date | None, args: list[str], extra: tuple[str, ...] = ()) -> tuple[int, str]:
-        code, out, err, sec = self.run(["uv", "run", *extra, "python", "-m", "trendsit", *args])
+        code, out, err, sec = self.run(["uv", "run", *extra, "python", "-m", "trendsit", *args], name)
         self.add(name, day, code, sec, out, err)
         return code, out
 
@@ -139,8 +155,9 @@ def _tag(d: date) -> str:
 
 def catchup_days(db: DB, cfg: OpsConfig, today: date) -> list[date]:
     """직전 nightly가 시도한 마지막 날 다음(없거나 start_day 앞이면 start_day)부터 어제까지, 앞에서 max_catchup_days일."""
-    done = [date.fromisoformat(d) for (raw,) in db.conn.execute(
-        "SELECT summary_json FROM runs WHERE kind='nightly' AND summary_json IS NOT NULL") for d in json.loads(raw).get("days", [])]
+    rows = [json.loads(raw) for (raw,) in db.conn.execute(
+        "SELECT summary_json FROM runs WHERE kind='nightly' AND summary_json IS NOT NULL")]
+    done = [date.fromisoformat(d) for r in rows if not r.get("manual") for d in r.get("days", [])]  # --day 손 실행은 범위 계산에서 뺌
     first = max(max(done, default=cfg.start_day - timedelta(days=1)) + timedelta(days=1), cfg.start_day)
     n = min((today - timedelta(days=1) - first).days + 1, cfg.max_catchup_days)
     return [first + timedelta(days=i) for i in range(max(n, 0))]
@@ -152,14 +169,17 @@ def nightly(db: DB, cfg: OpsConfig, *, day: date | None = None, now: datetime | 
     now = (now or datetime.now(KST)).astimezone(KST)
     data_dir = data_dir or ROOT / "data"
     today = now.date()
+    if day and day > today - timedelta(days=1):
+        print(f"--day {day}: 어제({today - timedelta(days=1)}) 이후 날은 돌리지 않음", file=sys.stderr)
+        return 2
     with ops_lock(data_dir) as got:
         if not got:
             return _skipped(db, "nightly", _tag(today - timedelta(days=1)),
                             {"days": [], "steps": [], "cost_usd": 0.0})
         days = [day] if day else catchup_days(db, cfg, today)
         tr = Tracer(db, "nightly", _tag(days[-1] if days else today - timedelta(days=1)),
-                    f"nightly {days[0]}~{days[-1]}" if days else "nightly 범위 없음")
-        log = StepLog(runner, data_dir / "logs" / "ops" / f"{today.isoformat()}-nightly.log")
+                    (f"nightly {days[0]}~{days[-1]}" if days else "nightly 범위 없음") + _pull_note())
+        log = StepLog(runner, data_dir / "logs" / "ops" / f"{today.isoformat()}-nightly.log", cfg)
         status = "failed"
         try:
             if days:
@@ -172,14 +192,17 @@ def nightly(db: DB, cfg: OpsConfig, *, day: date | None = None, now: datetime | 
                 tag = ["--spec", _tag(d)]
                 log.step("plan", d, ["plan", "run", "--day", str(d), *tag])
                 log.step("deep_text", d, ["deep", "text", "--day", str(d), *tag])
-                _video(log, d, tag, data_dir)
-                log.step("repo_analyze", d, ["repo-analyze", "--week", iso_week(d), *tag])
+                _queue_step(log, d, tag, data_dir, "video")
+                _queue_step(log, d, tag, data_dir, "repo_analyze")
             status = "ok" if all(s["exit"] == 0 for s in log.steps) else "partial"
         finally:
             started = db.conn.execute("SELECT started_at FROM runs WHERE id=?", (tr.run_id,)).fetchone()[0]
             cost = db.conn.execute("SELECT COALESCE(SUM(cost_usd),0) FROM runs WHERE spec LIKE 'RUN-%' AND started_at>=?",
                                    (started,)).fetchone()[0]
-            _close_run(db, tr, status, {"days": [d.isoformat() for d in days], "steps": log.steps, "cost_usd": round(cost, 4)})
+            summary: dict[str, Any] = {"days": [d.isoformat() for d in days], "steps": log.steps, "cost_usd": round(cost, 4)}
+            if day:
+                summary["manual"] = True
+            _close_run(db, tr, status, summary | _pull_summary())
     bad = [s for s in log.steps if s["exit"] != 0]
     print(f"nightly {status}: 날 {len(days)}개, 단계 {len(log.steps)}개 중 실패 {len(bad)}개")
     for s in bad:
@@ -187,24 +210,41 @@ def nightly(db: DB, cfg: OpsConfig, *, day: date | None = None, now: datetime | 
     return 0 if status == "ok" else 1
 
 
-def _video(log: StepLog, d: date, tag: list[str], data_dir: Path) -> None:
-    """계획의 영상 큐를 파일로 받아 video run. 큐가 비면 건너뜀(성공). plan show 실패는 영상 단계 실패."""
-    code, out, err, sec = log.run(["uv", "run", "python", "-m", "trendsit", "plan", "show", "--day", str(d), "--video-queue"])
+def _queue_step(log: StepLog, d: date, tag: list[str], data_dir: Path, name: str) -> None:
+    """계획의 큐(video: 영상 큐, repo_analyze: 레포 큐)를 파일로 받아 실행. 큐가 비면 건너뜀(성공). plan show 실패는 그 단계 실패.
+    레포는 계획이 이미 그 주 카드가 있는 레포를 뺀 큐(C-7)라 같은 레포를 매일 다시 분석하지 않는다."""
+    video = name == "video"
+    code, out, err, sec = log.run(["uv", "run", "python", "-m", "trendsit", "plan", "show", "--day", str(d),
+                                   *(["--video-queue"] if video else [])])
     queue: Any = []
     if code == 0:
         try:
-            queue = json.loads(out)
-        except ValueError:
-            code, err = 1, "plan show 출력이 JSON이 아님"
+            data = json.loads(out)
+            queue = data if video else data["repo_queue"]
+        except (ValueError, KeyError, TypeError):
+            code, err = 1, "plan show 출력 형식 오류"
     if code != 0:
-        log.add("video", d, code, sec, out, err)
+        log.add(name, d, code, sec, out, err)
     elif not queue:
-        log.add("video", d, 0, sec)
+        log.add(name, d, 0, sec)
     else:
-        path = data_dir / "tmp" / f"video-queue-{d}.json"
+        path = data_dir / "tmp" / f"{'video' if video else 'repo'}-queue-{d}.json"
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(queue, ensure_ascii=False), encoding="utf-8")
-        log.step("video", d, ["video", "run", "--queue", str(path), *tag], extra=("--extra", "video"))
+        args = ["video", "run", "--queue", str(path), *tag] if video else ["repo-analyze", "--week", iso_week(d), "--queue", str(path), *tag]
+        log.step(name, d, args, extra=("--extra", "video") if video else ())
+
+
+def _pull_failed() -> bool:
+    return os.environ.get("TRENDSIT_PULL_FAILED") == "1"  # run_ops.sh가 git pull 실패 때 세움
+
+
+def _pull_note() -> str:
+    return " / git pull 실패: 옛 코드로 실행(실행 폴더 확인)" if _pull_failed() else ""
+
+
+def _pull_summary() -> dict[str, Any]:
+    return {"pull_failed": True} if _pull_failed() else {}
 
 
 # ---------- weekly ----------
@@ -219,8 +259,8 @@ def weekly(db: DB, cfg: OpsConfig, *, week: str | None = None, now: datetime | N
     with ops_lock(data_dir, wait) as got:
         if not got:
             return _skipped(db, "ops-weekly", spec, {"week": week, "steps": []})
-        tr = Tracer(db, "ops-weekly", spec, f"ops weekly {week}")
-        log = StepLog(runner, data_dir / "logs" / "ops" / f"{now.date().isoformat()}-weekly.log")
+        tr = Tracer(db, "ops-weekly", spec, f"ops weekly {week}" + _pull_note())
+        log = StepLog(runner, data_dir / "logs" / "ops" / f"{now.date().isoformat()}-weekly.log", cfg)
         status, code = "failed", 1
         try:
             row = db.conn.execute("SELECT status FROM weeks WHERE week=?", (week,)).fetchone()
@@ -236,10 +276,10 @@ def weekly(db: DB, cfg: OpsConfig, *, week: str | None = None, now: datetime | N
                     log.add("publish", None, pub, round(time.monotonic() - t0, 1), err="빌드 실패 또는 발행 불가(로그 참고)")
                     status, code = ("ok", 0) if pub == 0 else ("failed", 1)
         finally:
-            _close_run(db, tr, status, {"week": week, "steps": log.steps})
+            _close_run(db, tr, status, {"week": week, "steps": log.steps} | _pull_summary())
     return code
 
 
 def _logged(log: StepLog, cmd: list[str]) -> tuple[int, str, str]:
-    code, out, err, _ = log.run(cmd)
+    code, out, err, _ = log.run(cmd, "publish")
     return code, out, err

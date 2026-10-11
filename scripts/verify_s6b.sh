@@ -33,7 +33,7 @@ b11() {
       mkdir -p data scripts && echo '{}' >data/example.json && cp "$repo/scripts/run_ops.sh" scripts/ &&
       git add -A && git commit -q -m init && git push -q origin main && git checkout -q -b dev
   ) >/dev/null 2>&1 || { echo "임시 저장소 준비 실패"; return 1; }
-  printf '#!/bin/bash\necho "$@" >>"%s/uv.log"\n[ "${1:-}" = run ] && exit "${UV_FAKE_EXIT:-0}"\nexit 0\n' "$T" >"$T/bin/uv"
+  printf '#!/bin/bash\necho "$@ PULL=${TRENDSIT_PULL_FAILED:-}" >>"%s/uv.log"\n[ "${1:-}" = run ] && exit "${UV_FAKE_EXIT:-0}"\nexit 0\n' "$T" >"$T/bin/uv"
   chmod +x "$T/bin/uv"
   local out
   out=$(bash scripts/setup_run_worktree.sh "$T/work" "$T/run" 2>&1) || { echo "setup 1회차 실패: $out"; return 1; }
@@ -49,6 +49,8 @@ b11() {
   PATH="$T/bin:$PATH" bash "$T/run/scripts/run_ops.sh" weekly >/dev/null 2>&1 || { echo "pull 실패 때 ops를 실행하지 않음"; return 1; }
   grep -q 'run python -m trendsit ops nightly' "$T/uv.log" && grep -q 'run python -m trendsit ops weekly' "$T/uv.log" ||
     { echo "uv run ... ops <job> 호출 기록 없음"; return 1; }
+  grep -q 'ops nightly PULL=$' "$T/uv.log" && grep -q 'ops weekly PULL=1$' "$T/uv.log" ||
+    { echo "pull 실패가 ops에 알려지지 않음(TRENDSIT_PULL_FAILED) 또는 성공인데 표시됨"; return 1; }
   grep -q 'sync --extra video --extra embed' "$T/uv.log" || { echo "uv sync에 video·embed 묶음이 없음"; return 1; }
   grep -rq 'git pull 실패' "$T/work/data/logs/ops" || { echo "pull 실패가 로그에 없음"; return 1; }
   UV_FAKE_EXIT=7 PATH="$T/bin:$PATH" bash "$T/run/scripts/run_ops.sh" nightly >/dev/null 2>&1

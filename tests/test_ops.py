@@ -15,8 +15,10 @@ from trendsit.core.db import DB, KST
 from trendsit.core.trace import Tracer
 from trendsit.deep.plan import repo_candidates, video_candidates
 
-CFG = OpsConfig(start_day=date(2026, 10, 12), max_catchup_days=7, weekly_lock_wait_min=1)
+CFG = OpsConfig(start_day=date(2026, 10, 12), max_catchup_days=7, weekly_lock_wait_min=1, step_timeout_min=60,
+                video_timeout_min=240, weekly_timeout_min=120)
 PREFIX = ["uv", "run", "python", "-m", "trendsit"]
+REPO_Q = [{"full_name": "o/fresh", "max_depth": 2, "reason": "계획"}]
 VIDEO_Q = [{"video_id": "VIDEO000001", "mode": "captions", "start_sec": None, "end_sec": None, "reason": "r"}]
 
 
@@ -31,18 +33,24 @@ def at(y, m, d, h=2) -> datetime:
 class Fake:
     """단계 명령을 기록하고 정해진 종료 코드를 돌려주는 실행기. fail에 든 이름(plan, video, collect...)의 단계는 1."""
 
-    def __init__(self, db=None, fail=(), queue=None, weekly_status="done", cost=0.0):
+    def __init__(self, db=None, fail=(), queue=None, weekly_status="done", cost=0.0, repos=None):
         self.db, self.fail, self.queue, self.weekly_status, self.cost = db, set(fail), queue or {}, weekly_status, cost
+        self.repos = repos or {}  # 날 -> 계획의 repo_queue
         self.cmds: list[list[str]] = []
+        self.timeouts: list[float | None] = []
 
-    def __call__(self, cmd):
+    def __call__(self, cmd, timeout=None):
         self.cmds.append(cmd)
+        self.timeouts.append(timeout)
         args = cmd[cmd.index("trendsit") + 1:] if "trendsit" in cmd else cmd
         name = args[0] if args[0] != "plan" else f"plan {args[1]}"
         name = {"plan run": "plan", "deep": "deep_text", "repo-analyze": "repo_analyze"}.get(name, name)
         spec = args[args.index("--spec") + 1] if "--spec" in args else None
         if name == "plan show":
-            return 0, json.dumps(self.queue.get(args[args.index("--day") + 1], [])), ""
+            day = args[args.index("--day") + 1]
+            if "--video-queue" in args:
+                return 0, json.dumps(self.queue.get(day, [])), ""
+            return 0, json.dumps({"video_queue": [], "repo_queue": self.repos.get(day, []), "_source": "model"}), ""
         if name in self.fail:
             return 1, "일부 출력\n", "Traceback\nBudgetExceeded: 상한 초과 " + "x" * 300
         if name == "plan" and self.cost:  # 하위 프로세스가 남기는 실행 기록(비용)을 흉내
@@ -131,17 +139,18 @@ def test_b1_day_option_runs_only_that_day(db, tmp_path):
     run_night(db, tmp_path, at(2026, 10, 14))
     code, fake = run_night(db, tmp_path, at(2026, 10, 20), day=date(2026, 10, 12))
     assert code == 0 and nightly_rows(db)[-1]["summary"]["days"] == ["2026-10-12"]
-    assert ["plan run", "deep text", "plan show", "repo-analyze"] == [
-        n for n in fake.names() if n in ("plan run", "deep text", "plan show", "repo-analyze")]
+    assert ["plan run", "deep text", "plan show", "plan show"] == [n for n in fake.names() if n.startswith(("plan", "deep"))]
     assert fake.names()[0] == "collect" and fake.cmds[0][fake.cmds[0].index("--since") + 1] == "2026-10-11"
 
 
 # ---------- B2 ----------
 def test_b2_step_order_and_args(db, tmp_path):
-    fake = Fake(db, queue={"2026-10-12": VIDEO_Q})  # 13일은 빈 큐
+    repo_q = REPO_Q
+    fake = Fake(db, queue={"2026-10-12": VIDEO_Q}, repos={"2026-10-12": repo_q})  # 13일은 빈 큐
     code, _ = run_night(db, tmp_path, at(2026, 10, 14), fake)
     w = "RUN-2026-W42"
     q = str(tmp_path / "tmp" / "video-queue-2026-10-12.json")
+    rq = str(tmp_path / "tmp" / "repo-queue-2026-10-12.json")
     assert code == 0
     assert [tail(c) for c in fake.cmds] == [
         ["collect", "--since", "2026-10-11", "--until", "2026-10-14", "--spec", w],
@@ -151,12 +160,14 @@ def test_b2_step_order_and_args(db, tmp_path):
         ["deep", "text", "--day", "2026-10-12", "--spec", w],
         ["plan", "show", "--day", "2026-10-12", "--video-queue"],
         ["video", "run", "--queue", q, "--spec", w],
-        ["repo-analyze", "--week", "2026-W42", "--spec", w],
+        ["plan", "show", "--day", "2026-10-12"],
+        ["repo-analyze", "--week", "2026-W42", "--queue", rq, "--spec", w],
         ["plan", "run", "--day", "2026-10-13", "--spec", w],
         ["deep", "text", "--day", "2026-10-13", "--spec", w],
         ["plan", "show", "--day", "2026-10-13", "--video-queue"],  # 빈 큐: video 명령 없음
-        ["repo-analyze", "--week", "2026-W42", "--spec", w],
+        ["plan", "show", "--day", "2026-10-13"],  # 빈 레포 큐: repo-analyze 없음
     ]
+    assert json.loads(open(rq).read()) == repo_q  # 계획의 레포 큐만(이미 카드 있는 레포는 계획이 뺌)
     video = next(c for c in fake.cmds if "video" in tail(c)[:1])
     assert video[:5] == ["uv", "run", "--extra", "video", "python"]  # video만 --extra video
     assert all(c[:5] == PREFIX for c in fake.cmds if "video" not in tail(c)[:1])
@@ -165,19 +176,20 @@ def test_b2_step_order_and_args(db, tmp_path):
 
 
 def test_b2_week_tag_follows_each_day(db, tmp_path):
-    cfg = OpsConfig(start_day=date(2026, 10, 18), max_catchup_days=7, weekly_lock_wait_min=1)  # 일(W42), 월(W43)
+    cfg = CFG.model_copy(update={"start_day": date(2026, 10, 18)})  # 일(W42), 월(W43)
     fake = Fake(db)
     ops.nightly(db, cfg, now=at(2026, 10, 20), runner=fake, data_dir=tmp_path)
     specs = [(tail(c)[0], c[c.index("--spec") + 1], c[c.index("--week") + 1] if "--week" in c else None)
              for c in fake.cmds if "--spec" in c]
     assert specs[0] == ("collect", "RUN-2026-W43", None)  # 수집·필터·요약: 범위 마지막 날(월) 주차
-    assert ("repo-analyze", "RUN-2026-W42", "2026-W42") in specs and ("repo-analyze", "RUN-2026-W43", "2026-W43") in specs
+    assert ("plan", "RUN-2026-W42", None) in specs and ("plan", "RUN-2026-W43", None) in specs
     assert nightly_rows(db)[-1]["spec"] == "RUN-2026-W43"
 
 
 # ---------- B3 ----------
 def test_b3_partial_failure_continues(db, tmp_path):
-    fake = Fake(db, fail={"collect", "video"}, queue={"2026-10-12": VIDEO_Q, "2026-10-13": VIDEO_Q}, cost=0.21)
+    fake = Fake(db, fail={"collect", "video"}, queue={"2026-10-12": VIDEO_Q, "2026-10-13": VIDEO_Q},
+                repos={"2026-10-12": REPO_Q, "2026-10-13": REPO_Q}, cost=0.21)
     code, _ = run_night(db, tmp_path, at(2026, 10, 14), fake)
     assert code == 1
     assert fake.names().count("repo-analyze") == 2 and fake.names()[:3] == ["collect", "filter", "summarize"]  # 나머지 단계 모두 실행
@@ -318,8 +330,8 @@ def test_b10_unfinished_week_is_not_published(db, tmp_path):
 
 def test_b10_build_failure_returns_1(db, tmp_path):
     class BuildFails(Fake):
-        def __call__(self, cmd):
-            return (1, "", "빌드 실패") if cmd[0] == "python3" else super().__call__(cmd)
+        def __call__(self, cmd, timeout=None):
+            return (1, "", "빌드 실패") if cmd[0] == "python3" else super().__call__(cmd, timeout)
 
     fake = BuildFails(db)
     assert ops.weekly(db, CFG, now=at(2026, 10, 19, 7), runner=fake, data_dir=tmp_path) == 1
@@ -357,7 +369,7 @@ def test_b3_error_finds_budget_message_on_stdout(db, tmp_path):
     class Real(Fake):
         """실제 하위 명령처럼: 예산 초과는 stdout 요약 줄(또는 stderr 중간)에, stderr 끝은 다른 줄."""
 
-        def __call__(self, cmd):
+        def __call__(self, cmd, timeout=None):
             name = tail(cmd)[0]
             if name == "summarize":
                 return 1, "요약 3건\nstopped: BudgetExceeded: 스펙 RUN-2026-W42 상한 초과: 누적 $1.4900\n", "경고: 다른 줄\n"
@@ -365,9 +377,81 @@ def test_b3_error_finds_budget_message_on_stdout(db, tmp_path):
                 return 1, "", "BudgetExceeded: 단계 상한 초과\nuv 종료 안내 줄\n"
             if name == "filter":
                 return 1, "", "Traceback\nValueError: 다른 오류\n"
-            return super().__call__(cmd)
+            return super().__call__(cmd, timeout)
 
     run_night(db, tmp_path, at(2026, 10, 13), Real(db))
     err = {x["name"]: x["error"] for x in nightly_rows(db)[-1]["summary"]["steps"] if x["exit"]}
     assert "상한 초과" in err["summarize"] and "BudgetExceeded" in err["collect"]
     assert err["filter"] == "ValueError: 다른 오류"  # 예산 줄이 없으면 stderr 마지막 줄
+
+
+# ---------- --day 손 실행: 범위 계산에서 빠지고, 어제 이후는 거부 ----------
+def test_b1_manual_day_does_not_move_catchup_and_future_day_refused(db, tmp_path, capsys):
+    code, fake = run_night(db, tmp_path, at(2026, 10, 20), day=date(2026, 10, 19))  # 어제 = 19
+    assert code == 0 and nightly_rows(db)[-1]["summary"]["manual"] is True
+    run_night(db, tmp_path, at(2026, 10, 20))  # 손 실행이 가장 늦은 날이어도 사이 날(12~)을 이어서 따라잡음
+    assert nightly_rows(db)[-1]["summary"]["days"][0] == "2026-10-12"
+    for bad in (date(2026, 10, 20), date(2026, 10, 25)):  # 오늘, 미래
+        n = len(nightly_rows(db))
+        code, fake = run_night(db, tmp_path, at(2026, 10, 20), day=bad)
+        assert code == 2 and fake.cmds == [] and len(nightly_rows(db)) == n
+    assert "이후 날은 돌리지 않음" in capsys.readouterr().err
+
+
+# ---------- 단계 timeout ----------
+def test_b3_timeouts_per_step_and_timeout_is_a_failed_step(db, tmp_path):
+    class Slow(Fake):
+        def __call__(self, cmd, timeout=None):
+            super().__call__(cmd, timeout)
+            if tail(cmd)[0] == "deep":
+                return 124, "", "시간 초과: 3600초 넘겨 끝냄"
+            return 0, json.dumps(VIDEO_Q) if "--video-queue" in cmd else json.dumps({"repo_queue": REPO_Q}), ""
+
+    fake = Slow(db)
+    code, _ = run_night(db, tmp_path, at(2026, 10, 13), fake)
+    assert code == 1
+    by_name = {" ".join(tail(c)[:2]): t for c, t in zip(fake.cmds, fake.timeouts, strict=True)}
+    assert by_name["collect --since"] == 3600 and by_name["video run"] == 240 * 60 and by_name["repo-analyze --week"] == 3600
+    steps = nightly_rows(db)[-1]["summary"]["steps"]
+    assert [(x["name"], x["exit"]) for x in steps if x["exit"]] == [("deep_text", 124)]
+    assert "시간 초과" in next(x for x in steps if x["exit"])["error"]
+    assert [x["name"] for x in steps][-2:] == ["video", "repo_analyze"]  # 다음 단계는 계속(C-6)
+
+
+def test_b10_weekly_timeout_value(db, tmp_path):
+    fake = Fake(db)
+    ops.weekly(db, CFG, now=at(2026, 10, 19, 7), runner=fake, data_dir=tmp_path)
+    assert fake.timeouts[0] == 120 * 60
+
+
+def test_run_subprocess_kills_process_group_on_timeout():
+    t0 = time.monotonic()
+    code, out, err = ops.run_subprocess(["bash", "-c", "echo 시작; sleep 30 & wait"], timeout=0.5)
+    assert code == 124 and "시작" in out and "시간 초과" in err and time.monotonic() - t0 < 5
+    assert ops.run_subprocess(["bash", "-c", "echo ok; exit 3"], timeout=5)[:2] == (3, "ok\n")
+
+
+# ---------- git pull 실패는 runs 행에 남김 ----------
+def test_pull_failure_is_recorded(db, tmp_path, monkeypatch):
+    run_night(db, tmp_path, at(2026, 10, 13))
+    assert "pull_failed" not in nightly_rows(db)[-1]["summary"] and "pull" not in (nightly_rows(db)[-1]["note"] or "")
+    monkeypatch.setenv("TRENDSIT_PULL_FAILED", "1")
+    run_night(db, tmp_path, at(2026, 10, 14))
+    row = nightly_rows(db)[-1]
+    assert row["summary"]["pull_failed"] is True and "git pull 실패" in row["note"]
+    ops.weekly(db, CFG, now=at(2026, 10, 19, 7), runner=Fake(db), data_dir=tmp_path)
+    w = db.conn.execute("SELECT note, summary_json FROM runs WHERE kind='ops-weekly'").fetchone()
+    assert "git pull 실패" in w[0] and json.loads(w[1])["pull_failed"] is True
+
+
+def test_repo_step_failure_when_plan_show_fails(db, tmp_path):
+    class NoPlan(Fake):
+        def __call__(self, cmd, timeout=None):
+            if tail(cmd)[:2] == ["plan", "show"]:
+                return 1, "", "2026-10-12 계획 없음"
+            return super().__call__(cmd, timeout)
+
+    code, fake = run_night(db, tmp_path, at(2026, 10, 13), NoPlan(db))
+    steps = nightly_rows(db)[-1]["summary"]["steps"]
+    assert code == 1 and [x["name"] for x in steps if x["exit"]] == ["video", "repo_analyze"]
+    assert not any(tail(c)[0] in ("video", "repo-analyze") for c in fake.cmds)

@@ -15,7 +15,11 @@ if [ "$branch" != "main" ]; then
   echo "실행 폴더가 main 아님 ($branch)" >&2
   exit 3
 fi
-git pull --ff-only origin main >>"$log" 2>&1 || say "git pull 실패: 기존 코드로 계속"
+# 실패해도 기존 코드로 계속하되, ops가 runs 행(note, summary_json.pull_failed)에 남기게 환경 변수로 알린다
+if ! git pull --ff-only origin main >>"$log" 2>&1; then
+  say "git pull 실패: 기존 코드로 계속"
+  export TRENDSIT_PULL_FAILED=1
+fi
 # 정확 동기화라 지정하지 않은 묶음을 지운다: 영상(video)과 임베딩 필터(embed) 둘 다
 uv sync --extra video --extra embed >>"$log" 2>&1 || say "uv sync 실패: 기존 환경으로 계속"
 say "ops $job 시작 ($(git rev-parse --short HEAD))"

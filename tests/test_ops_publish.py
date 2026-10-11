@@ -101,53 +101,53 @@ def counts(db):
     return {t: db.conn.execute(f"SELECT COUNT(*) FROM {t}").fetchone()[0] for t in ("runs", "weeks", "topics")}
 
 
-def test_b9_weekly_refuses_published_week(tmp_path, monkeypatch, capsys):
+def fake_ctx(db, monkeypatch):
+    """명령이 쓰는 DB 연결을 임시 DB로(실제 data/trendsit.db는 열리지 않음). 실행 기록(tracer)은 명령이 검사 뒤에 만든다."""
+    ctx = SimpleNamespace(db=db, tracer=None, stopped=None, spec="S5")
+    monkeypatch.setattr("trendsit.core.context.open_ctx", lambda *a, **k: ctx)
+    return ctx
+
+
+def boom(*a, **k):
+    raise RuntimeError("stop")
+
+
+def published_db(tmp_path):
     db = weeks_db(tmp_path, "published")
-    monkeypatch.setattr("trendsit.core.db.open_db", lambda *a, **k: db)
+    db.conn.execute("UPDATE weeks SET published_at='2026-10-12T07:10:00+09:00'")
+    db.conn.commit()
+    return db
+
+
+def test_b9_weekly_refuses_published_week(tmp_path, monkeypatch, capsys):
+    db = published_db(tmp_path)
+    fake_ctx(db, monkeypatch)
     before = counts(db)
     assert cli.main(["weekly", "--week", "2026-W41"]) == 2
     assert cli.main(["weekly", "--week", "2026-W41", "--from-step", "write"]) == 2
     assert cli.main(["write", "--week", "2026-W41"]) == 2
+    assert cli.main(["cluster", "--week", "2026-W41"]) == 2
     assert "발행된 주: --force로 다시 실행" in capsys.readouterr().err
-    assert counts(db) == before
+    assert counts(db) == before and tuple(week_row(db)) == ("published", "2026-10-12T07:10:00+09:00")
 
 
-def test_b9_weekly_force_runs(tmp_path, monkeypatch):
-    db = weeks_db(tmp_path, "published")
+def test_b9_weekly_force_runs_and_clears_published_at(tmp_path, monkeypatch):
+    db = published_db(tmp_path)
+    fake_ctx(db, monkeypatch)
     seen = []
-    ctx = SimpleNamespace(tracer=Tracer(db, "weekly", "S5"), stopped=None, db=db)
     summary = {"week": "2026-W41", "status": "done", "select": {}, "write": {}, "review": {}, "cost_usd": 0, "duration_sec": 1}
-    monkeypatch.setattr("trendsit.core.db.open_db", lambda *a, **k: db)
-    monkeypatch.setattr("trendsit.core.context.open_ctx", lambda *a, **k: ctx)
     monkeypatch.setattr("trendsit.brief.pipeline.run_weekly", lambda week, c, **k: seen.append(week) or summary)
     monkeypatch.setattr("trendsit.brief.briefing.write_briefing_md", lambda *a, **k: "읽기본.md")
     assert cli.main(["weekly", "--week", "2026-W41", "--force"]) == 0
     assert seen == ["2026-W41"]
+    assert tuple(week_row(db)) == ("done", None)  # C-3: published가 아니면 published_at도 없음
+    assert db.conn.execute("SELECT kind FROM runs").fetchone()[0] == "weekly"
 
 
-def test_b9_cluster_refuses_published_and_force_unpublishes(tmp_path, monkeypatch):
-    db = weeks_db(tmp_path, "published")
-    db.conn.execute("UPDATE weeks SET published_at='2026-10-12T07:10:00+09:00'")
-    db.conn.commit()
-    monkeypatch.setattr("trendsit.core.db.open_db", lambda *a, **k: db)
-    assert cli.main(["cluster", "--week", "2026-W41"]) == 2
-    assert tuple(week_row(db)) == ("published", "2026-10-12T07:10:00+09:00")
-
-    def stop(*a, **k):  # --force는 발행을 풀고 진행(여기서는 진입 직후 멈춤)
-        raise RuntimeError("stop")
-
-    monkeypatch.setattr("trendsit.core.context.open_ctx", stop)
+def test_b9_cluster_force_clears_published_at(tmp_path, monkeypatch):
+    db = published_db(tmp_path)
+    fake_ctx(db, monkeypatch)
+    monkeypatch.setattr("trendsit.brief.weekly.stage_cluster", boom)
     with pytest.raises(RuntimeError):
         cli.main(["cluster", "--week", "2026-W41", "--force"])
-    assert tuple(week_row(db)) == ("done", None)  # C-3: published가 아니면 published_at도 없음
-
-
-def test_b9_weekly_force_clears_published_at(tmp_path, monkeypatch):
-    db = weeks_db(tmp_path, "published")
-    db.conn.execute("UPDATE weeks SET published_at='2026-10-12T07:10:00+09:00'")
-    db.conn.commit()
-    monkeypatch.setattr("trendsit.core.db.open_db", lambda *a, **k: db)
-    monkeypatch.setattr("trendsit.core.context.open_ctx", lambda *a, **k: (_ for _ in ()).throw(RuntimeError("stop")))
-    with pytest.raises(RuntimeError):
-        cli.main(["weekly", "--week", "2026-W41", "--force"])
     assert tuple(week_row(db)) == ("done", None)

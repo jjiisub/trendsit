@@ -43,6 +43,10 @@ PASS B12 임시 예약 파일 없음, README 자동 실행 절, check-config의 
 - **`uv sync --extra video --extra embed`**: 명세는 `--extra video`만 적었다. `uv sync`는 정확 동기화라 `embed`를 지정하지 않으면 sentence-transformers·torch를 지워 `filter`(기본 임베더 real)와 `weekly`(묶기)가 깨진다. `uv run`은 임시 폴더 실험으로 확인한 대로 추가 묶음을 지우지 않으므로(명세대로 단계 명령은 `uv run [--extra video]`) setup과 래퍼의 sync만 두 묶음으로 했다
 - **`ops weekly`의 runs 행**: `kind='ops-weekly'`(안쪽 `weekly` 명령이 만드는 `kind='weekly'` 행과 구분), spec `RUN-<주차>`, `summary_json={"week","steps":[{name,day,exit,sec,error?}]}`. 이미 발행·잠금 실패·실패·성공 모두 행을 남김(이미 발행은 status ok)
 - **nightly ②③의 `--until`**: 명세는 "어제". 실제 처리하는 범위의 마지막 날(`days[-1]`)로 했다. 정상 운영에서는 어제와 같고, 7일 상한으로 잘린 따라잡기나 `--day D` 손 실행에서 범위 밖 날까지 요약하지 않는다
+- **단계 timeout(사용자 포함 결정 F06)**: `config/ops.yaml`에 `step_timeout_min: 60`(수집·필터·요약·계획·글·레포·빌드, 하루치 정상 실행은 수 분), `video_timeout_min: 240`(영상 큐 전체, 영상 예산 90분 처리에 한 편 15분 안팎 걸린 실측의 여유), `weekly_timeout_min: 120`(묶기·선별·토픽별 작성⇄검수). 넘기면 새 세션으로 띄운 프로세스 그룹을 SIGKILL하고 종료 코드 124, 그 단계 실패로 기록한 뒤 다음 단계로(C-6)
+- **레포 분석 단계 ⑦(F02)**: 매일 규칙 큐 상위 10개를 다시 분석하던 것을 `plan show --day D`의 `repo_queue`(그 주 카드 있는 레포는 계획이 이미 뺌, C-7)를 `repo-analyze --queue`로 넘기게 바꿨다. 큐가 비면 건너뜀. 명세 5.2 ⑦의 `repo-analyze --week`와 다른 사용자 포함 결정
+- **`--day`(F04)**: 손 실행 행은 `summary_json.manual=true`로 남겨 따라잡기 `last` 계산에서 뺀다. `--day`가 어제(KST)보다 늦으면 종료 코드 2
+- **발행 검사 DB(F20)**: 명령이 쓰는 `open_ctx(None, ...)`의 DB 연결을 쓴다. 거부 때 runs 행이 안 생기도록 실행 기록(Tracer)은 검사 뒤에 연다. 전체 pytest 전후 `data/trendsit.db` mtime 동일(2026-10-11 10:14:19). 마이그레이션 40은 앞선 런(A1~A2)에서 이미 실제 DB에 적용돼 있음
 - **PATH**: 래퍼는 `PATH` 뒤에 `/opt/homebrew/bin:/usr/local/bin`을 붙인다(launchd 기본 PATH에 uv 없음, 이미 PATH에 있으면 그것이 먼저)
 - **publish의 빌드 명령**: 명세대로 `python3 site_src/build.py`(실행 폴더 `uv run` 안이라 PATH의 `python3`는 그 환경 것)
 - **`weekly` 거부 검사는 단계 명령(`select`·`write`·`review`)과 `cluster`에도** 적용하고 같은 `--force`를 줌(한 함수 `_guard_published`)
@@ -52,11 +56,9 @@ PASS B12 임시 예약 파일 없음, README 자동 실행 절, check-config의 
 - 4장의 `uv sync` 묶음(video + embed)과 ②③ `--until`의 마지막 날 기준. 그 밖에는 명세대로
 
 ## 6. 남은 문제, 다음 스펙 제안
-- **[결정 필요] 실행 폴더의 `git pull --ff-only`와 추적 파일 `data/make_data.py`, `data/trendsit-example.json`**: main에 `data/` 아래 추적 파일 2개가 있어, 실행 폴더에서 `data/`를 작업 폴더로 링크하면 git은 그 파일들을 "지워진 상태"로 본다. 임시 저장소 실험으로 확인: **main이 이 두 파일 중 하나를 바꾸면 pull이 "local changes would be overwritten"으로 실패**하고, 명세대로 "기존 코드로 계속"하므로 실행 폴더가 옛 코드에 머문다(로그에 `git pull 실패`). sparse-checkout, skip-worktree, assume-unchanged로 막아 봤으나 심볼릭 링크 너머에 같은 이름 파일이 실제로 있어 소용없었다. 지금은 두 파일이 거의 안 바뀌어 실사용에 영향 없음. S6a가 `data/trendsit-example.json`을 바꾸거나 없앨 때가 위험하다. 기획 세션이 정할 것: 추적 파일을 `data/` 밖으로 옮기거나 S6a에서 같이 처리
-- 병합 뒤 `reports/S5-1/help_before.txt` 스냅숏과 `verify_s5.sh`의 B7(`CLI --help 전부 불변`)은 새 명령(`ops`, `publish`)과 `weekly --force` 때문에 달라진다(의도한 변경). 이 파일은 S5-1a 리팩터 불변 스냅숏이라 손대지 않았다. 갱신 여부는 리뷰·기획이 판단
-- `repo-analyze --week W`는 명세대로 매일 같은 규칙 큐(상위 10개)를 다시 돌린다. 편집장 계획의 `repo_queue`를 `--queue`로 넘기거나 카드가 있는 레포를 건너뛰면 비용이 줄 텐데 명세 5.2 단계 ⑦이 아니라 제안으로만 남긴다
+- **추적 파일 `data/` 밖 이동은 S6a 결정 사항.** main에 `data/` 아래 추적 파일 2개(`data/make_data.py`, `data/trendsit-example.json`)가 있어, 실행 폴더에서 `data/`를 작업 폴더로 링크하면 git이 그 파일들을 지워진 상태로 본다. main이 둘 중 하나를 바꾸면 `git pull --ff-only`가 실패한다(임시 저장소 실험, sparse-checkout·skip-worktree·assume-unchanged로는 못 막음). 명세대로 옛 코드로 계속 실행하되, 실패를 조용히 넘기지 않게 했다: `run_ops.sh`가 `TRENDSIT_PULL_FAILED=1`을 세우고 `ops`가 그 값을 보면 runs 행 `note`에 "git pull 실패: 옛 코드로 실행"을 붙이고 `summary_json.pull_failed=true`를 남긴다(종료 코드는 그대로, 래퍼 로그에도 줄이 남음). 방식 근거: 새 파일·새 저장소 없이 래퍼-ops 사이 환경 변수 하나로 사람이 보는 runs 표에 남기는 가장 단순한 길이고, 종료 코드를 바꾸면 C-6(종료 코드 0 ⇔ 모든 단계 0)과 어긋난다
+- 병합 뒤 `reports/S5-1/help_before.txt` 스냅숏과 `verify_s5.sh`의 B7(`CLI --help 전부 불변`)은 새 명령(`ops`, `publish`)과 `--force`, 새 옵션 때문에 달라진다(의도한 변경). 이 파일은 S5-1a 리팩터 불변 스냅숏이라 손대지 않았다. 갱신 여부는 리뷰·기획이 판단
 - `cluster --week W`도 `weekly`와 같이 발행된 주를 거부한다(종료 코드 2). `weekly`·`cluster --force`는 시작할 때 발행을 풀어 status `done`, `published_at` NULL로 되돌린다(C-3). 다시 올리는 것은 `publish`로
-- `--day D`로 손 실행한 날이 가장 늦은 날보다 뒤면 다음 밤 따라잡기 범위가 그 날 뒤로 간다(5.2의 "가장 늦은 날" 규칙 그대로). 명세가 말한 용도(실패한 옛 날 다시 돌리기)에서는 문제 없음
 - 작업 중 untracked 폴더 `docs/reference/s6_design/`가 작업 폴더에서 사라졌다(01:27경). 이 런은 건드린 적 없고 `trendsit-design/claude/s6_design`에 같은 이름이 있어 기획 세션이 옮긴 것으로 보인다
 
 ## 7. 사용액과 실제 1회 따라잡기
