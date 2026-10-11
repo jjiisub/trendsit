@@ -455,3 +455,20 @@ def test_repo_step_failure_when_plan_show_fails(db, tmp_path):
     steps = nightly_rows(db)[-1]["summary"]["steps"]
     assert code == 1 and [x["name"] for x in steps if x["exit"]] == ["video", "repo_analyze"]
     assert not any(tail(c)[0] in ("video", "repo-analyze") for c in fake.cmds)
+
+
+def test_b3_cost_counts_unfinished_runs_within_window_only(db, tmp_path):
+    old = Tracer(db, "plan", "RUN-2026-W42")  # 이 nightly 시작 전(손 실행): 세지 않음
+    old.step(kind="llm", role="x", cost_usd=5.0)
+    db.conn.execute("UPDATE steps SET t='2026-01-01T00:00:00+09:00'")
+    db.conn.commit()
+
+    class Killed(Fake):
+        def __call__(self, cmd, timeout=None):
+            if tail(cmd)[:2] == ["plan", "run"]:  # timeout으로 죽어 finish되지 못한 run: runs.cost_usd는 0이지만 호출은 기록됨
+                Tracer(db, "plan", "RUN-2026-W42").step(kind="llm", role="editor_plan", cost_usd=0.3)
+                return 124, "", "시간 초과"
+            return super().__call__(cmd, timeout)
+
+    run_night(db, tmp_path, at(2026, 10, 13), Killed(db))
+    assert nightly_rows(db)[-1]["summary"]["cost_usd"] == pytest.approx(0.3)

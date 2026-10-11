@@ -91,7 +91,7 @@ launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.trendsit.nightly.pli
 launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.trendsit.weekly.plist
 ```
 - 로그: `data/logs/ops/<날짜>-nightly.log`, `<날짜>-weekly.log`(단계 출력 전체), `data/logs/ops/launchd.log`. 단계별 종료 코드·시간·오류는 실행 기록의 `runs.summary_json`(`kind='nightly'`)
-- 종료 코드: 0 성공, 1 단계 실패(나머지 단계는 계속 돔), 2 거부(발행된 주의 `weekly`, 발행 대상이 아닌 주), 3 잠금을 못 얻음·실행 폴더가 main 아님(다음 예약이 다시 시도)
+- 종료 코드: 0 성공, 1 단계 실패(나머지 단계는 계속 돔), 2 거부(발행된 주의 `weekly`·`cluster`, 발행 대상이 아닌 주, 어제 이후 날의 `ops nightly --day`), 3 잠금을 못 얻음·실행 폴더가 main 아님(다음 예약이 다시 시도)
 - 손 실행: `uv run python -m trendsit ops nightly [--day 2026-10-12]`, `ops weekly [--week 2026-W42]`, `publish --week 2026-W42`. 실패한 날은 자동 재시도하지 않으니 `ops nightly --day D`로 다시. 발행된 주를 다시 쓰려면 `weekly --week W --force` 뒤 `publish --week W`
 그 밖의 명령: 수집 항목 보기 `items [--week 2026-W40] [--status pass]`, 기록된 호출 다시 실행 `role --replay <step_id> [--model 별칭]`, 평가 `eval <역할> [--model 별칭]`, 실행 기록 보기 `trace <run_id>`. 전체 명령표와 동작 방식은 [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
 

@@ -197,8 +197,9 @@ def nightly(db: DB, cfg: OpsConfig, *, day: date | None = None, now: datetime | 
             status = "ok" if all(s["exit"] == 0 for s in log.steps) else "partial"
         finally:
             started = db.conn.execute("SELECT started_at FROM runs WHERE id=?", (tr.run_id,)).fetchone()[0]
-            cost = db.conn.execute("SELECT COALESCE(SUM(cost_usd),0) FROM runs WHERE spec LIKE 'RUN-%' AND started_at>=?",
-                                   (started,)).fetchone()[0]
+            # 호출 단위(steps) 기준: timeout으로 끝나지 못한 run의 비용도 잡고, 이 nightly의 시작~끝 구간만 센다
+            cost = db.conn.execute("SELECT COALESCE(SUM(s.cost_usd),0) FROM steps s JOIN runs r ON r.id=s.run_id "
+                                   "WHERE r.spec LIKE 'RUN-%' AND s.t>=? AND s.t<=?", (started, now_kst())).fetchone()[0]
             summary: dict[str, Any] = {"days": [d.isoformat() for d in days], "steps": log.steps, "cost_usd": round(cost, 4)}
             if day:
                 summary["manual"] = True
