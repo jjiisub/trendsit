@@ -517,16 +517,16 @@ def build_into(out):
 
 def build(data_path, out_path):
     """site.json → out_path. 임시 폴더에 다 만든 뒤 교체한다(C-10): 실패하면 out_path는 그대로."""
-    out = pathlib.Path(out_path).resolve()  # 실행 폴더에서는 site가 작업 폴더로 가는 링크
-    out.parent.mkdir(parents=True, exist_ok=True)
-    old = out.with_name(out.name + ".old")
-    if not out.exists() and old.exists():
-        old.rename(out)  # 이전 빌드가 두 rename 사이에 죽어 site/가 없으면 이전 사이트를 되살린다
     try:
         d = json.loads(pathlib.Path(data_path).read_text(encoding="utf-8"))
         load(d)
     except (OSError, ValueError, BuildError) as e:
         raise BuildError(f"site.json을 읽을 수 없음({data_path}): {e}") from e
+    out = pathlib.Path(out_path).resolve()  # 실행 폴더에서는 site가 작업 폴더로 가는 링크
+    out.parent.mkdir(parents=True, exist_ok=True)
+    old = out.with_name(out.name + ".old")
+    if not out.exists() and old.exists():
+        old.rename(out)  # 이전 빌드가 두 rename 사이에 죽어 site/가 없으면 이전 사이트를 되살린다(입력 검증 뒤)
     tmp = pathlib.Path(tempfile.mkdtemp(prefix=out.name + ".tmp-", dir=out.parent))
     try:
         build_into(tmp)

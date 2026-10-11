@@ -14,7 +14,7 @@
 
 ## 2. 관문 A 결과
 `bash scripts/verify_s6a.sh`(구현 런의 관문과 같은 스크립트), 약 50초. 마지막 실행 FAIL 0줄. 항목: A0 ruff, A1·A2·A11(export·주차·W40 근사), A14(data/ 정리·B7/A17), A3·A4(도식·번호·확인 필요), A5~A10(check.py --fixture), A12(발행·원자 교체), A13(문서).
-게이트 밖 전체 `uv run pytest -q`: 647 passed. 실데이터 사본(W40·W41을 임시 DB 사본에서 published 처리)으로 export → 임시 폴더 빌드 → `check.py` 13/13 통과(Chromium·WebKit 관문 9, 동작 포함).
+게이트 밖 전체 `uv run pytest -q`: 649 passed. 실데이터 사본(W40·W41을 임시 DB 사본에서 published 처리)으로 export → 임시 폴더 빌드 → `check.py` 13/13 통과(Chromium·WebKit 관문 9, 동작 포함).
 
 ## 3. 관문 B 결과
 없음(LLM 역할 변경 없음).
@@ -32,9 +32,9 @@
 - 영상 타임라인(`type: video`, `marks`)은 `export_topic`이 만들지 않아 실데이터에는 없고 픽스처로만 검증한다(빌드는 지원)
 - `check.py`의 "예시"·"동작 안 함" 검사는 site.json 본문 문자열을 뺀 화면 문구에만 적용(실제 글에 "예시"가 흔히 나옴)
 - Python 3.12 f-string 문법(따옴표 중첩)을 `build.py`에서 씀. 시스템 `python3`은 3.14라 문제 없음
-- `esc()`는 원문에 이미 들어 있는 `&#x27;` 같은 엔티티를 풀어 한 번만 이스케이프하고, `nb_tokens`는 태그와 엔티티(`&#x27;` `&quot;` `&amp;` `&lt;`)를 건드리지 않는다(처음 구현은 엔티티 속 `x27`·`quot`를 토큰으로 감싸 화면에 글자로 찍혔음, 실데이터 사본 38건 → 0건). check.py M-1이 렌더된 글자에 엔티티·마크업 조각이 보이면 실패시킨다
+- `esc()`는 원문을 풀지 않고 한 번만 이스케이프하고, `nb_tokens`는 태그와 엔티티(`&#x27;` `&quot;` `&amp;` `&lt;`)를 건드리지 않는다(처음 구현은 엔티티 속 `x27`·`quot`를 토큰으로 감싸 화면에 글자로 찍혔음, 실데이터 사본 38건 → 0건). check.py M-1은 태그 중첩 어긋남과 엔티티가 태그로 쪼개진 곳만 실패시킨다(5장 F50)
 - 매일 수집의 비용은 `summary_json.cost_usd`, 소스는 `sources.yaml`에 있는 것만(daily 칸 포함), `nightly_failed`는 partial·failed·stopped만
-- ruff는 `docs/reference`(디자인 시안 복사본, E702 등)를 `--extend-exclude`로 뺌(pyproject 변경 없이)
+- ruff: 디자인 시안 복사본(`docs/reference/s6_design/drafts/*.py`) 머리에 `# ruff: noqa`(5장 F47)
 
 ## 5. 스펙과 다르게 한 것 (모두 명세 갱신은 기획 몫)
 - **발행 직전의 주를 export에 담는 내부 인자(`export.export(db, out, with_week)`)**: `publish`는 status를 바꾸기 전에 export·빌드를 돌려야(S6b C-3) 하는데 export는 published 주만 담는다. 공개 CLI 옵션으로 열면 C-1을 우회할 수 있어(리뷰 F04) CLI에는 두지 않고 `ops.publish`가 함수로 직접 부른다. 결과는 `data/site.json.new`로 받아 그 파일로 빌드하고 성공했을 때만 `data/site.json`으로 바꾼다. 이 때문에 publish의 export는 실행기(runner)를 거치지 않는다
@@ -55,6 +55,8 @@
 - **build 시작 시 복구(F59)**: `site/`가 없고 `site.old`가 있으면 되살린 뒤 시작한다
 - **C-6 측정 확장(F64)**: gate.js가 오른쪽 테두리·outline·text-decoration 색과 box-shadow 색도 토큰 10개와 대조한다. 단, 검정+투명도 그림자(툴팁의 `rgb(0 0 0 / .08)`, 복사본 CSS 그대로)는 색이 아니라 깊이 표현이라 뺀다
 - **소스 화면 GitHub Trending 수집 수(F69)**: `github_trending`의 주별 `collected`는 items가 아니라 그 주 `repo_trending` 행 수. 레포 설명은 `repo_oneliners`에서만 읽는다(F57, 레포 카드에 없는 칸을 읽던 죽은 분기 제거)
+- **check.py `--site`·`--data` 옵션**: 명세에는 없는 옵션. 7장 QA("그 폴더에 check 실행")에 필요해서 둠
+- **`.gitignore` 두 줄(`/site.tmp-*`, `/site.old`)**: 위에 적은 대로 build의 임시 폴더 때문에 추가(명세 3.1 0번 밖)
 - `weeks[].start·end`는 쓰는 곳이 없어 내보내지 않는다. 키워드 관련 토픽·`used_in_topics`는 사이트에 실린 토픽만 센다
 
 ## 6. 남은 문제, 다음 스펙 제안
@@ -63,8 +65,10 @@
 - 홈 메타 "/ 확인 필요"는 명세대로 `has_check`(빠진 도식만 있는 토픽 포함)를 따르는데 토픽 화면에는 그때 표기가 없다
 - 실행 폴더 1회 정리(`fetch` + `reset --hard origin/main`)는 병합 절차(7장), 이 구현에서 하지 않음
 
+- **기획에 넘길 것(C1 #1)**: 레포 목록 원천은 명세 5.1이 "repo_trending(그 주 마지막 수집 run)"인데, `repo_trending`은 `(week, full_name)` upsert라 주에 수집 run 행이 여럿 섞여 있다. 구현은 run을 가리지 않고 그 주의 모든 수집 run 행을 쓴다. 명세 글자대로(마지막 run만)면 실데이터 W41 레포가 0개가 된다(마지막 run의 레포 9개는 카드·한 줄 설명이 없어 빠짐). "그 주 누적 + 카드·설명 있는 것"으로 명세를 고칠지 정해야 한다
+
 ## 7. 런 뒤 단계 (워크플로우 밖, 구현 세션)
 이 리포트 작성 시점에는 하지 않았다(실제 DB·사이트 불변, 유료 호출 0 약속). ① `uv run python scripts/trending_monthly.py --week 2026-W40` ② `trendsit publish --week 2026-W40`, `--week 2026-W41` ③ `python3 site_src/check.py` ④ trendsit.jiseop.com WebKit 375 캡처(홈·토픽 1개).
 
 ## 8. impl-workflow SUMMARY 요약
-라운드 A1 구현 완료, 게이트(`verify_s6a.sh`) 통과. 변경 기존 파일 8(`.gitignore`, `README.md`, `scripts/verify_s5.sh`, `site_src/build.py`, `site_src/check.py`, `trendsit/ops.py`, `trendsit/cli_ops.py`, `style.css` 삭제) + 테스트 2(위 5장), 새 파일 14, 옮긴 파일 2, 새 의존성 0, `build.py` 566줄(≤ 1050).
+라운드 A1 구현 완료, 게이트(`verify_s6a.sh`) 통과. 변경 기존 파일 8(`.gitignore`, `README.md`, `scripts/verify_s5.sh`, `site_src/build.py`, `site_src/check.py`, `trendsit/ops.py`, `trendsit/cli_ops.py`, `style.css` 삭제) + 목록 밖 4(`tests/test_ops.py`, `tests/test_ops_publish.py`, `docs/reference/s6_design/drafts/common.py`·`shoot.py`의 `# ruff: noqa`) = 12로 예산 ≤ 8 초과(테스트 2는 5장, drafts 2는 F47), 새 파일 14, 옮긴 파일 2, 새 의존성 0, `build.py` 566줄(≤ 1050).

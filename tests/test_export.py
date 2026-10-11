@@ -287,8 +287,16 @@ def test_a11_failure_leaves_db_unchanged(tmp_path, monkeypatch):
         monkeypatch.setattr("trendsit.core.context.open_ctx", lambda *a, **k: pytest.fail("open_ctx를 부르면 안 됨"))
         assert tm.main(["--week", "2026-W40"], fetch=lambda url, r=result: r) == 1
         assert snap() == before
+    # 월간 목록이 전부 그 뒤 주 레포면 고를 게 없음: DB 변경 없이 1
+    html, names13 = monthly()
+    for name in names13:
+        db.conn.execute("INSERT OR IGNORE INTO repo_trending(week, full_name, rank, run_id) VALUES ('2026-W41',?,9,'x')", (name,))
+    db.conn.commit()
+    before_all = snap()
+    assert tm.run(db, "2026-W40", lambda url: (html, None)) == (1, []) and snap() == before_all
+    db.conn.execute("DELETE FROM repo_trending WHERE week='2026-W41' AND rank=9")
+    db.conn.commit()
     # 저장 도중 실패하면 runs 행도 남지 않음(한 트랜잭션)
-    html, _ = monthly()
     db.conn.execute("CREATE TRIGGER boom BEFORE INSERT ON repo_trending BEGIN SELECT RAISE(ABORT, 'x'); END")
     with pytest.raises(Exception, match="x"):
         tm.run(db, "2026-W40", lambda url: (html, None))

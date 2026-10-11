@@ -45,6 +45,9 @@ def run(db: DB, week: str, fetch: Callable[[str], tuple[str | None, str | None]]
         return 1, []
     later = {r[0] for r in db.conn.execute("SELECT full_name FROM repo_trending WHERE week>?", (week,))}  # 월간 창에 함께 든 그 뒤 주의 레포는 W40이 아님
     picked = [r for r in rows if r["full_name"] not in later][:TOP]
+    if not picked:
+        print("월간 목록이 모두 그 뒤 주 레포라 근사 목록을 만들 수 없음", file=sys.stderr)
+        return 1, []
     run_id, now = new_run_id("collect"), now_kst()
     with db.conn:
         db.conn.execute("INSERT INTO runs(id, kind, spec, started_at, finished_at, status, note) VALUES (?,?,?,?,?,?,?)",

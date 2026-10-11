@@ -224,6 +224,25 @@ def test_a12_publish_runs_export_then_build_and_failure_keeps_site(tmp_path):
     assert calls == ["build:site.json.new"] * 2
 
 
+def test_f75_approx_week_home_note_and_no_week_stars_and_empty_notes(site):
+    w39 = (site / "week/2026-w39/index.html").read_text(encoding="utf-8")
+    assert w39.count("주간 기록이 없어 월간 목록으로 대신한다") == 1 and "monthly-a" in w39
+    assert 'class="rp-s"' not in w39  # 별 수가 없는 레포에는 "이번 주 별" 줄이 없음
+    assert "이 주는 트렌딩 기록이 없다" in (site / "week/2026-w41/index.html").read_text(encoding="utf-8")  # 레포 0개 주
+    assert "매일 실행 기록 없음(손으로 실행)" in (site / "runs/2026-w41/index.html").read_text(encoding="utf-8")  # nightly 0개 주
+
+
+def test_f79_site_old_not_restored_when_input_invalid(tmp_path):
+    b = load_build()
+    b.build(FIXTURE, tmp_path / "site")
+    (tmp_path / "site").rename(tmp_path / "site.old")
+    bad = tmp_path / "bad.json"
+    bad.write_text("{", encoding="utf-8")
+    with pytest.raises(b.BuildError):
+        b.build(bad, tmp_path / "site")
+    assert not (tmp_path / "site").exists() and (tmp_path / "site.old").is_dir()  # C-10: 깨진 입력이면 건드리지 않음
+
+
 def test_f53_publish_export_exception_returns_1_and_keeps_state(tmp_path, monkeypatch, capsys):
     db = make_db(tmp_path, published=())
 
@@ -389,10 +408,7 @@ def test_f59_build_restores_old_site_when_site_missing(tmp_path):
     out = tmp_path / "site"
     b.build(FIXTURE, out)
     out.rename(tmp_path / "site.old")  # 두 rename 사이에 죽은 상태
-    bad = tmp_path / "bad.json"
-    bad.write_text("{", encoding="utf-8")
-    with pytest.raises(b.BuildError):
-        b.build(bad, out)
+    b.build(FIXTURE, out)  # 입력이 정상이면 시작할 때 복구한 뒤 새로 교체
     assert (out / "index.html").is_file() and not (tmp_path / "site.old").exists()
 
 
