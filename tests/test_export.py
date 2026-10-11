@@ -66,8 +66,9 @@ def make_db(tmp_path: Path, published: tuple[str, ...] = ("2026-W41",)) -> DB:
       ('x','geeknews','2026-10-07','failed',0,'시간 초과','2026-10-07T02:00:00+09:00');
     INSERT INTO repos(full_name, description) VALUES ('a/b','desc');
     INSERT INTO repo_trending(week, full_name, rank, stars_this_week, run_id, filter_status) VALUES ('2026-W41','a/b',1,1600,'x','pass');
+    INSERT INTO repo_oneliners VALUES ('a/b','h','{"oneliner":"에이비 도구"}','m','2026-10-11');
     INSERT INTO repo_cards(week, full_name, card_json) VALUES
-      ('2026-W41','a/b','{"relevant":true,"signal":"release","oneliner":"에이비 도구","why_trending":"","release":null}');
+      ('2026-W41','a/b','{"relevant":true,"signal":"release","why_trending":"","release":null}');
     """)
     for i in (1, 2, 3):
         card = json.dumps({"summary": f"요약 {i}.", "relevance": "high", "entities": [], "keywords": [],
@@ -208,6 +209,12 @@ def test_a2_week_label(week, label, rng):
 
 def test_a2_stars_text():
     assert [stars_text(n) for n in (None, 950, 1000, 1600, 21365)] == [None, "+950", "+1.0k", "+1.6k", "+21.4k"]
+
+
+def test_f69_github_collected_counts_repo_trending(tmp_path):
+    site = build(make_db(tmp_path))
+    gh = next(s for s in site["sources"] if s["id"] == "github_trending")
+    assert gh["weeks"]["2026-w41"]["collected"] == 1  # items에는 없고 repo_trending 행(그 주)만 있음
 
 
 # ---------- A11 ----------

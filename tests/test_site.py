@@ -224,6 +224,20 @@ def test_a12_publish_runs_export_then_build_and_failure_keeps_site(tmp_path):
     assert calls == ["build:site.json.new"] * 2
 
 
+def test_f53_publish_export_exception_returns_1_and_keeps_state(tmp_path, monkeypatch, capsys):
+    db = make_db(tmp_path, published=())
+
+    def boom(*a, **k):
+        raise KeyError("rank")
+
+    monkeypatch.setattr(ops, "export_site", boom)
+    assert ops.publish(db, "2026-W41", lambda cmd: pytest.fail("빌드까지 가면 안 됨")) == 1
+    err = capsys.readouterr().err.strip().splitlines()
+    assert len(err) == 1 and "KeyError" in err[0]
+    assert db.conn.execute("SELECT status FROM weeks WHERE week='2026-W41'").fetchone()[0] == "done"
+    assert not (tmp_path / "site.json").exists() and not (tmp_path / "site.json.new").exists()
+
+
 # ---------- F01 끝 어절 묶기: 원문 어절 단위 ----------
 def load_build():
     sys.path.insert(0, str(ROOT / "site_src"))
@@ -315,12 +329,71 @@ def test_f25_checker_flags_exposed_entity(site, tmp_path):
     bad = tmp_path / "site"
     shutil.copytree(site, bad)
     f = bad / "topic/w41-mid/index.html"
-    f.write_text(f.read_text(encoding="utf-8").replace("it</span>&#x27;s", "it</span>&amp;#<span>x27</span>;s"), encoding="utf-8")
+    f.write_text(f.read_text(encoding="utf-8").replace("it</span>&#x27;s", 'it</span>&#<span class="nb">x27</span>;s'), encoding="utf-8")
     check.results.clear()
     pages = {p: check.parse(p) for p in sorted(bad.rglob("*.html"))}
     with contextlib.redirect_stdout(io.StringIO()):
         check.static_checks(bad, json.loads(FIXTURE.read_text(encoding="utf-8")), pages)
     assert "M-1" in [n.split()[0] for n, ok, _ in check.results if not ok]
+
+
+# ---------- F50 데이터 원문 글자 보존, F68 내부 근거 id ----------
+def test_f50_literal_markup_text_in_data_is_kept_and_passes_m1(site, tmp_path):
+    import contextlib
+    import io
+
+    sys.path.insert(0, str(ROOT / "site_src"))
+    import check
+
+    data = json.loads(FIXTURE.read_text(encoding="utf-8"))
+    t = next(t for t in data["topics"] if t["id"] == "w41-one")
+    t["points"][0]["text"] = 'HTML 태그 `<span class="x">`를 쓰고 &amp; 문제 &#x27; 확인'
+    p = tmp_path / "s.json"
+    p.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+    out = tmp_path / "site"
+    assert run_build(p, out).returncode == 0
+    html = (out / "topic/w41-one/index.html").read_text(encoding="utf-8")
+    shown = re.sub(r"\s+", " ", "".join(Dom(html).els[i]["text"] for i in range(len(Dom(html).els))))
+    assert '<span class="x">' in shown and "&amp; 문제 &#x27; 확인" in shown  # 파싱한 화면 글자가 원문 그대로
+    check.results.clear()
+    pages = {f: check.parse(f) for f in sorted(out.rglob("*.html"))}
+    with contextlib.redirect_stdout(io.StringIO()):
+        check.static_checks(out, data, pages)
+    assert not [n for n, ok, _ in check.results if n.startswith("M-1") and not ok]
+
+
+def test_f68_evidence_ids_stripped_from_diagram_context(site, tmp_path):
+    import contextlib
+    import io
+    import shutil
+
+    sys.path.insert(0, str(ROOT / "site_src"))
+    import check
+
+    pages_html = "".join(f.read_text(encoding="utf-8") for f in site.rglob("*.html"))
+    assert not re.search(r"\[it:|#q\d", pages_html) and "같은 조건." in pages_html  # 설명 글은 남고 id만 빠짐
+    bad = tmp_path / "site"
+    shutil.copytree(site, bad)
+    f = bad / "topic/w41-mid/index.html"
+    f.write_text(f.read_text(encoding="utf-8").replace("</main>", "<p>[it:8#q2]</p></main>", 1), encoding="utf-8")
+    check.results.clear()
+    pages = {p: check.parse(p) for p in sorted(bad.rglob("*.html"))}
+    with contextlib.redirect_stdout(io.StringIO()):
+        check.static_checks(bad, json.loads(FIXTURE.read_text(encoding="utf-8")), pages)
+    assert "M-2" in [n.split()[0] for n, ok, _ in check.results if not ok]
+
+
+# ---------- F59 site/ 없이 site.old만 남은 경우 복구 ----------
+def test_f59_build_restores_old_site_when_site_missing(tmp_path):
+    b = load_build()
+    out = tmp_path / "site"
+    b.build(FIXTURE, out)
+    out.rename(tmp_path / "site.old")  # 두 rename 사이에 죽은 상태
+    bad = tmp_path / "bad.json"
+    bad.write_text("{", encoding="utf-8")
+    with pytest.raises(b.BuildError):
+        b.build(bad, out)
+    assert (out / "index.html").is_file() and not (tmp_path / "site.old").exists()
 
 
 # ---------- F39 수집 URL 스킴 ----------

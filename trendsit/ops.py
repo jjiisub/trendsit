@@ -11,7 +11,6 @@ import fcntl
 import json
 import os
 import signal
-import sqlite3
 import subprocess
 import sys
 import time
@@ -25,7 +24,6 @@ from .collect.text import iso_week
 from .core.config import ROOT, OpsConfig
 from .core.db import DB, KST, now_kst
 from .core.trace import Tracer
-from .export import ExportError
 from .export import export as export_site
 
 # 명령 하나를 (종료 코드, 표준 출력, 표준 오류)로. 테스트는 이 자리에 가짜 실행기를 넣는다. timeout(초)을 넘기면 종료 코드 124
@@ -75,8 +73,8 @@ def publish(db: DB, week: str, runner: Build = run_subprocess) -> int:
     try:
         try:
             export_site(db, tmp, week)
-        except (ExportError, sqlite3.Error) as e:
-            print(f"export 실패: {e}", file=sys.stderr)
+        except Exception as e:  # noqa: BLE001 - export가 무엇으로 죽든 상태는 그대로 두고 1 + 이유 한 줄(C-3)
+            print(f"export 실패: {type(e).__name__}: {e}"[:300].replace("\n", " "), file=sys.stderr)
             return 1
         code, out, err = runner([*BUILD_CMD, "--data", str(tmp)])
         if code != 0:

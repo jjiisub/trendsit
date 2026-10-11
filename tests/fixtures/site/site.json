@@ -136,7 +136,7 @@
      "anchor": 2,
      "title": "Jeeves가 4개 모델 중 정확도 최고",
      "unit": "%",
-     "context": "같은 JevBench 231문항으로 잰 정확도.",
+     "context": "같은 JevBench 231문항으로 잰 정확도. [it:8#q2]",
      "items": [
       {
        "label": "Jeeves",
@@ -449,7 +449,7 @@
      "anchor": 1,
      "title": "처리량 비교",
      "unit": "배",
-     "context": "같은 조건.",
+     "context": "같은 조건. [it:924#q3, it:924#q4]",
      "items": [
       {
        "label": "이전",

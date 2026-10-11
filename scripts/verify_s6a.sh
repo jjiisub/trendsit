@@ -10,8 +10,8 @@ EXTRA=()
 
 source scripts/verify_common.sh
 
-# ruff. docs/reference는 디자인 참고용 복사본(시안 스크립트)이라 뺀다
-if uv run --quiet ruff check . --extend-exclude docs/reference >"$TMP/ruff" 2>&1; then pass A0 "ruff: $(tail -1 "$TMP/ruff")"; else fail A0 "ruff: $(tail -3 "$TMP/ruff" | tr '\n' ' ')"; fi
+# ruff
+if uv run --quiet ruff check . >"$TMP/ruff" 2>&1; then pass A0 "ruff: $(tail -1 "$TMP/ruff")"; else fail A0 "ruff: $(tail -3 "$TMP/ruff" | tr '\n' ' ')"; fi
 
 # ---------- S-1: export, 주차 표기, W40 근사, data/ 정리 ----------
 pt A1 "export 구조(최상위 8칸, 칸별 값, example/notice/markup 없음, published 주만 C-1, C-2 실패 시 파일 유지, 종료 코드)" tests/test_export.py -k "a1_"

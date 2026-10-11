@@ -13,8 +13,8 @@
 `trendsit export`가 published 주만 `data/site.json`(예시 JSON 구조)으로 꺼내고, `site_src/build.py`가 그것을 디자인 시스템 v1 마크업(홈·주차·토픽·소스·키워드·실행 기록)으로 임시 폴더에 빌드한 뒤 `site/`를 한 번에 교체한다. `publish`는 export → 빌드 순서이고 둘 중 하나가 실패하면 상태를 바꾸지 않는다. `site_src/check.py`가 정적 검사와 관문 9(Chromium·WebKit)·동작을 잰다. 워크플로우 안 유료 호출 0.
 
 ## 2. 관문 A 결과
-`bash scripts/verify_s6a.sh`(= `.workflow/gate.sh`), 약 50초. 마지막 실행 FAIL 0줄(원문은 `.workflow/005-s6a/A1-impl.md`). 항목: A0 ruff, A1·A2·A11(export·주차·W40 근사), A14(data/ 정리·B7/A17), A3·A4(도식·번호·확인 필요), A5~A10(check.py --fixture), A12(발행·원자 교체), A13(문서).
-게이트 밖 전체 `uv run pytest -q`: 626 passed. 실데이터 사본(W40·W41을 임시 DB 사본에서 published 처리)으로 export → 임시 폴더 빌드 → `check.py` 13/13 통과(Chromium·WebKit 관문 9, 동작 포함).
+`bash scripts/verify_s6a.sh`(구현 런의 관문과 같은 스크립트), 약 50초. 마지막 실행 FAIL 0줄. 항목: A0 ruff, A1·A2·A11(export·주차·W40 근사), A14(data/ 정리·B7/A17), A3·A4(도식·번호·확인 필요), A5~A10(check.py --fixture), A12(발행·원자 교체), A13(문서).
+게이트 밖 전체 `uv run pytest -q`: 647 passed. 실데이터 사본(W40·W41을 임시 DB 사본에서 published 처리)으로 export → 임시 폴더 빌드 → `check.py` 13/13 통과(Chromium·WebKit 관문 9, 동작 포함).
 
 ## 3. 관문 B 결과
 없음(LLM 역할 변경 없음).
@@ -48,6 +48,13 @@
 - **매일 수집 runs의 steps에는 `t`가 없다**: 원천(`summary_json.steps`)에 시각이 없어 칸을 뺐다(D-11 "못 만드는 칸은 뺌"). build는 `t`가 없으면 시각 열을 그리지 않는다
 - **`.gitignore` 두 줄(`/site.tmp-*`, `/site.old`)**: 명세 3.1 0번이 정한 변경 밖이지만 build의 임시 폴더 이름 때문에 필요(F32 수용)
 - **실행 1건 화면**: `.rail`은 명세 5.6대로 steps의 역할 문장, counts는 키-값(`.kv`)으로 보인다
+- **verify_s6a의 ruff 우회 제거(F47)**: `docs/reference/s6_design/drafts/common.py`·`shoot.py`(참고 복사본) 머리에 `# ruff: noqa`를 넣고 pyproject는 그대로 둔다. `--extend-exclude docs/reference`를 뺐고 `uv run ruff check .`가 전체에서 통과한다(이전 스펙 verify의 ruff 항목 회귀 해소)
+- **M-1은 빌드가 만든 깨짐만(F50)**: `esc()`는 원문을 풀지 않고 한 번만 이스케이프해 본문의 `<span`·`&amp;` 글자가 화면에 그대로 보인다. M-1은 태그 중첩 어긋남과 "엔티티가 태그로 쪼개짐(`&#<span`)"만 잡는다(데이터 원문 글자로 오탐 없음)
+- **내부 근거 id 제거(F68)**: 도식 설명(`context`) 끝의 `[it:8#q2]`·`[it:924#q3, it:924#q4]`는 build가 화면에 내기 전에 뺀다(brief/는 건드리지 않음). check.py에 M-2(`[it:`·`#q숫자` 노출 0)를 추가, 픽스처 도식 설명 2곳에 해당 표기를 넣어 둠
+- **publish의 export 예외(F53)**: ExportError·sqlite3.Error뿐 아니라 어떤 예외든 잡아 종료 1과 이유 한 줄(`export 실패: 예외이름: 내용`)을 남기고 상태는 그대로 둔다
+- **build 시작 시 복구(F59)**: `site/`가 없고 `site.old`가 있으면 되살린 뒤 시작한다
+- **C-6 측정 확장(F64)**: gate.js가 오른쪽 테두리·outline·text-decoration 색과 box-shadow 색도 토큰 10개와 대조한다. 단, 검정+투명도 그림자(툴팁의 `rgb(0 0 0 / .08)`, 복사본 CSS 그대로)는 색이 아니라 깊이 표현이라 뺀다
+- **소스 화면 GitHub Trending 수집 수(F69)**: `github_trending`의 주별 `collected`는 items가 아니라 그 주 `repo_trending` 행 수. 레포 설명은 `repo_oneliners`에서만 읽는다(F57, 레포 카드에 없는 칸을 읽던 죽은 분기 제거)
 - `weeks[].start·end`는 쓰는 곳이 없어 내보내지 않는다. 키워드 관련 토픽·`used_in_topics`는 사이트에 실린 토픽만 센다
 
 ## 6. 남은 문제, 다음 스펙 제안
@@ -60,4 +67,4 @@
 이 리포트 작성 시점에는 하지 않았다(실제 DB·사이트 불변, 유료 호출 0 약속). ① `uv run python scripts/trending_monthly.py --week 2026-W40` ② `trendsit publish --week 2026-W40`, `--week 2026-W41` ③ `python3 site_src/check.py` ④ trendsit.jiseop.com WebKit 375 캡처(홈·토픽 1개).
 
 ## 8. impl-workflow SUMMARY 요약
-라운드 A1 구현 완료, 게이트(`verify_s6a.sh`) 통과. 변경 기존 파일 8(`.gitignore`, `README.md`, `scripts/verify_s5.sh`, `site_src/build.py`, `site_src/check.py`, `trendsit/ops.py`, `trendsit/cli_ops.py`, `style.css` 삭제) + 테스트 2(위 5장), 새 파일 14, 옮긴 파일 2, 새 의존성 0, `build.py` 549줄(≤ 1050).
+라운드 A1 구현 완료, 게이트(`verify_s6a.sh`) 통과. 변경 기존 파일 8(`.gitignore`, `README.md`, `scripts/verify_s5.sh`, `site_src/build.py`, `site_src/check.py`, `trendsit/ops.py`, `trendsit/cli_ops.py`, `style.css` 삭제) + 테스트 2(위 5장), 새 파일 14, 옮긴 파일 2, 새 의존성 0, `build.py` 566줄(≤ 1050).

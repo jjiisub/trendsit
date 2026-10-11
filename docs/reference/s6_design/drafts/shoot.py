@@ -1,3 +1,4 @@
+# ruff: noqa
 """시안 빌드 + Chromium 캡처 + 관문 측정.
 
 사용: python3 shoot.py [시안id ...]   (없으면 전부)

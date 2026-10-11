@@ -96,10 +96,16 @@ function gateInBrowser([weights, tokens]) {
   const used = new Set();
   for (const el of document.querySelectorAll('body, body *')) {
     const cs = getComputedStyle(el);
-    for (const p of ['color', 'backgroundColor', 'borderTopColor', 'borderBottomColor', 'borderLeftColor']) {
+    for (const p of ['color', 'backgroundColor', 'borderTopColor', 'borderRightColor', 'borderBottomColor', 'borderLeftColor', 'outlineColor', 'textDecorationColor']) {
       const v = cs[p];
-      if (v && v !== 'rgba(0, 0, 0, 0)' && !(p.startsWith('border') && cs[p.replace('Color', 'Width')] === '0px')) used.add(v);
+      if (!v || v === 'rgba(0, 0, 0, 0)') continue;
+      if (p.startsWith('border') && cs[p.replace('Color', 'Width')] === '0px') continue;
+      if (p === 'outlineColor' && (cs.outlineStyle === 'none' || cs.outlineWidth === '0px')) continue;
+      if (p === 'textDecorationColor' && cs.textDecorationLine === 'none') continue;
+      used.add(v);
     }
+    // box-shadow 색(밑줄 역할). 검정 + 투명도(툴팁 그림자)는 색이 아니라 깊이 표현이라 뺀다
+    for (const m of (cs.boxShadow === 'none' ? [] : cs.boxShadow.match(/rgba?\([^)]*\)/g) || [])) if (!/^rgba\(0, 0, 0, [\d.]+\)$/.test(m)) used.add(m);
   }
   g.colorsOff = [...used].filter((c) => !tokens.includes(c));
   g.fonts = weights.map((w) => [w, [...document.fonts].some((ff) => ff.family.replace(/["']/g, '') === 'Pretendard' && String(ff.weight) === w && ff.status === 'loaded')]);

@@ -68,7 +68,7 @@ def _topics(db: DB, week: str, run_id: str) -> list[dict[str, Any]]:
 
 
 def _repos(db: DB, week: str, run_id: str, topics: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """그 주 트렌딩(관련 있는 것) + 토픽 근거로 쓴 레포. 설명(what)은 레포 카드 → repo_oneliners 순."""
+    """그 주 트렌딩(관련 있는 것) + 토픽 근거로 쓴 레포. 설명(what)은 repo_oneliners."""
     topic_of: dict[str, str] = {}
     for t in topics:  # rank 순이라 먼저 쓴 토픽이 이김
         for (m,) in db.conn.execute("SELECT DISTINCT member FROM topic_evidence WHERE run_id=? AND topic_id=? AND member LIKE 'rp:%'",
@@ -80,7 +80,7 @@ def _repos(db: DB, week: str, run_id: str, topics: list[dict[str, Any]]) -> list
     out = []
     for name in dict.fromkeys([*rows, *topic_of]):
         card, row = cards.get(name), rows.get(name)
-        what = (card or {}).get("oneliner") or oneliners.get(name)
+        what = oneliners.get(name)
         if name not in topic_of:  # 토픽 근거가 아니면 관련 있는 트렌딩만(카드가 있으면 relevant, 없으면 키워드 필터 통과 + 설명 있음)
             ok = card["relevant"] if card else bool(what) and row["filter_status"] != "filtered"
             if not ok:
@@ -202,7 +202,10 @@ def _sources(db: DB, weeks: list[dict[str, Any]], members: dict[str, set[tuple[s
         if cfg.get("note"):
             entry["note"] = cfg["note"]
         for w in weeks:
-            n = db.conn.execute("SELECT COUNT(*) FROM items WHERE source_id=? AND week=?", (s["id"], w["_db_week"])).fetchone()[0]
+            if s["id"] == "github_trending":  # 트렌딩 레포는 items가 아니라 repo_trending에 쌓임
+                n = db.conn.execute("SELECT COUNT(*) FROM repo_trending WHERE week=?", (w["_db_week"],)).fetchone()[0]
+            else:
+                n = db.conn.execute("SELECT COUNT(*) FROM items WHERE source_id=? AND week=?", (s["id"], w["_db_week"])).fetchone()[0]
             failed = db.conn.execute("SELECT COUNT(DISTINCT day) FROM fetch_log WHERE source_id=? AND status='failed' AND day BETWEEN ? AND ?",
                                      (s["id"], w["_start"].isoformat(), w["_end"].isoformat())).fetchone()[0]
             used = sum(1 for _, src in members[w["_db_week"]] if src == s["id"])

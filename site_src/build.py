@@ -41,8 +41,8 @@ def link(url):
 
 
 def esc(s):
-    """이스케이프. 원문에 이미 엔티티(&#x27; 등)로 들어 있는 글자는 풀어서 한 번만 이스케이프(그대로 화면에 찍히지 않게)."""
-    return html.escape(html.unescape(str(s)), quote=True)
+    """이스케이프. 원문 글자(&amp; 등 포함)는 그대로 화면에 보이게 한 번만 이스케이프."""
+    return html.escape(str(s), quote=True)
 
 
 TOKEN_RE = re.compile(r"([A-Za-z0-9][A-Za-z0-9.%$+\-_/:,~]*[A-Za-z0-9%)]|[A-Za-z0-9]{2,})")
@@ -211,8 +211,13 @@ def bars_html(t, g, ctr):
     return f'<figure class="dg dg-bars"><figcaption class="dg-t">{esc(g["title"])}</figcaption>{ctx_p(g)}<div class="bars">{rows}</div>{src}</figure>'
 
 
+EVIDENCE_ID_RE = re.compile(r"\s*\[\s*it:\d+#q\d+(?:\s*,\s*it:\d+#q\d+)*\s*\]")
+
+
 def ctx_p(g):
-    return f'<p class="dg-c">{rich(g["context"])}</p>' if g.get("context") else ""
+    """도식 설명 끝의 내부 근거 id([it:8#q2] 등)는 공개 화면에 내지 않는다."""
+    ctx = EVIDENCE_ID_RE.sub("", g.get("context") or "").strip()
+    return f'<p class="dg-c">{rich(ctx)}</p>' if ctx else ""
 
 
 def events_html(t, g, ctr):
@@ -512,18 +517,20 @@ def build_into(out):
 
 def build(data_path, out_path):
     """site.json → out_path. 임시 폴더에 다 만든 뒤 교체한다(C-10): 실패하면 out_path는 그대로."""
+    out = pathlib.Path(out_path).resolve()  # 실행 폴더에서는 site가 작업 폴더로 가는 링크
+    out.parent.mkdir(parents=True, exist_ok=True)
+    old = out.with_name(out.name + ".old")
+    if not out.exists() and old.exists():
+        old.rename(out)  # 이전 빌드가 두 rename 사이에 죽어 site/가 없으면 이전 사이트를 되살린다
     try:
         d = json.loads(pathlib.Path(data_path).read_text(encoding="utf-8"))
         load(d)
     except (OSError, ValueError, BuildError) as e:
         raise BuildError(f"site.json을 읽을 수 없음({data_path}): {e}") from e
-    out = pathlib.Path(out_path).resolve()  # 실행 폴더에서는 site가 작업 폴더로 가는 링크
-    out.parent.mkdir(parents=True, exist_ok=True)
     tmp = pathlib.Path(tempfile.mkdtemp(prefix=out.name + ".tmp-", dir=out.parent))
     try:
         build_into(tmp)
         os.chmod(tmp, 0o755)
-        old = out.with_name(out.name + ".old")
         shutil.rmtree(old, ignore_errors=True)
         had = out.exists()
         if had:

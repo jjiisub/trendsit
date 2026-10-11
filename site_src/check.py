@@ -91,8 +91,11 @@ def static_checks(site, data, pages):
           all((site / p).exists() for p in ("index.html", "sources/index.html", "keywords/index.html", "runs/index.html", "runs/weeks/index.html"))
           and any(f.parent.parent.parent.name == "runs" for f in files), f"html {len(files)}개")
     broken = [f"{page_url(site, f)} 중첩 어긋남 {p.mismatch}" for f, p in pages.items() if p.mismatch or p.open]
-    broken += [f"{page_url(site, f)} 본문에 마크업 조각·엔티티 노출" for f, p in pages.items() if re.search(r'class="|<span|</span|&#\w+;|&(?:quot|amp|lt|gt);', "".join(p.text))]
-    check("M-1 마크업 무결성: 태그 중첩 어긋남 0, 본문 글자에 class=·<span·엔티티(&#x27; &quot; &amp;) 노출 0", not broken, "; ".join(broken[:3]))
+    # 빌드가 만든 깨짐만: 엔티티가 태그로 쪼개짐(&#<span ..>x27</span>;). 데이터 원문 글자(<span, &amp;)는 &lt;span, &amp;amp;로 나가므로 걸리지 않음
+    broken += [f"{page_url(site, f)} 엔티티가 태그로 쪼개짐" for f in pages if re.search(r"&#?\w*<", f.read_text(encoding="utf-8"))]
+    check("M-1 마크업 무결성: 태그 중첩 어긋남 0, 엔티티가 태그로 쪼개진 곳 0", not broken, "; ".join(broken[:3]))
+    leak = [page_url(site, f) for f in pages if re.search(r"\[it:\d+|#q\d+", f.read_text(encoding="utf-8"))]
+    check("M-2 내부 근거 id([it:8#q2] 등) 노출 0", not leak, "; ".join(leak[:3]))
     # C-3 내부 링크의 대상 파일·앵커
     bad = []
     for f, p in pages.items():
