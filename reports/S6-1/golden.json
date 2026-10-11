@@ -4,36 +4,6 @@
    "autofix": [],
    "issues": [
     {
-     "comment": "sections[0].paragraphs[0]의 '2.50'가 it:1180#s1, it:1180#s3, it:1180#s6, it:1180#s7에 없음. 근거의 가까운 값은 0.5, 0.1, 5.5",
-     "loc": "sections[0].paragraphs[0]",
-     "type": "number_mismatch"
-    },
-    {
-     "comment": "sections[2].paragraphs[0]의 '15.7'가 it:1180#s14, it:1180#s15, it:1180#s16, it:1180#s17에 없음. 근거의 가까운 값은 6, 4.5, 2.1",
-     "loc": "sections[2].paragraphs[0]",
-     "type": "number_mismatch"
-    },
-    {
-     "comment": "sections[2].paragraphs[0]의 '48.9'가 it:1180#s14, it:1180#s15, it:1180#s16, it:1180#s17에 없음. 근거의 가까운 값은 72.4, 6, 4.5",
-     "loc": "sections[2].paragraphs[0]",
-     "type": "number_mismatch"
-    },
-    {
-     "comment": "sections[2].paragraphs[1]의 '57.4'가 it:1180#s24, it:1180#s25, it:1180#s26, it:1180#s20에 없음. 근거의 가까운 값은 46.4, 44, 43",
-     "loc": "sections[2].paragraphs[1]",
-     "type": "number_mismatch"
-    },
-    {
-     "comment": "sections[2].table.rows[3]의 '39.2'가 it:1180#s15, it:1180#s16, it:1180#s17, it:1180#s18에 없음. 근거의 가까운 값은 48.9, 15.7, 6",
-     "loc": "sections[2].table.rows[3]",
-     "type": "number_mismatch"
-    },
-    {
-     "comment": "sections[2].table.rows[3]의 '16.4'가 it:1180#s15, it:1180#s16, it:1180#s17, it:1180#s18에 없음. 근거의 가까운 값은 15.7, 6, 4.5",
-     "loc": "sections[2].table.rows[3]",
-     "type": "number_mismatch"
-    },
-    {
      "comment": "sections[3].paragraphs[1] 금지 표현: 뛰어난",
      "loc": "sections[3].paragraphs[1]",
      "type": "format"

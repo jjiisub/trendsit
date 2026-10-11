@@ -279,7 +279,8 @@ def slide_html(s, video_url):
     cap_parts = [esc(sl["title"])] if sl.get("title") else []
     if sl.get("caption"):
         cap_parts.append(esc(sl["caption"]))
-    time_link = f'<a href="{esc(url)}&t={sl["sec"]}s">{esc(mmss(sl["sec"]))}</a>' if url and link(url) else esc(mmss(sl["sec"]))
+    time_text = f"슬라이드 {esc(mmss(sl['sec']))}"
+    time_link = f'<a href="{esc(url)}&t={sl["sec"]}s">{time_text}</a>' if url and link(url) else time_text
     cap = meta_line([time_link, *cap_parts])
     return (f'<figure class="simg"><img src="/assets/slides/{esc(sl["image"].split("/")[-1])}" width="960" height="540" '
             f'loading="lazy" alt="슬라이드: {esc(sl.get("title") or "")}"><figcaption>{cap}</figcaption></figure>')
@@ -596,8 +597,9 @@ def build_into(out):
             if s.get("slide"):
                 fname = s["slide"]["image"].split("/")[-1]
                 src = slides_src / fname
-                if src.is_file():
-                    write_bytes(f"assets/slides/{fname}", src.read_bytes())
+                if not src.is_file():
+                    raise BuildError(f"슬라이드 파일 없음: {src}")
+                write_bytes(f"assets/slides/{fname}", src.read_bytes())
     for i, w in enumerate(C.d["weeks"]):
         write(f'week/{w["id"]}/index.html', render_week(w, week_path(w)))
         if i == 0:

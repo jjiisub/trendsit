@@ -190,14 +190,6 @@ async function behavior(browser, longTopic, homePath) {
       b.only = await page.evaluate(() => [...document.querySelectorAll('.cite > .tip')].map((t, i) => { const cs = getComputedStyle(t); return cs.visibility === 'visible' && parseFloat(cs.opacity) > 0.5 ? i : -1; }).filter((i) => i >= 0));
     }
   }
-  // 미니 바: 맨 위에서는 숨김, 제목이 위로 빠지면 보임
-  await page.mouse.move(2, 2);
-  await page.evaluate(() => window.scrollTo(0, 0));
-  await sleep(150);
-  b.miniTop = await page.evaluate(() => { const m = document.querySelector('.mini'); return m ? getComputedStyle(m).visibility : null; });
-  await page.evaluate(() => window.scrollTo(0, 1400));
-  await sleep(300);
-  b.miniScrolled = await page.evaluate(() => { const m = document.querySelector('.mini'); if (!m) return null; const r = m.getBoundingClientRect(); return { visibility: getComputedStyle(m).visibility, top: Math.round(r.top), height: Math.round(r.height), scrollY: Math.round(window.scrollY) }; });
   await page.close();
   // 탭: 기본은 토픽, #repos면 레포
   const panel = (pg) => pg.evaluate(() => ({ topics: getComputedStyle(document.querySelector('#panel-topics')).display, repos: getComputedStyle(document.querySelector('#panel-repos')).display }));
@@ -211,6 +203,23 @@ async function behavior(browser, longTopic, homePath) {
   b.tabClick = await panel(page);
   await ctx.close();
   return b;
+}
+
+// 미니 바(PC 상세, S6a): 맨 위에서는 숨김, 제목이 위로 빠지면 보임. 독립된 새 컨텍스트·새 페이지에서 바로
+// 스크롤해 측정한다(behavior()의 툴팁 측정에서 이미 스크롤·마우스 조작을 거친 같은 페이지로 재 측정하면
+// animation-timeline:view()의 진행도 계산이 그 이전 scrollTo들의 영향을 받아 가끔 틀어짐, O01).
+async function miniBar(browser, longTopic) {
+  const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  const page = await ctx.newPage();
+  await page.goto(base + longTopic, { waitUntil: 'networkidle' });
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await sleep(150);
+  const miniTop = await page.evaluate(() => { const m = document.querySelector('.mini'); return m ? getComputedStyle(m).visibility : null; });
+  await page.evaluate(() => window.scrollTo(0, 1400));
+  await sleep(300);
+  const miniScrolled = await page.evaluate(() => { const m = document.querySelector('.mini'); if (!m) return null; const r = m.getBoundingClientRect(); return { visibility: getComputedStyle(m).visibility, top: Math.round(r.top), height: Math.round(r.height), scrollY: Math.round(window.scrollY) }; });
+  await ctx.close();
+  return { miniTop, miniScrolled };
 }
 
 // D-1·D-40·C-10: 두 탭 중 어느 쪽을 눌러도 스크롤 위치가 거의 같고(.tabs 바로 위 0높이 앵커) .nav가 가려지지 않음.
@@ -236,6 +245,7 @@ async function tabAnchorScroll(browser, homePath) {
   const longTopic = (pages.find((p) => p.longTopic) || pages.find((p) => p.topic)).path;
   out.behavior = await behavior(chromium, longTopic, pages[0].path);
   out.behavior.tabScroll = await tabAnchorScroll(chromium, pages[0].path);
+  Object.assign(out.behavior, await miniBar(chromium, longTopic));
   await chromium.close();
   const webkit = await pw.webkit.launch();
   await gates(webkit, 'webkit', [[375, 812, true], [1280, 900, false]], out.gates, out.external);

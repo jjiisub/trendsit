@@ -1,10 +1,9 @@
 """작성자 출력의 코드 검사(S6-1 5.5, LLM 0원). 검수자 앞에서 돈다.
 
-1. 고칠 수 있는 형식은 직접 고친다(반려하지 않음): 형광 개수 초과, 공백·문장부호, 별칭 표기 → 정본,
-   slide가 후보 밖이면 null, video_secs가 타임라인에 없으면 제거, sections 수 초과면 뒤에서 자름
+1. 고칠 수 있는 형식은 직접 고친다(반려 아님): 형광 초과·공백·문장부호·별칭 표기 → 정본, slide가 후보 밖이면
+   null, video_secs가 타임라인에 없으면 제거, sections 수 초과면 뒤에서 자름
 2. 반려(라운드에 셈): 필수 칸·분량, refs 실재, 수치 대조, 시각 요소 칸 규칙, 문체(평가어·해요체)
-3. 경고(검수자 입력): 시각 요소 남발·누락 의심, 같은 단락 중복
-반려 메시지는 위치·근거·힌트를 구체적으로.
+3. 경고(검수자 입력): 시각 요소 남발·누락 의심, 같은 단락 중복. 반려 메시지는 위치·근거·힌트를 구체적으로
 """
 
 from __future__ import annotations
@@ -25,10 +24,7 @@ HL = re.compile(r"==(.+?)==")
 DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 REF = re.compile(r"(?:it|og|vd|rp|sl):[\w./#@:-]+")
 _SENT = re.compile(r"(?<=[.!?다])\s+")
-
-
 UNIT_WORDS = ("%", "퍼센트", "포인트", "밀리초", "초", "달러", "원", "배", "분기", "시간", "개월", "분", "개", "명", "회", "건")
-COUNT_UNITS = {"개", "명", "건", "회", "편", "종", "곳", "개국", "차원", "개월", "년"}
 
 
 def is_unit(text: str) -> bool:
@@ -97,6 +93,12 @@ def _text_slots(page: TopicPage) -> list[tuple[str, str]]:
     return out
 
 
+def _canon_slots(page: TopicPage) -> list[tuple[str, str]]:
+    """정본 표기·공백 정리 대상(summary·단락·title·heading, 형광 상한 대상 + title·heading)."""
+    slots = [*_text_slots(page), ("title", page.title)]
+    return slots + [(f"sections[{i}].heading", s.heading) for i, s in enumerate(page.sections)]
+
+
 def _set(page: TopicPage, loc: str, text: str) -> TopicPage:
     if loc in ("summary", "title"):
         return page.model_copy(update={loc: text})
@@ -126,37 +128,30 @@ def _cut_sections(page: TopicPage, hi: int, fixes: list[dict[str, Any]]) -> Topi
     return page.model_copy(update={"sections": page.sections[:hi]})
 
 
-def _fix_slide_candidates(page: TopicPage, slide_candidates: list[str], fixes: list[dict[str, Any]]) -> TopicPage:
-    """section.slide가 slide_candidates 밖이면 null로(C-4)."""
+def _fix_slide_and_video_secs(page: TopicPage, slide_candidates: list[str], timeline_secs: set[int],
+                              fixes: list[dict[str, Any]]) -> TopicPage:
+    """C-4: section.slide가 slide_candidates 밖이면 null로, video_secs가 타임라인에 없으면 그 값만 제거."""
     secs = list(page.sections)
     changed = False
     for i, s in enumerate(secs):
+        upd: dict[str, Any] = {}
         if s.slide and s.slide not in slide_candidates:
             fixes.append({"loc": f"sections[{i}].slide", "rule": "slide_candidates 밖 → null", "before": s.slide, "after": None})
-            secs[i] = s.model_copy(update={"slide": None, "slide_caption": ""})
-            changed = True
-    return page.model_copy(update={"sections": secs}) if changed else page
-
-
-def _fix_video_secs(page: TopicPage, timeline_secs: set[int], fixes: list[dict[str, Any]]) -> TopicPage:
-    """video_secs가 타임라인 sec에 없으면 그 값만 제거(C-4)."""
-    secs = list(page.sections)
-    changed = False
-    for i, s in enumerate(secs):
+            upd = {"slide": None, "slide_caption": ""}
         kept = [v for v in s.video_secs if v in timeline_secs]
         if kept != s.video_secs:
             fixes.append({"loc": f"sections[{i}].video_secs", "rule": "타임라인 밖 sec 제거", "before": s.video_secs, "after": kept})
-            secs[i] = s.model_copy(update={"video_secs": kept})
+            upd["video_secs"] = kept
+        if upd:
+            secs[i] = s.model_copy(update=upd)
             changed = True
     return page.model_copy(update={"sections": secs}) if changed else page
 
 
-def _canonical_names(page: TopicPage, canon: dict[str, str], translit: list[tuple[re.Pattern[str], str]],
-                     fixes: list[dict[str, Any]]) -> TopicPage:
-    """별칭 → 정본(긴 표기부터), 음차 표기 → 정본."""
-    slots = [*_text_slots(page), ("title", page.title)]
-    slots += [(f"sections[{i}].heading", s.heading) for i, s in enumerate(page.sections)]
-    for loc, text in slots:
+def _canonical_names_and_spacing(page: TopicPage, canon: dict[str, str],
+                                 translit: list[tuple[re.Pattern[str], str]], fixes: list[dict[str, Any]]) -> TopicPage:
+    """별칭 → 정본(긴 표기부터), 음차 표기 → 정본, 그 뒤 공백·문장부호 정리(한 번에 돈다)."""
+    for loc, text in _canon_slots(page):
         new = text
         for alias in sorted(canon, key=len, reverse=True):
             pat = rf"(?<![A-Za-z0-9]){re.escape(alias)}(?![A-Za-z0-9])"
@@ -167,19 +162,11 @@ def _canonical_names(page: TopicPage, canon: dict[str, str], translit: list[tupl
         if new != text:
             fixes.append({"loc": loc, "rule": "별칭 표기를 정본으로", "before": text, "after": new})
             page = _set(page, loc, new)
-    return page
-
-
-def _tidy_spacing(page: TopicPage, fixes: list[dict[str, Any]]) -> TopicPage:
-    slots = [*_text_slots(page), ("title", page.title)]
-    slots += [(f"sections[{i}].heading", s.heading) for i, s in enumerate(page.sections)]
-    for loc, text in slots:
-        new = re.sub(r"\s{2,}", " ", text).strip()
-        new = re.sub(r"\s+([,.;:])", r"\1", new)
-        new = re.sub(r"([.,])\1+", r"\1", new)
-        if new != text:
-            fixes.append({"loc": loc, "rule": "공백·문장부호 정리", "before": text, "after": new})
-            page = _set(page, loc, new)
+        new2 = re.sub(r"\s{2,}", " ", new).strip()
+        new2 = re.sub(r"([.,])\1+", r"\1", re.sub(r"\s+([,.;:])", r"\1", new2))
+        if new2 != new:
+            fixes.append({"loc": loc, "rule": "공백·문장부호 정리", "before": new, "after": new2})
+            page = _set(page, loc, new2)
     return page
 
 
@@ -204,10 +191,8 @@ def autofix(page: TopicPage, cfg: BriefConfig, canon: dict[str, str], slide_cand
            translit: list[tuple[re.Pattern[str], str]] | None = None) -> tuple[TopicPage, list[dict[str, Any]]]:
     fixes: list[dict[str, Any]] = []
     page = _cut_sections(page, sections_hi, fixes)
-    page = _fix_slide_candidates(page, slide_candidates, fixes)
-    page = _fix_video_secs(page, timeline_secs, fixes)
-    page = _canonical_names(page, canon, translit or [], fixes)
-    page = _tidy_spacing(page, fixes)
+    page = _fix_slide_and_video_secs(page, slide_candidates, timeline_secs, fixes)
+    page = _canonical_names_and_spacing(page, canon, translit or [], fixes)
     return _cap_highlights(page, cfg.write.highlights, fixes), fixes
 
 
@@ -281,14 +266,13 @@ def _check_counts(page: TopicPage, cfg: BriefConfig, n_sources: int) -> list[Iss
             if not 1 <= len(p.refs) <= cfg.evidence.max_refs_per_paragraph:
                 issues.append(_issue(ploc, "wrong_ref", f"{ploc} refs {len(p.refs)}개(1~{cfg.evidence.max_refs_per_paragraph})",
                                      "그 단락을 받치는 근거 id만"))
-    if len(page.head_tiles) > w.head_tiles_max:
-        issues.append(_issue("head_tiles", "overuse", f"head_tiles {len(page.head_tiles)}개(최대 {w.head_tiles_max})", ""))
     n_visual = sum(1 for s in page.sections if s.visual != "none")
-    if n_visual > w.visuals_max:
-        issues.append(_issue("sections", "overuse", f"visual≠none {n_visual}개(최대 {w.visuals_max})", "꼭 필요한 절만"))
     n_slides = sum(1 for s in page.sections if s.slide)
-    if n_slides > w.slides_max:
-        issues.append(_issue("sections", "overuse", f"slide {n_slides}개(최대 {w.slides_max})", ""))
+    for loc3, label, n, hi, hint in (("head_tiles", "head_tiles", len(page.head_tiles), w.head_tiles_max, ""),
+                                      ("sections", "visual≠none", n_visual, w.visuals_max, "꼭 필요한 절만"),
+                                      ("sections", "slide", n_slides, w.slides_max, "")):
+        if n > hi:
+            issues.append(_issue(loc3, "format", f"{label} {n}개(최대 {hi})", hint))
     return issues
 
 
@@ -298,6 +282,11 @@ def _check_refs(page: TopicPage, pack: dict[str, list[EvidenceItem]]) -> list[Is
         issues += [_issue(slot.loc, "wrong_ref", f"{slot.loc}의 근거 id {r}가 이 토픽 근거 목록에 없음", "근거 목록의 id만", evidence_id=r)
                    for r in slot.refs if r not in pack]
     return issues
+
+
+def _range_issue(loc: str, label: str, n: int, rng: tuple[int, int]) -> Issue | None:
+    lo, hi = rng
+    return None if lo <= n <= hi else _issue(loc, "format", f"{label} {n}개({lo}~{hi})", "")
 
 
 def _check_visual_structure(page: TopicPage, cfg: BriefConfig) -> list[Issue]:
@@ -312,25 +301,16 @@ def _check_visual_structure(page: TopicPage, cfg: BriefConfig) -> list[Issue]:
             issues.append(_issue(loc, "format", f"{loc}.visual={s.visual}인데 칸 상태가 안 맞음(has={has})",
                                  "visual에 맞는 칸만 채우고 나머지는 비움"))
             continue
-        if s.bars is not None and not w.bars_items[0] <= len(s.bars.items) <= w.bars_items[1]:
-            issues.append(_issue(f"{loc}.bars", "format", f"bars items {len(s.bars.items)}개({w.bars_items[0]}~{w.bars_items[1]})", ""))
+        ranged = [(f"{loc}.bars", "bars items", s.bars and len(s.bars.items), w.bars_items),
+                  (f"{loc}.table", "table rows", s.table and len(s.table.rows), w.table.rows),
+                  (f"{loc}.table", "table columns", s.table and len(s.table.columns), w.table.cols),
+                  (f"{loc}.tiles", "tiles", s.visual == "tiles" and len(s.tiles), w.tiles_per_section),
+                  (f"{loc}.events", "events items", s.events and len(s.events.items), (2, 6))]
+        issues += [iss for rloc, label, n, rng in ranged if n and (iss := _range_issue(rloc, label, n, rng))]
         if s.bars is not None and not s.bars.unit.strip("() \t"):
             issues.append(_issue(f"{loc}.bars", "format", "bars 단위가 비어 있음", "근거의 단위 그대로"))
-        if s.table is not None:
-            if not w.table.rows[0] <= len(s.table.rows) <= w.table.rows[1]:
-                issues.append(_issue(f"{loc}.table", "format", f"table rows {len(s.table.rows)}개"
-                                     f"({w.table.rows[0]}~{w.table.rows[1]})", ""))
-            if not w.table.cols[0] <= len(s.table.columns) <= w.table.cols[1]:
-                issues.append(_issue(f"{loc}.table", "format", f"table columns {len(s.table.columns)}개"
-                                     f"({w.table.cols[0]}~{w.table.cols[1]})", ""))
-            bad_rows = [k for k, row in enumerate(s.table.rows) if len(row) != len(s.table.columns)]
-            if bad_rows:
-                issues.append(_issue(f"{loc}.table", "format", f"table rows {bad_rows}의 길이가 columns와 다름", ""))
-        if s.visual == "tiles" and not w.tiles_per_section[0] <= len(s.tiles) <= w.tiles_per_section[1]:
-            issues.append(_issue(f"{loc}.tiles", "format", f"tiles {len(s.tiles)}개"
-                                 f"({w.tiles_per_section[0]}~{w.tiles_per_section[1]})", ""))
-        if s.events is not None and not 2 <= len(s.events.items) <= 6:
-            issues.append(_issue(f"{loc}.events", "format", f"events items {len(s.events.items)}개(2~6)", ""))
+        if s.table is not None and (bad_rows := [k for k, row in enumerate(s.table.rows) if len(row) != len(s.table.columns)]):
+            issues.append(_issue(f"{loc}.table", "format", f"table rows {bad_rows}의 길이가 columns와 다름", ""))
         for k, it in enumerate(s.events.items if s.events else []):
             if not DATE.match(it.date):
                 issues.append(_issue(f"{loc}.events.items[{k}]", "format", f"날짜 '{it.date}'가 YYYY-MM-DD가 아님", ""))
@@ -339,10 +319,14 @@ def _check_visual_structure(page: TopicPage, cfg: BriefConfig) -> list[Issue]:
     return issues
 
 
-def _number_slots(page: TopicPage) -> list[tuple[str, str, list[str]]]:
-    """수치를 대조할 칸 (위치, 글, 근거 id들). refs 없는 칸(title)은 토픽 근거 전체(all_ids는 호출부에서 채움)."""
-    slots: list[tuple[str, str, list[str]]] = []
+def _number_slots(page: TopicPage) -> list[tuple[str, str, list[str] | None]]:
+    """수치를 대조할 칸 (위치, 글, 근거 id들). ids가 None인 칸(refs가 없는 heading·slide_caption 등)은
+    토픽 근거 전체와 대조(①, 호출부가 all_ids로 채움)."""
+    slots: list[tuple[str, str, list[str] | None]] = []
     for i, s in enumerate(page.sections):
+        slots.append((f"sections[{i}].heading", s.heading, None))
+        if s.slide_caption:
+            slots.append((f"sections[{i}].slide", s.slide_caption, None))
         if s.bars is not None:
             ids = [it.ref for it in s.bars.items] + REF.findall(s.bars.context)
             slots.append((f"sections[{i}].bars", s.bars.title, ids))
@@ -366,8 +350,9 @@ def _check_numbers(page: TopicPage, pack: dict[str, list[EvidenceItem]]) -> list
                                      f"sections[{i}].paragraphs[{j}]의 '{f}'가 {', '.join(p.refs)}에 없음"
                                      + (f". 근거의 가까운 값은 {near}" if near else ""),
                                      "근거 표기 그대로", evidence_id=p.refs[0] if p.refs else None))
-    for loc, text, ids in [("title", page.title, all_ids), *_number_slots(page)]:
-        for f, near in _numbers_ok(text, ids, pack):
+    for loc, text, ids in [("title", page.title, None), ("summary", page.summary, None), *_number_slots(page)]:
+        ids = all_ids if ids is None else ids
+        for f, near in _numbers_ok(text, ids, pack, with_units=loc == "summary"):
             issues.append(_issue(loc, "number_mismatch", f"{loc}의 '{f}'가 {'이 토픽 근거' if ids is all_ids else ', '.join(ids)}에 없음"
                                  + (f". 근거의 가까운 값은 {near}" if near else ""),
                                  "근거 표기 그대로(근거 값끼리 빼거나 나눈 값을 새로 만들지 않음)"))
@@ -394,15 +379,6 @@ def _check_numbers(page: TopicPage, pack: dict[str, list[EvidenceItem]]) -> list
     return issues
 
 
-def _check_summary_numbers(page: TopicPage) -> list[Issue]:
-    body_pack = {"sections": [EvidenceItem("sections", "page", "text", "sentence", " ".join(
-        [plain(p.text) for s in page.sections for p in s.paragraphs]
-        + [f"{it.value} {it.label}" for t in page.head_tiles for it in [t]]), {})]}
-    return [_issue("summary", "unsupported", f"summary의 수치 '{f}'가 단락·타일에 없음",
-                   "요약은 단락에 있는 사실만(수치를 쓰려면 먼저 단락에)")
-            for f, _near in _numbers_ok(page.summary, ["sections"], body_pack, with_units=True)]
-
-
 def _check_style(page: TopicPage) -> list[Issue]:
     """문체: 명사형 칸(heading)이 문장으로 끝남, summary는 '~다', 해요체·평가어."""
     issues: list[Issue] = []
@@ -410,14 +386,12 @@ def _check_style(page: TopicPage) -> list[Issue]:
         if ends_as_sentence(plain(s.heading)):
             issues.append(_issue(f"sections[{i}].heading", "format", f"heading이 문장으로 끝남('…{plain(s.heading)[-12:]}')",
                                  "명사형 끝(~함, ~임, 명사)"))
-    for sent in sentences(plain(page.summary)):
-        if not sent.strip().rstrip(".").endswith("다"):
-            issues.append(_issue("summary", "format", f"summary의 문장이 '~다'로 끝나지 않음('…{sent.strip()[-12:]}')",
-                                 "문장마다 평서체 '~다'"))
-    notes = [("title", page.title), ("summary", page.summary)]
-    notes += [(f"sections[{i}].heading", s.heading) for i, s in enumerate(page.sections)]
-    notes += [(f"sections[{i}].paragraphs[{j}]", p.text) for i, s in enumerate(page.sections) for j, p in enumerate(s.paragraphs)]
-    for loc, text in notes:
+    for loc2, text2 in _text_slots(page):
+        for sent in sentences(plain(text2)):
+            if not sent.strip().rstrip(".").endswith("다"):
+                issues.append(_issue(loc2, "format", f"{loc2}의 문장이 '~다'로 끝나지 않음('…{sent.strip()[-12:]}')",
+                                     "문장마다 평서체 '~다'"))
+    for loc, text in _canon_slots(page):
         t = plain(text)
         bad = ["해요체"] if any(is_haeyo(s) for s in sentences(t)) else []
         bad += [e for e in EVAL_ENDINGS if e in t]
@@ -431,7 +405,7 @@ def _check_style(page: TopicPage) -> list[Issue]:
 
 def check(page: TopicPage, pack: dict[str, list[EvidenceItem]], n_sources: int, cfg: BriefConfig) -> list[Issue]:
     return [*_check_counts(page, cfg, n_sources), *_check_refs(page, pack), *_check_numbers(page, pack),
-            *_check_visual_structure(page, cfg), *_check_summary_numbers(page), *_check_style(page)]
+            *_check_visual_structure(page, cfg), *_check_style(page)]
 
 
 # ---------- 경고 ----------
@@ -451,16 +425,20 @@ def warnings(page: TopicPage, pack: dict[str, list[EvidenceItem]], cfg: BriefCon
             if SequenceMatcher(None, paras[a][2], paras[b][2]).ratio() >= cfg.review.duplicate_point_similarity:
                 out.append(f"중복 의심: sections[{paras[a][0]}].paragraphs[{paras[a][1]}] ↔ "
                            f"sections[{paras[b][0]}].paragraphs[{paras[b][1]}]")
-    summary_plain = plain(page.summary)
+    summary_sents = sentences(plain(page.summary))
     for i, j, text in paras:
-        if SequenceMatcher(None, summary_plain, text).ratio() >= 0.8:
-            out.append(f"중복 의심: summary ↔ sections[{i}].paragraphs[{j}]")
+        for sent in sentences(text):
+            if any(SequenceMatcher(None, su, sent).ratio() >= 0.8 for su in summary_sents):
+                out.append(f"중복 의심: summary ↔ sections[{i}].paragraphs[{j}]")
+                break
     tile_values = {plain(str(t.value)) for t in page.head_tiles}
     for i, s in enumerate(page.sections):
         if s.bars is not None and any(plain(str(it.value)) in tile_values for it in s.bars.items):
             out.append(f"반복 의심: head_tiles 수치가 sections[{i}].bars에 다시 나옴")
         if s.visual == "tiles" and any(plain(str(t.value)) in tile_values for t in s.tiles):
             out.append(f"반복 의심: head_tiles 수치가 sections[{i}].tiles에 다시 나옴")
+        if s.table is not None and any(plain(cell) in tile_values for row in s.table.rows for cell in row[1:]):
+            out.append(f"반복 의심: head_tiles 수치가 sections[{i}].table에 다시 나옴")
     return out
 
 

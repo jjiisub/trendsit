@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any
 
 from ..core.artifacts_brief import TopicPage
+from ..core.config import ROOT
 from ..core.db import DB
 from . import report
 from .evidence import week_evidence
@@ -40,25 +41,18 @@ def _video_timeline(db: DB, video_id: str) -> dict[int, dict[str, Any]]:
 
 
 def _slide_reading(db: DB, video_id: str, sec: int) -> dict[str, Any]:
-    r = db.conn.execute("SELECT reading_json FROM video_frames WHERE video_id=? AND t=?", (video_id, float(sec))).fetchone()
+    r = db.conn.execute("SELECT reading_json FROM video_frames WHERE video_id=? AND ABS(t-?)<0.5 ORDER BY ABS(t-?) LIMIT 1",
+                        (video_id, float(sec), float(sec))).fetchone()
     return json.loads(r["reading_json"]) if r and r["reading_json"] else {}
 
 
-def export_topic(db: DB, run_id: str, topic_id: str, sources_by_id: dict[str, dict[str, Any]]) -> dict[str, Any]:
-    """topics + topic_pages(최종판) + topic_evidence → 사이트 데이터 토픽 v2 모양.
-    sources_by_id: 근거 id → {channel, site, title, date, url, [origin]}."""
-    t = db.conn.execute("SELECT * FROM topics WHERE run_id=? AND topic_id=?", (run_id, topic_id)).fetchone()
-    page = _final_page(db, run_id, topic_id)
-    if t is None or page is None:
-        raise KeyError(topic_id)
-    ev_rows = db.conn.execute("SELECT evidence_id, member FROM topic_evidence WHERE run_id=? AND topic_id=? ORDER BY rowid",
-                              (run_id, topic_id)).fetchall()
+def _export_sources(db: DB, ev_rows: list[Any], sources_by_id: dict[str, dict[str, Any]]) -> tuple[list[dict], dict, dict]:
+    """토픽 근거 구성원마다 출처 항목 하나(s1·v1·g1 …), 영상은 timeline도. → (sources, member→sid, member→video_id)."""
     members = list(dict.fromkeys(r["member"] for r in ev_rows))
     sid: dict[str, str] = {}
     counters = {"text": 0, "video": 0, "github": 0}
     prefix = {"text": "s", "video": "v", "github": "g"}
-    sources = []
-    video_ids: dict[str, str] = {}  # member(vd:{video_id}) → video_id
+    sources, video_ids = [], {}
     for mkey in members:
         eid = next(r["evidence_id"] for r in ev_rows if r["member"] == mkey)
         src = sources_by_id.get(eid, {})
@@ -77,51 +71,64 @@ def export_topic(db: DB, run_id: str, topic_id: str, sources_by_id: dict[str, di
             entry["timeline"] = [{"sec": m["sec"], "label": m["label"], "slide": bool(m.get("slide"))}
                                  for m in sorted(timeline.values(), key=lambda m: m["sec"])]
         sources.append(entry)
+    return sources, sid, video_ids
+
+
+def _visual_of(s: Any, refs: Any, by_eid: dict[str, str]) -> dict[str, Any]:
+    if s.visual == "none":
+        return {"type": "none"}
+    if s.visual == "bars" and s.bars:
+        g = s.bars
+        r = (refs([it.ref for it in g.items]) or [None])[0]
+        return {"type": "bars", "title": g.title, "context": g.context, "unit": g.unit,
+                "items": [{"label": it.label, "value": it.value} | ({"emphasis": True} if it.emphasis else {})
+                          | ({"baseline": True} if it.baseline else {}) for it in g.items], "ref": r}
+    if s.visual == "table" and s.table:
+        tb = s.table
+        return {"type": "table", "title": tb.title, "note": tb.note, "columns": tb.columns, "rows": tb.rows,
+                "refs": refs(tb.refs)}
+    if s.visual == "tiles":
+        return {"type": "tiles", "items": [{"value": x.value, "label": x.label, "note": x.note, "refs": refs(x.refs)}
+                                           for x in s.tiles]}
+    if s.visual == "events" and s.events:
+        g = s.events
+        return {"type": "events", "title": g.title, "context": g.context,
+                "items": [{"date": it.date, "text": it.text} | ({"ref": by_eid.get(it.ref)} if it.ref else
+                          {"topic_id": it.topic_id}) for it in g.items]}
+    return {"type": "none"}
+
+
+def _slide_of(db: DB, s: Any) -> dict[str, Any] | None:
+    if not s.slide:
+        return None
+    m = re.match(r"^sl:(\d+)@(\d+)$", s.slide)
+    if not m:
+        return None
+    sec = int(m[2])
+    row = db.conn.execute("SELECT video_id FROM videos WHERE item_id=?", (int(m[1]),)).fetchone()
+    video_id = row[0] if row else None
+    path = ROOT / "data" / "slides" / f"{video_id}_{sec}.jpg"
+    if video_id is None or not path.is_file():
+        return None
+    reading = _slide_reading(db, video_id, sec)
+    return {"sec": sec, "title": reading.get("title") or "", "caption": s.slide_caption,
+            "image": f"slides/{video_id}_{sec}.jpg"}
+
+
+def export_topic(db: DB, run_id: str, topic_id: str, sources_by_id: dict[str, dict[str, Any]]) -> dict[str, Any]:
+    """topics + topic_pages(최종판) + topic_evidence → 사이트 데이터 토픽 v2 모양.
+    sources_by_id: 근거 id → {channel, site, title, date, url, [origin]}."""
+    t = db.conn.execute("SELECT * FROM topics WHERE run_id=? AND topic_id=?", (run_id, topic_id)).fetchone()
+    page = _final_page(db, run_id, topic_id)
+    if t is None or page is None:
+        raise KeyError(topic_id)
+    ev_rows = db.conn.execute("SELECT evidence_id, member FROM topic_evidence WHERE run_id=? AND topic_id=? ORDER BY rowid",
+                              (run_id, topic_id)).fetchall()
+    sources, sid, video_ids = _export_sources(db, ev_rows, sources_by_id)
     by_eid = {r["evidence_id"]: sid[r["member"]] for r in ev_rows}
 
     def refs(ids: list[str]) -> list[str]:
         return list(dict.fromkeys(by_eid[i] for i in ids if i in by_eid))
-
-    def visual_of(s: Any) -> dict[str, Any] | None:
-        if s.visual == "none":
-            return None
-        if s.visual == "bars" and s.bars:
-            g = s.bars
-            r = (refs([it.ref for it in g.items]) or [None])[0]
-            return {"type": "bars", "title": g.title, "context": g.context, "unit": g.unit,
-                    "items": [{"label": it.label, "value": it.value} | ({"emphasis": True} if it.emphasis else {})
-                              | ({"baseline": True} if it.baseline else {}) for it in g.items], "ref": r}
-        if s.visual == "table" and s.table:
-            tb = s.table
-            return {"type": "table", "title": tb.title, "note": tb.note, "columns": tb.columns, "rows": tb.rows,
-                    "refs": refs(tb.refs)}
-        if s.visual == "tiles":
-            return {"type": "tiles", "items": [{"value": x.value, "label": x.label, "note": x.note, "refs": refs(x.refs)}
-                                               for x in s.tiles]}
-        if s.visual == "events" and s.events:
-            g = s.events
-            return {"type": "events", "title": g.title, "context": g.context,
-                    "items": [{"date": it.date, "text": it.text} | ({"ref": by_eid.get(it.ref)} if it.ref else
-                              {"topic_id": it.topic_id}) for it in g.items]}
-        return None
-
-    def slide_of(s: Any) -> dict[str, Any] | None:
-        if not s.slide:
-            return None
-        m = re.match(r"^sl:(\d+)@(\d+)$", s.slide)
-        if not m:
-            return None
-        sec = int(m[2])
-        row = db.conn.execute("SELECT video_id FROM videos WHERE item_id=?", (int(m[1]),)).fetchone()
-        video_id = row[0] if row else None
-        from ..core.config import ROOT
-
-        path = ROOT / "data" / "slides" / f"{video_id}_{sec}.jpg"
-        if video_id is None or not path.is_file():
-            return None
-        reading = _slide_reading(db, video_id, sec)
-        return {"sec": sec, "title": reading.get("title") or "", "caption": s.slide_caption,
-                "image": f"slides/{video_id}_{sec}.jpg"}
 
     timeline_by_sec: dict[int, dict[str, Any]] = {}
     for vid in video_ids.values():
@@ -129,9 +136,10 @@ def export_topic(db: DB, run_id: str, topic_id: str, sources_by_id: dict[str, di
     sections = []
     for s in page.sections:
         sections.append({"heading": s.heading, "paragraphs": [{"text": p.text, "refs": refs(p.refs)} for p in s.paragraphs],
-                         "visual": visual_of(s), "slide": slide_of(s),
-                         "video_secs": [{"sec": sec, "label": timeline_by_sec.get(sec, {}).get("label", ""),
-                                        "slide": bool(timeline_by_sec.get(sec, {}).get("slide"))} for sec in s.video_secs],
+                         "visual": _visual_of(s, refs, by_eid), "slide": _slide_of(db, s),
+                         "video_secs": [{"sec": sec, "label": timeline_by_sec[sec].get("label", ""),
+                                        "slide": bool(timeline_by_sec[sec].get("slide"))}
+                                       for sec in s.video_secs if sec in timeline_by_sec],
                          "check": s.check})
     checks = visible_checks(json.loads(t["checks_json"] or "[]"), page)
     rel: dict[str, Any] = {"type": t["relation_type"] or "new"}
@@ -143,12 +151,59 @@ def export_topic(db: DB, run_id: str, topic_id: str, sources_by_id: dict[str, di
             "title": page.title, "summary": page.summary, "relation": rel,
             "head_tiles": [{"value": x.value, "label": x.label, "note": x.note, "refs": refs(x.refs)} for x in page.head_tiles],
             "sections": sections, "sources": sources, "channels": sorted({s["channel"] for s in sources}),
-            "has_check": any(s.check for s in page.sections) or bool(checks), "checks": checks}
+            # has_check은 실제로 .chk가 그려지는 위치만(절 check + title·summary). head_tiles 등 화면에 없는
+            # check 위치는 메타 "확인 필요" 링크(#chk-1)의 대상 없음을 막기 위해 제외한다(006-A1-7, C-9)
+            "has_check": any(s.check for s in page.sections) or any(c in ("title", "summary") for c in checks),
+            "checks": checks}
 
 
 def sources_index(db: DB, week: str) -> dict[str, dict[str, Any]]:
     ev = week_evidence(db, week)
     return {it.id: {"channel": m.channel} | it.source for m in ev.members.values() for it in m.items}
+
+
+def _topic_md_lines(db: DB, run_id: str, t: Any, srcs: dict[str, dict[str, Any]]) -> list[str]:
+    """write_briefing_md의 토픽 하나 분량(제목·요약·절·출처)."""
+    page = _final_page(db, run_id, t["topic_id"])
+    mark = "리드 · " if t["lead"] else ""
+    if page is None or t["status"] == "failed":
+        return [f"## {t['rank']}. ({mark}작성 실패) {t['topic_id']}", ""]
+    lines = [f"## {t['rank']}. {mark}{page.title}", "",
+             f"`{t['topic_id']}` · 상태 {t['status']} · {t['final_round']}라운드 · 축: {t['angle']}"
+             + (f" · 후속: {t['relation_topic_id']}" if t["relation_topic_id"] else ""), "",
+             *([f"> ⚠ 확인 필요: {', '.join(checks)}", ""]
+               if (checks := visible_checks(json.loads(t["checks_json"] or "[]"), page)) else []),
+             f"**요약(홈)** {page.summary}", ""]
+    if page.head_tiles:
+        lines += ["**핵심 수치**", ""] + [f"- {x.value} — {x.label}({x.note}) `{', '.join(x.refs)}`" for x in page.head_tiles] + [""]
+    for i, s in enumerate(page.sections, 1):
+        lines += [f"### {i}. {'⚠ ' if s.check else ''}{s.heading}", ""]
+        for p in s.paragraphs:
+            refs = "; ".join(f"`{r}` {((srcs.get(r) or {}).get('title') or '?')[:50]}" for r in p.refs)
+            lines += [p.text, f"← {refs}", ""]
+        if s.bars:
+            lines += [f"표/막대: {s.bars.title} ({s.bars.unit}) — {s.bars.context}", "",
+                      "| 라벨 | 값 | 근거 | 표시 |", "|---|---|---|---|"]
+            lines += [f"| {it.label} | {it.value} | `{it.ref}` | {'강조' if it.emphasis else ''}{'기준' if it.baseline else ''} |"
+                      for it in s.bars.items]
+            lines.append("")
+        if s.table:
+            lines += [f"표: {s.table.title} — {s.table.note}", "", f"| {' | '.join(s.table.columns)} |",
+                      "|" + "---|" * len(s.table.columns)]
+            lines += [f"| {' | '.join(row)} |" for row in s.table.rows]
+            lines.append("")
+        if s.events:
+            lines += [f"사건 흐름: {s.events.title} — {s.events.context}", "", "| 날짜 | 사건 | 근거 |", "|---|---|---|"]
+            lines += [f"| {it.date} | {it.text} | `{it.ref or it.topic_id}` |" for it in s.events.items]
+            lines.append("")
+        if s.slide:
+            lines += [f"슬라이드: `{s.slide}` — {s.slide_caption}", ""]
+        if s.video_secs:
+            lines += [f"영상 구간: {s.video_secs}", ""]
+    ev = db.conn.execute("SELECT DISTINCT member FROM topic_evidence WHERE run_id=? AND topic_id=?",
+                         (run_id, t["topic_id"])).fetchall()
+    lines += [f"출처 {len(ev)}곳: " + ", ".join(f"`{r['member']}`" for r in ev), ""]
+    return lines
 
 
 def write_briefing_md(db: DB, week: str, run_id: str | None = None) -> Path:
@@ -165,47 +220,7 @@ def write_briefing_md(db: DB, week: str, run_id: str | None = None) -> Path:
     if plan_row and plan_row["source"] == "fallback":
         lines += ["> 편집장 선별 대체 계획(점수 순)", ""]
     for t in topics:
-        page = _final_page(db, run_id, t["topic_id"])
-        mark = "리드 · " if t["lead"] else ""
-        if page is None or t["status"] == "failed":
-            lines += [f"## {t['rank']}. ({mark}작성 실패) {t['topic_id']}", ""]
-            continue
-        lines += [f"## {t['rank']}. {mark}{page.title}", "",
-                  f"`{t['topic_id']}` · 상태 {t['status']} · {t['final_round']}라운드 · 축: {t['angle']}"
-                  + (f" · 후속: {t['relation_topic_id']}" if t["relation_topic_id"] else ""), "",
-                  *([f"> ⚠ 확인 필요: {', '.join(checks)}", ""]
-                    if (checks := visible_checks(json.loads(t["checks_json"] or "[]"), page)) else []),
-                  f"**요약(홈)** {page.summary}", ""]
-        if page.head_tiles:
-            lines += ["**핵심 수치**", ""] + [f"- {x.value} — {x.label}({x.note}) `{', '.join(x.refs)}`" for x in page.head_tiles] + [""]
-        for i, s in enumerate(page.sections, 1):
-            lines.append(f"### {i}. {'⚠ ' if s.check else ''}{s.heading}")
-            lines.append("")
-            for p in s.paragraphs:
-                refs = "; ".join(f"`{r}` {((srcs.get(r) or {}).get('title') or '?')[:50]}" for r in p.refs)
-                lines += [p.text, f"← {refs}", ""]
-            if s.bars:
-                lines += [f"표/막대: {s.bars.title} ({s.bars.unit}) — {s.bars.context}", "",
-                          "| 라벨 | 값 | 근거 | 표시 |", "|---|---|---|---|"]
-                lines += [f"| {it.label} | {it.value} | `{it.ref}` | {'강조' if it.emphasis else ''}{'기준' if it.baseline else ''} |"
-                          for it in s.bars.items]
-                lines.append("")
-            if s.table:
-                lines += [f"표: {s.table.title} — {s.table.note}", "", f"| {' | '.join(s.table.columns)} |",
-                          "|" + "---|" * len(s.table.columns)]
-                lines += [f"| {' | '.join(row)} |" for row in s.table.rows]
-                lines.append("")
-            if s.events:
-                lines += [f"사건 흐름: {s.events.title} — {s.events.context}", "", "| 날짜 | 사건 | 근거 |", "|---|---|---|"]
-                lines += [f"| {it.date} | {it.text} | `{it.ref or it.topic_id}` |" for it in s.events.items]
-                lines.append("")
-            if s.slide:
-                lines += [f"슬라이드: `{s.slide}` — {s.slide_caption}", ""]
-            if s.video_secs:
-                lines += [f"영상 구간: {s.video_secs}", ""]
-        ev = db.conn.execute("SELECT DISTINCT member FROM topic_evidence WHERE run_id=? AND topic_id=?",
-                             (run_id, t["topic_id"])).fetchall()
-        lines += [f"출처 {len(ev)}곳: " + ", ".join(f"`{r['member']}`" for r in ev), ""]
+        lines += _topic_md_lines(db, run_id, t, srcs)
     repos = plan.get("featured_repos") or []
     others = [r["full_name"] for r in db.conn.execute(
         "SELECT full_name FROM repo_cards WHERE week=? ORDER BY full_name", (week,))

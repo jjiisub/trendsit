@@ -41,18 +41,30 @@ def cmd_export(args: argparse.Namespace) -> int:
 
 
 def cmd_backup(args: argparse.Namespace) -> int:
+    import re
+
     from .core.config import ROOT
     from .core.db import KST, open_db
 
+    if args.tag and not re.fullmatch(r"[\w-]+", args.tag):
+        print(f"backup: --tag는 글자·숫자·_·-만 ({args.tag})", file=sys.stderr)
+        return 1
+    src = ROOT / "data" / "trendsit.db"
+    if not src.is_file():
+        print(f"backup: 원본이 없음 ({src})", file=sys.stderr)
+        return 1
     dest = ROOT / "data" / "backup" / (datetime.now(KST).strftime("%Y%m%d-%H%M") + (f"-{args.tag}" if args.tag else "") + ".db")
     if dest.exists():
         print(f"backup: 같은 이름이 있음 ({dest})", file=sys.stderr)
         return 1
+    db = open_db()
     try:
-        open_db().backup(dest)
+        db.backup(dest)
     except (OSError, sqlite3.Error) as e:
         print(f"backup: {e}", file=sys.stderr)
         return 1
+    finally:
+        db.conn.close()
     print(str(dest))
     return 0
 

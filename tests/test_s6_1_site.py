@@ -164,23 +164,50 @@ def test_backup_cli_rejects_existing_name(tmp_path, monkeypatch):
     assert cli_ops.cmd_backup(Args()) == 1
 
 
+def test_backup_cli_rejects_bad_tag_and_missing_db(tmp_path, monkeypatch):
+    """006-A1-37: --tag에 경로 문자가 있거나 원본 DB가 없으면 1(빈 DB를 새로 만들어 백업하지 않음)."""
+    from trendsit import cli_ops
+    from trendsit.core import config as cfgmod
+
+    monkeypatch.setattr(cfgmod, "ROOT", tmp_path)
+    (tmp_path / "data").mkdir()
+
+    class Args:
+        tag = "../x"
+
+    assert cli_ops.cmd_backup(Args()) == 1
+    assert not (tmp_path / "data" / "trendsit.db").exists()  # 검증만 하고 DB를 만들지 않음
+
+    class Args2:
+        tag = None
+
+    assert cli_ops.cmd_backup(Args2()) == 1
+    assert not (tmp_path / "data" / "trendsit.db").exists()  # 원본 없음 → open_db()로 새로 만들지 않고 거부
+
+
 # ---------- A9: build 토픽(v2 픽스처, 5.8) ----------
 @pytest.fixture(scope="module")
 def site_v2(tmp_path_factory):
-    # llamaindex 토픽의 슬라이드 이미지는 실제 data/slides/에서 build가 복사한다(5.6). 테스트 동안만 만들고 치운다
+    # llamaindex 토픽의 슬라이드 이미지는 data/slides/에서 build가 복사한다(5.6). 실제 data/slides/를 건드리지
+    # 않게(006-A1-17) 임시 루트에서 build.ROOT를 바꿔 in-process로 빌드한다(subprocess면 ROOT를 못 바꿈)
+    sys.path.insert(0, str(ROOT / "site_src"))
+    import build as b
+
+    tmp_root = tmp_path_factory.mktemp("s6_1_v2_root")
     names = ["S-bRN-avZ4Q_208.jpg", "S-bRN-avZ4Q_422.jpg"]
-    paths = [ROOT / "data" / "slides" / n for n in names]
-    for p in paths:
-        p.parent.mkdir(parents=True, exist_ok=True)
-        p.write_bytes(b"\xff\xd8\xff\xdb" + b"\x00" * 16)
+    slides_dir = tmp_root / "data" / "slides"
+    slides_dir.mkdir(parents=True)
+    for n in names:
+        (slides_dir / n).write_bytes(b"\xff\xd8\xff\xdb" + b"\x00" * 16)
+    old_root = b.ROOT
+    b.ROOT = tmp_root
     try:
         out = tmp_path_factory.mktemp("s6_1_v2") / "site"
-        r = run_build(V2_FIXTURE, out)
-        assert r.returncode == 0, r.stderr
+        n = b.build(str(V2_FIXTURE), str(out))
+        assert n > 0
         yield out
     finally:
-        for p in paths:
-            p.unlink(missing_ok=True)
+        b.ROOT = old_root
 
 
 def _topic_html(site_v2, tid):

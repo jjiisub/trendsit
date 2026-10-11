@@ -94,8 +94,9 @@ def static_checks(site, data, pages):
     # 빌드가 만든 깨짐만: 엔티티가 태그로 쪼개짐(&#<span ..>x27</span>;). 데이터 원문 글자(<span, &amp;)는 &lt;span, &amp;amp;로 나가므로 걸리지 않음
     broken += [f"{page_url(site, f)} 엔티티가 태그로 쪼개짐" for f in pages if re.search(r"&#?\w*<", f.read_text(encoding="utf-8"))]
     check("M-1 마크업 무결성: 태그 중첩 어긋남 0, 엔티티가 태그로 쪼개진 곳 0", not broken, "; ".join(broken[:3]))
-    leak = [page_url(site, f) for f in pages if re.search(r"\[it:\d+|#q\d+", f.read_text(encoding="utf-8"))]
-    check("M-2 내부 근거 id([it:8#q2] 등) 노출 0", not leak, "; ".join(leak[:3]))
+    leak = [page_url(site, f) for f in pages
+           if re.search(r"\[(?:it|og|vd|rp|sl):[\w./#@:-]+|#q\d+|#f\d+", f.read_text(encoding="utf-8"))]
+    check("M-2 내부 근거 id([it:8#q2]·sl:·vd:·rp:#f· 등) 노출 0", not leak, "; ".join(leak[:3]))
     # C-3 내부 링크의 대상 파일·앵커
     bad = []
     for f, p in pages.items():

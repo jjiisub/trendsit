@@ -22,7 +22,7 @@ mark.hl{background:linear-gradient(transparent 56%,var(--c-hl) 56%);color:inheri
 code.ic{font-family:inherit;font-size:.94em;background:var(--c-track);border-radius:var(--radius-s);padding:0 var(--sp-1);white-space:nowrap}
 .check{display:inline-block;font-size:var(--fs-xs);line-height:20px;padding:0 var(--sp-2);border:1px solid var(--c-muted);
   border-radius:var(--radius-s);color:var(--c-title);white-space:nowrap}
-.ts,.ov,.pt-x,.it-s,.cc dd,.cb dd{text-wrap:pretty}
+.ts,.it-s{text-wrap:pretty}
 
 /* ---------- 레이아웃·상단 내비 ---------- */
 .wrap{max-width:var(--maxw);margin:0 auto;padding:0 var(--gutter)}
@@ -88,8 +88,6 @@ code.ic{font-family:inherit;font-size:.94em;background:var(--c-track);border-rad
 .sec{margin-top:var(--sp-7);padding-top:var(--sp-5);border-top:1px solid var(--c-line)}
 .sec-t{font-size:var(--fs-lg);line-height:var(--lh-title)}
 .sec .sec-t{margin-bottom:var(--sp-3)}
-.pt{padding:var(--sp-3) 0;border-top:1px solid var(--c-line)}
-.pt:first-child{border-top:none;padding-top:0}
 
 /* ---------- 인용 번호와 출처 툴팁 ---------- */
 .ref{display:inline-block;min-width:var(--target);min-height:var(--target);line-height:var(--target);text-align:center;

@@ -180,6 +180,23 @@ def test_a1_with_week_includes_unpublished_week_and_export_failures_keep_file(tm
     assert out.read_text() == before
 
 
+def test_topic_ref_slots_covers_tiles_table_events_not_just_paragraphs():
+    """006-A1-15: C-2가 단락 refs만 보지 않고 head_tiles·table·tiles·events도 봄."""
+    from trendsit.export import _topic_ref_slots
+
+    t = {"head_tiles": [{"value": "1", "refs": ["s1"]}],
+         "sections": [{"paragraphs": [{"refs": ["s1"]}],
+                       "visual": {"type": "tiles", "items": [{"value": "1", "refs": ["s1", "zz"]}]}},
+                      {"paragraphs": [{"refs": ["s1"]}], "visual": {"type": "table", "refs": ["s1", "zz"]}},
+                      {"paragraphs": [{"refs": ["s1"]}],
+                       "visual": {"type": "events", "items": [{"ref": "zz"}, {"ref": None}]}}]}
+    slots = dict(_topic_ref_slots(t))
+    assert slots["sections[0].tiles[0]"] == ["s1", "zz"]
+    assert slots["sections[1].table"] == ["s1", "zz"]
+    assert slots["sections[2].events.items[0]"] == ["zz"]
+    assert "sections[2].events.items[1]" not in slots  # ref 없는 사건은 topic_id로 받침, C-2 대상 아님
+
+
 def test_a1_cli_exit_codes(tmp_path, monkeypatch):
     from types import SimpleNamespace
 

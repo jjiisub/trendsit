@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import pytest
@@ -226,6 +227,45 @@ def test_normalize_loc_fixes_one_based_index():
     assert revision.normalize_loc(p, "sections[1]") == "sections[0]"
 
 
+def test_apply_revision_add_does_not_leak_into_unflagged_section():
+    prev = page(sections=three_sections())  # 3절
+    rev = TopicPageRevision(changed=[
+        Change(issue_idx=0, loc="sections[2].paragraphs[1]", action="add", value=para(text="몰래 끼움."))], log="l")
+    new, reverts, notes = revision.apply_revision(prev, rev, {"sections[0]"})
+    assert len(new.sections[2].paragraphs) == 1 and reverts == 1, notes
+
+
+def test_apply_revision_allows_adding_a_brand_new_section():
+    prev = page(sections=three_sections())  # 0,1,2
+    rev = TopicPageRevision(changed=[
+        Change(issue_idx=0, loc="sections[3]", action="add", value=section(heading="새 절"))], log="l")
+    new, reverts, notes = revision.apply_revision(prev, rev, {"sections[0]"})
+    assert len(new.sections) == 4 and new.sections[3].heading == "새 절" and reverts == 0, notes
+
+
+def test_apply_revision_rejects_deleting_all_sections_via_multiple_deletes():
+    prev = page(sections=three_sections())
+    rev = TopicPageRevision(changed=[
+        Change(issue_idx=0, loc="sections[0]", action="delete", value=None),
+        Change(issue_idx=0, loc="sections[1]", action="delete", value=None),
+        Change(issue_idx=0, loc="sections[2]", action="delete", value=None),
+    ], log="l")
+    new, _reverts, notes = revision.apply_revision(prev, rev, {"sections[0]", "sections[1]", "sections[2]"})
+    assert len(new.sections) >= 1
+    assert any("전체 삭제는 받지 않음" in n for n in notes)
+
+
+def test_apply_revision_slide_caption_and_table_rows_delete():
+    tbl = Table(title="t", note="", columns=["a", "b"], rows=[["1", "2"], ["3", "4"], ["5", "6"]], refs=["it:1#s1"])
+    prev = page(sections=[section(visual="table", table=tbl, slide="sl:1@10", slide_caption="옛 캡션")])
+    rev = TopicPageRevision(changed=[
+        Change(issue_idx=0, loc="sections[0].slide_caption", action="edit", value="새 캡션"),
+        Change(issue_idx=0, loc="sections[0].table.rows[1]", action="delete", value=None),
+    ], log="l")
+    new, reverts, notes = revision.apply_revision(prev, rev, {"sections[0]"})
+    assert new.sections[0].slide_caption == "새 캡션" and len(new.sections[0].table.rows) == 2 and reverts == 0, notes
+
+
 # ---------- A7: 슬라이드 ----------
 def test_slide_candidates_short_lines_with_numbers():
     slide = {"sec": 100, "frame_kind": "slide", "title": "t", "ocr_text": "\n".join(f"line{i}" for i in range(20)),
@@ -251,16 +291,71 @@ def test_slide_candidates_respects_max():
     assert len(slides.candidates(7, many, 2)) == 2
 
 
+def test_slide_candidates_on_llamaindex_digest_fixture():
+    """A7: LlamaIndex 영상(20장 사본, 실DB에서 뽑음) 후보 = 873·900초 2장."""
+    digest = json.loads((Path(__file__).resolve().parent / "fixtures/s6_1/digest_llamaindex.json").read_text())
+    assert len(digest["slides"]) == 20
+    assert slides.candidates(digest["item_id"], digest["slides"], 2) == ["sl:274@873", "sl:274@900"]
+
+
 def test_place_candidate_prefers_preceding_timeline_section():
     placed = slides.place_candidate(sec=100, timeline_secs=[0, 90, 200], section_video_secs=[[0], [90]],
                                     section_has_video=[True, True], taken=set())
     assert placed == 1
 
 
+def test_write_places_unassigned_slide_candidates_into_preceding_section():
+    p = page(sections=[section(heading="a", video_secs=[0]), section(heading="b", video_secs=[90])])
+    final = slides.place_unassigned(p, ["sl:1@100"], {0, 90}, 2)
+    assert final.sections[1].slide == "sl:1@100" and final.sections[0].slide is None
+
+
 def test_place_candidate_falls_back_to_first_video_section():
     placed = slides.place_candidate(sec=5, timeline_secs=[], section_video_secs=[[], []],
                                     section_has_video=[False, True], taken=set())
     assert placed == 1
+
+
+def test_slide_read_lines_sec_matches_rounded_candidate_sec(tmp_path):
+    """후보 id(digest 반올림 sec)와 판독 줄 id(video_frames.t)가 같은 초로 만들어져야 한다(006-A1-1)."""
+    db = DB(tmp_path / "t.db")
+    db.conn.execute("INSERT INTO items(id, source_id, channel, external_id, url, title, day, week) VALUES "
+                    "(1,'s','video','e','http://x','t','2026-10-06','2026-W41')")
+    db.conn.execute("INSERT INTO videos(item_id, video_id) VALUES (1, 'v1')")
+    db.conn.execute("INSERT INTO video_frames(video_id, t, reading_json) VALUES ('v1', 872.867, ?)",
+                    ('{"frame_kind":"slide","title":"t","ocr_text":"' + "\\n".join(f"l{i}" for i in range(20)) +
+                     '","numbers":[{"value":"1"}]}',))
+    [(eid, _text)] = fulltext.slide_read_lines(db, 1, "v1")
+    digest_slide = {"sec": round(872.867), "frame_kind": "slide", "title": "t",
+                    "ocr_text": "\n".join(f"l{i}" for i in range(20)), "numbers": [{"value": "1"}], "table": None}
+    assert slides.candidates(1, [digest_slide], 2) == [eid]
+
+
+# ---------- 006-A1-2: 최종판 저장 전 pack 밖 refs 제거(C-1) ----------
+def test_scrub_pack_refs_clears_invalid_slide_and_keeps_section():
+    from trendsit.brief.write import _scrub_pack_refs
+
+    p = page(sections=[section(visual="none", slide="sl:1@999", slide_caption="캡션")])
+    final, touched = _scrub_pack_refs(_result_stub(), p, pack())
+    assert final.sections[0].slide is None and final.sections[0].slide_caption == ""
+    assert touched == {"sections[0]"}
+
+
+def test_scrub_pack_refs_drops_tile_refs_outside_pack():
+    from trendsit.brief.write import _scrub_pack_refs
+
+    p = page(head_tiles=[Tile(value="1", label="l", refs=["it:1#s1", "it:99#s1"])])
+    final, _touched = _scrub_pack_refs(_result_stub(), p, pack())
+    assert final.head_tiles == []
+
+
+def _result_stub():
+    from trendsit.brief.write import TopicResult
+
+    class _T:
+        topic_id = "t1"
+
+    return TopicResult(_T(), "checked", None, [], [], [], [], 1)
 
 
 # ---------- B8: writer_limits ----------

@@ -59,12 +59,28 @@ def _topics(db: DB, week: str, run_id: str) -> list[dict[str, Any]]:
     for r in rows.fetchall():
         t = export_topic(db, run_id, r["topic_id"], srcs)
         ids = {s["id"] for s in t["sources"]}
-        for i, s in enumerate(t["sections"]):
-            for j, p in enumerate(s["paragraphs"]):
-                if not p["refs"] or not set(p["refs"]) <= ids:
-                    raise ExportError(f"C-2 위반: {t['id']} sections[{i}].paragraphs[{j}] refs={p['refs']} (출처 {sorted(ids)})")
+        for loc, refs in _topic_ref_slots(t):
+            if not refs or not set(refs) <= ids:
+                raise ExportError(f"C-2 위반: {t['id']} {loc} refs={refs} (출처 {sorted(ids)})")
         out.append(t)
     return out
+
+
+def _topic_ref_slots(t: dict[str, Any]) -> list[tuple[str, list[str]]]:
+    """토픽의 refs 칸 전부(C-2 검사용): 단락은 refs 1개 이상 필수, 나머지는 있으면 검사."""
+    slots = [(f"head_tiles[{i}]", x["refs"]) for i, x in enumerate(t["head_tiles"])]
+    for i, s in enumerate(t["sections"]):
+        slots += [(f"sections[{i}].paragraphs[{j}]", p["refs"]) for j, p in enumerate(s["paragraphs"])]
+        v = s["visual"]
+        if v and v["type"] == "bars" and v.get("ref"):
+            slots.append((f"sections[{i}].bars", [v["ref"]]))
+        elif v and v["type"] == "table":
+            slots.append((f"sections[{i}].table", v["refs"]))
+        elif v and v["type"] == "tiles":
+            slots += [(f"sections[{i}].tiles[{k}]", x["refs"]) for k, x in enumerate(v["items"])]
+        elif v and v["type"] == "events":
+            slots += [(f"sections[{i}].events.items[{k}]", [x["ref"]]) for k, x in enumerate(v["items"]) if x.get("ref")]
+    return slots
 
 
 def _repos(db: DB, week: str, run_id: str, topics: list[dict[str, Any]]) -> list[dict[str, Any]]:

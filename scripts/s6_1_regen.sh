@@ -1,8 +1,19 @@
 #!/usr/bin/env bash
 # S6-1 7장 런 뒤 ①~⑤를 한 번에(D-46). 실DB에 쓴다(backup·weekly·publish): 사용자 승인 뒤에만 돌린다.
-# 한 단계라도 실패하면 거기서 멈추고 종료 코드 1. 사용: bash scripts/s6_1_regen.sh
+# 한 단계라도 실패하면(명령 실패 또는 비용 상한 초과) 거기서 멈추고 종료 코드 1. 사용: bash scripts/s6_1_regen.sh
 set -eu
 cd "$(dirname "$0")/.."
+
+check_cost() {  # 합 ≤ 1.50(2장), 넘으면 멈춤
+  local line spent cap
+  line=$(uv run python -m trendsit cost --spec S6-1 | tee /dev/stderr | grep '^- 스펙')
+  spent=$(echo "$line" | grep -oE '기록 합 \$[0-9.]+' | grep -oE '[0-9.]+')
+  cap=$(echo "$line" | grep -oE '상한 \$[0-9.]+' | grep -oE '[0-9.]+')
+  if awk -v s="$spent" -v c="$cap" 'BEGIN{exit !(s>c)}'; then
+    echo "비용 상한 초과: \$$spent / \$$cap, 멈춤" >&2
+    exit 1
+  fi
+}
 
 echo "== ① 영상 파일 확인 =="
 for vid in S-bRN-avZ4Q D7q8fa589FY; do
@@ -16,9 +27,9 @@ uv run python -m trendsit backup --tag pre-s6-1
 
 echo "== ③ weekly --force --spec S6-1(W40, W41) =="
 uv run --extra embed python -m trendsit weekly --week 2026-W40 --force --spec S6-1
-uv run python -m trendsit cost --spec S6-1
+check_cost
 uv run --extra embed python -m trendsit weekly --week 2026-W41 --force --spec S6-1
-uv run python -m trendsit cost --spec S6-1
+check_cost
 
 echo "== ④ 읽기본 확인(손으로 reports/S5_brief/briefing_<week>.md 훑기) =="
 echo "reports/S5_brief/briefing_2026-W40.md, briefing_2026-W41.md을 열어 작성 실패·⚠ 수를 리포트에 적을 것"

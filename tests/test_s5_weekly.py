@@ -31,7 +31,7 @@ def page(i: int, text: str, summary: str = "모델이 공개됐다. 쟁점이 �
     """단일 소스 토픽(sections [3,5]): 첫 절에 text, 나머지는 채우기용 절."""
     sections = [_sec(f"{TITLES[i]} 핵심 사실", text, [f"it:{i}#q1"])]
     for j in range(2, n_sections + 1):
-        sections.append(_sec(f"{TITLES[i]} 관련 {j}번째 사실", f"{TITLES[i]} 관련 {j}번째 사실 정리.", [f"it:{i}#q1"]))
+        sections.append(_sec(f"{TITLES[i]} 관련 {j}번째 사실", f"{TITLES[i]} 관련 {j}번째 사실 정리했다.", [f"it:{i}#q1"]))
     return json.dumps({"head_tiles": [], "sections": sections, "summary": summary, "title": TITLES[i],
                        "log": "l", "attention": False}, ensure_ascii=False)
 
@@ -78,23 +78,23 @@ def plan(cids: dict[str, int]) -> str:
 
 def test_weekly_rounds_storage_summary_export(week):
     ctx, cids = week
-    bad = "Argon이 DeepSWE에서 88.0% 기록"  # 근거는 77.9%
+    bad = "Argon이 DeepSWE에서 88.0% 기록했다"  # 근거는 77.9%
     responses = [
         plan(cids),
         # 토픽 1: 초안(코드 반려) → 수정(지적 안 된 summary도 바꿈 → 되돌림) → 검수 반려(sections[1]) → 수정 → 같은 이슈 다시 → check
         page(1, bad),
         revision([{"issue_idx": 0, "loc": "sections[0].paragraphs[0]", "action": "edit",
-                   "value": {"text": "Argon이 DeepSWE에서 77.9% 기록", "refs": ["it:1#q1"]}},
+                   "value": {"text": "Argon이 DeepSWE에서 77.9% 기록했다", "refs": ["it:1#q1"]}},
                   {"issue_idx": 0, "loc": "summary", "action": "edit", "value": "몰래 바꾼 요약이다."}]),
         verdict([{"loc": "sections[1].paragraphs[0]", "type": "unsupported", "evidence_id": "it:1#q1",
                   "comment": "근거에 없음", "hint": "삭제"}]),
         revision([{"issue_idx": 0, "loc": "sections[1].paragraphs[0]", "action": "edit",
-                   "value": {"text": "Gemini 4 Argon 관련 다른 서술로 바꿈", "refs": ["it:1#q1"]}}]),
+                   "value": {"text": "Gemini 4 Argon 관련 다른 서술로 바꿨다", "refs": ["it:1#q1"]}}]),
         verdict([{"loc": "sections[1].paragraphs[0]", "type": "unsupported", "evidence_id": "it:1#q1",
                   "comment": "여전히 없음", "hint": "삭제"}]),
     ]
     for i in (2, 3, 4):
-        responses += [page(i, f"{TITLES[i]} 근거 문장 요약 정리"), verdict([])]
+        responses += [page(i, f"{TITLES[i]} 근거 문장 요약 정리했다"), verdict([])]
     ctx.llm.transport.responses = [response(r) for r in responses]
     ctx.tracer = Tracer(ctx.db, "weekly", "S0")
     summary = pipeline.run_weekly("2026-W41", ctx, from_step="select", embedder=HashEmbedder(), cfg=CFG)
@@ -143,7 +143,7 @@ def test_weekly_rounds_storage_summary_export(week):
     assert ex["sources"][0]["title"] == TITLES[1]
     # 재실행: 새 run, 이전 행 보존, current_run_id 갱신
     ctx.llm.transport.responses = [response(r) for r in [plan(cids)] + [x for i in TITLES for x in
-                                                                        (page(i, f"{TITLES[i]} 근거 문장 요약 정리"), verdict([]))]]
+                                                                        (page(i, f"{TITLES[i]} 근거 문장 요약 정리했다"), verdict([]))]]
     ctx.tracer = Tracer(ctx.db, "weekly", "S0")
     pipeline.run_weekly("2026-W41", ctx, from_step="select", embedder=HashEmbedder(), cfg=CFG)
     assert db.execute("SELECT COUNT(DISTINCT run_id) FROM topics").fetchone()[0] == 2
@@ -157,7 +157,7 @@ def test_editor_select_retries_then_falls_back(week):
     bad = json.loads(plan(cids))
     bad["topics"][1]["lead"] = True  # 리드 2개 → 거부
     ctx.llm.transport.responses = [response(json.dumps(bad, ensure_ascii=False))] * 3 + [
-        response(x) for i in TITLES for x in (page(i, f"{TITLES[i]} 근거 문장 요약 정리"), verdict([]))]
+        response(x) for i in TITLES for x in (page(i, f"{TITLES[i]} 근거 문장 요약 정리했다"), verdict([]))]
     ctx.tracer = Tracer(ctx.db, "weekly", "S0")
     summary = pipeline.run_weekly("2026-W41", ctx, from_step="select", embedder=HashEmbedder(), cfg=CFG)
     row = ctx.db.conn.execute("SELECT source FROM briefing_plans WHERE run_id=?", (ctx.tracer.run_id,)).fetchone()
@@ -191,7 +191,7 @@ def test_single_topic_rerun_carries_other_topics(tmp_path):
 def test_unresolved_diagram_issue_drops_the_group(week):
     """시각 요소 위치의 이슈가 두 번 남으면 그 절의 visual을 none으로 비우고(단락은 남김) 토픽은 checked."""
     ctx, cids = week
-    p1 = json.loads(page(1, "Argon이 DeepSWE에서 77.9% 기록"))
+    p1 = json.loads(page(1, "Argon이 DeepSWE에서 77.9% 기록했다"))
     p1["sections"][0]["visual"] = "bars"
     p1["sections"][0]["bars"] = {"title": "점수", "context": "같은 벤치 [it:1#q1]", "unit": "ms",
                                  "items": [{"label": lab, "value": v, "ref": "it:1#q1", "baseline": False, "emphasis": False}
@@ -199,7 +199,7 @@ def test_unresolved_diagram_issue_drops_the_group(week):
     # 코드 반려만 이어지면 끝에서 검수자가 한 번 봄(리뷰 지적 2) → verdict 응답 하나
     responses = [plan(cids), json.dumps(p1, ensure_ascii=False), revision([]), verdict([])]
     for i in (2, 3, 4):
-        responses += [page(i, f"{TITLES[i]} 근거 문장 요약 정리"), verdict([])]
+        responses += [page(i, f"{TITLES[i]} 근거 문장 요약 정리했다"), verdict([])]
     ctx.llm.transport.responses = [response(r) for r in responses]
     ctx.tracer = Tracer(ctx.db, "weekly", "S0")
     pipeline.run_weekly("2026-W41", ctx, from_step="select", embedder=HashEmbedder(), cfg=CFG)
@@ -221,12 +221,12 @@ def test_same_issue_twice_within_one_round_is_not_repeat(week):
     ctx, cids = week
     two = [{"loc": "sections[1].paragraphs[0]", "type": "unsupported", "evidence_id": "it:1#q1", "comment": c, "hint": "h"}
            for c in ("근거 없음 1", "근거 없음 2")]
-    responses = [plan(cids), page(1, "Argon이 DeepSWE에서 77.9% 기록"), verdict(two),
+    responses = [plan(cids), page(1, "Argon이 DeepSWE에서 77.9% 기록했다"), verdict(two),
                  revision([{"issue_idx": 0, "loc": "sections[1].paragraphs[0]", "action": "edit",
-                            "value": {"text": "Gemini 4 Argon 근거 문장 요약 정리", "refs": ["it:1#q1"]}}]),
+                            "value": {"text": "Gemini 4 Argon 근거 문장 요약 정리했다", "refs": ["it:1#q1"]}}]),
                  verdict([])]
     for i in (2, 3, 4):
-        responses += [page(i, f"{TITLES[i]} 근거 문장 요약 정리"), verdict([])]
+        responses += [page(i, f"{TITLES[i]} 근거 문장 요약 정리했다"), verdict([])]
     ctx.llm.transport.responses = [response(r) for r in responses]
     ctx.tracer = Tracer(ctx.db, "weekly", "S0")
     pipeline.run_weekly("2026-W41", ctx, from_step="select", embedder=HashEmbedder(), cfg=CFG)
@@ -294,14 +294,35 @@ def test_export_bars_events_og_and_checks(tmp_path):
     assert ex["checks"] == ["summary"] and ex["has_check"]
 
 
+def test_export_has_check_ignores_locs_without_a_chk_anchor(tmp_path):
+    """006-A1-7: head_tiles[i] 같은 check 위치는 .chk가 안 그려지므로 has_check에 안 들어가야 함(C-9)."""
+    ctx = make_ctx(tmp_path, FakeTransport([]), spec_cap=1.0)
+    db = ctx.db.conn
+    page_json = {"head_tiles": [{"value": "1", "label": "l", "note": "", "refs": ["it:5#q1"]}],
+                 "sections": [{"heading": "h", "paragraphs": [{"text": "문장이다.", "refs": ["it:5#q1"]}], "visual": "none",
+                              "bars": None, "table": None, "tiles": [], "events": None, "slide": None,
+                              "slide_caption": "", "video_secs": [], "check": False}],
+                 "summary": "요약이다.", "title": "제목", "log": "l", "attention": False}
+    db.execute("INSERT INTO topics(run_id, topic_id, week, cluster_ids_json, rank, lead, relation_type, status, final_round,"
+               " angle, checks_json) VALUES ('r','w41-x','2026-W41','[]',1,1,'new','checked',2,'a','[\"head_tiles[0]\"]')")
+    db.execute("INSERT INTO topic_pages(run_id, topic_id, round, page_json) VALUES ('r','w41-x',2,?)", (json.dumps(page_json),))
+    db.execute("INSERT INTO topic_evidence(run_id, topic_id, evidence_id, member, field, idx) VALUES ('r','w41-x','it:5#q1','it:5','point',0)")
+    db.commit()
+    srcs = {"it:5#q1": {"channel": "text", "site": "S", "title": "T", "date": "2026-10-06", "url": "https://s/5"}}
+    ex = briefing.export_topic(ctx.db, "r", "w41-x", srcs)
+    assert ex["checks"] == ["head_tiles[0]"] and not ex["has_check"]
+    assert ex["sections"][0]["visual"] == {"type": "none"}  # 006-A1-28: null이 아니라 {"type":"none"}
+    assert ex["sections"][0]["video_secs"] == []
+
+
 def test_critic_empty_atoms_is_not_a_pass(week):
     """원자 사실 0개 통과는 대조를 건너뛴 판정: 한 번 다시 부르고, 또 비면 검수 실패(attention), 판정은 기록하지 않음."""
     ctx, cids = week
     empty = json.dumps({"atoms": [], "fact_support": {"total": 0, "supported": 0}, "issues": [], "status": "pass",
                         "log": "원자 사실 0개", "attention": False})
-    responses = [plan(cids), page(1, "Argon이 DeepSWE에서 77.9% 기록"), empty, empty]
+    responses = [plan(cids), page(1, "Argon이 DeepSWE에서 77.9% 기록했다"), empty, empty]
     for i in (2, 3, 4):
-        responses += [page(i, f"{TITLES[i]} 근거 문장 요약 정리"), verdict([])]
+        responses += [page(i, f"{TITLES[i]} 근거 문장 요약 정리했다"), verdict([])]
     ctx.llm.transport.responses = [response(r) for r in responses]
     ctx.tracer = Tracer(ctx.db, "weekly", "S0")
     pipeline.run_weekly("2026-W41", ctx, from_step="select", embedder=HashEmbedder(), cfg=CFG)
@@ -317,7 +338,7 @@ def test_critic_empty_atoms_is_not_a_pass(week):
 def test_f2_diagram_with_only_critic_issue_is_kept_with_check(week):
     """시각 요소는 코드가 확인한 형식·수치 오류일 때만 뺀다. 검수자 의미 지적만 두 번 남으면 두고 ⚠(반영 확인 리뷰 F2)."""
     ctx, cids = week
-    p1 = json.loads(page(1, "Argon이 DeepSWE에서 77.9% 기록"))
+    p1 = json.loads(page(1, "Argon이 DeepSWE에서 77.9% 기록했다"))
     p1["sections"][0]["visual"] = "bars"
     p1["sections"][0]["bars"] = {"title": "Argon DeepSWE 77.9%", "context": "같은 벤치 [it:1#q1]", "unit": "%",
                                  "items": [{"label": lab, "value": "77.9", "ref": "it:1#q1", "baseline": False, "emphasis": False}
@@ -326,7 +347,7 @@ def test_f2_diagram_with_only_critic_issue_is_kept_with_check(week):
     responses = [plan(cids), json.dumps(p1, ensure_ascii=False), verdict(over),
                  revision([{"issue_idx": 0, "loc": "sections[0].heading", "action": "edit", "value": "Argon 점수"}]), verdict(over)]
     for i in (2, 3, 4):
-        responses += [page(i, f"{TITLES[i]} 근거 문장 요약 정리"), verdict([])]
+        responses += [page(i, f"{TITLES[i]} 근거 문장 요약 정리했다"), verdict([])]
     ctx.llm.transport.responses = [response(r) for r in responses]
     ctx.tracer = Tracer(ctx.db, "weekly", "S0")
     pipeline.run_weekly("2026-W41", ctx, from_step="select", embedder=HashEmbedder(), cfg=CFG)
@@ -341,7 +362,7 @@ def test_f2_diagram_with_only_critic_issue_is_kept_with_check(week):
 def test_f2c_check_pointing_to_removed_section_is_labeled():
     from trendsit.core.artifacts_brief import TopicPage
 
-    p = TopicPage.model_validate(json.loads(page(1, "Argon이 DeepSWE에서 77.9% 기록")))
+    p = TopicPage.model_validate(json.loads(page(1, "Argon이 DeepSWE에서 77.9% 기록했다")))
     assert briefing.visible_checks(["sections[9]", "summary"], p) == ["빠진 시각 요소(sections[9])", "summary"]
 
 
@@ -394,7 +415,7 @@ def test_budget_stop_write(week, monkeypatch, tmp_path, capsys):
 
     ctx, cids = week
     before = tuple(ctx.db.conn.execute("SELECT status, current_run_id FROM weeks").fetchone())
-    ctx.llm.transport.responses = [response(r) for r in [plan(cids), page(1, "Argon이 DeepSWE에서 77.9% 기록"), verdict([])]]
+    ctx.llm.transport.responses = [response(r) for r in [plan(cids), page(1, "Argon이 DeepSWE에서 77.9% 기록했다"), verdict([])]]
     calls = stub_run_role(monkeypatch, wr, lambda n, role: BudgetExceeded("상한") if n == 3 else None)
     assert run_cmd(ctx, monkeypatch, tmp_path) == 1
     assert_stopped(ctx, tmp_path, capsys, before, "BudgetExceeded: 상한")
@@ -442,7 +463,7 @@ def _status_of(ctx, cids, monkeypatch, fail) -> dict:
     from trendsit.brief import write as wr
 
     ctx.llm.transport.responses = [response(r) for r in [plan(cids)] + [x for i in TITLES for x in
-                                                                        (page(i, f"{TITLES[i]} 근거 문장 요약 정리"), verdict([]))]]
+                                                                        (page(i, f"{TITLES[i]} 근거 문장 요약 정리했다"), verdict([]))]]
     stub_run_role(monkeypatch, wr, fail)
     ctx.tracer = Tracer(ctx.db, "weekly", "S0")
     summary = pipeline.run_weekly("2026-W41", ctx, from_step="select", embedder=HashEmbedder(), cfg=CFG)
@@ -487,7 +508,7 @@ def test_editor_select_fallback_reason_tells_call_failure_from_validation(week, 
     ctx, cids = week
     stub_run_role(monkeypatch, sel, lambda n, role: LLMError("제공사 오류"))
     ctx.tracer = Tracer(ctx.db, "weekly", "S0")
-    ctx.llm.transport.responses = [response(x) for i in TITLES for x in (page(i, f"{TITLES[i]} 근거 문장 요약 정리"), verdict([]))]
+    ctx.llm.transport.responses = [response(x) for i in TITLES for x in (page(i, f"{TITLES[i]} 근거 문장 요약 정리했다"), verdict([]))]
     pipeline.run_weekly("2026-W41", ctx, from_step="select", embedder=HashEmbedder(), cfg=CFG)
     log = json.loads(ctx.db.conn.execute("SELECT plan_json FROM briefing_plans WHERE run_id=?", (ctx.tracer.run_id,)).fetchone()[0])["log"]
     assert "호출 실패" in log and "검증 실패" not in log
@@ -499,9 +520,9 @@ def test_writer_truncation_retries_with_no_visuals(week, monkeypatch):
     from trendsit.core.role import RoleFailed
 
     ctx, cids = week
-    responses = [plan(cids), page(1, "Argon이 DeepSWE에서 77.9% 기록"), verdict([])]
+    responses = [plan(cids), page(1, "Argon이 DeepSWE에서 77.9% 기록했다"), verdict([])]
     for i in (2, 3, 4):
-        responses += [page(i, f"{TITLES[i]} 근거 문장 요약 정리"), verdict([])]
+        responses += [page(i, f"{TITLES[i]} 근거 문장 요약 정리했다"), verdict([])]
     ctx.llm.transport.responses = [response(r) for r in responses]
     calls = stub_run_role(monkeypatch, wr, lambda n, role: RoleFailed("writer: 스키마 검증 실패 (출력 잘림(max_tokens 4500 도달): x)")
                           if n == 1 else None)
@@ -511,6 +532,27 @@ def test_writer_truncation_retries_with_no_visuals(week, monkeypatch):
     t1 = ctx.db.conn.execute("SELECT status FROM topics WHERE run_id=? AND rank=1", (run_id,)).fetchone()
     assert t1["status"] in ("passed", "checked")  # 잘림 뒤 no_visuals 재시도로 회복(C-5: 토픽당 호출 ≤4)
     assert calls[0] == "writer" and calls[1] == "writer"  # 1회 실패(잘림) + 1회 성공(no_visuals), 토픽 1
+
+
+def test_writer_total_failure_logs_one_step_not_two(week, monkeypatch):
+    """006-A1-24: 작성 실패 토픽도 steps(writer,code) 행이 하나만(counts.written 이중 계산 방지)."""
+    from trendsit.brief import write as wr
+    from trendsit.core.role import RoleFailed
+
+    ctx, cids = week
+    responses = [plan(cids)]
+    for i in (2, 3, 4):
+        responses += [page(i, f"{TITLES[i]} 근거 문장 요약 정리했다"), verdict([])]
+    ctx.llm.transport.responses = [response(r) for r in responses]
+    stub_run_role(monkeypatch, wr, lambda n, role: RoleFailed("writer: 스키마 검증 실패 (사유)") if n == 1 else None)
+    ctx.tracer = Tracer(ctx.db, "weekly", "S0")
+    pipeline.run_weekly("2026-W41", ctx, from_step="select", embedder=HashEmbedder(), cfg=CFG)
+    run_id = ctx.tracer.run_id
+    t1 = ctx.db.conn.execute("SELECT status FROM topics WHERE run_id=? AND rank=1", (run_id,)).fetchone()
+    assert t1["status"] == "failed"
+    n = ctx.db.conn.execute("SELECT COUNT(*) FROM steps WHERE run_id=? AND role='writer' AND kind='code'",
+                            (run_id,)).fetchone()[0]
+    assert n == 4  # 토픽 4개, 실패해도 _log_topic 한 번씩만(두 번 세지 않음)
 
 
 def test_briefing_md_untitled_source(week, monkeypatch):

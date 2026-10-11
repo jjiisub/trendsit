@@ -21,7 +21,7 @@ from ..core.artifacts_brief import (
 LOC = re.compile(r"^(title|summary)$|^(head_tiles|sections)\[(\d+)\]")
 # sections[i].<하위>: heading/slide/video_secs(직접 칸), paragraphs[j]/tiles[j](목록 항목), bars/table/events(그룹 전체),
 # bars.items[k]/table.rows[k]/events.items[k](그룹 안 항목)
-SUB_LOC = re.compile(r"^sections\[(?P<i1>\d+)\]\.(?P<whole>heading|slide|video_secs|bars|table|events)$|"
+SUB_LOC = re.compile(r"^sections\[(?P<i1>\d+)\]\.(?P<whole>heading|slide|slide_caption|video_secs|bars|table|events)$|"
                      r"^sections\[(?P<i2>\d+)\]\.(?P<list>paragraphs|tiles)\[(?P<idx2>\d+)\]$|"
                      r"^sections\[(?P<i3>\d+)\]\.(?P<nested>bars\.items|table\.rows|events\.items)\[(?P<idx3>\d+)\]$")
 FIELD_TYPES: dict[str, type] = {"head_tiles": Tile, "sections": Section}
@@ -66,6 +66,8 @@ def _apply_section_sub(sec: dict, field_: str, idx: int | None, value) -> tuple[
         sec["heading"] = value
     elif field_ == "slide" and (value is None or isinstance(value, str)):
         sec["slide"] = value
+    elif field_ == "slide_caption" and isinstance(value, str):
+        sec["slide_caption"] = value
     elif field_ == "video_secs" and isinstance(value, list):
         sec["video_secs"] = value
     elif field_ == "paragraphs":
@@ -119,16 +121,35 @@ def _apply_section_sub(sec: dict, field_: str, idx: int | None, value) -> tuple[
     return sec, notes
 
 
+def _delete_sub_item(sec: dict, field_: str, idx: int) -> str | None:
+    """sections[i].<field_>[idx] 항목 하나 삭제. 실패하면 notes용 이유 문자열."""
+    arr_name = {"paragraphs": "paragraphs", "tiles": "tiles"}.get(field_)
+    if arr_name:
+        if idx < len(sec[arr_name]):
+            sec[arr_name].pop(idx)
+            return None
+        return "위치 없음"
+    group = {"bars": "items", "table": "rows", "events": "items"}.get(field_)
+    if group and sec.get(field_):
+        items = sec[field_][group]
+        if idx < len(items):
+            items.pop(idx)
+            return None
+        return "위치 없음"
+    return "삭제 대상 없음"
+
+
 def apply_revision(prev: TopicPage, rev: TopicPageRevision, allowed: set[str]) -> tuple[TopicPage, int, list[str]]:
     """지적된 위치(최상위 칸 기준)만 합친다. 그 밖의 변경은 되돌림(세어 반환). 삭제는 뒤 번호부터."""
     data = prev.model_dump()
-    reverts, notes, deletes = 0, [], []
+    reverts, notes, deletes, sections_delete_n = 0, [], [], 0
     for ch in rev.changed:
         raw_loc = ch.loc if ch.action == "add" else normalize_loc(prev, ch.loc)
         loc = top_loc(raw_loc)
-        whole = {a for a in allowed if re.fullmatch(r"(head_tiles|sections)", a)}
-        if loc not in allowed and loc.split("[")[0] not in whole and not (
-                ch.action == "add" and loc.split("[")[0] in {a.split("[")[0] for a in allowed}):
+        # "Section 전체 add"(5.3): loc 자체가 그대로 sections[i]/head_tiles[i](하위 경로 없음)인 새 항목 추가만
+        # 지적 없이도 허용. sections[i].<하위> 변경은 그 절(sections[i])이 지적됐을 때만 받는다
+        is_whole_add = ch.action == "add" and raw_loc == loc and bool(re.fullmatch(r"(head_tiles|sections)\[\d+\]", loc))
+        if loc not in allowed and not is_whole_add:
             reverts += 1
             notes.append(f"지적 안 된 위치 {ch.loc} 변경 되돌림")
             continue
@@ -144,17 +165,8 @@ def apply_revision(prev: TopicPage, rev: TopicPageRevision, allowed: set[str]) -
                 notes.append(f"{ch.loc}: 위치 없음")
                 continue
             if ch.action == "delete" and idx is not None:
-                arr_name = {"paragraphs": "paragraphs", "tiles": "tiles"}.get(field_)
-                if arr_name and idx < len(data["sections"][i][arr_name]):
-                    data["sections"][i][arr_name].pop(idx)
-                elif field_ == "bars" and data["sections"][i].get("bars"):
-                    items = data["sections"][i]["bars"]["items"]
-                    if idx < len(items):
-                        items.pop(idx)
-                elif field_ == "events" and data["sections"][i].get("events"):
-                    items = data["sections"][i]["events"]["items"]
-                    if idx < len(items):
-                        items.pop(idx)
+                if (reason := _delete_sub_item(data["sections"][i], field_, idx)) is not None:
+                    notes.append(f"{ch.loc}: {reason}")
                 continue
             data["sections"][i], sub_notes = _apply_section_sub(data["sections"][i], field_, idx, ch.value)
             notes += [f"{ch.loc}: {n}" for n in sub_notes]
@@ -164,9 +176,10 @@ def apply_revision(prev: TopicPage, rev: TopicPageRevision, allowed: set[str]) -
             continue
         name, idx_s = m.group(2), int(m.group(3))
         if ch.action == "delete":
-            if name == "sections" and len(data["sections"]) <= 1:
+            if name == "sections" and len(data["sections"]) - sections_delete_n <= 1:
                 notes.append("sections 전체 삭제는 받지 않음")
                 continue
+            sections_delete_n += name == "sections"
             deletes.append((name, idx_s))
             continue
         if not isinstance(ch.value, FIELD_TYPES[name]):

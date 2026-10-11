@@ -16,7 +16,6 @@ import re
 from dataclasses import dataclass, field
 from typing import Any
 
-from ..core import config
 from ..core.artifacts import Document
 from ..core.artifacts_brief import (
     AliasLine,
@@ -37,13 +36,11 @@ from ..core.context import Ctx
 from ..core.db import DB
 from ..core.errors import LLMError
 from ..core.role import RoleFailed, load_role, run_role
-from . import checks, slides
+from . import checks, fulltext, slides
 from .aliases import AliasTable, to_original, translit_pattern
-from .evidence import EvidenceItem, Member, cap_pack, pack_index
+from .evidence import EvidenceItem, Member, cap_pack, evidence_docs, pack_index
 from .revision import LOC, apply_revision, normalize_loc, top_loc
 from .select import Applied
-
-MAX_WRITER_CALLS = 4  # 기본 2(스키마 재시도 내부) + no_visuals 재시도로 최대 2회 더(D-42, C-5)
 
 
 @dataclass
@@ -75,40 +72,10 @@ class TopicResult:
     member_by_id: dict[str, str] = field(default_factory=dict)
     checks: list[str] = field(default_factory=list)
     dropped_diagrams: list[dict[str, Any]] = field(default_factory=list)  # 코드가 visual을 none으로 되돌린 절
+    no_visuals: bool = False  # D-42: 잘림 뒤 no_visuals=true로 재시도해 회복한 토픽
 
 
 # ---------- 입력 조립 ----------
-_LINE_LABEL = {"quote": "원문: ", "number": "(카드 수치, 위 원문에서 뽑음) ", "slide_fact": "발표 슬라이드 수치: "}
-_SKIP_KINDS = ("summary", "claim")  # 카드 요약·핵심 포인트는 원문이 아니라 작성자에게 주지 않음(리뷰 R2 계승)
-
-
-def _line(it: EvidenceItem) -> str | None:
-    if it.kind == "context":
-        return it.text  # 요약+타임라인(근거 id 없음, 참고용)
-    if it.kind in _SKIP_KINDS:
-        return None
-    v = f" [{it.value}{(' ' + it.unit) if it.unit else ''}]" if it.value else ""
-    return f"[{it.id}] {_LINE_LABEL.get(it.kind, '')}{it.text}{v}"
-
-
-def evidence_docs(pack: dict[str, list[EvidenceItem]]) -> list[Document]:
-    """근거 id마다 줄 하나, 구성원(member)마다 문서 하나(COMMON 6.1-4, S6-1 5.2 D-27). og:·it: 등 접두어가 섞여도
-    같은 member 문서에 함께 담긴다(원문 문장 + 원본 대조 문장). 줄 순서는 구성원 안에서 Member.items 조립 순서 그대로."""
-    by_member: dict[str, list[EvidenceItem]] = {}
-    for items in pack.values():
-        for it in items:
-            by_member.setdefault(it.member, []).append(it)
-    docs = []
-    for member, items in by_member.items():
-        lines = [ln for it in items if (ln := _line(it)) is not None]
-        if not lines:
-            continue
-        src = items[0].source
-        docs.append(Document(id=member, source=src.get("site") or items[0].channel, title=src.get("title"),
-                             url=src.get("url"), text="\n".join(lines)))
-    return docs
-
-
 def previous_topic(db: DB, topic_id: str | None) -> PreviousTopic | None:
     if not topic_id:
         return None
@@ -154,44 +121,6 @@ def topic_slide_info(ms: list[Member], used_members: set[str], cfg: BriefConfig)
     return cands[: cfg.write.slides_max], secs
 
 
-def raw_evidence(db: DB, eid: str, items: list[EvidenceItem]) -> str:
-    """검수자용 근거 원문(5.2): it:#s → 그 문장 ± 1문장, vd:@sec(transcript) → 그 묶음 그대로,
-    vd:@sec(slide_fact) → 기존 ±30초 전사 창, sl: → 판독 글자 전체, rp:#f → 그 사실 그대로."""
-    kind = items[0].kind if items else None
-    if m := re.match(r"^it:(\d+)#s(\d+)$", eid):
-        item_id, n = int(m[1]), int(m[2])
-        from . import fulltext
-
-        row = db.conn.execute("SELECT text FROM item_texts WHERE item_id=?", (item_id,)).fetchone()
-        sents = fulltext.sentences(row["text"]) if row and row["text"] else []
-        if sents and 1 <= n <= len(sents):
-            return " ".join(sents[max(0, n - 2): n + 1])
-        return items[0].text if items else ""
-    if m := re.match(r"^sl:(\d+)@(\d+)$", eid):
-        video_id = db.conn.execute("SELECT video_id FROM videos WHERE item_id=?", (int(m[1]),)).fetchone()
-        if video_id:
-            fr = db.conn.execute("SELECT reading_json FROM video_frames WHERE video_id=? AND t=?",
-                                 (video_id[0], float(m[2]))).fetchone()
-            if fr and fr["reading_json"]:
-                return json.loads(fr["reading_json"]).get("ocr_text") or ""
-        return items[0].text if items else ""
-    if kind == "slide_fact" and (m := re.match(r"^vd:(\d+)@(\d+)$", eid)):
-        item_id, sec_i = int(m[1]), int(m[2])
-        window_sec = config.load("video.yaml").align_window_sec
-        vid = db.conn.execute("SELECT video_id FROM videos WHERE item_id=?", (item_id,)).fetchone()
-        if vid:
-            segs = db.conn.execute('SELECT text FROM video_segments WHERE video_id=? AND "end">=? AND start<=? ORDER BY idx',
-                                   (vid[0], sec_i - window_sec, sec_i + window_sec)).fetchall()
-            if any(s["text"] for s in segs):
-                return " ".join(s["text"] for s in segs if s["text"])
-        return items[0].text if items else ""
-    if kind == "transcript":
-        return items[0].text if items else ""
-    if m := re.match(r"^rp:.+#f\d+$", eid):
-        return items[0].text if items else ""
-    return items[0].text if items else ""
-
-
 def refs_of(page: TopicPage) -> list[str]:
     order = ("point", "number", "event", "context")
     slots = sorted(checks.page_refs(page), key=lambda s: order.index(s.field))
@@ -224,7 +153,7 @@ def _run_critic(ctx: Ctx, res: TopicResult, topic: Applied, winp: WriterInput, p
     raw_ids = [e for e in pack if not all(it.kind in ("summary", "context") for it in pack[e])]
     order = [e for e in refs_of(pg) if e in raw_ids] + [e for e in raw_ids if e not in refs_of(pg)]
     evid = [Document(id=e, source=pack[e][0].source.get("site") or pack[e][0].channel,
-                     title=pack[e][0].source.get("title"), text=raw_evidence(ctx.db, e, pack[e])) for e in order]
+                     title=pack[e][0].source.get("title"), text=fulltext.raw_evidence(ctx.db, e, pack[e])) for e in order]
     cinp = CriticInput(loc_lines=loc_lines(pg), page=pg, evidence=evid, angle=topic.angle, previous=winp.previous,
                        code_warnings=warns, round=rnd)
     critic = load_role("critic", ctx.models)
@@ -344,28 +273,57 @@ def _drop_code_bad_sections(res: TopicResult, final: TopicPage, pack: dict[str, 
         loc = f"sections[{idx}]"
         res.dropped_diagrams.append({"section": loc, "heading": secs[idx].heading, "issue": last_issue.get(loc, "")})
         check_locs.add(loc)
-        secs[idx] = secs[idx].model_copy(update={"visual": "none", "bars": None, "table": None, "tiles": [], "events": None})
+        secs[idx] = secs[idx].model_copy(update={"visual": "none", "bars": None, "table": None, "tiles": [], "events": None,
+                                                  "slide": None, "slide_caption": ""})
     res.attention.append(f"형식·수치 오류가 남은 시각 요소 {len(bad_secs)}개 뺌(절 단락은 유지)")
     return final.model_copy(update={"sections": secs})
 
 
-def _render_slide_frames(res: TopicResult, final: TopicPage, ms: dict[str, Member]) -> TopicPage:
-    """최종판 저장 직전에 슬라이드가 붙은 절마다 프레임을 만든다(5.6, D-34·D-39). 실패하면 slide=null + attention."""
+def _scrub_pack_refs(res: TopicResult, final: TopicPage, pack: dict[str, list[EvidenceItem]]) -> tuple[TopicPage, set[str]]:
+    """최종판 저장 직전 안전망(C-1): 라운드를 다 거친 뒤에도 pack 밖 refs가 남으면 지운다(남은 지적만으로는 이미
+    못 고쳤으므로, 가짜 출처로 발행되는 것보다 그 칸을 비우는 쪽을 택한다)."""
     secs = list(final.sections)
-    changed = False
+    touched: set[str] = set()
     for i, s in enumerate(secs):
-        if not s.slide:
-            continue
-        m = re.match(r"^sl:(\d+)@(\d+)$", s.slide)
-        if not m:
-            continue
-        video_id = next((mm.key[3:] for mm in ms.values() if mm.item_id == int(m[1])), None)
-        if video_id and slides.ensure_frame(video_id, int(m[2])) is not None:
-            continue
-        res.attention.append(f"슬라이드 프레임 없음: {video_id or '?'}@{m[2]}")
-        secs[i] = s.model_copy(update={"slide": None, "slide_caption": ""})
-        changed = True
-    return final.model_copy(update={"sections": secs}) if changed else final
+        upd: dict[str, Any] = {}
+        paras = [p.model_copy(update={"refs": kept}) if (kept := [r for r in p.refs if r in pack]) != p.refs else p
+                 for p in s.paragraphs]
+        if paras != list(s.paragraphs):
+            upd["paragraphs"] = paras
+        if s.tiles:
+            tiles = [t.model_copy(update={"refs": kept}) if (kept := [r for r in t.refs if r in pack]) != t.refs else t
+                     for t in s.tiles]
+            if tiles != list(s.tiles):
+                upd["tiles"] = tiles
+        if s.table is not None and (kept := [r for r in s.table.refs if r in pack]) != s.table.refs:
+            upd["table"] = s.table.model_copy(update={"refs": kept})
+        if s.bars is not None and any(it.ref not in pack for it in s.bars.items):
+            upd["visual"], upd["bars"] = "none", None
+        if s.events is not None:
+            items = [it for it in s.events.items if it.ref is None or it.ref in pack]
+            if len(items) != len(s.events.items):
+                upd["visual"], upd["events"] = ("none", None) if len(items) < 2 else (s.visual, s.events.model_copy(update={"items": items}))
+        if s.slide and s.slide not in pack:
+            upd["slide"], upd["slide_caption"] = None, ""
+        if upd:
+            secs[i] = s.model_copy(update=upd)
+            touched.add(f"sections[{i}]")
+    tiles = [t for t in final.head_tiles if all(r in pack for r in t.refs)]
+    if touched or len(tiles) != len(final.head_tiles):
+        res.attention.append("pack 밖 근거 id를 최종판에서 지움(C-1)")
+        return final.model_copy(update={"sections": secs, "head_tiles": tiles}), touched
+    return final, touched
+
+
+def _finalize_page(res: TopicResult, final: TopicPage, pack: dict[str, list[EvidenceItem]], cfg: BriefConfig,
+                   last_issue: dict[str, str], check_locs: set[str], ms: list[Member], slide_candidates: list[str],
+                   timeline_secs: set[int]) -> tuple[TopicPage, set[str]]:
+    """저장 전 마지막 손질: 코드 확인 오류가 남은 시각 요소 빼기 → 미배치 슬라이드 배치 → 프레임 생성 → pack 밖 refs 제거."""
+    final = _drop_code_bad_sections(res, final, pack, cfg, last_issue, check_locs)
+    final = slides.place_unassigned(final, slide_candidates, timeline_secs, cfg.write.slides_max)
+    final = slides.render_frames(final, {m.key: m for m in ms}, res.attention)
+    final, scrubbed_locs = _scrub_pack_refs(res, final, pack)
+    return final, check_locs | scrubbed_locs
 
 
 def write_topic(ctx: Ctx, topic: Applied, members: dict[str, Member], table: AliasTable, cfg: BriefConfig,
@@ -401,18 +359,20 @@ def write_topic(ctx: Ctx, topic: Applied, members: dict[str, Member], table: Ali
             page, err2, sid = _call(load_role("writer", ctx.models), winp2, ctx, res.costs, "writer")
             if page is not None:
                 winp = winp2
+                res.no_visuals = True
             err = err2 if page is None else err
     if page is None or not page.sections:
-        res.attention.append(f"작성 실패: {err or '절 없음'}")
-        ctx.tracer.step(kind="code", role="writer", text=f"{topic.topic_id}: 작성 실패", attention=True, error=err)
+        # pipeline._log_topic이 토픽마다 steps(writer,code) 행을 하나 남긴다(D-37 counts.written). 여기서 또
+        # 남기면 실패 토픽이 두 번 세이므로(006-A1-24) attention에만 적고 트레이스는 _log_topic에 맡긴다
+        msg = "작성 실패: 잘림" if err and "출력 잘림" in err else f"작성 실패: {err or '절 없음'}"
+        res.attention.append(msg)
         return res
     page, check_locs, last_issue = _rounds(ctx, res, topic, winp, pack, cfg, _canon_translit(table, ms, cfg),
                                            slide_candidates, timeline_secs, page, sid, review)
     final = res.page or page
     if review and not any(lg.checker == "critic" for lg in res.rounds) and res.status != "passed":
         _critic_unseen_pages(ctx, res, topic, winp, pack, final, check_locs, cfg)
-    final = _drop_code_bad_sections(res, final, pack, cfg, last_issue, check_locs)
-    final = _render_slide_frames(res, final, {m.key: m for m in ms})
+    final, check_locs = _finalize_page(res, final, pack, cfg, last_issue, check_locs, ms, slide_candidates, timeline_secs)
     secs = [s.model_copy(update={"check": f"sections[{i}]" in check_locs}) for i, s in enumerate(final.sections)]
     final = final.model_copy(update={"sections": secs})
     if check_locs:
@@ -451,8 +411,8 @@ def save(db: DB, res: TopicResult, run_id: str) -> None:
         if page is not None and res.status != "failed":
             db.conn.executemany(
                 "INSERT INTO topic_evidence(run_id, topic_id, evidence_id, member, field, idx) VALUES (?,?,?,?,?,?)",
-                [(run_id, t.topic_id, eid, res.member_by_id.get(eid, eid), slot.field, 0)
-                 for slot in checks.page_refs(page) for eid in slot.refs])
+                [(run_id, t.topic_id, eid, res.member_by_id[eid], slot.field, 0)
+                 for slot in checks.page_refs(page) for eid in slot.refs if eid in res.member_by_id])
         db.conn.execute("UPDATE topics SET status=?, final_round=?, title=?, summary=?, checks_json=? "
                         "WHERE run_id=? AND topic_id=?",
                         (res.status, res.final_round, page.title if page else None, page.summary if page else None,

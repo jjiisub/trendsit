@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+import re
 import shutil
 import subprocess
 from pathlib import Path
 from typing import Any
 
+from ..core.artifacts_brief import TopicPage
 from ..core.config import ROOT
 
 SLIDES_DIR = ROOT / "data" / "slides"
@@ -56,6 +58,53 @@ def place_candidate(sec: int, timeline_secs: list[int], section_video_secs: list
     return next((i for i, has in enumerate(section_has_video) if has and i not in taken), None)
 
 
+def place_unassigned(final: TopicPage, slide_candidates: list[str], timeline_secs: set[int],
+                     slides_max: int) -> TopicPage:
+    """작성자가 두지 않은 슬라이드 후보를 코드가 붙인다(5.6, D-30·D-34): 직전 구간 절 → 가까운 절 → 첫 영상 근거 절."""
+    secs = list(final.sections)
+    placed = {int(m[1]) for s in secs if s.slide and (m := re.match(r"^sl:\d+@(\d+)$", s.slide))}
+    taken = {i for i, s in enumerate(secs) if s.slide}
+    if len(placed) >= slides_max:
+        return final
+    section_video_secs = [s.video_secs for s in secs]
+    section_has_video = [bool(s.video_secs) or any((r.startswith("vd:") or r.startswith("sl:"))
+                         for p in s.paragraphs for r in p.refs) for s in secs]
+    changed = False
+    for cand in slide_candidates:
+        if len(placed) >= slides_max:
+            break
+        m = re.match(r"^sl:\d+@(\d+)$", cand)
+        if not m or int(m[1]) in placed:
+            continue
+        idx = place_candidate(int(m[1]), sorted(timeline_secs), section_video_secs, section_has_video, taken)
+        if idx is None:
+            continue
+        secs[idx] = secs[idx].model_copy(update={"slide": cand})
+        taken.add(idx)
+        placed.add(int(m[1]))
+        changed = True
+    return final.model_copy(update={"sections": secs}) if changed else final
+
+
+def render_frames(final: TopicPage, ms: dict[str, Any], attention: list[str]) -> TopicPage:
+    """최종판 저장 직전에 슬라이드가 붙은 절마다 프레임을 만든다(5.6, D-34·D-39). 실패하면 slide=null + attention."""
+    secs = list(final.sections)
+    changed = False
+    for i, s in enumerate(secs):
+        if not s.slide:
+            continue
+        m = re.match(r"^sl:(\d+)@(\d+)$", s.slide)
+        if not m:
+            continue
+        video_id = next((mm.key[3:] for mm in ms.values() if mm.item_id == int(m[1])), None)
+        if video_id and ensure_frame(video_id, int(m[2])) is not None:
+            continue
+        attention.append(f"슬라이드 프레임 없음: {video_id or '?'}@{m[2]}")
+        secs[i] = s.model_copy(update={"slide": None, "slide_caption": ""})
+        changed = True
+    return final.model_copy(update={"sections": secs}) if changed else final
+
+
 def frame_path(video_id: str, sec: int) -> Path:
     return SLIDES_DIR / f"{video_id}_{sec}.jpg"
 
@@ -65,7 +114,7 @@ def ensure_frame(video_id: str, sec: int, timeout: int = 60) -> str | None:
     out = frame_path(video_id, sec)
     if out.is_file():
         return str(out)
-    media = next(iter((MEDIA_ROOT / video_id).glob("media.*")), None)
+    media = next(iter(sorted((MEDIA_ROOT / video_id).glob("media.*"))), None)  # 확장자가 여럿이면 이름 순 고정
     ffmpeg = shutil.which("ffmpeg") or "/opt/homebrew/bin/ffmpeg"
     if media is None or not Path(ffmpeg).exists():
         return None
@@ -77,5 +126,9 @@ def ensure_frame(video_id: str, sec: int, timeout: int = 60) -> str | None:
              "-q:v", "4", str(out)],
             capture_output=True, timeout=timeout)
     except (OSError, subprocess.TimeoutExpired):
+        out.unlink(missing_ok=True)  # 시간 초과로 죽었을 때 남은 부분 파일을 다음 실행이 정상 프레임으로 쓰지 않게
         return None
-    return str(out) if r.returncode == 0 and out.is_file() else None
+    if r.returncode == 0 and out.is_file():
+        return str(out)
+    out.unlink(missing_ok=True)
+    return None

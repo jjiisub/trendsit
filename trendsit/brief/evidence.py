@@ -14,6 +14,7 @@ from datetime import date
 from typing import Any
 
 from ..core import config
+from ..core.artifacts import Document
 from ..core.budget import estimate_tokens
 from ..core.db import DB
 from . import fulltext, slides
@@ -226,6 +227,37 @@ def week_evidence(db: DB, week: str) -> WeekEvidence:
     repos, irrelevant = repo_members(db, week)
     members = {m.key: m for m in [*texts, *videos, *repos]}
     return WeekEvidence(week, members, {"no_card": no_card, "no_digest": no_digest, "irrelevant_repo": irrelevant})
+
+
+_LINE_LABEL = {"quote": "원문: ", "number": "(카드 수치, 위 원문에서 뽑음) ", "slide_fact": "발표 슬라이드 수치: "}
+_SKIP_KINDS = ("summary", "claim")  # 카드 요약·핵심 포인트는 원문이 아니라 작성자에게 주지 않음(리뷰 R2 계승)
+
+
+def _line(it: EvidenceItem) -> str | None:
+    if it.kind == "context":
+        return it.text  # 요약+타임라인(근거 id 없음, 참고용)
+    if it.kind in _SKIP_KINDS:
+        return None
+    v = f" [{it.value}{(' ' + it.unit) if it.unit else ''}]" if it.value else ""
+    return f"[{it.id}] {_LINE_LABEL.get(it.kind, '')}{it.text}{v}"
+
+
+def evidence_docs(pack: dict[str, list[EvidenceItem]]) -> list[Document]:
+    """근거 id마다 줄 하나, 구성원(member)마다 문서 하나(COMMON 6.1-4, S6-1 5.2 D-27, write.py가 씀). og:·it: 등
+    접두어가 섞여도 같은 member 문서에 함께 담긴다. 줄 순서는 구성원 안에서 Member.items 조립 순서 그대로."""
+    by_member: dict[str, list[EvidenceItem]] = {}
+    for items in pack.values():
+        for it in items:
+            by_member.setdefault(it.member, []).append(it)
+    docs = []
+    for member, items in by_member.items():
+        lines = [ln for it in items if (ln := _line(it)) is not None]
+        if not lines:
+            continue
+        src = items[0].source
+        docs.append(Document(id=member, source=src.get("site") or items[0].channel, title=src.get("title"),
+                             url=src.get("url"), text="\n".join(lines)))
+    return docs
 
 
 def pack_index(items: list[EvidenceItem]) -> dict[str, list[EvidenceItem]]:

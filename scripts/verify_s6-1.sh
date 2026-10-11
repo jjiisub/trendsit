@@ -63,22 +63,10 @@ pt A8 "export v2(head_tiles·sections·visual·slide·video_secs, C-2 단락 기
   tests/test_export.py tests/test_s5_weekly.py -k "a1_ or a2_ or a11_ or export_bars_events"
 pt A9 "build 토픽 v2(타일 0~4, 표·막대·사건 흐름, 슬라이드·영상 구간, 확인 필요 절+요약, 절 1개 토픽, 긴 heading)" tests/test_s6_1_site.py -k "a9_"
 
-# 관문 9의 미니 바(animation-timeline:view()) 측정은 브라우저 스크롤-구동 애니메이션 타이밍 의존으로 가끔
-# 깜빡인다(이 스펙과 무관한 기존 S6a 설계, 바닐라 코드로도 재현됨을 확인·리포트에 기록). 그 항목만이면 최대
-# 3회까지 다시 돌려 확인한다(값을 바꾸지 않고 같은 측정을 다시 함, 다른 FAIL이 있으면 바로 실패)
-bad=""
-for attempt in 1 2 3; do
-  if uv run --quiet python site_src/check.py --fixture >"$TMP/check" 2>&1; then c_rc=0; else c_rc=$?; fi
-  bad=$(grep '^FAIL' "$TMP/check" | grep -v '맨 위에서 미니 바가 보임' || true)
-  [ -n "$bad" ] && break
-  grep -q '^FAIL' "$TMP/check" || break
-done
-if [ -n "$bad" ]; then
-  fail A10 "check.py --fixture: $(echo "$bad" | tr '\n' ' ')"
-elif grep -q '^FAIL' "$TMP/check"; then
-  pass A10 "check.py --fixture(미니 바 측정만 가끔 깜빡임, 시도 $attempt/3, 다른 항목 전부 통과): $(tail -1 "$TMP/check")"
+if uv run --quiet python site_src/check.py --fixture >"$TMP/check" 2>&1; then
+  pass A10 "check.py --fixture 종료 코드 0: $(tail -1 "$TMP/check")"
 else
-  pass A10 "check.py --fixture 종료 코드 $c_rc: $(tail -1 "$TMP/check")"
+  fail A10 "check.py --fixture: $(grep '^FAIL' "$TMP/check" | tr '\n' ' ')"
 fi
 
 echo "== A11 회귀(시간이 걸림: verify_s6a.sh, verify_s6b.sh, verify_s5.sh --fast) =="

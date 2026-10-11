@@ -8,9 +8,13 @@ from __future__ import annotations
 
 import json
 import re
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
+from ..core import config
 from ..core.db import DB
+
+if TYPE_CHECKING:
+    from .evidence import EvidenceItem
 
 # 문장 경계: 줄바꿈 단위 우선, 줄 안에서는 .?!(또는 '다.') 뒤 공백. 소수점(3.7)·약어 뒤에 공백이 없으면 안 쪼갠다
 # (구현 시점 기본값 9장: 완벽한 한국어 문장 분리기는 아니다)
@@ -71,7 +75,7 @@ def slide_read_lines(db: DB, item_id: int, video_id: str) -> list[tuple[str, str
         d = json.loads(r["reading_json"])
         if d.get("frame_kind") != "slide":
             continue
-        sec = int(r["t"])
+        sec = round(r["t"])
         nums = "; ".join(f"{n.get('what', '')}: {n.get('value', '')}{n.get('unit', '')}" for n in d.get("numbers") or [])
         out.append((f"sl:{item_id}@{sec}", f"{d.get('title') or ''} | {(d.get('ocr_text') or '')[:500]} | {nums} | "
                                             f"표 {'있음' if d.get('table') else '없음'}"))
@@ -105,3 +109,35 @@ def video_context_text(digest: dict[str, Any]) -> str:
     lines = ["요약: " + (digest.get("summary") or ""), "타임라인:"]
     lines += [f"  {m['sec']}초 {m['label']}" + (" (슬라이드)" if m.get("slide") else "") for m in digest.get("timeline") or []]
     return "\n".join(lines)
+
+
+def raw_evidence(db: DB, eid: str, items: list[EvidenceItem]) -> str:
+    """검수자용 근거 원문(5.2, write.py가 씀): it:#s → 그 문장 ± 1문장, vd:@sec(transcript) → 그 묶음 그대로,
+    vd:@sec(slide_fact) → 기존 ±30초 전사 창, sl: → 판독 글자 전체, rp:#f → 그 사실 그대로."""
+    kind = items[0].kind if items else None
+    fallback = items[0].text if items else ""
+    if m := re.match(r"^it:(\d+)#s(\d+)$", eid):
+        item_id, n = int(m[1]), int(m[2])
+        row = db.conn.execute("SELECT text FROM item_texts WHERE item_id=?", (item_id,)).fetchone()
+        sents = sentences(row["text"]) if row and row["text"] else []
+        if sents and 1 <= n <= len(sents):
+            return " ".join(sents[max(0, n - 2): n + 1])
+        return fallback
+    if m := re.match(r"^sl:(\d+)@(\d+)$", eid):
+        video_id = db.conn.execute("SELECT video_id FROM videos WHERE item_id=?", (int(m[1]),)).fetchone()
+        if video_id:
+            fr = db.conn.execute("SELECT reading_json FROM video_frames WHERE video_id=? AND ABS(t-?)<0.5 "
+                                 "ORDER BY ABS(t-?) LIMIT 1", (video_id[0], float(m[2]), float(m[2]))).fetchone()
+            if fr and fr["reading_json"]:
+                return json.loads(fr["reading_json"]).get("ocr_text") or ""
+        return fallback
+    if kind == "slide_fact" and (m := re.match(r"^vd:(\d+)@(\d+)$", eid)):
+        item_id, sec_i = int(m[1]), int(m[2])
+        window_sec = config.load("video.yaml").align_window_sec
+        vid = db.conn.execute("SELECT video_id FROM videos WHERE item_id=?", (item_id,)).fetchone()
+        if vid:
+            segs = db.conn.execute('SELECT text FROM video_segments WHERE video_id=? AND "end">=? AND start<=? ORDER BY idx',
+                                   (vid[0], sec_i - window_sec, sec_i + window_sec)).fetchall()
+            if any(s["text"] for s in segs):
+                return " ".join(s["text"] for s in segs if s["text"])
+    return fallback
