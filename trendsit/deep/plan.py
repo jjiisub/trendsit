@@ -43,6 +43,7 @@ def video_candidates(db: DB, day: date, cfg: DeepConfig) -> list[VideoCandidate]
             "SELECT i.id, i.title, i.published_at, t.text AS description, v.video_id, v.duration_sec, "
             "v.manual_sub_langs, v.has_auto_sub, v.chapters_json FROM items i JOIN videos v ON v.item_id=i.id "
             "LEFT JOIN item_texts t ON t.item_id=i.id WHERE i.channel='video' AND i.day BETWEEN ? AND ? "
+            "AND v.video_id NOT IN (SELECT video_id FROM video_digests) "  # 이미 digest가 있는 영상은 다시 올리지 않음
             "ORDER BY i.published_at DESC, i.id", (lo, hi)):
         if not r["video_id"]:
             continue
@@ -81,8 +82,10 @@ def repo_candidates(ctx: Any, day: date, *, hype: bool = True) -> list[RepoCandi
     from .repo_agent import hype_check, rule_queue, trending_stats
 
     week = iso_week(day)
+    done = {r[0] for r in ctx.db.conn.execute("SELECT full_name FROM repo_cards WHERE week=?", (week,))}
     out = []
-    for q in rule_queue(ctx.db, week, REPO_CANDIDATES):
+    # 이미 그 주 카드가 있는 레포는 뺀 뒤 앞 REPO_CANDIDATES개(뺀 자리를 다음 후보가 채움)
+    for q in [q for q in rule_queue(ctx.db, week, 1000) if q.full_name not in done][:REPO_CANDIDATES]:
         st = trending_stats(ctx.db, week, q.full_name)
         h = None
         if hype:

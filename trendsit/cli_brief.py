@@ -7,6 +7,8 @@ import re
 import sys
 from typing import Any
 
+from .core.trace import Tracer
+
 WEEK = re.compile(r"^\d{4}-W\d{2}$")
 
 
@@ -16,13 +18,30 @@ def _week(v: str) -> str:
     return v
 
 
+def _guard_published(db: Any, week: str, force: bool) -> int | None:
+    """발행된 주는 --force 없이 다시 쓰지 않는다(종료 코드 2). --force면 발행을 푼다(status done, published_at NULL: C-3)."""
+    if not db.conn.execute("SELECT 1 FROM weeks WHERE week=? AND status='published'", (week,)).fetchone():
+        return None
+    if not force:
+        print("발행된 주: --force로 다시 실행", file=sys.stderr)
+        return 2
+    with db.conn:
+        db.conn.execute("UPDATE weeks SET status='done', published_at=NULL WHERE week=?", (week,))
+    return None
+
+
 def cmd_cluster(args: argparse.Namespace) -> int:
     from .brief.report import write_cluster_report, write_label_sheets
     from .brief.weekly import stage_cluster
     from .core import config
     from .core.context import open_ctx
 
-    ctx = open_ctx("weekly", spec=config.current_spec(args.spec, "S5"), no_cache=args.no_cache, note=f"cluster {args.week}")
+    # 발행 검사는 명령이 쓰는 DB 연결로. 거부하면 runs 행을 만들지 않도록 실행 기록은 검사 뒤에 연다
+    ctx = open_ctx(None, spec=config.current_spec(args.spec, "S5"), no_cache=args.no_cache)
+    if (refused := _guard_published(ctx.db, args.week, getattr(args, "force", False))) is not None:
+        return refused
+    if ctx.tracer is None:
+        ctx.tracer = Tracer(ctx.db, "weekly", ctx.spec, f"cluster {args.week}")
     status = "ok"
     try:
         stage = stage_cluster(args.week, ctx, use_llm=not args.no_llm)
@@ -57,9 +76,12 @@ def cmd_weekly(args: argparse.Namespace) -> int:
     until = getattr(args, "step", None)  # select/write/review 단계 명령
     until = until if until in ("select", "write") else None
     from_step = args.from_step
-    ctx = open_ctx("weekly", spec=config.current_spec(args.spec, "S5"), no_cache=args.no_cache,
-                   note=f"weekly {args.week} from {from_step}" + (f" until {until}" if until else "")
-                   + (f" topic {args.topic}" if getattr(args, "topic", None) else ""))
+    ctx = open_ctx(None, spec=config.current_spec(args.spec, "S5"), no_cache=args.no_cache)
+    if (refused := _guard_published(ctx.db, args.week, getattr(args, "force", False))) is not None:
+        return refused
+    if ctx.tracer is None:
+        ctx.tracer = Tracer(ctx.db, "weekly", ctx.spec, f"weekly {args.week} from {from_step}" + (f" until {until}" if until else "")
+                            + (f" topic {args.topic}" if getattr(args, "topic", None) else ""))
     status = "ok"
     try:
         summary = run_weekly(args.week, ctx, from_step=from_step, only_topic=getattr(args, "topic", None), until=until)
@@ -91,6 +113,7 @@ def register(sub: Any) -> None:
                    help="앞 단계는 이 주의 현재판 run에서 읽고 새 run으로 이어서")
     w.add_argument("--topic", help="한 토픽만(write·review)")
     w.add_argument("--no-cache", action="store_true")
+    w.add_argument("--force", action="store_true", help="발행된 주도 다시 실행(발행은 publish로 따로)")
     w.add_argument("--spec")
     w.set_defaults(fn=cmd_weekly)
     for step, help_ in (("select", "편집장 선별까지(현재판 묶기에서)"), ("write", "작성자 초안 + 코드 검사까지(검수자 없음)"),
@@ -99,6 +122,7 @@ def register(sub: Any) -> None:
         sp.add_argument("--week", type=_week, required=True)
         sp.add_argument("--topic")
         sp.add_argument("--no-cache", action="store_true")
+        sp.add_argument("--force", action="store_true", help="발행된 주도 다시 실행")
         sp.add_argument("--spec")
         sp.set_defaults(fn=cmd_weekly, step=step, from_step=step)
     c = sub.add_parser("cluster", help="주간 묶기(S5): 근거 목록 → 표기 정규화 → 묶기 → 과거 대조 → 묶기 리포트")
@@ -106,5 +130,6 @@ def register(sub: Any) -> None:
     c.add_argument("--no-llm", action="store_true", help="decide를 부르지 않음(경계 쌍은 묶지 않음, 0원)")
     c.add_argument("--note", help="리포트 머리에 남길 메모(예: 수집 범위)")
     c.add_argument("--no-cache", action="store_true")
+    c.add_argument("--force", action="store_true", help="발행된 주도 다시 실행(발행은 publish로 따로)")
     c.add_argument("--spec")
     c.set_defaults(fn=cmd_cluster)

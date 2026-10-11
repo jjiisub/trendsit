@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+from datetime import date
 from pathlib import Path
 from typing import Annotated, Any, Literal
 
@@ -267,6 +268,28 @@ class DeepConfig(Strict):
         return self
 
 
+# ---------- ops.yaml (S6b 자동 실행) ----------
+PosInt = Annotated[int, Field(gt=0, strict=True)]  # bool·실수·문자열 거부
+
+
+class OpsConfig(Strict):
+    start_day: date  # 따라잡기의 가장 이른 날(날짜 또는 YYYY-MM-DD 문자열만)
+    max_catchup_days: PosInt
+    weekly_lock_wait_min: PosInt  # 주간 실행이 밤 실행 끝을 기다리는 최대 시간(분)
+    step_timeout_min: PosInt  # 단계 하위 프로세스 상한(분). 넘기면 그 단계 실패로 기록하고 다음 단계로
+    video_timeout_min: PosInt  # video run 단계(큐 전체)
+    weekly_timeout_min: PosInt  # weekly 단계
+
+    @field_validator("start_day", mode="before")
+    @classmethod
+    def _date_only(cls, v: Any) -> Any:
+        if isinstance(v, str):
+            return date.fromisoformat(v)  # 형식이 틀리면 ValueError → 검증 오류
+        if type(v) is not date:  # 정수(타임스탬프), datetime 등
+            raise ValueError("날짜(YYYY-MM-DD)여야 함")
+        return v
+
+
 FILES: dict[str, type[BaseModel]] = {
     "models.yaml": ModelsConfig,
     "budget.yaml": BudgetConfig,
@@ -277,6 +300,7 @@ FILES: dict[str, type[BaseModel]] = {
     "deep.yaml": DeepConfig,  # S3
     "video.yaml": VideoConfig,  # S4
     "brief.yaml": BriefConfig,  # S5
+    "ops.yaml": OpsConfig,  # S6b
 }
 
 

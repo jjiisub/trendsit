@@ -1,0 +1,8 @@
+# S6b 자동 실행 설정(S6b 소유). check-config가 검증한다
+start_day: 2026-10-12        # 따라잡기의 가장 이른 날(W42 시작). 이전 날은 손으로 돌렸음
+max_catchup_days: 7
+weekly_lock_wait_min: 240    # 주간 실행이 밤 실행 끝을 기다리는 최대 시간
+# 단계 하위 프로세스 상한(분). 멈춘 단계가 잠금을 쥔 채 이후 실행을 막지 않게 한다. 넘기면 그 단계는 실패로 기록하고 다음 단계로
+step_timeout_min: 60         # collect, filter, summarize, plan, deep text, repo-analyze, 빌드. 하루치 정상 실행은 수 분
+video_timeout_min: 240       # 영상 큐 전체. 영상 예산(deep.yaml video_minutes 90분) 처리에 영상 한 편이 15분 안팎 걸린 실측의 여유
+weekly_timeout_min: 120      # 주간 브리핑(묶기, 선별, 토픽마다 작성 ⇄ 검수)

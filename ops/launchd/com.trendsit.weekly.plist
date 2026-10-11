@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- 자동 실행 (weekly). 설치: README "자동 실행". 잠든 사이 놓친 실행은 깨어날 때 한 번 돈다(꺼져 있던 동안은 안 돎) -->
+<plist version="1.0"><dict>
+  <key>Label</key><string>com.trendsit.weekly</string>
+  <key>ProgramArguments</key><array>
+    <string>/bin/bash</string><string>/Users/jiseop/Claude/projects/trendsit-run/scripts/run_ops.sh</string><string>weekly</string>
+  </array>
+  <key>StartCalendarInterval</key><dict>
+    <key>Weekday</key><integer>1</integer><key>Hour</key><integer>7</integer><key>Minute</key><integer>0</integer>
+  </dict>
+  <key>StandardOutPath</key><string>/Users/jiseop/Claude/projects/trendsit-run/data/logs/ops/launchd.log</string>
+  <key>StandardErrorPath</key><string>/Users/jiseop/Claude/projects/trendsit-run/data/logs/ops/launchd.log</string>
+</dict></plist>

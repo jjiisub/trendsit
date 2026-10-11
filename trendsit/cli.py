@@ -177,7 +177,7 @@ def cmd_cost(args: argparse.Namespace) -> int:
               f"{r['tokens_out']} | {r['cost']:.6f}{est} |")
     print(f"| 합계 | | | | | | {total:.6f} |")
     b = ctx.budget
-    cap = b.cfg.specs.get(ctx.spec)
+    cap = b.spec_cap
     print()
     print(f"- 스펙 {ctx.spec}: 기록 합 ${ctx.db.spent(ctx.spec):.6f} / 상한 ${cap:.2f}")
     if b.source == "key":
@@ -342,6 +342,7 @@ def main(argv: list[str] | None = None) -> int:
     _register(sub, "cli_text")  # S2~S3
     _register(sub, "cli_video")  # S4
     _register(sub, "cli_brief")  # S5
+    _register(sub, "cli_ops")  # S6b
 
     args = p.parse_args(argv)
     try:
