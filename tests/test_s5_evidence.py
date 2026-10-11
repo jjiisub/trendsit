@@ -12,7 +12,7 @@ from trendsit.brief.evidence import EvidenceItem, Member, cap_pack, week_evidenc
 from trendsit.core import config
 from trendsit.core.db import DB
 
-ID = re.compile(r"^(it:\d+(#q\d+)?|og:\d+#q\d+|vd:\d+(@\d+)?|rp:[\w.-]+/[\w.-]+)$")
+ID = re.compile(r"^(it:\d+(#q\d+)?|og:\d+#q\d+|vd:\d+(@\d+|#ctx)?|sl:\d+@\d+|rp:[\w.-]+/[\w.-]+(#f\d+)?)$")
 
 
 def _card(n_quotes: int = 2, relevance: str = "high", entities=("OpenAI",)) -> str:
@@ -129,19 +129,23 @@ def test_numbers_inside_names_block_spelling_only_approval():
     assert not t.approved()
 
 
+def _v2_page(text: str, summary: str = "s다."):
+    from trendsit.core.artifacts_brief import Para, Section, TopicPage
+
+    return TopicPage(head_tiles=[], sections=[Section(heading="h", paragraphs=[Para(text=text, refs=["it:1#q1"])],
+                                                      visual="none")], summary=summary, title="t", log="l")
+
+
 def test_alias_replacement_respects_word_boundaries():
     from trendsit.brief import checks
-    from trendsit.core.artifacts_brief import Point, TopicPage
 
-    p = TopicPage(points=[Point(text="Aider와 AI 도구 비교 정리 내용", refs=["r"])], numbers=[], events=[], contributions=[],
-                  concepts=[], overview="o다.", summary="s다.", title="t", log="l")
-    fixed, _ = checks.autofix(p, config.load("brief.yaml"), {"AI": "인공지능"})
-    assert fixed.points[0].text == "Aider와 인공지능 도구 비교 정리 내용"
+    p = _v2_page("Aider와 AI 도구 비교 정리 내용")
+    fixed, _ = checks.autofix(p, config.load("brief.yaml"), {"AI": "인공지능"}, [], set(), 10)
+    assert fixed.sections[0].paragraphs[0].text == "Aider와 인공지능 도구 비교 정리 내용"
 
 
 def test_r11_transliteration_aliases_and_autofix():
     from trendsit.brief import checks
-    from trendsit.core.artifacts_brief import Point, TopicPage
 
     tr = {"Luna": "루나", "Flash": "플래시", "DeepSeek": "딥시크"}
     ms = [Member(f"it:{i}", "text", "", "", "", "high", [n], [], {})
@@ -155,8 +159,6 @@ def test_r11_transliteration_aliases_and_autofix():
         assert pat.sub("X", f"{text}가 나왔다") == "X가 나왔다"
     assert al.translit_pattern("Sol", {"Sol": "솔"}).sub("X", "솔루션과 솔은") == "솔루션과 X은"  # 낱말 안은 아님
     assert al.to_original("클로드 소네트 5.5", {"Claude": "클로드", "Sonnet": "소넷|소네트"}) == "Claude Sonnet 5.5"
-    page = TopicPage(points=[Point(text="딥시크-V4.1 플래시 공개, 가격 인하함", refs=["it:1#q1"])], numbers=[], events=[],
-                     contributions=[], concepts=[], overview="a다. b다.", summary="딥시크-V4.1 플래시가 나왔다.", title="t",
-                     log="l", attention=False)
-    fixed, _ = checks.autofix(page, config.load("brief.yaml"), {}, translit=canon_pat)
-    assert fixed.summary == "DeepSeek V4.1 Flash가 나왔다." and fixed.points[0].text.startswith("DeepSeek V4.1 Flash")
+    page = _v2_page("딥시크-V4.1 플래시 공개, 가격 인하함", "딥시크-V4.1 플래시가 나왔다.")
+    fixed, _ = checks.autofix(page, config.load("brief.yaml"), {}, [], set(), 10, translit=canon_pat)
+    assert fixed.summary == "DeepSeek V4.1 Flash가 나왔다." and fixed.sections[0].paragraphs[0].text.startswith("DeepSeek V4.1 Flash")

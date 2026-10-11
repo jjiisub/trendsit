@@ -1,0 +1,306 @@
+"""S6-1 S-2: TopicPage v2 스키마·코드 검사·수정 합치기·근거 조립(5.2~5.6). A3~A7."""
+
+from __future__ import annotations
+
+import pytest
+from pydantic import ValidationError
+
+from trendsit.brief import checks, fulltext, revision, slides
+from trendsit.brief.evidence import EvidenceItem, pack_index
+from trendsit.brief.write import evidence_docs, refs_of
+from trendsit.core import config
+from trendsit.core.artifacts_brief import (
+    BarGroup,
+    Change,
+    EventGroup,
+    EventItem,
+    NumberItem,
+    Para,
+    Section,
+    Table,
+    Tile,
+    TopicPage,
+    TopicPageRevision,
+)
+from trendsit.core.db import DB
+
+CFG = config.load("brief.yaml")
+
+
+def para(text="문장이다.", refs=("it:1#s1",)):
+    return Para(text=text, refs=list(refs))
+
+
+def section(**over):
+    base = dict(heading="절 제목", paragraphs=[para()], visual="none", bars=None, table=None, tiles=[], events=None,
+               slide=None, slide_caption="", video_secs=[], check=False)
+    base.update(over)
+    return Section(**base)
+
+
+def page(**over):
+    base = dict(head_tiles=[], sections=[section()], summary="사건이다. 쟁점이다.", title="제목", log="l", attention=False)
+    base.update(over)
+    return TopicPage(**base)
+
+
+def pack(**extra):
+    src = {"site": "GeekNews", "title": "t", "date": "2026-10-06"}
+    base = {"it:1#s1": [EvidenceItem("it:1#s1", "it:1", "text", "sentence", "원문 문장이다. 비율은 20%다.", src)]}
+    base.update(extra)
+    return base
+
+
+def three_sections(**over_first):
+    return [section(**over_first), section(heading="둘째 절"), section(heading="셋째 절")]
+
+
+# ---------- A3: 스키마 ----------
+def test_topic_page_v2_schema_matches_spec_example():
+    p = page(head_tiles=[Tile(value="90%", label="가격 인하율", note="기준", refs=["it:1#s1"])],
+             sections=[section(heading="제목", paragraphs=[para()], visual="table",
+                               table=Table(title="표", note="", columns=["a", "b"], rows=[["1", "2"], ["3", "4"]],
+                                          refs=["it:1#s1"]))])
+    assert p.sections[0].visual == "table" and p.sections[0].table.columns == ["a", "b"]
+    with pytest.raises(ValidationError):
+        Section(heading="x", paragraphs=[para()], visual="none", extra_field=1)  # extra=forbid
+
+
+def test_enforce_clears_writer_check_true():
+    p = page(sections=[section(check=True)])
+    out = p.enforce(None, None)
+    assert out.sections[0].check is False
+    assert out.enforced and out.enforced[0]["owned"] is True
+
+
+# ---------- A4: 근거 공급 ----------
+def test_fulltext_sentences_split_on_newline_and_terminal_punct():
+    text = "첫 문장이다. 둘째 문장이다!\n새 줄 문장이다?"
+    assert fulltext.sentences(text) == ["첫 문장이다.", "둘째 문장이다!", "새 줄 문장이다?"]
+
+
+def test_fulltext_cap_sentences_keeps_at_least_one():
+    assert fulltext.cap_sentences(["가" * 100], 10) == ["가" * 100]
+    assert fulltext.cap_sentences(["가" * 10, "나" * 10], 15) == ["가" * 10]
+
+
+def test_article_lines_builds_sentence_ids_and_missing_text_flag(tmp_path):
+    db = DB(tmp_path / "t.db")
+    db.conn.execute("INSERT INTO items(id, source_id, channel, external_id, url, title, day, week) VALUES "
+                    "(1,'s','text','e','http://x','t','2026-10-06','2026-W41')")
+    db.conn.execute("INSERT INTO item_texts(item_id, text) VALUES (1, '첫 문장이다. 둘째 문장이다.')")
+    lines, no_text = fulltext.article_lines(db, 1, 10000)
+    assert lines == [("it:1#s1", "첫 문장이다."), ("it:1#s2", "둘째 문장이다.")] and not no_text
+    lines2, no_text2 = fulltext.article_lines(db, 99, 10000)
+    assert lines2 == [] and no_text2
+
+
+def test_repo_fact_lines_order_fact_then_trending_then_release():
+    card = {"evidence": [{"fact": "하는 일"}, {"fact": "별 1.6k"}], "why_trending": "릴리스 때문",
+            "release": {"tag": "v1", "date": "2026-10-01", "line": "첫 출시"}}
+    out = fulltext.repo_fact_lines("a/b", card)
+    assert [eid for eid, _ in out] == ["rp:a/b#f1", "rp:a/b#f2", "rp:a/b#f3", "rp:a/b#f4"]
+    assert "뜨는 이유" in out[2][1] and "릴리스 v1" in out[3][1]
+
+
+def test_evidence_docs_groups_by_member_one_document():
+    p = pack()
+    p["it:1#s2"] = [EvidenceItem("it:1#s2", "it:1", "text", "sentence", "둘째 문장.", {"site": "GeekNews", "title": "t"})]
+    docs = evidence_docs(p)
+    assert len(docs) == 1 and docs[0].id == "it:1"
+    assert "[it:1#s1]" in docs[0].text and "[it:1#s2]" in docs[0].text
+
+
+def test_evidence_docs_skips_summary_and_claim_kinds():
+    p = {"vd:1": [EvidenceItem("vd:1", "vd:X", "video", "summary", "요약", {})]}
+    assert evidence_docs(p) == []
+
+
+# ---------- A5: 코드 검사 ----------
+def test_check_passes_good_page():
+    p = page(sections=three_sections())
+    assert checks.check(p, pack(), 1, CFG) == []
+
+
+def test_check_rejects_wrong_ref():
+    p = page(sections=[section(paragraphs=[para(refs=["it:99#s1"])])])
+    issues = checks.check(p, pack(), 1, CFG)
+    assert any(i.type == "wrong_ref" for i in issues)
+
+
+def test_check_rejects_number_mismatch():
+    p = page(sections=three_sections(paragraphs=[para(text="비율은 90%다.")]))
+    issues = checks.check(p, pack(), 1, CFG)
+    assert any(i.type == "number_mismatch" for i in issues)
+
+
+def test_check_rejects_visual_bars_without_bars_field():
+    p = page(sections=three_sections(visual="bars", bars=None))
+    issues = checks.check(p, pack(), 1, CFG)
+    assert any(i.type == "format" and "visual" in i.comment for i in issues)
+
+
+def test_check_accepts_valid_bars_group():
+    bars_pack = pack(**{"it:1#s2": [EvidenceItem("it:1#s2", "it:1", "text", "sentence", "A는 10%, B는 20%.", {"site": "x"})]})
+    p = page(sections=three_sections(visual="bars", paragraphs=[para(refs=["it:1#s2"])],
+                                     bars=BarGroup(title="A vs B", context="비교", unit="%",
+                                                  items=[NumberItem(label="A", value="10%", ref="it:1#s2"),
+                                                         NumberItem(label="B", value="20%", ref="it:1#s2")])))
+    assert checks.check(p, bars_pack, 1, CFG) == []
+
+
+def test_autofix_fixes_slide_candidates_and_video_secs():
+    p = page(sections=[section(slide="sl:1@999", video_secs=[1, 2, 3])])
+    fixed, fixes = checks.autofix(p, CFG, {}, ["sl:1@50"], {1, 2}, 10)
+    assert fixed.sections[0].slide is None and fixed.sections[0].video_secs == [1, 2]
+    assert any("slide_candidates" in f["rule"] for f in fixes)
+
+
+def test_autofix_cuts_sections_from_the_end():
+    p = page(sections=[section(heading="a"), section(heading="b"), section(heading="c")])
+    fixed, fixes = checks.autofix(p, CFG, {}, [], set(), 2)
+    assert [s.heading for s in fixed.sections] == ["a", "b"]
+    assert any("sections" in f["loc"] for f in fixes)
+
+
+def test_page_refs_covers_head_tiles_and_section_kinds():
+    p = page(head_tiles=[Tile(value="1", label="l", refs=["it:1#s1"])],
+             sections=[section(visual="events", paragraphs=[para()],
+                               events=EventGroup(title="t", context="c", items=[
+                                   EventItem(date="2026-10-01", text="a", ref="it:1#s1"),
+                                   EventItem(date="2026-10-02", text="b", ref=None, topic_id="w40-x")]))])
+    slots = checks.page_refs(p)
+    locs = {s.loc for s in slots}
+    assert "head_tiles[0]" in locs and "sections[0].events.items[0]" in locs
+    assert any(s.loc == "sections[0].events.items[1]" and s.refs == [] for s in slots)
+
+
+def test_refs_of_order_point_before_number():
+    p = page(sections=[section(visual="bars", paragraphs=[para(refs=["it:1#s1"])],
+                               bars=BarGroup(title="t", context="", unit="%",
+                                            items=[NumberItem(label="a", value="1%", ref="it:1#s2"),
+                                                   NumberItem(label="b", value="2%", ref="it:1#s3")]))])
+    assert refs_of(p) == ["it:1#s1", "it:1#s2", "it:1#s3"]
+
+
+# ---------- A6: 라운드·수정 ----------
+def test_apply_revision_only_touches_flagged_loc():
+    prev = page(sections=[section(heading="원래"), section(heading="둘째")])
+    rev = TopicPageRevision(changed=[
+        Change(issue_idx=0, loc="sections[0].heading", action="edit", value="고침"),
+        Change(issue_idx=0, loc="sections[1].heading", action="edit", value="몰래 바꿈"),
+    ], log="l")
+    new, reverts, notes = revision.apply_revision(prev, rev, {"sections[0]"})
+    assert new.sections[0].heading == "고침" and new.sections[1].heading == "둘째"
+    assert reverts == 1 and "지적 안 된" in notes[0]
+
+
+def test_apply_revision_section_add_and_delete():
+    prev = page(sections=[section(heading="a"), section(heading="b")])
+    rev = TopicPageRevision(changed=[Change(issue_idx=0, loc="sections[1]", action="delete", value=None)], log="l")
+    new, reverts, notes = revision.apply_revision(prev, rev, {"sections[1]"})
+    assert len(new.sections) == 1 and reverts == 0, notes
+
+
+def test_apply_revision_rejects_deleting_all_sections():
+    prev = page(sections=[section(heading="only")])
+    rev = TopicPageRevision(changed=[Change(issue_idx=0, loc="sections[0]", action="delete", value=None)], log="l")
+    new, _reverts, notes = revision.apply_revision(prev, rev, {"sections[0]"})
+    assert len(new.sections) == 1 and any("전체 삭제는 받지 않음" in n for n in notes)
+
+
+def test_apply_revision_bars_item_edit():
+    prev = page(sections=[section(visual="bars", bars=BarGroup(title="t", context="", unit="%",
+                                                                items=[NumberItem(label="a", value="1%", ref="it:1#s1"),
+                                                                      NumberItem(label="b", value="2%", ref="it:1#s1")]))])
+    rev = TopicPageRevision(changed=[Change(issue_idx=0, loc="sections[0].bars.items[0]", action="edit",
+                                            value=NumberItem(label="a", value="10%", ref="it:1#s1"))], log="l")
+    new, reverts, notes = revision.apply_revision(prev, rev, {"sections[0]"})
+    assert new.sections[0].bars.items[0].value == "10%" and reverts == 0, notes
+
+
+def test_normalize_loc_fixes_one_based_index():
+    p = page(sections=[section(heading="a")])
+    assert revision.normalize_loc(p, "sections[1]") == "sections[0]"
+
+
+# ---------- A7: 슬라이드 ----------
+def test_slide_candidates_short_lines_with_numbers():
+    slide = {"sec": 100, "frame_kind": "slide", "title": "t", "ocr_text": "\n".join(f"line{i}" for i in range(20)),
+            "numbers": [{"value": "1"}], "table": None}
+    assert slides.candidates(7, [slide], 2) == ["sl:7@100"]
+
+
+def test_slide_candidates_table_qualifies():
+    slide = {"sec": 50, "frame_kind": "slide", "title": "", "ocr_text": "", "numbers": [], "table": [["a"]]}
+    assert slides.candidates(7, [slide], 2) == ["sl:7@50"]
+
+
+def test_slide_candidates_excludes_non_slide_and_duplicate_titles():
+    s1 = {"sec": 10, "frame_kind": "slide", "title": "같은 제목", "ocr_text": "", "numbers": [], "table": [["a"]]}
+    s2 = {"sec": 20, "frame_kind": "slide", "title": "같은 제목", "ocr_text": "", "numbers": [], "table": [["a"]]}
+    s3 = {"sec": 5, "frame_kind": "demo", "title": "", "ocr_text": "", "numbers": [], "table": [["a"]]}
+    assert slides.candidates(7, [s1, s2, s3], 2) == ["sl:7@10"]
+
+
+def test_slide_candidates_respects_max():
+    many = [{"sec": i, "frame_kind": "slide", "title": str(i), "ocr_text": "", "numbers": [], "table": [["a"]]}
+           for i in range(5)]
+    assert len(slides.candidates(7, many, 2)) == 2
+
+
+def test_place_candidate_prefers_preceding_timeline_section():
+    placed = slides.place_candidate(sec=100, timeline_secs=[0, 90, 200], section_video_secs=[[0], [90]],
+                                    section_has_video=[True, True], taken=set())
+    assert placed == 1
+
+
+def test_place_candidate_falls_back_to_first_video_section():
+    placed = slides.place_candidate(sec=5, timeline_secs=[], section_video_secs=[[], []],
+                                    section_has_video=[False, True], taken=set())
+    assert placed == 1
+
+
+# ---------- B8: writer_limits ----------
+def test_writer_limits_follow_source_count_and_brief_yaml():
+    from trendsit.brief.write import writer_limits
+
+    assert writer_limits(CFG, 1).sections == (3, 5) and writer_limits(CFG, 2).sections == (4, 7)
+    full = writer_limits(CFG, 2)
+    assert full.summary_sentences == (1, 2) and full.summary_chars_max == 200
+    assert full.head_tiles_max == 4 and full.visuals_max == 4 and full.slides_max == 2
+    tuned = CFG.model_copy(deep=True)  # 값이 md가 아니라 brief.yaml에서 옴
+    tuned.write.sections.single_source = (1, 2)
+    assert writer_limits(tuned, 1).sections == (1, 2)
+
+
+def test_writer_limits_required_in_writer_input():
+    from pydantic import ValidationError
+
+    from trendsit.core.artifacts_brief import PlanBrief, Relation, WriterInput
+
+    plan_ = PlanBrief(rank=1, angle="a", relation=Relation(type="new", topic_id=None))
+    with pytest.raises(ValidationError, match="limits"):
+        WriterInput(plan=plan_, evidence=[], previous=None, aliases=[])
+
+
+# ---------- B9: loc_lines 렌더에 중복 없음 ----------
+def test_render_no_page_dup():
+    """검수자·수정 입력에 같은 단락 문장이 loc_lines로 한 번만(page·previous는 코드만 씀)."""
+    from trendsit.core.artifacts_brief import CriticInput, IndexedIssue, WriterReviseInput, loc_lines
+    from trendsit.core.render import render_data
+
+    p = page()
+    sentence = p.sections[0].paragraphs[0].text
+    critic = CriticInput(loc_lines=loc_lines(p), page=p, evidence=[], angle="a", code_warnings=[], round=1)
+    revise = WriterReviseInput(loc_lines=loc_lines(p), previous=p, evidence=[], aliases=[],
+                               issues=[IndexedIssue(idx=0, loc="sections[0].paragraphs[0]", type="format",
+                                                    evidence_id=None, comment="c", hint="h")])
+    assert render_data(critic).count(sentence) == 1 and render_data(revise).count(sentence) == 1
+    assert critic.page is p and revise.previous is p
+
+
+def test_pack_index_groups_by_exact_id():
+    items = [EvidenceItem("it:1#s1", "it:1", "text", "sentence", "a", {}), EvidenceItem("it:1#s2", "it:1", "text", "sentence", "b", {})]
+    idx = pack_index(items)
+    assert set(idx) == {"it:1#s1", "it:1#s2"}

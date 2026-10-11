@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import json
 import os
-import re
 from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Any
@@ -60,9 +59,10 @@ def _topics(db: DB, week: str, run_id: str) -> list[dict[str, Any]]:
     for r in rows.fetchall():
         t = export_topic(db, run_id, r["topic_id"], srcs)
         ids = {s["id"] for s in t["sources"]}
-        for i, p in enumerate(t["points"]):
-            if not p["refs"] or not set(p["refs"]) <= ids:
-                raise ExportError(f"C-2 위반: {t['id']} points[{i}] refs={p['refs']} (출처 {sorted(ids)})")
+        for i, s in enumerate(t["sections"]):
+            for j, p in enumerate(s["paragraphs"]):
+                if not p["refs"] or not set(p["refs"]) <= ids:
+                    raise ExportError(f"C-2 위반: {t['id']} sections[{i}].paragraphs[{j}] refs={p['refs']} (출처 {sorted(ids)})")
         out.append(t)
     return out
 
@@ -95,8 +95,8 @@ def _repos(db: DB, week: str, run_id: str, topics: list[dict[str, Any]]) -> list
 
 
 def _page_checks(t: dict[str, Any]) -> list[str]:
-    """포인트 밖에서 화면에 표시되는 확인 필요 위치(build의 shown_checks와 같은 규칙)."""
-    return [c for c in t.get("checks", []) if c in ("overview", "summary") or re.fullmatch(r"concepts\[\d+\]", c)]
+    """절 밖에서 화면에 표시되는 확인 필요 위치(build의 shown_checks와 같은 규칙, S6-1 v2: summary·title만)."""
+    return [c for c in t.get("checks", []) if c in ("summary", "title")]
 
 
 # ---------- 실행 기록(5.6) ----------
@@ -279,7 +279,7 @@ def build(db: DB, with_week: str | None = None) -> dict[str, Any]:
         approx = db.conn.execute("SELECT EXISTS(SELECT 1 FROM repo_trending t JOIN runs x ON x.id=t.run_id WHERE t.week=? AND x.note=?)",
                                  (wk, APPROX_NOTE)).fetchone()[0]
         members[wk] = _used_members(db, wk, r["current_run_id"], [t["id"] for t in ts])
-        counts[wk] = (len(ts), sum(bool(p.get("check")) for t in ts for p in t["points"]) + sum(len(_page_checks(t)) for t in ts))
+        counts[wk] = (len(ts), sum(bool(s.get("check")) for t in ts for s in t["sections"]) + sum(len(_page_checks(t)) for t in ts))
         cited = {(s["channel"], s["url"] or s["title"]) for t in ts for s in t["sources"]}
         weeks.append({"id": week_id(wk), "label": label, "range": rng,
                       "published_at": r["published_at"] or now_kst(), "collected": collected, "topic_ids": [t["id"] for t in ts],

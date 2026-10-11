@@ -256,7 +256,7 @@ def compute_summary(db: DB, run_id: str) -> dict[str, Any]:
         r = db.conn.execute("SELECT page_json FROM topic_pages WHERE run_id=? AND topic_id=? ORDER BY round DESC LIMIT 1",
                             (run_id, t["topic_id"])).fetchone()
         if r:
-            check_points += sum(1 for p in json.loads(r["page_json"]).get("points", []) if p.get("check"))
+            check_points += sum(1 for s in json.loads(r["page_json"]).get("sections", []) if s.get("check"))
     writers = _detail(db, run_id, "writer")
     cost = {k: round(float(db.conn.execute("SELECT COALESCE(SUM(cost_usd),0) FROM steps WHERE run_id=? AND role=?",
                                            (run_id, k)).fetchone()[0] or 0), 6) for k in ROLES}

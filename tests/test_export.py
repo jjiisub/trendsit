@@ -9,13 +9,12 @@ from pathlib import Path
 import pytest
 
 from trendsit.core.artifacts_brief import (
-    Concept,
-    Contribution,
+    BarGroup,
     EventGroup,
     EventItem,
-    NumberGroup,
     NumberItem,
-    Point,
+    Para,
+    Section,
     TopicPage,
 )
 from trendsit.core.db import DB
@@ -32,18 +31,18 @@ def _spec(path: str, name: str):
 
 
 def page(title: str, n_points: int = 3, check_first: bool = False) -> str:
-    pts = [Point(text=f"포인트 {i}", refs=r, check=check_first and i == 0)
-           for i, r in enumerate([["it:1#q1"], ["it:2#q1"], ["it:1#q2", "rp:a/b"]][:n_points])]
-    return TopicPage(
-        log="x", points=pts, title=title, summary="요약이다.", overview="개요다.",
-        numbers=[NumberGroup(anchor=1, group="g", title="수치", context="맥락", unit="%",
-                             items=[NumberItem(label="가", value="10%", ref="it:1#q1", emphasis=True),
-                                    NumberItem(label="나", value=5, ref="it:2#q1", baseline=True)])],
-        events=[EventGroup(anchor=2, title="흐름", context="맥락", items=[
-            EventItem(date="2026-10-06", text="사건", ref="it:1#q1", topic_id=None),
-            EventItem(date="2026-09-29", text="지난 사건", ref=None, topic_id="w40-x")])],
-        contributions=[Contribution(channel="text", text="글에서 더한 것", refs=["it:1#q1"])],
-        concepts=[Concept(term="용어", desc="설명")]).model_dump_json()
+    paras = [Para(text=f"문장 {i}", refs=r)
+             for i, r in enumerate([["it:1#q1"], ["it:2#q1"], ["it:1#q2", "rp:a/b"]][:n_points])]
+    sections = [Section(heading="절 하나", paragraphs=paras[:2] or [paras[0]], visual="bars", check=check_first,
+                        bars=BarGroup(title="수치", context="맥락", unit="%",
+                                     items=[NumberItem(label="가", value="10%", ref="it:1#q1", emphasis=True),
+                                            NumberItem(label="나", value=5, ref="it:2#q1", baseline=True)]))]
+    if len(paras) > 2:
+        sections.append(Section(heading="절 둘", paragraphs=[paras[2]], visual="events",
+                                events=EventGroup(title="흐름", context="맥락", items=[
+                                    EventItem(date="2026-10-06", text="사건", ref="it:1#q1", topic_id=None),
+                                    EventItem(date="2026-09-29", text="지난 사건", ref=None, topic_id="w40-x")])))
+    return TopicPage(log="x", head_tiles=[], sections=sections, title=title, summary="요약이다. 쟁점이다.").model_dump_json()
 
 
 def make_db(tmp_path: Path, published: tuple[str, ...] = ("2026-W41",)) -> DB:
@@ -112,7 +111,7 @@ def make_db(tmp_path: Path, published: tuple[str, ...] = ("2026-W41",)) -> DB:
 
     topic("r40", "w40-x", "2026-W40", 1, "W40 토픽", n_points=2)
     topic("r41", "w41-a", "2026-W41", 1, "첫 토픽")
-    topic("r41", "w41-b", "2026-W41", 2, "둘째 토픽", "follow_up", "w40-x", '["points[0]"]', check_first=True)
+    topic("r41", "w41-b", "2026-W41", 2, "둘째 토픽", "follow_up", "w40-x", '["sections[0]"]', check_first=True)
     c.commit()
     return db
 
@@ -136,7 +135,8 @@ def test_a1_structure_and_only_published(tmp_path):
     assert "cross_checked" not in t["w41-a"]
     for x in site["topics"]:  # C-2
         ids = {s["id"] for s in x["sources"]}
-        assert all(p["refs"] and set(p["refs"]) <= ids for p in x["points"])
+        for sec in x["sections"]:
+            assert all(p["refs"] and set(p["refs"]) <= ids for p in sec["paragraphs"])
     assert [(r["name"], r["stars_7d"], r["signal"], r["what"], r["topic_id"]) for r in site["repos"]] == [
         ("a/b", "+1.6k", "release", "에이비 도구", "w41-a")]
     assert "ghost" not in {s["id"] for s in site["sources"]}  # sources.yaml에 없는 소스는 제외
