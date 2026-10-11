@@ -14,3 +14,6 @@ __pycache__/
 
 # impl-workflow 런 디렉터리(증적·원장). 남길 것은 reports/로 옮긴다
 .workflow/
+
+# S6-1 샘플 사이트(사람이 보는 용도, site_src/build.py --data tests/fixtures/s6_1/site_v2.json --out site.sample)
+/site.sample
