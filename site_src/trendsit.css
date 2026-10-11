@@ -152,14 +152,13 @@ code.ic{font-family:inherit;font-size:.94em;background:var(--c-track);border-rad
 .cmpt th,.cmpt td{padding:var(--sp-2) var(--sp-3);border-bottom:1px solid var(--c-line);text-align:left;white-space:nowrap}
 .cmpt thead th{color:var(--c-muted);font-weight:var(--fw-regular)}
 .cmpt tbody th{color:var(--c-title);font-weight:var(--fw-regular)}
-.cmpt td.em{color:var(--c-title);font-weight:var(--fw-medium)}
 
 /* ---------- 수치 타일 ---------- */
 .tiles-wrap{margin-top:var(--sp-5)}
 .tiles{display:grid;gap:var(--sp-3);grid-template-columns:1fr}
 .tiles.n2,.tiles.n4{grid-template-columns:repeat(2,minmax(0,1fr))}
 .tiles.n3{grid-template-columns:1fr}
-.tile{padding:var(--sp-3) var(--sp-4);background:var(--c-panel);border-radius:var(--radius-m);display:grid;gap:2px}
+.tile{padding:var(--sp-3) var(--sp-4);background:var(--c-panel);border-radius:var(--radius-m);display:grid;gap:var(--sp-1)}
 .tile-v{font-size:var(--fs-2xl);font-weight:var(--fw-medium);color:var(--c-title);font-variant-numeric:tabular-nums}
 .tile-l{font-size:var(--fs-sm)}
 .tile-s{font-size:var(--fs-xs);color:var(--c-muted)}
@@ -182,7 +181,7 @@ code.ic{font-family:inherit;font-size:.94em;background:var(--c-track);border-rad
 
 /* ---------- 절 안 영상 구간 ---------- */
 .vgo{margin-top:var(--sp-3);display:grid;gap:var(--sp-1);font-size:var(--fs-sm)}
-.vgo li{display:grid;grid-template-columns:48px 1fr;gap:var(--sp-2)}
+.vgo li{display:grid;grid-template-columns:var(--sp-12) 1fr;gap:var(--sp-2)}
 .vgo .vx{font-weight:var(--fw-medium);color:var(--c-title)}
 
 /* ---------- 출처 ---------- */
@@ -193,7 +192,7 @@ code.ic{font-family:inherit;font-size:.94em;background:var(--c-track);border-rad
 .src-t{overflow-wrap:anywhere}
 /* 영상 타임라인(영상 출처 아래) */
 .vtl{margin-top:var(--sp-2);display:grid;gap:var(--sp-1);font-size:var(--fs-sm)}
-.vtl li{display:grid;grid-template-columns:48px 1fr;gap:var(--sp-2)}
+.vtl li{display:grid;grid-template-columns:var(--sp-12) 1fr;gap:var(--sp-2)}
 .vt-t{font-variant-numeric:tabular-nums;color:var(--c-muted)}
 .vtl li.slide .vt-x{font-weight:var(--fw-medium);color:var(--c-title)}
 

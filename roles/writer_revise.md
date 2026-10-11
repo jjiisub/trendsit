@@ -35,7 +35,7 @@ core_rules:
 | wrong_ref | 내용을 받치는 근거 id로 바꾼다. 받치는 id가 없으면 unsupported처럼 처리 |
 | missing_key | angle의 핵심이 빠졌다는 뜻. 근거에 있는 그 사실을 단락 하나로 더한다(지정된 위치가 없으면 가장 관련된 절에 add) |
 | overuse | 지적된 시각 요소(bars·table·tiles·events)를 비우고(`visual: "none"`, 해당 칸 null/[]) 그 내용을 단락 문장으로 옮긴다. 의미 없는 타일은 지운다 |
-| missing_diagram | 근거의 같은 단위 값(2개 이상, 비교가 요지일 때)이나 날짜 다른 사건(2개 이상)을 bars·table·events로 낸다 |
+| missing_diagram | 근거의 같은 단위 값(여럿, 비교가 요지일 때)이나 날짜 다른 사건(여럿)을 limits 범위 안에서 bars·table·events로 낸다 |
 | format | 코드 검사가 반려한 형식(분량, 빈 필수 칸, 금지 표현, 시각 요소 칸 규칙). comment대로 그 칸만 고친다 |
 
 - hint는 참고만 한다. hint의 문장을 그대로 붙여 넣지 말고 근거 원문을 다시 보고 쓴다

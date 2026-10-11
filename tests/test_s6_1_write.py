@@ -418,6 +418,18 @@ def test_writer_limits_required_in_writer_input():
 
 
 # ---------- B9: loc_lines 렌더에 중복 없음 ----------
+def test_writer_input_renders_no_visuals_as_spec_sentence():
+    """006-A2-32: no_visuals=true면 'no_visuals: true'가 아니라 5.2가 정한 뜻 문장이 렌더된다."""
+    from trendsit.brief.write import writer_limits
+    from trendsit.core.artifacts_brief import PlanBrief, Relation, WriterInput
+    from trendsit.core.render import render_data
+
+    plan_ = PlanBrief(rank=1, angle="a", relation=Relation(type="new", topic_id=None))
+    winp = WriterInput(plan=plan_, evidence=[], previous=None, aliases=[], limits=writer_limits(CFG, 1), no_visuals=True)
+    text = render_data(winp)
+    assert "no_visuals: 모든 절의 visual을 none, head_tiles만" in text and "no_visuals: true" not in text
+
+
 def test_render_no_page_dup():
     """검수자·수정 입력에 같은 단락 문장이 loc_lines로 한 번만(page·previous는 코드만 씀)."""
     from trendsit.core.artifacts_brief import CriticInput, IndexedIssue, WriterReviseInput, loc_lines

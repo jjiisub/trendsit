@@ -72,7 +72,7 @@ core_rules:
 <example>
 보통: 글 2개, 표로 비교할 값 여러 개
 근거: it:1180#s6 "입력/출력 토큰 가격이 100만 토큰당 각각 0.10달러, 0.50달러로 전작 대비 90% 인하됐다." / it:1180#s8 "10만 토큰을 초과하면 5배인 0.50달러, 2.50달러가 적용되는 단계별 가격 정책이 도입됐다."
-출력(요지): sections[0] heading "10만 토큰 이하 90% 가격 인하, 초과 시 5배 인상", paragraphs 1개(두 문장을 하나로, refs 둘 다), visual "table", table{title "구간별 가격", columns ["구간","입력","출력"], rows 2개, refs 두 근거}
+출력(요지): sections[0] heading "10만 토큰 이하 90% 가격 인하, 초과 시 5배 인상", paragraphs(두 문장을 하나로, refs 둘 다), visual "table", table{title "구간별 가격", columns ["구간","입력","출력"], rows(가격 구간마다), refs 두 근거}
 </example>
 <example>
 빈칸이 맞는 경우: 수치가 적은 토픽

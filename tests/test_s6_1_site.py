@@ -73,10 +73,10 @@ def test_keyword_topic_links_capped_at_5_with_overflow_count(site):
 # ---------- 5.1-3 실행 1건 ----------
 def test_run_meta_line_published_and_written_counts(tmp_path):
     db = make_db(tmp_path, published=("2026-W41",))
-    db.conn.execute("INSERT INTO steps(run_id, seq, t, role, kind, text, attention) VALUES ('r41', 100, "
-                    "'2026-10-12T07:12:00+09:00', 'writer', 'code', 'w41-a: passed, 1라운드', 0)")
-    db.conn.execute("INSERT INTO steps(run_id, seq, t, role, kind, text, attention) VALUES ('r41', 101, "
-                    "'2026-10-12T07:13:00+09:00', 'writer', 'code', 'w41-b: checked, 2라운드', 0)")
+    db.conn.execute("INSERT INTO steps(run_id, seq, t, role, kind, text, attention, detail) VALUES ('r41', 100, "
+                    "'2026-10-12T07:12:00+09:00', 'writer', 'code', 'w41-a: passed, 1라운드', 0, '{\"topic_id\":\"w41-a\"}')")
+    db.conn.execute("INSERT INTO steps(run_id, seq, t, role, kind, text, attention, detail) VALUES ('r41', 101, "
+                    "'2026-10-12T07:13:00+09:00', 'writer', 'code', 'w41-b: checked, 2라운드', 0, '{\"topic_id\":\"w41-b\"}')")
     db.conn.commit()
     site = export_build(db)
     run = next(r for r in site["runs"] if r["id"] == "r41")
