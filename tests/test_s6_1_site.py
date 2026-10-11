@@ -19,6 +19,7 @@ from trendsit.export import build as export_build
 ROOT = Path(__file__).resolve().parents[1]
 BUILD = ROOT / "site_src" / "build.py"
 FIXTURE = ROOT / "tests" / "fixtures" / "site" / "site.json"
+V2_FIXTURE = ROOT / "tests" / "fixtures" / "s6_1" / "site_v2.json"
 
 
 def run_build(data: Path, out: Path):
@@ -161,3 +162,69 @@ def test_backup_cli_rejects_existing_name(tmp_path, monkeypatch):
         tag = "dup"
 
     assert cli_ops.cmd_backup(Args()) == 1
+
+
+# ---------- A9: build 토픽(v2 픽스처, 5.8) ----------
+@pytest.fixture(scope="module")
+def site_v2(tmp_path_factory):
+    # llamaindex 토픽의 슬라이드 이미지는 실제 data/slides/에서 build가 복사한다(5.6). 테스트 동안만 만들고 치운다
+    names = ["S-bRN-avZ4Q_208.jpg", "S-bRN-avZ4Q_422.jpg"]
+    paths = [ROOT / "data" / "slides" / n for n in names]
+    for p in paths:
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_bytes(b"\xff\xd8\xff\xdb" + b"\x00" * 16)
+    try:
+        out = tmp_path_factory.mktemp("s6_1_v2") / "site"
+        r = run_build(V2_FIXTURE, out)
+        assert r.returncode == 0, r.stderr
+        yield out
+    finally:
+        for p in paths:
+            p.unlink(missing_ok=True)
+
+
+def _topic_html(site_v2, tid):
+    return (site_v2 / "topic" / tid / "index.html").read_text(encoding="utf-8")
+
+
+def test_a9_head_tiles_counts_0_to_4(site_v2):
+    assert '<div class="tiles-wrap">' not in _topic_html(site_v2, "w41-agent-slop-state-machine")  # 0개
+    assert 'class="tiles n4"' in _topic_html(site_v2, "w41-embedding-gemma-2")
+    assert 'class="tiles n1"' in _topic_html(site_v2, "w41-openrig-multi-agent")
+    assert 'class="tiles n2"' in _topic_html(site_v2, "w41-claude-haiku-5-5")
+    assert 'class="tiles n3"' in _topic_html(site_v2, "w41-mistral-large-4")
+
+
+def test_a9_table_bars_events_present(site_v2):
+    assert "dg-table" in _topic_html(site_v2, "w41-claude-haiku-5-5")
+    assert "dg-bars" in _topic_html(site_v2, "w41-embedding-gemma-2")
+    assert "dg-events" in _topic_html(site_v2, "w41-openrig-multi-agent")
+
+
+def test_a9_slide_and_video_timeline(site_v2):
+    html = _topic_html(site_v2, "w40-llamaindex-context-layer")
+    assert html.count('class="simg"') == 2
+    assert 'loading="lazy"' in html and "&t=" in html
+    assert 'class="vtl"' in html
+
+
+def test_a9_check_marks_section_and_summary(site_v2):
+    html = _topic_html(site_v2, "w41-claude-haiku-5-5")
+    assert html.count('class="chk"') == 2
+    assert '<a class="fu" href="#chk-1">확인 필요</a>' in html
+
+
+def test_a9_single_section_topic_and_long_heading(site_v2):
+    html = _topic_html(site_v2, "w41-agent-slop-state-machine")
+    assert html.count('class="dsec"') == 1
+    long_html = _topic_html(site_v2, "w41-mistral-large-4")
+    assert "세부 조건과 비교 대상을 함께 담아 평소보다 길게 쓴 절 제목" in long_html
+
+
+def test_a9_no_broken_markup_across_all_topics(site_v2):
+    sys.path.insert(0, str(ROOT / "site_src"))
+    import check
+
+    for f in sorted(site_v2.rglob("*.html")):
+        p = check.parse(f)
+        assert not p.mismatch and not p.open, f

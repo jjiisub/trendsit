@@ -167,11 +167,12 @@ def static_checks(site, data, pages):
         hits += [f"{page_url(site, f)} '{w}'" for w in FORBIDDEN_TEXT if w in text]
     check("A7 '동작 안 함'·'예시' 문구 0(사이트 전체, 데이터 본문 제외)", not hits, "; ".join(hits[:3]))
     check("C-7 title 속성 0", not any(p.titles for p in pages.values()))
-    # S6-1 5.9: 옛 섹션 제목, h3.src-g 제거 확인
+    # S6-1 5.9: 옛 섹션 제목, h3.src-g 제거 확인(화면이 만든 문구만, 데이터 본문 안의 우연한 일치는 제외)
+    all_data = sorted(data_strings(data), key=len, reverse=True)
     old_titles = []
     for f, p in pages.items():
         text = "".join(p.text)
-        for s in sorted(own, key=len, reverse=True):
+        for s in all_data:
             text = text.replace(s, "")
         old_titles += [f"{page_url(site, f)} '{w}'" for w in ("개요", "핵심 포인트", "핵심 개념", "소스별로 더한 것") if w in text]
     src_g = [page_url(site, f) for f, p in pages.items() if any(c == "src-g" for _, cls in p.classes for c in cls)]
