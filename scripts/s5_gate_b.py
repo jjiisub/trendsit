@@ -60,14 +60,16 @@ def merge_csv(path: Path, key: tuple[str, ...], cols: list[str], rows: list[dict
 
 def style_violations(page: TopicPage) -> list[str]:
     out = []
-    for loc, text in [("summary", page.summary), ("overview", page.overview),
-                      *[(f"points[{i}]", p.text) for i, p in enumerate(page.points)]]:
+    slots = [("summary", page.summary)]
+    slots += [(f"sections[{i}].heading", s.heading) for i, s in enumerate(page.sections)]
+    slots += [(f"sections[{i}].paragraphs[{j}]", p.text) for i, s in enumerate(page.sections) for j, p in enumerate(s.paragraphs)]
+    for loc, text in slots:
         t = checks.plain(text)
         if any(is_haeyo(s) for s in checks.sentences(t)) or any(e in t for e in (*EVAL_ENDINGS, *SPECULATIVE)):
             out.append(f"{loc} 해요체·평가형")
-        if loc.startswith("points") and ends_as_sentence(t):
+        if "heading" in loc and ends_as_sentence(t):
             out.append(f"{loc} 명사형 아님")
-        if loc in ("summary", "overview") and any(not x.strip().rstrip(".").endswith("다") for x in checks.sentences(t)):
+        if loc == "summary" and any(not x.strip().rstrip(".").endswith("다") for x in checks.sentences(t)):
             out.append(f"{loc} '~다' 아님(문장마다)")
     return out
 
@@ -267,12 +269,14 @@ def main() -> int:
                 (t["cluster_ids_json"],))})
             sv = style_violations(page)
             topics_all.append((week, t, page, chans, sv))
-            diag[t["topic_id"]] = {"week": week, "numbers": [g.title for g in page.numbers],
-                                   "events": [g.title for g in page.events], "code_warnings": sorted(set(warn)),
+            bars_secs = [s for s in page.sections if s.visual == "bars"]
+            events_secs = [s for s in page.sections if s.visual == "events"]
+            diag[t["topic_id"]] = {"week": week, "numbers": [s.bars.title for s in bars_secs],
+                                   "events": [s.events.title for s in events_secs], "code_warnings": sorted(set(warn)),
                                    "needed_numbers": None, "needed_events": None, "labeler": None, "critique": None}
             lines.append(f"| {t['rank']} | {t['topic_id']} | {t['status']} | {t['final_round']} | {'+'.join(chans)} | "
-                         f"{len(page.numbers)}·{len(page.events)} | {len(set(warn))} | {len(sv)} | "
-                         f"{sum(p.check for p in page.points)} |")
+                         f"{len(bars_secs)}·{len(events_secs)} | {len(set(warn))} | {len(sv)} | "
+                         f"{sum(s.check for s in page.sections)} |")
         lines.append("")
     # 코드가 뺀 도식과 남은 이슈(반영 확인 리뷰 F2): 토픽마다 마지막으로 쓴 run의 writer 기록
     lines += ["### 코드가 뺀 도식(형식·수치 오류가 남은 것만)", "", "| 토픽 | 도식 | 제목 | 남은 이슈 |", "|---|---|---|---|"]
@@ -283,7 +287,7 @@ def main() -> int:
                             (t["topic_id"] + ":%", week)).fetchone()
         for d in (json.loads(r["detail"]).get("dropped_diagrams") or []) if r else []:
             n_drop += 1
-            lines.append(f"| {t['topic_id']} | {d['group']} | {d['title']} | {d['issue'][:160]} |")
+            lines.append(f"| {t['topic_id']} | {d['section']} | {d['heading']} | {d['issue'][:160]} |")
     if not n_drop:
         lines.append("| 없음 | | | |")
     lines.append("")

@@ -17,7 +17,7 @@
 - 모델이 알아야 하는 것은 `roles/*.md`, 반드시 지켜져야 하는 것(스키마, 허용 도구, 반복과 깊이 상한, 예산, 보안)은 코드
 - 역할은 순수 함수. DB 쓰기는 오케스트레이터만. 모든 역할 출력에 `log`, `attention`
 - 모델 이름과 제공사는 `config/models.yaml`에만. 코드에 박지 않음
-- 최종 출력 형식은 예시 사이트의 `trendsit-example.json`과 같아야 함(S6에서 연결)
+- 최종 출력 형식은 `data/site.json`(S6a 최상위 구조 + S6-1 토픽 v2, `docs/handoff/S6-1_TASK.md` 5.7)
 - 역할 md는 COMMON 6.1과 `docs/reference/prompt_guide.md` 형식(섹션 고정, task와 core_rules, 인용·이유 칸 먼저). `check-config`는 frontmatter(필수 칸·모델 별칭 등)와 본문의 섹션 순서, 예시 3~5개, 굵게 1개 이하를 검사
 
 ## 함정

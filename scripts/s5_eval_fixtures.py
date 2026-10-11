@@ -90,30 +90,41 @@ def week_topics(db: DB, week: str, cfg) -> list[dict]:
     return out
 
 
+def _set_para(secs: list, si: int, pi: int, text: str) -> None:
+    paras = list(secs[si].paragraphs)
+    paras[pi] = paras[pi].model_copy(update={"text": text})
+    secs[si] = secs[si].model_copy(update={"paragraphs": paras})
+
+
 def mutate(page: TopicPage, pack: dict, kind: str) -> tuple[TopicPage, str] | None:
-    pts = list(page.points)
+    """S6-1 v2: sections[i].paragraphs[j]에 오류를 심는다(기존 points[i] 대신)."""
+    secs = list(page.sections)
     if kind == "number_mismatch":
-        for i, p in enumerate(pts):
-            m = re.search(r"\d+(?:\.\d+)?%", p.text)
-            if m:
-                v = float(m.group()[:-1])
-                new = f"{v * 1.5:.1f}%".replace(".0%", "%")
-                pts[i] = p.model_copy(update={"text": p.text.replace(m.group(), new, 1)})
-                return page.model_copy(update={"points": pts}), f"points[{i}]"
+        for si, s in enumerate(secs):
+            for pi, p in enumerate(s.paragraphs):
+                m = re.search(r"\d+(?:\.\d+)?%", p.text)
+                if m:
+                    v = float(m.group()[:-1])
+                    new = f"{v * 1.5:.1f}%".replace(".0%", "%")
+                    _set_para(secs, si, pi, p.text.replace(m.group(), new, 1))
+                    return page.model_copy(update={"sections": secs}), f"sections[{si}].paragraphs[{pi}]"
         return None
     if kind == "unsupported":
-        i = len(pts) - 1
-        pts[i] = pts[i].model_copy(update={"text": pts[i].text.rstrip() + ", 이용약관 조항에 따른 조치로 미국 사용자부터 적용"})
-        return page.model_copy(update={"points": pts}), f"points[{i}]"
+        si = len(secs) - 1
+        pi = len(secs[si].paragraphs) - 1
+        _set_para(secs, si, pi, secs[si].paragraphs[pi].text.rstrip() + ", 이용약관 조항에 따른 조치로 미국 사용자부터 적용")
+        return page.model_copy(update={"sections": secs}), f"sections[{si}].paragraphs[{pi}]"
     if kind == "overclaim":
-        pts[0] = pts[0].model_copy(update={"text": "기술 역사상 가장 빠른 채택 속도. " + pts[0].text})
-        return page.model_copy(update={"points": pts}), "points[0]"
+        _set_para(secs, 0, 0, "기술 역사상 가장 빠른 채택 속도. " + secs[0].paragraphs[0].text)
+        return page.model_copy(update={"sections": secs}), "sections[0].paragraphs[0]"
     if kind == "wrong_ref":
-        ids = [r for r in pack if r not in pts[0].refs]
+        ids = [r for r in pack if r not in secs[0].paragraphs[0].refs]
         if not ids:
             return None
-        pts[0] = pts[0].model_copy(update={"refs": [ids[-1]]})
-        return page.model_copy(update={"points": pts}), "points[0]"
+        paras = list(secs[0].paragraphs)
+        paras[0] = paras[0].model_copy(update={"refs": [ids[-1]]})
+        secs[0] = secs[0].model_copy(update={"paragraphs": paras})
+        return page.model_copy(update={"sections": secs}), "sections[0].paragraphs[0]"
     return None
 
 
@@ -207,7 +218,7 @@ def main() -> int:
     rv = 0
     for t in done[:8]:
         page, pack = t["page"], t["pack"]
-        if not page.points:
+        if not page.sections:
             continue
         # 이슈가 실제로 맞도록 페이지에 오류를 심고 그 위치를 지적한다(첫 평가 때 멀쩡한 페이지에 이슈만 붙여 기대가 틀렸음)
         kind = ("number", "delete", "overclaim-summary")[rv % 3]
@@ -216,7 +227,10 @@ def main() -> int:
             if not m:
                 continue
             page, loc = m
-            issues = [{"loc": loc, "type": "number_mismatch", "evidence_id": (page.points[int(loc[7:-1])].refs or [None])[0],
+            m2 = re.match(r"sections\[(\d+)\]\.paragraphs\[(\d+)\]", loc)
+            si, pi = int(m2[1]), int(m2[2])
+            issues = [{"loc": loc, "type": "number_mismatch",
+                       "evidence_id": (page.sections[si].paragraphs[pi].refs or [None])[0],
                        "comment": f"{loc}의 수치가 근거와 다름", "hint": "근거 표기 그대로"}]
             act = "edit"
         elif kind == "delete":
@@ -232,7 +246,7 @@ def main() -> int:
                        "comment": "summary의 '기술 역사상 가장 빠른 행보'가 근거에 없는 평가", "hint": "근거가 말한 정도로"}]
             act = "edit"
         name = kind
-        ids = {i["evidence_id"] for i in issues if i["evidence_id"]} | {r for p in page.points for r in p.refs}
+        ids = {i["evidence_id"] for i in issues if i["evidence_id"]} | {r for s in page.sections for p in s.paragraphs for r in p.refs}
         inp = WriterReviseInput(loc_lines=loc_lines(page), previous=page,
                                 issues=[IndexedIssue(idx=k, **x) for k, x in enumerate(issues)],
                                 evidence=[d for d in evidence_docs(pack) if d.id in ids], aliases=t["aliases"])
@@ -246,7 +260,7 @@ def main() -> int:
                                  evidence=[], aliases=t["aliases"])
         dump("writer_revise", f"trap-only-title-{t['topic'].topic_id}", trap.model_dump(), {"action": "edit"},
              "함정: 제목만 지적, 다른 칸을 다듬고 싶어짐")
-        noev = WriterReviseInput(loc_lines=loc_lines(page), previous=page, issues=[IndexedIssue(idx=0, loc="points[0]", type="unsupported", evidence_id="it:0#q9",
+        noev = WriterReviseInput(loc_lines=loc_lines(page), previous=page, issues=[IndexedIssue(idx=0, loc="sections[0].paragraphs[0]", type="unsupported", evidence_id="it:0#q9",
                                                                      comment="근거 원문 없음", hint="")],
                                  evidence=[], aliases=t["aliases"])
         dump("writer_revise", f"no-evidence-{t['topic'].topic_id}", noev.model_dump(), {},

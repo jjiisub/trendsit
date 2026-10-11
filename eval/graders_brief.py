@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from typing import Any
 
 from trendsit.core import config
@@ -44,30 +45,33 @@ graders.THRESHOLDS["decide"] = {"code_pass_all": False}
 
 
 # ---------- writer(관문 B: 근거 충실성은 원자 사실 judge, 나머지 Q1~Q4 judge + 코드 검사) ----------
+_LINE_REF = re.compile(r"^\[([^\]]+)\]\s?(.*)$")
+
+
 def _pack_from_docs(inp: dict[str, Any]) -> dict[str, list[Any]]:
-    """작성자 입력의 근거 문서 → 코드 검사용 근거 목록. 원문 기준(리뷰 R2): 글 카드의 주장·요약 줄은 빼고 quote·수치 줄만."""
+    """작성자 입력의 근거 문서(구성원당 하나, 줄마다 [근거 id] 글) → 코드 검사용 근거 목록(근거 id 단위, S6-1 5.2)."""
     from trendsit.brief.evidence import EvidenceItem
 
-    out = {}
+    out: dict[str, list[Any]] = {}
     for d in inp["evidence"]:
         ch = "video" if d["id"].startswith("vd:") else "github" if d["id"].startswith("rp:") else "text"
-        text = d["text"]
-        if ch == "text":  # 지금 작성자 입력에는 주장·요약 줄이 없음. 이전 픽스처의 "주장: "·"요약: " 줄을 뺌
-            text = "\n".join(ln for ln in text.splitlines() if not ln.startswith(("(카드 주장", "주장: ", "요약: ")))
-        out[d["id"]] = [EvidenceItem(d["id"], d["id"].split("#")[0].split("@")[0], ch, "quote", text,
-                                     {"site": d.get("source"), "title": d.get("title")})]
+        src = {"site": d.get("source"), "title": d.get("title")}
+        for line in d["text"].splitlines():
+            m = _LINE_REF.match(line)
+            eid, text = (m.group(1), m.group(2)) if m else (d["id"], line)
+            out.setdefault(eid, []).append(EvidenceItem(eid, d["id"], ch, "sentence", text, src))
     return out
 
 
 def code_writer(inp: dict[str, Any], out: dict[str, Any], expect: dict[str, Any]) -> list[dict[str, Any]]:
-    """원래 출력에 S5 코드 검사(5.7)를 그대로. 반려 사유 0이면 통과. 자동 수정은 실패가 아님."""
+    """원래 출력에 S6-1 코드 검사(5.5)를 그대로. 반려 사유 0이면 통과. 자동 수정은 실패가 아님."""
     from trendsit.brief.checks import run_checks
     from trendsit.core.artifacts_brief import TopicPage
 
     cfg = config.load("brief.yaml")
     pack = _pack_from_docs(inp)
-    n_sources = len({k.split("#")[0].split("@")[0] for k in pack})
-    r = run_checks(TopicPage.model_validate(out), pack, n_sources, cfg, {}, angle=inp["plan"]["angle"])
+    n_sources = len({items[0].member for items in pack.values()})
+    r = run_checks(TopicPage.model_validate(out), pack, n_sources, cfg, {}, inp.get("slide_candidates", []), set())
     by_type: dict[str, list[str]] = {}
     for i in r.issues:
         by_type.setdefault("문체(금지어·명사형)" if "금지 표현" in i.comment or "끝남" in i.comment or "'~다'" in i.comment
