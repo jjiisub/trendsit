@@ -27,7 +27,7 @@ S3 3a의 `CollectionPlan.video_queue[]` 항목이자 S4 `video run --queue`의 �
 | 레포 | `rp:{owner/name}` | `rp:ollama/ollama` |
 | 원본 문서(S3b) | `og:{item_id}#q{n}` | ItemCard v2 quotes의 n |
 | 글 원문 문장(S6-1) | `it:{item_id}#s{n}` | `it:812#s7` (item_texts.text를 fulltext.sentences()로 나눈 n번째 문장) |
-| 레포 사실(S6-1) | `rp:{owner/name}#f{n}` | `rp:ollama/ollama#f0`(하는 일, oneliner) → `#f1`부터 RepoCard evidence[].fact 순서 → 뜨는 이유·릴리스 → (별 있으면) 이번 주 별이 맨 끝 |
+| 레포 사실(S6-1) | `rp:{owner/name}#f{n}` | `rp:ollama/ollama#f1`부터 RepoCard evidence[].fact 순서 → (있으면) 뜨는 이유 → 릴리스 한 줄 |
 | 슬라이드 판독(S6-1) | `sl:{item_id}@{sec}` | `sl:905@754` (frame_kind=slide인 프레임의 판독, slides.py 후보 중) |
 - 전사 묶음(S6-1)은 `vd:{item_id}@{sec}`(video_segments start 25초 묶음의 시작 초, 글 자리와 같은 형식이지만 범위가 넓음)
 

@@ -191,8 +191,8 @@ def video_members(db: DB, week: str) -> tuple[list[Member], int]:
 
 
 def repo_members(db: DB, week: str) -> tuple[list[Member], int]:
-    """relevant=true RepoCard. 근거(S6-1 5.2 v2, rp:{name}#f{n}): 하는 일 한 문장(oneliner) + evidence[].fact
-    순서대로 + 이번 주 별 + 뜨는 이유 + 릴리스(fulltext.repo_fact_lines)."""
+    """relevant=true RepoCard. 근거(S6-1 5.2 v2, rp:{name}#f{n}): evidence[].fact 순서대로 → 뜨는 이유 → 릴리스
+    (fulltext.repo_fact_lines). 하는 일(oneliner)·이번 주 별은 명세 밖이라 근거 줄로 주지 않는다(006-A2-10)."""
     rows = db.conn.execute(
         "SELECT c.full_name, c.card_json, t.stars_this_week, t.rank, t.keywords, r.description, o.output_json AS oneliner "
         "FROM repo_cards c LEFT JOIN repo_trending t ON t.week=c.week AND t.full_name=c.full_name "
@@ -208,13 +208,8 @@ def repo_members(db: DB, week: str) -> tuple[list[Member], int]:
         member = f"rp:{name}"
         line = (json.loads(r["oneliner"]).get("oneliner") if r["oneliner"] else "") or (r["description"] or "")
         source = {"site": "GitHub", "title": name, "date": None, "url": f"https://github.com/{name}"}
-        items = [EvidenceItem(f"{member}#f0", member, "github", "repo_field", f"하는 일: {line}", source)]
-        for eid, text in fulltext.repo_fact_lines(name, card):
-            items.append(EvidenceItem(eid, member, "github", "repo_field", text, source))
-        if r["stars_this_week"] is not None:
-            n = len(items)
-            items.append(EvidenceItem(f"{member}#f{n}", member, "github", "repo_field", "이번 주 별", source,
-                                      value=f"{r['stars_this_week']:,}", unit="개"))
+        items = [EvidenceItem(eid, member, "github", "repo_field", text, source)
+                for eid, text in fulltext.repo_fact_lines(name, card)]
         owner, repo = name.split("/", 1)
         out.append(Member(member, "github", name, line, " ".join(x for x in (line, r["description"] or "") if x),
                           "high", [repo, name], sorted(json.loads(r["keywords"] or "{}")), source, items))

@@ -535,6 +535,36 @@ def test_writer_truncation_retries_with_no_visuals(week, monkeypatch):
     assert calls[0] == "writer" and calls[1] == "writer"  # 1회 실패(잘림) + 1회 성공(no_visuals), 토픽 1
 
 
+def test_writer_skips_no_visuals_retry_if_first_call_already_used_3_attempts(week, monkeypatch):
+    """006-A2-7: role.py 내부에서 스키마 실패+잘림이 섞여 한 번의 run_role 호출이 LLM을 3번 썼으면(role.py는
+    건드리지 않을 파일이라 write.py가 호출 수를 세어) no_visuals 재시도를 하지 않는다(합쳐도 C-5 ≤4 넘지 않음)."""
+    from trendsit.brief import write as wr
+    from trendsit.core.role import RoleFailed
+
+    ctx, cids = week
+    responses = [plan(cids)]
+    for i in (2, 3, 4):
+        responses += [page(i, f"{TITLES[i]} 근거 문장 요약 정리했다"), verdict([])]
+    ctx.llm.transport.responses = [response(r) for r in responses]
+    real, calls = wr.run_role, []
+
+    def fake(role, inp, ctx_):
+        calls.append(role.name)
+        if len(calls) == 1:
+            for _ in range(3):  # 혼합 실패(스키마 2회 + 잘림)로 실제 LLM 호출이 3번 일어난 것처럼(role.py가 매 시도 기록)
+                ctx_.last_step_id = ctx_.tracer.step(kind="llm", role="writer", text="시도")
+            raise RoleFailed("writer: 스키마 검증 실패 (출력 잘림(max_tokens 4500 도달): x)")
+        return real(role, inp, ctx_)
+
+    monkeypatch.setattr(wr, "run_role", fake)
+    ctx.tracer = Tracer(ctx.db, "weekly", "S0")
+    pipeline.run_weekly("2026-W41", ctx, from_step="select", embedder=HashEmbedder(), cfg=CFG)
+    run_id = ctx.tracer.run_id
+    t1 = ctx.db.conn.execute("SELECT status FROM topics WHERE run_id=? AND rank=1", (run_id,)).fetchone()
+    assert t1["status"] == "failed"  # no_visuals 재시도를 안 했으므로 그대로 실패
+    assert calls.count("writer") == 4  # 토픽마다 1회(토픽 1은 재시도 없이 실패, 나머지 3개는 정상 1회씩. 재시도였으면 5)
+
+
 def test_writer_total_failure_logs_one_step_not_two(week, monkeypatch):
     """006-A1-24: 작성 실패 토픽도 steps(writer,code) 행이 하나만(counts.written 이중 계산 방지)."""
     from trendsit.brief import write as wr
@@ -587,3 +617,5 @@ def test_scrub_empties_topic_isolates_failure_not_whole_export(week):
     site = export.build(ctx.db, with_week="2026-W41")
     assert all(t["id"] != "w41-model-1" for t in site["topics"])  # 실패 토픽은 export에 없음(격리)
     assert any(t["title"] == TITLES[2] for t in site["topics"])  # 다른 토픽은 그대로 발행
+
+

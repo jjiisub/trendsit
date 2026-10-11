@@ -178,8 +178,14 @@ class Table(_Strict):
     title: str
     note: str = ""
     columns: list[str] = Field(min_length=2, max_length=4)
-    rows: list[list[str]] = Field(min_length=2, max_length=6, description="행마다 columns와 같은 길이, 첫 열은 행 머리")
+    rows: list[list[str | float]] = Field(min_length=2, max_length=6,
+                                          description="행마다 columns와 같은 길이, 첫 열은 행 머리. 숫자 셀도 받음(NumberItem과 같은 이유)")
     refs: list[str] = Field(min_length=1, max_length=4)
+
+    @field_validator("rows", mode="after")
+    @classmethod
+    def _rows_as_text(cls, v: list[list[str | float]]) -> list[list[str]]:
+        return [[f"{c:g}" if isinstance(c, float) else c for c in row] for row in v]
 
 
 class EventItem(_Strict):

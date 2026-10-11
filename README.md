@@ -82,7 +82,7 @@ uv run python -m trendsit video purge --older-than 7                            
 ```
 시스템 의존성(영상): ffmpeg·ffprobe(`brew install ffmpeg`), yt-dlp용 JS 런타임 deno·node·bun 중 하나(없으면 유튜브 영상 포맷이 403). 전사는 로컬 mlx-whisper(`large-v3-turbo`, 첫 실행 때 약 1.6GB 받음). 외부 전사 API와 유튜브 자동 자막은 쓰지 않는다. `uv run`은 선택 묶음을 지우므로 영상 명령은 `--extra video`를 붙인다.
 ### 자동 실행 (S6b)
-매일 02:00 `ops nightly`(수집 → 필터 → 글 요약 → 날마다 편집장 계획·글·영상·레포 분석)와 월 07:00 `ops weekly`(막 끝난 주의 브리핑 → 성공하면 사이트 발행)가 launchd로 돈다. 개발 중인 브랜치 코드가 섞이지 않게 main만 체크아웃한 별도 폴더 `~/Claude/projects/trendsit-run`(git worktree)에서 돌고, `data/`와 `site/`는 이 작업 폴더 것을 링크로 함께 쓴다. 자동 실행 비용은 주당 $1.50 상한(`RUN-<ISO 주차>` 꼬리표, `config/budget.yaml`). 맥이 꺼졌던 날은 다음 실행이 따라잡는다(`config/ops.yaml`).
+매일 02:00 `ops nightly`(수집 → 필터 → 글 요약 → 날마다 편집장 계획·글·영상·레포 분석)와 월 07:00 `ops weekly`(막 끝난 주의 브리핑 → 성공하면 사이트 발행)가 launchd로 돈다. 개발 중인 브랜치 코드가 섞이지 않게 main만 체크아웃한 별도 폴더 `~/Claude/projects/trendsit-run`(git worktree)에서 돌고, `data/`와 `site/`는 이 작업 폴더 것을 링크로 함께 쓴다. 자동 실행 비용은 주당 $1.50 상한(`RUN-<ISO 주차>` 꼬리표, `config/budget.yaml`). 맥이 꺼졌던 날은 다음 실행이 따라잡는다(`config/ops.yaml`). 실행 전 `scripts/run_ops.sh`가 그 폴더에서 `git fetch origin main && git reset --hard origin/main`으로 origin/main에 맞춘다(배포 전용 폴더, `data/`·`site/` 링크는 보존). 동기화에 실패해도 기존 코드로 ops는 계속 돌고 `TRENDSIT_PULL_FAILED=1`을 남긴다.
 ```bash
 bash scripts/setup_run_worktree.sh        # 실행 폴더 만들기(두 번 돌려도 같음). 이 작업 폴더는 main이 아닌 브랜치여야 함
 launchctl bootout gui/$(id -u)/com.trendsit.collect-temp    # 임시 수집 예약 해제(이 예약은 이 스펙에서 대체됨)

@@ -1,13 +1,10 @@
 """작성자(1단) + 코드 검사 + 검수자 + 작성자 수정 루프(S6-1 5.5~5.6).
-
 라운드: 초안(1) → 반려 → 수정(2) → 반려 → 수정(3). 최대 max_rounds, 코드 반려도 셈.
-- 코드 검사가 반려하면 그 라운드는 검수자를 부르지 않는다(LLM 0원)
-- 같은 이슈(위치 + 유형)가 두 라운드 남으면 그 이슈는 더 돌리지 않고 해당 절(또는 summary) check=true로 확정
-- 마지막 라운드 뒤 남은 이슈의 절은 check=true, 토픽 status=checked
+- 코드 검사가 반려하면 그 라운드는 검수자를 부르지 않는다(LLM 0원). 같은 이슈가 두 라운드(또는 마지막 라운드 뒤) 남으면
+  그 절(또는 summary) check=true, 토픽 status=checked
 - writer_revise는 고친 칸만 낸다. 지적되지 않은 위치를 바꾸면 코드가 되돌리고 횟수를 센다
-- 잘림(D-42): run_role이 1회 재시도 뒤에도 잘리면 같은 입력에 no_visuals=true로 1회 더(최대 호출 4회)
-대체: writer 실패 → 그 토픽 제외(failed) / critic 실패 → 코드 검사만 통과한 판 + attention / revise 실패 → 이전 판 유지
-"""
+- 잘림(D-42): run_role이 1회 재시도 뒤에도 잘리면 같은 입력에 no_visuals=true로 1회 더(최대 호출 4회, C-5)
+대체: writer 실패 → 토픽 제외(failed) / critic 실패 → 코드 통과판+attention / revise 실패 → 이전 판 유지"""
 
 from __future__ import annotations
 
@@ -371,6 +368,7 @@ def write_topic(ctx: Ctx, topic: Applied, members: dict[str, Member], table: Ali
         if m.corrections.get("_no_text") and m.key in used_members:
             res.attention.append(f"원문 없음: {m.key}")
     slide_candidates, timeline_secs = topic_slide_info(ms, used_members, cfg)
+    slide_candidates = [c for c in slide_candidates if c in pack]  # 006-A2-9: cap_pack이 뺀 후보는 주지 않음(거짓 wrong_ref 방지)
     winp = WriterInput(plan=PlanBrief(rank=topic.rank, angle=topic.angle,
                                       relation=Relation(type=topic.relation_type, topic_id=topic.relation_topic_id)),
                        evidence=evidence_docs(pack), previous=previous_topic(ctx.db, topic.relation_topic_id),
@@ -380,8 +378,10 @@ def write_topic(ctx: Ctx, topic: Applied, members: dict[str, Member], table: Ali
         draft = draft.model_copy(update={"sections": [s.model_copy(update={"check": False}) for s in draft.sections]})
         page, err, sid = draft, None, None
     else:
+        before_sid = ctx.last_step_id or 0
         page, err, sid = _call(load_role("writer", ctx.models), winp, ctx, res.costs, "writer")
-        if page is None and err and "출력 잘림" in err:  # D-42: no_visuals로 1회 더
+        used = (sid or 0) - before_sid  # role.py가 쓴 LLM 시도 수(step id 증가분, 스키마 재시도 포함)
+        if page is None and err and "출력 잘림" in err and used <= 2:  # D-42·C-5: 기본 호출이 2회 안이었을 때만 no_visuals 1회 더
             res.attention.append("작성 잘림, no_visuals로 재시도")
             winp2 = winp.model_copy(update={"no_visuals": True})
             page, err2, sid = _call(load_role("writer", ctx.models), winp2, ctx, res.costs, "writer")

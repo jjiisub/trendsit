@@ -4,7 +4,8 @@
 이 스크립트는 그 파일 끝에 "실제 실행(W40 + W41)" 절을 붙이고, 라벨 시트를 만든다(이미 채운 칸은 보존).
 - 묶기: 2채널 이상 토픽 비율, 묶인 쌍 목록(오병합 라벨용 eval/labels/decide.csv는 묶기 리포트 때 만듦)
 - 선별: 실제 실행의 코드 검증 통과(첫 시도), drop 이유 표 → eval/labels/editor_select.csv
-- 작성·검수: 토픽별 라운드·상태·check·원자 사실(judge_facts는 writer 평가에서) → eval/labels/critic.csv(라운드별 판정)
+- 작성·검수: 토픽별 라운드·상태·check·원자 사실(judge_facts는 writer 평가에서) → eval/labels/critic.csv(절별 판정,
+  5.11 열 `topic_id, section, type, label`: 검수자가 낸 이슈마다 한 행, 라운드를 거듭해도 같은 절+유형은 한 번만)
 - 표현 선택: 토픽별 도식(있음/없음)과 코드 경고 → eval/labels/diagram_labels.json(needed_numbers/needed_events 빈칸)
 - 문체: 최종판 코드 정규식 위반 수
 
@@ -24,6 +25,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from trendsit.brief import checks  # noqa: E402
+from trendsit.brief.revision import top_loc  # noqa: E402
 from trendsit.core.artifacts_brief import TopicPage  # noqa: E402
 from trendsit.core.db import DB  # noqa: E402
 from trendsit.core.style import EVAL_ENDINGS, ends_as_sentence, is_haeyo  # noqa: E402
@@ -218,7 +220,7 @@ def main() -> int:
         if args.judge else saved
     lines = ["", "## 실제 실행(" + " + ".join(args.weeks) + ", 관문 B 대상 주)", "",
              "> `scripts/s5_gate_b.py`가 붙인 절. 라벨이 필요한 항목은 2차 라벨(D1-3, 리뷰 세션 opus-5.5) 전 잠정.", ""]
-    sel_rows, crit_rows, diag = [], [], {}
+    sel_rows, crit_rows, crit_seen, diag = [], [], set(), {}
     topics_all = []
     for week in args.weeks:
         run = db.conn.execute("SELECT current_run_id FROM weeks WHERE week=?", (week,)).fetchone()[0]
@@ -253,12 +255,11 @@ def main() -> int:
                                  "topic_id=? ORDER BY id", (run, t["topic_id"])).fetchall()
             for v in vs:
                 if v["checker"] == "critic":
-                    rp = db.conn.execute("SELECT page_json FROM topic_pages WHERE run_id=? AND topic_id=? AND round=?",
-                                         (run, t["topic_id"], v["round"])).fetchone()
-                    crit_rows.append({"week": week, "topic_id": t["topic_id"], "round": v["round"], "status": v["status"],
-                                      "page_hash": _hash(rp[0] if rp else ""),
-                                      "issues": json.dumps([{k: i[k] for k in ("loc", "type", "comment")}
-                                                            for i in json.loads(v["issues_json"] or "[]")], ensure_ascii=False)})
+                    for iss in json.loads(v["issues_json"] or "[]"):
+                        key = (t["topic_id"], top_loc(iss["loc"]), iss["type"])
+                        if key not in crit_seen:
+                            crit_seen.add(key)
+                            crit_rows.append({"topic_id": key[0], "section": key[1], "type": key[2]})
             if page_row is None:
                 lines.append(f"| {t['rank']} | {t['topic_id']} | {t['status']} | - | - | - | - | - | - |")
                 continue
@@ -334,8 +335,8 @@ def main() -> int:
     LABELS.mkdir(parents=True, exist_ok=True)
     merge_csv(LABELS / "editor_select.csv", ("week", "cluster_id"),
               ["week", "cluster_id", "action", "drop_reason", "reason", *KEEP], sel_rows)
-    merge_csv(LABELS / "critic.csv", ("week", "topic_id", "round"),
-              ["week", "topic_id", "round", "status", "page_hash", "issues", *KEEP], crit_rows)
+    merge_csv(LABELS / "critic.csv", ("topic_id", "section", "type"),
+              ["topic_id", "section", "type", *KEEP], crit_rows)
     hashes = {t["topic_id"]: _hash(p.model_dump_json()) for _w, t, p, _c, _s in topics_all}
     wrows = [{"topic_id": k, "week": v["week"], "status": v["status"], "page_hash": hashes.get(k, ""),
               **{f"judge_{q}": v["verdicts"].get(q, {}).get("verdict", "") for q in ("Q1", "Q2", "Q3", "Q4")},

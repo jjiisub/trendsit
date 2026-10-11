@@ -414,11 +414,6 @@ def warnings(page: TopicPage, pack: dict[str, list[EvidenceItem]], cfg: BriefCon
     n_visual = sum(1 for s in page.sections if s.visual != "none")
     if page.sections and n_visual > len(page.sections) / 2:
         out.append(f"남발 의심: visual≠none {n_visual}/{len(page.sections)}절(절의 절반 넘음)")
-    for i, s in enumerate(page.sections):
-        if s.bars is not None and len(s.bars.items) == 2 and not any(it.baseline for it in s.bars.items):
-            out.append(f"남발 의심: sections[{i}].bars 값 2개인데 baseline 없음")
-        if s.events is not None and len(s.events.items) == 2 and not s.events.flow_is_point:
-            out.append(f"남발 의심: sections[{i}].events 사건 2개인데 flow_is_point 없음")
     paras = [(i, j, plain(p.text)) for i, s in enumerate(page.sections) for j, p in enumerate(s.paragraphs)]
     for a in range(len(paras)):
         for b in range(a + 1, len(paras)):

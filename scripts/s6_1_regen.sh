@@ -2,6 +2,7 @@
 # S6-1 7장 런 뒤 ①~⑤를 한 번에(D-46). 실DB에 쓴다(backup·weekly·publish): 사용자 승인 뒤에만 돌린다.
 # 한 단계라도 실패하면(명령 실패 또는 비용 상한 초과) 거기서 멈추고 종료 코드 1. 사용: bash scripts/s6_1_regen.sh
 set -eu
+trap 'exit 1' ERR  # 명령 실패 종료 코드와 무관하게 1로(7장 "멈추고 종료 코드 1")
 cd "$(dirname "$0")/.."
 
 check_cost() {  # 합 ≤ 1.50(2장), 넘으면 멈춤

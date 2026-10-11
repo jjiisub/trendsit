@@ -69,6 +69,12 @@ def test_topic_page_v2_schema_matches_spec_example():
         Section(heading="x", paragraphs=[para()], visual="none", extra_field=1)  # extra=forbid
 
 
+def test_table_rows_accepts_numbers_and_normalizes_to_text():
+    """006-A2-11: NumberItem처럼 표 셀도 숫자를 받아 문자열로 바꾼다(모델이 숫자를 쓰려다 잘리는 것 방지)."""
+    tbl = Table(title="t", note="", columns=["a", "b"], rows=[["구분", 1], [2.5, "원"]], refs=["it:1#s1"])
+    assert tbl.rows == [["구분", "1"], ["2.5", "원"]]
+
+
 def test_enforce_clears_writer_check_true():
     p = page(sections=[section(check=True)])
     out = p.enforce(None, None)
@@ -96,6 +102,36 @@ def test_article_lines_builds_sentence_ids_and_missing_text_flag(tmp_path):
     assert lines == [("it:1#s1", "첫 문장이다."), ("it:1#s2", "둘째 문장이다.")] and not no_text
     lines2, no_text2 = fulltext.article_lines(db, 99, 10000)
     assert lines2 == [] and no_text2
+
+
+def test_raw_evidence_sl_falls_back_to_given_line_when_ocr_empty(tmp_path):
+    """006-A2-20: OCR 글자가 비어도(수치만 있는 슬라이드) raw_evidence가 빈 글자 대신 작성자가 받은 판독 줄을 돌려준다."""
+    db = DB(tmp_path / "t.db")
+    db.conn.execute("INSERT INTO items(id, source_id, channel, external_id, url, title, day, week) VALUES "
+                    "(1,'s','video','e','http://x','t','2026-10-06','2026-W41')")
+    db.conn.execute("INSERT INTO videos(item_id, video_id) VALUES (1, 'v1')")
+    db.conn.execute("INSERT INTO video_frames(video_id, t, reading_json) VALUES ('v1', 100, ?)",
+                    ('{"frame_kind":"slide","title":"제목","ocr_text":"","numbers":[{"value":"1"}],"table":null}',))
+    [(eid, text)] = fulltext.slide_read_lines(db, 1, "v1")
+    item = EvidenceItem(eid, "vd:v1", "video", "slide_read", text, {})
+    out = fulltext.raw_evidence(db, eid, [item])
+    assert out == text and out != ""
+
+
+def test_raw_evidence_keeps_both_sides_when_slide_fact_and_transcript_id_collide(tmp_path):
+    """006-A2-8: slide_fact vd:{id}@{sec}가 전사 묶음과 같은 sec(25의 배수)면 id가 겹친다. raw_evidence가
+    ±30초 창(slide_fact)뿐 아니라 겹친 전사 묶음 원문(items[1:])도 잃지 않고 이어 붙인다."""
+    db = DB(tmp_path / "t.db")
+    db.conn.execute("INSERT INTO items(id, source_id, channel, external_id, url, title, day, week) VALUES "
+                    "(1,'s','video','e','http://x','t','2026-10-06','2026-W41')")
+    db.conn.execute("INSERT INTO videos(item_id, video_id) VALUES (1, 'v1')")
+    db.conn.execute('INSERT INTO video_segments(video_id, idx, start, "end", text) VALUES '
+                    "('v1', 0, 510, 525, '창 안 발화다.')")
+    src = {"site": "GeekNews", "title": "t"}
+    slide_fact = EvidenceItem("vd:1@525", "vd:v1", "video", "slide_fact", "발표 슬라이드 수치: 1위", src, value="1", unit="위")
+    transcript = EvidenceItem("vd:1@525", "vd:v1", "video", "transcript", "전사 묶음 원문이다.", src)
+    out = fulltext.raw_evidence(db, "vd:1@525", [slide_fact, transcript])
+    assert "창 안 발화다." in out and "전사 묶음 원문이다." in out
 
 
 def test_repo_fact_lines_order_fact_then_trending_then_release():

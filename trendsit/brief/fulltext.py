@@ -129,15 +129,20 @@ def raw_evidence(db: DB, eid: str, items: list[EvidenceItem]) -> str:
             fr = db.conn.execute("SELECT reading_json FROM video_frames WHERE video_id=? AND ABS(t-?)<0.5 "
                                  "ORDER BY ABS(t-?) LIMIT 1", (video_id[0], float(m[2]), float(m[2]))).fetchone()
             if fr and fr["reading_json"]:
-                return json.loads(fr["reading_json"]).get("ocr_text") or ""
+                return json.loads(fr["reading_json"]).get("ocr_text") or fallback  # 006-A2-20: OCR 빈 슬라이드(수치만)도 작성자가 받은 판독 줄로
         return fallback
     if kind == "slide_fact" and (m := re.match(r"^vd:(\d+)@(\d+)$", eid)):
         item_id, sec_i = int(m[1]), int(m[2])
         window_sec = config.load("video.yaml").align_window_sec
         vid = db.conn.execute("SELECT video_id FROM videos WHERE item_id=?", (item_id,)).fetchone()
+        window_text = ""
         if vid:
             segs = db.conn.execute('SELECT text FROM video_segments WHERE video_id=? AND "end">=? AND start<=? ORDER BY idx',
                                    (vid[0], sec_i - window_sec, sec_i + window_sec)).fetchall()
-            if any(s["text"] for s in segs):
-                return " ".join(s["text"] for s in segs if s["text"])
+            window_text = " ".join(s["text"] for s in segs if s["text"])
+        # 006-A2-8: slide_fact와 전사 묶음이 같은 vd:@sec id로 겹칠 수 있다(명세 5.2 id 형식 그대로, sec가 25의
+        # 배수면 충돌). 겹친 묶음(items[1:])의 원문도 잃지 않게 이어 붙인다
+        other = " ".join(it.text for it in items[1:] if it.kind != "slide_fact" and it.text)
+        combined = " ".join(x for x in (window_text, other) if x)
+        return combined or fallback
     return fallback
