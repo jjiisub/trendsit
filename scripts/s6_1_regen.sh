@@ -16,6 +16,27 @@ check_cost() {  # 합 ≤ 1.50(2장), 넘으면 멈춤
   fi
 }
 
+DB="data/trendsit.db"
+
+week_state() {  # "status|current_run_id"(읽기만, -readonly)
+  sqlite3 -readonly -separator '|' "$DB" "SELECT status, current_run_id FROM weeks WHERE week='$1'"
+}
+
+# 006-C1-3: weekly --force는 시작하자마자 그 주를 published → done으로 푼다. 토픽 하나만 failed여도
+# run은 partial이라 weeks.status가 'written'에 머물고, publish는 'done'·'published'만 받는다(거부 2).
+# 그러면 두 주가 미발행으로 남으므로 여기서 멈추고 되돌릴 방법을 안내한다(이전 current_run_id로 복구).
+check_week_publishable() {  # ③ 각 weekly 뒤: week prev_state("status|current_run_id")
+  local week="$1" prev="$2" now status
+  now=$(week_state "$week")
+  status="${now%%|*}"
+  if [ "$status" != "done" ] && [ "$status" != "published" ]; then
+    echo "주 ${week}이 발행 가능 상태가 아님: $status(= 토픽 실패로 partial, publish 거부됨)" >&2
+    echo "복구: data/backup/의 pre-s6-1 백업(②)으로 되돌리거나, 아래로 이전 판을 되돌린 뒤 publish를 다시 시도할 것:" >&2
+    echo "  sqlite3 $DB \"UPDATE weeks SET status='${prev%%|*}', current_run_id='${prev##*|}' WHERE week='$week'\"" >&2
+    exit 1
+  fi
+}
+
 echo "== ① 영상 파일 확인 =="
 for vid in S-bRN-avZ4Q D7q8fa589FY; do
   if ! ls "data/media/$vid"/media.* >/dev/null 2>&1; then
@@ -27,10 +48,14 @@ echo "== ② trendsit backup --tag pre-s6-1 =="
 uv run python -m trendsit backup --tag pre-s6-1
 
 echo "== ③ weekly --force --spec S6-1(W40, W41) =="
+prev40=$(week_state 2026-W40)
 uv run --extra embed python -m trendsit weekly --week 2026-W40 --force --spec S6-1
 check_cost
+check_week_publishable 2026-W40 "$prev40"
+prev41=$(week_state 2026-W41)
 uv run --extra embed python -m trendsit weekly --week 2026-W41 --force --spec S6-1
 check_cost
+check_week_publishable 2026-W41 "$prev41"
 
 echo "== ④ 읽기본 확인(손으로 reports/S5_brief/briefing_<week>.md 훑기) =="
 echo "reports/S5_brief/briefing_2026-W40.md, briefing_2026-W41.md을 열어 작성 실패·⚠ 수를 리포트에 적을 것"

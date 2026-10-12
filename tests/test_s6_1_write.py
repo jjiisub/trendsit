@@ -114,6 +114,33 @@ def test_check_rejects_number_mismatch():
     assert any(i.type == "number_mismatch" for i in issues)
 
 
+def test_check_rejects_number_mismatch_with_currency_ms_and_k_suffix():
+    """006-C1-2: 5.5 ① 전체 — $·ms·K 표기가 타일 value·표 셀·단락·heading에서도 대조된다(근거는 $30·120ms·8K)."""
+    unit_pack = pack(**{"it:1#s2": [EvidenceItem("it:1#s2", "it:1", "text", "sentence", "월 $30, 120ms, 8K 컨텍스트다.", {"site": "x"})]})
+    p = page(head_tiles=[Tile(value="$20", label="가격", refs=["it:1#s2"])],
+             sections=three_sections(paragraphs=[para(text="지연은 300ms다.", refs=["it:1#s2"])],
+                                     heading="16K 컨텍스트 지원",
+                                     visual="table", table=Table(title="t", note="", columns=["구분", "값"],
+                                                                 rows=[["가격", "$45"], ["기간", "월간"]], refs=["it:1#s2"])))
+    issues = checks.check(p, unit_pack, 1, CFG)
+    locs = {i.loc for i in issues if i.type == "number_mismatch"}
+    assert "head_tiles[0]" in locs  # $20 ≠ $30
+    assert "sections[0].paragraphs[0]" in locs  # 300ms ≠ 120ms
+    assert "sections[0].heading" in locs  # 16K ≠ 8K
+    assert "sections[0].table.rows[0]" in locs  # $45 ≠ $30
+
+
+def test_check_accepts_matching_currency_ms_and_k_suffix():
+    """근거와 같은 $·ms·K 값은 반려되지 않는다(위 반려 테스트의 짝)."""
+    unit_pack = pack(**{"it:1#s2": [EvidenceItem("it:1#s2", "it:1", "text", "sentence", "월 $30, 120ms, 8K 컨텍스트다.", {"site": "x"})]})
+    p = page(head_tiles=[Tile(value="$30", label="가격", refs=["it:1#s2"])],
+             sections=three_sections(paragraphs=[para(text="지연은 120ms다.", refs=["it:1#s2"])],
+                                     heading="8K 컨텍스트 지원",
+                                     visual="table", table=Table(title="t", note="", columns=["구분", "값"],
+                                                                 rows=[["가격", "$30"], ["기간", "월간"]], refs=["it:1#s2"])))
+    assert [i for i in checks.check(p, unit_pack, 1, CFG) if i.type == "number_mismatch"] == []
+
+
 def test_check_rejects_visual_bars_without_bars_field():
     p = page(sections=three_sections(visual="bars", bars=None))
     issues = checks.check(p, pack(), 1, CFG)

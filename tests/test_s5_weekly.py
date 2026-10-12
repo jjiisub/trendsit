@@ -603,6 +603,37 @@ def test_writer_truncation_retries_with_no_visuals(week, monkeypatch):
     assert calls[0] == "writer" and calls[1] == "writer"  # 1회 실패(잘림) + 1회 성공(no_visuals), 토픽 1
 
 
+def test_writer_truncation_retry_survives_a_real_code_step_in_between(week):
+    """006-C1-1: 실제 weekly 경로 재현. topic1이 끝나면 pipeline._log_topic이 role='writer' kind='code'인
+    step을 남긴다(step id는 전역 autoincrement). 그 바로 다음 토픽(topic2)의 writer 호출이 진짜로(스텁 없이,
+    run_role·record_llm을 그대로 거쳐) 잘리면, 전역 step id 차이로 세면 code step 하나가 끼어 used=3이 되어
+    no_visuals 재시도가 걸러진다(이 테스트가 재현하는 버그). writer LLM step 수로 세면 used=2로 정확해 재시도가
+    돌고 topic2가 회복한다."""
+    ctx, cids = week
+    trunc = response("{", tokens=(100, 4500))  # max_tokens 4500 도달 + 스키마 파싱 실패 → "출력 잘림"
+    responses = [
+        response(plan(cids)),
+        response(page(1, "Argon이 DeepSWE에서 77.9% 기록했다")), response(verdict([])),  # topic1: 정상 완료 → _log_topic code step
+        trunc, trunc,  # topic2: 1차 호출이 run_role 내부에서 2번 다 잘려 RoleFailed("출력 잘림…")
+        response(page(2, f"{TITLES[2]} 근거 문장 요약 정리했다")), response(verdict([])),  # topic2: no_visuals 재시도로 회복
+        response(page(3, f"{TITLES[3]} 근거 문장 요약 정리했다")), response(verdict([])),
+        response(page(4, f"{TITLES[4]} 근거 문장 요약 정리했다")), response(verdict([])),
+    ]
+    ctx.llm.transport.responses = responses
+    ctx.tracer = Tracer(ctx.db, "weekly", "S0")
+    pipeline.run_weekly("2026-W41", ctx, from_step="select", embedder=HashEmbedder(), cfg=CFG)
+    run_id = ctx.tracer.run_id
+    db = ctx.db.conn
+    code_step = db.execute("SELECT kind, role FROM steps WHERE run_id=? AND kind='code' AND role='writer' ORDER BY id LIMIT 1",
+                           (run_id,)).fetchone()
+    assert code_step is not None  # topic1의 _log_topic code step이 실제로 끼었음을 확인(재현 전제)
+    t2 = db.execute("SELECT status FROM topics WHERE run_id=? AND rank=2", (run_id,)).fetchone()
+    assert t2["status"] in ("passed", "checked")  # no_visuals 재시도가 걸러지지 않고 돌아 회복해야 함
+    n2 = db.execute("SELECT detail FROM steps WHERE run_id=? AND kind='code' AND role='writer' AND "
+                   "json_extract(detail,'$.topic_id')=?", (run_id, "w41-model-2")).fetchone()
+    assert json.loads(n2["detail"])["no_visuals"] is True  # detail.no_visuals로 재시도가 실제로 일어났음을 확인
+
+
 def test_writer_skips_no_visuals_retry_if_first_call_already_used_3_attempts(week, monkeypatch):
     """006-A2-7: role.py 내부에서 스키마 실패+잘림이 섞여 한 번의 run_role 호출이 LLM을 3번 썼으면(role.py는
     건드리지 않을 파일이라 write.py가 호출 수를 세어) no_visuals 재시도를 하지 않는다(합쳐도 C-5 ≤4 넘지 않음)."""

@@ -361,6 +361,16 @@ def _finalize_page(res: TopicResult, final: TopicPage, pack: dict[str, list[Evid
     return final, _remap_section_locs(check_locs, remap) | scrubbed_locs
 
 
+def _writer_call_count(ctx: Ctx, before_sid: int) -> int:
+    """006-C1-1: 이번 토픽의 writer LLM 호출 수(role.py 내부 스키마 재시도 포함)를 센다. 전역 step id 차이는
+    쓰지 않는다 — _log_topic·editor_select 같은 code/다른 역할 step이 사이에 끼면 id가 그만큼 더 벌어져
+    실제 호출 수보다 많게 보인다(id는 run_id 전체에서 전역 autoincrement)."""
+    row = ctx.db.conn.execute(
+        "SELECT COUNT(*) AS n FROM steps WHERE run_id=? AND role='writer' AND kind='llm' AND id>?",
+        (ctx.tracer.run_id, before_sid)).fetchone()  # type: ignore[union-attr]
+    return row["n"]
+
+
 def _initial_page(ctx: Ctx, winp: WriterInput, res: TopicResult, draft: TopicPage | None) -> tuple[TopicPage | None, str | None, int | None, WriterInput]:
     """초안을 부르거나(draft 주면 그대로) 잘림이면 no_visuals로 1회 더(D-42·C-5, winp도 갈아 끼워 돌려줌)."""
     if draft is not None:
@@ -368,13 +378,13 @@ def _initial_page(ctx: Ctx, winp: WriterInput, res: TopicResult, draft: TopicPag
         return draft, None, None, winp
     before_sid = ctx.last_step_id or 0
     page, err, sid = _call(load_role("writer", ctx.models), winp, ctx, res.costs, "writer")
-    used = (sid or 0) - before_sid  # role.py가 쓴 LLM 시도 수(step id 증가분, 스키마 재시도 포함)
+    used = _writer_call_count(ctx, before_sid)  # 이번 토픽이 쓴 writer LLM 호출 수(스키마 재시도 포함)
     if page is None and err and "출력 잘림" in err and used <= 2:  # D-42·C-5: 기본 호출이 2회 안이었을 때만 no_visuals 1회 더
         res.attention.append("작성 잘림, no_visuals로 재시도")
         res.no_visuals = True  # 시도했음을 바로 기록(detail.no_visuals, 성공 여부와 무관)
         winp2 = winp.model_copy(update={"no_visuals": True})
         page, err2, sid = _call(load_role("writer", ctx.models), winp2, ctx, res.costs, "writer")
-        total_used = (sid or 0) - before_sid
+        total_used = _writer_call_count(ctx, before_sid)
         if total_used > 4:  # 006-A3-9: 두 번째 호출의 내부 재시도까지 합쳐 C-5 상한(4)을 넘으면 성공해도 버림
             page, err2 = None, f"호출 상한 초과(C-5, 총 {total_used}회)"
         if page is not None:
