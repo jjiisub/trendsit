@@ -714,6 +714,26 @@ def test_briefing_md_untitled_source(week, monkeypatch):
     assert "`it:1#q1` ?" in text
 
 
+def test_briefing_md_includes_section_tiles_and_table_refs(week):
+    """007-A1-12: 읽기본에 절 안 타일(visual=tiles)과 표 refs도 나온다(런 뒤 ④ 훑어보기·관문 B 라벨 작업에 필요)."""
+    ctx, _cids = week
+    sec = {"heading": "절", "paragraphs": [{"text": "문장이다.", "refs": ["it:1#s1"]}], "visual": "tiles",
+          "bars": None, "table": None, "tiles": [{"value": "77.9%", "label": "지표", "note": "", "refs": ["it:1#s1"]}],
+          "events": None, "slide": None, "slide_caption": "", "video_secs": [], "check": False}
+    sec2 = {**sec, "heading": "표 절", "visual": "table", "tiles": [],
+           "table": {"title": "표", "note": "", "columns": ["a", "b"], "rows": [["1", "2"], ["3", "4"]], "refs": ["it:1#s1", "it:1#q1"]}}
+    page_json = {"head_tiles": [], "sections": [sec, sec2], "summary": "s", "title": "t", "log": "l", "attention": False}
+    ctx.db.conn.execute("INSERT INTO topic_pages(run_id, topic_id, round, page_json) VALUES ('r','t1',1,?)",
+                        (json.dumps(page_json, ensure_ascii=False),))
+    ctx.db.conn.commit()
+    t = {"topic_id": "t1", "rank": 1, "lead": False, "status": "passed", "final_round": 1, "angle": "a",
+        "relation_topic_id": None, "checks_json": "[]"}
+    lines = briefing._topic_md_lines(ctx.db, "r", t, {})
+    text = "\n".join(lines)
+    assert "타일: 77.9% — 지표" in text
+    assert "근거: it:1#s1, it:1#q1" in text
+
+
 def test_scrub_empties_topic_isolates_failure_not_whole_export(week):
     """006-A2-3: refs가 전부 pack 밖이라 수정으로도 못 고치면 그 토픽만 failed(export C-2 전체 중단 방지), 나머지는 계속."""
     sections = [{"heading": f"{TITLES[1]} {n}번째 절", "paragraphs": [{"text": f"{TITLES[1]} 관련 사실 {n}이다.",

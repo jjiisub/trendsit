@@ -187,11 +187,13 @@ def _topic_md_lines(db: DB, run_id: str, t: Any, srcs: dict[str, dict[str, Any]]
             lines += [f"| {it.label} | {it.value} | `{it.ref}` | {'강조' if it.emphasis else ''}{'기준' if it.baseline else ''} |"
                       for it in s.bars.items]
             lines.append("")
+        if s.tiles:  # 007-A1-12: 절 안 타일(visual=tiles)도 읽기본에 출력
+            lines += [f"타일: {x.value} — {x.label}({x.note}) `{', '.join(x.refs)}`" for x in s.tiles] + [""]
         if s.table:
             lines += [f"표: {s.table.title} — {s.table.note}", "", f"| {' | '.join(s.table.columns)} |",
                       "|" + "---|" * len(s.table.columns)]
             lines += [f"| {' | '.join(row)} |" for row in s.table.rows]
-            lines.append("")
+            lines += [f"근거: {', '.join(s.table.refs)}", ""]  # 007-A1-12: 표 refs도 출력
         if s.events:
             lines += [f"사건 흐름: {s.events.title} — {s.events.context}", "", "| 날짜 | 사건 | 근거 |", "|---|---|---|"]
             lines += [f"| {it.date} | {it.text} | `{it.ref or it.topic_id}` |" for it in s.events.items]
