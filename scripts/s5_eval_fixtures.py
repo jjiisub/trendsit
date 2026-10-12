@@ -130,14 +130,16 @@ def mutate(page: TopicPage, pack: dict, kind: str) -> tuple[TopicPage, str] | No
 
 
 def _open_readonly_copy(cfg) -> DB:
-    """실제 DB는 읽기만(DB 클래스는 열 때 스키마·캐시를 쓰므로 읽기 전용 연결로 복사한 임시 DB를 연다)."""
-    tmp = tempfile.TemporaryDirectory()
+    """실제 DB는 읽기만(DB 클래스는 열 때 스키마·캐시를 쓰므로 읽기 전용 연결로 복사한 임시 DB를 연다).
+    007-A2-18: TemporaryDirectory를 지역 변수로 두면 반환 즉시 GC가 폴더를 지운다 — mkdtemp로 만들어 스크립트
+    종료까지(수동 정리 없음, 짧게 돌고 끝나는 1회성 스크립트라 OS 임시 폴더 정리에 맡김)."""
+    tmp = tempfile.mkdtemp()
     src = sqlite3.connect(f"file:{ROOT / 'data' / 'trendsit.db'}?mode=ro", uri=True)
-    dst = sqlite3.connect(Path(tmp.name) / "trendsit.db")
+    dst = sqlite3.connect(Path(tmp) / "trendsit.db")
     src.backup(dst)
     dst.close()
     src.close()
-    return DB(Path(tmp.name) / "trendsit.db")
+    return DB(Path(tmp) / "trendsit.db")
 
 
 def _dump_writer(cfg, db: DB, topics: list) -> None:
@@ -253,7 +255,7 @@ def _dump_writer_revise(done: list) -> int:
         ids = {i["evidence_id"] for i in issues if i["evidence_id"]} | {r for s in page.sections for p in s.paragraphs for r in p.refs}
         inp = WriterReviseInput(loc_lines=loc_lines(page), previous=page,
                                 issues=[IndexedIssue(idx=k, **x) for k, x in enumerate(issues)],
-                                evidence=[d for d in evidence_docs(pack) if d.id in ids], aliases=t["aliases"])
+                                evidence=evidence_docs({k: v for k, v in pack.items() if k in ids}), aliases=t["aliases"])  # 007-A2-4: write._revise와 같은 계산(근거 id→구성원)
         dump("writer_revise", f"{kind}-{t['topic'].topic_id}", inp.model_dump(), {"action": "edit"}, f"이슈 {kind}(오류를 심음)")
         rv += 1
     if done:
