@@ -33,6 +33,7 @@ from trendsit.brief.write import (  # noqa: E402
     evidence_docs,
     previous_topic,
     refs_of,
+    topic_slide_info,
     writer_limits,
 )
 from trendsit.core import config  # noqa: E402
@@ -85,7 +86,7 @@ def week_topics(db: DB, week: str, cfg) -> list[dict]:
         kept, _ = cap_pack(ms, cfg.evidence.max_tokens_per_topic)
         pack = pack_index(kept)
         out.append({"week": week, "run": run, "topic": t, "status": row["status"] if row else None,
-                    "page": TopicPage.model_validate_json(page[0]) if page else None, "pack": pack,
+                    "page": TopicPage.model_validate_json(page[0]) if page else None, "pack": pack, "ms": ms,
                     "aliases": alias_lines(table, ms), "n_sources": len({it.member for it in kept}), "inp_select": sel.build_input(cands, ev, db, cfg), "cands": cands})
     return out
 
@@ -142,10 +143,13 @@ def _open_readonly_copy(cfg) -> DB:
 def _dump_writer(cfg, db: DB, topics: list) -> None:
     for t in topics[:20]:
         tp = t["topic"]
+        used_members = {it.member for v in t["pack"].values() for it in v}
+        slide_candidates, _timeline_secs = topic_slide_info(t["ms"], used_members, cfg)
+        slide_candidates = [c for c in slide_candidates if c in t["pack"]][: cfg.write.slides_max]  # write_topic과 같은 계산
         inp = WriterInput(plan=PlanBrief(rank=tp.rank, angle=tp.angle, relation=Relation(type=tp.relation_type,
                                                                                        topic_id=tp.relation_topic_id)),
                           evidence=evidence_docs(t["pack"]), previous=previous_topic(db, tp.relation_topic_id),
-                          aliases=t["aliases"], limits=writer_limits(cfg, t["n_sources"]))
+                          aliases=t["aliases"], limits=writer_limits(cfg, t["n_sources"]), slide_candidates=slide_candidates)
         dump("writer", tp.topic_id, inp.model_dump(), {}, f"{t['week']} 실제 토픽 입력(run {t['run']})")
 
 
