@@ -9,7 +9,7 @@
 | 항목 | 값 |
 |---|---|
 | slug | `s6-1` |
-| 버전 / 작성일 | v1.1 / 2026-10-12(v1.1: 보기 확인점 3개와 런 뒤 단일 스크립트 추가, 사용자 요청) |
+| 버전 / 작성일 | v1.2 / 2026-10-12(v1.1: 보기 확인점 3개와 런 뒤 단일 스크립트 추가, 사용자 요청. v1.2: 런 006 C2 리뷰 반영 — 5.13 부분 실패 주 발행, C-5 상한, A3·A11 판정, 3.4 예산, 5.3 시각 칸 비우기. 13장) |
 | 문서 상태 | **확정(투입 가능)** |
 | 미해결 `Q-*` | 0건(Q-10 소스 페이지 영상 id 노출은 다음 사이클로 보류 → 비목표 NG-8) |
 | 선행 런 | `.workflow/005-s6a/`(리뷰 모드 재료: handoff 006 F74·F10·F48·F70·F09) |
@@ -104,7 +104,7 @@
 ### 3.4 복잡도 예산
 | 항목 | 값 |
 |---|---|
-| 변경하는 기존 파일 | ≤ 37(`.gitignore`에 `/site.sample` 한 줄 포함). 코드 12(`core/artifacts_brief.py`, `core/config_brief.py`, `brief/evidence.py`, `brief/write.py`, `brief/checks.py`, `brief/revision.py`, `brief/briefing.py`, `brief/pipeline.py`, `export.py`, `cli_ops.py`, `site_src/build.py`, `site_src/check.py`), `site_src/gate.js`, `site_src/trendsit.css`, 역할·스킬 md 4, `config/brief.yaml`, 스크립트 5(`run_ops.sh`, `setup_run_worktree.sh`, `verify_s5.sh`, `verify_s6b.sh`, `s5_eval_fixtures.py`), `eval/graders_brief.py`, `scripts/s5_gate_b.py`, 테스트 7(`test_s5_select_checks.py`, `test_s5_weekly.py`, `test_s5_evidence.py`, `test_s5_material.py`, `test_export.py`, `test_site.py`, `test_ops.py`), 픽스처 `tests/fixtures/site/site.json`, 문서 3(`README.md`, `AGENTS.md`, `docs/handoff/CONTRACTS.md`) |
+| 변경하는 기존 파일 | ≤ 39(v1.2: 런 006 실측으로 `scripts/s5_1_golden.py`(B1 구현에 필수)·`trendsit/core/db.py`(3.3이 허용한 backup 함수) 수용. `core/render.py`는 수용 안 함 — 되돌림). 원안 ≤ 37(`.gitignore`에 `/site.sample` 한 줄 포함). 코드 12(`core/artifacts_brief.py`, `core/config_brief.py`, `brief/evidence.py`, `brief/write.py`, `brief/checks.py`, `brief/revision.py`, `brief/briefing.py`, `brief/pipeline.py`, `export.py`, `cli_ops.py`, `site_src/build.py`, `site_src/check.py`), `site_src/gate.js`, `site_src/trendsit.css`, 역할·스킬 md 4, `config/brief.yaml`, 스크립트 5(`run_ops.sh`, `setup_run_worktree.sh`, `verify_s5.sh`, `verify_s6b.sh`, `s5_eval_fixtures.py`), `eval/graders_brief.py`, `scripts/s5_gate_b.py`, 테스트 7(`test_s5_select_checks.py`, `test_s5_weekly.py`, `test_s5_evidence.py`, `test_s5_material.py`, `test_export.py`, `test_site.py`, `test_ops.py`), 픽스처 `tests/fixtures/site/site.json`, 문서 3(`README.md`, `AGENTS.md`, `docs/handoff/CONTRACTS.md`) |
 | 새 파일 | ≤ 11: `scripts/s6_1_regen.sh`(7장 ①~⑤ 한 번에), `trendsit/brief/fulltext.py`(원문 조립), `trendsit/brief/slides.py`(후보·프레임), `scripts/verify_s6-1.sh`, 테스트 2~3(`tests/test_s6_1_write.py`, `tests/test_s6_1_site.py`, 선택 `tests/test_s6_1_ops.py`), 픽스처 2(`tests/fixtures/s6_1/digest_llamaindex.json`, `tests/fixtures/s6_1/topic_v2.json`), `reports/S6-1_report.md`, `reports/S6-1/golden.json`(새 구조 코드 검사 골든, 5.11) |
 | 삭제 | 옛 eval 픽스처 `eval/fixtures/writer|critic|writer_revise/*.json`(런 뒤 재생성으로 교체), `reports/S5-1/golden_before.json`은 **남김**(verify_s5 B1이 더는 읽지 않음) |
 | 새 의존성 | 금지(Python·npm). ffmpeg는 외부 실행 파일(subprocess) |
@@ -183,6 +183,7 @@ TopicPage   {head_tiles: list[Tile] 0~4, sections: list[Section], summary: str, 
 - 도식 위치 이름(`loc_lines`, 번호 0부터): `title`, `summary`, `head_tiles[i]`, `sections[i].heading`, `sections[i].paragraphs[j]`, `sections[i].bars`, `sections[i].bars.items[k]`, `sections[i].table`, `sections[i].table.rows[k]`, `sections[i].tiles[k]`, `sections[i].events`, `sections[i].events.items[k]`, `sections[i].slide`, `sections[i].video_secs`
 - revise `Change.loc`은 위 이름 그대로. `value` 형식: 문자열(title·summary·heading·paragraph text·slide_caption), `Para`, `Tile`, `BarGroup`, `Table`, `EventGroup`, `NumberItem`, `EventItem`, `list[str]`(table.rows[k])、`list[int]`(video_secs). `Section` 전체 add/delete 허용(`sections[i]`), `sections` 전체 삭제는 거부
 - `check`·`slide`(코드가 채운 것)는 코드 소유: 작성자 출력의 `check=true`는 enforce가 false로
+- (v1.2) 시각 요소 비우기: 위치 문법에 `visual` 칸은 없다. revise 적용 뒤 절의 visual 종류 칸(bars·table·events가 null, tiles가 [])이 비면 코드가 `visual="none"`으로 맞춘다(자동 수정, 반려 아님). 하위 경로가 붙은 loc이 위 이름에 없으면 그 변경은 버리고 note(절 전체 delete는 loc이 정확히 `sections[i]`일 때만)
 
 **실제 예시(정상, 요지)** — Haiku 토픽(글 2), 시험 1단 결과에서:
 ```json
@@ -228,7 +229,7 @@ TopicPage   {head_tiles: list[Tile] 0~4, sections: list[Section], summary: str, 
 
 라운드: 기존 3라운드 흐름 그대로(코드 반려 → 검수 안 부름, 같은 이슈 2회 → check, 마지막 라운드 남은 이슈 → check). `check` 위치는 `sections[i]` 단위(단락·타일·표 이슈는 그 절), `summary`·`title`. `topics.checks_json`에 위치 이름 그대로. 코드 확인 오류가 남은 시각 요소(단위 섞임·값 불일치)는 최종판에서 뺀다(기존 `_drop_code_bad_diagrams` 방식: visual → none, 그 절 check).
 
-잘림(⑥, D-42): `roles/writer.md` `max_tokens: 4500`. `run_role`이 잘림 1회 재시도 뒤 `RoleFailed("출력 잘림…")`을 올리면 write.py가 **같은 입력에 `no_visuals=true`**로 `run_role` 1회 더(내부 재시도 포함 최대 4회 호출). 그래도 실패면 기존대로 토픽 failed + attention "작성 실패: 잘림"(D-33). 비용 기록은 `costs["writer"]`에 합산, `steps.detail`에 `{"no_visuals": true}`.
+잘림(⑥, D-42): `roles/writer.md` `max_tokens: 4500`. `run_role`이 잘림 1회 재시도 뒤 `RoleFailed("출력 잘림…")`을 올리면 write.py가 **같은 입력에 `no_visuals=true`**로 `run_role` 1회 더(v1.2: 내부 재시도 포함 토픽당 최대 5회 호출 — 잘림 2 + no_visuals 쪽 스키마 재시도 포함 3. 성공한 판은 횟수 때문에 버리지 않는다). 그래도 실패면 기존대로 토픽 failed + attention "작성 실패: 잘림"(D-33). 비용 기록은 `costs["writer"]`에 합산, `steps.detail`에 `{"no_visuals": true}`.
 
 ### 5.6 슬라이드 후보·배치·프레임(slides.py, D-30·D-34·D-39)
 - 후보(코드, 영상 digest `slides[]`): `frame_kind == "slide"`이고 ① 25자 이하 짧은 줄(`ocr_text` 줄 단위) 20개 이상 + `numbers` 1개 이상, 또는 ② `table`이 있음. 같은 `title`은 첫 장만. sec 오름차순 최대 `slides_max`(2). id `sl:{item_id}@{sec}`
@@ -310,7 +311,7 @@ review: 그대로(max_rounds 3, same_issue_repeat_to_check 2, duplicate_point_si
 | C-2 | 타일 value·표 셀(첫 열 제외)·막대 value의 모든 수치는 그 칸 refs 원문에 값으로 존재(`same()`) | 코드 검사 반려(number_mismatch) |
 | C-3 | 절마다 `visual != none`인 것은 그 종류의 내용이 있고 나머지 시각 칸은 비어 있다; 페이지 `visual != none` 수 ≤ `visuals_max`; `len(head_tiles) ≤ head_tiles_max`; 슬라이드 ≤ `slides_max` | 반려(format) / 자동 수정(sections 자름) |
 | C-4 | `section.slide`는 `slide_candidates`의 원소이거나 null; `video_secs ⊆ 타임라인 sec` | 자동 수정 |
-| C-5 | 작성자 호출은 토픽당 최대 4회(기본 ≤2 + no_visuals ≤2), 실패 토픽은 `status='failed'`이고 export에 없다 | 테스트 실패 |
+| C-5 | 작성자 호출은 토픽당 최대 5회(v1.2: 기본 ≤2 + no_visuals run_role 1회 ≤3), 성공 판은 폐기하지 않음, 실패 토픽은 `status='failed'`이고 export에 없다 | 테스트 실패 |
 | C-6 | `page.check`·`section.check`는 코드만 바꾼다(작성자·수정 출력의 true는 false로) | enforce |
 | C-7 | site.json 토픽에 `overview`·`points`·`diagrams`·`concepts`·`contributions` 키 없음; `slide.image`가 가리키는 파일이 `data/slides/`에 존재 | export 테스트 실패 |
 | C-8 | 생성 HTML: 외부 요청 0(S6a C-4) + `img src`는 `/assets/slides/*.jpg`이고 파일 존재; 사이트 JS 0 | check 실패 |
@@ -322,7 +323,9 @@ review: 그대로(max_rounds 3, same_issue_repeat_to_check 2, duplicate_point_si
 ### 5.13 실패 동작
 | 상황 | 동작 | 종료/상태 |
 |---|---|---|
-| 작성자 잘림 2회(기본) + no_visuals 2회 모두 실패 | 토픽 failed, attention, 다른 토픽 계속 | weekly 0(partial은 요약 상태로), 사이트에서 그 토픽 제외 |
+| 작성자 잘림 2회(기본) + no_visuals 모두 실패 | 토픽 failed, attention, 다른 토픽 계속 | weekly 0(partial은 요약 상태로), 사이트에서 그 토픽 제외 |
+| (v1.2) 토픽 일부만 failed(예산 중단 아님, 성공 토픽 ≥ 1) | runs.status·summary는 `partial` 그대로, **`weeks.status`는 `done`**(지금 코드는 `written`이라 publish가 2로 거부 → 무인 발행이 통째로 막힘). ops weekly는 그대로 publish까지 | 발행됨, 실패 토픽은 export에 없음 |
+| 토픽 전부 failed 또는 예산 중단 | 기존대로 weeks 갱신 안 함·발행 안 함 | 1 |
 | 원문 없음(만료) | 카드 인용으로 대체 + attention | 계속 |
 | 영상 파일 없음 / ffmpeg 없음·실패 | 슬라이드 null + attention, 토픽 계속 | 계속 |
 | export: C-2 위반, published 0개, DB 오류 | ExportError, 파일 미작성(기존) | 1 |
@@ -339,15 +342,15 @@ review: 그대로(max_rounds 3, same_issue_repeat_to_check 2, duplicate_point_si
 |---|---|---|---|---|---|---|
 | A1 | 작은 보완(운영) | 임시 저장소(verify_s6b B11 방식)로 run_ops fetch+reset(원격 앞선 커밋 뒤 HEAD == origin/main, 링크 보존, 동기화 실패에도 실행, 종료 코드 전달, main 아니면 3), setup이 fetch 뒤 origin/main으로 worktree, `trendsit backup` 임시 DB(사본 integrity ok, 원본 해시 동일, 같은 이름 1, --tag) | 전부 통과, verify_s6b 전체 PASS | 스크립트 | 5.1-6·7·9, C-11·C-12 | S-1 |
 | A2 | 작은 보완(화면) | 픽스처 빌드 → HTML 파싱 + gate.js | 키워드 행 링크 ≤ 5 + "외 n개", 실행 1건 "이 주 발행 n개 / 이 실행이 쓴 토픽 m개"와 export `counts.written`, 대체 계획 문구 2종, `h3.src-g` 0, 레포 메타 줄 " / " 구분, 탭 C-10 | 스크립트 | 5.1-1~5·8 | S-1 |
-| A3 | 스키마·역할 md·설정 | `check-config`(역할 md 3개 lint: 섹션 순서·예시 3~5·굵게 ≤1, brief.yaml 새 칸), TopicPage v2 검증(이상 예시가 거부·enforce), WriterLimits가 brief.yaml 값, writer.md에 숫자 패턴 0(B10), md 3개에 `limits.` 참조 ≥ 1 | 통과 | 스크립트 | 5.3·5.4·5.10, D-44 | S-2 |
+| A3 | 스키마·역할 md·설정 | `check-config`(역할 md 3개 lint: 섹션 순서·예시 3~5·굵게 ≤1, brief.yaml 새 칸), TopicPage v2 검증(이상 예시가 거부·enforce), WriterLimits가 brief.yaml 값, writer.md에 숫자 패턴 0(B10), writer.md에 `limits.` 참조 ≥ 1(v1.2: critic·writer_revise 입력에는 limits 칸이 없어 제외) | 통과 | 스크립트 | 5.3·5.4·5.10, D-44 | S-2 |
 | A4 | 근거 공급 | 임시 DB(글 2·영상 1·레포 1): Document 줄 형식 4종 id, 글 6,000자·전사 14,000자 상한(문장 경계), 토픽 상한 문장 단위 자름, 원문 NULL → `#q` 대체 + attention, 검수자 raw_evidence 매핑(#s ±1문장, 전사 묶음, sl 판독), topic_evidence field 저장 | 통과 | 스크립트 | 5.2, C-1 | S-2 |
 | A5 | 코드 검사 | 5.5 표 각 행 1건 이상(이상 예시 포함) + 자동 수정 4종 + 경고 4종 | 반려·수정·경고가 명세대로 | 스크립트 | 5.5, C-2·C-3·C-4 | S-2 |
-| A6 | 라운드·수정·잘림 | 가짜 LLM: 위치 문법 v2 apply(지적 안 된 절 되돌림, sections[i] add/delete, rows[k]), 같은 이슈 2회 → section check, 잘림 → no_visuals 재호출(호출 수 ≤ 4, detail.no_visuals) → 그래도 실패면 failed·export 제외, 비용 합산, previous_topic v2 | 통과 | 스크립트 | 5.3·5.5, C-5·C-6 | S-2 |
+| A6 | 라운드·수정·잘림 | 가짜 LLM: 위치 문법 v2 apply(지적 안 된 절 되돌림, sections[i] add/delete, rows[k]), 같은 이슈 2회 → section check, 잘림 → no_visuals 재호출(호출 수 ≤ 4, detail.no_visuals) → 그래도 실패면 failed·export 제외, 비용 합산, previous_topic v2, (v1.2) 하위 위치 오류 delete가 절을 지우지 않음, 시각 칸 비우면 visual none, 토픽 1개 failed인 run → weeks `done`·ops weekly publish 0·사이트에 그 토픽 없음 | 통과 | 스크립트 | 5.3·5.5, C-5·C-6 | S-2 |
 | A7 | 슬라이드 | 픽스처 digest(LlamaIndex 20장 사본): 후보 = 873·900초 2장(같은 제목 첫 장, 글머리표 슬라이드 제외), 작성자 선택 후보 밖 → null, 미배치 → 직전 구간 절, ffmpeg로 합성 영상(`lavfi testsrc` 10초, 테스트가 만듦) 프레임 960×540 생성·재실행 시 재생성 안 함, 영상 없음 → null + attention | 통과(ffmpeg 없으면 FAIL) | 스크립트 | 5.6, C-4 | S-2 |
 | A8 | export v2 | 임시 DB v2 페이지 → site.json: 토픽 칸 목록 일치, 옛 키 0(C-7), refs → 출처 id, 영상 sources.timeline·video_id, video_secs 라벨, slide 파일 있을 때만, C-2 위반 시 파일 유지, runs.counts.written·fallback | 통과 | 스크립트 | 5.7, C-7 | S-3 |
 | A9 | build 토픽 | v2 픽스처(타일 0·1·2·3·4, 표, 막대 2개, events, 슬라이드, 영상 타임라인, ⚠ 절·요약, 절 1개 토픽, 긴 heading) → HTML 파싱 | 블록 순서 5.8, 시각 요소가 첫 단락 뒤, `.tiles.n{k}`, 슬라이드 figure·캡션 링크 `&t=`, `.vgo`·`.vtl` 링크 수 = secs 수, `.chk` id 순번·메타 링크(C-9), 읽는 시간 식, 옛 섹션 제목 0 | 스크립트 | 5.8, C-9 | S-3 |
 | A10 | 관문 9 + 동작 | `check.py --fixture`(정적 + gate.js Chromium·WebKit 375/768/1280, 대상 페이지 5.9) | 9항목 전부 + 새 측정(탭 높이, 표 스크롤·넘침 0, 이미지 로드, 타일 잘림 0) 통과, 외부 요청 0(C-8) | 스크립트 | 5.9, C-8·C-10 | S-3 |
-| A11 | 회귀 | `verify_s6a.sh`, `verify_s6b.sh`, `verify_s5.sh --fast`(개정 항목 포함) | 셋 다 종료 코드 0, pytest 전체 건너뜀 0, `reports/S6-1/golden.json`과 B1 일치 | 스크립트 | 5.11 | S-3 |
+| A11 | 회귀 | `verify_s6a.sh`, `verify_s6b.sh`, `verify_s5.sh --fast`(개정 항목 포함) | 셋 다 종료 코드 0(v1.2 예외: verify_s5 B5·A23 "순 감소 아님"은 S5-1 전용 불변식으로 기준 커밋에서 이미 FAIL → 이 두 줄만 FAIL 허용, 다른 항목 FAIL은 불합격), pytest 전체 건너뜀 0, `reports/S6-1/golden.json`(6토픽)과 B1 일치 | 스크립트 | 5.11 | S-3 |
 | A12 | 실측 QA(0원) | qa-verifier: `site.sample/`(5.9 명령, 시험 6토픽)을 WebKit 375×812·Chromium 1280으로 열어 캡처를 `reports/S6-1/shots/`에(홈 탭 2개, 타일 3개 토픽, 표 토픽, 슬라이드·타임라인 토픽, ⚠ 토픽, 키워드, 실행 1건). 적대적: 절 1개 토픽, 타일 1개·3개 모바일 배치, 표 4열 모바일 가로 스크롤, 슬라이드 파일 없는 토픽(null → figure 없음), 영상 없는 토픽에 `.vgo` 0, 확인 필요 0인 토픽에 메타 링크 없음 | 캡처가 5.8 배치 규칙과 일치, 가로 넘침 0, 깨진 레이아웃 0 | QA | 5.8 | S-3 |
 | A13 | 문서·정리 | 파일 검사 | README "사이트" 절(새 구조·`backup`·`export` v2), README "자동 실행" 절(래퍼 fetch+reset), `AGENTS.md` 출력 형식 줄 교체, CONTRACTS 2장 근거 id 3행, `reports/S6-1_report.md` 8장까지, `reports/S6-1/shots/` png ≥ 6장, `.gitignore`에 `/site.sample`, 옛 eval 픽스처 3폴더 비어 있음, `trendsit/`에 `overview`·`concepts` 식별자 0(grep) | 스크립트 | 5.11 | S-4 |
 
@@ -386,8 +389,10 @@ review: 그대로(max_rounds 3, same_issue_repeat_to_check 2, duplicate_point_si
 - 구현 시점 기본값(리포트 "결정한 것"에 적는다): 문장 나누기 정규식의 약어·소수점 처리, 전사 묶음 경계(25초 ± 문장 끝), 표 셀 수치 정규화(`$0.10` 등 통화 기호 처리는 `number_values` 그대로), 타일 `note` 비었을 때 표시, 슬라이드 캡션에 title이 빈 경우 "슬라이드 m:ss"만, `.vgo` 라벨이 긴 경우 줄바꿈, 읽기본(md) 표 모양, `counts.written` 0일 때 표시, 백업 파일명 시각 형식(`%Y%m%d-%H%M`), ffmpeg 입력 파일 확장자 탐색 순서
 - 기획 세션 몫(병합 뒤): 19·63 3.3·64 부록 C(C-34: S6-1 결과), `docs/CONTEXT.md`·COMMON 8장 스펙 표 동기화, 디자인 문서(`docs/reference/s6_design/DESIGN.md` 4.3)에 새 조각 반영은 **다음 사이클**(이 스펙에서는 `trendsit.css`만. 참고 복사본은 건드리지 않음 3.3)
 - 사용자 몫: 원격 브랜치 정리, 관문 B 미달 시 되돌림 결정, 예산 상향(필요 시)
+- 다음 사이클(v1.2, 런 006에서 발견, 시연 뒤): ① 출처 메타(channel·title·url)를 만료되는 원문(item_texts·video_segments, 8주)에서 찾아 W40·W41은 약 11/26 이후 재발행 때 출처가 깨짐 → member 단위(items·videos)에서 찾기(006-C2-14). ② 영상 2개 이상 토픽의 `video_secs`·슬라이드 시점 링크가 첫 영상으로 감(006-C2-16, 칸에 영상 id 필요). ③ verify_s5 B5·A23을 "직전 스펙 기준"으로 바꾸거나 삭제
 - 위험: 10/19 첫 무인 실행이 새 작성자 — 잘림 재시도(D-42)와 실패 격리(D-33)가 안전장치. 시험 잘림률 6/25라 토픽당 평균 호출 1.3회 가정, 주당 비용 +$0.1~0.2(RUN 1.50 안)
 
 ## 13. 실측 반영 이력
 | 날짜 | 런 | 발견 | 근거 | 변경한 § |
 |---|---|---|---|---|
+| 2026-10-12 | 006-s6-1 | C2 리뷰 High 3(revise 절 삭제, 복합 수치 일부만 대조, 부분 실패 주 미발행)·Medium(C-5 사후 폐기, limits 참조, B5·A23, 예산 39) | `.workflow/006-s6-1/C2-review.md`, 코드 지적 `.workflow/planning/s6-1/code-findings-1.md` | 3.4, 5.3, 5.5, 5.12 C-5, 5.13, 6장 A3·A6·A11, 9장 |
