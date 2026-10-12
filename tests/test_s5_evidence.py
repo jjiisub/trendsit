@@ -10,10 +10,10 @@ import pytest
 from tests.conftest import FakeTransport, make_ctx, response
 from trendsit.brief import aliases as al
 from trendsit.brief import fulltext
+from trendsit.brief import write as wr
 from trendsit.brief.evidence import EvidenceItem, Member, cap_pack, week_evidence
 from trendsit.brief.select import Applied
 from trendsit.brief.write import evidence_docs
-from trendsit.brief import write as wr
 from trendsit.core import config
 from trendsit.core.db import DB
 
