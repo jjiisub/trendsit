@@ -2,8 +2,27 @@
 # S6-1 7장 런 뒤 ①~⑤를 한 번에(D-46). 실DB에 쓴다(backup·weekly·publish): 사용자 승인 뒤에만 돌린다.
 # 한 단계라도 실패하면(명령 실패 또는 비용 상한 초과) 거기서 멈추고 종료 코드 1. 사용: bash scripts/s6_1_regen.sh
 set -eu
-trap 'exit 1' ERR  # 명령 실패 종료 코드와 무관하게 1로(7장 "멈추고 종료 코드 1")
 cd "$(dirname "$0")/.."
+
+DB="data/trendsit.db"
+FORCED=()  # 이번 실행에서 --force로 푼 주들("week|이전status|이전run_id"), 실패 시 trap이 전부 안내
+
+week_state() {  # "status|current_run_id"(읽기만, -readonly)
+  sqlite3 -readonly -separator '|' "$DB" "SELECT status, current_run_id FROM weeks WHERE week='$1'"
+}
+
+on_err() {  # v1.2: weekly 명령 자체가 실패(set -e)해도, --force한 모든 주의 복구 명령을 안내하고 종료 코드 1
+  local code=$?
+  if [ "${#FORCED[@]}" -gt 0 ]; then
+    echo "실패(종료 코드 $code). --force로 푼 주가 있음. 복구(필요한 주만):" >&2
+    for f in "${FORCED[@]}"; do
+      local week="${f%%|*}" rest="${f#*|}"
+      echo "  sqlite3 $DB \"UPDATE weeks SET status='${rest%%|*}', current_run_id='${rest##*|}' WHERE week='$week'\"" >&2
+    done
+  fi
+  exit 1
+}
+trap on_err ERR  # 명령 실패 종료 코드와 무관하게 1로(7장 "멈추고 종료 코드 1")
 
 check_cost() {  # 합 ≤ 1.50(2장), 넘으면 멈춤
   local line spent cap
@@ -14,12 +33,6 @@ check_cost() {  # 합 ≤ 1.50(2장), 넘으면 멈춤
     echo "비용 상한 초과: \$$spent / \$$cap, 멈춤" >&2
     exit 1
   fi
-}
-
-DB="data/trendsit.db"
-
-week_state() {  # "status|current_run_id"(읽기만, -readonly)
-  sqlite3 -readonly -separator '|' "$DB" "SELECT status, current_run_id FROM weeks WHERE week='$1'"
 }
 
 # 006-C1-3: weekly --force는 시작하자마자 그 주를 published → done으로 푼다. 토픽 하나만 failed여도
@@ -49,10 +62,12 @@ uv run python -m trendsit backup --tag pre-s6-1
 
 echo "== ③ weekly --force --spec S6-1(W40, W41) =="
 prev40=$(week_state 2026-W40)
+FORCED+=("2026-W40|$prev40")
 uv run --extra embed python -m trendsit weekly --week 2026-W40 --force --spec S6-1
 check_cost
 check_week_publishable 2026-W40 "$prev40"
 prev41=$(week_state 2026-W41)
+FORCED+=("2026-W41|$prev41")
 uv run --extra embed python -m trendsit weekly --week 2026-W41 --force --spec S6-1
 check_cost
 check_week_publishable 2026-W41 "$prev41"
