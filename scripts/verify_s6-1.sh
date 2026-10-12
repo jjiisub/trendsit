@@ -92,14 +92,21 @@ if msg=$(a11 2>&1); then pass A11 "verify_s6a.sh·verify_s6b.sh·verify_s5.sh --
 a13() {
   grep -q '^### 사이트' README.md || { echo "README 사이트 절 없음"; return 1; }
   grep -q 'trendsit backup' README.md || { echo "README에 trendsit backup 없음"; return 1; }
+  grep -q 'git fetch origin main && git reset --hard origin/main' README.md || { echo "README 자동 실행 절에 fetch+reset 설명 없음"; return 1; }
+  grep -q 'S6a 최상위 구조 + S6-1 토픽 v2' AGENTS.md || { echo "AGENTS.md 출력 형식 줄 없음"; return 1; }
   for n in 1 2 3 4 5 6 7 8; do grep -q "^## $n\\." reports/S6-1_report.md 2>/dev/null || { echo "reports/S6-1_report.md에 $n장 없음"; return 1; }; done
   local shots
   shots=$(ls reports/S6-1/shots/*.png 2>/dev/null | wc -l | tr -d ' ')
   [ "${shots:-0}" -ge 6 ] || { echo "reports/S6-1/shots/ png ${shots:-0}장(6장 이상 필요)"; return 1; }
   grep -q '^/site.sample' .gitignore || { echo ".gitignore에 /site.sample 없음"; return 1; }
+  # 006-C1-16: "빈 폴더"는 7장 ⑥(런 뒤 eval 픽스처 재생성·커밋) 이후 영구 FAIL이 되는 모순이 있다. 대신 "옛 구조
+  # (points·overview 키) 픽스처 0개"로 본다 — 지금처럼 비어 있어도, ⑥ 뒤 v2 픽스처가 들어와도 통과한다
   for d in writer critic writer_revise; do
-    n=$(ls "eval/fixtures/$d" 2>/dev/null | wc -l | tr -d ' ')
-    [ "${n:-0}" = 0 ] || { echo "eval/fixtures/$d/가 비어 있지 않음(런 뒤 재생성 대상)"; return 1; }
+    files=$(ls "eval/fixtures/$d"/*.json 2>/dev/null)
+    if [ -n "$files" ]; then
+      bad=$(grep -lE '"(points|overview)"\s*:' $files 2>/dev/null || true)
+      [ -z "$bad" ] || { echo "eval/fixtures/$d/에 옛 구조(points·overview 키) 픽스처 남음: $bad"; return 1; }
+    fi
   done
   local ids
   # 주석 한 줄짜리(마이그레이션 번호의 역사적 맥락 설명 등)는 식별자가 아니라 빼고 본다
@@ -108,6 +115,6 @@ a13() {
   grep -q 'it:{item_id}#s{n}' docs/handoff/CONTRACTS.md || { echo "CONTRACTS.md에 it:#s 행 없음"; return 1; }
   return 0
 }
-if out=$(a13 2>&1); then pass A13 "README·AGENTS·CONTRACTS, reports/S6-1_report.md 8장, shots ≥6장, .gitignore, 옛 eval 픽스처 빈 폴더, overview·concepts 식별자 0"; else fail A13 "$out"; fi
+if out=$(a13 2>&1); then pass A13 "README·AGENTS·CONTRACTS, reports/S6-1_report.md 8장, shots ≥6장, .gitignore, 옛 구조 eval 픽스처 0개, overview·concepts 식별자 0"; else fail A13 "$out"; fi
 
 exit $FAILED
