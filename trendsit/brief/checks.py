@@ -195,12 +195,26 @@ def _cap_highlights(page: TopicPage, hl: Any, fixes: list[dict[str, Any]]) -> To
     return page
 
 
+def _fix_empty_visual(page: TopicPage, fixes: list[dict[str, Any]]) -> TopicPage:
+    """v1.2 5.3: revise 적용 뒤 절의 visual 종류 칸(bars·table·events null, tiles [])이 비면 visual=none으로 맞춤(반려 아님)."""
+    secs = list(page.sections)
+    changed = False
+    for i, s in enumerate(secs):
+        empty = {"bars": s.bars is None, "table": s.table is None, "events": s.events is None, "tiles": not s.tiles}
+        if s.visual != "none" and empty.get(s.visual, False):
+            fixes.append({"loc": f"sections[{i}]", "rule": "visual 종류 칸이 비어 none으로 맞춤", "before": s.visual, "after": "none"})
+            secs[i] = s.model_copy(update={"visual": "none"})
+            changed = True
+    return page.model_copy(update={"sections": secs}) if changed else page
+
+
 def autofix(page: TopicPage, cfg: BriefConfig, canon: dict[str, str], slide_candidates: list[str],
            timeline_secs: set[int], sections_hi: int,
            translit: list[tuple[re.Pattern[str], str]] | None = None) -> tuple[TopicPage, list[dict[str, Any]]]:
     fixes: list[dict[str, Any]] = []
     page = _cut_sections(page, sections_hi, fixes)
     page = _fix_slide_and_video_secs(page, slide_candidates, timeline_secs, fixes)
+    page = _fix_empty_visual(page, fixes)
     page = _canonical_names_and_spacing(page, canon, translit or [], fixes)
     return _cap_highlights(page, cfg.write.highlights, fixes), fixes
 
@@ -246,7 +260,7 @@ def _value_mismatch(value: str, ids: list[str], pack: dict[str, list[EvidenceIte
     if not cell_vals or not known:
         return False
     vals = number_values(_ev_text(known, pack))
-    return not any(same(v, w) for v in cell_vals for w in vals)
+    return any(not any(same(v, w) for w in vals) for v in cell_vals)  # v1.2: 수치마다 대조(하나만 맞아도 통과하면 안 됨)
 
 
 def _check_counts(page: TopicPage, cfg: BriefConfig, n_sources: int) -> list[Issue]:
@@ -326,7 +340,7 @@ def _check_visual_structure(page: TopicPage, cfg: BriefConfig) -> list[Issue]:
         ranged = [(f"{loc}.bars", "bars items", s.bars and len(s.bars.items), w.bars_items),
                   (f"{loc}.table", "table rows", s.table and len(s.table.rows), w.table.rows),
                   (f"{loc}.table", "table columns", s.table and len(s.table.columns), w.table.cols),
-                  (f"{loc}.tiles", "tiles", s.visual == "tiles" and len(s.tiles), w.tiles_per_section),
+                  (loc, "tiles", s.visual == "tiles" and len(s.tiles), w.tiles_per_section),  # v1.2 5.3: tiles 전체는 문법 안 이름이 아니라 절 단위 loc
                   (f"{loc}.events", "events items", s.events and len(s.events.items), (2, 6))]
         issues += [iss for rloc, label, n, rng in ranged if n and (iss := _range_issue(rloc, label, n, rng))]
         if s.bars is not None and not s.bars.unit.strip("() \t"):
