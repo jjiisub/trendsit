@@ -1,6 +1,4 @@
-"""작성자(1단) + 코드 검사 + 검수자 + 작성자 수정 루프(S6-1 5.5~5.6).
-라운드: 초안(1) → 반려 → 수정(2) → 반려 → 수정(3). 최대 max_rounds, 코드 반려도 셈. 코드 검사가 반려하면 그 라운드는 검수자를 부르지 않는다(LLM 0원). 같은 이슈가 두 라운드(또는 마지막 라운드 뒤) 남으면 그 절(또는 summary) check=true, 토픽 status=checked. writer_revise는 고친 칸만 낸다(지적 안 된 위치를 바꾸면 되돌리고 횟수를 셈). 잘림(D-42): run_role이 1회 재시도 뒤에도 잘리면 같은 입력에 no_visuals=true로 1회 더(최대 호출 4회, C-5).
-대체: writer 실패 → 토픽 제외(failed) / critic 실패 → 코드 통과판+attention / revise 실패 → 이전 판 유지"""
+"""작성자(1단) + 코드 검사 + 검수자 + 작성자 수정 루프(S6-1 5.5~5.6). 라운드: 초안(1) → 반려 → 수정(2) → 반려 → 수정(3). 최대 max_rounds, 코드 반려도 셈. 코드 검사가 반려하면 그 라운드는 검수자를 부르지 않는다(LLM 0원). 같은 이슈가 두 라운드(또는 마지막 라운드 뒤) 남으면 그 절(또는 summary) check=true, 토픽 status=checked. writer_revise는 고친 칸만 낸다(지적 안 된 위치를 바꾸면 되돌리고 횟수를 셈). 잘림(D-42): run_role이 1회 재시도 뒤에도 잘리면 같은 입력에 no_visuals=true로 1회 더(최대 호출 4회, C-5). 대체: writer 실패 → 토픽 제외(failed) / critic 실패 → 코드 통과판+attention / revise 실패 → 이전 판 유지"""
 
 from __future__ import annotations
 
@@ -18,7 +16,6 @@ from ..core.artifacts_brief import (
     PreviousTopic,
     Relation,
     ReviewVerdict,
-    Section,
     TopicPage,
     WriterInput,
     WriterLimits,
@@ -261,8 +258,7 @@ def _critic_unseen_pages(ctx: Ctx, res: TopicResult, topic: Applied, winp: Write
 
 def _drop_code_bad_sections(res: TopicResult, final: TopicPage, pack: dict[str, list[EvidenceItem]], cfg: BriefConfig,
                             last_issue: dict[str, str], check_locs: set[str]) -> TopicPage:
-    """형식·수치 오류가 남은 절은 visual만 비우고(단락은 둠), 근거와 다른 머리 타일은 빼고, 페이지 상한(visuals_max·
-    slides_max) 초과는 뒤에서부터 줄인다(C-2·C-3. head_tiles_max는 스키마 max_length가 이미 막음)."""
+    """형식·수치 오류가 남은 절은 visual만 비우고(단락은 둠), 근거와 다른 머리 타일은 빼고, 페이지 상한(visuals_max·slides_max) 초과는 뒤에서부터 줄인다(C-2·C-3. head_tiles_max는 스키마 max_length가 이미 막음)."""
     issues = checks.check(final, pack, res.n_sources, cfg)
     bad_secs = {int(m.group(1)) for i in issues
                if (m := re.match(r"^sections\[(\d+)\]", i.loc)) and ".paragraphs" not in i.loc and ".heading" not in i.loc}
@@ -296,11 +292,8 @@ def _drop_code_bad_sections(res: TopicResult, final: TopicPage, pack: dict[str, 
 
 
 def _scrub_pack_refs(res: TopicResult, final: TopicPage, pack: dict[str, list[EvidenceItem]]) -> tuple[TopicPage, set[str]]:
-    """저장 직전 안전망(C-1): 남은 pack 밖 refs를 지운다(가짜 출처보다 빈 칸이 낫다). 빈 refs가 되는 단락은 단락째
-    빼고(절이 통째로 비면 절째), 표·타일·막대도 비면 시각 요소째 뺀다(export C-2의 refs=[] 전체 중단 방지, 006-A2-3)."""
-    secs: list[Section] = []
-    touched: set[str] = set()
-    dropped = 0
+    """저장 직전 안전망(C-1): 남은 pack 밖 refs를 지운다(가짜 출처보다 빈 칸이 낫다). 빈 refs가 되는 단락은 단락째 빼고(절이 통째로 비면 절째), 표·타일·막대도 비면 시각 요소째 뺀다(export C-2의 refs=[] 전체 중단 방지, 006-A2-3)."""
+    secs, touched, dropped = [], set(), 0
     for i, s in enumerate(final.sections):
         upd: dict[str, Any] = {}
         paras = [p.model_copy(update={"refs": kept}) if (kept := [r for r in p.refs if r in pack]) != p.refs else p
@@ -351,6 +344,25 @@ def _finalize_page(res: TopicResult, final: TopicPage, pack: dict[str, list[Evid
     return final, check_locs | scrubbed_locs
 
 
+def _initial_page(ctx: Ctx, winp: WriterInput, res: TopicResult, draft: TopicPage | None) -> tuple[TopicPage | None, str | None, int | None, WriterInput]:
+    """초안을 부르거나(draft 주면 그대로) 잘림이면 no_visuals로 1회 더(D-42·C-5, winp도 갈아 끼워 돌려줌)."""
+    if draft is not None:
+        draft = draft.model_copy(update={"sections": [s.model_copy(update={"check": False}) for s in draft.sections]})
+        return draft, None, None, winp
+    before_sid = ctx.last_step_id or 0
+    page, err, sid = _call(load_role("writer", ctx.models), winp, ctx, res.costs, "writer")
+    used = (sid or 0) - before_sid  # role.py가 쓴 LLM 시도 수(step id 증가분, 스키마 재시도 포함)
+    if page is None and err and "출력 잘림" in err and used <= 2:  # D-42·C-5: 기본 호출이 2회 안이었을 때만 no_visuals 1회 더
+        res.attention.append("작성 잘림, no_visuals로 재시도")
+        res.no_visuals = True  # 시도했음을 바로 기록(detail.no_visuals, 성공 여부와 무관)
+        winp2 = winp.model_copy(update={"no_visuals": True})
+        page, err2, sid = _call(load_role("writer", ctx.models), winp2, ctx, res.costs, "writer")
+        if page is not None:
+            winp = winp2
+        err = err2 if page is None else err
+    return page, err, sid, winp
+
+
 def write_topic(ctx: Ctx, topic: Applied, members: dict[str, Member], table: AliasTable, cfg: BriefConfig,
                review: bool = True, draft: TopicPage | None = None) -> TopicResult:
     """draft를 주면 작성자를 부르지 않고 그 초안부터 검사·검수(--from-step review)."""
@@ -374,21 +386,7 @@ def write_topic(ctx: Ctx, topic: Applied, members: dict[str, Member], table: Ali
                        evidence=evidence_docs(pack), previous=previous_topic(ctx.db, topic.relation_topic_id),
                        aliases=alias_lines(table, ms), limits=writer_limits(cfg, n_sources),
                        slide_candidates=slide_candidates, no_visuals=False)
-    if draft is not None:
-        draft = draft.model_copy(update={"sections": [s.model_copy(update={"check": False}) for s in draft.sections]})
-        page, err, sid = draft, None, None
-    else:
-        before_sid = ctx.last_step_id or 0
-        page, err, sid = _call(load_role("writer", ctx.models), winp, ctx, res.costs, "writer")
-        used = (sid or 0) - before_sid  # role.py가 쓴 LLM 시도 수(step id 증가분, 스키마 재시도 포함)
-        if page is None and err and "출력 잘림" in err and used <= 2:  # D-42·C-5: 기본 호출이 2회 안이었을 때만 no_visuals 1회 더
-            res.attention.append("작성 잘림, no_visuals로 재시도")
-            res.no_visuals = True  # 시도했음을 바로 기록(detail.no_visuals, 성공 여부와 무관)
-            winp2 = winp.model_copy(update={"no_visuals": True})
-            page, err2, sid = _call(load_role("writer", ctx.models), winp2, ctx, res.costs, "writer")
-            if page is not None:
-                winp = winp2
-            err = err2 if page is None else err
+    page, err, sid, winp = _initial_page(ctx, winp, res, draft)
     if page is None or not page.sections:
         # pipeline._log_topic이 토픽마다 steps(writer,code) 행을 하나 남긴다(D-37 counts.written). 여기서 또
         # 남기면 실패 토픽이 두 번 세이므로(006-A1-24) attention에만 적고 트레이스는 _log_topic에 맡긴다
