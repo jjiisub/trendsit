@@ -1,5 +1,1503 @@
 [
  {
+  "topic_id": "w40-llamaindex-context-layer",
+  "page": {
+   "head_tiles": [
+    {
+     "value": "10T+",
+     "label": "인간 생성 문서 페이지 수",
+     "note": "PDF, PowerPoint, Word, Excel",
+     "refs": [
+      "sl:S-bRN-avZ4Q@422",
+      "vd:S-bRN-avZ4Q@353"
+     ]
+    },
+    {
+     "value": "90%",
+     "label": "비정형 문서에 저장된 데이터 비율",
+     "note": "PDF, PowerPoint, Word, Excel 등",
+     "refs": [
+      "sl:S-bRN-avZ4Q@525",
+      "vd:S-bRN-avZ4Q@353"
+     ]
+    }
+   ],
+   "sections": [
+    {
+     "heading": "단순 Top-K 검색에서 에이전트 하네스 기반 컨텍스트 관리로",
+     "paragraphs": [
+      {
+       "text": "Jerry Liu는 2023년 초의 단순 RAG가 문서 분할, 임베딩, Top-K 검색, LLM 생성으로 고정된 파이프라인이었다고 설명했다. 2026년에는 검색 복잡성이 에이전트 레이어로 이동했으며, 에이전트가 최적의 검색어를 추론하고 반복적으로 쿼리를 입력해 작업을 해결한다고 밝혔다.",
+       "refs": [
+        "vd:S-bRN-avZ4Q@85",
+        "vd:S-bRN-avZ4Q@142",
+        "vd:S-bRN-avZ4Q@171"
+       ]
+      },
+      {
+       "text": "컨텍스트 관리는 에이전트 컨텍스트 윈도우 오버플로 방지에서 적절한 MCP 서버와 스킬 연결로 이동했다. 에이전트 오케스트레이션도 2023~2025년 코드 기반 프로그램 정의에서 2025~2026년 영어 기반 런북 정의, 2026년 이후 목표와 정렬 정의 방향으로 발전하고 있다고 설명했다.",
+       "refs": [
+        "vd:S-bRN-avZ4Q@171",
+        "vd:S-bRN-avZ4Q@203",
+        "vd:S-bRN-avZ4Q@232"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": "sl:S-bRN-avZ4Q@208",
+     "slide_caption": "현대 일반화 에이전트의 스택 변화: 검색 복잡성, 컨텍스트 관리, 오케스트레이션의 레이어 이동",
+     "video_secs": [
+      79,
+      177
+     ],
+     "check": false
+    },
+    {
+     "heading": "10T+ 페이지 비정형 문서의 기계 해석 난이도와 3층 플랫폼 구조",
+     "paragraphs": [
+      {
+       "text": "PDF는 디스플레이를 위해 설계되어 텍스트가 좌표가 있는 개별 글리프, 테이블이 선분과 셀 위치 텍스트로 저장되어 기계 해석이 어렵다. Jerry Liu는 세계 데이터의 90%가 PDF, PowerPoint, Word, Excel 등 비정형 문서에 있으며, 10T+ 페이지의 인간 생성 문서가 이러한 컨테이너에 잠겨 있다고 밝혔다.",
+       "refs": [
+        "vd:S-bRN-avZ4Q@511",
+        "vd:S-bRN-avZ4Q@543",
+        "sl:S-bRN-avZ4Q@525",
+        "vd:S-bRN-avZ4Q@353"
+       ]
+      },
+      {
+       "text": "에이전트 네이티브 문서 플랫폼은 파싱 레이어, 시맨틱 및 스토리지 레이어, 에이전틱 워크플로 레이어로 구성된다. 파싱 레이어는 10T+ 페이지를 정확하고 토큰 효율적인 컨텍스트로 디지털화하고, 시맨틱 레이어는 인간과 에이전트를 위한 문서 관리를, 워크플로 레이어는 반복 가능한 문서 워크플로의 정확도 최적화와 비용 절감을 담당한다.",
+       "refs": [
+        "vd:S-bRN-avZ4Q@384",
+        "vd:S-bRN-avZ4Q@417",
+        "vd:S-bRN-avZ4Q@446",
+        "sl:S-bRN-avZ4Q@422"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": "sl:S-bRN-avZ4Q@422",
+     "slide_caption": "에이전트 네이티브 문서 플랫폼의 3층 구조: 파싱, 시맨틱/스토리지, 에이전틱 워크플로",
+     "video_secs": [
+      301,
+      398,
+      493
+     ],
+     "check": false
+    },
+    {
+     "heading": "파이프라인과 VLM 결합의 하이브리드 OCR과 ParseBench 벤치마크",
+     "paragraphs": [
+      {
+       "text": "기존 접근법은 결정론적 파이프라인(휴리스틱과 ML 모델)과 비전 모델(VLM) 원샷 처리로 나뉘며, VLM은 텍스트 전용 페이지에서 환각을 일으키고 비용이 높으며 시맨틱과 그라운딩이 부족하다. Jerry Liu는 파일 컨테이너와 바이너리를 깊이 이해하는 파이프라인 접근법과 비전 기반 접근법을 결합한 하이브리드 방식이 비용과 정확도의 파레토 프런티어에 있다고 설명했다.",
+       "refs": [
+        "vd:S-bRN-avZ4Q@646",
+        "vd:S-bRN-avZ4Q@675",
+        "vd:S-bRN-avZ4Q@712"
+       ]
+      },
+      {
+       "text": "LlamaParse는 RLVR로 포스트 트레이닝한 VLM, 에이전틱 판정 및 정제, 문서 복잡도 모델 기반 자동 라우팅, 모델 증류 및 양자화, 최적화된 PDFium 포크를 통한 직접 추출을 활용한다. ParseBench 벤치마크는 프런티어 모델, OSS 모델, 전문 파싱 제공업체를 평가하며, 어떤 파서도 100%에 근접하지 못하도록 의도적으로 어렵게 설계되었다.",
+       "refs": [
+        "sl:S-bRN-avZ4Q@780",
+        "vd:S-bRN-avZ4Q@753",
+        "sl:S-bRN-avZ4Q@873"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "ParseBench: 프런티어 모델, OSS 모델, 전문 파싱 제공업체의 정확도-비용 비교",
+     "video_secs": [
+      632,
+      795
+     ],
+     "check": false
+    },
+    {
+     "heading": "정확도-비용-지연 파레토 곡선과 LightParse 에이전트 루프 통합",
+     "paragraphs": [
+      {
+       "text": "문서 OCR은 3가지 처리 영역으로 나뉜다. 고정확도 영역은 금융 데이터룸 추출처럼 ~99%+ 정확도가 필요하고 가격에 무관하며, 저비용 영역은 1일 1M 문서 처리와 최소 정확도 이상을, 초저지연/저비용 영역은 Cowork 실시간 파일 업로드처럼 수 초 내 대량 처리와 가격 민감성을 요구한다.",
+       "refs": [
+        "sl:S-bRN-avZ4Q@900",
+        "sl:S-bRN-avZ4Q@957",
+        "sl:S-bRN-avZ4Q@992"
+       ]
+      },
+      {
+       "text": "Rust 기반 파서 LightParse는 14페이지를 0.03초에 파싱하며, 보조 에이전트 루프의 기본값으로 적합하다. 에이전트는 텍스트 검색에 충분한 정확도로 LightParse를 사용하고, 더 깊은 분석이 필요할 때 VLM 기반 OCR 도구로 '줌 인'할 수 있다. VLM 기반 접근법은 주로 지연에 무관한 배치 처리에 적합하다.",
+       "refs": [
+        "sl:S-bRN-avZ4Q@1063",
+        "sl:S-bRN-avZ4Q@900"
+       ]
+      }
+     ],
+     "visual": "tiles",
+     "bars": null,
+     "table": null,
+     "tiles": [
+      {
+       "value": "99%+",
+       "label": "고정확도 영역 요구 정확도",
+       "note": "가격 무관, 예: 금융 데이터룸 추출",
+       "refs": [
+        "sl:S-bRN-avZ4Q@957"
+       ]
+      },
+      {
+       "value": "1M docs/day",
+       "label": "저비용 영역 처리량",
+       "note": "최소 정확도 이상, 예: 페타바이트 SharePoint 오프라인 인덱싱",
+       "refs": [
+        "sl:S-bRN-avZ4Q@900"
+       ]
+      },
+      {
+       "value": "0.03s",
+       "label": "LightParse 14페이지 파싱 시간",
+       "note": "Rust 기반, 에이전트 루프 기본값",
+       "refs": [
+        "sl:S-bRN-avZ4Q@1063"
+       ]
+      }
+     ],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [
+      894,
+      991
+     ],
+     "check": false
+    }
+   ],
+   "summary": "LlamaIndex CEO Jerry Liu는 2026년 RAG를 에이전트 하네스와 문서 컨텍스트 레이어로 재정의했다. 10T+ 페이지의 비정형 문서 처리를 위해 파이프라인과 VLM을 결합한 하이브리드 OCR과 Rust 기반 파서 LightParse를 에이전트 루프에 통합하는 구조를 제시했다.",
+   "title": "LlamaIndex, RAG을 에이전트 하네스와 문서 컨텍스트 레이어로 재정의",
+   "log": "절 4개, 단락 8개, 슬라이드 3개, 타일 3개",
+   "attention": false
+  },
+  "pack": {
+   "sl:S-bRN-avZ4Q@422": [
+    {
+     "id": "sl:S-bRN-avZ4Q@422",
+     "member": "vd:S-bRN-avZ4Q",
+     "channel": "video",
+     "kind": "slide_read",
+     "text": "Building an Agent-Native Document Platform / Agent / Document Context Layer / Parsing Layer / Semantic and Storage Layer / Agentic Workflow Layer / Digitalize the 10T+ pages of human-created documents into accurate, token-efficient context. / Document management for humans and agents. Edit, version, and collaborate over documents. / Hillclimb repeatable workflows over documents to optimize accuracy and lower cost. 10T+ human-created documents",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 422
+    }
+   ],
+   "sl:S-bRN-avZ4Q@447": [
+    {
+     "id": "sl:S-bRN-avZ4Q@447",
+     "member": "vd:S-bRN-avZ4Q",
+     "channel": "video",
+     "kind": "slide_read",
+     "text": "Building an Agent-Native Document Platform / Agent / Document Context Layer / Parsing Layer / Semantic and Storage Layer / Agentic Workflow Layer / Digitize the 10T+ pages of human-created documents into accurate, token-efficient context. / Document management for humans and agents. Edit, version, and collaborate over documents. / Hillclimb repeatable workflows over documents to optimize accuracy and lower cost. / Llamaindex - Redefine Document Workflows with AI Agents 10T+ pages of human-created documents",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 447
+    }
+   ],
+   "sl:S-bRN-avZ4Q@525": [
+    {
+     "id": "sl:S-bRN-avZ4Q@525",
+     "member": "vd:S-bRN-avZ4Q",
+     "channel": "video",
+     "kind": "slide_read",
+     "text": "Document OCR is Hard / 90% of the world's data lies in unstructured documents like PDFs, Powerpoints, Word, Excel / These documents are not natively machine readable and require machine learning to extract information / PDF / The quick brown fox jumps over the lazy dog. / [clean text] / What you see / PDF / B1 /F0 12 Tf / 10 0 172 740 Tm / (The quick bro ) Tj / 10 0 168 740 Tm / (wn ) Tj / 10 0 172 726 Tm / (fox jumps over ) Tj / ET / What the PDF actually stores / What You See vs. What the PDF  90% of the world's data lies in unstructured documents",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 525
+    }
+   ],
+   "sl:S-bRN-avZ4Q@900": [
+    {
+     "id": "sl:S-bRN-avZ4Q@900",
+     "member": "vd:S-bRN-avZ4Q",
+     "channel": "video",
+     "kind": "slide_read",
+     "text": "The Accuracy-Cost-Latency Pareto Curve / 1. High Accuracy Regime: require ~99%+ accuracy, price insensitive / * e.g. financial data room extraction / 2. Low Cost Regime: require 1M docs per day, accuracy above min threshold / * e.g. offline indexing a petabyte of Sharepoint data for retrieval / 3. Low Latency/Low Cost Regime: require parsing massive volumes in seconds, price sensitive / * e.g. real-time file uploads to Cowork / VLM-based approaches are primarily good for latency-insensitive batc 99% High Accuracy Regime accuracy, 1M Low Cost Regime volume",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 900
+    }
+   ],
+   "sl:S-bRN-avZ4Q@957": [
+    {
+     "id": "sl:S-bRN-avZ4Q@957",
+     "member": "vd:S-bRN-avZ4Q",
+     "channel": "video",
+     "kind": "slide_read",
+     "text": "The Accuracy-Cost-Latency Pareto Curve / 1. High Accuracy Regime: require ~99%+ accuracy, price insensitive / * e.g. financial data room extraction / 2. Low Cost Regime: require 1M docs per day, accuracy above min threshold / * e.g. offline indexing a petabyte of Sharepoint data for retrieval / 3. Low Latency-Low Cost Regime: require parsing massive volumes in seconds, price sensitive / * e.g. real-time file uploads to Cowork / VLM-based approaches are primarily good for latency-insensitive batc 99%+ accuracy (High Accuracy Regime), 1M require (Low Cost Regime)",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 957
+    }
+   ],
+   "sl:S-bRN-avZ4Q@992": [
+    {
+     "id": "sl:S-bRN-avZ4Q@992",
+     "member": "vd:S-bRN-avZ4Q",
+     "channel": "video",
+     "kind": "slide_read",
+     "text": "The Accuracy-Cost-Latency Pareto Curve / 1. High Accuracy Regime: require ~99%+ accuracy, price insensitive / * e.g. financial data room extraction / 2. Low Cost Regime: require 1M docs per day, accuracy above min threshold / * e.g. offline indexing a petabyte of Sharepoint data for retrieval / 3. Low Latency/Low Cost Regime: require parsing massive volumes in seconds, price sensitive / * e.g. real-time file uploads to Cowork / VLM-based approaches are primarily good for latency-insensitive batc 99%+ accuracy (High Accuracy Regime), 1M requirement (Low Cost Regime)",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 992
+    }
+   ],
+   "sl:S-bRN-avZ4Q@78": [
+    {
+     "id": "sl:S-bRN-avZ4Q@78",
+     "member": "vd:S-bRN-avZ4Q",
+     "channel": "video",
+     "kind": "slide_read",
+     "text": "RAG in 2026 / LlamaIndex - Redefine Document Workflows with AI Agents ",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 78
+    }
+   ],
+   "sl:S-bRN-avZ4Q@208": [
+    {
+     "id": "sl:S-bRN-avZ4Q@208",
+     "member": "vd:S-bRN-avZ4Q",
+     "channel": "video",
+     "kind": "slide_read",
+     "text": "The Modern Generalized Agent / Today's stack / 1. Retrieval complexity is in the agent / layer: Interleave simple tools (grep + CLI) / with semantic search to achieve complex / results. / 2. Context is moving up the stack: / Managing the agent context window → / configure the right MCP servers and skills. / 3. Agent Orchestration is moving up the / stack: / a. 2023-2025: define programs through / code / b. 2025-2026: define runbooks through / English / c. 2026+: define goals and alignment / Post ",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 208
+    }
+   ],
+   "sl:S-bRN-avZ4Q@300": [
+    {
+     "id": "sl:S-bRN-avZ4Q@300",
+     "member": "vd:S-bRN-avZ4Q",
+     "channel": "video",
+     "kind": "slide_read",
+     "text": "The Modern / Document Context / Layer for Agents / LlamaIndex - Redefine Document Workflows with AI Agents ",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 300
+    }
+   ],
+   "sl:S-bRN-avZ4Q@680": [
+    {
+     "id": "sl:S-bRN-avZ4Q@680",
+     "member": "vd:S-bRN-avZ4Q",
+     "channel": "video",
+     "kind": "slide_read",
+     "text": "An Evolution of Approaches / 1. Deterministic Pipelines: Heuristics and ML models / 2. Vision Models / 3. Hybrid Approach (Ours) / pipeline approach / model approach / hybrid approach / page image / text direction / chat recog / layout analysis / output / page image / [VLM] / Structured Output / PDF page / layout detection / Text extraction (body text) fast / $ / VLM processing (tables, charts) / agentc validation / each stage independent / reasons about everything together / structured output ( ",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 680
+    }
+   ],
+   "sl:S-bRN-avZ4Q@780": [
+    {
+     "id": "sl:S-bRN-avZ4Q@780",
+     "member": "vd:S-bRN-avZ4Q",
+     "channel": "video",
+     "kind": "slide_read",
+     "text": "The Document OCR Agent Harness / LlamaParse: https://cloud.llamaindex.ai/ / SOTA Document OCR / (LlamaParse) / Increased Accuracy: / - Post-train VLMs with RLVR for tables, charts, hand-writing, etc / - Agentic judge & refinement / Cost Optimization: / - Auto-routing (doc complexity model) / - Model distillation & quantization / - Direct extraction (optimized PDFium fork) / Latest Frontier Models / Accuracy / Cost / LlamaIndex - Redefine Document Workflows with AI Agents ",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 780
+    }
+   ],
+   "sl:S-bRN-avZ4Q@873": [
+    {
+     "id": "sl:S-bRN-avZ4Q@873",
+     "member": "vd:S-bRN-avZ4Q",
+     "channel": "video",
+     "kind": "slide_read",
+     "text": "ParseBench: An Enterprise Document Benchmark for Agents / We evaluate frontier models, OSS models, specialized parse providers (including LlamaParse) / No parser gets close to 100%, the benchmark is meant to be hard! / Overall vs. Cost / LlamaParse / VLMs / Specialized Document Parsers / LP Agentic / LP Cost-Eff / Gemini (high) / Reducto (agentic) / Gemini (mini) / Reducto / GPT-5.4 / Azure DI / Extend / Haku 4.5 (think) / Opus 4.6 / Google DocAI / GPT-mini (med) / Gemini Pro / Texttract / GPT-m 100% No parser gets close to",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 873
+    }
+   ],
+   "sl:S-bRN-avZ4Q@892": [
+    {
+     "id": "sl:S-bRN-avZ4Q@892",
+     "member": "vd:S-bRN-avZ4Q",
+     "channel": "video",
+     "kind": "slide_read",
+     "text": "ParseBench: An Enterprise Document Benchmark for Agents / We evaluate frontier models, OSS models, specialized parse providers (including LlamaParse) / No parser gets close to 100%, the benchmark is meant to be hard! / Overall vs. Cost / LlamaParse / VLMs / Specialized Document Parsers / LP Agentic / LP Cost-Eff / Gemini (high) / Reducto (agentic) / Gemini (min) / Reducto / Gemini Pro / Azure DI / GPT-5.4 / Extend / Haku 4.5 (think) / Opus 4.6 / Google DocAI / GPT-mini (med) / Textract / GPT-min 100% parser score (no parser gets close to)",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 892
+    }
+   ],
+   "sl:S-bRN-avZ4Q@1063": [
+    {
+     "id": "sl:S-bRN-avZ4Q@1063",
+     "member": "vd:S-bRN-avZ4Q",
+     "channel": "video",
+     "kind": "slide_read",
+     "text": "LiteParse: Fast, Free, Surprisingly Good Parsing / It is perfect as a default in the / assistive agent loop: / - Extremely fast over any set of /   data / - Good enough that the agent /   can do text search / - The agent can decide to /   \"zoom-in\" with a VLM-based /   OCR tool if it needs to do /   deeper analysis. / Drop a PDF here or click to browse / Paste 14 page(s) in 0.03s / Output: JSON (with bounding boxes) / Wrap: On / LlamaIndex - Redefine Document Workflows with AI Agents 14 Paste 14 page(s) in 0.03s, 0.03s Paste 14 page(s) in 0.03s",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 1063
+    }
+   ],
+   "sl:S-bRN-avZ4Q@1133": [
+    {
+     "id": "sl:S-bRN-avZ4Q@1133",
+     "member": "vd:S-bRN-avZ4Q",
+     "channel": "video",
+     "kind": "slide_read",
+     "text": "Document Extraction / Goal: Schema-based structured extraction over any document, regardless of document complexity or schema complexity. / Use Cases: / - Automate human data entry / - Batch ETL / - Add metadata for search / Extraction Modalities: / - Fast Extraction / - Agentic Extraction / Grounding and Semantics: / - Granular attribution / - Calibrated Confidence Scores / Output Options / Granular Boundary Boxes Beta / Line / Word / Cell / Markdown / Annotate links / Inline images in markdown ",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 1133
+    }
+   ],
+   "sl:S-bRN-avZ4Q@1188": [
+    {
+     "id": "sl:S-bRN-avZ4Q@1188",
+     "member": "vd:S-bRN-avZ4Q",
+     "channel": "video",
+     "kind": "slide_read",
+     "text": "Document Search / 2026: Retrieval Harness / Give access to a full set of retrieval and filesystem tools for full range of operations / - Keyword search: BM25, grep / - Semantic search: Vector / - File operations: Read/scroll / - Filesystem operations: compose via pipes / Agents can iteratively crawl context and generate in a multi-turn fashion. / Semantic Search Alone / LlamaIndex - Redefine Document Workflows with AI Agents 2026 Retrieval Harness",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 1188
+    }
+   ],
+   "sl:S-bRN-avZ4Q@1220": [
+    {
+     "id": "sl:S-bRN-avZ4Q@1220",
+     "member": "vd:S-bRN-avZ4Q",
+     "channel": "video",
+     "kind": "slide_read",
+     "text": "Thanks! / Come find us at booth #L-G47 / JUNE 29-JULY 2, MOSCONE WEST / BOOTH L-G47 / AI Engineer / World's Fair / LlamaIndex / Also pickleball / https://luma.com/the-agent-open / THE / AGENT OPEN / HOSTED BY / Braintrust / LlamaIndex / turbopuffer / Modal / parallel / Browserbase / CURSOR ",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 1220
+    }
+   ],
+   "vd:S-bRN-avZ4Q@0": [
+    {
+     "id": "vd:S-bRN-avZ4Q@0",
+     "member": "vd:S-bRN-avZ4Q",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "Hey everyone, I'm Jerry, co-founder and CEO of Lama Index, and today I'm excited to give a talk called Building the Document Context Layer for AI Agents. Really big shout out to the AI Engineer World Fair for hosting, and if you've seen some of my earlier talks from the previous AI Engineer conferences, we've kind of traced through a lot of the evolution of how, you know, agent advances have correlated with, you know, how you inject context into evolving applications. And so today in 2026, we'll kind of talk",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 0
+    }
+   ],
+   "vd:S-bRN-avZ4Q@27": [
+    {
+     "id": "vd:S-bRN-avZ4Q@27",
+     "member": "vd:S-bRN-avZ4Q",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "about three main topics. One is, you know, what is RAG in 2026? Two, basically, that basically decomposes into an agent harness plus a context layer. So kind of going into the modern document context layer for agents, and giving you a little bit of sense of kind of some of the core capabilities today, especially unlocking, you know, the vast trove of document-based data today, and give you a glimpse of what's next. All right, RAG in 2026. But before that, just a little bit about the company, and I'll kind of get on with the main talk.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 27
+    }
+   ],
+   "vd:S-bRN-avZ4Q@55": [
+    {
+     "id": "vd:S-bRN-avZ4Q@55",
+     "member": "vd:S-bRN-avZ4Q",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "You might have seen us as a RAG framework. We started in 2023, got pretty popular, kind of create a lot of techniques around like advanced RAG, that type of stuff. Today, we're basically the main document infrastructure for AI agents. We deliver the best platform for agents to actually read and operate over documents, and we see ourselves as unlocking basically the vast troves of document context, even as agents and models themselves get better. All right, so what does RAG actually mean in 2026, and how are agents actually inhaling and adjusting context",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 55
+    }
+   ],
+   "vd:S-bRN-avZ4Q@85": [
+    {
+     "id": "vd:S-bRN-avZ4Q@85",
+     "member": "vd:S-bRN-avZ4Q",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "today? This is a snapshot from actually three years ago, when I first gave a talk on this. And naive RAG was basically just building a simple chatbot over your private corpus of data. If you flashback all the way to January of like 2023, you know, this technique basically consisted of you have some corpus of documents, you chunk it up, embed it, and put it into a vector database. You do some naive top-k retrieval, and then you generate some stuff with an LLM.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 85
+    }
+   ],
+   "vd:S-bRN-avZ4Q@111": [
+    {
+     "id": "vd:S-bRN-avZ4Q@111",
+     "member": "vd:S-bRN-avZ4Q",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "All the steps are fixed. You use kind of like a fixed set of techniques. And then with that, you actually get some basic application results by just being able to chat over a corpus of documents. Of course, the agent landscape has changed quite a bit, and quite dramatically since then. One is agent loops and tool use have gone a lot, a lot better, especially as both the models and agent harnesses have increased. And there's basically a cleaner separation now between agent reasoning and how they actually interact with context. If you look at what I call kind of the modern generalized agent,",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 111
+    }
+   ],
+   "vd:S-bRN-avZ4Q@142": [
+    {
+     "id": "vd:S-bRN-avZ4Q@142",
+     "member": "vd:S-bRN-avZ4Q",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "which includes, you know, all your favorite applications and tools out there from Cloud Code, Cloud Cowork, OpenClaw, Codex, and a few others, you know, the retrieval complexity has started to get baked into the agent layer. So instead of coming up with a variety of hacks to really work around the limitations of naive top-k retrieval, you can start getting the agent to really reason about, for instance, the best keyword to search for, best, like, you know, search term to actually get back good results. Even if the retrieval tools are basic, the agent can input the right queries",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 142
+    }
+   ],
+   "vd:S-bRN-avZ4Q@171": [
+    {
+     "id": "vd:S-bRN-avZ4Q@171",
+     "member": "vd:S-bRN-avZ4Q",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "to basically loop upon itself and help solve the task at hand. Number two, context is moving up the stack. There's been a lot of conversations, I think, for the first two and a half years of Gen.AI of how do you actually manage the agent context window, make sure it doesn't overflow, that type of thing. But I think as, you know, a lot of the evolving techniques, compaction, long context have evolved, I think more and more of the conversation is actually how do you just hook up the right MCP servers and skills and tasks to the agent to enable it to do various types of tasks.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 171
+    }
+   ],
+   "vd:S-bRN-avZ4Q@203": [
+    {
+     "id": "vd:S-bRN-avZ4Q@203",
+     "member": "vd:S-bRN-avZ4Q",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "And so that also applies to agent orchestration, right? Coding agents have gotten better. Abstractions of actually defining what types of tasks and programs you want to build have moved a little bit upwards towards English as opposed to through code. And so maybe in 2023 to 2025, you define programs and you still build stuff via, like, importing Python, using TypeScript through code. It's pretty clear these days more and more people are just building stuff using English, whether you're a software engineer or you're in a non-technical function,",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 203
+    }
+   ],
+   "vd:S-bRN-avZ4Q@232": [
+    {
+     "id": "vd:S-bRN-avZ4Q@232",
+     "member": "vd:S-bRN-avZ4Q",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "like go-to-market marketing, and you're defining runbooks through English and kind of like defining the right goals and making sure that AI is aligned on the right task. And we see that carrying over going forward as well. So in terms of just like general evolving knowledge work patterns, and this kind of forms a foundation for how we think about the context layer, you know, in the past maybe you could use AI to just like ask simple questions, get it resolved. Today, you're starting to be able to define and solve more end-to-end like tasks just through English",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 232
+    }
+   ],
+   "vd:S-bRN-avZ4Q@264": [
+    {
+     "id": "vd:S-bRN-avZ4Q@264",
+     "member": "vd:S-bRN-avZ4Q",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "and also use English to start compiling repeatable programs to actually execute something at scale. Obviously, there's been a lot of discussion on how this will evolve even more, and we do see AI agents as behaving even more autonomously through solving long horizon tasks, looping upon themselves to be able to achieve a goal. So the future will move towards a state where you actually might not even have to define the task in English, but actually more the goal and a scoring rubric, and then the agent will use all available contexts available to it to actually solve the task.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 264
+    }
+   ],
+   "vd:S-bRN-avZ4Q@295": [
+    {
+     "id": "vd:S-bRN-avZ4Q@295",
+     "member": "vd:S-bRN-avZ4Q",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "So with that overall framing, let's talk about what kind of is a pretty core focus for us as a company, which is basically helping to unlock unstructured context to basically feed into these agents even as they get really, really good, both in terms of the core model capabilities as well as the agent harness. And we'll focus a lot on our core focus area, which is document context, but of course there's plenty of other sources of context as well. In fact, we do think context really is everything.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 295
+    }
+   ],
+   "vd:S-bRN-avZ4Q@324": [
+    {
+     "id": "vd:S-bRN-avZ4Q@324",
+     "member": "vd:S-bRN-avZ4Q",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "In the end, you could have an infinitely smart agent, but your ability to actually get value out of this infinitely smart agent that's able to do more and more stuff end-to-end is actually giving it the right things to do. And the right things to do include the actual task, the goal, but also access to the vast troves of organizational context available to it. Whether that is web search, web context, whether that is connectors through tools and skills and MCP servers,",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 324
+    }
+   ],
+   "vd:S-bRN-avZ4Q@353": [
+    {
+     "id": "vd:S-bRN-avZ4Q@353",
+     "member": "vd:S-bRN-avZ4Q",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "whether it's connectors through Snowflake or Databricks warehouses, or for us, whether it's access to the vast trove like the 90% of documents are stored within SharePoint, Box, Dropbox, S3, all the unstructured data that's locked up within document containers. And so for us, we care a lot about how do you actually build the right tools and unlock the right context here. We see documents as universal containers for unstructured context. There's over 10 trillion-plus pages of human native knowledge",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 353
+    }
+   ],
+   "vd:S-bRN-avZ4Q@384": [
+    {
+     "id": "vd:S-bRN-avZ4Q@384",
+     "member": "vd:S-bRN-avZ4Q",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "locked up within PDFs, PowerPoints, Word documents, and Excel sheets. And at the same time, agents are also starting to generate exponentially more data in terms of, you know, more agent-native formats in terms of Markdown and HTML. So, for us, building an agent-native document platform contains three main pieces. It contains the document parsing layer, actually digitalizing the vast troves of PDFs, PowerPoints, and Word documents into kind of accurate, token-efficient context and feeding it, you know, either Markdown, metadata, and other forms",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 384
+    }
+   ],
+   "vd:S-bRN-avZ4Q@417": [
+    {
+     "id": "vd:S-bRN-avZ4Q@417",
+     "member": "vd:S-bRN-avZ4Q",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "to actually enable agents to do stuff over your documents. The next is actually what we call the semantic and storage layer, which is kind of like this concept of document management for humans and agents. Instead of humans opening up Microsoft Word using your file system or file storage, how do you create some sort of agent interface that actually captures, stores all your documents, and enables agents to actually manage and operate over them in various ways? And then there's still room for actually kind of repeatable document workflows",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 417
+    }
+   ],
+   "vd:S-bRN-avZ4Q@446": [
+    {
+     "id": "vd:S-bRN-avZ4Q@446",
+     "member": "vd:S-bRN-avZ4Q",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "that the agent layer, they can actually encode within the, within like this type of platform, too. If there is a repeatable workflow, like invoice processing, KYC, or claims, instead of always offloading it to a generalized agent, how do you actually develop some sort of specialized workflow for it and really carefully tune cost and accuracy to make sure that you achieve your goal? So, when we talk about like the concepts today, in terms of these three layers, we'll talk about this concept of document OCR, which is one of the core concepts of this track,",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 446
+    }
+   ],
+   "vd:S-bRN-avZ4Q@478": [
+    {
+     "id": "vd:S-bRN-avZ4Q@478",
+     "member": "vd:S-bRN-avZ4Q",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "to document extraction, document search, and document workflows. There's still a variety of topics yet left unsolved from agent-native document formats, document versioning, document editing, you know, hill climbing as a service, and just like a wide set of kind of remaining concepts to actually create a comprehensive piece of software where agents and humans can collaborate on documents and actually do work over them. So, we'll start with the first section, and maybe start kind of with the document OCR piece. First off, you know, document OCR is hard.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 478
+    }
+   ],
+   "vd:S-bRN-avZ4Q@511": [
+    {
+     "id": "vd:S-bRN-avZ4Q@511",
+     "member": "vd:S-bRN-avZ4Q",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "Some of you might have seen a blog post that we put out a few months ago related to this topic. But the reason this problem even exists is an agent cannot actually take the raw PDF file binary and make sense of it. That's because the way PDFs are actually stored as a format is it's rendered for kind of like display purposes, and not really for, you know, machine consumption in an interpretable manner. They're designed for printing. So, basically, text are represented as almost like individual glyphs with coordinates.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 511
+    }
+   ],
+   "vd:S-bRN-avZ4Q@543": [
+    {
+     "id": "vd:S-bRN-avZ4Q@543",
+     "member": "vd:S-bRN-avZ4Q",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "Tables are not represented as tables. They're represented as like typically line segments drawn with various types of borders, and also text drawn as certain cell positions. And so, if you're kind of an agent that's trying to make sense of this like document, you're going to have a really hard time actually trying to reason about what character and what shapes like map to what. So, the whole point of document OCR, you know, it's been around for like 20 plus years, is to really try to create some sort of digitalized, well interpretable representation that's both interpretable to humans as well as AI agents. Also, reading order itself, if you have a multi-column layout, there is no guarantee that the way it's represented in the PDF",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 543
+    }
+   ],
+   "vd:S-bRN-avZ4Q@583": [
+    {
+     "id": "vd:S-bRN-avZ4Q@583",
+     "member": "vd:S-bRN-avZ4Q",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "actually corresponds to the typical ways that humans would read it. Because again, it's basically just an arbitrary sequence of characters drawn with coordinate positions. Related to this, you know, even Word doc parsing is hard. They're a little bit more structured than PDFs, but they're in kind of like this custom bespoke XML format, and this applies to PowerPoints as well. It contains more structural information, but still, there's a ton of like fluff. Like, you don't actually need to ingest all the tags to actually have the agent make sense of the Word document.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 583
+    }
+   ],
+   "vd:S-bRN-avZ4Q@613": [
+    {
+     "id": "vd:S-bRN-avZ4Q@613",
+     "member": "vd:S-bRN-avZ4Q",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "It still needs to infer a bunch of structure from it. It needs like the right kind of, to lift the right metadata around like formatting, semantics, that type of stuff. But also being able to ignore the tags and actually being able to render the document so that the agent can see the overall structure of the page. It's still generally a hard problem, and there's a lot of uplift you can get by actually parsing it into a more interpretable format, instead of just using the native OXML and feeding that to an agent. If you're familiar with document understanding, you know, it's been around for quite a bit of time.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 613
+    }
+   ],
+   "vd:S-bRN-avZ4Q@646": [
+    {
+     "id": "vd:S-bRN-avZ4Q@646",
+     "member": "vd:S-bRN-avZ4Q",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "There's a lot of these like heuristic and pipeline-based approaches, which focused on kind of more, I guess, like human-driven, handwritten like techniques to analyze like kind of various pieces of text, group them into clusters and identify tables, paragraphs, and be able to kind of like generate some sort of output representation. A lot of basic techniques if you use open source libraries like PyPDF, PyMUPDF, and of course, like some of the more recent approaches, basically use this type of approach.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 646
+    }
+   ],
+   "vd:S-bRN-avZ4Q@675": [
+    {
+     "id": "vd:S-bRN-avZ4Q@675",
+     "member": "vd:S-bRN-avZ4Q",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "There's also, of course, using a VLM to one-shot a document into text. That's what we call like a vision-based approach. This works decently well, obviously. You know, I think there's kind of a lot of uplift you can get by being able to read the visual structure, but there's a lot of suboptimal pieces about it. It can hallucinate on text-only pages. It costs a ton of money, and also it still lacks a lot of the semantics and grounding that you typically expect with some sort of document processing tool. And so for us, we really think about combining both the pipeline-based approaches of deeply understanding the file containers and binaries",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 675
+    }
+   ],
+   "vd:S-bRN-avZ4Q@712": [
+    {
+     "id": "vd:S-bRN-avZ4Q@712",
+     "member": "vd:S-bRN-avZ4Q",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "with the vision-based approaches to help generate, you know, kind of a hybrid approach that we think is at the Pareto frontier of cost and accuracy. A quick note on this, I'll probably just like skim the high level, but the Pareto frontier for document OCR will always be like much more accurate and cheap compared to the Pareto frontier for, you know, wherever the frontier models are in terms of document understanding. It's because it's a very specific data type, and there's always ways to kind of like distill the latest visual understanding capabilities from, you know, Gemini, GPT, Opus, into kind of a carefully tailored workflow that's able to process your documents at scale and in a highly accurate manner.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 712
+    }
+   ],
+   "vd:S-bRN-avZ4Q@753": [
+    {
+     "id": "vd:S-bRN-avZ4Q@753",
+     "member": "vd:S-bRN-avZ4Q",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "To some extent, that's exactly what we do. You know, we both optimize the underlying like PDF engines plus like Word, PowerPoint, and others. We have an agentic harness that's like carefully tuned for auto routing between cheaper specialized models to frontier models, and also kind of specialized fine-tuned document VLMs that are parameter efficient and focus on specific classes of documents, elements like tables, charts, and others. That's our commercial service called LlamaParse, which we'll talk about in a bit.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 753
+    }
+   ]
+  },
+  "n_sources": 1,
+  "slide_candidates": [
+   "sl:S-bRN-avZ4Q@208",
+   "sl:S-bRN-avZ4Q@422"
+  ],
+  "timeline_secs": [
+   0,
+   79,
+   177,
+   301,
+   398,
+   493,
+   632,
+   795,
+   894,
+   991
+  ]
+ },
+ {
+  "topic_id": "w41-agent-slop-state-machine",
+  "page": {
+   "head_tiles": [
+    {
+     "value": "수학적으로 불가능",
+     "label": "잘못된 상태에서의 이메일 발송",
+     "note": "상태 머신 전이 규칙에 기반",
+     "refs": [
+      "vd:D7q8fa589FY@491"
+     ]
+    }
+   ],
+   "sections": [
+    {
+     "heading": "비구조화된 위임이 에이전트 Slop의 원인",
+     "paragraphs": [
+      {
+       "text": "David Korshid는 에이전트 Slop의 원인이 비구조화된 위임이라고 분석했다. 에이전트에게 판단, 구현, 취향까지 모든 구조를 위임하면 모델이 더 강력해져도 '벽 너머로 던져놓고 최선을 바라는' 방식의 리스크가 남는다. 동작하지 않을 때 에이전트에게 무엇을 수정해야 하는지 가리킬 수 있는 근거가 부재하다.",
+       "refs": [
+        "vd:D7q8fa589FY@208",
+        "vd:D7q8fa589FY@239"
+       ]
+      },
+      {
+       "text": "결정론성은 동일한 입력에 대해 항상 동일한 예측 가능한 출력을 얻는 것을 의미한다. David Korshid는 이것이 에이전트 행동 개선에 특히 유용하다고 설명했다. 에이전트 공학의 하이프 사이클이 루프에서 그래프로 이동한 것처럼, 루프는 그래프의 특수한 경우이며 동일한 그림을 그린다.",
+       "refs": [
+        "vd:D7q8fa589FY@269",
+        "vd:D7q8fa589FY@147"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [
+      209
+     ],
+     "check": false
+    },
+    {
+     "heading": "메가 프롬프트 방식의 제어 흐름 내재화 문제",
+     "paragraphs": [
+      {
+       "text": "David Korshid는 메가 프롬프트 방식이 제어 흐름을 프롬프트 안에 인코딩한다고 지적했다. '먼저 이것을 하고, 그 다음 저것을 하고, 사용자가 변경을 요청하면 초안을 수정하고, 사용자가 명시적으로 승인하기 전에는 이메일을 보내지 마라'는 지시와 도구 호출 설명에 같은 규칙을 반복해야 한다. 도구가 제어 흐름의 일부가 되는 것은 바람직하지 않다.",
+       "refs": [
+        "vd:D7q8fa589FY@366",
+        "vd:D7q8fa589FY@397"
+       ]
+      },
+      {
+       "text": "단계를 분리하지 않으면 단일 모델, 단일 시스템 프롬프트, 단일 설정으로 제한된다. 블랙박스 프롬프트에서는 동작을 증명할 수 없고 에이전트가 어떻게 작동하는지 볼 수 없다. 컨텍스트가 쌓일수록 프롬프트 안의 규칙은 텍스트로서 점점 중요성이 줄어든다.",
+       "refs": [
+        "vd:D7q8fa589FY@397",
+        "vd:D7q8fa589FY@426",
+        "vd:D7q8fa589FY@454"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [
+      366
+     ],
+     "check": false
+    },
+    {
+     "heading": "상태 머신이 제공하는 수학적 안전장치",
+     "paragraphs": [
+      {
+       "text": "David Korshid는 이메일 작성 에이전트 예시로 상태 머신 설계를 시연했다. 초안 작성(drafting) 상태에서 검토(reviewing) 상태로 전이하고, 검토 단계에서 명확화나 수정이 필요할 수 있다. 수신자 없이 이메일을 보내는 것은 절대 허용되지 않으며, 수신자를 제공해야만 발송 상태로 전이된다.",
+       "refs": [
+        "vd:D7q8fa589FY@469",
+        "vd:D7q8fa589FY@491"
+       ]
+      },
+      {
+       "text": "초안 작성 상태나 검토 상태에서 이메일을 보내는 것은 수학적으로 불가능하다. 해당 상태에 전이가 존재하지 않기 때문이다. David Korshid는 라이브 데모에서 'Jenny에게 강연 후 커피를 제안하는 이메일'을 요청하자 에이전트가 이메일 주소와 주제, 본문 등 누락 정보를 단계별로 질문하며 최종 발송까지 진행하는 모습을 보여줬다.",
+       "refs": [
+        "vd:D7q8fa589FY@491",
+        "vd:D7q8fa589FY@526",
+        "vd:D7q8fa589FY@551"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [
+      469,
+      526
+     ],
+     "check": false
+    },
+    {
+     "heading": "에이전트 자기 개선 루프와 워크플로우 최적화",
+     "paragraphs": [
+      {
+       "text": "David Korshid는 상태 머신을 지속 가능한 아티팩트로 보고 에이전트에 전달해 워크플로우를 개선하도록 하는 루프를 제안했다. 상태 머신, 샘플 워크플로우 트레이스, 각 단계의 평가 결과를 에이전트에 제공하면 에이전트가 스스로 상태 머신을 수정할 수 있다. Stately의 소프트웨어 팩토리에서 상태 생성 및 편집 파이프라인으로 이를 검증했다.",
+       "refs": [
+        "vd:D7q8fa589FY@717",
+        "vd:D7q8fa589FY@759",
+        "vd:D7q8fa589FY@790"
+       ]
+      },
+      {
+       "text": "에이전트가 생성한 V2 상태 머신은 작은 문제를 수정하기 위해 여러 번 반복하던 과정을 개선해, 먼저 이메일을 초안 작성한 후 필요한 사항을 확인하는 더 빠른 워크플로우를 만들었다. David Korshid는 모든 평가가 첫 번째 머신에서 통과해도, 에이전트가 자체 상태 머신을 개선하는 반복 과정을 거치지 않으면 최적의 결과를 얻기 어렵다고 강조했다.",
+       "refs": [
+        "vd:D7q8fa589FY@821",
+        "vd:D7q8fa589FY@854",
+        "vd:D7q8fa589FY@885"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [
+      717,
+      900
+     ],
+     "check": false
+    },
+    {
+     "heading": "모든 에이전트에 적용할 필요는 없다",
+     "paragraphs": [
+      {
+       "text": "David Korshid는 모든 에이전트를 상태 머신으로 모델링해야 한다고 주장하지 않았다. 모델링이 혼란을 대체할 때 의식이 아니라 유용하다고 보며, 적용되는 범위에서 매우 유용하다고 설명했다. 상태 머신은 에이전트와 개발자 모두에게 에이전트 행동에 대한 공통 이해를 제공한다.",
+       "refs": [
+        "vd:D7q8fa589FY@612",
+        "vd:D7q8fa589FY@641"
+       ]
+      },
+      {
+       "text": "명시적인 구조는 검사 가능하며, 이는 암시적인 구조보다 유용하다. 문단 안에 화살표를 그릴 수 없고, 프롬프트의 어느 부분이 실패했는지 가리킬 수 없다. 상태 머신에서는 단계별 평가와 전체 워크플로우 평가를 수행할 수 있으며, LLM as judge를 활용할 수도 있다. 구현에는 특별한 라이브러리나 도구가 필요하지 않다.",
+       "refs": [
+        "vd:D7q8fa589FY@669",
+        "vd:D7q8fa589FY@699",
+        "vd:D7q8fa589FY@728",
+        "vd:D7q8fa589FY@919"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [
+      900
+     ],
+     "check": false
+    }
+   ],
+   "summary": "David Korshid는 에이전트 Slop의 원인이 비구조화된 위임이며, 상태 머신을 도입해 제어 흐름을 명시화하면 수학적 안전장치와 관측 가능성을 확보할 수 있다고 발표했다. 에이전트가 자체 상태 머신과 트레이스를 분석해 워크플로우를 개선하는 자기 개선 루프가 핵심이다.",
+   "title": "상태 머신 기반 결정론적 에이전트 설계",
+   "log": "절 5개, 단락 10개, 표 0개, 타일 1개",
+   "attention": false
+  },
+  "pack": {
+   "vd:D7q8fa589FY@0": [
+    {
+     "id": "vd:D7q8fa589FY@0",
+     "member": "vd:D7q8fa589FY",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "Hello, everyone. So goodbye, slop. Welcome, determinism. I know this seems contrary to a few of the talks here, but I'm going to show you there's actually a lot of overlap here. Our goal at Agent Comp, we want to make agents that are predictable, and we really want to get rid of the slop because our users don't really want to see that. So who am I? Just real quick, I'm at David K. Piano pretty much everywhere. That's my handle.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 0
+    }
+   ],
+   "vd:D7q8fa589FY@26": [
+    {
+     "id": "vd:D7q8fa589FY@26",
+     "member": "vd:D7q8fa589FY",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "My name is David Korshid. I created a state machine library called xDate. How many of you have used or know what xDate is? All right. Thank you for the lights, because I'm blind. The PR, I can't see your hands. But yeah, a good amount of you. And I am also the founder of a company called stately.ai. I'm not trying to sell you anything. You could do this with pretty much anything. xDate's an open source library. And also, Piano's not my last name.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 26
+    }
+   ],
+   "vd:D7q8fa589FY@53": [
+    {
+     "id": "vd:D7q8fa589FY@53",
+     "member": "vd:D7q8fa589FY",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "I'm a pianist just like this guy. You might know him. Chopin, I hope you do. We're in Poland. All right. So first of all, some groundwork. What is a state machine? Now, I could give you the mathematical definition, or I could show you a visual diagram, which of course I'm going to do. But instead, I want to point you to this very simple relation. Given a state and given an event, you are expected to reach a next date. This is how pretty much every single application that you've ever built works.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 53
+    }
+   ],
+   "vd:D7q8fa589FY@86": [
+    {
+     "id": "vd:D7q8fa589FY@86",
+     "member": "vd:D7q8fa589FY",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "You're in a state, some event happens, and predictably, you're in some next dates. And this is what we call deterministic. And this is going to be a key point in this entire talk. So I recently, well, I didn't have the baby, but I am a father to a baby. It's like my new thing right now. And he is six months old right now. But when he was born, it was actually embarrassingly deterministic.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 86
+    }
+   ],
+   "vd:D7q8fa589FY@118": [
+    {
+     "id": "vd:D7q8fa589FY@118",
+     "member": "vd:D7q8fa589FY",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "He's crying. You feed him. He's eating. He's fed. And now he's sleeping. And then he wakes up. And then you repeat this process every half hour or every hour. You have no sleep. But basically, this is the simple infant loop. And then at around three months, it got a little bit crazier. So this date machine got a lot more complicated. And right now, it's even worse than this. There's some mysterious discontent.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 118
+    }
+   ],
+   "vd:D7q8fa589FY@147": [
+    {
+     "id": "vd:D7q8fa589FY@147",
+     "member": "vd:D7q8fa589FY",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "I had trouble figuring that out. Right now, we're going through sleep regression. So like nothing works. You just have to pray for a miracle, and then they'll go to sleep. But yeah, so babies pretty much went from loops to graphs for me, just like our whole hype cycle of agents. You saw everyone talking about loops, and now people are talking about graphs. They're the same picture. They're the same thing, actually. Loops are graphs.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 147
+    }
+   ],
+   "vd:D7q8fa589FY@175": [
+    {
+     "id": "vd:D7q8fa589FY@175",
+     "member": "vd:D7q8fa589FY",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "And so what I'm going to be doing is doubling down on this whole theme here about using graphs in agent engineering. So funny enough, I actually talked about this or a related topic at the previous agent conf, which was three years ago. And back then, it was more about constraining agent behavior to state machines. So today, I'm actually going to be talking about how we could use state machines and determinism to improve agent behavior and to remove slop.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 175
+    }
+   ],
+   "vd:D7q8fa589FY@208": [
+    {
+     "id": "vd:D7q8fa589FY@208",
+     "member": "vd:D7q8fa589FY",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "So where does slop in agents come from? In my opinion, it comes from unstructured delegation. And here's what I mean by this. When you tell an agent to basically do everything, you let it do judgment, you give all the structure over to an agent, you let it do all the implementation and taste, agents and models are getting smarter and more powerful and it could actually do a lot more things now where it's not hallucinating or doing silly things.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 208
+    }
+   ],
+   "vd:D7q8fa589FY@239": [
+    {
+     "id": "vd:D7q8fa589FY@239",
+     "member": "vd:D7q8fa589FY",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "However, there's still always the risk of slop when you're just throwing things over the wall and you're hoping for the best from the agent. So I'm not arguing that we throw this away and that we say, no, agent, you must do these specific things. I'm going to demonstrate the opposite soon. And of course, we say it works, so who cares? The problem is it works until it doesn't and when it stops working, what can we actually point to to tell the agent this is what you need to fix?",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 239
+    }
+   ],
+   "vd:D7q8fa589FY@269": [
+    {
+     "id": "vd:D7q8fa589FY@269",
+     "member": "vd:D7q8fa589FY",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "So one of the key things to fixing this is determinism where in simple terms, determinism means given the same input, you get the same predictable output every single time. Again this seems opposite to what agents in AI are, but I promise you it is actually going to be useful specifically for how we improve agent behavior. So I'm going to do this because I only have around 15 minutes. We're going to be doing this with a simple example.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 269
+    }
+   ],
+   "vd:D7q8fa589FY@299": [
+    {
+     "id": "vd:D7q8fa589FY@299",
+     "member": "vd:D7q8fa589FY",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "And the example is, it's an email drafter, so you say, I want to draft an email about this and then this agent that we're building is actually going to help you draft an email. So again, very simple and it is a distillation of some of the most complex problems that I've been working on for the last few months, but I wanted a simple example to explain it. So where does determinism fit in here? Because obviously, emails, there could be infinite possibilities for them, but determinism lives",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 299
+    }
+   ],
+   "vd:D7q8fa589FY@330": [
+    {
+     "id": "vd:D7q8fa589FY@330",
+     "member": "vd:D7q8fa589FY",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "in the rules. For example, you must draft an email before you send it. You can only send approved emails, so emails that the user says, yes, I approve, this is the email I want to send, and you must never invent a recipient, obviously. The non-deterministic parts are, for example, the email content, the questions that the agent may ask you to clarify what you want to include in the email, and of course, the drafts made when it is going through that feedback loop and iterating over your requests.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 330
+    }
+   ],
+   "vd:D7q8fa589FY@366": [
+    {
+     "id": "vd:D7q8fa589FY@366",
+     "member": "vd:D7q8fa589FY",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "So you might think, you know what, I know how to do this, I'm just going to write a mega prompt, I'm going to have some rules over here, I'm going to give it a tool call to send the email. This works, of course, but there is a problem with this. First of all, we're encoding control flow inside the prompt. We're saying, first do this, then do that, if the user asks for changes, revise the draft, and never call send email until the user explicitly approved the email. And we're also repeating that in the tool call, too.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 366
+    }
+   ],
+   "vd:D7q8fa589FY@397": [
+    {
+     "id": "vd:D7q8fa589FY@397",
+     "member": "vd:D7q8fa589FY",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "So in the description, we're saying, only call this after the user approves it. Obviously you should never write tools like this where the tool is part of the control flow, but if you're doing a mega prompt and you're trying to have the agent do everything, that's the problem you have. And also, when you don't split up the steps, you're pretty much restricted to a single model, a single system prompt, single settings, instead of having variety in each of the steps that happen.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 397
+    }
+   ],
+   "vd:D7q8fa589FY@426": [
+    {
+     "id": "vd:D7q8fa589FY@426",
+     "member": "vd:D7q8fa589FY",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "So, of course, this works most of the time, but the problem is, when you have this black box of a prompt, you can't prove that it works, you can't even see what the agent is thinking or how it's working, even if you turn reasoning on, et cetera. You can't guarantee that it's going to work every single time. And the rules decay with context because that prompt, the rules in there, it's text just like the rest of your context.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 426
+    }
+   ],
+   "vd:D7q8fa589FY@454": [
+    {
+     "id": "vd:D7q8fa589FY@454",
+     "member": "vd:D7q8fa589FY",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "So as your context builds up, the rules get a little bit less significant over time. And like I said, with one prompt, you're limited to one strategy instead of having different strategies for different parts of your agentic workflow. So what would this look like with a more deterministic system? For example, if we create a state machine, this is what that state machine may look like, where we initially make the request to drafting, and then we go into the reviewing state. And in the reviewing state, we could say, we need clarification or we need to make modifications,",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 454
+    }
+   ],
+   "vd:D7q8fa589FY@491": [
+    {
+     "id": "vd:D7q8fa589FY@491",
+     "member": "vd:D7q8fa589FY",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "things like that. And we also have some safeguards. For example, we should never send an email without a recipient. And so when we provide a recipient, then we're sending. And then once we decide to send it, only then can the email be sent. So in this, it's actually mathematically impossible to send an email when you're in the drafting state or the reviewing state. Because there just doesn't exist any transition there.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 491
+    }
+   ],
+   "vd:D7q8fa589FY@520": [
+    {
+     "id": "vd:D7q8fa589FY@520",
+     "member": "vd:D7q8fa589FY",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "So let's do a quick demo and see how this might look. All right. Here we go. So here is an example of an email trafter. And this is being automatically visualized from a state machine that I actually, an agent, wrote this. But still works. So I'm going to say email Jenny, invite them for coffee after my talk. So it's intentionally vague. It's saying it needs more info. And it says, hey, there are some details missing. What's your email address, et cetera.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 520
+    }
+   ],
+   "vd:D7q8fa589FY@551": [
+    {
+     "id": "vd:D7q8fa589FY@551",
+     "member": "vd:D7q8fa589FY",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "And I'm just going to, or what is the subject? Subject is coffee. And so it's going to add that information. It's still going to ask for more info, like what should the body say. I'm going to say draft anyway, just because I don't have too much time. It's reviewing. Oh, wait. It says, best your name. OK. My name is David. And so you could see it's actually going through each of the steps.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 551
+    }
+   ],
+   "vd:D7q8fa589FY@582": [
+    {
+     "id": "vd:D7q8fa589FY@582",
+     "member": "vd:D7q8fa589FY",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "And then we're just sending the email. But of course, we forgot the email address. And you might be looking at this and saying, yeah, this is pretty cool, but it's not the best workflow. And that is exactly the points that I'm going to show next. So then finally, we have the email sent to a simulated outbox. But that is an agent working from a state machine. Now, one of the things you might be asking yourself",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 582
+    }
+   ],
+   "vd:D7q8fa589FY@612": [
+    {
+     "id": "vd:D7q8fa589FY@612",
+     "member": "vd:D7q8fa589FY",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "is, isn't this too much ceremony? And in my opinion, I would say that modeling is not ceremony when it actually replaces confusion, both for you and for the agent. It's actually extremely useful to basically have a common understanding of how your agent behaves for both your agents to introspect and for you to understand each of the steps. And of course, not everything needs to be formally modeled as a state machine.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 612
+    }
+   ],
+   "vd:D7q8fa589FY@641": [
+    {
+     "id": "vd:D7q8fa589FY@641",
+     "member": "vd:D7q8fa589FY",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "I'm not saying that you should do this with every single one of your agents. But where it applies, it's really, really useful. And with this, you also have observability. You have logs where it's not just plain text. It's not just agent thinking or something. You have structured logs for what states you were in, what events happened. And this is a simpler example. This is a more complex example. But at the end of the day, both of them, you could see,",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 641
+    }
+   ],
+   "vd:D7q8fa589FY@669": [
+    {
+     "id": "vd:D7q8fa589FY@669",
+     "member": "vd:D7q8fa589FY",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "have reached the same state, which is sent, and that we have sent an email. So I'm not arguing that explicit, like just modeling everything as a state machine or a workflow is good. And this is the next point. I'm saying that when things are explicit, and you have an explicit structure like a state machine, it's inspectable. And in my opinion, that's a lot more useful than just having an implicit structure.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 669
+    }
+   ],
+   "vd:D7q8fa589FY@699": [
+    {
+     "id": "vd:D7q8fa589FY@699",
+     "member": "vd:D7q8fa589FY",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "Because you cannot draw arrows in paragraphs. You can't say, like, you know, in this prompt, this is where it failed, or this is where we're having problems, or this is where we could adjust things. It's all just text. And so with a state machine, you actually have that ability. And so this is what got me thinking and experimenting a few months ago, where when we have a state machine workflow representing agent behavior, we could do evals on each of the steps, of course.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 699
+    }
+   ],
+   "vd:D7q8fa589FY@728": [
+    {
+     "id": "vd:D7q8fa589FY@728",
+     "member": "vd:D7q8fa589FY",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "So we could say when we're drafting an email, this is the expected output from this input. Or we could evaluate the entire outcome of the workflow, where we could say, given this initial set of input, assuming that we go through the whole process, the overall output should be as we expected, and we could use LLM as judge, et cetera. But one thing we're missing is actually evaling the edges. So when you saw the previous demo, you were probably thinking, like, as a user, OK, this works.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 728
+    }
+   ],
+   "vd:D7q8fa589FY@759": [
+    {
+     "id": "vd:D7q8fa589FY@759",
+     "member": "vd:D7q8fa589FY",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "It does get me to the end state of having an email. But it's a little bit annoying. So this is where you could actually take that state machine as a durable artifact, and you could pass it to an agent and say, here's my state machine. Here's all the traces from a few of the sample workflows that we've done through this with. It could be real users. It could be simulated users, like you dog fooding your agent. And here's actually all of the evals from each of the steps",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 759
+    }
+   ],
+   "vd:D7q8fa589FY@790": [
+    {
+     "id": "vd:D7q8fa589FY@790",
+     "member": "vd:D7q8fa589FY",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "and the overall evals from the machine. Please propose some changes to this agent. And I've done this with software factories at Stately. We've done it with our state generation, or state machine generation and editing pipeline. And so this actually works really well because you're essentially saying, hey, here's the state machine that you're working from. Look at it and see how you could actually improve it yourself. And so I keep doing the wrong key command.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 790
+    }
+   ],
+   "vd:D7q8fa589FY@821": [
+    {
+     "id": "vd:D7q8fa589FY@821",
+     "member": "vd:D7q8fa589FY",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "I actually did that. And here we go. So what it actually produced was a V2 over here. And if you find me after the talk, I could show you a diff of it and go into more detail. But now this state machine changed. It found improvements. It saw that we were doing multiple passes just to fix small issues in the email when instead we could actually draft the email first and then figure out what's needed after.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 821
+    }
+   ],
+   "vd:D7q8fa589FY@854": [
+    {
+     "id": "vd:D7q8fa589FY@854",
+     "member": "vd:D7q8fa589FY",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "So it goes straight to reviewing. It drafted an email. I could make changes like my name is David. And it could add that, go to reviewing, and then it could send the email. And this is actually a much quicker workflow. And then you could actually compare this against what you did before. And you could see, like, hey, this actually feels better. So all of your evals could pass with the first machine. But unless you're dogfooding and you're going through these iteration processes",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 854
+    }
+   ],
+   "vd:D7q8fa589FY@885": [
+    {
+     "id": "vd:D7q8fa589FY@885",
+     "member": "vd:D7q8fa589FY",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "where you're actually having the agent improve its own state machine, you're not going to get the optimal results until you actually do that. And with state machines, you actually have something where you could do that. So I would argue that to implement this, again, you don't need a special library. You don't need a special tool. In fact, this is pretty much the only loop you need where you have some sort of initial state. And so while the state is active or whatever your definition of not done is, you're executing,",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 885
+    }
+   ],
+   "vd:D7q8fa589FY@919": [
+    {
+     "id": "vd:D7q8fa589FY@919",
+     "member": "vd:D7q8fa589FY",
+     "channel": "video",
+     "kind": "transcript",
+     "text": "for example, LLM calls, tool calls, async processes that might be outside of the agent. And you're determining what is the next state and the effects to execute based on the current state and the events that just happened. And so that machine, that logic, it could be X state. You could write a switch statement, a reducer function. Coding agents are really good at updating these things regardless of whatever you use. You could use Langraph, I guess, which actually is one of the most popular tools for using state",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": 919
+    }
+   ]
+  },
+  "n_sources": 1,
+  "slide_candidates": [],
+  "timeline_secs": [
+   0,
+   209,
+   293,
+   366,
+   469,
+   526,
+   717,
+   900,
+   1128
+  ]
+ },
+ {
   "topic_id": "w41-claude-haiku-5-5",
   "page": {
    "head_tiles": [
@@ -36,10 +1534,10 @@
       {
        "text": "Simon Willison은 전작 Haiku 4.5가 GPT-6 루나 대비 10배 비쌌던 점을 지적하며, 10만 토큰 이하 워크로드에서는 Haiku 5.5가 동일 가격에 더 높은 벤치마크 점수를 기록한다고 평가했다. 반면 10만 토큰 초과 구간에서는 GPT-6 루나가 272,000 토큰에서 0.20달러/0.75달러로만 인상되어 더 유리한 조건을 제공한다.",
        "refs": [
-        "it:1144#s5",
         "it:1144#s6",
         "it:1144#s8",
-        "it:1144#s11"
+        "it:1144#s11",
+        "it:1144#s12"
        ]
       }
      ],
@@ -97,10 +1595,10 @@
       {
        "text": "아티피셜 애널리시스의 AI 지수(AAII)에서 Haiku 5.5는 43점을 기록해 1년 전 전작 대비 26점 상승했으며, 최대 노력 설정 시 GLM-5.3 플래시(42점), 제미나이 3.8 플래시(41점), GPT-6 루나(38점)를 모두 앞질렀다. 에이전트 코딩 역량 '터미널벤치 4.0'에서는 39.2%로 GPT-6 루나(16.4%)를 제쳤고, 추론 분야 'HLE'에서는 도구 사용 시 57.4%를 기록했다.",
        "refs": [
-        "it:1180#s19",
+        "it:1180#s25",
+        "it:1180#s26",
         "it:1180#s20",
-        "it:1180#s24",
-        "it:1180#s26"
+        "it:1180#s19"
        ]
       }
      ],
@@ -121,6 +1619,11 @@
         "1437점"
        ],
        [
+        "AA-브리프케이스 v1.1",
+        "1578점",
+        "1336점"
+       ],
+       [
         "OS월드 2.1",
         "72.4%",
         "48.9%"
@@ -137,10 +1640,10 @@
        ]
       ],
       "refs": [
-       "it:1180#s15",
-       "it:1180#s17",
        "it:1180#s18",
-       "it:1180#s20"
+       "it:1180#s20",
+       "it:1180#s24",
+       "it:1180#s26"
       ]
      },
      "tiles": [],
@@ -1545,6 +3048,3858 @@
      "channel": "text",
      "kind": "sentence",
      "text": "- OpenAI DevDay 2026 live blog - 29th September 2026",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ]
+  },
+  "n_sources": 2,
+  "slide_candidates": [],
+  "timeline_secs": []
+ },
+ {
+  "topic_id": "w41-embedding-gemma-2",
+  "page": {
+   "head_tiles": [
+    {
+     "value": "740M",
+     "label": "매개변수",
+     "note": "Gemma 4 기반",
+     "refs": [
+      "it:1111#s6",
+      "it:1183#s8"
+     ]
+    },
+    {
+     "value": "8K",
+     "label": "토큰 컨텍스트",
+     "note": "전작 대비 4배",
+     "refs": [
+      "it:1111#s15",
+      "it:1183#s12"
+     ]
+    },
+    {
+     "value": "78.68",
+     "label": "MTEB Code 점수",
+     "note": "전작 68.76 대비 +9.92",
+     "refs": [
+      "it:1111#s17",
+      "it:1183#s21"
+     ]
+    },
+    {
+     "value": "~567MB",
+     "label": "멀티모달 RAM",
+     "note": "Pixel 11 Pro, 양자화",
+     "refs": [
+      "it:1111#s14",
+      "it:1183#s28"
+     ]
+    }
+   ],
+   "sections": [
+    {
+     "heading": "텍스트·코드·이미지·오디오를 하나의 벡터 공간으로 통합",
+     "paragraphs": [
+      {
+       "text": "Google DeepMind는 6일, 텍스트뿐 아니라 코드, 이미지, 비디오, 오디오까지 하나의 임베딩 공간에서 처리하는 EmbeddingGemma 2를 공개했다. 이 모델은 Gemma 4 아키텍처를 기반으로 740M 매개변수를 가지며, Apache 2.0 라이선스로 상업적 활용이 가능하다.",
+       "refs": [
+        "it:1111#s6",
+        "it:1183#s3",
+        "it:1183#s8",
+        "it:1183#s9"
+       ]
+      },
+      {
+       "text": "전작 EmbeddingGemma는 누적 2000만회 이상 다운로드되며 온디바이스 검색과 RAG 파이프라인에 활용됐다. 이번 버전은 이러한 수요를 바탕으로 멀티모달 영역으로 범위를 전면 확장한 것이다.",
+       "refs": [
+        "it:1111#s4",
+        "it:1183#s5"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "모듈형 구조와 MRL 적용으로 저장·메모리 효율 극대화",
+     "paragraphs": [
+      {
+       "text": "EmbeddingGemma 2는 텍스트 백본(270M), 비전 인코더(170M), 오디오 인코더(300M)로 구성된 모듈형 구조다. 필요한 기능만 선택해 구동할 수 있어 텍스트 전용 작업에서는 전체 모델보다 적은 자원을 사용한다.",
+       "refs": [
+        "it:1111#s10",
+        "it:1183#s10",
+        "it:1183#s11"
+       ]
+      },
+      {
+       "text": "Matryoshka Representation Learning(MRL)을 적용해 기본 768차원 벡터를 512, 256, 128차원으로 동적으로 줄일 수 있다. 이를 통해 로컬 벡터 데이터베이스의 저장 공간과 메모리 사용량을 최대 6배까지 절감할 수 있다.",
+       "refs": [
+        "it:1111#s11",
+        "it:1111#s12",
+        "it:1183#s25",
+        "it:1183#s26"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "코드 성능 9.92점 향상, 8K 컨텍스트로 멀티모달 처리 확장",
+     "paragraphs": [
+      {
+       "text": "MTEB Code 벤치마크에서 78.68점을 기록해 전작의 68.76점보다 9.92점 향상됐다. MAEB 등 오디오 벤치마크에서도 10억개 미만 매개변수 모델 중 최고 수준의 성능을 입증했다.",
+       "refs": [
+        "it:1111#s17",
+        "it:1183#s21",
+        "it:1183#s22"
+       ]
+      },
+      {
+       "text": "컨텍스트 윈도우는 전작 대비 4배 늘어난 8K 토큰을 지원한다. 한 번의 입력에서 최대 29장의 이미지, 58개의 비디오 프레임, 5.5분 분량의 오디오를 처리하거나 이를 섞어 입력할 수 있다.",
+       "refs": [
+        "it:1111#s15",
+        "it:1183#s12",
+        "it:1183#s13",
+        "it:1183#s14"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "Pixel 11 Pro 기준 567MB RAM, Gemma 4와 통합 파이프라인 가능",
+     "paragraphs": [
+      {
+       "text": "양자화된 모델 기준, Google Pixel 11 Pro에서 텍스트 전용은 약 191MB, 전체 멀티모달 모델은 약 567MB의 활성 RAM을 사용한다. 이는 온디바이스 추론에 최적화된 자원 효율을 보여준다.",
+       "refs": [
+        "it:1111#s14",
+        "it:1183#s28"
+       ]
+      },
+      {
+       "text": "Gemma 4와 텍스트 토크나이저 및 오디오 인코더를 공유하므로, 생성 모델과 함께 구동 시 통합 파이프라인의 전체 메모리 점유율을 낮출 수 있다. 온디바이스 임베딩 생성은 데이터 프라이버시 보호와 지연 시간 감소, 완전한 오프라인 검색을 가능하게 한다.",
+       "refs": [
+        "it:1111#s24",
+        "it:1183#s29",
+        "it:1183#s30"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "Hugging Face·Kaggle 배포, 주요 개발 도구 연동 지원",
+     "paragraphs": [
+      {
+       "text": "모델 가중치는 Hugging Face와 Kaggle에서 내려받을 수 있으며, Gemini Enterprise Agent Platform Model Garden에도 곧 제공될 예정이다. 온디바이스 배포는 MediaPipe와 LiteRT를 통해 지원된다.",
+       "refs": [
+        "it:1111#s28",
+        "it:1111#s30",
+        "it:1183#s31"
+       ]
+      },
+      {
+       "text": "transformers, sentence-transformers, MLX, vLLM, llama.cpp, SGLang, Ollama, LMStudio 등 주요 개발 도구와 연동된다. 벡터 저장에는 Qdrant를, 파인튜닝에는 Unsloth 가이드를 활용할 수 있다.",
+       "refs": [
+        "it:1111#s32",
+        "it:1111#s33",
+        "it:1111#s34",
+        "it:1183#s32"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    }
+   ],
+   "summary": "Google DeepMind가 텍스트·코드·이미지·오디오를 통합 처리하는 740M 매개변수 임베딩 모델 EmbeddingGemma 2를 공개했다. ==온디바이스 RAG와 오프라인 검색을 위한 경량화==가 핵심이며, 전작 대비 코드 성능과 컨텍스트 길이가 크게 늘었다.",
+   "title": "Google DeepMind, 멀티모달 임베딩 모델 EmbeddingGemma 2 공개",
+   "log": "절 5개, 단락 10개, 표 0개, 타일 4개",
+   "attention": false
+  },
+  "pack": {
+   "it:1111#s1": [
+    {
+     "id": "it:1111#s1",
+     "member": "it:1111",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "EmbeddingGemma 2: an open, lightweight multimodal embedding model",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1111#s2": [
+    {
+     "id": "it:1111#s2",
+     "member": "it:1111",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "We introduced EmbeddingGemma last year to provide a lightweight option for high-quality text embeddings, to help your apps organize, search, and connect information directly on consumer hardware.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1111#s3": [
+    {
+     "id": "it:1111#s3",
+     "member": "it:1111",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "The developer community’s response blew past our expectations.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1111#s4": [
+    {
+     "id": "it:1111#s4",
+     "member": "it:1111",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "With more than 20 million downloads, builders have used it to power smarter on-device search tools and privacy-first retrieval augmented generation (RAG) pipelines.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1111#s5": [
+    {
+     "id": "it:1111#s5",
+     "member": "it:1111",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "Today, we’re launching EmbeddingGemma 2, expanding beyond text to unify code, images, video, and audio in a shared embedding space.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1111#s6": [
+    {
+     "id": "it:1111#s6",
+     "member": "it:1111",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "Built on the Gemma 4 architecture and released under a commercially permissive Apache 2.0 license, EmbeddingGemma 2 has 740 million parameters, making it optimal for on-device inference.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1111#s7": [
+    {
+     "id": "it:1111#s7",
+     "member": "it:1111",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "It can help find a specific video clip from a voice memo, or search through hours of audio recordings based on a text query, all processed by a single, natively multimodal model.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1111#s8": [
+    {
+     "id": "it:1111#s8",
+     "member": "it:1111",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "Built from the same technology as Gemini Embedding models, EmbeddingGemma 2 is:",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1111#s9": [
+    {
+     "id": "it:1111#s9",
+     "member": "it:1111",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "- Best-in-class for its size: Achieves leading scores among sub-1B multimodal embedders for its size across benchmarks like MTEB (Massive Text Embedding Benchmark) Code and MAEB (Massive Audio Embedding Benchmark), while matching or outperforming many larger models across text, vision, and audio tasks.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1111#s10": [
+    {
+     "id": "it:1111#s10",
+     "member": "it:1111",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "- Modular by design: Requires as little as 270M parameters for text-only workloads with optional vision (170M) and audio (300M) encoders for full multimodal support.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1111#s11": [
+    {
+     "id": "it:1111#s11",
+     "member": "it:1111",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "- Storage-efficient: Using Matryoshka Representation Learning (MRL), developers can dynamically truncate output vectors from 768 dimensions down to 512, 256, or 128 dimensions.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1111#s12": [
+    {
+     "id": "it:1111#s12",
+     "member": "it:1111",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "This provides up to 6x storage reduction for local vector databases and memory usage.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1111#s13": [
+    {
+     "id": "it:1111#s13",
+     "member": "it:1111",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "- Optimized for on-device performance: Runs efficiently within tight resource constraints.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1111#s14": [
+    {
+     "id": "it:1111#s14",
+     "member": "it:1111",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "With quantization, on a Google Pixel 11 Pro, EmbeddingGemma 2 requires as little as ~191MB active RAM for text-only weights and ~567MB for the full multimodal model.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1111#s15": [
+    {
+     "id": "it:1111#s15",
+     "member": "it:1111",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "- Extended context ready: Features an 8K token context window (4x larger than EmbeddingGemma 1), allowing it to process up to 5.5 minutes of audio, 29 images, 58 video frames, or interleaved combinations thereof directly on local hardware.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1111#s16": [
+    {
+     "id": "it:1111#s16",
+     "member": "it:1111",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "Achieving top-tier quality for code, vision, and audio",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1111#s17": [
+    {
+     "id": "it:1111#s17",
+     "member": "it:1111",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "EmbeddingGemma 2 matches the strong multilingual text performance of EmbeddingGemma while delivering a significant 9.92-point improvement on code performance (in MTEB Code, from 68.76 to 78.68), making it well-suited for local codebase indexing, semantic code search, and coding agent retrieval.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1111#s18": [
+    {
+     "id": "it:1111#s18",
+     "member": "it:1111",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "Across image, video, documents, and audio, it sets a new standard in quality-per-parameter for sub-1B models and even outperforms some specialist models more than twice its size.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1111#s19": [
+    {
+     "id": "it:1111#s19",
+     "member": "it:1111",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "Find full evaluation metrics and model information in the EmbeddingGemma 2 model card.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1111#s20": [
+    {
+     "id": "it:1111#s20",
+     "member": "it:1111",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "Enabling semantic search, routing, and retrieval, fully on-device",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1111#s21": [
+    {
+     "id": "it:1111#s21",
+     "member": "it:1111",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "EmbeddingGemma 2 brings robust capabilities directly to edge hardware.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1111#s22": [
+    {
+     "id": "it:1111#s22",
+     "member": "it:1111",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "Generating embeddings locally helps ensure data privacy, reduces pipeline latency, and empowers developers to build cross-modal search and retrieval that works entirely offline.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1111#s23": [
+    {
+     "id": "it:1111#s23",
+     "member": "it:1111",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "When paired with generative models such as Gemma 4, EmbeddingGemma 2 enables on-device RAG pipelines that understand complex multimodal data.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1111#s24": [
+    {
+     "id": "it:1111#s24",
+     "member": "it:1111",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "Because EmbeddingGemma 2 is built on Gemma 4 and shares its text tokenizer and audio encoder, developers can run both models together in a unified pipeline with a lower combined total memory footprint.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1111#s25": [
+    {
+     "id": "it:1111#s25",
+     "member": "it:1111",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "To learn how to build on-device search and RAG systems with LiteRT, read the Google AI Edge blog post.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1111#s26": [
+    {
+     "id": "it:1111#s26",
+     "member": "it:1111",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "Getting started with EmbeddingGemma 2",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1111#s27": [
+    {
+     "id": "it:1111#s27",
+     "member": "it:1111",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "We worked closely with the following partners to ensure EmbeddingGemma 2 works immediately where you build:",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1111#s28": [
+    {
+     "id": "it:1111#s28",
+     "member": "it:1111",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "- Download the models: Find the model weights on Hugging Face and Kaggle, with Gemini Enterprise Agent Platform Model Garden availability coming soon.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1111#s29": [
+    {
+     "id": "it:1111#s29",
+     "member": "it:1111",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "Visit LiteRT Community on Hugging Face for models optimized for on-device.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1111#s30": [
+    {
+     "id": "it:1111#s30",
+     "member": "it:1111",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "- On-device deployment: Develop cross-platform apps with Google AI Edge MediaPipe for turnkey embedding, retrieval & decision tasks or LiteRT for custom model integration.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1111#s31": [
+    {
+     "id": "it:1111#s31",
+     "member": "it:1111",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "Build for the browser with transformers.js or WebGPU.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1111#s32": [
+    {
+     "id": "it:1111#s32",
+     "member": "it:1111",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "- Use your favorite development tools: Serve the model efficiently using transformers, sentence-transformers, MLX, vLLM, llama.cpp, SGLang, Ollama, and LMStudio.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1111#s33": [
+    {
+     "id": "it:1111#s33",
+     "member": "it:1111",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "Store your embedding vectors with Qdrant.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1111#s34": [
+    {
+     "id": "it:1111#s34",
+     "member": "it:1111",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "- Fine-tuning: Follow guidance by Unsloth for how to fine-tune EmbeddingGemma 2 for your use cases.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1111#s35": [
+    {
+     "id": "it:1111#s35",
+     "member": "it:1111",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "Explore our developer guide, documentation, and guides for inference and fine-tuning.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1183#s1": [
+    {
+     "id": "it:1183#s1",
+     "member": "it:1183",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "구글이 기기 안에서 다양한 형태의 데이터를 연결하고 검색할 수 있는 온디바이스 AI 기술을 확장했다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1183#s2": [
+    {
+     "id": "it:1183#s2",
+     "member": "it:1183",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "대규모 클라우드 모델에 의존하지 않고도 여러 데이터를 빠르게 처리할 수 있도록 경량화한 멀티모달 임베딩 모델을 선보였다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1183#s3": [
+    {
+     "id": "it:1183#s3",
+     "member": "it:1183",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "구글은 6일(현지시간) 스마트폰과 PC 같은 소비자 기기에서 직접 실행할 수 있는 경량 멀티모달 임베딩 모델 ‘임베딩젬마 2(EmbeddingGemma 2)’를 공개했다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1183#s4": [
+    {
+     "id": "it:1183#s4",
+     "member": "it:1183",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "텍스트뿐 아니라 코드, 이미지, 비디오, 오디오까지 하나의 벡터 공간에서 처리할 수 있도록 확장해 온디바이스 검색과 검색증강생성(RAG) 활용 범위를 넓힌 것이 특징이다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1183#s5": [
+    {
+     "id": "it:1183#s5",
+     "member": "it:1183",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "누적 2000만회 이상 다운로드된 전작의 흥행에 힘입어 멀티모달 영역으로 범위를 전면 확정한 것이다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1183#s6": [
+    {
+     "id": "it:1183#s6",
+     "member": "it:1183",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "임베딩 모델은 텍스트나 이미지, 오디오 같은 데이터를 컴퓨터가 이해할 수 있는 수치(벡터)로 변환해 유사도를 비교하고 관련 정보를 빠르게 찾아내는 AI 기술이다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1183#s7": [
+    {
+     "id": "it:1183#s7",
+     "member": "it:1183",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "단순 답변 생성을 넘어 검색·추천·RAG 등 AI 서비스 전반의 기초 엔진으로 쓰여 활용 범위가 매우 넓다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1183#s8": [
+    {
+     "id": "it:1183#s8",
+     "member": "it:1183",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "임베딩젬마 2는 ‘젬마 4(Gemma 4)’ 아키텍처를 기반으로 개발된 7억4000만(740M) 매개변수 모델이다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1183#s9": [
+    {
+     "id": "it:1183#s9",
+     "member": "it:1183",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "아파치 2.0 라이선스로 공개돼 상업적 활용도 가능하다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1183#s10": [
+    {
+     "id": "it:1183#s10",
+     "member": "it:1183",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "이 모델은 텍스트·코드 처리용 백본에 2억7000만개, 비전 인코더에 1억7000만개, 오디오 인코더에 3억개의 매개변수를 배분하는 모듈형 구조로 설계됐다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1183#s11": [
+    {
+     "id": "it:1183#s11",
+     "member": "it:1183",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "필요한 기능만 선택해 구동할 수 있어 텍스트 전용 작업에서는 전체 모델보다 훨씬 적은 자원만 사용할 수 있다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1183#s12": [
+    {
+     "id": "it:1183#s12",
+     "member": "it:1183",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "구글은 임베딩젬마 2가 최대 8192토큰의 컨텍스트를 지원한다고 설명했다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1183#s13": [
+    {
+     "id": "it:1183#s13",
+     "member": "it:1183",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "이는 전작보다 4배 늘어난 규모다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1183#s14": [
+    {
+     "id": "it:1183#s14",
+     "member": "it:1183",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "한 번의 입력에서 최대 29장의 이미지, 58개의 비디오 프레임, 5.5분 분량의 오디오를 처리할 수 있으며, 여러 형태의 데이터를 섞어 입력하는 것도 가능하다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1183#s15": [
+    {
+     "id": "it:1183#s15",
+     "member": "it:1183",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "예를 들어 텍스트로 검색해 특정 사진을 찾거나, 음성 메모를 이용해 관련 비디오 장면을 검색하는 방식이다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1183#s16": [
+    {
+     "id": "it:1183#s16",
+     "member": "it:1183",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "이미지와 설명, 동영상이 함께 포함된 상품 정보처럼 서로 다른 데이터를 하나의 벡터 공간에서 비교하고 검색할 수도 있다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1183#s17": [
+    {
+     "id": "it:1183#s17",
+     "member": "it:1183",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "We’re releasing EmbeddingGemma 2, our first natively multimodal open model engineered for on-device embeddings.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1183#s18": [
+    {
+     "id": "it:1183#s18",
+     "member": "it:1183",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "Built on the Gemma 4 architecture and released under an Apache 2.0 license, it goes beyond text to unify images, video, audio, and code in a single embedding space. pic.twitter.com/PBdx42PwS7",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1183#s19": [
+    {
+     "id": "it:1183#s19",
+     "member": "it:1183",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "— Google (@Google) October 6, 2026",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1183#s20": [
+    {
+     "id": "it:1183#s20",
+     "member": "it:1183",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "코드 및 음성 검색 성능도 크게 향상됐다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1183#s21": [
+    {
+     "id": "it:1183#s21",
+     "member": "it:1183",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "MTEB 코드에서 78.68점을 기록해 전작의 68.76점보다 9.92점 올랐다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1183#s22": [
+    {
+     "id": "it:1183#s22",
+     "member": "it:1183",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "아울러 대규모 오디오 임베딩 벤치마크(MAEB) 등에서도 10억개 미만 매개변수 모델 중 최고 수준의 성능을 입증했다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1183#s23": [
+    {
+     "id": "it:1183#s23",
+     "member": "it:1183",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "구글은 이를 바탕으로 로컬 코드베이스 색인과 의미 기반 코드 검색, 코딩 에이전트의 검색·검색증강 작업 등에 적합하다고 설명했다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1183#s24": [
+    {
+     "id": "it:1183#s24",
+     "member": "it:1183",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "저장 공간과 메모리 효율도 개선했다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1183#s25": [
+    {
+     "id": "it:1183#s25",
+     "member": "it:1183",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "‘마트료시카 표현 학습(MRL)’을 적용해 기본 768차원 벡터를 512, 256, 128차원으로 줄일 수 있다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1183#s26": [
+    {
+     "id": "it:1183#s26",
+     "member": "it:1183",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "이를 통해 로컬 벡터 데이터베이스의 저장 공간과 메모리 사용량을 최대 6배까지 줄일 수 있다고 구글은 밝혔다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1183#s27": [
+    {
+     "id": "it:1183#s27",
+     "member": "it:1183",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "온디바이스 성능도 강조했다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1183#s28": [
+    {
+     "id": "it:1183#s28",
+     "member": "it:1183",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "양자화된 모델을 기준으로 구글 픽셀 11 프로에서는 텍스트 전용 모델이 약 191MB의 활성 RAM만 사용하며, 전체 멀티모달 모델은 약 567MB 수준이다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1183#s29": [
+    {
+     "id": "it:1183#s29",
+     "member": "it:1183",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "특히 젬마 4와 텍스트 토크나이저 및 오디오 인코더를 공유하므로, 온디바이스 생성 모델과 함께 구동 시 통합 파이프라인의 전체 메모리 점유율을 한층 더 낮출 수 있다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1183#s30": [
+    {
+     "id": "it:1183#s30",
+     "member": "it:1183",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "구글은 “온디바이스에서 임베딩을 생성하면 데이터의 개인정보를 보호하고 지연 시간을 줄이면서 완전히 오프라인으로 작동하는 검색과 검색증강 시스템을 구축할 수 있다”고 설명했다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1183#s31": [
+    {
+     "id": "it:1183#s31",
+     "member": "it:1183",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "임베딩젬마 2는 허깅페이스와 캐글에서 모델 가중치를 내려받을 수 있으며, MediaPipe와 LiteRT를 이용한 온디바이스 배포도 지원한다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1183#s32": [
+    {
+     "id": "it:1183#s32",
+     "member": "it:1183",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "Ollama, llama.cpp, vLLM, SGLang 등 주요 개발 도구와의 연동도 제공한다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1183#s33": [
+    {
+     "id": "it:1183#s33",
+     "member": "it:1183",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "박찬 기자 cpark@aitimes.com",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ]
+  },
+  "n_sources": 2,
+  "slide_candidates": [],
+  "timeline_secs": []
+ },
+ {
+  "topic_id": "w41-mistral-large-4",
+  "page": {
+   "head_tiles": [
+    {
+     "value": "1조500억",
+     "label": "총 파라미터",
+     "note": "MoE 구조",
+     "refs": [
+      "it:1198#s5"
+     ]
+    },
+    {
+     "value": "490억",
+     "label": "활성화 파라미터",
+     "note": "토큰당 추론 시",
+     "refs": [
+      "it:1198#s6"
+     ]
+    },
+    {
+     "value": "38점",
+     "label": "AAII 지능 지수",
+     "note": "Artificial Analysis",
+     "refs": [
+      "it:1198#s20"
+     ]
+    },
+    {
+     "value": "100만",
+     "label": "컨텍스트 창",
+     "note": "토큰",
+     "refs": [
+      "it:1198#s8"
+     ]
+    }
+   ],
+   "sections": [
+    {
+     "heading": "1조500억 파라미터 MoE 구조와 3,800개 GPU 학습",
+     "paragraphs": [
+      {
+       "text": "미스트랄은 10월 6일 오픈웨이트 모델 '미스트랄 라지 4(ML4)'를 공개했다. 총 1조500억개의 매개변수를 갖춘 희소 전문가 혼합(MoE) 모델로, 실제 추론 시 토큰당 활성화되는 매개변수는 490억개다.",
+       "refs": [
+        "it:1198#s3",
+        "it:1198#s5",
+        "it:1198#s6"
+       ]
+      },
+      {
+       "text": "이 모델은 유럽 내 자체 데이터센터에서 엔비디아 그레이스 블랙웰 GPU 3,800대를 이용해 처음부터 두 달에 걸쳐 학습했다. 160개 이상의 언어를 지원하며, 이미지 입력을 포함한 멀티모달 처리가 가능하고 컨텍스트 창은 최대 100만 토큰이다.",
+       "refs": [
+        "it:1198#s9",
+        "it:1198#s7",
+        "it:1198#s8"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "사이버 보안·코딩 벤치마크에서 오픈웨이트 최상위 성능",
+     "paragraphs": [
+      {
+       "text": "AA 사이버 지수에서 50%를 기록해 'GLM-5.3-플래시'와 동률을 이뤘으며, '키미 K3'와 딥시크 V4.1 플래시 등을 앞섰다. '사이벤치'에서 93%, '사이버짐-E2E'에서 82%의 점수를 기록했다. 오픈웨이트 모델이라는 점은 기업과 정부 기관이 자체 환경에 배포해 데이터 유출 걱정 없이 운영할 수 있다는 차별점으로 꼽혔다.",
+       "refs": [
+        "it:1198#s23",
+        "it:1198#s24",
+        "it:1198#s25",
+        "it:1198#s26"
+       ]
+      },
+      {
+       "text": "코딩 에이전트 종합 지표에서는 49.8%를 기록해 오픈 웨이트 모델 진영에서는 최고 수준(SOTA)급으로 평가받았다. '딥SWE v1.1'에서 61.7%, 'SWE-아틀라스-QnA'에서 59.4%, '터미널-벤치 4.0'에서 28.3%의 점수를 보였다.",
+       "refs": [
+        "it:1198#s31",
+        "it:1198#s32",
+        "it:1198#s30"
+       ]
+      }
+     ],
+     "visual": "table",
+     "bars": null,
+     "table": {
+      "title": "주요 벤치마크 점수",
+      "note": "미스트랄 공식 발표 기준",
+      "columns": [
+       "벤치마크",
+       "Mistral Large 4"
+      ],
+      "rows": [
+       [
+        "AAII 지능 지수",
+        "38점"
+       ],
+       [
+        "AA 사이버 지수",
+        "50%"
+       ],
+       [
+        "사이벤치",
+        "93%"
+       ],
+       [
+        "사이버짐-E2E",
+        "82%"
+       ],
+       [
+        "코딩 에이전트 종합",
+        "49.8%"
+       ]
+      ],
+      "refs": [
+       "it:1198#s20",
+       "it:1198#s23",
+       "it:1198#s24",
+       "it:1198#s31"
+      ]
+     },
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "API 프리뷰 요금과 27일 오픈웨이트 공개 일정",
+     "paragraphs": [
+      {
+       "text": "현재는 API를 통한 공개 프리뷰 단계로, 개발자와 사이버 보안 전문가, 정부 당국 등을 대상으로 약 3주간 테스트와 강화학습(RL)을 진행 중이다. 요금은 입력 토큰 100만개당 1.36달러, 출력 토큰 100만개당 4.18달러, 캐시된 입력 100만개당 0.14달러로 설정됐다.",
+       "refs": [
+        "it:1198#s4",
+        "it:1198#s49"
+       ]
+      },
+      {
+       "text": "미스트랄은 이달 27일 모델 가중치를 공개하면서 아키텍처와 추가 벤치마크, 사후 학습 방법도 함께 공개할 예정이다. 가중치 공개 후 기업과 정부기관은 자체 클라우드나 온프레미스 환경에서 모델을 직접 운영하고 커스터마이징할 수 있게 된다.",
+       "refs": [
+        "it:1198#s50",
+        "it:1198#s51"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "프런티어 대비 6개월 격차와 독립 검증 부재",
+     "paragraphs": [
+      {
+       "text": "Simon Willison은 Mistral Large 4가 Fable-class 모델은 아니지만, 프런티어 대비 약 6개월 뒤처진 수준으로 복귀했다고 평가했다. 지난 12월 Mistral Large 3가 AA에서 9점을 기록했던 것과 비교해 큰 개선이다.",
+       "refs": [
+        "it:1046#s10",
+        "it:1046#s9"
+       ]
+      },
+      {
+       "text": "다만 공개된 벤치마크 수치는 아직 독립적으로 모두 검증된 결과는 아니다. 벤치마크는 모델 자체뿐 아니라 에이전트 구성과 평가 환경에 따라 결과가 달라질 수 있어, 미스트랄이 공개한 비교 자료의 신뢰성에 대한 검증이 필요하다.",
+       "refs": [
+        "it:1198#s34",
+        "it:1198#s35"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    }
+   ],
+   "summary": "미스트랄이 1조500억 파라미터 MoE 모델 Mistral Large 4를 API 프리뷰로 공개했다. ==사이버 보안·코딩 벤치마크 최상위== 점수를 내세우며 27일 오픈웨이트 공개를 예고했다.",
+   "title": "미스트랄, 1조500억 파라미터 MoE 모델 Mistral Large 4 공개",
+   "log": "절 4개, 단락 8개, 표 1개, 타일 4개",
+   "attention": false
+  },
+  "pack": {
+   "it:1046#s1": [
+    {
+     "id": "it:1046#s1",
+     "member": "it:1046",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "6th October 2026 - Link Blog",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1046#s2": [
+    {
+     "id": "it:1046#s2",
+     "member": "it:1046",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "Introducing Mistral Large 4: Le chonk (via) Mistral are back in the game.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1046#s3": [
+    {
+     "id": "it:1046#s3",
+     "member": "it:1046",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "Today they're releasing a preview of Mistral Large 4, a 1 trillion parameter, 49 billion active parameter model trained on their own cluster of 3,800 NVIDIA Grace Blackwell GPUs.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1046#s4": [
+    {
+     "id": "it:1046#s4",
+     "member": "it:1046",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "The preview is available via their API.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1046#s5": [
+    {
+     "id": "it:1046#s5",
+     "member": "it:1046",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "They promise to release the open weights model at the \"end of this month\".",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1046#s6": [
+    {
+     "id": "it:1046#s6",
+     "member": "it:1046",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "The model only supports two reasoning levels - \"none\" and \"high\" - via the Mistral API.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1046#s7": [
+    {
+     "id": "it:1046#s7",
+     "member": "it:1046",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "Here are both pelicans - the \"high\" one looks better, though surprisingly it only used 2,717 output tokens compared to \"none\" which used 3,275:",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1046#s8": [
+    {
+     "id": "it:1046#s8",
+     "member": "it:1046",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "On Artificial Analysis it scores 38, just behind DeepSeek 4.1 Flash, which is a 552B model.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1046#s9": [
+    {
+     "id": "it:1046#s9",
+     "member": "it:1046",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "It's a huge improvement on last December's Mistral Large 3, which drew this terrible pelican and scored 9 on AA.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1046#s10": [
+    {
+     "id": "it:1046#s10",
+     "member": "it:1046",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "It's certainly not a Fable-class model, but it's great to see Mistral put out a model that's back to being maybe about 6 months behind the frontier.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1046#s11": [
+    {
+     "id": "it:1046#s11",
+     "member": "it:1046",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "Recent articles",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1046#s12": [
+    {
+     "id": "it:1046#s12",
+     "member": "it:1046",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "- Claude Haiku 5.5 - 7th October 2026",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1046#s13": [
+    {
+     "id": "it:1046#s13",
+     "member": "it:1046",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "- We're going to need default hard budget caps on pretty much everything - 3rd October 2026",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1046#s14": [
+    {
+     "id": "it:1046#s14",
+     "member": "it:1046",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "- OpenAI DevDay 2026 live blog - 29th September 2026",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s1": [
+    {
+     "id": "it:1198#s1",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "프랑스의 미스트랄 AI가 내부 별칭 '르 총크(Le Chonk)'로 불리는 차세대 플래그십 AI 모델을 공개했다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s2": [
+    {
+     "id": "it:1198#s2",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "'뚱뚱한 고양이'를 뜻하는 이 별칭은 1조개가 넘는 매개변수를 가진 거대 모델의 규모감을 위트 있게 표현한 것이다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s3": [
+    {
+     "id": "it:1198#s3",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "미스트랄은 6일(현지시간) 오픈웨이트 모델 '미스트랄 라지 4(ML4·Mistral Large 4)'를 공개했다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s4": [
+    {
+     "id": "it:1198#s4",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "현재는 API를 통한 공개 프리뷰 단계로, 개발자와 사이버 보안 전문가, 정부 당국 등을 대상으로 약 3주간 테스트와 강화학습(RL)을 진행한 뒤 이달 27일 모델 가중치를 공개할 예정이다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s5": [
+    {
+     "id": "it:1198#s5",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "라지 4는 총 1조500억개의 매개변수를 갖춘 희소 전문가 혼합(MoE) 모델이다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s6": [
+    {
+     "id": "it:1198#s6",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "이 가운데 실제 추론 과정에서 토큰당 활성화되는 매개변수는 490억개다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s7": [
+    {
+     "id": "it:1198#s7",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "160개 이상의 언어를 지원하며, 이미지 입력을 포함한 멀티모달 처리가 가능하다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s8": [
+    {
+     "id": "it:1198#s8",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "컨텍스트 창은 최대 100만 토큰이다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s9": [
+    {
+     "id": "it:1198#s9",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "이 모델을 유럽 내 자체 데이터센터에서 엔비디아 그레이스 블랙웰 GPU 3800대를 이용해 처음부터(from Scratch) 두 달에 걸쳐 학습했다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s10": [
+    {
+     "id": "it:1198#s10",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "공개 프리뷰도 같은 인프라에서 제공한다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s11": [
+    {
+     "id": "it:1198#s11",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "업계에서는 미국 빅테크의 폐쇄형 모델 및 중국계 오픈 모델에 맞서 유럽의 기술 주권(AI Sovereignty)을 확보하려는 미스트랄의 핵심 전략 카드로 평가하고 있다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s12": [
+    {
+     "id": "it:1198#s12",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "Meet Mistral Large 4, aka Le Chonk.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s13": [
+    {
+     "id": "it:1198#s13",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "• 1T parameters, natively multimodal.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s14": [
+    {
+     "id": "it:1198#s14",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "49B active.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s15": [
+    {
+     "id": "it:1198#s15",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "It is the best open weights model from US or Europe on aggregated benchmarks.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s16": [
+    {
+     "id": "it:1198#s16",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "• State-of-the-art on critical workloads, including cyber defense, manufacturing and finance and it surpasses… pic.twitter.com/Jr5Z11mxEv",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s17": [
+    {
+     "id": "it:1198#s17",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "— Mistral AI (@MistralAI) October 6, 2026",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s18": [
+    {
+     "id": "it:1198#s18",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "이 회사는 \"ML4는 오픈웨이트 모델의 최전선에 있다\"고 밝혔다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s19": [
+    {
+     "id": "it:1198#s19",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "특히 코딩과 사이버 보안, 금융, 제조, 과학, 에이전트 작업, 이미지 분석 등 전문 분야에서 높은 성능을 보인다고 강조했다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s20": [
+    {
+     "id": "it:1198#s20",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "ML4는 아티피셜 에널리시스 지능 지수(AAII)에서 38점을 기록했다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s21": [
+    {
+     "id": "it:1198#s21",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "이는 'GPT-6 루나(38점)'와 비슷한 수준이며, '딥시크-V4.1 플래시(39점)'와도 경쟁할 만한 성능이다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s22": [
+    {
+     "id": "it:1198#s22",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "사이버 보안은 가장 강하게 내세우는 분야다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s23": [
+    {
+     "id": "it:1198#s23",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "AA 사이버 지수에서 50%를 기록해 'GLM-5.3-플래시'와 동률을 기록했으며, '키미 K3'와 딥시크 V4.1 플래시 등을 앞섰다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s24": [
+    {
+     "id": "it:1198#s24",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "또 '사이벤치'에서 93%, '사이버짐-E2E'에서 82%의 점수를 기록했다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s25": [
+    {
+     "id": "it:1198#s25",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "오픈웨이트 모델이라는 점도 사이버 보안 분야에서 중요한 차별점으로 꼽았다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s26": [
+    {
+     "id": "it:1198#s26",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "기업과 정부 기관이 모델을 자체 클라우드나 온프레미스 환경에 배포해 데이터 유출 걱정 없이 조직의 고유한 보안 정책에 맞게 운영할 수 있기 때문이다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s27": [
+    {
+     "id": "it:1198#s27",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "Mistral has released Mistral Large 4, scoring 38 on the Artificial Analysis Intelligence Index; France is back to having the most intelligent model from outside the US and China@MistralAI has released Mistral Large 4 in Research Public Preview, with plans to release the weights… pic.twitter.com/pzGQujfDlH",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s28": [
+    {
+     "id": "it:1198#s28",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "— Artificial Analysis (@ArtificialAnlys) October 6, 2026",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s29": [
+    {
+     "id": "it:1198#s29",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "코딩과 에이전트 성능에서도 높은 점수를 제시했다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s30": [
+    {
+     "id": "it:1198#s30",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "'딥SWE v1.1'에서 61.7%, 'SWE-아틀라스-QnA'에서 59.4%, '터미널-벤치 4.0'에서 28.3%를 기록했다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s31": [
+    {
+     "id": "it:1198#s31",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "코딩 에이전트 종합 지표에서는 49.8%를 기록했다고 밝혔다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s32": [
+    {
+     "id": "it:1198#s32",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "이는 오픈 웨이트 모델 진영에서는 최고 수준(SOTA)급이며, 최상위 폐쇄형 모델들과 비교하면 상위권~중상위권 위치에 해당한다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s33": [
+    {
+     "id": "it:1198#s33",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "실제로 딥SWE의 공개 리더보드에서는 모델별 최적 설정을 적용하면 GLM-5.3과 키미 K3가 약 69%, 'GPT-6 아스트라'와 '제미나이 3.8 플래시' '클로드 오퍼스 5' 등이 약 74% 수준으로 나타난다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s34": [
+    {
+     "id": "it:1198#s34",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "다만 이 수치들은 아직 독립적으로 모두 검증된 결과는 아니다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s35": [
+    {
+     "id": "it:1198#s35",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "미스트랄이 공개한 비교 자료에서는 일부 경쟁 오픈 모델보다 높은 점수를 기록했지만, 벤치마크는 모델 자체뿐 아니라 에이전트 구성과 평가 환경에 따라 결과가 달라질 수 있다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s36": [
+    {
+     "id": "it:1198#s36",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "전문가의 블라인드 평가에서는 비교적 긍정적인 결과가 나왔다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s37": [
+    {
+     "id": "it:1198#s37",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "미스트랄이 서지AI와 진행한 평가에서 전문 평가자들은 5점 만점에 3.74점을 줬다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s38": [
+    {
+     "id": "it:1198#s38",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "이는 평가 대상 5개 모델 가운데 2위로, GLM-5.3의 3.60점과 키미 K3의 3.59점을 앞섰다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s39": [
+    {
+     "id": "it:1198#s39",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "다만 클로드 오퍼스 5의 4.22점에는 미치지 못했다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s40": [
+    {
+     "id": "it:1198#s40",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "법률과 금융 분야에서도 높은 성능을 강조했다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s41": [
+    {
+     "id": "it:1198#s41",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "하비의 리걸 에이전트 벤치마크에서는 15%의 과제 통과율을 기록했다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s42": [
+    {
+     "id": "it:1198#s42",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "외부 평가기관 발스 AI의 공개 자료에서는 키미 K3가 12.92%, '미모 V2.6 프로'가 10.83%, GLM-5.3이 8.33%로 나타나 라지 4가 이들 오픈 웨이트 모델을 앞선 것으로 볼 수 있다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s43": [
+    {
+     "id": "it:1198#s43",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "금융·회계 업무를 평가하는 핀치에서는 67%를 기록했다고 미스트랄은 밝혔다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s44": [
+    {
+     "id": "it:1198#s44",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "이 벤치마크는 스프레드시트와 문서, 검색, 모델링, 보고서 작성 등 실제 기업 업무에 가까운 장기 작업 384개로 구성돼 있다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s45": [
+    {
+     "id": "it:1198#s45",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "멀티모달 능력도 주요 특징이다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s46": [
+    {
+     "id": "it:1198#s46",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "모델은 복잡한 문서와 차트, 자연 이미지뿐 아니라 위성·항공 이미지와 엔지니어링 도면 등을 분석할 수 있다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s47": [
+    {
+     "id": "it:1198#s47",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "특히 시각적 위치 지정 능력을 평가하는 '덴스200'에서 42%를 기록해 일부 최상위 모델을 앞섰다고 설명했다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s48": [
+    {
+     "id": "it:1198#s48",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "라지 4의 API는 현재 공개 프리뷰 형태로 제공된다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s49": [
+    {
+     "id": "it:1198#s49",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "요금 정책은 입력 토큰 100만개당 1.36달러, 출력 토큰 100만개당 4.18달러로 설정됐으며, 캐시된 입력은 100만개당 0.14달러로 책정돼 높은 가격 경쟁력을 확보했다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s50": [
+    {
+     "id": "it:1198#s50",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "미스트랄은 오는 27일 가중치를 공개하면서 모델 아키텍처와 추가 벤치마크, 사후 학습 방법도 공개할 예정이다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s51": [
+    {
+     "id": "it:1198#s51",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "가중치가 공개되면 기업과 정부기관이 자체 클라우드나 온프레미스 환경에서 모델을 직접 운영하고 커스터마이징할 수 있게 된다.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1198#s52": [
+    {
+     "id": "it:1198#s52",
+     "member": "it:1198",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "박찬 기자 cpark@aitimes.com",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ]
+  },
+  "n_sources": 2,
+  "slide_candidates": [],
+  "timeline_secs": []
+ },
+ {
+  "topic_id": "w41-openrig-multi-agent",
+  "page": {
+   "head_tiles": [
+    {
+     "value": "100+",
+     "label": "최근 7일 커밋",
+     "note": "2026-10-08 기준",
+     "refs": [
+      "rp:mvschwarz/openrig#f5"
+     ]
+    },
+    {
+     "value": "50명",
+     "label": "기여자",
+     "note": "상위 mvschwarz 1839, v-openrig-build 1304",
+     "refs": [
+      "rp:mvschwarz/openrig#f6"
+     ]
+    }
+   ],
+   "sections": [
+    {
+     "heading": "v0.6.6 릴리스: operator가 팀 제안 후 즉시 실행",
+     "paragraphs": [
+      {
+       "text": "OpenRig v0.6.6가 2026-10-07에 릴리스되었다. 이번 버전의 개선 사항은 설치 후 operator가 팀을 제안해 즉시 실행하는 흐름이다. v0.6.5는 2026-10-04, v0.6.4는 2026-10-02에 릴리스되어 3일 간격으로 업데이트가 이어졌다.",
+       "refs": [
+        "rp:mvschwarz/openrig#f3",
+        "rp:mvschwarz/openrig#f4"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "YAML로 에이전트 팀 정의, 한 명령으로 부팅",
+     "paragraphs": [
+      {
+       "text": "OpenRig는 YAML로 에이전트 팀을 정의하고 한 명령으로 부팅하는 오픈소스 소프트웨어다. Claude Code와 Codex를 같은 rig 안에서 하나의 시스템으로 관리한다. 리드 에이전트에게 원하는 결과를 말하면, 전문가들을 조정해 결과와 판단이 필요한 결정을 가져온다.",
+       "refs": [
+        "it:1122#s3",
+        "it:1122#s4",
+        "it:1122#s5",
+        "it:1122#s7"
+       ]
+      },
+      {
+       "text": "AI 코딩 에이전트를 터미널 세션 묶음에서 영속적이고 조직된 팀으로 전환한다. 저장소와 하나의 유용한 변경으로 시작해, 팀의 작업과 컨텍스트를 같은 주소에 유지한다.",
+       "refs": [
+        "it:1122#s6",
+        "it:1122#s8"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "개발 활동: 7일 커밋 100+, 기여자 50명",
+     "paragraphs": [
+      {
+       "text": "최근 7일간 커밋 100건 이상, 작성자 8명이 참여했으며 마지막 커밋은 2026-10-08이다. 기여자는 총 50명으로, 상위 기여자는 mvschwarz(1839)와 v-openrig-build(1304)다. v0.6.6 릴리스와 활발한 개발이 이번 주 트렌딩의 이유다.",
+       "refs": [
+        "rp:mvschwarz/openrig#f5",
+        "rp:mvschwarz/openrig#f6",
+        "rp:mvschwarz/openrig#f8"
+       ]
+      }
+     ],
+     "visual": "tiles",
+     "bars": null,
+     "table": null,
+     "tiles": [
+      {
+       "value": "8명",
+       "label": "최근 7일 커밋 작성자",
+       "note": "마지막 커밋 2026-10-08",
+       "refs": [
+        "rp:mvschwarz/openrig#f5"
+       ]
+      }
+     ],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "설치 요구사항: Node.js 22/24, tmux, macOS·Linux",
+     "paragraphs": [
+      {
+       "text": "OpenRig는 Node.js 22 또는 24와 tmux를 요구하며, macOS와 Linux를 지원한다. Linux 배포판의 Node.js가 오래될 수 있어 nvm이나 NodeSource로 지원 버전을 설치해야 한다. Windows는 WSL2를 통해 지원되며 네이티브 Windows는 지원하지 않는다.",
+       "refs": [
+        "it:1122#s15",
+        "it:1122#s16",
+        "it:1122#s18"
+       ]
+      },
+      {
+       "text": "WSL2에서는 OpenRig의 자동화 테스트가 아직 실행되지 않는다. 설치 스크립트는 v0.6.8 릴리스에서 제공되며, Node.js와 npm을 확인한 뒤 @openrig/cli를 npm install -g로 설치하고 rig setup을 실행한다.",
+       "refs": [
+        "it:1122#s19",
+        "it:1122#s23",
+        "it:1122#s24"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "권한 정책: 팀 기본값과 워크숍 번들",
+     "paragraphs": [
+      {
+       "text": "권한 정책이 없는 팀 시트는 OpenRig 팀 기본값으로 시작한다. Claude는 일반 rig 명령, 프로젝트 읽기, 일반 테스트를 프롬프트 없이 실행하고, rig up·rig down 같은 라이프사이클 명령은 확인을 요청한다. Codex는 OpenRig 워크스페이스와 pod 상태 디렉토리를 쓰기 가능 디렉토리로 받는다.",
+       "refs": [
+        "it:1122#s44"
+       ]
+      },
+      {
+       "text": "권한 프롬프트가 느리면 워크숍 번들을 고려할 수 있다. 이 번들은 광범위한 접근과 비중단 모드를 제공하며, 에이전트가 권한 프롬프트와 지원되는 harness 경고 다이얼로그를 우회한다. 목록과 설치 전 뷰가 선택 전에 그 접근을 설명한다.",
+       "refs": [
+        "it:1122#s50",
+        "it:1122#s51",
+        "it:1122#s52"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    }
+   ],
+   "summary": "OpenRig v0.6.6가 2026-10-07에 릴리스되며 Claude Code와 Codex를 하나의 팀으로 오케스트레이션하는 기능이 개선되었다. 설치 후 operator가 팀을 제안해 즉시 실행하는 흐름이 이번 버전의 핵심 변화다.",
+   "title": "OpenRig v0.6.6 릴리스, Claude Code·Codex 팀 오케스트레이션",
+   "log": "절 5개, 단락 8개, 타일 1개",
+   "attention": false
+  },
+  "pack": {
+   "rp:mvschwarz/openrig#f1": [
+    {
+     "id": "rp:mvschwarz/openrig#f1",
+     "member": "rp:mvschwarz/openrig",
+     "channel": "github",
+     "kind": "repo_field",
+     "text": "README: A rig wraps your harnesses. Define your agent team in YAML, boot it with one command. Claude Code and Codex in the same rig",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "rp:mvschwarz/openrig#f2": [
+    {
+     "id": "rp:mvschwarz/openrig#f2",
+     "member": "rp:mvschwarz/openrig",
+     "channel": "github",
+     "kind": "repo_field",
+     "text": "토픽: agent-orchestration, multi-agent, ai-coding, claude-code, codex-cli",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "rp:mvschwarz/openrig#f3": [
+    {
+     "id": "rp:mvschwarz/openrig#f3",
+     "member": "rp:mvschwarz/openrig",
+     "channel": "github",
+     "kind": "repo_field",
+     "text": "v0.6.6 2026-10-07 릴리스, 설치 후 operator가 팀을 제안해 즉시 실행하는 개선",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "rp:mvschwarz/openrig#f4": [
+    {
+     "id": "rp:mvschwarz/openrig#f4",
+     "member": "rp:mvschwarz/openrig",
+     "channel": "github",
+     "kind": "repo_field",
+     "text": "v0.6.5 2026-10-04, v0.6.4 2026-10-02 릴리스",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "rp:mvschwarz/openrig#f5": [
+    {
+     "id": "rp:mvschwarz/openrig#f5",
+     "member": "rp:mvschwarz/openrig",
+     "channel": "github",
+     "kind": "repo_field",
+     "text": "최근 7일 커밋 100+, 작성자 8명, 마지막 커밋 2026-10-08",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "rp:mvschwarz/openrig#f6": [
+    {
+     "id": "rp:mvschwarz/openrig#f6",
+     "member": "rp:mvschwarz/openrig",
+     "channel": "github",
+     "kind": "repo_field",
+     "text": "기여자 50명, 상위 mvschwarz 1839, v-openrig-build 1304",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "rp:mvschwarz/openrig#f7": [
+    {
+     "id": "rp:mvschwarz/openrig#f7",
+     "member": "rp:mvschwarz/openrig",
+     "channel": "github",
+     "kind": "repo_field",
+     "text": "이번 주 글에 openrig 언급 없음",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "rp:mvschwarz/openrig#f8": [
+    {
+     "id": "rp:mvschwarz/openrig#f8",
+     "member": "rp:mvschwarz/openrig",
+     "channel": "github",
+     "kind": "repo_field",
+     "text": "트렌딩 이유: v0.6.6 릴리스(2026-10-07), 7일 커밋 100+로 개발 활발",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s1": [
+    {
+     "id": "it:1122#s1",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "A harness wraps a model.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s2": [
+    {
+     "id": "it:1122#s2",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "A rig wraps your harnesses.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s3": [
+    {
+     "id": "it:1122#s3",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "Define your agent team in YAML, boot it with one command.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s4": [
+    {
+     "id": "it:1122#s4",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "Claude Code and Codex in the same rig, managed as one system.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s5": [
+    {
+     "id": "it:1122#s5",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "OpenRig is open-source software for building and running your own network of agents.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s6": [
+    {
+     "id": "it:1122#s6",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "It turns AI coding agents from a pile of terminal sessions into a persistent, organized team.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s7": [
+    {
+     "id": "it:1122#s7",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "Talk to a lead agent about the outcome you want; it can coordinate specialists across teams and bring you results and decisions that need your attention.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s8": [
+    {
+     "id": "it:1122#s8",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "Start with a repository and one useful change, then keep the team's work and context at the same addresses.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s9": [
+    {
+     "id": "it:1122#s9",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "It's the open-source system behind my AI civilization experiments.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s10": [
+    {
+     "id": "it:1122#s10",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "Guide: Getting started · Stuck?",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s11": [
+    {
+     "id": "it:1122#s11",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "Help · Questions: Q&A · Updates and demos: @_feralmachine on X",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s12": [
+    {
+     "id": "it:1122#s12",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "Start here: the guided first-use path: install, talk to the kernel operator, then choose a team for your first useful change.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s13": [
+    {
+     "id": "it:1122#s13",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "Not setting this up today?",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s14": [
+    {
+     "id": "it:1122#s14",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "Get the next walkthrough and occasional OpenRig updates → https://openrig.dev/follow",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s15": [
+    {
+     "id": "it:1122#s15",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "Requires Node.js 22 or 24 and tmux, on macOS or Linux.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s16": [
+    {
+     "id": "it:1122#s16",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "On Linux, the distribution's own Node.js can be older (Ubuntu 24.04's is 18); install a supported version with nvm (nvm install 22) or NodeSource.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s17": [
+    {
+     "id": "it:1122#s17",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "On a Mac with Apple silicon, use Node.js 22 (compatibility history).",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s18": [
+    {
+     "id": "it:1122#s18",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "On Windows, use WSL2, the Windows route OpenRig supports; native Windows isn't supported.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s19": [
+    {
+     "id": "it:1122#s19",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "OpenRig's automated tests don't run on WSL2 yet; see one user's working setup.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s20": [
+    {
+     "id": "it:1122#s20",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "Launching a rig writes provider hooks and workspace trust settings.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s21": [
+    {
+     "id": "it:1122#s21",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "Before running the commands below, read what OpenRig changes on your machine and back up the relevant files.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s22": [
+    {
+     "id": "it:1122#s22",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "One command.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s23": [
+    {
+     "id": "it:1122#s23",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "This runs OpenRig's install script from the v0.6.8 release.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s24": [
+    {
+     "id": "it:1122#s24",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "It checks Node.js and npm, installs the latest published @openrig/cli with npm install -g, runs the Node.js and SQLite check, then runs rig setup --dry-run and rig setup.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s25": [
+    {
+     "id": "it:1122#s25",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "The first line prints that plan and changes nothing:",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s26": [
+    {
+     "id": "it:1122#s26",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "curl -fsSL https://raw.githubusercontent.com/mvschwarz/openrig/v0.6.8/scripts/install.sh | sh -s -- --dry-run",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s27": [
+    {
+     "id": "it:1122#s27",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "curl -fsSL https://raw.githubusercontent.com/mvschwarz/openrig/v0.6.8/scripts/install.sh | sh",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s28": [
+    {
+     "id": "it:1122#s28",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "If a provider isn't signed in yet, the last step reports FAILED [4/4], and rig setup lists the sign-in under \"Some steps need attention\".",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s29": [
+    {
+     "id": "it:1122#s29",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "If the only remaining failures are provider sign-ins, the install steps finished; sign in to each selected provider as below and continue.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s30": [
+    {
+     "id": "it:1122#s30",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "Or step by step:",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s31": [
+    {
+     "id": "it:1122#s31",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "npm install -g @openrig/cli",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s32": [
+    {
+     "id": "it:1122#s32",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "rig setup --dry-run",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s33": [
+    {
+     "id": "it:1122#s33",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "To install with Bun instead, run bun add -g @openrig/cli.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s34": [
+    {
+     "id": "it:1122#s34",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "OpenRig still runs on Node.js, so install Node.js 22 as well.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s35": [
+    {
+     "id": "it:1122#s35",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "Bun may block this package's postinstall script, in which case the Node.js and SQLite check described under what OpenRig changes on your machine does not run at install time.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s36": [
+    {
+     "id": "it:1122#s36",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "npm 11 and later can skip that postinstall script and print npm warn install-scripts naming @openrig/cli.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s37": [
+    {
+     "id": "it:1122#s37",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "That's expected: the CLI still works, and only the Node.js and SQLite check was skipped.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s38": [
+    {
+     "id": "it:1122#s38",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "To run it yourself, use node \"$(npm root -g)/@openrig/cli/scripts/check-abi.mjs\"; rig doctor checks the Node.js version only.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s39": [
+    {
+     "id": "it:1122#s39",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "Choose the working account you already have: Claude Code, Codex, or both.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s40": [
+    {
+     "id": "it:1122#s40",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "Reuse an explicit choice; no second subscription is required. rig setup --dry-run previews the broader setup; applying rig setup checks both harnesses and installs a missing one, plus Herdr unless declined with --no-herdr.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s41": [
+    {
+     "id": "it:1122#s41",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "On macOS, the installing agent offers Ghostty once.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s42": [
+    {
+     "id": "it:1122#s42",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "Setup leaves an existing cmux installation alone.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s43": [
+    {
+     "id": "it:1122#s43",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "It is optional for the selected-provider path.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s44": [
+    {
+     "id": "it:1122#s44",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "A team seat with no permission policy, per-seat choice or (for Codex) named profile launches with OpenRig's team default: Claude runs ordinary rig commands, project reads and common tests without prompting, while lifecycle commands such as rig up and rig down still ask; Codex also gets the OpenRig workspace and its pod's state directory as writable directories.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s45": [
+    {
+     "id": "it:1122#s45",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "Before launching, your agent recommends keeping that default, and offers to remember selected OpenRig commands in your native settings only if you want that, at personal project scope unless you explicitly choose user-wide sessions.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s46": [
+    {
+     "id": "it:1122#s46",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "It is not global YOLO or permission to invent work.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s47": [
+    {
+     "id": "it:1122#s47",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "On Yes, the agent adds and verifies native rules; No or no answer keeps the team default and leaves settings unchanged.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s48": [
+    {
+     "id": "it:1122#s48",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "An existing explicit choice is reused.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s49": [
+    {
+     "id": "it:1122#s49",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "Say “Undo the OpenRig command allowances added by this setup” to remove only its additions.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s50": [
+    {
+     "id": "it:1122#s50",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "If permission prompts are slowing you down, consider the workshop bundle.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s51": [
+    {
+     "id": "it:1122#s51",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "It ships with broad access and non-interruptive mode: its agents bypass permission prompts and supported harness warning dialogs.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s52": [
+    {
+     "id": "it:1122#s52",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "The listing and before-install view explain that access before you choose it.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s53": [
+    {
+     "id": "it:1122#s53",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "Check tmux -V and only your selected CLI/login: claude --version plus",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s54": [
+    {
+     "id": "it:1122#s54",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "claude auth status, or codex --version plus codex login status.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s55": [
+    {
+     "id": "it:1122#s55",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "If needed,",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s56": [
+    {
+     "id": "it:1122#s56",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "sign in once with claude auth login or codex login; do not install or log in",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s57": [
+    {
+     "id": "it:1122#s57",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "to an unused provider.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s58": [
+    {
+     "id": "it:1122#s58",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "After installing, your agent opens the OpenRig TUI and the operator for you.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s59": [
+    {
+     "id": "it:1122#s59",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "To get back to them later, ask your agent for OpenRig or your agents in any words.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s60": [
+    {
+     "id": "it:1122#s60",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "After checking the selected login, it runs:",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s61": [
+    {
+     "id": "it:1122#s61",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "rig daemon start  # if stopped",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s62": [
+    {
+     "id": "it:1122#s62",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "rig terminal open saved:kernel --window",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s63": [
+    {
+     "id": "it:1122#s63",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "--window opens a new terminal tab or window itself, or a space in your current",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s64": [
+    {
+     "id": "it:1122#s64",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "Herdr session.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s65": [
+    {
+     "id": "it:1122#s65",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "Below 120 measured columns,",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s66": [
+    {
+     "id": "it:1122#s66",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "the operator fills the first page; from 120, the dashboard and operator share",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s67": [
+    {
+     "id": "it:1122#s67",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "it equally.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s68": [
+    {
+     "id": "it:1122#s68",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "The advisor has a separate tab or tmux window.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s69": [
+    {
+     "id": "it:1122#s69",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "An installing agent can run it from its shell on the daemon's",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s70": [
+    {
+     "id": "it:1122#s70",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "desktop; the person copies nothing.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s71": [
+    {
+     "id": "it:1122#s71",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "It uses Herdr when installed, otherwise",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s72": [
+    {
+     "id": "it:1122#s72",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "the same layout in plain tmux, and preserves existing conversations. rig tui",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s73": [
+    {
+     "id": "it:1122#s73",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "is the team dashboard.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s74": [
+    {
+     "id": "it:1122#s74",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "Installation is finished when you are talking to the",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s75": [
+    {
+     "id": "it:1122#s75",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "operator; if you choose to talk later, that handoff remains pending.",
+     "source": {
+      "site": "x"
+     },
+     "value": null,
+     "unit": null,
+     "sec": null
+    }
+   ],
+   "it:1122#s76": [
+    {
+     "id": "it:1122#s76",
+     "member": "it:1122",
+     "channel": "text",
+     "kind": "sentence",
+     "text": "If setup stops, read the named step: missing tools and selected-provider logins need their specific setup action.",
      "source": {
       "site": "x"
      },
