@@ -287,11 +287,13 @@ def slide_html(s, video_url):
 
 
 def video_secs_html(s, video_url):
+    """006-B1-1: 라벨을 span.vt-x 하나로 감싼다. .nb 강조 스팬이 섞여도(grid가 직계 자식만 칸으로 삼음) 깨지지 않게."""
     secs = s.get("video_secs") or []
     if not secs or not video_url:
         return ""
-    rows = "".join(f'<li class="{"vx" if m.get("slide") else ""}"><a href="{esc(video_url)}&t={m["sec"]}s">{mmss(m["sec"])}</a> '
-                   f'{rich(m.get("label", ""))}</li>' for m in secs)
+    rows = "".join(f'<li class="{"vx" if m.get("slide") else ""}"><span class="vt-t">'
+                   f'<a href="{esc(video_url)}&t={m["sec"]}s">{mmss(m["sec"])}</a></span>'
+                   f'<span class="vt-x">{rich(m.get("label", ""))}</span></li>' for m in secs)
     return f'<ol class="vgo" aria-label="영상 구간">{rows}</ol>'
 
 
