@@ -339,43 +339,13 @@ def _check_visual_structure(page: TopicPage, cfg: BriefConfig) -> list[Issue]:
     return issues
 
 
-def _number_slots(page: TopicPage) -> list[tuple[str, str, list[str] | None]]:
-    """수치를 대조할 자유 문장 칸(위치, 글, 근거 id들). ids가 None인 칸(refs가 없는 heading·slide_caption 등)은
-    토픽 근거 전체와 대조(①, 호출부가 all_ids로 채움). 표 셀·타일 값처럼 수치 그 자체인 칸은 여기 넣지 않고
-    `_value_slots`가 number_values 전체 대조로 따로 본다(006-C1-2)."""
-    slots: list[tuple[str, str, list[str] | None]] = []
-    for i, s in enumerate(page.sections):
-        slots.append((f"sections[{i}].heading", s.heading, None))
-        if s.slide_caption:
-            slots.append((f"sections[{i}].slide", s.slide_caption, None))
-        if s.bars is not None:
-            ids = [it.ref for it in s.bars.items] + REF.findall(s.bars.context)
-            slots.append((f"sections[{i}].bars", s.bars.title, ids))
-        if s.table is not None:
-            slots.append((f"sections[{i}].table", s.table.title, s.table.refs))
-        if s.events is not None:
-            ids = [it.ref for it in s.events.items if it.ref] + REF.findall(s.events.context)
-            slots.append((f"sections[{i}].events", s.events.title, ids))
-    return slots
-
-
-def _value_slots(page: TopicPage) -> list[tuple[str, str, list[str]]]:
-    """수치 그 자체인 칸(타일 value, 표 셀 첫 열 제외, 막대 value): number_values 전체 대조(5.5 ①, 006-C1-2)."""
-    slots: list[tuple[str, str, list[str]]] = [(f"head_tiles[{i}]", t.value, t.refs) for i, t in enumerate(page.head_tiles)]
-    for i, s in enumerate(page.sections):
-        if s.bars is not None:
-            slots += [(f"sections[{i}].bars.items[{k}]", it.value, [it.ref]) for k, it in enumerate(s.bars.items)]
-        if s.table is not None:
-            slots += [(f"sections[{i}].table.rows[{k}]", cell, s.table.refs)
-                     for k, row in enumerate(s.table.rows) for ci, cell in enumerate(row) if ci > 0]
-        if s.visual == "tiles":
-            slots += [(f"sections[{i}].tiles[{k}]", t.value, t.refs) for k, t in enumerate(s.tiles)]
-    return slots
-
-
 def _check_numbers(page: TopicPage, pack: dict[str, list[EvidenceItem]]) -> list[Issue]:
+    """①: 단락·heading·title·summary·캡션·표·막대 제목은 figures+단위 붙은 수로(_numbers_ok), 타일 value·표
+    셀(첫 열 제외)·막대 value는 수치 그 자체인 칸이라 number_values 전체로 대조한다(_value_mismatch, 006-C1-2)."""
     issues = []
     all_ids = list(pack)
+    text_slots: list[tuple[str, str, list[str] | None]] = [("title", page.title, None), ("summary", page.summary, None)]
+    value_slots: list[tuple[str, str, list[str]]] = [(f"head_tiles[{i}]", t.value, t.refs) for i, t in enumerate(page.head_tiles)]
     for i, s in enumerate(page.sections):
         for j, p in enumerate(s.paragraphs):
             for f, near in _numbers_ok(p.text, p.refs, pack, with_units=True):
@@ -383,13 +353,29 @@ def _check_numbers(page: TopicPage, pack: dict[str, list[EvidenceItem]]) -> list
                                      f"sections[{i}].paragraphs[{j}]의 '{f}'가 {', '.join(p.refs)}에 없음"
                                      + (f". 근거의 가까운 값은 {near}" if near else ""),
                                      "근거 표기 그대로", evidence_id=p.refs[0] if p.refs else None))
-    for loc, text, ids in [("title", page.title, None), ("summary", page.summary, None), *_number_slots(page)]:
+        text_slots.append((f"sections[{i}].heading", s.heading, None))
+        if s.slide_caption:
+            text_slots.append((f"sections[{i}].slide", s.slide_caption, None))
+        if s.bars is not None:
+            ids = [it.ref for it in s.bars.items] + REF.findall(s.bars.context)
+            text_slots.append((f"sections[{i}].bars", s.bars.title, ids))
+            value_slots += [(f"sections[{i}].bars.items[{k}]", it.value, [it.ref]) for k, it in enumerate(s.bars.items)]
+        if s.table is not None:
+            text_slots.append((f"sections[{i}].table", s.table.title, s.table.refs))
+            value_slots += [(f"sections[{i}].table.rows[{k}]", cell, s.table.refs)
+                           for k, row in enumerate(s.table.rows) for ci, cell in enumerate(row) if ci > 0]
+        if s.events is not None:
+            ids = [it.ref for it in s.events.items if it.ref] + REF.findall(s.events.context)
+            text_slots.append((f"sections[{i}].events", s.events.title, ids))
+        if s.visual == "tiles":
+            value_slots += [(f"sections[{i}].tiles[{k}]", t.value, t.refs) for k, t in enumerate(s.tiles)]
+    for loc, text, ids in text_slots:
         ids = all_ids if ids is None else ids
         for f, near in _numbers_ok(text, ids, pack, with_units=True):
             issues.append(_issue(loc, "number_mismatch", f"{loc}의 '{f}'가 {'이 토픽 근거' if ids is all_ids else ', '.join(ids)}에 없음"
                                  + (f". 근거의 가까운 값은 {near}" if near else ""),
                                  "근거 표기 그대로(근거 값끼리 빼거나 나눈 값을 새로 만들지 않음)"))
-    for loc, value, ids in _value_slots(page):
+    for loc, value, ids in value_slots:
         if ids and _value_mismatch(value, ids, pack):
             issues.append(_issue(loc, "number_mismatch", f"{loc} 값 '{value}'가 {', '.join(ids)}에 없음",
                                  "근거 표기 그대로", evidence_id=ids[0]))

@@ -363,7 +363,10 @@ def browser_checks(site, data):
         (b["tabScroll"]["topics"]["navTop"] >= 0 and b["tabScroll"]["repos"]["navTop"] >= 0,
          f'탭 이동 뒤 .nav가 화면 밖(D-40) {b["tabScroll"]}')) if not ok]
     check("A10 동작(Chromium 1280): 툴팁 0.15초 뒤·0.6초 유지·1초 뒤 닫힘·동시에 하나, 탭(기본·#repos), 미니 바", not problems, "; ".join(problems))
-    tm = out["tabScrollMobile"]
+    _check_mobile_tab_scroll(out["tabScrollMobile"])
+
+
+def _check_mobile_tab_scroll(tm):
     mobile_problems = [m for ok, m in (
         (tm["diff"] <= 1, f'두 탭의 scrollY 차 {tm["diff"]}px(C-10, WebKit 375)'),
         (tm["topics"]["navTop"] >= 0 and tm["repos"]["navTop"] >= 0, f'탭 이동 뒤 .nav가 화면 밖(D-40, WebKit 375) {tm}')) if not ok]

@@ -355,7 +355,7 @@ def test_scrub_pack_refs_drops_tile_refs_outside_pack():
 
 def test_scrub_pack_refs_drop_shifts_later_section_numbers():
     """006-A3-10: 첫 절이 빠지면 둘째 절은 새 번호 0으로 당겨지고, check_locs도 새 번호로 맞춰진다."""
-    from trendsit.brief.write import _remap_section_locs, _scrub_pack_refs
+    from trendsit.brief.write import _scrub_pack_refs
 
     empty = section(paragraphs=[para(refs=["it:99#s1"])])  # pack 밖 refs뿐 → 절째 빠짐
     kept = section(heading="둘째", paragraphs=[para()])
@@ -363,8 +363,20 @@ def test_scrub_pack_refs_drop_shifts_later_section_numbers():
     final, touched, remap = _scrub_pack_refs(_result_stub(), p, pack())
     assert len(final.sections) == 1 and final.sections[0].heading == "둘째"
     assert remap == {1: 0} and touched == set()  # 둘째 절은 안 건드렸으니 touched는 아니고 번호만 당겨짐
+
+
+def test_finalize_page_remaps_check_locs_when_section_drops():
+    """006-A3-10: _finalize_page가 _scrub_pack_refs의 절 번호 대응표로 남은 check_locs도 새 번호로 맞춘다
+    (예전 _remap_section_locs를 _finalize_page 안으로 합침, 006-C1-7)."""
+    from trendsit.brief.write import _finalize_page
+
+    empty = section(paragraphs=[para(refs=["it:99#s1"])])  # pack 밖 refs뿐 → 절째 빠짐
+    kept = section(heading="둘째", paragraphs=[para()])
+    p = page(sections=[empty, kept])
     old_check_locs = {"sections[0]", "sections[1]", "summary"}  # 1라운드 때 빠진 절·남은 절에 붙은 ⚠
-    assert _remap_section_locs(old_check_locs, remap) == {"sections[0]", "summary"}  # 빠진 절 표시는 버려짐
+    final, remapped = _finalize_page(_result_stub(), p, pack(), CFG, {}, old_check_locs, [], [], set())
+    assert len(final.sections) == 1 and final.sections[0].heading == "둘째"
+    assert remapped == {"sections[0]", "summary"}  # 빠진 절 표시는 버려지고, 남은 절 표시는 새 번호로
 
 
 def _result_stub():
