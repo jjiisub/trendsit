@@ -77,6 +77,8 @@ def _apply_section_sub(sec: dict, field_: str, idx: int | None, value) -> tuple[
             sec["paragraphs"][int(idx)] = value.model_dump()
         elif isinstance(value, Para):
             sec["paragraphs"].append(value.model_dump())
+        elif isinstance(value, str) and int(idx) < len(sec["paragraphs"]):  # v1.2 5.3: 문자열 value는 기존 refs 유지·text만 교체
+            sec["paragraphs"][int(idx)]["text"] = value
         else:
             notes.append(f"sections.paragraphs[{idx}]: 값 형식이 Para가 아님")
     elif field_ == "bars":
@@ -154,6 +156,9 @@ def apply_revision(prev: TopicPage, rev: TopicPageRevision, allowed: set[str]) -
             notes.append(f"지적 안 된 위치 {ch.loc} 변경 되돌림")
             continue
         sub = _parse_sub(normalize_loc(prev, ch.loc))
+        if sub is None and raw_loc != loc:  # v1.2 5.3: 문법 밖 하위 경로(sections[i].tiles 등)는 절 전체 delete로 새지 않게 버림
+            notes.append(f"알 수 없는 위치 {ch.loc}")
+            continue
         m = LOC.match(loc)
         if m and m.group(1):  # title / summary
             if ch.action == "edit" and isinstance(ch.value, str):
