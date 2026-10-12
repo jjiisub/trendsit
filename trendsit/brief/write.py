@@ -359,6 +359,9 @@ def _initial_page(ctx: Ctx, winp: WriterInput, res: TopicResult, draft: TopicPag
         res.no_visuals = True  # 시도했음을 바로 기록(detail.no_visuals, 성공 여부와 무관)
         winp2 = winp.model_copy(update={"no_visuals": True})
         page, err2, sid = _call(load_role("writer", ctx.models), winp2, ctx, res.costs, "writer")
+        total_used = (sid or 0) - before_sid
+        if total_used > 4:  # 006-A3-9: 두 번째 호출의 내부 재시도까지 합쳐 C-5 상한(4)을 넘으면 성공해도 버림
+            page, err2 = None, f"호출 상한 초과(C-5, 총 {total_used}회)"
         if page is not None:
             winp = winp2
         err = err2 if page is None else err

@@ -449,3 +449,22 @@ def test_drop_code_bad_sections_removes_mismatched_head_tile():
     out = _drop_code_bad_sections(res, p, pack(), CFG, {}, set())
     assert out.head_tiles == []
     assert any("타일" in a for a in res.attention)
+
+
+def test_initial_page_discards_page_when_total_calls_exceed_c5_cap(tmp_path):
+    """006-A3-9: 1차 호출 2회(둘 다 잘림) 뒤 2차 호출이 3회(스키마 실패+잘림 2회)면 합이 5회라 C-5(토픽당
+    ≤4회)를 넘는다. 성공해도 페이지를 버리고 호출 상한 초과로 실패한다."""
+    from tests.conftest import FakeTransport, make_ctx, response
+    from trendsit.brief.write import TopicResult, _initial_page, writer_limits
+    from trendsit.core.artifacts_brief import PlanBrief, Relation, WriterInput
+
+    cut = response('{"bad": 1}', tokens=(100, 4500))
+    bad = response('{"bad": 1}', tokens=(100, 50))
+    ctx = make_ctx(tmp_path, FakeTransport([cut, cut, bad, cut, cut]), spec_cap=1.0)
+    ctx.no_cache = True
+    plan_ = PlanBrief(rank=1, angle="a", relation=Relation(type="new", topic_id=None))
+    winp = WriterInput(plan=plan_, evidence=[], previous=None, aliases=[],
+                       limits=writer_limits(CFG, 1), slide_candidates=[], no_visuals=False)
+    res = TopicResult(None, "failed", None, [], [], [], [], 1)
+    page, err, _sid, _winp = _initial_page(ctx, winp, res, None)
+    assert page is None and err is not None and "호출 상한 초과" in err
