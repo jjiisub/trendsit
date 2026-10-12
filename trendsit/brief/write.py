@@ -250,7 +250,7 @@ def _critic_unseen_pages(ctx: Ctx, res: TopicResult, topic: Applied, winp: Write
 
 
 def _drop_code_bad_sections(res: TopicResult, final: TopicPage, pack: dict[str, list[EvidenceItem]], cfg: BriefConfig,
-                            last_issue: dict[str, str], check_locs: set[str]) -> TopicPage:
+                            last_issue: dict[str, str], check_locs: set[str]) -> tuple[TopicPage, set[int]]:
     """형식·수치 오류가 남은 절은 visual만 비우고(단락은 둠), 근거와 다른 머리 타일은 빼고, 페이지 상한(visuals_max·slides_max) 초과는 뒤에서부터 줄인다(C-2·C-3. head_tiles_max는 스키마 max_length가 이미 막음)."""
     issues = checks.check(final, pack, res.n_sources, cfg)
     bad_secs = {int(m.group(1)) for i in issues
@@ -279,7 +279,7 @@ def _drop_code_bad_sections(res: TopicResult, final: TopicPage, pack: dict[str, 
     tiles = [t for i, t in enumerate(final.head_tiles) if i not in bad_tiles]
     if bad_tiles:
         res.attention.append(f"근거와 다른 머리 타일 {len(bad_tiles)}개 뺌")
-    return final.model_copy(update={"sections": secs, "head_tiles": tiles})
+    return final.model_copy(update={"sections": secs, "head_tiles": tiles}), bad_secs
 
 
 def _scrub_pack_refs(res: TopicResult, final: TopicPage, pack: dict[str, list[EvidenceItem]]) -> tuple[TopicPage, set[str], dict[int, int]]:
@@ -327,8 +327,8 @@ def _scrub_pack_refs(res: TopicResult, final: TopicPage, pack: dict[str, list[Ev
 def _finalize_page(res: TopicResult, final: TopicPage, pack: dict[str, list[EvidenceItem]], cfg: BriefConfig, last_issue: dict[str, str],
                    check_locs: set[str], ms: list[Member], slide_candidates: list[str], timeline_secs: set[int]) -> tuple[TopicPage, set[str]]:
     """저장 전 마지막 손질: 코드 확인 오류가 남은 시각 요소 빼기 → 미배치 슬라이드 배치 → 프레임 생성 → pack 밖 refs 제거."""
-    final = _drop_code_bad_sections(res, final, pack, cfg, last_issue, check_locs)
-    final = slides.place_unassigned(final, slide_candidates, timeline_secs, cfg.write.slides_max)
+    final, bad_secs = _drop_code_bad_sections(res, final, pack, cfg, last_issue, check_locs)
+    final = slides.place_unassigned(final, slide_candidates, timeline_secs, cfg.write.slides_max, exclude=bad_secs)
     final = slides.render_frames(final, {m.key: m for m in ms}, res.attention)
     final, scrubbed_locs, remap = _scrub_pack_refs(res, final, pack)
     # 006-A3-10: 절이 통째로 빠지면 뒤 절의 번호가 당겨진다. sections[old] 위치를 새 번호로 옮기고, 빠진 절을 가리키던 위치는 버린다(그 절 자체가 더는 없음)

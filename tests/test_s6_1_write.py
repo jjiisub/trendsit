@@ -329,6 +329,14 @@ def test_place_candidate_falls_back_to_first_video_section():
     assert placed == 1
 
 
+def test_place_candidate_2nd_stage_requires_section_max_secs_not_exceed_sec():
+    """006-C1-12: 5.6 2단계는 video_secs의 '최댓값'이 sec 이하인 절만 후보다. 절 0은 [100, 1000](최댓값이
+    873보다 큼) → 제외, 절 1은 [50](최댓값 50 ≤ 873) → 선택돼야 한다."""
+    placed = slides.place_candidate(sec=873, timeline_secs=[], section_video_secs=[[100, 1000], [50]],
+                                    section_has_video=[True, True], taken=set())
+    assert placed == 1
+
+
 def test_slide_read_lines_sec_matches_rounded_candidate_sec(tmp_path):
     """후보 id(digest 반올림 sec)와 판독 줄 id(video_frames.t)가 같은 초로 만들어져야 한다(006-A1-1)."""
     db = DB(tmp_path / "t.db")
@@ -372,6 +380,29 @@ def test_scrub_pack_refs_drop_shifts_later_section_numbers():
     final, touched, remap = _scrub_pack_refs(_result_stub(), p, pack())
     assert len(final.sections) == 1 and final.sections[0].heading == "둘째"
     assert remap == {1: 0} and touched == set()  # 둘째 절은 안 건드렸으니 touched는 아니고 번호만 당겨짐
+
+
+def test_place_unassigned_does_not_reattach_slide_to_section_dropped_for_bad_content():
+    """006-C1-20: _drop_code_bad_sections가 형식 오류로 시각 요소를 통째로 비운 절에는 place_unassigned가
+    슬라이드를 다시 붙이지 않는다(exclude=bad_secs). 대신 다른 자격 있는 절로 간다(render_frames 앞 단계만 본다,
+    실제 프레임 파일 없이도 배치 로직만 확인)."""
+    from trendsit.brief.write import _drop_code_bad_sections
+
+    bad = section(heading="나쁜 절", visual="bars", bars=None, slide="sl:1@50", slide_caption="c", video_secs=[50],
+                  paragraphs=[para(refs=["vd:1@50"])])
+    good = section(heading="좋은 절", video_secs=[200], paragraphs=[para(refs=["vd:1@200"])])
+    p = page(sections=[bad, good])
+    vid_pack = pack(**{"vd:1@50": [EvidenceItem("vd:1@50", "vd:v1", "video", "transcript", "전사", {"site": "x"})],
+                       "vd:1@200": [EvidenceItem("vd:1@200", "vd:v1", "video", "transcript", "전사", {"site": "x"})],
+                       "sl:1@50": [EvidenceItem("sl:1@50", "vd:v1", "video", "slide_read", "판독", {"site": "x"})]})
+    dropped, bad_secs = _drop_code_bad_sections(_result_stub(), p, vid_pack, CFG, {}, set())
+    assert bad_secs == {0} and dropped.sections[0].slide is None  # 형식 오류 절(0)의 slide는 코드가 먼저 비움
+    final = slides.place_unassigned(dropped, ["sl:1@50"], {50, 200}, CFG.write.slides_max, exclude=bad_secs)
+    assert final.sections[0].slide is None  # exclude라 재부착 안 됨
+    assert final.sections[1].slide == "sl:1@50"  # 대신 자격 있는 다른 절로
+
+    without_exclude = slides.place_unassigned(dropped, ["sl:1@50"], {50, 200}, CFG.write.slides_max)
+    assert without_exclude.sections[0].slide == "sl:1@50"  # exclude 없으면(옛 버그) 같은 절로 돌아감
 
 
 def test_finalize_page_remaps_check_locs_when_section_drops():
@@ -487,7 +518,7 @@ def test_drop_code_bad_sections_strips_excess_visual_sections_and_flags_check():
     secs = [section(heading=f"절{i}", visual="tiles", tiles=[Tile(value="20", label="l", refs=["it:1#s1"])] * 2)
             for i in range(6)]
     check_locs: set[str] = set()
-    out = _drop_code_bad_sections(_result_stub(), page(sections=secs), pack(), CFG, {}, check_locs)
+    out, _bad_secs = _drop_code_bad_sections(_result_stub(), page(sections=secs), pack(), CFG, {}, check_locs)
     assert sum(1 for s in out.sections if s.visual != "none") == CFG.write.visuals_max
     assert check_locs == {f"sections[{i}]" for i in range(CFG.write.visuals_max, 6)}
 
@@ -499,7 +530,7 @@ def test_drop_code_bad_sections_strips_excess_slides():
     slide_pack = pack(**{f"sl:1@{i}": [EvidenceItem(f"sl:1@{i}", "it:1", "video", "slide_read", "판독", src)]
                          for i in range(3)})
     secs = [section(heading=f"절{i}", slide=f"sl:1@{i}", slide_caption="c") for i in range(3)]
-    out = _drop_code_bad_sections(_result_stub(), page(sections=secs), slide_pack, CFG, {}, set())
+    out, _bad_secs = _drop_code_bad_sections(_result_stub(), page(sections=secs), slide_pack, CFG, {}, set())
     assert sum(1 for s in out.sections if s.slide) == CFG.write.slides_max
 
 
@@ -508,7 +539,7 @@ def test_drop_code_bad_sections_removes_mismatched_head_tile():
 
     p = page(head_tiles=[Tile(value="8192 토큰", label="컨텍스트", refs=["it:1#s1"])])
     res = _result_stub()
-    out = _drop_code_bad_sections(res, p, pack(), CFG, {}, set())
+    out, _bad_secs = _drop_code_bad_sections(res, p, pack(), CFG, {}, set())
     assert out.head_tiles == []
     assert any("타일" in a for a in res.attention)
 

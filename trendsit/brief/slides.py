@@ -51,19 +51,21 @@ def place_candidate(sec: int, timeline_secs: list[int], section_video_secs: list
         hit = next((i for i, secs in enumerate(section_video_secs) if i not in taken and prev_start in secs), None)
         if hit is not None:
             return hit
-    cands = [(i, max(s for s in secs if s <= sec)) for i, secs in enumerate(section_video_secs)
-             if i not in taken and any(s <= sec for s in secs)]
+    # 5.6 2단계: video_secs의 **최댓값**이 sec 이하인 절만(006-C1-12 — "하나라도 sec 이하"가 아니라 그 절
+    # 전체가 sec보다 앞선 구간이어야 한다. [100,1000]짜리 절은 sec=873에 포함되지 않음)
+    cands = [(i, max(secs)) for i, secs in enumerate(section_video_secs) if i not in taken and secs and max(secs) <= sec]
     if cands:
         return max(cands, key=lambda x: x[1])[0]
     return next((i for i, has in enumerate(section_has_video) if has and i not in taken), None)
 
 
 def place_unassigned(final: TopicPage, slide_candidates: list[str], timeline_secs: set[int],
-                     slides_max: int) -> TopicPage:
-    """작성자가 두지 않은 슬라이드 후보를 코드가 붙인다(5.6, D-30·D-34): 직전 구간 절 → 가까운 절 → 첫 영상 근거 절."""
+                     slides_max: int, exclude: frozenset[int] = frozenset()) -> TopicPage:
+    """작성자가 두지 않은 슬라이드 후보를 코드가 붙인다(5.6, D-30·D-34): 직전 구간 절 → 가까운 절 → 첫 영상 근거 절.
+    exclude는 코드가 형식·수치 오류로 시각 요소를 통째로 비운 절(006-C1-20): 그 절은 후보로 다시 고르지 않는다."""
     secs = list(final.sections)
     placed = {int(m[1]) for s in secs if s.slide and (m := re.match(r"^sl:\d+@(\d+)$", s.slide))}
-    taken = {i for i, s in enumerate(secs) if s.slide}
+    taken = {i for i, s in enumerate(secs) if s.slide} | set(exclude)
     if len(placed) >= slides_max:
         return final
     section_video_secs = [s.video_secs for s in secs]
