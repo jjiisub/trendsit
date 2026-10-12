@@ -21,12 +21,17 @@
 - `counts.written` 0일 때: 화면은 "이 실행이 쓴 토픽 0개"를 그대로 보여줌(숨기지 않음)
 - 백업 파일명 시각 형식: `%Y%m%d-%H%M`(KST)
 - ffmpeg 입력 파일 확장자 탐색: `data/media/<video_id>/media.*` 글롭에서 첫 번째 일치 파일
-- TopicPage v2의 `visual` 칸(export): 없을 때 `{"type":"none"}`이 아니라 `null`로 둠(build.py가 `if sec.get("visual")`로 동일하게 처리, 더 단순)
+- TopicPage v2의 `visual` 칸(export): `briefing._visual_of`가 비어 있을 때도 항상 `{"type":"none"}`을 낸다(`null`이 아님, A1-impl 라운드의 서술이 틀렸음 — A3 라운드에서 정정, 007-A2-22)
 - `og:`·슬라이드 판독(`sl:`) 등 여러 접두어 근거가 같은 member를 공유할 때 WriterInput 문서는 member 하나당 하나(COMMON 6.1-4 그대로, 세부 id는 줄마다 태그)
-- `tests/fixtures/s6_1/digest_llamaindex.json`(A2 라운드에서 추가, 실DB `video_digests`의 `S-bRN-avZ4Q` digest `slides[]`를 읽기 전용으로 그대로 옮긴 20장 사본). 새 파일 수는 11개(≤11, 상한)
+- `tests/fixtures/s6_1/digest_llamaindex.json`(A2 라운드에서 추가, 실DB `video_digests`의 `S-bRN-avZ4Q` digest `slides[]`를 읽기 전용으로 그대로 옮긴 20장 사본)
 
 ## 5. 스펙과 다르게 한 것과 이유
 - `scripts/s5_1_golden.py`는 3.4 "변경하는 기존 파일" 목록에 없었지만 5.11의 B1 요구(실DB 전후 비교 → v2 픽스처 완전 일치)를 구현하려면 반드시 고쳐야 해서 수정함(건드리지 않으면 B1이 깨진 v1 API를 그대로 불러 크래시)
+- **새 파일 수(007-A1-2/A2-22 정정)**: 3.4 목록(≤11)에 없는 파일이 더 있어 실제는 17개(png 제외) — `tests/fixtures/s6_1/site_v2.json`(5.9가 요구하지만 3.4 목록엔 없음), 슬라이드 픽스처 jpg 3장(`tests/fixtures/s6_1/slides/S-bRN-avZ4Q_{208,422}.jpg`, `tests/fixtures/site/slides/V1xxxxxxxxx_920.jpg`), `eval/fixtures/{writer,critic,writer_revise}/.gitkeep` 3개. jpg·gitkeep은 테스트가 실행 중에 만들 수도 있었으나(A7 ffmpeg 생성 방식) 이미 커밋됐고, 넘긴 시점에 handoff를 하지 않아 사실과 다른 "11개(≤11)"로 적혔던 것을 바로잡음
+- `og:` 원본 문서: 5.2 표는 별도 `og:{item_id}` Document를 요구하지만, `evidence_docs`는 member 단위로 묶어 og 줄이 `it:{item_id}` 문서 안에 섞여 들어간다(007-A1-9/A2-11)
+- `site_src/check.py`의 `a[href*="&t="]` 검사는 전체 페이지가 아니라 `.vgo`·`.vtl`·`.simg` 안으로 좁힘(글 출처 URL에 우연히 `&t=`가 있을 때 오탐 방지, 007-A2-12)
+- `no_visuals=true`일 때 `<data>`에 5.2가 적은 "모든 절의 visual을 none, head_tiles만" 문장이 그대로 렌더되지 않는다. 3.4가 `core/render.py` 변경을 "수용 안 함"으로 막아 범용 bool 렌더(`no_visuals: true`)로 대체했다(의미는 `roles/writer.md` 입력 절 정적 설명으로 보완, 007-A2-9)
+- `.cmpt td.em`(5.8 CSS 목록) 정의는 추가했지만, Table에 셀 단위 강조(emphasis) 데이터가 없어 `build.py`가 그 클래스를 실제로 내는 곳은 없다(007-A1-11/A2-24). 데이터 원천을 정하는 건 설계 결정이라 이번 범위에서는 CSS만
 
 ## 6. 남은 문제 (미해결)
 - **verify_s5.sh B5·A23("순 감소 아님")**: S5-1 리팩터 전용 불변식으로, 이 브랜치 시작 커밋(5cca090, S6a·S6b 병합 직후)부터 이미 깨져 있었다(`git diff --stat bed7887 5cca090 -- trendsit roles skills`로 확인: 1534줄 추가 > 784줄 삭제). `reports/S6b_report.md`도 같은 이유로 verify_s5.sh 전체를 자기 게이트에서 뺐다. S6-1이 기능 스펙이라 net 코드가 느는 것은 불가피하므로, `verify_s6-1.sh`의 A11은 이 두 항목만 예외로 두고 넘어간다(값·채점표는 바꾸지 않음). 다음 사이클에서 B5·A23을 "S5-1 기준"이 아니라 "직전 스펙 기준"으로 바꾸거나 삭제하는 것을 설계 세션에 제안
