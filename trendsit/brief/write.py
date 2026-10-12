@@ -207,8 +207,10 @@ def _rounds(ctx: Ctx, res: TopicResult, topic: Applied, winp: WriterInput, pack:
     last_issue: dict[str, str] = {}
     reviser = load_role("writer_revise", ctx.models)
     raw_page: dict[str, Any] | None = page.raw_dump()
+    canon, translit = fixers
     for rnd in range(1, cfg.review.max_rounds + 1):
-        cr = checks.run_checks(page, pack, res.n_sources, cfg, *fixers, slide_candidates, timeline_secs)
+        cr = checks.run_checks(page, pack, res.n_sources, cfg, canon=canon, slide_candidates=slide_candidates,
+                               timeline_secs=timeline_secs, translit=translit)
         page = cr.page
         res.pages.append((rnd, page, raw_page, sid))
         issues = cr.issues
