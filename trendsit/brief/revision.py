@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import copy
 import re
 
 from ..core.artifacts_brief import (
@@ -25,6 +26,8 @@ SUB_LOC = re.compile(r"^sections\[(?P<i1>\d+)\]\.(?P<whole>heading|slide|slide_c
                      r"^sections\[(?P<i2>\d+)\]\.(?P<list>paragraphs|tiles)\[(?P<idx2>\d+)\]$|"
                      r"^sections\[(?P<i3>\d+)\]\.(?P<nested>bars\.items|table\.rows|events\.items)\[(?P<idx3>\d+)\]$")
 FIELD_TYPES: dict[str, type] = {"head_tiles": Tile, "sections": Section}
+GROUP_TYPES: dict[str, tuple[str, type, type]] = {  # field_ -> (항목 칸 이름, 항목 값 타입, 그룹 전체 값 타입)
+    "bars": ("items", NumberItem, BarGroup), "table": ("rows", list, Table), "events": ("items", EventItem, EventGroup)}
 
 
 def _parse_sub(loc: str) -> tuple[int, str, int | None] | None:
@@ -59,6 +62,23 @@ def normalize_loc(page: TopicPage, loc: str) -> str:
     return loc
 
 
+def _apply_group(sec: dict, field_: str, idx: int | None, value) -> list[str]:
+    """bars·table·events 그룹 전체(idx None) 또는 그 안 항목(idx) 값 합치기(007-A2-19: 세 분기를 표로 합침)."""
+    item_key, item_type, whole_type = GROUP_TYPES[field_]
+    if idx is None and (value is None or isinstance(value, whole_type)):
+        sec[field_] = value.model_dump() if value else None
+        return []
+    if idx is not None and sec.get(field_) and isinstance(value, item_type):
+        items = sec[field_][item_key]
+        dumped = value.model_dump() if hasattr(value, "model_dump") else value
+        if int(idx) < len(items):
+            items[int(idx)] = dumped
+        else:
+            items.append(dumped)
+        return []
+    return [f"sections.{field_}: 값 형식이 맞지 않음"]
+
+
 def _apply_section_sub(sec: dict, field_: str, idx: int | None, value) -> tuple[dict, list[str]]:
     """sections[i].<field_>[idx] 하위 값 합치기. 실패하면 notes에 이유."""
     notes: list[str] = []
@@ -81,24 +101,6 @@ def _apply_section_sub(sec: dict, field_: str, idx: int | None, value) -> tuple[
             sec["paragraphs"][int(idx)]["text"] = value
         else:
             notes.append(f"sections.paragraphs[{idx}]: 값 형식이 Para가 아님")
-    elif field_ == "bars":
-        if idx is None and (value is None or isinstance(value, BarGroup)):
-            sec["bars"] = value.model_dump() if value else None
-        elif idx is not None and isinstance(value, NumberItem) and sec.get("bars") and int(idx) < len(sec["bars"]["items"]):
-            sec["bars"]["items"][int(idx)] = value.model_dump()
-        else:
-            notes.append("sections.bars: 값 형식이 맞지 않음")
-    elif field_ == "table":
-        if idx is None and (value is None or isinstance(value, Table)):
-            sec["table"] = value.model_dump() if value else None
-        elif idx is not None and isinstance(value, list) and sec.get("table"):
-            rows = sec["table"]["rows"]
-            if int(idx) < len(rows):
-                rows[int(idx)] = value
-            else:
-                rows.append(value)
-        else:
-            notes.append("sections.table: 값 형식이 맞지 않음")
     elif field_ == "tiles":
         if idx is not None and isinstance(value, Tile):
             if int(idx) < len(sec["tiles"]):
@@ -107,17 +109,8 @@ def _apply_section_sub(sec: dict, field_: str, idx: int | None, value) -> tuple[
                 sec["tiles"].append(value.model_dump())
         else:
             notes.append("sections.tiles: 값 형식이 맞지 않음")
-    elif field_ == "events":
-        if idx is None and (value is None or isinstance(value, EventGroup)):
-            sec["events"] = value.model_dump() if value else None
-        elif idx is not None and isinstance(value, EventItem) and sec.get("events"):
-            items = sec["events"]["items"]
-            if int(idx) < len(items):
-                items[int(idx)] = value.model_dump()
-            else:
-                items.append(value.model_dump())
-        else:
-            notes.append("sections.events: 값 형식이 맞지 않음")
+    elif field_ in GROUP_TYPES:
+        notes += _apply_group(sec, field_, idx, value)
     else:
         notes.append(f"알 수 없는 하위 위치 sections.{field_}")
     return sec, notes
@@ -139,6 +132,27 @@ def _delete_sub_item(sec: dict, field_: str, idx: int) -> str | None:
             return None
         return "위치 없음"
     return "삭제 대상 없음"
+
+
+def _apply_sub_change(data: dict, i: int, field_: str, idx: int | None, action: str, value, loc: str) -> list[str]:
+    """sections[i]의 하위 변경 하나를 적용하고 즉시 검증한다(007-A1-5): 적용 결과가 스키마를 깨면 그 변경만
+    되돌리고(나머지 변경은 영향 없음) note를 남긴다."""
+    before = data["sections"][i]
+    sec = copy.deepcopy(before)
+    if action == "delete" and idx is not None:
+        if (reason := _delete_sub_item(sec, field_, idx)) is not None:
+            return [f"{loc}: {reason}"]
+    else:
+        sec, notes = _apply_section_sub(sec, field_, idx, value)
+        if notes:
+            return [f"{loc}: {n}" for n in notes]
+    data["sections"][i] = sec
+    try:
+        TopicPage.model_validate(data)
+        return []
+    except ValueError:
+        data["sections"][i] = before
+        return [f"{loc}: 적용하면 스키마가 깨져 이 변경만 되돌림"]
 
 
 def apply_revision(prev: TopicPage, rev: TopicPageRevision, allowed: set[str]) -> tuple[TopicPage, int, list[str]]:
@@ -169,12 +183,7 @@ def apply_revision(prev: TopicPage, rev: TopicPageRevision, allowed: set[str]) -
             if i >= len(data["sections"]):
                 notes.append(f"{ch.loc}: 위치 없음")
                 continue
-            if ch.action == "delete" and idx is not None:
-                if (reason := _delete_sub_item(data["sections"][i], field_, idx)) is not None:
-                    notes.append(f"{ch.loc}: {reason}")
-                continue
-            data["sections"][i], sub_notes = _apply_section_sub(data["sections"][i], field_, idx, ch.value)
-            notes += [f"{ch.loc}: {n}" for n in sub_notes]
+            notes += _apply_sub_change(data, i, field_, idx, ch.action, ch.value, ch.loc)
             continue
         if not m:
             notes.append(f"알 수 없는 위치 {ch.loc}")
@@ -195,8 +204,8 @@ def apply_revision(prev: TopicPage, rev: TopicPageRevision, allowed: set[str]) -
             val = val.model_copy(update={"check": False})  # check는 코드 소유
         if ch.action == "edit" and idx_s < len(data[name]):
             data[name][idx_s] = val.model_dump()
-        else:
-            data[name].append(val.model_dump())
+        else:  # 007-A1-6/A2-27: add는 i 위치에 넣는다(절 순서가 의미 있음, 뒤에 붙이면 안 됨)
+            data[name].insert(min(idx_s, len(data[name])), val.model_dump())
     for name, idx_s in sorted(deletes, key=lambda x: -x[1]):
         if idx_s < len(data[name]):
             data[name].pop(idx_s)
