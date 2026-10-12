@@ -44,7 +44,7 @@ def cmd_backup(args: argparse.Namespace) -> int:
     import re
 
     from .core.config import ROOT
-    from .core.db import KST
+    from .core.db import KST, backup_conn
 
     if args.tag and not re.fullmatch(r"[\w-]+", args.tag):
         print(f"backup: --tag는 글자·숫자·_·-만 ({args.tag})", file=sys.stderr)
@@ -57,17 +57,21 @@ def cmd_backup(args: argparse.Namespace) -> int:
     if dest.exists():
         print(f"backup: 같은 이름이 있음 ({dest})", file=sys.stderr)
         return 1
-    dest.parent.mkdir(parents=True, exist_ok=True)
-    src_conn = sqlite3.connect(src)  # open_db()는 스키마·마이그레이션을 적용함: 원본을 그대로 두려면 직접 연다(C-11)
     try:
-        with sqlite3.connect(dest) as dst_conn:
-            src_conn.backup(dst_conn)
+        # open_db()·DB()는 스키마·마이그레이션을 적용함: 원본을 그대로 두려면 mode=ro로 직접 연다(C-11·006-C1-10.
+        # 쓰기 가능하게 열면 마지막 연결 종료 때 WAL 체크포인트가 원본 파일 바이트를 바꿀 수 있다)
+        src_conn = sqlite3.connect(f"file:{src}?mode=ro", uri=True)
+        try:
+            backup_conn(src_conn, dest)
+        finally:
+            src_conn.close()
     except (OSError, sqlite3.Error) as e:
         print(f"backup: {e}", file=sys.stderr)
-        dest.unlink(missing_ok=True)
+        try:  # mkdir 자체가 실패한 경우(자리에 파일이 있음 등)는 dest가 있을 수 없는 경로라 unlink도 실패할 수 있음
+            dest.unlink(missing_ok=True)
+        except OSError:
+            pass
         return 1
-    finally:
-        src_conn.close()
     print(str(dest))
     return 0
 

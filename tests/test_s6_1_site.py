@@ -186,6 +186,49 @@ def test_backup_cli_rejects_existing_name(tmp_path, monkeypatch):
     assert cli_ops.cmd_backup(Args()) == 1
 
 
+def test_backup_cli_handles_mkdir_failure_cleanly(tmp_path, monkeypatch):
+    """006-C1-10: dest.parent.mkdir 실패(백업 폴더 자리에 파일이 있음)가 트레이스백 없이 메시지 한 줄 + 1로."""
+    from trendsit import cli_ops
+    from trendsit.core import config as cfgmod
+
+    monkeypatch.setattr(cfgmod, "ROOT", tmp_path)
+    (tmp_path / "data").mkdir()
+    DB(tmp_path / "data" / "trendsit.db").conn.close()
+    (tmp_path / "data" / "backup").write_bytes(b"x")  # 폴더가 있어야 할 자리에 파일 → mkdir이 NotADirectoryError
+
+    class Args:
+        tag = None
+
+    assert cli_ops.cmd_backup(Args()) == 1
+
+
+def test_backup_cli_opens_original_read_only(tmp_path, monkeypatch):
+    """006-C1-10: 원본을 mode=ro URI로 열어 쓰기 가능한 연결을 만들지 않는다(WAL 체크포인트로 원본이 바뀌는 것 방지)."""
+    import sqlite3
+
+    from trendsit import cli_ops
+    from trendsit.core import config as cfgmod
+
+    monkeypatch.setattr(cfgmod, "ROOT", tmp_path)
+    (tmp_path / "data").mkdir()
+    DB(tmp_path / "data" / "trendsit.db").conn.close()
+    seen = []
+    real_connect = sqlite3.connect
+
+    def spy(database, *a, **kw):
+        seen.append((database, kw))
+        return real_connect(database, *a, **kw)
+
+    monkeypatch.setattr(sqlite3, "connect", spy)
+
+    class Args:
+        tag = None
+
+    assert cli_ops.cmd_backup(Args()) == 0
+    src_calls = [c for c in seen if c[1].get("uri")]  # mode=ro URI 연결만 uri=True로 연다(목적지 연결은 평범한 경로)
+    assert src_calls and all("trendsit.db?mode=ro" in str(db) for db, _kw in src_calls)
+
+
 def test_backup_cli_rejects_bad_tag_and_missing_db(tmp_path, monkeypatch):
     """006-A1-37: --tag에 경로 문자가 있거나 원본 DB가 없으면 1(빈 DB를 새로 만들어 백업하지 않음)."""
     from trendsit import cli_ops
