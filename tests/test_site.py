@@ -401,6 +401,29 @@ def test_f50_literal_markup_text_in_data_is_kept_and_passes_m1(site, tmp_path):
     assert not [n for n, ok, _ in check.results if n.startswith("M-1") and not ok]
 
 
+def test_t_query_on_non_video_source_link_is_not_flagged(site, tmp_path):
+    """006-C1-17: &t= 쿼리가 있는 글 출처 링크(.vgo·.vtl·.simg 밖)는 A9 시점 링크 검사 대상이 아니다(오탐 방지)."""
+    import contextlib
+    import io
+    import shutil
+
+    sys.path.insert(0, str(ROOT / "site_src"))
+    import check
+
+    bad = tmp_path / "site"
+    shutil.copytree(site, bad)
+    f = bad / "topic/w41-long/index.html"
+    html = f.read_text(encoding="utf-8")
+    assert "</main>" in html
+    f.write_text(html.replace("</main>", '<p><a href="https://x.example/post?id=1&t=5s">글 출처</a></p></main>', 1), encoding="utf-8")
+    check.results.clear()
+    pages = {p: check.parse(p) for p in sorted(bad.rglob("*.html"))}
+    with contextlib.redirect_stdout(io.StringIO()):
+        check.static_checks(bad, json.loads(FIXTURE.read_text(encoding="utf-8")), pages)
+    bad_names = [n for n, ok, _ in check.results if not ok]
+    assert not any("&t=" in n for n in bad_names), bad_names
+
+
 def test_f68_evidence_ids_stripped_from_diagram_context(site, tmp_path):
     import contextlib
     import io

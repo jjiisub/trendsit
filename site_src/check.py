@@ -38,26 +38,31 @@ class Page(HTMLParser):
         self.tags, self.links, self.ids, self.titles, self.text, self.classes, self.pn = {}, [], set(), 0, [], [], []
         self.open, self.mismatch = [], 0  # 태그 중첩 어긋남 수
         self.tiles, self._tiles_stack = [], []  # .tiles 블록마다 (n{k} 선언값, 실제 .tile 자식 수)
+        self.class_stack = []  # self.open과 같은 깊이로 쌓는 조상 class 집합(006-C1-17: &t= 링크 범위를 영상 타임라인 조각으로 좁힘)
+        self.timeline_links = []  # .vgo·.vtl·.simg 안에서 나온 href만(글 출처의 &t= 쿼리 오탐 방지)
 
     def handle_starttag(self, tag, attrs):
         a = dict(attrs)
+        cls = set(a.get("class", "").split())
         if tag not in VOID:
             self.open.append(tag)
+            self.class_stack.append(cls)
         self.tags[tag] = self.tags.get(tag, 0) + 1
         if "id" in a:
             self.ids.add(a["id"])
         if "title" in a and tag != "link":
             self.titles += 1
         if "class" in a:
-            cls = a["class"].split()
-            self.classes.append((tag, cls))
+            self.classes.append((tag, a["class"].split()))
             if tag == "div" and "tiles" in cls:
                 n = next((c[1:] for c in cls if c.startswith("n") and c[1:].isdigit()), None)
                 self._tiles_stack.append({"depth": len(self.open), "n": n, "count": 0})
             elif tag == "div" and "tile" in cls and self._tiles_stack and len(self.open) == self._tiles_stack[-1]["depth"] + 1:
                 self._tiles_stack[-1]["count"] += 1
-        if tag == "a" and {"pn-prev", "pn-next"} & set(a.get("class", "").split()):
+        if tag == "a" and {"pn-prev", "pn-next"} & cls:
             self.pn.append(a["href"])
+        if tag == "a" and "href" in a and {"vgo", "vtl", "simg"} & {c for frame in self.class_stack for c in frame}:
+            self.timeline_links.append(a["href"])
         for k in ("href", "src"):
             if a.get(k) is not None:
                 self.links.append((tag, a.get("rel", ""), k, a[k]))
@@ -70,11 +75,14 @@ class Page(HTMLParser):
             self.tiles.append((e["n"], e["count"]))
         if self.open and self.open[-1] == tag:
             self.open.pop()
+            self.class_stack.pop()
         else:
             self.mismatch += 1
             if tag in self.open:
-                while self.open.pop() != tag:
-                    pass
+                while True:
+                    popped, _ = self.open.pop(), self.class_stack.pop()
+                    if popped == tag:
+                        break
 
     def handle_data(self, data):
         self.text.append(data)
@@ -218,10 +226,9 @@ def _check_s6_1_content(site, data, pages):
         if got != want:
             bad_chk.append(f"{tid} got={got} want={want}")
         vids = [s["url"] for s in t["sources"] if s["channel"] == "video" and s.get("url")]
-        bad_t += [f"{tid} {h}" for _, _, k, h in pages[f].links if k == "href" and "&t=" in h
-                 and not any(h.startswith(u) for u in vids)]
+        bad_t += [f"{tid} {h}" for h in pages[f].timeline_links if "&t=" in h and not any(h.startswith(u) for u in vids)]
     check("C-9 .chk 수 = site.json의 확인 필요 수", not bad_chk, "; ".join(bad_chk[:3]))
-    check("A9 &t= 시점 링크는 그 토픽 영상 출처 URL로 시작", not bad_t, "; ".join(bad_t[:3]))
+    check("A9 &t= 시점 링크(.vgo·.vtl·.simg 안)는 그 토픽 영상 출처 URL로 시작", not bad_t, "; ".join(bad_t[:3]))
 
 
 def static_checks(site, data, pages):

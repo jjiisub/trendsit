@@ -84,7 +84,7 @@ def _topic_ref_slots(t: dict[str, Any]) -> list[tuple[str, list[str]]]:
 
 
 def _repos(db: DB, week: str, run_id: str, topics: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """그 주 트렌딩(관련 있는 것) + 토픽 근거로 쓴 레포. 설명(what)은 repo_oneliners."""
+    """그 주 모든 수집 run 행(repo_trending) 중 카드 relevant 또는 설명 있는 것 + 토픽 근거로 쓴 레포(5.7 F74 정정). 설명(what)은 repo_oneliners."""
     topic_of: dict[str, str] = {}
     for t in topics:  # rank 순이라 먼저 쓴 토픽이 이김
         for (m,) in db.conn.execute("SELECT DISTINCT member FROM topic_evidence WHERE run_id=? AND topic_id=? AND member LIKE 'rp:%'",
