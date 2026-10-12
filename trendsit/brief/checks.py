@@ -23,7 +23,7 @@ from .evidence import EvidenceItem
 HL = re.compile(r"==(.+?)==")
 DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 REF = re.compile(r"(?:it|og|vd|rp|sl):[\w./#@:-]+")
-_SENT = re.compile(r"(?<=[.!?다])\s+")
+_SENT = re.compile(r"(?<=[.!?])\s+")  # 006-A3-2: "보다 "·"위한다 " 같은 문장 중간 "다"에서 쪼개지 않음(fulltext.sentences와 맞춤)
 UNIT_WORDS = ("%", "퍼센트", "포인트", "밀리초", "초", "달러", "원", "배", "분기", "시간", "개월", "분", "개", "명", "회", "건")
 
 

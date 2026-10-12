@@ -83,9 +83,23 @@ def test_enforce_clears_writer_check_true():
 
 
 # ---------- A5: 코드 검사 ----------
+def test_sentences_does_not_split_on_comparison_particle_da():
+    """006-A3-2: "보다 " 같은 문장 중간 "다"+공백에서 쪼개지 않는다(fulltext.sentences와 같은 경계)."""
+    text = "GPT-6는 이전 모델보다 빠르다. 비용은 Haiku보다 낮다."
+    assert checks.sentences(text) == ["GPT-6는 이전 모델보다 빠르다.", "비용은 Haiku보다 낮다."]
+
+
 def test_check_passes_good_page():
     p = page(sections=three_sections())
     assert checks.check(p, pack(), 1, CFG) == []
+
+
+def test_check_accepts_comparison_sentence_within_limit():
+    """006-A3-2 회귀: 비교문 2개짜리 단락이 문장 분리 버그로 4문장으로 세여 거짓 반려되지 않는다."""
+    text = "GPT-6는 이전 모델보다 빠르다. 비용은 Haiku보다 낮다."
+    p = page(summary=text, sections=three_sections(paragraphs=[para(text=text)]))
+    issues = checks.check(p, pack(), 1, CFG)
+    assert not any("문장" in i.comment and i.loc in ("summary", "sections[0]") for i in issues)
 
 
 def test_check_rejects_wrong_ref():
