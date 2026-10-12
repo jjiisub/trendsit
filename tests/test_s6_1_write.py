@@ -329,6 +329,20 @@ def test_place_candidate_falls_back_to_first_video_section():
     assert placed == 1
 
 
+def test_topic_slide_info_does_not_truncate_before_pack_filter():
+    """006-C1-21: topic_slide_info는 slides_max로 자르지 않는다(호출부인 write_topic이 pack 필터 뒤에 자른다).
+    여기서 자르면 cap_pack이 앞선 후보를 빼도(pack 밖) 자격 있는 다음 후보를 돌려줄 기회가 없다."""
+    from trendsit.brief.evidence import Member
+    from trendsit.brief.write import topic_slide_info
+
+    m = Member("vd:v1", "video", "t", "", "", "high", [], [], {}, slide_candidates=["sl:1@10", "sl:1@20", "sl:1@30"])
+    cands, _secs = topic_slide_info([m], {"vd:v1"}, CFG)
+    assert cands == ["sl:1@10", "sl:1@20", "sl:1@30"]  # 전부 돌려줌(slides_max=2라도 안 자름)
+    only_third_in_pack = {"sl:1@30": []}
+    filtered = [c for c in cands if c in only_third_in_pack][: CFG.write.slides_max]
+    assert filtered == ["sl:1@30"]  # pack 필터를 먼저 거친 뒤 자르면 세 번째 후보가 살아남음
+
+
 def test_place_candidate_2nd_stage_requires_section_max_secs_not_exceed_sec():
     """006-C1-12: 5.6 2단계는 video_secs의 '최댓값'이 sec 이하인 절만 후보다. 절 0은 [100, 1000](최댓값이
     873보다 큼) → 제외, 절 1은 [50](최댓값 50 ≤ 873) → 선택돼야 한다."""

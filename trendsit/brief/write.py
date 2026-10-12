@@ -97,7 +97,8 @@ def alias_lines(table: AliasTable, members: list[Member]) -> list[AliasLine]:
 
 
 def topic_slide_info(ms: list[Member], used_members: set[str], cfg: BriefConfig) -> tuple[list[str], set[int]]:
-    """이 토픽 근거에 실제로 쓰인 영상 구성원에서 slide_candidates(최대 slides_max)와 허용 video_secs(타임라인 sec)를 모은다."""
+    """이 토픽 근거에 실제로 쓰인 영상 구성원에서 slide_candidates와 허용 video_secs(타임라인 sec)를 모은다. slides_max로
+    자르지 않는다 — 호출부가 cap_pack 뒤 pack 필터까지 거친 다음에 자른다(006-C1-21: 먼저 자르면 자격 있는 다음 후보를 놓친다)."""
     cands: list[str] = []
     secs: set[int] = set()
     for m in ms:
@@ -105,7 +106,7 @@ def topic_slide_info(ms: list[Member], used_members: set[str], cfg: BriefConfig)
             continue
         cands += m.slide_candidates
         secs |= {t["sec"] for t in m.timeline}
-    return cands[: cfg.write.slides_max], secs
+    return cands, secs
 
 
 def refs_of(page: TopicPage) -> list[str]:
@@ -345,9 +346,8 @@ def _finalize_page(res: TopicResult, final: TopicPage, pack: dict[str, list[Evid
 def _writer_call_count(ctx: Ctx, before_sid: int) -> int:
     """006-C1-1: 이번 토픽의 writer LLM 호출 수(role.py 내부 스키마 재시도 포함)를 센다. 전역 step id 차이는 쓰지 않는다 —
     _log_topic·editor_select 같은 code/다른 역할 step이 사이에 끼면 id가 그만큼 더 벌어져 실제 호출 수보다 많게 보인다(전역 autoincrement)."""
-    row = ctx.db.conn.execute(
-        "SELECT COUNT(*) AS n FROM steps WHERE run_id=? AND role='writer' AND kind='llm' AND id>?",
-        (ctx.tracer.run_id, before_sid)).fetchone()  # type: ignore[union-attr]
+    row = ctx.db.conn.execute("SELECT COUNT(*) AS n FROM steps WHERE run_id=? AND role='writer' AND kind='llm' AND id>?",
+                             (ctx.tracer.run_id, before_sid)).fetchone()  # type: ignore[union-attr]
     return row["n"]
 
 
@@ -389,7 +389,7 @@ def write_topic(ctx: Ctx, topic: Applied, members: dict[str, Member], table: Ali
         if m.corrections.get("_no_text") and m.key in used_members:
             res.attention.append(f"원문 없음: {m.key}")
     slide_candidates, timeline_secs = topic_slide_info(ms, used_members, cfg)
-    slide_candidates = [c for c in slide_candidates if c in pack]  # 006-A2-9: cap_pack이 뺀 후보는 주지 않음(거짓 wrong_ref 방지)
+    slide_candidates = [c for c in slide_candidates if c in pack][: cfg.write.slides_max]  # 006-A2-9·006-C1-21: 필터 먼저, 자르기는 그 뒤
     winp = WriterInput(plan=PlanBrief(rank=topic.rank, angle=topic.angle, relation=Relation(type=topic.relation_type, topic_id=topic.relation_topic_id)),
                        evidence=evidence_docs(pack), previous=previous_topic(ctx.db, topic.relation_topic_id), aliases=alias_lines(table, ms),
                        limits=writer_limits(cfg, n_sources), slide_candidates=slide_candidates, no_visuals=False)

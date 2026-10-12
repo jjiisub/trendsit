@@ -12,7 +12,7 @@ const TOKENS = [...new Set(tokenCss.match(/--c-[a-z-]+:\s*#[0-9a-fA-F]{6}/g).map
 const WEIGHTS = ['400', '500'];
 
 // 관문 9의 9항목 측정(drafts/shoot.py의 GATE_JS, 이 사이트의 토큰·클래스에 맞게). 브라우저 안에서 실행
-function gateInBrowser([weights, tokens]) {
+async function gateInBrowser([weights, tokens]) {
   const vw = document.documentElement.clientWidth;
   const g = {};
   g.overflow = document.documentElement.scrollWidth - vw;
@@ -116,6 +116,14 @@ function gateInBrowser([weights, tokens]) {
   g.titleAttrs = document.querySelectorAll('[title]:not(link)').length;
   // S6-1 5.9: 표는 자신만 가로로 스크롤(overflow-x), 이미지는 로드됨, 375에서 타일 글자 안 잘림
   g.cmptOverflowBad = [...document.querySelectorAll('.cmpt-wrap')].filter((el) => !['auto', 'scroll'].includes(getComputedStyle(el).overflowX)).length;
+  // 006-C1-15: loading="lazy"인 슬라이드 img는 화면 밖이면 아직 요청 전이라 complete가 false라 위 판정에서 늘 빠진다.
+  // 화면으로 스크롤해 decode()까지 기다린 뒤에 봐야 실제 로드 실패를 잡는다
+  for (const img of document.querySelectorAll('img')) {
+    if (!img.complete) {
+      img.scrollIntoView();
+      await img.decode().catch(() => {});
+    }
+  }
   g.imgBad = [...document.querySelectorAll('img')].filter((img) => img.complete && img.naturalWidth === 0).length;
   g.tileOverflowBad = [...document.querySelectorAll('.tiles .tile-v, .tiles .tile-l, .tiles .tile-s')].filter((el) => el.scrollWidth > el.clientWidth + 1).length;
   return g;
