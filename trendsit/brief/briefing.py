@@ -41,7 +41,7 @@ def _video_timeline(db: DB, video_id: str) -> dict[int, dict[str, Any]]:
 
 
 def _slide_reading(db: DB, video_id: str, sec: int) -> dict[str, Any]:
-    r = db.conn.execute("SELECT reading_json FROM video_frames WHERE video_id=? AND ABS(t-?)<0.5 ORDER BY ABS(t-?) LIMIT 1",
+    r = db.conn.execute("SELECT reading_json FROM video_frames WHERE video_id=? AND ABS(t-?)<=0.5 ORDER BY ABS(t-?) LIMIT 1",
                         (video_id, float(sec), float(sec))).fetchone()
     return json.loads(r["reading_json"]) if r and r["reading_json"] else {}
 

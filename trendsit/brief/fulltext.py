@@ -126,7 +126,7 @@ def raw_evidence(db: DB, eid: str, items: list[EvidenceItem]) -> str:
     if m := re.match(r"^sl:(\d+)@(\d+)$", eid):
         video_id = db.conn.execute("SELECT video_id FROM videos WHERE item_id=?", (int(m[1]),)).fetchone()
         if video_id:
-            fr = db.conn.execute("SELECT reading_json FROM video_frames WHERE video_id=? AND ABS(t-?)<0.5 "
+            fr = db.conn.execute("SELECT reading_json FROM video_frames WHERE video_id=? AND ABS(t-?)<=0.5 "
                                  "ORDER BY ABS(t-?) LIMIT 1", (video_id[0], float(m[2]), float(m[2]))).fetchone()
             if fr and fr["reading_json"]:
                 return json.loads(fr["reading_json"]).get("ocr_text") or fallback  # 006-A2-20: OCR 빈 슬라이드(수치만)도 작성자가 받은 판독 줄로
