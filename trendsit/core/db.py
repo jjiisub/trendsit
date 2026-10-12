@@ -68,7 +68,7 @@ def now_kst() -> str:
 
 def backup_conn(src: sqlite3.Connection, dest: Path) -> None:
     """sqlite3 Connection.backup으로 WAL 포함 일관 사본을 만든다(원본 연결은 바뀌지 않음, S6-1 D-35·006-C1-9).
-    DB.backup과 cli_ops.cmd_backup이 같은 구현을 쓴다(src는 각자 적절한 연결로 열어서 넘긴다)."""
+    cli_ops.cmd_backup과 테스트가 같은 구현을 쓴다(src는 각자 적절한 연결로 열어서 넘긴다, 007-A1-13/A2-7: db.py 함수 하나로)."""
     dest.parent.mkdir(parents=True, exist_ok=True)
     with sqlite3.connect(dest) as dst:
         src.backup(dst)
@@ -94,10 +94,6 @@ class DB:
             if name not in have:
                 self.conn.execute(f"ALTER TABLE steps ADD COLUMN {name} {kind}")
         self.migrate(migrations)
-
-    def backup(self, dest: Path) -> None:
-        """sqlite3 Connection.backup으로 WAL 포함 일관 사본을 만든다(원본은 바뀌지 않음, S6-1 D-35)."""
-        backup_conn(self.conn, dest)
 
     def migrate(self, migrations: dict[int, str] | None = None) -> list[int]:
         """등록된 마이그레이션 중 아직 적용하지 않은 것을 적용한다(core/migrations.py). 적용한 번호를 돌려준다."""

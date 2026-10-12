@@ -13,7 +13,7 @@ from pathlib import Path
 import pytest
 
 from tests.test_export import make_db
-from trendsit.core.db import DB
+from trendsit.core.db import DB, backup_conn
 from trendsit.export import build as export_build
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -134,7 +134,7 @@ def test_backup_creates_consistent_copy_without_touching_original(tmp_path, monk
     db.conn.commit()
     before = (data_dir / "trendsit.db").read_bytes()
     dest = tmp_path / "backup" / "20261012-0000-pre.db"
-    db.backup(dest)
+    backup_conn(db.conn, dest)  # 007-A1-13/A2-7: db.py 함수 하나(backup_conn)로, cmd_backup과 같은 경로
     assert dest.is_file()
     after = (data_dir / "trendsit.db").read_bytes()
     assert before == after
