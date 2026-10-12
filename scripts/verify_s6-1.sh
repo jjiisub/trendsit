@@ -116,6 +116,7 @@ a13() {
   grep -q '^### 사이트' README.md || { echo "README 사이트 절 없음"; return 1; }
   grep -q 'trendsit backup' README.md || { echo "README에 trendsit backup 없음"; return 1; }
   grep -q 'git fetch origin main && git reset --hard origin/main' README.md || { echo "README 자동 실행 절에 fetch+reset 설명 없음"; return 1; }
+  grep -q '토픽 상세(S6-1)' README.md || { echo "README 사이트 절에 토픽 v2(절 구조) 설명 없음"; return 1; }  # 007-A1-15/A2-13
   grep -q 'S6a 최상위 구조 + S6-1 토픽 v2' AGENTS.md || { echo "AGENTS.md 출력 형식 줄 없음"; return 1; }
   for n in 1 2 3 4 5 6 7 8; do grep -q "^## $n\\." reports/S6-1_report.md 2>/dev/null || { echo "reports/S6-1_report.md에 $n장 없음"; return 1; }; done
   local shots
@@ -136,6 +137,9 @@ a13() {
   ids=$(grep -rnE '\boverview\b|\bconcepts\b' trendsit --include='*.py' | grep -v __pycache__ | grep -vE '^[^:]+:[0-9]+:\s*#' || true)
   [ -z "$ids" ] || { echo "trendsit/에 overview·concepts 식별자가 남음: $ids"; return 1; }
   grep -q 'it:{item_id}#s{n}' docs/handoff/CONTRACTS.md || { echo "CONTRACTS.md에 it:#s 행 없음"; return 1; }
+  grep -q 'rp:{owner/name}#f{n}' docs/handoff/CONTRACTS.md || { echo "CONTRACTS.md에 rp:#f 행 없음"; return 1; }  # 007-A1-15/A2-13
+  grep -q 'sl:{item_id}@{sec}' docs/handoff/CONTRACTS.md || { echo "CONTRACTS.md에 sl:@ 행 없음"; return 1; }
+  grep -q '전사 묶음(S6-1)' docs/handoff/CONTRACTS.md || { echo "CONTRACTS.md에 전사 묶음 vd:@ 한 줄 없음"; return 1; }
   return 0
 }
 if out=$(a13 2>&1); then pass A13 "README·AGENTS·CONTRACTS, reports/S6-1_report.md 8장, shots ≥6장, .gitignore, 옛 구조 eval 픽스처 0개, overview·concepts 식별자 0"; else fail A13 "$out"; fi
