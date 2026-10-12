@@ -341,6 +341,49 @@ def test_export_has_check_ignores_locs_without_a_chk_anchor(tmp_path):
     assert ex["sections"][0]["video_secs"] == []
 
 
+def test_export_video_sources_timeline_video_id_and_slide_only_if_file_exists(tmp_path, monkeypatch):
+    """006-A3-5(A2-review #5 재발): sources[].timeline·video_id, section.video_secs 라벨, slide.image는
+    파일이 있을 때만 나온다(C-7 둘째 절)."""
+    monkeypatch.setattr(briefing, "ROOT", tmp_path)
+    ctx = make_ctx(tmp_path, FakeTransport([]), spec_cap=1.0)
+    db = ctx.db.conn
+    db.execute("INSERT INTO items(id, source_id, channel, external_id, url, title, day, week) VALUES "
+               "(9,'yt','video','e9','https://youtu.be/VID1','영상 제목','2026-10-06','2026-W41')")
+    db.execute("INSERT INTO videos(item_id, video_id) VALUES (9, 'VID1')")
+    digest = {"timeline": [{"sec": 10, "label": "시작", "slide": False}, {"sec": 60, "label": "슬라이드 등장", "slide": True}]}
+    db.execute("INSERT INTO video_digests(video_id, item_id, digest_json) VALUES ('VID1', 9, ?)", (json.dumps(digest),))
+    page_json = {"head_tiles": [], "sections": [
+        {"heading": "h1", "paragraphs": [{"text": "문장이다.", "refs": ["vd:9@10"]}], "visual": "none",
+         "bars": None, "table": None, "tiles": [], "events": None, "slide": "sl:9@60", "slide_caption": "캡션",
+         "video_secs": [10, 60], "check": False},
+        {"heading": "h2", "paragraphs": [{"text": "문장이다.", "refs": ["vd:9@10"]}], "visual": "none",
+         "bars": None, "table": None, "tiles": [], "events": None, "slide": None, "slide_caption": "",
+         "video_secs": [], "check": False}],
+        "summary": "요약이다.", "title": "제목", "log": "l", "attention": False}
+    db.execute("INSERT INTO topics(run_id, topic_id, week, cluster_ids_json, rank, lead, relation_type, status, final_round,"
+               " angle, checks_json) VALUES ('r','w41-v','2026-W41','[]',1,1,'new','checked',1,'a','[]')")
+    db.execute("INSERT INTO topic_pages(run_id, topic_id, round, page_json) VALUES ('r','w41-v',1,?)", (json.dumps(page_json),))
+    db.execute("INSERT INTO topic_evidence(run_id, topic_id, evidence_id, member, field, idx) VALUES "
+               "('r','w41-v','vd:9@10','vd:VID1','point',0)")
+    db.commit()
+    srcs = {"vd:9@10": {"channel": "video", "site": "YouTube", "title": "영상 제목", "date": "2026-10-06",
+                        "url": "https://youtu.be/VID1"}}
+
+    ex1 = briefing.export_topic(ctx.db, "r", "w41-v", srcs)
+    assert ex1["sources"][0]["video_id"] == "VID1"
+    assert ex1["sources"][0]["timeline"] == [{"sec": 10, "label": "시작", "slide": False},
+                                             {"sec": 60, "label": "슬라이드 등장", "slide": True}]
+    assert ex1["sections"][0]["video_secs"] == [{"sec": 10, "label": "시작", "slide": False},
+                                                {"sec": 60, "label": "슬라이드 등장", "slide": True}]
+    assert ex1["sections"][1]["video_secs"] == []
+    assert ex1["sections"][0]["slide"] is None  # 파일 없음 → null(C-7)
+
+    (tmp_path / "data" / "slides").mkdir(parents=True, exist_ok=True)
+    (tmp_path / "data" / "slides" / "VID1_60.jpg").write_bytes(b"x")
+    ex2 = briefing.export_topic(ctx.db, "r", "w41-v", srcs)
+    assert ex2["sections"][0]["slide"] == {"sec": 60, "title": "", "caption": "캡션", "image": "slides/VID1_60.jpg"}
+
+
 def test_critic_empty_atoms_is_not_a_pass(week):
     """원자 사실 0개 통과는 대조를 건너뛴 판정: 한 번 다시 부르고, 또 비면 검수 실패(attention), 판정은 기록하지 않음."""
     ctx, cids = week
