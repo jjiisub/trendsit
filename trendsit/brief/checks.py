@@ -128,20 +128,17 @@ def _set(page: TopicPage, loc: str, text: str) -> TopicPage:
     raise KeyError(loc)
 
 
-def _cut_sections(page: TopicPage, hi: int, fixes: list[dict[str, Any]]) -> TopicPage:
-    """sections 개수 초과: 중요도 순이라 뒤에서 자른다(그 절의 시각 요소도 함께)."""
-    if len(page.sections) <= hi:
-        return page
-    fixes.append({"loc": "sections", "rule": f"sections {len(page.sections)}개 → {hi}개(뒤에서 자름)",
-                  "before": [s.heading for s in page.sections[hi:]], "after": []})
-    return page.model_copy(update={"sections": page.sections[:hi]})
-
-
-def _fix_slide_and_video_secs(page: TopicPage, slide_candidates: list[str], timeline_secs: set[int],
-                              fixes: list[dict[str, Any]]) -> TopicPage:
-    """C-4: section.slide가 slide_candidates 밖이면 null로, video_secs가 타임라인에 없으면 그 값만 제거."""
+def _fix_sections(page: TopicPage, hi: int, slide_candidates: list[str], timeline_secs: set[int],
+                  fixes: list[dict[str, Any]]) -> TopicPage:
+    """sections 개수 초과면 중요도 순 뒤에서 자른다(그 절의 시각 요소도 함께). C-4: section.slide가
+    slide_candidates 밖이면 null로, video_secs가 타임라인에 없으면 그 값만 제거. v1.2 5.3: revise 적용 뒤
+    절의 visual 종류 칸(bars·table·events null, tiles [])이 비면 visual=none으로 맞춤(반려 아님)."""
     secs = list(page.sections)
-    changed = False
+    if len(secs) > hi:
+        fixes.append({"loc": "sections", "rule": f"sections {len(secs)}개 → {hi}개(뒤에서 자름)",
+                      "before": [s.heading for s in secs[hi:]], "after": []})
+        secs = secs[:hi]
+    changed = len(secs) != len(page.sections)
     for i, s in enumerate(secs):
         upd: dict[str, Any] = {}
         if s.slide and s.slide not in slide_candidates:
@@ -151,6 +148,10 @@ def _fix_slide_and_video_secs(page: TopicPage, slide_candidates: list[str], time
         if kept != s.video_secs:
             fixes.append({"loc": f"sections[{i}].video_secs", "rule": "타임라인 밖 sec 제거", "before": s.video_secs, "after": kept})
             upd["video_secs"] = kept
+        empty = {"bars": s.bars is None, "table": s.table is None, "events": s.events is None, "tiles": not s.tiles}
+        if s.visual != "none" and empty.get(s.visual, False):
+            fixes.append({"loc": f"sections[{i}]", "rule": "visual 종류 칸이 비어 none으로 맞춤", "before": s.visual, "after": "none"})
+            upd["visual"] = "none"
         if upd:
             secs[i] = s.model_copy(update=upd)
             changed = True
@@ -195,26 +196,11 @@ def _cap_highlights(page: TopicPage, hl: Any, fixes: list[dict[str, Any]]) -> To
     return page
 
 
-def _fix_empty_visual(page: TopicPage, fixes: list[dict[str, Any]]) -> TopicPage:
-    """v1.2 5.3: revise 적용 뒤 절의 visual 종류 칸(bars·table·events null, tiles [])이 비면 visual=none으로 맞춤(반려 아님)."""
-    secs = list(page.sections)
-    changed = False
-    for i, s in enumerate(secs):
-        empty = {"bars": s.bars is None, "table": s.table is None, "events": s.events is None, "tiles": not s.tiles}
-        if s.visual != "none" and empty.get(s.visual, False):
-            fixes.append({"loc": f"sections[{i}]", "rule": "visual 종류 칸이 비어 none으로 맞춤", "before": s.visual, "after": "none"})
-            secs[i] = s.model_copy(update={"visual": "none"})
-            changed = True
-    return page.model_copy(update={"sections": secs}) if changed else page
-
-
 def autofix(page: TopicPage, cfg: BriefConfig, canon: dict[str, str], slide_candidates: list[str],
            timeline_secs: set[int], sections_hi: int,
            translit: list[tuple[re.Pattern[str], str]] | None = None) -> tuple[TopicPage, list[dict[str, Any]]]:
     fixes: list[dict[str, Any]] = []
-    page = _cut_sections(page, sections_hi, fixes)
-    page = _fix_slide_and_video_secs(page, slide_candidates, timeline_secs, fixes)
-    page = _fix_empty_visual(page, fixes)
+    page = _fix_sections(page, sections_hi, slide_candidates, timeline_secs, fixes)
     page = _canonical_names_and_spacing(page, canon, translit or [], fixes)
     return _cap_highlights(page, cfg.write.highlights, fixes), fixes
 
