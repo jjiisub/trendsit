@@ -203,7 +203,7 @@ def _rounds(ctx: Ctx, res: TopicResult, topic: Applied, winp: WriterInput, pack:
     raw_page: dict[str, Any] | None = page.raw_dump()
     canon, translit = fixers
     for rnd in range(1, cfg.review.max_rounds + 1):
-        cr = checks.run_checks(page, pack, res.n_sources, cfg, canon=canon, slide_candidates=slide_candidates, timeline_secs=timeline_secs, translit=translit)
+        cr = checks.run_checks(page, pack, res.n_sources, cfg, canon=canon, slide_candidates=slide_candidates, timeline_secs=timeline_secs, translit=translit, after_revise=rnd > 1)
         page = cr.page
         res.pages.append((rnd, page, raw_page, sid))
         issues = cr.issues
@@ -257,6 +257,7 @@ def _drop_code_bad_sections(res: TopicResult, final: TopicPage, pack: dict[str, 
     bad_secs = {int(m.group(1)) for i in issues
                if (m := re.match(r"^sections\[(\d+)\]", i.loc)) and ".paragraphs" not in i.loc and ".heading" not in i.loc}
     bad_tiles = {int(m.group(1)) for i in issues if i.type in ("number_mismatch", "wrong_ref") if (m := re.match(r"^head_tiles\[(\d+)\]$", i.loc))}
+    bad_tiles |= {int(m.group(1)) for loc in check_locs if (m := re.match(r"^head_tiles\[(\d+)\]$", loc))}  # 007-A1-4/A2-6: 검수자가 지적한 머리 타일도 뺌(⚠ 없이 발행 방지)
     secs = list(final.sections)
     for idx in bad_secs:
         loc = f"sections[{idx}]"
@@ -337,7 +338,7 @@ def _finalize_page(res: TopicResult, final: TopicPage, pack: dict[str, list[Evid
     for loc in check_locs:
         m = re.match(r"^sections\[(\d+)\]$", loc)
         if not m:
-            remapped.add(loc)
+            remapped.add("summary" if loc == "sections" else loc)  # 007-A1-4/A2-6: 페이지 상한(bare "sections") 이슈는 summary ⚠로
         elif (new_i := remap.get(int(m.group(1)))) is not None:
             remapped.add(f"sections[{new_i}]")
     return final, remapped | scrubbed_locs

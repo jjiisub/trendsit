@@ -20,7 +20,7 @@ from .evidence import EvidenceItem
 HL = re.compile(r"==(.+?)==")
 DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 REF = re.compile(r"(?:it|og|vd|rp|sl):[\w./#@:-]+")
-_SENT = re.compile(r"(?<=[.!?])\s+")  # 006-A3-2: "보다 "·"위한다 " 같은 문장 중간 "다"에서 쪼개지 않음(fulltext.sentences와 맞춤)
+_SENT = re.compile(r"(?<!\b[A-Za-z]\.)(?<!\b[A-Za-z]{2}\.)(?<!\b[A-Za-z]{3}\.)(?<=[.!?])\s+")  # 006-A3-2: "보다 "·"위한다 "에서 안 쪼개짐(fulltext.sentences와 맞춤). 007-A2-3: 1~3자 라틴 약어(vs.·U.S.·Inc. 등) 뒤에서도 안 쪼갬
 UNIT_WORDS = ("%", "퍼센트", "포인트", "밀리초", "초", "달러", "원", "배", "분기", "시간", "개월", "분", "개", "명", "회", "건")
 _ASCII_UNIT = re.compile(r"(?<![\d.,A-Za-z])(\d+(?:\.\d+)?)(ms|[KMBT])(?![A-Za-z])")
 _CURRENCY = re.compile(r"[$₩€£]\s?(\d+(?:\.\d+)?)")
@@ -129,7 +129,7 @@ def _set(page: TopicPage, loc: str, text: str) -> TopicPage:
 
 
 def _fix_sections(page: TopicPage, hi: int, slide_candidates: list[str], timeline_secs: set[int],
-                  fixes: list[dict[str, Any]]) -> TopicPage:
+                  fixes: list[dict[str, Any]], after_revise: bool = False) -> TopicPage:
     """sections 개수 초과면 중요도 순 뒤에서 자른다(그 절의 시각 요소도 함께). C-4: section.slide가
     slide_candidates 밖이면 null로, video_secs가 타임라인에 없으면 그 값만 제거. v1.2 5.3: revise 적용 뒤
     절의 visual 종류 칸(bars·table·events null, tiles [])이 비면 visual=none으로 맞춤(반려 아님)."""
@@ -149,7 +149,7 @@ def _fix_sections(page: TopicPage, hi: int, slide_candidates: list[str], timelin
             fixes.append({"loc": f"sections[{i}].video_secs", "rule": "타임라인 밖 sec 제거", "before": s.video_secs, "after": kept})
             upd["video_secs"] = kept
         empty = {"bars": s.bars is None, "table": s.table is None, "events": s.events is None, "tiles": not s.tiles}
-        if s.visual != "none" and empty.get(s.visual, False):
+        if after_revise and s.visual != "none" and empty.get(s.visual, False):
             fixes.append({"loc": f"sections[{i}]", "rule": "visual 종류 칸이 비어 none으로 맞춤", "before": s.visual, "after": "none"})
             upd["visual"] = "none"
         if upd:
@@ -197,10 +197,10 @@ def _cap_highlights(page: TopicPage, hl: Any, fixes: list[dict[str, Any]]) -> To
 
 
 def autofix(page: TopicPage, cfg: BriefConfig, canon: dict[str, str], slide_candidates: list[str],
-           timeline_secs: set[int], sections_hi: int,
-           translit: list[tuple[re.Pattern[str], str]] | None = None) -> tuple[TopicPage, list[dict[str, Any]]]:
+           timeline_secs: set[int], sections_hi: int, translit: list[tuple[re.Pattern[str], str]] | None = None,
+           after_revise: bool = False) -> tuple[TopicPage, list[dict[str, Any]]]:
     fixes: list[dict[str, Any]] = []
-    page = _fix_sections(page, sections_hi, slide_candidates, timeline_secs, fixes)
+    page = _fix_sections(page, sections_hi, slide_candidates, timeline_secs, fixes, after_revise)
     page = _canonical_names_and_spacing(page, canon, translit or [], fixes)
     return _cap_highlights(page, cfg.write.highlights, fixes), fixes
 
@@ -329,8 +329,8 @@ def _check_visual_structure(page: TopicPage, cfg: BriefConfig) -> list[Issue]:
                   (loc, "tiles", s.visual == "tiles" and len(s.tiles), w.tiles_per_section),  # v1.2 5.3: tiles 전체는 문법 안 이름이 아니라 절 단위 loc
                   (f"{loc}.events", "events items", s.events and len(s.events.items), (2, 6))]
         issues += [iss for rloc, label, n, rng in ranged if n and (iss := _range_issue(rloc, label, n, rng))]
-        if s.bars is not None and not s.bars.unit.strip("() \t"):
-            issues.append(_issue(f"{loc}.bars", "format", "bars 단위가 비어 있음", "근거의 단위 그대로"))
+        if s.bars is not None and (not s.bars.unit.strip("() \t") or len({re.sub(r"^[-+]?[$₩€£]?[\d,.]+", "", it.value).strip() for it in s.bars.items}) > 1):
+            issues.append(_issue(f"{loc}.bars", "format", "bars 단위가 비어 있거나 항목끼리 단위가 섞임", "같은 단위로, 근거 표기 그대로"))
         if s.table is not None and (bad_rows := [k for k, row in enumerate(s.table.rows) if len(row) != len(s.table.columns)]):
             issues.append(_issue(f"{loc}.table", "format", f"table rows {bad_rows}의 길이가 columns와 다름", ""))
         for k, it in enumerate(s.events.items if s.events else []):
@@ -444,7 +444,7 @@ def warnings(page: TopicPage, pack: dict[str, list[EvidenceItem]], cfg: BriefCon
 
 def run_checks(page: TopicPage, pack: dict[str, list[EvidenceItem]], n_sources: int, cfg: BriefConfig,
                canon: dict[str, str], slide_candidates: list[str], timeline_secs: set[int],
-               translit: list[tuple[re.Pattern[str], str]] | None = None) -> CheckResult:
+               translit: list[tuple[re.Pattern[str], str]] | None = None, after_revise: bool = False) -> CheckResult:
     sections_hi = cfg.write.sections_for(n_sources)[1]
-    fixed, fixes = autofix(page, cfg, canon, slide_candidates, timeline_secs, sections_hi, translit)
+    fixed, fixes = autofix(page, cfg, canon, slide_candidates, timeline_secs, sections_hi, translit, after_revise)
     return CheckResult(fixed, fixes, check(fixed, pack, n_sources, cfg), warnings(fixed, pack, cfg))

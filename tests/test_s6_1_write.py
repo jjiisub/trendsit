@@ -165,6 +165,22 @@ def test_check_rejects_visual_bars_without_bars_field():
     assert any(i.type == "format" and "visual" in i.comment for i in issues)
 
 
+def test_run_checks_rejects_initial_draft_with_empty_visual_instead_of_autofixing():
+    """007-A1-3/A2-1: 5.3 "revise 적용 뒤"만 visual=none 자동 수정 대상. 초안(after_revise=False, 라운드 1)은
+    5.3 이상 예시대로 반려돼야 한다(조용히 none으로 넘어가면 안 됨)."""
+    p = page(sections=three_sections(visual="bars", bars=None))
+    cr = checks.run_checks(p, pack(), 1, CFG, {}, [], set())
+    assert any(i.type == "format" and "visual" in i.comment for i in cr.issues)
+    assert cr.page.sections[0].visual == "bars"  # autofix로 none이 되지 않음
+
+
+def test_run_checks_autofixes_empty_visual_after_revise():
+    p = page(sections=three_sections(visual="bars", bars=None))
+    cr = checks.run_checks(p, pack(), 1, CFG, {}, [], set(), after_revise=True)
+    assert cr.page.sections[0].visual == "none"
+    assert cr.issues == []
+
+
 def test_check_accepts_valid_bars_group():
     bars_pack = pack(**{"it:1#s2": [EvidenceItem("it:1#s2", "it:1", "text", "sentence", "A는 10%, B는 20%.", {"site": "x"})]})
     p = page(sections=three_sections(visual="bars", paragraphs=[para(refs=["it:1#s2"])],
@@ -286,6 +302,29 @@ def test_apply_revision_slide_caption_and_table_rows_delete():
     ], log="l")
     new, reverts, notes = revision.apply_revision(prev, rev, {"sections[0]"})
     assert new.sections[0].slide_caption == "새 캡션" and len(new.sections[0].table.rows) == 2 and reverts == 0, notes
+
+
+def test_apply_revision_discards_only_the_change_that_breaks_schema():
+    """007-A1-5: 한 절뿐인 단락을 delete하면(min_length=1 위반) 그 변경만 되돌리고, 같은 revision의 다른
+    절·칸 수정은 그대로 적용된다(전체 revision을 버리던 버그 수정)."""
+    prev = page(sections=[section(heading="원래", paragraphs=[para(text="하나뿐")]), section(heading="둘째")])
+    rev = TopicPageRevision(changed=[
+        Change(issue_idx=0, loc="sections[0].paragraphs[0]", action="delete", value=None),
+        Change(issue_idx=0, loc="sections[1].heading", action="edit", value="고침"),
+    ], log="l")
+    new, reverts, notes = revision.apply_revision(prev, rev, {"sections[0]", "sections[1]"})
+    assert len(new.sections[0].paragraphs) == 1  # 단락 delete는 스키마를 깨 되돌려짐
+    assert new.sections[1].heading == "고침"  # 다른 절 수정은 살아남음
+    assert reverts == 0 and any("스키마가 깨져" in n for n in notes)
+
+
+def test_apply_revision_section_add_inserts_at_index_not_appended():
+    """007-A1-6/A2-27: sections[1] add는 절 순서를 지키려고 그 위치에 끼워 넣는다(맨 뒤에 붙이면 안 됨)."""
+    prev = page(sections=three_sections())  # 0,1,2
+    rev = TopicPageRevision(changed=[
+        Change(issue_idx=0, loc="sections[1]", action="add", value=section(heading="끼워 넣을 절"))], log="l")
+    new, reverts, notes = revision.apply_revision(prev, rev, {"sections[1]"})
+    assert len(new.sections) == 4 and new.sections[1].heading == "끼워 넣을 절" and reverts == 0, notes
 
 
 # ---------- A7: 슬라이드 ----------
@@ -442,6 +481,16 @@ def test_finalize_page_remaps_check_locs_when_section_drops():
     assert remapped == {"sections[0]", "summary"}  # 빠진 절 표시는 버려지고, 남은 절 표시는 새 번호로
 
 
+def test_finalize_page_maps_page_wide_sections_check_to_summary():
+    """007-A1-4/A2-6: 페이지 상한(visuals_max·slides_max 등) 이슈는 loc이 "sections"(절 번호 없음)로 남는데,
+    어느 절에도 안 붙고 summary·title도 아니면 화면에 ⚠가 전혀 안 뜬다. summary로 올려 표시되게 한다."""
+    from trendsit.brief.write import _finalize_page
+
+    p = page(sections=[section(), section(heading="둘째")])
+    final, remapped = _finalize_page(_result_stub(), p, pack(), CFG, {}, {"sections"}, [], [], set())
+    assert remapped == {"summary"}
+
+
 def _result_stub():
     from trendsit.brief.write import TopicResult
 
@@ -565,6 +614,16 @@ def test_drop_code_bad_sections_removes_mismatched_head_tile():
     out, _bad_secs = _drop_code_bad_sections(res, p, pack(), CFG, {}, set())
     assert out.head_tiles == []
     assert any("타일" in a for a in res.attention)
+
+
+def test_drop_code_bad_sections_removes_head_tile_left_checked_by_critic():
+    """007-A1-4/A2-6: 검수자가 head_tiles[0]을 지적해 check_locs에 남으면(코드 재검사로는 안 잡히는 unsupported·overuse
+    류), ⚠ 표시 없이 발행되지 않도록 그 타일을 뺀다."""
+    from trendsit.brief.write import _drop_code_bad_sections
+
+    p = page(head_tiles=[Tile(value="1점", label="의미 없는 수치", refs=["it:1#s1"])])
+    out, _bad_secs = _drop_code_bad_sections(_result_stub(), p, pack(), CFG, {}, {"head_tiles[0]"})
+    assert out.head_tiles == []
 
 
 def test_initial_page_keeps_success_when_total_calls_reach_c5_cap(tmp_path):
