@@ -138,6 +138,11 @@ class BriefingPlan(RoleOutput):
 VisualType = Literal["none", "bars", "table", "tiles", "events"]
 
 
+def _num_text(v: float) -> str:
+    """부동소수점 값을 원래 자릿수로(007-A2-2): f'{v:g}'의 유효숫자 6자리 잘림·지수 표기(1.62e+06)를 피한다."""
+    return str(int(v)) if v == int(v) else f"{v:.10f}".rstrip("0")
+
+
 class Tile(_Strict):
     value: str
     label: str
@@ -159,9 +164,7 @@ class NumberItem(_Strict):
     @field_validator("value", mode="after")
     @classmethod
     def _as_text(cls, v: str | float) -> str:
-        if isinstance(v, float):
-            return f"{v:g}" if abs(v) < 1e15 else str(v)
-        return v
+        return _num_text(v) if isinstance(v, float) else v
     ref: str
     baseline: bool = Field(default=False, description="전후 비교의 이전 값")
     emphasis: bool = False
@@ -185,7 +188,7 @@ class Table(_Strict):
     @field_validator("rows", mode="after")
     @classmethod
     def _rows_as_text(cls, v: list[list[str | float]]) -> list[list[str]]:
-        return [[f"{c:g}" if isinstance(c, float) else c for c in row] for row in v]
+        return [[_num_text(c) if isinstance(c, float) else c for c in row] for row in v]
 
 
 class EventItem(_Strict):
