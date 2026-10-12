@@ -4,6 +4,16 @@
    "autofix": [],
    "issues": [
     {
+     "comment": "sections[2].table.rows[3] 값 '43점'가 it:1180#s15, it:1180#s17, it:1180#s18, it:1180#s20에 없음",
+     "loc": "sections[2].table.rows[3]",
+     "type": "number_mismatch"
+    },
+    {
+     "comment": "sections[2].table.rows[3] 값 '38점'가 it:1180#s15, it:1180#s17, it:1180#s18, it:1180#s20에 없음",
+     "loc": "sections[2].table.rows[3]",
+     "type": "number_mismatch"
+    },
+    {
      "comment": "sections[3].paragraphs[1] 금지 표현: 뛰어난",
      "loc": "sections[3].paragraphs[1]",
      "type": "format"

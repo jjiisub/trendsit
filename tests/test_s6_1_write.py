@@ -150,6 +150,15 @@ def test_check_accepts_matching_currency_ms_and_k_suffix():
     assert [i for i in checks.check(p, unit_pack, 1, CFG) if i.type == "number_mismatch"] == []
 
 
+def test_check_accepts_korean_compound_magnitude_number_as_false_positive():
+    """006-C1-2 회귀: "16만2000개"의 "2000"은 "16만"과 합쳐진 값(162000)이지 독립된 수가 아니다. 단락·근거가
+    같은 표기를 그대로 쓰면 반려되지 않아야 한다(실데이터 w41-claude-haiku-5-5 사례로 재현)."""
+    unit_pack = pack(**{"it:1#s2": [EvidenceItem("it:1#s2", "it:1", "text", "sentence",
+                                                 "작업당 약 16만2000개의 출력 토큰을 소모했다.", {"site": "x"})]})
+    p = page(sections=three_sections(paragraphs=[para(text="작업당 약 16만2000개의 토큰을 썼다.", refs=["it:1#s2"])]))
+    assert [i for i in checks.check(p, unit_pack, 1, CFG) if i.type == "number_mismatch"] == []
+
+
 def test_check_rejects_visual_bars_without_bars_field():
     p = page(sections=three_sections(visual="bars", bars=None))
     issues = checks.check(p, pack(), 1, CFG)

@@ -32,8 +32,9 @@ def is_unit(text: str) -> bool:
 
 
 def _unit_figures(body: str) -> list[str]:
-    """①: 단위 붙은 수 — 한국어 단위어(개·초·달러 등) + ms·K·M·B·T 접미사 + $·₩·€·£ 접두 통화(006-C1-2)."""
-    out = [m.group(1) for m in _KO_UNIT.finditer(body) if is_unit(m.group(2))]
+    """①: 단위 붙은 수 — 한국어 단위어(개·초·달러 등) + ms·K·M·B·T 접미사 + $·₩·€·£ 접두 통화(006-C1-2). "16만2000개"의
+    "2000"처럼 한국어 큰 단위 뒤에 바로 이어지는 수는 그 앞 수와 합쳐진 값이라 빼지 않는다(figures()의 before.isalpha()와 같은 이유, 만·억·천·조도 한글)."""
+    out = [m.group(1) for m in _KO_UNIT.finditer(body) if is_unit(m.group(2)) and not body[m.start() - 1:m.start()].isalpha()]
     out += [m.group(1) + m.group(2) for m in _ASCII_UNIT.finditer(body)]
     out += [m.group(1) for m in _CURRENCY.finditer(body)]
     return out
