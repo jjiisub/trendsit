@@ -313,17 +313,31 @@ def test_scrub_pack_refs_clears_invalid_slide_and_keeps_section():
     from trendsit.brief.write import _scrub_pack_refs
 
     p = page(sections=[section(visual="none", slide="sl:1@999", slide_caption="캡션")])
-    final, touched = _scrub_pack_refs(_result_stub(), p, pack())
+    final, touched, remap = _scrub_pack_refs(_result_stub(), p, pack())
     assert final.sections[0].slide is None and final.sections[0].slide_caption == ""
-    assert touched == {"sections[0]"}
+    assert touched == {"sections[0]"} and remap == {0: 0}
 
 
 def test_scrub_pack_refs_drops_tile_refs_outside_pack():
     from trendsit.brief.write import _scrub_pack_refs
 
     p = page(head_tiles=[Tile(value="1", label="l", refs=["it:1#s1", "it:99#s1"])])
-    final, _touched = _scrub_pack_refs(_result_stub(), p, pack())
+    final, _touched, _remap = _scrub_pack_refs(_result_stub(), p, pack())
     assert final.head_tiles == []
+
+
+def test_scrub_pack_refs_drop_shifts_later_section_numbers():
+    """006-A3-10: 첫 절이 빠지면 둘째 절은 새 번호 0으로 당겨지고, check_locs도 새 번호로 맞춰진다."""
+    from trendsit.brief.write import _remap_section_locs, _scrub_pack_refs
+
+    empty = section(paragraphs=[para(refs=["it:99#s1"])])  # pack 밖 refs뿐 → 절째 빠짐
+    kept = section(heading="둘째", paragraphs=[para()])
+    p = page(sections=[empty, kept])
+    final, touched, remap = _scrub_pack_refs(_result_stub(), p, pack())
+    assert len(final.sections) == 1 and final.sections[0].heading == "둘째"
+    assert remap == {1: 0} and touched == set()  # 둘째 절은 안 건드렸으니 touched는 아니고 번호만 당겨짐
+    old_check_locs = {"sections[0]", "sections[1]", "summary"}  # 1라운드 때 빠진 절·남은 절에 붙은 ⚠
+    assert _remap_section_locs(old_check_locs, remap) == {"sections[0]", "summary"}  # 빠진 절 표시는 버려짐
 
 
 def _result_stub():

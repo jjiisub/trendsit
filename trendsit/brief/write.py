@@ -293,9 +293,23 @@ def _drop_code_bad_sections(res: TopicResult, final: TopicPage, pack: dict[str, 
     return final.model_copy(update={"sections": secs, "head_tiles": tiles})
 
 
-def _scrub_pack_refs(res: TopicResult, final: TopicPage, pack: dict[str, list[EvidenceItem]]) -> tuple[TopicPage, set[str]]:
-    """저장 직전 안전망(C-1): 남은 pack 밖 refs를 지운다(가짜 출처보다 빈 칸이 낫다). 빈 refs가 되는 단락은 단락째 빼고(절이 통째로 비면 절째), 표·타일·막대도 비면 시각 요소째 뺀다(export C-2의 refs=[] 전체 중단 방지, 006-A2-3)."""
-    secs, touched, dropped = [], set(), 0
+def _remap_section_locs(locs: set[str], remap: dict[int, int]) -> set[str]:
+    """006-A3-10: 절이 통째로 빠지면 뒤 절의 번호가 당겨진다. sections[old] 꼴 위치를 새 번호로 옮기고,
+    빠진 절을 가리키던 위치는 버린다(그 절 자체가 더는 없음)."""
+    out = set()
+    for loc in locs:
+        m = re.match(r"^sections\[(\d+)\]$", loc)
+        if not m:
+            out.add(loc)
+        elif (new_i := remap.get(int(m.group(1)))) is not None:
+            out.add(f"sections[{new_i}]")
+    return out
+
+
+def _scrub_pack_refs(res: TopicResult, final: TopicPage, pack: dict[str, list[EvidenceItem]]
+                     ) -> tuple[TopicPage, set[str], dict[int, int]]:
+    """저장 직전 안전망(C-1): 남은 pack 밖 refs를 지운다(가짜 출처보다 빈 칸이 낫다). 빈 refs가 되는 단락은 단락째 빼고(절이 통째로 비면 절째), 표·타일·막대도 비면 시각 요소째 뺀다(export C-2의 refs=[] 전체 중단 방지, 006-A2-3). 절을 빼면 뒤 절 번호가 당겨지므로 old→new 번호 대응표도 함께 돌려준다(006-A3-10)."""
+    secs, touched, dropped, remap = [], set(), 0, {}
     for i, s in enumerate(final.sections):
         upd: dict[str, Any] = {}
         paras = [p.model_copy(update={"refs": kept}) if (kept := [r for r in p.refs if r in pack]) != p.refs else p
@@ -323,16 +337,17 @@ def _scrub_pack_refs(res: TopicResult, final: TopicPage, pack: dict[str, list[Ev
                 upd["visual"], upd["events"] = ("none", None) if len(items) < 2 else (s.visual, s.events.model_copy(update={"items": items}))
         if s.slide and s.slide not in pack:
             upd["slide"], upd["slide_caption"] = None, ""
+        remap[i] = len(secs)
         if upd:
             s = s.model_copy(update=upd)
-            touched.add(f"sections[{i}]")
+            touched.add(f"sections[{remap[i]}]")
         secs.append(s)
     tiles = [t for t in final.head_tiles if all(r in pack for r in t.refs)]
     if touched or dropped or len(tiles) != len(final.head_tiles):
         msg = "pack 밖 근거 id를 최종판에서 지움(C-1)"
         res.attention.append(f"{msg}, 근거 없는 절 {dropped}개 뺌" if dropped else msg)
-        return final.model_copy(update={"sections": secs, "head_tiles": tiles}), touched
-    return final, touched
+        return final.model_copy(update={"sections": secs, "head_tiles": tiles}), touched, remap
+    return final, touched, remap
 
 
 def _finalize_page(res: TopicResult, final: TopicPage, pack: dict[str, list[EvidenceItem]], cfg: BriefConfig,
@@ -342,8 +357,8 @@ def _finalize_page(res: TopicResult, final: TopicPage, pack: dict[str, list[Evid
     final = _drop_code_bad_sections(res, final, pack, cfg, last_issue, check_locs)
     final = slides.place_unassigned(final, slide_candidates, timeline_secs, cfg.write.slides_max)
     final = slides.render_frames(final, {m.key: m for m in ms}, res.attention)
-    final, scrubbed_locs = _scrub_pack_refs(res, final, pack)
-    return final, check_locs | scrubbed_locs
+    final, scrubbed_locs, remap = _scrub_pack_refs(res, final, pack)
+    return final, _remap_section_locs(check_locs, remap) | scrubbed_locs
 
 
 def _initial_page(ctx: Ctx, winp: WriterInput, res: TopicResult, draft: TopicPage | None) -> tuple[TopicPage | None, str | None, int | None, WriterInput]:
