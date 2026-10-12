@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # S6-1 7장 런 뒤 ①~⑤를 한 번에(D-46). 실DB에 쓴다(backup·weekly·publish): 사용자 승인 뒤에만 돌린다.
 # 한 단계라도 실패하면(명령 실패 또는 비용 상한 초과) 거기서 멈추고 종료 코드 1. 사용: bash scripts/s6_1_regen.sh
-set -eu
+set -Eeu  # -E: 함수 안 실패에도 ERR trap이 걸림(007-A2-17, check_cost·week_state 포함)
 cd "$(dirname "$0")/.."
 
 DB="data/trendsit.db"
@@ -31,22 +31,22 @@ check_cost() {  # 합 ≤ 1.50(2장), 넘으면 멈춤
   cap=$(echo "$line" | grep -oE '상한 \$[0-9.]+' | grep -oE '[0-9.]+')
   if awk -v s="$spent" -v c="$cap" 'BEGIN{exit !(s>c)}'; then
     echo "비용 상한 초과: \$$spent / \$$cap, 멈춤" >&2
-    exit 1
+    return 1  # 007-A2-17: exit는 ERR trap을 안 거치므로 return으로(set -Ee가 전파)
   fi
 }
 
-# 006-C1-3: weekly --force는 시작하자마자 그 주를 published → done으로 푼다. 토픽 하나만 failed여도
-# run은 partial이라 weeks.status가 'written'에 머물고, publish는 'done'·'published'만 받는다(거부 2).
+# weekly --force는 시작하자마자 그 주를 published → done으로 푼다. v1.2부터 토픽 일부만 failed(partial)여도
+# weeks.status는 done이라 publish를 받지만, 토픽 전부 failed거나 예산 중단이면 done이 안 돼 거부(2)된다.
 # 그러면 두 주가 미발행으로 남으므로 여기서 멈추고 되돌릴 방법을 안내한다(이전 current_run_id로 복구).
 check_week_publishable() {  # ③ 각 weekly 뒤: week prev_state("status|current_run_id")
   local week="$1" prev="$2" now status
   now=$(week_state "$week")
   status="${now%%|*}"
   if [ "$status" != "done" ] && [ "$status" != "published" ]; then
-    echo "주 ${week}이 발행 가능 상태가 아님: $status(= 토픽 실패로 partial, publish 거부됨)" >&2
+    echo "주 ${week}이 발행 가능 상태가 아님: $status(= 토픽 전부 실패 또는 예산 중단, publish 거부됨)" >&2
     echo "복구: data/backup/의 pre-s6-1 백업(②)으로 되돌리거나, 아래로 이전 판을 되돌린 뒤 publish를 다시 시도할 것:" >&2
     echo "  sqlite3 $DB \"UPDATE weeks SET status='${prev%%|*}', current_run_id='${prev##*|}' WHERE week='$week'\"" >&2
-    exit 1
+    return 1  # 007-A2-17: exit는 ERR trap을 안 거치므로 return으로(set -Ee가 전파)
   fi
 }
 
