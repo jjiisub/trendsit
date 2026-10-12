@@ -108,6 +108,15 @@ def test_check_rejects_wrong_ref():
     assert any(i.type == "wrong_ref" for i in issues)
 
 
+def test_check_rejects_summary_only_id_as_ref():
+    """006-C1-11: pack에 있어도 kind가 summary·context뿐인 id(예: Document id와 겹치는 카드 요약)는 refs로
+    쓸 수 없다 — 줄 머리에 안 붙어 작성자에게 참고용으로만 보이고 검수자 원문 대조에서도 빠진다."""
+    summary_pack = pack(**{"it:1": [EvidenceItem("it:1", "it:1", "text", "summary", "카드 요약이다.", {"site": "x"})]})
+    p = page(sections=[section(paragraphs=[para(refs=["it:1"])])])
+    issues = checks.check(p, summary_pack, 1, CFG)
+    assert any(i.type == "wrong_ref" and "요약" in i.comment for i in issues)
+
+
 def test_check_rejects_number_mismatch():
     p = page(sections=three_sections(paragraphs=[para(text="비율은 90%다.")]))
     issues = checks.check(p, pack(), 1, CFG)

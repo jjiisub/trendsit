@@ -243,6 +243,15 @@ def test_evidence_docs_skips_summary_and_claim_kinds():
     assert evidence_docs(p) == []
 
 
+def test_evidence_docs_video_document_id_uses_item_id_not_video_id():
+    """006-C1-11: 5.2 영상 Document id는 vd:{item_id}. member 키는 vd:{video_id}(묶음 구분용)라 서로 다르다."""
+    src = {"site": "YouTube", "title": "t"}
+    p = {"vd:905#ctx": [EvidenceItem("vd:905#ctx", "vd:S-bRN-avZ4Q", "video", "context", "요약+타임라인.", src)],
+         "vd:905@120": [EvidenceItem("vd:905@120", "vd:S-bRN-avZ4Q", "video", "transcript", "120초 전사.", src)]}
+    docs = evidence_docs(p)
+    assert len(docs) == 1 and docs[0].id == "vd:905"  # video_id(S-bRN-avZ4Q)가 아니라 item_id(905)
+
+
 # ---------- 006-A3-1: write.py가 checks.run_checks를 키워드 인자로 불러야 함(영상·음차 토픽이 끝까지 돌아야 함) ----------
 def _sec_v2(heading: str, text: str, refs: list[str], video_secs: list[int] | None = None) -> dict:
     return {"heading": heading, "paragraphs": [{"text": text, "refs": refs}], "visual": "none", "bars": None,

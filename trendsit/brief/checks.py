@@ -1,10 +1,7 @@
 """작성자 출력의 코드 검사(S6-1 5.5, LLM 0원). 검수자 앞에서 돈다.
-
-1. 고칠 수 있는 형식은 직접 고친다(반려 아님): 형광 초과·공백·문장부호·별칭 표기 → 정본, slide가 후보 밖이면
-   null, video_secs가 타임라인에 없으면 제거, sections 수 초과면 뒤에서 자름
+1. 고칠 수 있는 형식은 직접 고친다(반려 아님): 형광 초과·공백·문장부호·별칭 표기 → 정본, slide가 후보 밖이면 null, video_secs가 타임라인에 없으면 제거, sections 수 초과면 뒤에서 자름
 2. 반려(라운드에 셈): 필수 칸·분량, refs 실재, 수치 대조, 시각 요소 칸 규칙, 문체(평가어·해요체)
-3. 경고(검수자 입력): 시각 요소 남발·누락 의심, 같은 단락 중복. 반려 메시지는 위치·근거·힌트를 구체적으로
-"""
+3. 경고(검수자 입력): 시각 요소 남발·누락 의심, 같은 단락 중복. 반려 메시지는 위치·근거·힌트를 구체적으로"""
 
 from __future__ import annotations
 
@@ -297,11 +294,15 @@ def _check_counts(page: TopicPage, cfg: BriefConfig, n_sources: int) -> list[Iss
 
 
 def _check_refs(page: TopicPage, pack: dict[str, list[EvidenceItem]]) -> list[Issue]:
-    issues = []
+    """refs는 pack 안에 있어야 하고(C-1), summary·context뿐인 id는 줄 머리에 안 붙어 참고용일 뿐이고 검수자
+    원문 대조에서도 빠지므로 쓸 수 없다(006-C1-11, Document id와 겹쳐 혼동 가능)."""
+    out = []
     for slot in page_refs(page):
-        issues += [_issue(slot.loc, "wrong_ref", f"{slot.loc}의 근거 id {r}가 이 토픽 근거 목록에 없음", "근거 목록의 id만", evidence_id=r)
-                   for r in slot.refs if r not in pack]
-    return issues
+        for r in slot.refs:
+            bad = "이 토픽 근거 목록에 없음" if r not in pack else "" if any(it.kind not in ("summary", "context") for it in pack[r]) else "카드 요약·맥락일 뿐 원문이 아님(대조 불가)"
+            if bad:
+                out.append(_issue(slot.loc, "wrong_ref", f"{slot.loc}의 근거 id {r}가 {bad}", "근거 목록의 원문 문장·판독·사실 id만(#s·@·#f)", evidence_id=r))
+    return out
 
 
 def _range_issue(loc: str, label: str, n: int, rng: tuple[int, int]) -> Issue | None:

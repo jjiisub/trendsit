@@ -250,7 +250,10 @@ def evidence_docs(pack: dict[str, list[EvidenceItem]]) -> list[Document]:
         if not lines:
             continue
         src = items[0].source
-        docs.append(Document(id=member, source=src.get("site") or items[0].channel, title=src.get("title"),
+        # 5.2: 영상 Document id는 vd:{item_id}(member 키는 vd:{video_id}). 첫 항목은 늘 video_members()가 붙인
+        # vd:{item_id}#ctx(context)라 거기서 떼어 쓴다(006-C1-11)
+        doc_id = items[0].id.split("#", 1)[0] if items[0].channel == "video" else member
+        docs.append(Document(id=doc_id, source=src.get("site") or items[0].channel, title=src.get("title"),
                              url=src.get("url"), text="\n".join(lines)))
     return docs
 
