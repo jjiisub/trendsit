@@ -415,33 +415,39 @@
       "columns": [
        "벤치마크",
        "Haiku 5.5",
-       "GPT-6 루나"
+       "GPT-6 루나",
+       "격차"
       ],
       "rows": [
        [
         "GDPval-AA v2.1",
         "1620점",
-        "1437점"
+        "1437점",
+        "+183점"
        ],
        [
         "AA-브리프케이스 v1.1",
         "1578점",
-        "1336점"
+        "1336점",
+        "+242점"
        ],
        [
         "OS월드 2.1",
         "72.4%",
-        "48.9%"
+        "48.9%",
+        "+23.5%p"
        ],
        [
         "터미널벤치 4.0",
         "39.2%",
-        "16.4%"
+        "16.4%",
+        "+22.8%p"
        ],
        [
         "AAII",
         "43점",
-        "38점"
+        "38점",
+        "+5점"
        ]
       ],
       "refs": [
@@ -1248,8 +1254,98 @@
    "2026-w40",
    "2026-w41"
   ],
-  "items": []
+  "items": [
+   {
+    "id": "agent",
+    "name": "AI 에이전트",
+    "aliases": [
+     "agent",
+     "에이전트"
+    ],
+    "mentions": [
+     3,
+     5
+    ],
+    "topics": [
+     "w40-llamaindex-context-layer",
+     "w41-claude-haiku-5-5",
+     "w41-mistral-large-4",
+     "w41-embedding-gemma-2",
+     "w41-openrig-multi-agent",
+     "w41-agent-slop-state-machine"
+    ]
+   }
+  ]
  },
- "runs": [],
- "run_weeks": []
+ "runs": [
+  {
+   "id": "r41",
+   "kind": "weekly",
+   "week": "2026-w41",
+   "at": "2026-10-12T07:00:00+09:00",
+   "duration_min": 14.0,
+   "status": "ok",
+   "cost_usd": 0.0612,
+   "summary": "토픽 5개 발행, 검수 반려 1회, 확인 필요 1문장",
+   "fallback_select": true,
+   "counts": {
+    "candidates": 9,
+    "related": {
+     "follow_up": 1,
+     "new": 4,
+     "duplicate": 0
+    },
+    "selected": 5,
+    "evidence_ids": 62,
+    "review": {
+     "passed_first": 4,
+     "rejected": 1,
+     "needs_check": 1
+    },
+    "published": 5,
+    "written": 5
+   },
+   "steps": [
+    {
+     "role": "plan",
+     "text": "후보 9개 중 5개 선정",
+     "t": "07:02",
+     "attention": false,
+     "fallback": true
+    },
+    {
+     "role": "writer",
+     "text": "절 5개, 근거 id 12개",
+     "t": "07:05",
+     "attention": false
+    },
+    {
+     "role": "critic",
+     "text": "1차 반려: 수치가 근거와 단위가 달라 수정 요청",
+     "t": "07:09",
+     "attention": true
+    },
+    {
+     "role": "weekly",
+     "text": "토픽 5개 발행",
+     "t": "07:14",
+     "attention": false
+    }
+   ]
+  }
+ ],
+ "run_weeks": [
+  {
+   "week": "2026-w41",
+   "label": "10월 2주차",
+   "range": "10.5 ~ 10.11",
+   "nightly": 0,
+   "nightly_failed": 0,
+   "collected": 54,
+   "candidates": 9,
+   "published": 5,
+   "rejected": 1,
+   "needs_check": 1
+  }
+ ]
 }
