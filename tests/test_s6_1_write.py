@@ -327,6 +327,30 @@ def test_apply_revision_section_add_inserts_at_index_not_appended():
     assert len(new.sections) == 4 and new.sections[1].heading == "끼워 넣을 절" and reverts == 0, notes
 
 
+def test_apply_revision_add_does_not_shift_a_later_delete():
+    """007-C1-1: add sections[0]과 delete sections[2]가 같은 revision에 섞이면, delete는 원래 번호(C)를
+    지워야 한다 — add가 먼저 insert돼 번호가 밀려 B가 지워지면 안 된다."""
+    prev = page(sections=[section(heading="A"), section(heading="B"), section(heading="C")])
+    rev = TopicPageRevision(changed=[
+        Change(issue_idx=0, loc="sections[0]", action="add", value=section(heading="NEW")),
+        Change(issue_idx=0, loc="sections[2]", action="delete", value=None),
+    ], log="l")
+    new, reverts, notes = revision.apply_revision(prev, rev, {"sections[2]"})
+    assert [s.heading for s in new.sections] == ["NEW", "A", "B"] and reverts == 0, notes
+
+
+def test_apply_revision_add_does_not_shift_a_later_sub_edit():
+    """007-C1-1: add sections[0]과 sections[1].heading edit가 같은 revision에 섞이면, edit는 원래
+    번호(B)에 적용돼야 한다 — add가 먼저 insert돼 밀리면 지적 안 된 A가 바뀌면 안 된다."""
+    prev = page(sections=[section(heading="A"), section(heading="B"), section(heading="C")])
+    rev = TopicPageRevision(changed=[
+        Change(issue_idx=0, loc="sections[0]", action="add", value=section(heading="NEW")),
+        Change(issue_idx=0, loc="sections[1].heading", action="edit", value="B2"),
+    ], log="l")
+    new, reverts, notes = revision.apply_revision(prev, rev, {"sections[1]"})
+    assert [s.heading for s in new.sections] == ["NEW", "A", "B2", "C"] and reverts == 0, notes
+
+
 # ---------- A7: 슬라이드 ----------
 def test_slide_candidates_short_lines_with_numbers():
     slide = {"sec": 100, "frame_kind": "slide", "title": "t", "ocr_text": "\n".join(f"line{i}" for i in range(20)),

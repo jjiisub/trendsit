@@ -158,7 +158,7 @@ def _apply_sub_change(data: dict, i: int, field_: str, idx: int | None, action: 
 def apply_revision(prev: TopicPage, rev: TopicPageRevision, allowed: set[str]) -> tuple[TopicPage, int, list[str]]:
     """지적된 위치(최상위 칸 기준)만 합친다. 그 밖의 변경은 되돌림(세어 반환). 삭제는 뒤 번호부터."""
     data = prev.model_dump()
-    reverts, notes, deletes, sections_delete_n = 0, [], [], 0
+    reverts, notes, deletes, adds, sections_delete_n = 0, [], [], [], 0
     for ch in rev.changed:
         raw_loc = ch.loc if ch.action == "add" else normalize_loc(prev, ch.loc)
         loc = top_loc(raw_loc)
@@ -204,11 +204,13 @@ def apply_revision(prev: TopicPage, rev: TopicPageRevision, allowed: set[str]) -
             val = val.model_copy(update={"check": False})  # check는 코드 소유
         if ch.action == "edit" and idx_s < len(data[name]):
             data[name][idx_s] = val.model_dump()
-        else:  # 007-A1-6/A2-27: add는 i 위치에 넣는다(절 순서가 의미 있음, 뒤에 붙이면 안 됨)
-            data[name].insert(min(idx_s, len(data[name])), val.model_dump())
+        else:  # 007-A1-6/C1-1: add는 i 위치에 넣되, 다른 변경이 원래 번호를 쓰므로 insert는 맨 뒤로 미룬다
+            adds.append((name, idx_s, val.model_dump()))
     for name, idx_s in sorted(deletes, key=lambda x: -x[1]):
         if idx_s < len(data[name]):
             data[name].pop(idx_s)
+    for name, idx_s, dumped in sorted(adds, key=lambda x: x[1]):
+        data[name].insert(min(idx_s, len(data[name])), dumped)
     try:
         return TopicPage.model_validate(data), reverts, notes
     except ValueError as e:
