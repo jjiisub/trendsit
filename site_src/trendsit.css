@@ -163,9 +163,17 @@ code.ic{font-family:inherit;font-size:.94em;background:var(--c-track);border-rad
 .tile-l{font-size:var(--fs-sm)}
 .tile-s{font-size:var(--fs-xs);color:var(--c-muted)}
 .tile-x{font-size:var(--fs-xs)}
+/* 006-B1-2(=A3-8): 1개·3개(모바일)는 값을 라벨 옆에 두는 가로형 */
+.tiles.n1 .tile,.tiles.n3 .tile{grid-template-columns:auto 1fr;grid-template-areas:"v l" "v s" "v x";align-items:baseline;column-gap:var(--sp-4)}
+.tiles.n1 .tile-v,.tiles.n3 .tile-v{grid-area:v;min-width:5.5em}
+.tiles.n1 .tile-l,.tiles.n3 .tile-l{grid-area:l}
+.tiles.n1 .tile-s,.tiles.n3 .tile-s{grid-area:s}
+.tiles.n1 .tile-x,.tiles.n3 .tile-x{grid-area:x}
 @media (min-width:640px){
  .tiles.n4{grid-template-columns:repeat(4,minmax(0,1fr))}
  .tiles.n3{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .tiles.n3 .tile{grid-template-columns:1fr;grid-template-areas:"v" "l" "s" "x";align-items:start}
+ .tiles.n3 .tile-v{min-width:0}
 }
 
 /* ---------- 절, 단락 ---------- */
