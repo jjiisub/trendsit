@@ -167,8 +167,9 @@ def _close(ctx: Ctx, week: str, t0: float, dur: dict[str, float], n_topics: int 
     with db.conn:
         db.conn.execute("UPDATE runs SET summary_json=? WHERE id=?", (json.dumps(summary, ensure_ascii=False), run_id))
         if not ctx.stopped and (until or summary["status"] != "failed"):
-            status = ({"select": "selected", "write": "written"}[until] if until
-                      else {"done": "done", "partial": "written"}[summary["status"]])
+            # v1.2 5.13: 예산 중단이 아니고 성공 토픽 ≥1(partial도 포함)이면 weeks는 done(publish가 막히지 않게).
+            # runs.status·summary_json은 그대로 partial
+            status = {"select": "selected", "write": "written"}[until] if until else "done"
             db.conn.execute("UPDATE weeks SET status=?, current_run_id=? WHERE week=?", (status, run_id, week))
     return summary
 

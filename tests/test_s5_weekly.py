@@ -556,7 +556,26 @@ def test_summary_status_partial(week, monkeypatch):
     ctx, cids = week
     summary = _status_of(ctx, cids, monkeypatch, lambda n, role: RoleFailed("출력 검증 실패") if n == 7 else None)
     assert summary["status"] == "partial" and summary["write"] == {"topics": 4, "failed": 1}
-    assert ctx.db.conn.execute("SELECT status FROM weeks").fetchone()[0] == "written"
+    # v1.2 5.13: 예산 중단이 아니고 성공 토픽 ≥1이면 weeks는 done(runs.status·summary는 partial 그대로, publish가 막히지 않게)
+    assert ctx.db.conn.execute("SELECT status FROM weeks").fetchone()[0] == "done"
+
+
+def test_partial_week_still_publishes_without_failed_topic(week, monkeypatch):
+    """v1.2 5.13: 토픽 1개 failed인 run도 weeks가 done이라 ops.publish가 그대로 성공(0)하고, 사이트에 그 토픽은 없음."""
+    from trendsit import ops
+    from trendsit.core.role import RoleFailed
+
+    ctx, cids = week
+    summary = _status_of(ctx, cids, monkeypatch, lambda n, role: RoleFailed("출력 검증 실패") if n == 7 else None)
+    assert summary["status"] == "partial"
+    assert ctx.db.conn.execute("SELECT status FROM weeks").fetchone()[0] == "done"
+    run_id = ctx.tracer.run_id
+    failed_id = ctx.db.conn.execute("SELECT topic_id FROM topics WHERE run_id=? AND status='failed'", (run_id,)).fetchone()[0]
+    assert ops.publish(ctx.db, "2026-W41", lambda cmd: (0, "", "")) == 0
+    assert ctx.db.conn.execute("SELECT status FROM weeks").fetchone()[0] == "published"
+    site = json.loads((ctx.db.path.parent / "site.json").read_text())
+    assert failed_id not in {t["id"] for t in site["topics"]}
+    assert len(site["topics"]) == 3
 
 
 def test_summary_status_stopped(week, monkeypatch):
