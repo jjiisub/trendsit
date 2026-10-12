@@ -192,16 +192,8 @@ def runtime(db: DB, runs: list[str]) -> list[str]:
     return lines
 
 
-def main() -> int:
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--weeks", nargs="+", required=True)
-    ap.add_argument("--judge", action="store_true", help="최종판 judge를 새로 돌림(없으면 저장된 결과 사용)")
-    ap.add_argument("--topics", nargs="*", help="--judge를 이 토픽만(나머지는 저장된 결과, E2 실패 건만 재실행)")
-    ap.add_argument("--agreement", metavar="JUDGE_JSON", help="라벨 기준 관문 B와 judge ↔ 라벨 일치율만 출력")
-    ap.add_argument("--runtime", nargs="+", metavar="RUN_ID", help="이 run들(묶기 run 포함)의 실행 시간 분해만 출력")
-    ap.add_argument("--judge-out", metavar="JSON", help="현재판 최종판 judge만 돌려 이 파일에 쓰고 라벨 일치율 출력")
-    ap.add_argument("--judge-prev", metavar="JSON", help="--topics 밖 토픽은 이 결과를 그대로(E2)")
-    args = ap.parse_args()
+def _early_mode(args: argparse.Namespace) -> int | None:
+    """단독으로 끝내는 옵션(--judge-out·--runtime·--agreement). 없으면 None(본 리포트 흐름 계속)."""
     if args.judge_out:  # judge만(R5 보정: 라벨 단 출력을 다시 채점, 리포트·라벨 시트는 그대로)
         prev = json.loads(Path(args.judge_prev).read_text(encoding="utf-8")) if args.judge_prev else None
         judge_final(args.weeks, set(args.topics) if args.topics else None, prev, out_path=Path(args.judge_out))
@@ -213,74 +205,72 @@ def main() -> int:
     if args.agreement:
         print("\n".join(agreement(json.loads(Path(args.agreement).read_text(encoding="utf-8")))))
         return 0
-    db = DB(ROOT / "data" / "trendsit.db")
-    jpath = ROOT / "reports" / "S5_brief" / "gate_b_final_judge.json"
-    saved = json.loads(jpath.read_text()) if jpath.exists() else {}
-    final = judge_final(args.weeks, set(args.topics) if args.topics else None, saved if args.topics else None) \
-        if args.judge else saved
-    lines = ["", "## 실제 실행(" + " + ".join(args.weeks) + ", 관문 B 대상 주)", "",
-             "> `scripts/s5_gate_b.py`가 붙인 절. 라벨이 필요한 항목은 2차 라벨(D1-3, 리뷰 세션 opus-5.5) 전 잠정.", ""]
-    sel_rows, crit_rows, crit_seen, diag = [], [], set(), {}
-    topics_all = []
-    for week in args.weeks:
-        run = db.conn.execute("SELECT current_run_id FROM weeks WHERE week=?", (week,)).fetchone()[0]
-        summ = json.loads(db.conn.execute("SELECT summary_json FROM runs WHERE id=?", (run,)).fetchone()[0] or "{}")
-        cluster_run = summ.get("cluster_run") or run
-        topics = db.conn.execute("SELECT * FROM topics WHERE run_id=? ORDER BY rank", (run,)).fetchall()
-        sel_step = db.conn.execute("SELECT detail FROM steps WHERE role='editor_select' AND kind='code' AND run_id IN "
-                                   "(SELECT id FROM runs WHERE week=? AND kind='weekly') ORDER BY id DESC LIMIT 1",
-                                   (week,)).fetchone()
-        sel_detail = json.loads(sel_step["detail"]) if sel_step else {}
-        plan_run = run
-        prow = db.conn.execute("SELECT plan_json, source FROM briefing_plans WHERE run_id=?", (plan_run,)).fetchone()
-        plan = json.loads(prow["plan_json"]) if prow else {}
-        lines += [f"### {week} (run `{run}`, 묶기 run `{cluster_run}`)", "",
-                  f"- 실행 요약: 토픽 {summ.get('write', {}).get('topics')}, 실패 {summ.get('write', {}).get('failed')}, "
-                  f"라운드 {summ.get('review', {}).get('rounds')}, 코드 반려 {summ.get('review', {}).get('code_rejects')}, "
-                  f"검수 반려 {summ.get('review', {}).get('critic_rejects')}, 되돌림 {summ.get('review', {}).get('reverts')}, "
-                  f"check 포인트 {summ.get('review', {}).get('check_points')}, 사용액 ${summ.get('cost_usd', {}).get('total')}, "
-                  f"시간 {summ.get('duration_sec', {}).get('total')}초",
-                  f"- 선별: 첫 시도 코드 검증 {'통과' if sel_detail.get('errors_by_try', [[1]])[0] == [] else '실패'}"
-                  f"({len(sel_detail.get('errors_by_try', []))}회 시도, 계획 {prow['source'] if prow else '-'}), "
-                  f"reason 입력 대조 위반 {len(sel_detail.get('reason_mismatch', []))}", ""]
-        for d in plan.get("decisions", []):
-            sel_rows.append({"week": week, "cluster_id": d["cluster_id"], "action": d["action"],
-                             "drop_reason": d.get("drop_reason") or "", "reason": d["reason"]})
-        lines += ["| 순위 | 토픽 | 상태 | 라운드 | 채널 | 도식(수치·사건) | 코드 경고 | 문체 위반 | check |",
-                  "|---|---|---|---|---|---|---|---|---|"]
-        for t in topics:
-            page_row = db.conn.execute("SELECT page_json FROM topic_pages WHERE run_id=? AND topic_id=? ORDER BY round DESC, "
-                                       "id DESC LIMIT 1", (run, t["topic_id"])).fetchone()
-            vs = db.conn.execute("SELECT round, checker, status, issues_json, autofix_json FROM verdicts WHERE run_id=? AND "
-                                 "topic_id=? ORDER BY id", (run, t["topic_id"])).fetchall()
-            for v in vs:
-                if v["checker"] == "critic":
-                    for iss in json.loads(v["issues_json"] or "[]"):
-                        key = (t["topic_id"], top_loc(iss["loc"]), iss["type"])
-                        if key not in crit_seen:
-                            crit_seen.add(key)
-                            crit_rows.append({"topic_id": key[0], "section": key[1], "type": key[2]})
-            if page_row is None:
-                lines.append(f"| {t['rank']} | {t['topic_id']} | {t['status']} | - | - | - | - | - | - |")
-                continue
-            page = TopicPage.model_validate_json(page_row[0])
-            warn = [w for v in vs for w in json.loads(v["autofix_json"] or "{}").get("warnings") or []]
-            chans = sorted({r["channel"] for r in db.conn.execute(
-                "SELECT DISTINCT ci.channel FROM cluster_items ci WHERE ci.cluster_id IN (SELECT value FROM json_each(?))",
-                (t["cluster_ids_json"],))})
-            sv = style_violations(page)
-            topics_all.append((week, t, page, chans, sv))
-            bars_secs = [s for s in page.sections if s.visual == "bars"]
-            events_secs = [s for s in page.sections if s.visual == "events"]
-            diag[t["topic_id"]] = {"week": week, "numbers": [s.bars.title for s in bars_secs],
-                                   "events": [s.events.title for s in events_secs], "code_warnings": sorted(set(warn)),
-                                   "needed_numbers": None, "needed_events": None, "labeler": None, "critique": None}
-            lines.append(f"| {t['rank']} | {t['topic_id']} | {t['status']} | {t['final_round']} | {'+'.join(chans)} | "
-                         f"{len(bars_secs)}·{len(events_secs)} | {len(set(warn))} | {len(sv)} | "
-                         f"{sum(s.check for s in page.sections)} |")
-        lines.append("")
-    # 코드가 뺀 도식과 남은 이슈(반영 확인 리뷰 F2): 토픽마다 마지막으로 쓴 run의 writer 기록
-    lines += ["### 코드가 뺀 도식(형식·수치 오류가 남은 것만)", "", "| 토픽 | 도식 | 제목 | 남은 이슈 |", "|---|---|---|---|"]
+    return None
+
+
+def _week_section(db: DB, week: str, sel_rows: list, crit_rows: list, crit_seen: set, diag: dict, topics_all: list) -> list[str]:
+    """한 주의 실행 요약·선별 로그·토픽 표 줄. sel_rows·crit_rows·diag·topics_all(라벨·다음 절 재료)도 채운다."""
+    run = db.conn.execute("SELECT current_run_id FROM weeks WHERE week=?", (week,)).fetchone()[0]
+    summ = json.loads(db.conn.execute("SELECT summary_json FROM runs WHERE id=?", (run,)).fetchone()[0] or "{}")
+    cluster_run = summ.get("cluster_run") or run
+    topics = db.conn.execute("SELECT * FROM topics WHERE run_id=? ORDER BY rank", (run,)).fetchall()
+    sel_step = db.conn.execute("SELECT detail FROM steps WHERE role='editor_select' AND kind='code' AND run_id IN "
+                               "(SELECT id FROM runs WHERE week=? AND kind='weekly') ORDER BY id DESC LIMIT 1",
+                               (week,)).fetchone()
+    sel_detail = json.loads(sel_step["detail"]) if sel_step else {}
+    prow = db.conn.execute("SELECT plan_json, source FROM briefing_plans WHERE run_id=?", (run,)).fetchone()
+    plan = json.loads(prow["plan_json"]) if prow else {}
+    lines = [f"### {week} (run `{run}`, 묶기 run `{cluster_run}`)", "",
+             f"- 실행 요약: 토픽 {summ.get('write', {}).get('topics')}, 실패 {summ.get('write', {}).get('failed')}, "
+             f"라운드 {summ.get('review', {}).get('rounds')}, 코드 반려 {summ.get('review', {}).get('code_rejects')}, "
+             f"검수 반려 {summ.get('review', {}).get('critic_rejects')}, 되돌림 {summ.get('review', {}).get('reverts')}, "
+             f"check 포인트 {summ.get('review', {}).get('check_points')}, 사용액 ${summ.get('cost_usd', {}).get('total')}, "
+             f"시간 {summ.get('duration_sec', {}).get('total')}초",
+             f"- 선별: 첫 시도 코드 검증 {'통과' if sel_detail.get('errors_by_try', [[1]])[0] == [] else '실패'}"
+             f"({len(sel_detail.get('errors_by_try', []))}회 시도, 계획 {prow['source'] if prow else '-'}), "
+             f"reason 입력 대조 위반 {len(sel_detail.get('reason_mismatch', []))}", ""]
+    for d in plan.get("decisions", []):
+        sel_rows.append({"week": week, "cluster_id": d["cluster_id"], "action": d["action"],
+                         "drop_reason": d.get("drop_reason") or "", "reason": d["reason"]})
+    lines += ["| 순위 | 토픽 | 상태 | 라운드 | 채널 | 도식(수치·사건) | 코드 경고 | 문체 위반 | check |",
+              "|---|---|---|---|---|---|---|---|---|"]
+    for t in topics:
+        page_row = db.conn.execute("SELECT page_json FROM topic_pages WHERE run_id=? AND topic_id=? ORDER BY round DESC, "
+                                   "id DESC LIMIT 1", (run, t["topic_id"])).fetchone()
+        vs = db.conn.execute("SELECT round, checker, status, issues_json, autofix_json FROM verdicts WHERE run_id=? AND "
+                             "topic_id=? ORDER BY id", (run, t["topic_id"])).fetchall()
+        for v in vs:
+            if v["checker"] == "critic":
+                for iss in json.loads(v["issues_json"] or "[]"):
+                    key = (t["topic_id"], top_loc(iss["loc"]), iss["type"])
+                    if key not in crit_seen:
+                        crit_seen.add(key)
+                        crit_rows.append({"topic_id": key[0], "section": key[1], "type": key[2]})
+        if page_row is None:
+            lines.append(f"| {t['rank']} | {t['topic_id']} | {t['status']} | - | - | - | - | - | - |")
+            continue
+        page = TopicPage.model_validate_json(page_row[0])
+        warn = [w for v in vs for w in json.loads(v["autofix_json"] or "{}").get("warnings") or []]
+        chans = sorted({r["channel"] for r in db.conn.execute(
+            "SELECT DISTINCT ci.channel FROM cluster_items ci WHERE ci.cluster_id IN (SELECT value FROM json_each(?))",
+            (t["cluster_ids_json"],))})
+        sv = style_violations(page)
+        topics_all.append((week, t, page, chans, sv))
+        bars_secs = [s for s in page.sections if s.visual == "bars"]
+        events_secs = [s for s in page.sections if s.visual == "events"]
+        diag[t["topic_id"]] = {"week": week, "numbers": [s.bars.title for s in bars_secs],
+                               "events": [s.events.title for s in events_secs], "code_warnings": sorted(set(warn)),
+                               "needed_numbers": None, "needed_events": None, "labeler": None, "critique": None}
+        lines.append(f"| {t['rank']} | {t['topic_id']} | {t['status']} | {t['final_round']} | {'+'.join(chans)} | "
+                     f"{len(bars_secs)}·{len(events_secs)} | {len(set(warn))} | {len(sv)} | "
+                     f"{sum(s.check for s in page.sections)} |")
+    lines.append("")
+    return lines
+
+
+def _dropped_diagrams_lines(db: DB, topics_all: list) -> list[str]:
+    """코드가 뺀 도식과 남은 이슈(반영 확인 리뷰 F2): 토픽마다 마지막으로 쓴 run의 writer 기록."""
+    lines = ["### 코드가 뺀 도식(형식·수치 오류가 남은 것만)", "", "| 토픽 | 도식 | 제목 | 남은 이슈 |", "|---|---|---|---|"]
     n_drop = 0
     for week, t, *_rest in topics_all:
         r = db.conn.execute("SELECT detail FROM steps WHERE role='writer' AND kind='code' AND text LIKE ? AND run_id IN "
@@ -292,6 +282,11 @@ def main() -> int:
     if not n_drop:
         lines.append("| 없음 | | | |")
     lines.append("")
+    return lines
+
+
+def _judge_lines(final: dict, topics_all: list) -> list[str]:
+    """최종판 judge 표 + 관문 B 항목(실제 실행) 표."""
     n = len(topics_all)
     multi = sum(1 for _, _, _, c, _ in topics_all if len(c) >= 2)
     style = sum(len(sv) for *_, sv in topics_all)
@@ -300,8 +295,8 @@ def main() -> int:
                  sum(1 for v in final.values() if q in v["verdicts"])) for q in qs}
     facts = [(k, v["facts"]) for k, v in final.items() if v.get("facts")]
     full = sum(1 for _, f in facts if f["supported"] == f["total"])
-    lines += ["### 최종판 judge(관문 B, `reports/S5_brief/gate_b_final_judge.json`)", "",
-              "| 토픽 | 상태 | Q1 | Q2 | Q3 | Q4 | 원자 사실 | 비지지 |", "|---|---|---|---|---|---|---|---|"]
+    lines = ["### 최종판 judge(관문 B, `reports/S5_brief/gate_b_final_judge.json`)", "",
+             "| 토픽 | 상태 | Q1 | Q2 | Q3 | Q4 | 원자 사실 | 비지지 |", "|---|---|---|---|---|---|---|---|"]
     for k, v in final.items():
         f = v.get("facts") or {}
         un = "; ".join(f"{u['loc']} {u['fact'][:40]}" for u in (f.get("unsupported") or [])[:2])
@@ -326,7 +321,11 @@ def main() -> int:
               "| 선별 drop 이유 | 라벨 대기(`eval/labels/editor_select.csv`) | 일치 80% | 잠정 |",
               "| 검수 | 라벨 대기(`eval/labels/critic.csv`), 심은 오류 픽스처는 위 critic 절 | 일치 80% | 잠정 |",
               "| 표현 선택 | 라벨 대기(`eval/labels/diagram_labels.json`) | 남발 0, 누락 20개 중 1 이하 | 잠정 |", ""]
-    path = ROOT / "reports" / "S5_quality.md"
+    return lines
+
+
+def _write_outputs(path: Path, lines: list[str], sel_rows: list, crit_rows: list, topics_all: list, final: dict, diag: dict) -> None:
+    """리포트 절 갱신 + 라벨 시트(editor_select·critic·writer·diagram_labels, 기존 라벨은 보존)."""
     text = path.read_text(encoding="utf-8") if path.exists() else "# S5 품질 리포트 (관문 B)\n"
     marker = "\n## 실제 실행("
     if marker in text:
@@ -354,6 +353,35 @@ def main() -> int:
             if o.get(f) is not None:
                 v[f] = o[f]
     dpath.write_text(json.dumps(diag, ensure_ascii=False, indent=1), encoding="utf-8")
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--weeks", nargs="+", required=True)
+    ap.add_argument("--judge", action="store_true", help="최종판 judge를 새로 돌림(없으면 저장된 결과 사용)")
+    ap.add_argument("--topics", nargs="*", help="--judge를 이 토픽만(나머지는 저장된 결과, E2 실패 건만 재실행)")
+    ap.add_argument("--agreement", metavar="JUDGE_JSON", help="라벨 기준 관문 B와 judge ↔ 라벨 일치율만 출력")
+    ap.add_argument("--runtime", nargs="+", metavar="RUN_ID", help="이 run들(묶기 run 포함)의 실행 시간 분해만 출력")
+    ap.add_argument("--judge-out", metavar="JSON", help="현재판 최종판 judge만 돌려 이 파일에 쓰고 라벨 일치율 출력")
+    ap.add_argument("--judge-prev", metavar="JSON", help="--topics 밖 토픽은 이 결과를 그대로(E2)")
+    args = ap.parse_args()
+    early = _early_mode(args)
+    if early is not None:
+        return early
+    db = DB(ROOT / "data" / "trendsit.db")
+    jpath = ROOT / "reports" / "S5_brief" / "gate_b_final_judge.json"
+    saved = json.loads(jpath.read_text()) if jpath.exists() else {}
+    final = judge_final(args.weeks, set(args.topics) if args.topics else None, saved if args.topics else None) \
+        if args.judge else saved
+    lines = ["", "## 실제 실행(" + " + ".join(args.weeks) + ", 관문 B 대상 주)", "",
+             "> `scripts/s5_gate_b.py`가 붙인 절. 라벨이 필요한 항목은 2차 라벨(D1-3, 리뷰 세션 opus-5.5) 전 잠정.", ""]
+    sel_rows, crit_rows, crit_seen, diag, topics_all = [], [], set(), {}, []
+    for week in args.weeks:
+        lines += _week_section(db, week, sel_rows, crit_rows, crit_seen, diag, topics_all)
+    lines += _dropped_diagrams_lines(db, topics_all)
+    lines += _judge_lines(final, topics_all)
+    path = ROOT / "reports" / "S5_quality.md"
+    _write_outputs(path, lines, sel_rows, crit_rows, topics_all, final, diag)
     print(path)
     return 0
 

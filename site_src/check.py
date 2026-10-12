@@ -95,8 +95,8 @@ def is_internal(href):
     return not re.match(r"^([a-z][a-z0-9+.-]*:|//)", href, re.I)
 
 
-def static_checks(site, data, pages):
-    files = sorted(site.rglob("*.html"))
+def _check_markup_links(site, data, pages, files):
+    """A7 페이지 존재, M-1 마크업, M-2 근거 id 노출, C-3 내부 링크, A5 링크 규칙. 계속 돌아도 되면 True."""
     check("A7 페이지 존재: 홈, 소스, 키워드, 실행 기록(주차별·이번 주차·1건)",
           all((site / p).exists() for p in ("index.html", "sources/index.html", "keywords/index.html", "runs/index.html", "runs/weeks/index.html"))
           and any(f.parent.parent.parent.name == "runs" for f in files), f"html {len(files)}개")
@@ -130,7 +130,7 @@ def static_checks(site, data, pages):
     absent = [f"{page_url(site, f)}" for f in [*first, *(site / "week" / w["id"] / "index.html" for w in weeks), *(site / "topic" / t["id"] / "index.html" for t in data["topics"])] if f not in pages]
     if absent:  # site.json과 site/가 어긋남(예: 발행 중 실패로 한쪽만 바뀜): 트레이스백 대신 실패로 기록
         check("A5 링크 규칙", False, f"data에는 있고 site/에는 없는 페이지: {', '.join(absent[:3])}")
-        return
+        return False
     ok1 = all("지난 주차" not in "".join(pages[f].text) for f in first)
     ok2 = all(any(h == f'/week/{weeks[i + 1]["id"]}/' for _, _, _, h in pages[site / "week" / w["id"] / "index.html"].links)
               for i, w in enumerate(weeks[:-1]))
@@ -148,7 +148,11 @@ def static_checks(site, data, pages):
             bad.append(f'{t["id"]} 이전·다음이 다른 주로 이어짐')
     check("A5 첫 주에 지난 주차 링크 없음, 대상 없는 follow_up은 링크 없음, 이전·다음은 같은 주 안", ok1 and ok2 and not bad,
           "; ".join(bad[:3]) or ("" if ok1 and ok2 else f"지난 주차 링크 오류 첫 주 {ok1} 나머지 {ok2}"))
-    # C-4, A6 외부 요청·글꼴·CSS
+    return True
+
+
+def _check_fonts_css_ops(site, data, pages, files):
+    """C-4 외부 요청, A6 글꼴·CSS, C-5·C-7 관리 화면, A7 금지 문구."""
     css_files = sorted((site / "assets").glob("*.css"))
     css = "\n".join(f.read_text(encoding="utf-8") for f in css_files)
     ext = []
@@ -166,7 +170,6 @@ def static_checks(site, data, pages):
           weights == ["400", "500"] and len(faces) == 2 and len(names) == 1 and re.fullmatch(r"trendsit\.[0-9a-f]{10}\.css", names[0])
           and not googles and (site / "assets/fonts/Pretendard-Regular.woff2").is_file() and (site / "assets/fonts/Pretendard-Medium.woff2").is_file(),
           f"faces {len(faces)} weights {weights} css {names} google {googles}")
-    # C-5, C-7(title 속성) 관리 화면 조작 요소, 문구
     banned = [f"{page_url(site, f)} <{t}>" for f, p in pages.items() for t in OPS_BANNED if p.tags.get(t)]
     check("C-5 button·form·input·select·textarea 0", not banned, "; ".join(banned[:3]))
     own = [s for s in data_strings(data) if any(w in s for w in FORBIDDEN_TEXT)]
@@ -178,7 +181,10 @@ def static_checks(site, data, pages):
         hits += [f"{page_url(site, f)} '{w}'" for w in FORBIDDEN_TEXT if w in text]
     check("A7 '동작 안 함'·'예시' 문구 0(사이트 전체, 데이터 본문 제외)", not hits, "; ".join(hits[:3]))
     check("C-7 title 속성 0", not any(p.titles for p in pages.values()))
-    # S6-1 5.9: 옛 섹션 제목, h3.src-g 제거 확인(화면이 만든 문구만, 데이터 본문 안의 우연한 일치는 제외)
+
+
+def _check_s6_1_content(site, data, pages):
+    """S6-1 5.9: 옛 섹션 제목·h3.src-g, 슬라이드 img, .tiles 자식 수, C-9 .chk 수, &t= 링크."""
     all_data = sorted(data_strings(data), key=len, reverse=True)
     old_titles = []
     for f, p in pages.items():
@@ -189,7 +195,6 @@ def static_checks(site, data, pages):
     src_g = [page_url(site, f) for f, p in pages.items() if any(c == "src-g" for _, cls in p.classes for c in cls)]
     check("A9 옛 섹션 제목(개요·핵심 포인트·핵심 개념·소스별로 더한 것) 0, h3.src-g 0", not old_titles and not src_g,
           "; ".join((old_titles + src_g)[:3]))
-    # 슬라이드 img: /assets/slides/만이고 파일 존재
     bad_img = []
     for f, p in pages.items():
         for tag, _rel, k, href in p.links:
@@ -199,14 +204,11 @@ def static_checks(site, data, pages):
                 elif not (site / href.lstrip("/")).is_file():
                     bad_img.append(f"{page_url(site, f)} img 파일 없음 {href}")
     check("A9 슬라이드 img src는 /assets/slides/뿐이고 파일 존재", not bad_img, "; ".join(bad_img[:3]))
-    # .tiles 자식 수 1~4와 n{k} 클래스·실제 .tile 자식 수 일치(5.9)
     bad_tiles = [f"{page_url(site, f)} .tiles n{n} 실제 {cnt}개" for f, p in pages.items() for n, cnt in p.tiles
                 if n is None or not 1 <= int(n) <= 4 or int(n) != cnt]
     check("A9 .tiles 자식 수 1~4와 n{k} 클래스 일치", not bad_tiles, "; ".join(bad_tiles[:3]))
-    # C-9: .chk 수 = site.json의 확인 필요 수(절 check + 절 밖 summary/title)
     topics = {t["id"]: t for t in data["topics"]}
-    bad_chk = []
-    bad_t = []
+    bad_chk, bad_t = [], []
     for tid, t in topics.items():
         f = site / "topic" / tid / "index.html"
         if f not in pages:
@@ -220,6 +222,14 @@ def static_checks(site, data, pages):
                  and not any(h.startswith(u) for u in vids)]
     check("C-9 .chk 수 = site.json의 확인 필요 수", not bad_chk, "; ".join(bad_chk[:3]))
     check("A9 &t= 시점 링크는 그 토픽 영상 출처 URL로 시작", not bad_t, "; ".join(bad_t[:3]))
+
+
+def static_checks(site, data, pages):
+    files = sorted(site.rglob("*.html"))
+    if not _check_markup_links(site, data, pages, files):
+        return
+    _check_fonts_css_ops(site, data, pages, files)
+    _check_s6_1_content(site, data, pages)
 
 
 def data_strings(data):
