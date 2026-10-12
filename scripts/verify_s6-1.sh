@@ -71,16 +71,9 @@ fi
 
 echo "== A11 회귀(시간이 걸림: verify_s6a.sh, verify_s6b.sh, verify_s5.sh --fast) =="
 a11() {
-  local out rc bad6a
-  for attempt in 1 2 3; do
-    out=$(bash scripts/verify_s6a.sh 2>&1); rc=$?
-    [ $rc = 0 ] && break
-    bad6a=$(echo "$out" | grep '^FAIL' | grep -v '맨 위에서 미니 바가 보임\|C-all check.py --fixture 종료 코드')
-    [ -n "$bad6a" ] && break
-  done
-  if [ $rc != 0 ]; then
-    [ -z "$bad6a" ] || { echo "verify_s6a.sh 종료 코드 $rc: $(echo "$out" | grep '^FAIL' | tr '\n' ' ')"; return 1; }
-  fi
+  local out rc
+  out=$(bash scripts/verify_s6a.sh 2>&1); rc=$?
+  [ $rc = 0 ] || { echo "verify_s6a.sh 종료 코드 $rc: $(echo "$out" | grep '^FAIL' | tr '\n' ' ')"; return 1; }
   out=$(bash scripts/verify_s6b.sh 2>&1); rc=$?
   [ $rc = 0 ] || { echo "verify_s6b.sh 종료 코드 $rc: $(echo "$out" | grep '^FAIL' | tr '\n' ' ')"; return 1; }
   out=$(bash scripts/verify_s5.sh --fast 2>&1); rc=$?
