@@ -73,10 +73,7 @@ def render_body(obj: Any) -> str:
     if isinstance(obj, BaseModel):
         out: list[str] = []
         for name in type(obj).model_fields:
-            if name == "no_visuals":  # S6-1 5.2: true일 때만 뜻을 그대로 한 줄(WriterInput)
-                if getattr(obj, name):
-                    out.append("no_visuals: 모든 절의 visual을 none, head_tiles만")
-            elif name in getattr(obj, "RENDER_LINES", ()):  # list[str]을 한 항목 한 줄로
+            if name in getattr(obj, "RENDER_LINES", ()):  # list[str]을 한 항목 한 줄로
                 out += [f"{name}:", *(escape(ln) for ln in getattr(obj, name))]
             elif name not in getattr(obj, "RENDER_SKIP", ()):
                 out += _lines(name, getattr(obj, name))

@@ -475,16 +475,16 @@ def test_writer_limits_required_in_writer_input():
 
 
 # ---------- B9: loc_lines 렌더에 중복 없음 ----------
-def test_writer_input_renders_no_visuals_as_spec_sentence():
-    """006-A2-32: no_visuals=true면 'no_visuals: true'가 아니라 5.2가 정한 뜻 문장이 렌더된다."""
+def test_writer_input_renders_no_visuals_as_plain_bool():
+    """006-C2-4: no_visuals 전용 분기는 공통 코어(core/render.py)에서 되돌림(3.4 예산). 의미 설명은 writer.md가
+    이미 정적으로 담고 있어, <data>는 다른 bool 칸과 같은 범용 렌더(true/false)로 충분하다."""
     from trendsit.brief.write import writer_limits
     from trendsit.core.artifacts_brief import PlanBrief, Relation, WriterInput
     from trendsit.core.render import render_data
 
     plan_ = PlanBrief(rank=1, angle="a", relation=Relation(type="new", topic_id=None))
     winp = WriterInput(plan=plan_, evidence=[], previous=None, aliases=[], limits=writer_limits(CFG, 1), no_visuals=True)
-    text = render_data(winp)
-    assert "no_visuals: 모든 절의 visual을 none, head_tiles만" in text and "no_visuals: true" not in text
+    assert "no_visuals: true" in render_data(winp)
 
 
 def test_render_no_page_dup():
@@ -567,20 +567,26 @@ def test_drop_code_bad_sections_removes_mismatched_head_tile():
     assert any("타일" in a for a in res.attention)
 
 
-def test_initial_page_discards_page_when_total_calls_exceed_c5_cap(tmp_path):
-    """006-A3-9: 1차 호출 2회(둘 다 잘림) 뒤 2차 호출이 3회(스키마 실패+잘림 2회)면 합이 5회라 C-5(토픽당
-    ≤4회)를 넘는다. 성공해도 페이지를 버리고 호출 상한 초과로 실패한다."""
+def test_initial_page_keeps_success_when_total_calls_reach_c5_cap(tmp_path):
+    """v1.2 C-5: 1차 호출 2회(둘 다 잘림) 뒤 2차 호출이 3회째(스키마 실패+잘림 뒤 성공)에 성공하면 합이 5회라
+    상한에 닿지만, 성공한 판은 횟수 때문에 버리지 않는다(사후 폐기 분기 삭제)."""
     from tests.conftest import FakeTransport, make_ctx, response
     from trendsit.brief.write import TopicResult, _initial_page, writer_limits
     from trendsit.core.artifacts_brief import PlanBrief, Relation, WriterInput
 
     cut = response('{"bad": 1}', tokens=(100, 4500))
     bad = response('{"bad": 1}', tokens=(100, 50))
-    ctx = make_ctx(tmp_path, FakeTransport([cut, cut, bad, cut, cut]), spec_cap=1.0)
+    sec = {"heading": "h", "paragraphs": [{"text": "t", "refs": ["it:1#q1"]}], "visual": "none", "bars": None,
+          "table": None, "tiles": [], "events": None, "slide": None, "slide_caption": "", "video_secs": [],
+          "check": False}
+    ok = response(json.dumps({"head_tiles": [], "sections": [sec], "summary": "s", "title": "t",
+                              "log": "l", "attention": False}, ensure_ascii=False))
+    ctx = make_ctx(tmp_path, FakeTransport([cut, cut, bad, cut, ok]), spec_cap=1.0)
     ctx.no_cache = True
     plan_ = PlanBrief(rank=1, angle="a", relation=Relation(type="new", topic_id=None))
     winp = WriterInput(plan=plan_, evidence=[], previous=None, aliases=[],
                        limits=writer_limits(CFG, 1), slide_candidates=[], no_visuals=False)
     res = TopicResult(None, "failed", None, [], [], [], [], 1)
-    page, err, _sid, _winp = _initial_page(ctx, winp, res, None)
-    assert page is None and err is not None and "호출 상한 초과" in err
+    page, _err, _sid, winp2 = _initial_page(ctx, winp, res, None)
+    assert page is not None and page.sections  # 성공한 판을 그대로 돌려줌(호출 상한 초과로 버리지 않음)
+    assert winp2.no_visuals is True
