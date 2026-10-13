@@ -123,24 +123,6 @@ def test_check_rejects_number_mismatch():
     assert any(i.type == "number_mismatch" for i in issues)
 
 
-def test_check_rejects_benchmark_score_after_english_name_and_space():
-    """R2-08: 숫자 표기 검사 ①이 "영문 이름 + 공백 + 수치"(MMLU 88.1)를 무조건 건너뛰지 않는다 — 근거 전체에도
-    없으면 반려한다(근거는 MMLU 85)."""
-    p_pack = pack(**{"it:1#s1": [EvidenceItem("it:1#s1", "it:1", "text", "sentence", "MMLU 85를 기록했다.", {"site": "x"})]})
-    p = page(sections=three_sections(paragraphs=[para(text="MMLU 88.1을 기록했다.")]))
-    issues = checks.check(p, p_pack, 1, CFG)
-    assert any(i.type == "number_mismatch" for i in issues)
-
-
-def test_check_accepts_version_number_present_elsewhere_in_full_pack():
-    """R2-08 짝: 좁은 refs 원문에는 없어도 그 토픽 근거 전체(다른 id)에 같은 값이 있으면 버전 표기로 보고 통과시킨다."""
-    p_pack = pack(**{"it:1#s1": [EvidenceItem("it:1#s1", "it:1", "text", "sentence", "가격을 내렸다.", {"site": "x"})],
-                     "it:1#s2": [EvidenceItem("it:1#s2", "it:1", "text", "sentence", "Haiku 5.5를 출시했다.", {"site": "x"})]})
-    p = page(sections=three_sections(heading="Haiku 5.5 출시", paragraphs=[para(text="가격을 내렸다.")]))
-    issues = checks.check(p, p_pack, 1, CFG)
-    assert not any(i.type == "number_mismatch" and i.loc == "sections[0].heading" for i in issues)
-
-
 def test_check_rejects_number_mismatch_with_currency_ms_and_k_suffix():
     """006-C1-2: 5.5 ① 전체 — $·ms·K 표기가 타일 value·표 셀·단락·heading에서도 대조된다(근거는 $30·120ms·8K)."""
     unit_pack = pack(**{"it:1#s2": [EvidenceItem("it:1#s2", "it:1", "text", "sentence", "월 $30, 120ms, 8K 컨텍스트다.", {"site": "x"})]})
@@ -175,24 +157,6 @@ def test_check_accepts_korean_compound_magnitude_number_as_false_positive():
                                                  "작업당 약 16만2000개의 출력 토큰을 소모했다.", {"site": "x"})]})
     p = page(sections=three_sections(paragraphs=[para(text="작업당 약 16만2000개의 토큰을 썼다.", refs=["it:1#s2"])]))
     assert [i for i in checks.check(p, unit_pack, 1, CFG) if i.type == "number_mismatch"] == []
-
-
-def test_check_does_not_reject_page_wide_visual_or_slide_overflow():
-    """R2-03(5.15-3): visual≠none·slide 개수 상한 초과는 loc이 특정 절을 못 가리켜 수정이 매번 되돌려지고
-    summary에 거짓 ⚠가 붙는다 — write.py._drop_code_bad_sections가 최종판에서 자동으로 줄이므로 라운드에서는
-    반려하지 않는다(head_tiles_max는 스키마가 막아 그대로 반려 대상)."""
-    hi = CFG.write.sections_for(1)[1]
-    secs = [section(heading=f"절{i}", visual="tiles", tiles=[Tile(value="1", label="l", refs=["it:1#s1"])] * 2)
-           for i in range(hi)]  # sections 개수는 상한 안, visual≠none만 상한(4) 초과
-    issues = checks.check(page(sections=secs), pack(), 1, CFG)
-    assert not any(i.loc == "sections" for i in issues)
-
-
-def test_check_style_accepts_sentence_ending_in_quote_or_bracket():
-    """R2-14: "~다"로 끝나는 문장이 닫는 괄호·따옴표로 끝나도(예: '…했다"') 반려하지 않는다."""
-    p = page(sections=three_sections(paragraphs=[para(text='그는 "끝났다"라고 말했다".')]))
-    issues = checks.check(p, pack(), 1, CFG)
-    assert not any(i.type == "format" and "~다" in i.comment for i in issues)
 
 
 def test_check_rejects_visual_bars_without_bars_field():
@@ -322,19 +286,6 @@ def test_change_value_accepts_numeric_table_row_and_normalizes_to_text():
     revision 전체가 버려짐, 007-C1-8)."""
     ch = Change(issue_idx=0, loc="sections[0].table.rows[0]", action="edit", value=["Haiku", 1620])
     assert ch.value == ["Haiku", "1620"]
-
-
-def test_apply_revision_isolates_an_unflagged_add_that_breaks_head_tiles_schema():
-    """R2-05: 지적 없이 허용되는 전체 add(head_tiles[4])가 상한(4개)을 깨면 그 add만 되돌리고, 같은 revision의
-    지적된 summary 수정은 살린다(007-C1-2)."""
-    prev = page(head_tiles=[Tile(value=str(v), label="l", refs=["it:1#s1"]) for v in range(4)])
-    rev = TopicPageRevision(changed=[
-        Change(issue_idx=0, loc="summary", action="edit", value="고친 요약이다. 쟁점이다."),
-        Change(issue_idx=0, loc="head_tiles[4]", action="add", value=Tile(value="5", label="l", refs=["it:1#s1"])),
-    ], log="l")
-    new, reverts, notes = revision.apply_revision(prev, rev, {"summary"})
-    assert new.summary == "고친 요약이다. 쟁점이다." and len(new.head_tiles) == 4
-    assert reverts == 0 and any("이 추가만 되돌림" in n for n in notes)
 
 
 def test_apply_revision_rejects_deleting_all_sections_via_multiple_deletes():

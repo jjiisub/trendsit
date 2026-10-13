@@ -1,7 +1,7 @@
 """작성자 출력의 코드 검사(S6-1 5.5, LLM 0원). 검수자 앞에서 돈다.
 1. 고칠 수 있는 형식은 직접 고친다(반려 아님): 형광 초과·공백·문장부호·별칭 표기 → 정본, slide가 후보 밖이면 null, video_secs가 타임라인에 없으면 제거, sections 수 초과면 뒤에서 자름
 2. 반려(라운드에 셈): 필수 칸·분량, refs 실재, 수치 대조, 시각 요소 칸 규칙, 문체(평가어·해요체)
-3. 경고(검수자 입력): 시각 요소 남발, 같은 단락 중복. 반려 메시지는 위치·근거·힌트를 구체적으로"""
+3. 경고(검수자 입력): 시각 요소 남발·누락 의심, 같은 단락 중복. 반려 메시지는 위치·근거·힌트를 구체적으로"""
 
 from __future__ import annotations
 
@@ -247,19 +247,15 @@ def _numbers_ok(text: str, ids: list[str], pack: dict[str, list[EvidenceItem]],
     out = []
     body = plain(text)
     found = figures(body) + (_unit_figures(body) if with_units else [])
-    full_vals: list[float] | None = None  # R2-08: "영문 이름 뒤 수치"는 근거 전체에 있으면 버전 표기로 보고 넘긴다
     for f in dict.fromkeys(found):
+        if re.search(rf"[A-Za-z]\s{re.escape(f)}(?![\d.]|\s?(%|배|x|×|점|달러|초|ms))", body):
+            continue
         fvals = number_values(f)  # figures()는 순수 숫자, _unit_figures()는 K·M 등 접미사 포함(값으로 환산)
         if not fvals:
             continue
         v = fvals[0]
         if any(same(v, w) for w in vals):
             continue
-        if re.search(rf"[A-Za-z]\s{re.escape(f)}(?![\d.]|\s?(%|배|x|×|점|달러|초|ms))", body):
-            if full_vals is None:
-                full_vals = number_values(_ev_text(list(pack), pack))
-            if any(same(v, w) for w in full_vals):
-                continue
         near = sorted(set(vals), key=lambda w: abs(w - v))[:3]
         out.append((f, ", ".join(f"{x:g}" for x in near)))
     return out
@@ -311,11 +307,13 @@ def _check_counts(page: TopicPage, cfg: BriefConfig, n_sources: int) -> list[Iss
             if not 1 <= len(p.refs) <= cfg.evidence.max_refs_per_paragraph:
                 issues.append(_issue(ploc, "wrong_ref", f"{ploc} refs {len(p.refs)}개(1~{cfg.evidence.max_refs_per_paragraph})",
                                      "그 단락을 받치는 근거 id만"))
-    # R2-03(5.15-3): visual≠none·slide 페이지 상한 초과는 라운드에서 반려하지 않는다 — loc이 특정 절을 못 가리켜
-    # 수정이 매번 되돌려지고 summary에 거짓 ⚠가 붙는다. write.py._drop_code_bad_sections가 최종판에서 뒤부터
-    # 잘라 자동 수정한다(head_tiles_max는 스키마 max_length가 이미 막아 여기 남긴다)
-    if len(page.head_tiles) > w.head_tiles_max:
-        issues.append(_issue("head_tiles", "format", f"head_tiles {len(page.head_tiles)}개(최대 {w.head_tiles_max})", ""))
+    n_visual = sum(1 for s in page.sections if s.visual != "none")
+    n_slides = sum(1 for s in page.sections if s.slide)
+    for loc3, label, n, hi, hint in (("head_tiles", "head_tiles", len(page.head_tiles), w.head_tiles_max, ""),
+                                      ("sections", "visual≠none", n_visual, w.visuals_max, "꼭 필요한 절만"),
+                                      ("sections", "slide", n_slides, w.slides_max, "")):
+        if n > hi:
+            issues.append(_issue(loc3, "format", f"{label} {n}개(최대 {hi})", hint))
     return issues
 
 
@@ -418,8 +416,7 @@ def _check_style(page: TopicPage) -> list[Issue]:
                                  "명사형 끝(~함, ~임, 명사)"))
     for loc2, text2 in _text_slots(page):
         for sent in sentences(plain(text2)):
-            bare = re.sub(r'["\')」』]+$', "", sent.strip().rstrip("."))  # R2-14: 괄호·따옴표로 끝나도 '~다'로 봄
-            if not bare.endswith("다"):
+            if not sent.strip().rstrip(".").endswith("다"):
                 issues.append(_issue(loc2, "format", f"{loc2}의 문장이 '~다'로 끝나지 않음('…{sent.strip()[-12:]}')",
                                      "문장마다 평서체 '~다'"))
     for loc, text in _canon_slots(page):

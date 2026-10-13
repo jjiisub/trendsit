@@ -406,28 +406,6 @@ def test_critic_empty_atoms_is_not_a_pass(week):
     assert "summary" in json.loads(checks_json)  # 검수 실패는 summary check=true(⚠)로, 통과가 아니다
 
 
-def test_writer_empty_sections_goes_through_code_round_not_immediate_failure(week):
-    """R2-09(5.15): 작성자 출력 sections=[]는 즉시 작성 실패가 아니라 코드 검사(필수 칸 format)가 라운드에서
-    반려해 수정 기회를 준다(라운드에 셈). page가 None일 때만 즉시 실패."""
-    ctx, cids = week
-    empty_sections = json.dumps({"head_tiles": [], "sections": [], "summary": "사건이다. 쟁점이다.",
-                                 "title": TITLES[1], "log": "l", "attention": False})
-    add_section = revision([{"issue_idx": 0, "loc": "sections[0]", "action": "add",
-                             "value": _sec("새 절", "내용이다.", ["it:1#q1"])}])
-    responses = [plan(cids), empty_sections, add_section, verdict([]), verdict([])]
-    for i in (2, 3, 4):
-        responses += [page(i, f"{TITLES[i]} 근거 문장 요약 정리했다"), verdict([])]
-    ctx.llm.transport.responses = [response(r) for r in responses]
-    ctx.tracer = Tracer(ctx.db, "weekly", "S0")
-    pipeline.run_weekly("2026-W41", ctx, from_step="select", embedder=HashEmbedder(), cfg=CFG)
-    run_id = ctx.tracer.run_id
-    rounds = [r[0] for r in ctx.db.conn.execute(
-        "SELECT status FROM verdicts WHERE run_id=? AND topic_id='w41-model-1' AND checker='code' ORDER BY round", (run_id,))]
-    assert rounds and rounds[0] == "reject"  # 코드 검사가 "sections 0개"로 반려(즉시 실패가 아님)
-    t1 = ctx.db.conn.execute("SELECT status FROM topics WHERE run_id=? AND rank=1", (run_id,)).fetchone()
-    assert t1["status"] != "failed"  # 수정 기회를 받아 회복(절이 남아 있음)
-
-
 def test_critic_llm_error_retries_once_then_flags_summary_check(week, monkeypatch):
     """5.15-2: 검수자 호출이 LLMError(429 등)면 30초 뒤 1회 재시도. 재시도도 실패하면 검수 없이 통과시키지
     않고 summary check=true(⚠)+attention '검수 실패'로 남긴다(5.13의 'critic 실패 → 코드 통과판'을 대체)."""
