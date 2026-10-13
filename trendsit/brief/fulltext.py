@@ -11,6 +11,7 @@ import re
 from typing import TYPE_CHECKING, Any
 
 from ..core import config
+from ..core.artifacts import Document
 from ..core.db import DB
 
 if TYPE_CHECKING:
@@ -143,6 +144,31 @@ def raw_evidence(db: DB, eid: str, items: list[EvidenceItem]) -> str:
         # 006-A2-8: slide_fact와 전사 묶음이 같은 vd:@sec id로 겹칠 수 있다(명세 5.2 id 형식 그대로, sec가 25의
         # 배수면 충돌). 겹친 묶음(items[1:])의 원문도 잃지 않게 이어 붙인다
         other = " ".join(it.text for it in items[1:] if it.kind != "slide_fact" and it.text)
-        combined = " ".join(x for x in (window_text, other) if x)
+        # R2-07: 사실 줄(fallback) 자체가 빠지면 검수자가 slide_only_facts를 전사만으로 대조해 오반려한다
+        combined = " ".join(x for x in (fallback, window_text, other) if x)
         return combined or fallback
     return fallback
+
+
+def critic_documents(db: DB, order: list[str], pack: dict[str, list[EvidenceItem]]) -> list[Document]:
+    """검수자 원문(write.py가 씀, 5.2·5.15-1): 근거 id마다 따로가 아니라 구성원(member)마다 문서 하나.
+    it:#s 창(±1문장)은 같은 구성원 안에서 겹치면 한 번으로 합쳐 문장 순서대로 담고, 줄마다 원래 문장 id를 유지한다.
+    slide_fact·sl:·전사 묶음·레포 사실은 raw_evidence() 결과를 id를 붙여 그대로 줄로 쌓는다."""
+    by_member: dict[str, list[str]] = {}
+    for e in order:
+        by_member.setdefault(pack[e][0].member, []).append(e)
+    docs = []
+    for member, ids in by_member.items():
+        first = pack[ids[0]][0]
+        sent = [m for e in ids if (m := re.match(r"^it:(\d+)#s(\d+)$", e))]
+        if sent and len(sent) == len(ids):
+            item_id = int(sent[0][1])
+            row = db.conn.execute("SELECT text FROM item_texts WHERE item_id=?", (item_id,)).fetchone()
+            sents = sentences(row["text"]) if row and row["text"] else []
+            nums = sorted({n for m in sent for n in range(max(1, int(m[2]) - 1), min(len(sents), int(m[2]) + 1) + 1)})
+            lines = [f"[it:{item_id}#s{n}] {sents[n - 1]}" for n in nums] if sents else []
+        else:
+            lines = [f"[{e}] {t}" for e in ids if (t := raw_evidence(db, e, pack[e]))]
+        docs.append(Document(id=member, source=first.source.get("site") or first.channel,
+                             title=first.source.get("title"), text="\n".join(lines)))
+    return docs

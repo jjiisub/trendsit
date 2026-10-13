@@ -219,6 +219,7 @@ def test_raw_evidence_keeps_both_sides_when_slide_fact_and_transcript_id_collide
     transcript = EvidenceItem("vd:1@525", "vd:v1", "video", "transcript", "전사 묶음 원문이다.", src)
     out = fulltext.raw_evidence(db, "vd:1@525", [slide_fact, transcript])
     assert "창 안 발화다." in out and "전사 묶음 원문이다." in out
+    assert "발표 슬라이드 수치: 1위" in out  # R2-07: 사실 줄 자체도 창 전사와 함께 들어가야 함
 
 
 def test_repo_fact_lines_order_fact_then_trending_then_release():
@@ -236,6 +237,21 @@ def test_evidence_docs_groups_by_member_one_document():
     docs = evidence_docs(p)
     assert len(docs) == 1 and docs[0].id == "it:1"
     assert "[it:1#s1]" in docs[0].text and "[it:1#s2]" in docs[0].text
+
+
+def test_critic_documents_merges_overlapping_sentence_windows_into_one_doc(tmp_path):
+    """R2-01(5.15-1): 같은 구성원의 it:#s 창(±1문장)은 겹치면 한 번으로 합쳐 구성원마다 문서 하나로(문서 3배 비대화 방지)."""
+    db = DB(tmp_path / "t.db")
+    db.conn.execute("INSERT INTO items(id, source_id, channel, external_id, url, title, day, week) VALUES "
+                    "(1,'s','text','e','http://x','t','2026-10-06','2026-W41')")
+    db.conn.execute("INSERT INTO item_texts(item_id, text) VALUES (1, '하나다. 둘이다. 셋이다. 넷이다. 다섯이다.')")
+    src = {"site": "GeekNews", "title": "t"}
+    pack = {"it:1#s2": [EvidenceItem("it:1#s2", "it:1", "text", "sentence", "둘이다.", src)],
+            "it:1#s3": [EvidenceItem("it:1#s3", "it:1", "text", "sentence", "셋이다.", src)]}
+    docs = fulltext.critic_documents(db, ["it:1#s2", "it:1#s3"], pack)
+    assert len(docs) == 1 and docs[0].id == "it:1"
+    assert docs[0].text.count("둘이다") == 1 and docs[0].text.count("셋이다") == 1  # 겹친 창이 한 번만
+    assert docs[0].text.splitlines() == ["[it:1#s1] 하나다.", "[it:1#s2] 둘이다.", "[it:1#s3] 셋이다.", "[it:1#s4] 넷이다."]
 
 
 def test_evidence_docs_skips_summary_and_claim_kinds():

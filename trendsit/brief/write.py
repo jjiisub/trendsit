@@ -1,13 +1,13 @@
-"""작성자(1단) + 코드 검사 + 검수자 + 작성자 수정 루프(S6-1 5.5~5.6). 라운드: 초안(1) → 반려 → 수정(2) → 반려 → 수정(3). 최대 max_rounds, 코드 반려도 셈. 코드 검사가 반려하면 그 라운드는 검수자를 부르지 않는다(LLM 0원). 같은 이슈가 두 라운드(또는 마지막 라운드 뒤) 남으면 그 절(또는 summary) check=true, 토픽 status=checked. writer_revise는 고친 칸만 낸다(지적 안 된 위치를 바꾸면 되돌리고 횟수를 셈). 잘림(D-42): run_role이 1회 재시도 뒤에도 잘리면 같은 입력에 no_visuals=true로 1회 더(최대 호출 4회, C-5). 대체: writer 실패 → 토픽 제외(failed) / critic 실패 → 코드 통과판+attention / revise 실패 → 이전 판 유지"""
+"""작성자(1단) + 코드 검사 + 검수자 + 작성자 수정 루프(S6-1 5.5~5.6). 라운드: 초안(1) → 반려 → 수정(2) → 반려 → 수정(3). 최대 max_rounds, 코드 반려도 셈. 코드 검사가 반려하면 그 라운드는 검수자를 부르지 않는다(LLM 0원). 같은 이슈가 두 라운드(또는 마지막 라운드 뒤) 남으면 그 절(또는 summary) check=true, 토픽 status=checked. writer_revise는 고친 칸만 낸다(지적 안 된 위치를 바꾸면 되돌리고 횟수를 셈). 잘림(D-42): run_role이 1회 재시도 뒤에도 잘리면 같은 입력에 no_visuals=true로 1회 더(최대 호출 4회, C-5). 대체: writer 실패 → 토픽 제외(failed) / critic 실패(30초 뒤 1회 재시도까지) → summary check=true+attention(5.15-2) / revise 실패 → 이전 판 유지"""
 
 from __future__ import annotations
 
 import json
 import re
+import time
 from dataclasses import dataclass, field
 from typing import Any
 
-from ..core.artifacts import Document
 from ..core.artifacts_brief import (
     AliasLine,
     CriticInput,
@@ -142,11 +142,13 @@ def _run_critic(ctx: Ctx, res: TopicResult, topic: Applied, winp: WriterInput, p
                 pg: TopicPage, rnd: int, warns: list[str]) -> tuple[Any, str | None, int | None]:
     raw_ids = [e for e in pack if not all(it.kind in ("summary", "context") for it in pack[e])]
     order = [e for e in refs_of(pg) if e in raw_ids] + [e for e in raw_ids if e not in refs_of(pg)]
-    evid = [Document(id=e, source=pack[e][0].source.get("site") or pack[e][0].channel, title=pack[e][0].source.get("title"),
-                     text=fulltext.raw_evidence(ctx.db, e, pack[e])) for e in order]
+    evid = fulltext.critic_documents(ctx.db, order, pack)
     cinp = CriticInput(loc_lines=loc_lines(pg), page=pg, evidence=evid, angle=topic.angle, previous=winp.previous, code_warnings=warns, round=rnd)
     critic = load_role("critic", ctx.models)
     out = _call(critic, cinp, ctx, res.costs, "critic")
+    if out[0] is None and out[1] and out[1].startswith("LLMError"):  # 5.15-2: 429 등은 30초 뒤 1회 재시도
+        time.sleep(30)
+        out = _call(critic, cinp, ctx, res.costs, "critic")
     if out[0] is not None and not out[0].atoms and pg.sections:
         res.attention.append("검수자가 원자 사실 0개로 판정(대조 건너뜀), 다시 부름")
         again = cinp.model_copy(update={"code_warnings": [*warns, "직전 판정이 원자 사실 0개: 모든 문장을 원자 사실로 나눠 대조"]})
@@ -213,9 +215,11 @@ def _rounds(ctx: Ctx, res: TopicResult, topic: Applied, winp: WriterInput, pack:
         if not issues and review:
             res.rounds.append(log)
             verdict, err, vsid = _run_critic(ctx, res, topic, winp, pack, page, rnd, cr.warnings)
-            if verdict is None:
+            if verdict is None:  # 5.15-2: 재시도까지 실패하면 검수 없이 통과시키지 않고 summary check=true(⚠)
                 res.attention.append(f"검수 실패: {err}")
-                res.status, res.page, res.final_round = "passed", page, rnd
+                res.rounds.append(RoundLog(rnd, "critic", "reject", [], step_id=vsid))
+                check_locs.add("summary")
+                res.page, res.final_round = page, rnd
                 break
             log = _critic_log(rnd, verdict, vsid)
             issues = verdict.issues if verdict.status == "reject" else []
@@ -395,10 +399,10 @@ def write_topic(ctx: Ctx, topic: Applied, members: dict[str, Member], table: Ali
                        evidence=evidence_docs(pack), previous=previous_topic(ctx.db, topic.relation_topic_id), aliases=alias_lines(table, ms),
                        limits=writer_limits(cfg, n_sources), slide_candidates=slide_candidates, no_visuals=False)
     page, err, sid, winp = _initial_page(ctx, winp, res, draft)
-    if page is None or not page.sections:
+    if page is None:  # 5.15 R2-09: sections=[]는 즉시 실패가 아니라 코드 검사(format 반려)가 라운드에서 처리
         # pipeline._log_topic이 토픽마다 steps(writer,code) 행을 하나 남긴다(D-37 counts.written). 여기서 또
         # 남기면 실패 토픽이 두 번 세이므로(006-A1-24) attention에만 적고 트레이스는 _log_topic에 맡긴다
-        msg = "작성 실패: 잘림" if err and "출력 잘림" in err else f"작성 실패: {err or '절 없음'}"
+        msg = "작성 실패: 잘림" if err and "출력 잘림" in err else f"작성 실패: {err or '빈 응답'}"
         res.attention.append(msg)
         return res
     page, check_locs, last_issue = _rounds(ctx, res, topic, winp, pack, cfg, _canon_translit(table, ms, cfg),

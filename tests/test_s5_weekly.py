@@ -386,7 +386,8 @@ def test_export_video_sources_timeline_video_id_and_slide_only_if_file_exists(tm
 
 
 def test_critic_empty_atoms_is_not_a_pass(week):
-    """원자 사실 0개 통과는 대조를 건너뛴 판정: 한 번 다시 부르고, 또 비면 검수 실패(attention), 판정은 기록하지 않음."""
+    """원자 사실 0개 통과는 대조를 건너뛴 판정: 한 번 다시 부르고, 또 비면 검수 실패(5.15-2: summary check=true+attention,
+    실패 자체도 critic 판정으로 기록)."""
     ctx, cids = week
     empty = json.dumps({"atoms": [], "fact_support": {"total": 0, "supported": 0}, "issues": [], "status": "pass",
                         "log": "원자 사실 0개", "attention": False})
@@ -399,10 +400,53 @@ def test_critic_empty_atoms_is_not_a_pass(week):
     run_id = ctx.tracer.run_id
     checkers = [r[0] for r in ctx.db.conn.execute(
         "SELECT checker FROM verdicts WHERE run_id=? AND topic_id='w41-model-1' ORDER BY id", (run_id,))]
-    assert checkers == ["code"]  # 빈 판정 두 번 → 검수 실패, critic 판정 기록 없음
-    att = [json.loads(r[0]) for r in ctx.db.conn.execute(
-        "SELECT detail FROM steps WHERE run_id=? AND role='writer' AND kind='code' AND text LIKE 'w41-model-1%'", (run_id,))]
-    assert att and att[0]["topic_id"] == "w41-model-1"
+    assert checkers == ["code", "critic"]  # 빈 판정 두 번 → 검수 실패도 critic 판정으로 기록(5.15-2)
+    checks_json = ctx.db.conn.execute(
+        "SELECT checks_json FROM topics WHERE run_id=? AND topic_id='w41-model-1'", (run_id,)).fetchone()[0]
+    assert "summary" in json.loads(checks_json)  # 검수 실패는 summary check=true(⚠)로, 통과가 아니다
+
+
+def test_writer_empty_sections_goes_through_code_round_not_immediate_failure(week):
+    """R2-09(5.15): 작성자 출력 sections=[]는 즉시 작성 실패가 아니라 코드 검사(필수 칸 format)가 라운드에서
+    반려해 수정 기회를 준다(라운드에 셈). page가 None일 때만 즉시 실패."""
+    ctx, cids = week
+    empty_sections = json.dumps({"head_tiles": [], "sections": [], "summary": "사건이다. 쟁점이다.",
+                                 "title": TITLES[1], "log": "l", "attention": False})
+    add_section = revision([{"issue_idx": 0, "loc": "sections[0]", "action": "add",
+                             "value": _sec("새 절", "내용이다.", ["it:1#q1"])}])
+    responses = [plan(cids), empty_sections, add_section, verdict([]), verdict([])]
+    for i in (2, 3, 4):
+        responses += [page(i, f"{TITLES[i]} 근거 문장 요약 정리했다"), verdict([])]
+    ctx.llm.transport.responses = [response(r) for r in responses]
+    ctx.tracer = Tracer(ctx.db, "weekly", "S0")
+    pipeline.run_weekly("2026-W41", ctx, from_step="select", embedder=HashEmbedder(), cfg=CFG)
+    run_id = ctx.tracer.run_id
+    rounds = [r[0] for r in ctx.db.conn.execute(
+        "SELECT status FROM verdicts WHERE run_id=? AND topic_id='w41-model-1' AND checker='code' ORDER BY round", (run_id,))]
+    assert rounds and rounds[0] == "reject"  # 코드 검사가 "sections 0개"로 반려(즉시 실패가 아님)
+    t1 = ctx.db.conn.execute("SELECT status FROM topics WHERE run_id=? AND rank=1", (run_id,)).fetchone()
+    assert t1["status"] != "failed"  # 수정 기회를 받아 회복(절이 남아 있음)
+
+
+def test_critic_llm_error_retries_once_then_flags_summary_check(week, monkeypatch):
+    """5.15-2: 검수자 호출이 LLMError(429 등)면 30초 뒤 1회 재시도. 재시도도 실패하면 검수 없이 통과시키지
+    않고 summary check=true(⚠)+attention '검수 실패'로 남긴다(5.13의 'critic 실패 → 코드 통과판'을 대체)."""
+    from trendsit.brief import write as wr
+    from trendsit.core.errors import LLMError
+
+    ctx, cids = week
+    responses = [plan(cids), page(1, "Argon이 DeepSWE에서 77.9% 기록했다")]
+    for i in (2, 3, 4):
+        responses += [page(i, f"{TITLES[i]} 근거 문장 요약 정리했다"), verdict([])]
+    ctx.llm.transport.responses = [response(r) for r in responses]
+    monkeypatch.setattr(wr.time, "sleep", lambda s: None)
+    calls = stub_run_role(monkeypatch, wr, lambda n, role: LLMError("HTTP 429") if n in (2, 3) else None)
+    ctx.tracer = Tracer(ctx.db, "weekly", "S0")
+    pipeline.run_weekly("2026-W41", ctx, from_step="select", embedder=HashEmbedder(), cfg=CFG)
+    run_id = ctx.tracer.run_id
+    t1 = ctx.db.conn.execute("SELECT status, checks_json FROM topics WHERE run_id=? AND rank=1", (run_id,)).fetchone()
+    assert t1["status"] == "checked" and "summary" in json.loads(t1["checks_json"])
+    assert calls[:3] == ["writer", "critic", "critic"]  # 1회 실패 + 30초 뒤 재시도 1회(그래도 실패)
 
 
 def test_f2_diagram_with_only_critic_issue_is_kept_with_check(week):
