@@ -1,4 +1,4 @@
-"""작성자(1단) + 코드 검사 + 검수자 + 작성자 수정 루프(S6-1 5.5~5.6). 라운드: 초안(1) → 반려 → 수정(2) → 반려 → 수정(3). 최대 max_rounds, 코드 반려도 셈. 코드 검사가 반려하면 그 라운드는 검수자를 부르지 않는다(LLM 0원). 같은 이슈가 두 라운드(또는 마지막 라운드 뒤) 남으면 그 절(또는 summary) check=true, 토픽 status=checked. writer_revise는 고친 칸만 낸다(지적 안 된 위치를 바꾸면 되돌리고 횟수를 셈). 잘림(D-42): run_role이 1회 재시도 뒤에도 잘리면 같은 입력에 no_visuals=true로 1회 더(최대 호출 4회, C-5). 대체: writer 실패 → 토픽 제외(failed) / critic 실패(30초 뒤 1회 재시도까지) → summary check=true+attention(5.15-2) / revise 실패 → 이전 판 유지"""
+"""작성자(1단) + 코드 검사 + 검수자 + 작성자 수정 루프(S6-1 5.5~5.6). 라운드: 초안(1) → 반려 → 수정(2) → 반려 → 수정(3). 최대 max_rounds, 코드 반려도 셈. 코드 검사가 반려하면 그 라운드는 검수자를 부르지 않는다(LLM 0원). 같은 이슈가 두 라운드(또는 마지막 라운드 뒤) 남으면 그 절(또는 summary) check=true, 토픽 status=checked. writer_revise는 고친 칸만 낸다(지적 안 된 위치를 바꾸면 되돌리고 횟수를 셈). 잘림(D-42): run_role이 1회 재시도 뒤에도 잘리면 같은 입력에 no_visuals=true로 1회 더(최대 호출 5회, C-5). 대체: writer 실패 → 토픽 제외(failed) / critic 실패(30초 뒤 1회 재시도까지) → summary check=true+attention(5.15-2) / revise 실패 → 이전 판 유지"""
 
 from __future__ import annotations
 

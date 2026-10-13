@@ -74,10 +74,10 @@ else
   fail A3 "check-config: $cc; writer.md 숫자 패턴: $digit_pat; limits. 참조: ${limits_ref:-0}"
 fi
 pt A3b "TopicPage v2 스키마(이상 예시 거부·enforce), WriterLimits가 brief.yaml 값" tests/test_s6_1_write.py -k "schema or enforce_clears or writer_limits"
-pt A4 "근거 공급(글 원문 문장, 전사 25초 묶음, 슬라이드 판독, 레포 사실, 문서는 구성원당 하나)" tests/test_s5_evidence.py -k "fulltext or article_lines or repo_fact_lines or evidence_docs or write_topic_video_and_transliteration"
+pt A4 "근거 공급(글 원문 문장, 전사 25초 묶음, 슬라이드 판독, 레포 사실, 문서는 구성원당 하나)" tests/test_s5_evidence.py -k "fulltext or article_lines or repo_fact_lines or evidence_docs or raw_evidence or critic_documents or write_topic_video_and_transliteration"
 pt A5 "코드 검사(5.5: 수치 대조·refs 실재·시각 요소 구조·자동 수정 4종·경고, 이상 예시 포함)" tests/test_s6_1_write.py -k "check_passes or check_rejects or check_accepts or autofix or page_refs or refs_of"
 pt A6 "라운드·수정(위치 문법 v2 apply, sections add·delete, 같은 이슈 2회 check, 1부터 센 위치), 잘림→no_visuals 재시도" \
-  tests/test_s5_weekly.py tests/test_s6_1_write.py -k "rounds or one_based or empty_atoms or f2 or diagram_issue or apply_revision or truncation"
+  tests/test_s5_weekly.py tests/test_s6_1_write.py -k "rounds or one_based or empty_atoms or f2 or diagram_issue or apply_revision or truncation or partial_week or summary_status_partial or critic_llm_error or empty_sections_goes_through"
 pt A7 "슬라이드 후보(짧은 줄+수치, 표), 미배치 절 배정, ffmpeg 프레임 960x540·재실행 시 재생성 안 함, media 없음→None" \
   tests/test_s6_1_write.py -k "slide_candidates or place_candidate or ensure_frame"
 
