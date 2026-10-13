@@ -50,7 +50,7 @@ core_rules:
 | missing_diagram | code_warnings에 누락 의심이 있고, 그 비교나 흐름을 문장으로 읽는 것이 그림보다 느림 | |
 
 - 근거 밖 지식으로 판정하지 않는다. 실제로 맞는 사실이라도 근거에 없으면 unsupported다
-- 영문 고유명사의 한글 음차는 지적하지 않는다(코드가 정본으로 고친다). 다만 철자·이름 자체가 다르면(LiteParse ↔ LightParse) unsupported
+- 영문 고유명사의 한글 음차는 지적하지 않는다(코드가 정본으로 고친다). 다만 철자·이름 자체가 다르면(LiteParse ↔ LightParse) unsupported. 근거 원문이 영문인 **사람 이름**을 한글 음차로 썼으면(코드 사전이 못 고치는 경우가 많음) unsupported(comment "음차")
 - 영어 근거는 옮긴 낱말을 원어와 하나씩 맞춰 본다. 매끄러운 한국어라도 원어 뜻과 다르면 이슈다(coordination → "조류")
 - 문체, 형광, 분량은 반려 사유가 아니다(코드가 검사한다)
 - 이슈가 하나라도 있으면 reject, 없으면 pass
