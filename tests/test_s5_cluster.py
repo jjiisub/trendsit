@@ -238,3 +238,28 @@ def test_label_sheet_keeps_other_weeks_rows(tmp_path):
     _merge_csv(p, ("week", "a", "b"), cols, [{"week": "W40", "a": "m", "b": "n", "answer": "diff"}], keep, "W40")
     got = {(r["week"], r["a"], r["label"]) for r in csv.DictReader(p.open())}
     assert got == {("W41", "x", "same"), ("W40", "m", "")}
+
+
+def test_merge_csv_never_drops_same_week_rows_missing_from_a_regen(tmp_path):
+    """R2-10(5.15-4): 재생성이 같은 주에 더 적은 쌍을 내도(묶기 결과가 달라짐) 기존에 사람이 라벨을 채운 행을
+    지우지 않는다(58→36으로 줄던 버그)."""
+    import csv
+
+    from trendsit.brief.report import _merge_csv
+
+    p = tmp_path / "decide.csv"
+    cols = ["week", "a", "b", "answer", "label", "critique", "labeler"]
+    keep = ("label", "critique", "labeler")
+    _merge_csv(p, ("week", "a", "b"), cols,
+              [{"week": "W41", "a": "x", "b": "y", "answer": "same"}, {"week": "W41", "a": "p", "b": "q", "answer": "diff"}],
+              keep, "W41")
+    rows = list(csv.DictReader(p.open()))
+    for r in rows:
+        r["label"], r["labeler"] = "same", "opus-5.5"
+    with p.open("w", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=cols)
+        w.writeheader()
+        w.writerows(rows)
+    _merge_csv(p, ("week", "a", "b"), cols, [{"week": "W41", "a": "x", "b": "y", "answer": "same"}], keep, "W41")
+    got = {(r["week"], r["a"], r["label"]) for r in csv.DictReader(p.open())}
+    assert got == {("W41", "x", "same"), ("W41", "p", "same")}  # p-q는 재생성에 없어도 지워지지 않음
