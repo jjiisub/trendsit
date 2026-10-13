@@ -160,15 +160,18 @@ def _fix_sections(page: TopicPage, hi: int, slide_candidates: list[str], timelin
 
 def _canonical_names_and_spacing(page: TopicPage, canon: dict[str, str],
                                  translit: list[tuple[re.Pattern[str], str]], fixes: list[dict[str, Any]]) -> TopicPage:
-    """별칭 → 정본(긴 표기부터), 음차 표기 → 정본, 그 뒤 공백·문장부호 정리(한 번에 돈다)."""
-    for loc, text in _canon_slots(page):
-        new = text
-        for alias in sorted(canon, key=len, reverse=True):
-            pat = rf"(?<![A-Za-z0-9]){re.escape(alias)}(?![A-Za-z0-9])"
+    """별칭 → 정본(긴 표기부터), 음차 표기 → 정본, 그 뒤 공백·문장부호 정리(한 번에 돈다). 시각 요소 글자도(v1.3)."""
+    def names(new: str) -> str:
+        for alias in sorted(canon, key=len, reverse=True):  # @scope/pkg·계정 이름 안은 안 바꿈(v1.3: @openrig/cli)
+            pat = rf"(?<![A-Za-z0-9@/_.-]){re.escape(alias)}(?![A-Za-z0-9]|[-/_.@][A-Za-z0-9])"
             if alias and re.search(pat, new) and canon[alias] not in new:
                 new = re.sub(pat, canon[alias], new)
         for tp, target in translit:
             new = tp.sub(target, new)
+        return re.sub(r"([A-Za-z][\w.+-]*(?: [\w.+-]+)*)\(\1\)", r"\1", new)  # 병기가 같아진 "Anthropic(Anthropic)" 정리
+    page = _canon_visuals(page, names, fixes)
+    for loc, text in _canon_slots(page):
+        new = names(text)
         if new != text:
             fixes.append({"loc": loc, "rule": "별칭 표기를 정본으로", "before": text, "after": new})
             page = _set(page, loc, new)
@@ -178,6 +181,26 @@ def _canonical_names_and_spacing(page: TopicPage, canon: dict[str, str],
             fixes.append({"loc": loc, "rule": "공백·문장부호 정리", "before": new, "after": new2})
             page = _set(page, loc, new2)
     return page
+
+
+_CANON_SKIP = {"refs", "ref", "slide", "visual", "topic_id", "date", "check", "video_secs", "unit"}
+
+
+def _canon_visuals(page: TopicPage, fn: Any, fixes: list[dict[str, Any]]) -> TopicPage:
+    """head_tiles·절 시각 요소(표 칸·막대 라벨·타일·사건)·슬라이드 캡션의 글자에 이름 정리(v1.3: 표의 '제미나이 4 아르곤')."""
+    def walk(x: Any) -> Any:
+        if isinstance(x, str):
+            return fn(x)
+        if isinstance(x, list):
+            return [walk(v) for v in x]
+        return {k: (v if k in _CANON_SKIP else walk(v)) for k, v in x.items()} if isinstance(x, dict) else x
+    d = page.model_dump()
+    new = {"head_tiles": walk(d["head_tiles"]),
+           "sections": [s | {k: walk(s[k]) for k in ("bars", "table", "tiles", "events", "slide_caption")} for s in d["sections"]]}
+    if new["head_tiles"] == d["head_tiles"] and new["sections"] == d["sections"]:
+        return page
+    fixes.append({"loc": "visuals", "rule": "별칭 표기를 정본으로(시각 요소)", "before": "", "after": ""})
+    return TopicPage.model_validate(d | new)
 
 
 def _cap_highlights(page: TopicPage, hl: Any, fixes: list[dict[str, Any]]) -> TopicPage:
@@ -417,8 +440,8 @@ def check(page: TopicPage, pack: dict[str, list[EvidenceItem]], n_sources: int, 
 def warnings(page: TopicPage, pack: dict[str, list[EvidenceItem]], cfg: BriefConfig) -> list[str]:
     out = []
     n_visual = sum(1 for s in page.sections if s.visual != "none")
-    if page.sections and n_visual > len(page.sections) / 2:
-        out.append(f"남발 의심: visual≠none {n_visual}/{len(page.sections)}절(절의 절반 넘음)")
+    if n_visual > cfg.write.visuals_target[1]:  # v1.3: 기준을 '절의 절반'에서 목표 범위 위로
+        out.append(f"남발 의심: visual≠none {n_visual}개(목표 {cfg.write.visuals_target[1]}개 넘음)")
     paras = [(i, j, plain(p.text)) for i, s in enumerate(page.sections) for j, p in enumerate(s.paragraphs)]
     for a in range(len(paras)):
         for b in range(a + 1, len(paras)):

@@ -339,7 +339,7 @@ def browser_checks(site, data):
             g = e["gate"]
             miss = gate9(g, 812)
             if e["topic"] and e["vw"] == 375 and not (g["pointsTop"] is not None and g["pointsTop"] < 812):
-                miss.append(f'5 핵심 포인트가 첫 화면 밖({g["pointsTop"]})')
+                miss.append(f'5 본문 시작(머리 타일·첫 절)이 첫 화면 밖({g["pointsTop"]})')
             if g["cmptOverflowBad"]:
                 miss.append(f'표(.cmpt-wrap)가 자신만 가로 스크롤하지 않음 {g["cmptOverflowBad"]}건(5.9)')
             if g["imgBad"]:

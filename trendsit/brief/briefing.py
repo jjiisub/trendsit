@@ -11,6 +11,7 @@ import re
 from pathlib import Path
 from typing import Any
 
+from ..core import config
 from ..core.artifacts_brief import TopicPage
 from ..core.config import ROOT
 from ..core.db import DB
@@ -98,6 +99,17 @@ def _visual_of(s: Any, refs: Any, by_eid: dict[str, str]) -> dict[str, Any]:
     return {"type": "none"}
 
 
+def _section_secs(s: Any, starts: list[int], cap: int, derive: bool = True) -> list[int]:
+    """작성자가 고른 video_secs 뒤에, 그 절 단락 근거의 초(vd:·sl: …@초)가 든 타임라인 구간 시작 초를 덧붙인다(v1.3).
+    작성자가 칸을 거의 비워 두어(W40·W41 영상 토픽 9절 중 1절) 근거에서 코드로 채운다. 타임라인에 있는 초만, 시간순 cap개까지."""
+    mine = [sec for sec in s.video_secs if sec in starts]
+    derived = []
+    for r in (r for p in s.paragraphs for r in p.refs):
+        if derive and (m := re.match(r"^(?:vd|sl):\d+@(\d+)$", r)) and (before := [t for t in starts if t <= int(m[1])]):
+            derived.append(before[-1])
+    return sorted(dict.fromkeys([*mine, *sorted(set(derived) - set(mine))][:cap]))  # 작성자 선택 먼저(cap에 안 밀림)
+
+
 def _slide_of(db: DB, s: Any) -> dict[str, Any] | None:
     if not s.slide:
         return None
@@ -133,13 +145,15 @@ def export_topic(db: DB, run_id: str, topic_id: str, sources_by_id: dict[str, di
     timeline_by_sec: dict[int, dict[str, Any]] = {}
     for vid in video_ids.values():
         timeline_by_sec |= _video_timeline(db, vid)
+    # 영상 2개 이상이면 타임라인이 섞여 초가 엉뚱한 영상에 붙으므로 근거로 채우지 않는다(작성자 값만, 9장 ②)
+    starts, cap = sorted(timeline_by_sec), config.load("brief.yaml").write.video_secs_max
     sections = []
     for s in page.sections:
         sections.append({"heading": s.heading, "paragraphs": [{"text": p.text, "refs": refs(p.refs)} for p in s.paragraphs],
                          "visual": _visual_of(s, refs, by_eid), "slide": _slide_of(db, s),
                          "video_secs": [{"sec": sec, "label": timeline_by_sec[sec].get("label", ""),
                                         "slide": bool(timeline_by_sec[sec].get("slide"))}
-                                       for sec in s.video_secs if sec in timeline_by_sec],
+                                       for sec in _section_secs(s, starts, cap, derive=len(video_ids) == 1)],
                          "check": s.check})
     checks = visible_checks(json.loads(t["checks_json"] or "[]"), page)
     rel: dict[str, Any] = {"type": t["relation_type"] or "new"}

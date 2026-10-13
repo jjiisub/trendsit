@@ -85,7 +85,7 @@ async function gateInBrowser([weights, tokens]) {
   };
   g.hlMidBreaks = [];
   for (const m of document.querySelectorAll('mark.hl')) g.hlMidBreaks.push(...midBreaks(m));
-  const pt = document.querySelector('.dsec');
+  const pt = document.querySelector('.tiles, .dsec');  // v1.3: 본문 시작 = 머리 타일 또는 첫 절(문서 순서 첫 것)
   g.pointsTop = pt ? Math.round(pt.getBoundingClientRect().top + window.scrollY) : null;
   const small = [];
   for (const a of document.querySelectorAll('a.ref')) {

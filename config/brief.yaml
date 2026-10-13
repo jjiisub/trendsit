@@ -14,7 +14,8 @@ aliases:
   transliteration: {Luna: 루나, Sol: 솔, Astra: 아스트라, Argon: 아르곤, Flash: 플래시, DeepSeek: 딥시크, Claude: 클로드,
                     Gemini: 제미나이, Gemma: 젬마, Opus: 오퍼스, Sonnet: 소넷|소네트, Haiku: 하이쿠, Mistral: 미스트랄,
                     Llama: 라마, Qwen: 큐웬|큐원|퀜, Codex: 코덱스, Grok: 그록, Kimi: 키미, Solar: 솔라, Exaone: 엑사원,
-                    HyperCLOVA: 하이퍼클로바, Decisions: 디시전스, Nemotron: 네모트론}
+                    HyperCLOVA: 하이퍼클로바, Decisions: 디시전스, Nemotron: 네모트론,
+                    Anthropic: 앤트로픽, OpenAI: 오픈AI|오픈에이아이, Google: 구글, Microsoft: 마이크로소프트, Large: 라지}
 
 cluster:
   thresholds:
@@ -65,6 +66,7 @@ write:                              # S6-1: 절 구조(5.10)
   head_tiles_max: 4
   tiles_per_section: [2, 3]
   visuals_max: 4
+  visuals_target: [2, 3]          # S6-1 v1.3: 페이지 시각 요소 목표(원문에 재료가 있을 때). 상한은 visuals_max
   bars_items: [2, 6]
   table: {rows: [2, 6], cols: [2, 4]}
   slides_max: 2

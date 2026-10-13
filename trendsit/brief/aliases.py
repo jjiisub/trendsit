@@ -37,6 +37,11 @@ def norm_key(name: str) -> str:
 
 
 _SEP = re.compile(r"([\s\-_/]+)")
+# 한글 경계: 앞은 글자가 아니고, 뒤는 글자가 아니거나 조사(솔루션의 '솔'은 잡지 않음)
+# 식별자 보호(v1.3): @scope/pkg·URL·계정 이름 안(앞이 @ / _ . -, 뒤가 - / _ . @ + 영숫자)은 바꾸지 않는다
+_BEFORE = r"(?<![0-9A-Za-z가-힣@/_.\-])"
+_GUARD = r"(?![\-/_.@][0-9A-Za-z])"
+_AFTER = r"(?=$|[^0-9A-Za-z가-힣]|(?:으로|에서|보다|처럼|은|는|이|가|을|를|의|에|와|과|도|로|만)(?:$|[^가-힣]))"
 
 
 def _alts(translit: dict[str, str]) -> dict[str, list[str]]:
@@ -65,9 +70,16 @@ def translit_pattern(name: str, translit: dict[str, str]) -> re.Pattern[str] | N
         return None
     parts = ["(?:" + "|".join(re.escape(x) for x in sorted({t, *alts.get(t.lower(), [])}, key=len, reverse=True)) + ")"
              for t in toks]
-    # 한글 경계: 앞은 글자가 아니고, 뒤는 글자가 아니거나 조사(솔루션의 '솔'은 잡지 않음)
-    after = r"(?=$|[^0-9A-Za-z가-힣]|(?:으로|에서|보다|처럼|은|는|이|가|을|를|의|에|와|과|도|로|만)(?:$|[^가-힣]))"
-    return re.compile(r"(?<![0-9A-Za-z가-힣])" + r"[\s\-]?".join(parts) + after, re.IGNORECASE)
+    return re.compile(_BEFORE + r"[\s\-]?".join(parts) + _GUARD + _AFTER, re.IGNORECASE)
+
+
+def word_patterns(translit: dict[str, str]) -> list[tuple[re.Pattern[str], str]]:
+    """사전 낱말 하나하나의 음차 → 영문(S6-1 v1.3). 토픽 이름에 안 걸린 단독 낱말("제미나이는", "앤트로픽의")도 원문 표기로."""
+    out = []
+    for en, ko in translit.items():  # 2글자는 조사 없이 나올 때만("솔로"·"라지만" 보호), 1글자("솔")는 이름 패턴에서만
+        for k in sorted((k for k in ko.split("|") if len(k) >= 2), key=len, reverse=True):
+            out.append((re.compile(_BEFORE + re.escape(k) + _GUARD + (_AFTER if len(k) >= 3 else r"(?=$|[^0-9A-Za-z가-힣]|\d)")), en))
+    return out
 
 
 def numbers_of(name: str) -> tuple[str, ...]:

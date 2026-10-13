@@ -375,7 +375,8 @@ def test_export_video_sources_timeline_video_id_and_slide_only_if_file_exists(tm
                                              {"sec": 60, "label": "슬라이드 등장", "slide": True}]
     assert ex1["sections"][0]["video_secs"] == [{"sec": 10, "label": "시작", "slide": False},
                                                 {"sec": 60, "label": "슬라이드 등장", "slide": True}]
-    assert ex1["sections"][1]["video_secs"] == []
+    # v1.3(5.14-2): 작성자가 비운 video_secs도 단락 근거 vd:9@10이 든 타임라인 구간(10초)으로 채운다
+    assert ex1["sections"][1]["video_secs"] == [{"sec": 10, "label": "시작", "slide": False}]
     assert ex1["sections"][0]["slide"] is None  # 파일 없음 → null(C-7)
 
     (tmp_path / "data" / "slides").mkdir(parents=True, exist_ok=True)

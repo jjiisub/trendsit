@@ -248,6 +248,8 @@ class WriterLimits(_Strict):
     head_tiles_max: int
     tiles_per_section: tuple[int, int]
     visuals_max: int
+    visuals_target: tuple[int, int] = Field(description="페이지 시각 요소 목표(원문에 재료가 있을 때)")
+    highlights_page: tuple[int, int] = Field(description="페이지 전체 형광 개수 범위")
     bars_items: tuple[int, int]
     table_rows: tuple[int, int]
     table_cols: tuple[int, int]

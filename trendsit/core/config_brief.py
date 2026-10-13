@@ -118,6 +118,7 @@ class WriteCfg(_Strict):
     head_tiles_max: int
     tiles_per_section: tuple[int, int]
     visuals_max: int
+    visuals_target: tuple[int, int]
     bars_items: tuple[int, int]
     table: TableCfg
     slides_max: int

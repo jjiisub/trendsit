@@ -28,7 +28,7 @@ from ..core.db import DB
 from ..core.errors import LLMError
 from ..core.role import RoleFailed, load_role, run_role
 from . import checks, fulltext, slides
-from .aliases import AliasTable, to_original, translit_pattern
+from .aliases import AliasTable, to_original, translit_pattern, word_patterns
 from .evidence import EvidenceItem, Member, cap_pack, evidence_docs, pack_index
 from .revision import LOC, apply_revision, normalize_loc, top_loc
 from .select import Applied
@@ -83,6 +83,7 @@ def writer_limits(cfg: BriefConfig, n_sources: int) -> WriterLimits:
                         paragraph_sentences_max=w.paragraphs.sentences_max, paragraph_chars_max=w.paragraphs.chars_max,
                         summary_sentences=w.summary.sentences, summary_chars_max=w.summary.chars_max, heading_chars_max=w.heading_chars_max,
                         head_tiles_max=w.head_tiles_max, tiles_per_section=w.tiles_per_section, visuals_max=w.visuals_max, bars_items=w.bars_items,
+                        visuals_target=w.visuals_target, highlights_page=w.highlights.page,
                         table_rows=w.table.rows, table_cols=w.table.cols, slides_max=w.slides_max, video_secs_max=w.video_secs_max,
                         max_refs_per_paragraph=cfg.evidence.max_refs_per_paragraph)
 
@@ -133,6 +134,7 @@ def _canon_translit(table: AliasTable, ms: list[Member], cfg: BriefConfig) -> tu
         target = to_original(table.canonical(name), tl)
         if (pat := translit_pattern(target, tl)) is not None:
             translit.append((pat, target))
+    translit += word_patterns(tl)  # 이름 패턴 뒤에 낱말 단위(v1.3)
     return {a: c.canonical for c in alias_lines(table, ms) for a in c.aliases}, translit
 
 

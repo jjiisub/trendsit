@@ -14,5 +14,6 @@ jobs:
         with:
           enable-cache: true
       - run: uv sync --locked
+      - run: sudo apt-get update -q && sudo apt-get install -y -q ffmpeg  # S6-1 슬라이드 프레임 테스트(ffmpeg 없으면 실패가 정상, 명세 2장)
       - run: uv run ruff check .
       - run: uv run pytest -q
