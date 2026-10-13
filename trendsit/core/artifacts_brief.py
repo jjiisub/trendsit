@@ -345,9 +345,15 @@ class Change(_Strict):
     issue_idx: int
     loc: str
     action: Literal["edit", "delete", "add"]
-    value: str | Para | Tile | BarGroup | Table | EventGroup | NumberItem | EventItem | Section | list[str] | list[int] | None = Field(
+    value: str | Para | Tile | BarGroup | Table | EventGroup | NumberItem | EventItem | Section | list[str | float] | list[int] | None = Field(
         description="그 위치의 새 값(writer와 같은 칸 형식, 하위 위치면 그 항목·글자). delete면 null. "
                      "sections 전체 add/delete 허용(sections[i]), sections 전체 삭제는 거부")
+
+    @field_validator("value", mode="after")
+    @classmethod
+    def _row_as_text(cls, v: Any) -> Any:
+        # R2-04: table.rows[k] 수정도 writer처럼 숫자 셀을 받는다(문자열만 허용하면 구조화 출력이 막혀 수정 전체가 버려짐)
+        return [_num_text(c) if isinstance(c, float) else c for c in v] if isinstance(v, list) and v and not isinstance(v[0], int) else v
 
 
 class TopicPageRevision(RoleOutput):

@@ -210,7 +210,15 @@ def apply_revision(prev: TopicPage, rev: TopicPageRevision, allowed: set[str]) -
         if idx_s < len(data[name]):
             data[name].pop(idx_s)
     for name, idx_s, dumped in sorted(adds, key=lambda x: x[1]):
+        # R2-05: 지적 없이 허용되는 add 하나가(예: head_tiles 4개 초과) 스키마를 깨도 그 add만 되돌리고
+        # 같은 revision의 다른(지적된) 변경은 살린다(007-C1-2, _apply_sub_change와 같은 격리 방식)
+        before = list(data[name])
         data[name].insert(min(idx_s, len(data[name])), dumped)
+        try:
+            TopicPage.model_validate(data)
+        except ValueError:
+            data[name] = before
+            notes.append(f"{name}[{idx_s}] add: 적용하면 스키마가 깨져 이 추가만 되돌림")
     try:
         return TopicPage.model_validate(data), reverts, notes
     except ValueError as e:
