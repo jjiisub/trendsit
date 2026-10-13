@@ -7,8 +7,8 @@ cd "$(dirname "$0")/.."
 DB="data/trendsit.db"
 FORCED=()  # 이번 실행에서 --force로 푼 주들("week|이전status|이전run_id"), 실패 시 trap이 전부 안내
 
-week_state() {  # "status|current_run_id"(읽기만, -readonly)
-  sqlite3 -readonly -separator '|' "$DB" "SELECT status, current_run_id FROM weeks WHERE week='$1'"
+week_state() {  # "status|current_run_id"(SELECT만. -readonly는 WAL에서 -shm이 없으면 열지 못함(14))
+  sqlite3 -separator '|' "$DB" "SELECT status, current_run_id FROM weeks WHERE week='$1'"
 }
 
 on_err() {  # v1.2: weekly 명령 자체가 실패(set -e)해도, --force한 모든 주의 복구 명령을 안내하고 종료 코드 1
