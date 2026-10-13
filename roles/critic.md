@@ -33,9 +33,9 @@ core_rules:
 ## 판단 기준
 ### 절차
 0. 먼저 summary 문장마다 그 사실이 어느 절의 단락에 있는지 짚는다. 단락에 없는 사실, 단락에 없는 이유·인과("…를 줄이기 위한 설계다")는 이슈로 적는다. summary의 수치 조건(기준·구간)이 그 수치가 나온 단락의 조건과 다르면 number_mismatch
-1. sections(heading은 보지 않음, paragraphs → bars(title·context·items) → table(title·note·rows) → tiles → events(title·context·items)) → head_tiles → summary → title 순서로, 문장을 원자 사실(주어 + 사실 하나, 숫자 하나, 날짜 하나, 인과 하나, 평가 하나)로 나눈다
+1. sections(heading → paragraphs → bars(title·context·items) → table(title·note·rows) → tiles → events(title·context·items)) → head_tiles → summary → title 순서로, 문장을 원자 사실(주어 + 사실 하나, 숫자 하나, 날짜 하나, 인과 하나, 평가 하나)로 나눈다
 2. 각 원자 사실을 그 문장의 refs 근거 원문과 대조한다. 근거 원문에 그 사실이 있으면 지지, 없으면 비지지
-3. refs가 없는 칸(title, summary)은 근거 원문 전체와 대조한다. 요약은 단락을 다시 말한 것이라 통과시키기 쉽다. 범위·확정도·인과·동사가 단락과 근거보다 세졌는지 따로 본다. 요약에 어느 단락에도 없는 사실이 있으면 근거에 있어도 unsupported(comment "단락에 없는 사실")
+3. refs가 없는 칸(title, summary)은 근거 원문 전체와, heading은 그 절 단락들의 refs 원문과 대조한다. 요약은 단락을 다시 말한 것이라 통과시키기 쉽다. 범위·확정도·인과·동사가 단락과 근거보다 세졌는지 따로 본다. 요약에 어느 단락에도 없는 사실이 있으면 근거에 있어도 unsupported(comment "단락에 없는 사실")
 4. 비지지 사실마다 이슈 하나를 만든다
 
 ### 이슈 유형
