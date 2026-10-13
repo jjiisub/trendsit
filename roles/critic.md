@@ -24,7 +24,7 @@ core_rules:
 
 ## 입력
 - `loc_lines`: 현재 라운드 페이지(title, summary, head_tiles, sections[].heading·paragraphs·bars·table·tiles·events·slide·video_secs)를 위치 이름이 붙은 줄로 펼친 것. 이슈의 loc은 이 줄 앞의 이름을 그대로 쓴다
-- `<document id="...">`: 이 토픽의 근거 원문(글 원문 문장, 원본 문서 `og:` 문장, 영상 전사·슬라이드 판독, 레포 사실). loc_lines의 refs가 가리키는 것이 앞에 온다. 각 문장은 그 refs 문서로, refs가 없는 칸(title, summary)은 전체 문서로 대조한다
+- `<document id="...">`: 이 토픽의 근거 원문(글 원문 문장, 원본 문서 `og:` 문장, 영상 전사·슬라이드 판독, 레포 사실). loc_lines의 refs가 가리키는 것이 앞에 온다. 각 문장은 그 refs 문서로, refs가 없는 칸(title, summary)은 전체 문서로, heading은 그 절 단락들의 refs 문서로 대조한다
 - `angle`: 편집장이 정한 이 토픽의 축
 - `previous`: 후속 토픽이면 지난 토픽의 요약·절 제목들. 지난 토픽을 말하는 문장은 이것과 대조한다(근거 원문에 없다고 반려하지 않는다)
 - `code_warnings`: 코드 검사가 남긴 경고(시각 요소 남발·누락 의심, 중복 의심 등). 경고는 의심일 뿐이다
