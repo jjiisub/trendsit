@@ -1,0 +1,97 @@
+{
+ "input": {
+  "plan": {
+   "rank": 4,
+   "angle": "소형 모델 가격 인하와 비용 대비 가치",
+   "relation": {
+    "type": "follow_up",
+    "topic_id": "w40-claude-sonnet-5-5"
+   }
+  },
+  "evidence": [
+   {
+    "id": "it:1144",
+    "source": "Simon Willison's Weblog",
+    "text": "[og:1144#q1] 원문: Introducing Claude Haiku 5.5: the cheapest, fastest, and most capable small model we’ve ever released.\n[og:1144#q2] 원문: Haiku 5.5 is especially good value when used for tasks with prompts up to 100,000 tokens, which make up around 90% of requests to our previous Haiku model.\n[og:1144#q2] (카드 수치, 위 원문에서 뽑음) 기본 가격 적용 토큰 한도 [100,000 tokens]\n[og:1144#q2] (카드 수치, 위 원문에서 뽑음) 이전 Haiku 요청 중 100k 토큰 이하 비율 [90%]\n[og:1144#q3] 원문: Max 5x users will get $100 in credits per month, Max 20x users will get $200, and Team subscribers will receive up to $500, pooled across their users.\n[og:1144#q3] (카드 수치, 위 원문에서 뽑음) Max 5x 구독자 월별 API 크레딧 [$100]\n[og:1144#q3] (카드 수치, 위 원문에서 뽑음) Max 20x 구독자 월별 API 크레딧 [$200]\n[og:1144#q3] (카드 수치, 위 원문에서 뽑음) Team 구독자 월별 API 크레딧 상한 [$500]\n[og:1144#q4] 원문: Haiku 5.5 is available at a much lower price than Haiku 4.5. On average, it now costs around 75% less to run.\n[og:1144#q4] (카드 수치, 위 원문에서 뽑음) Haiku 4.5 대비 평균 비용 절감 [75%]\n[it:1144#s1] Claude Haiku 5.5\n[it:1144#s2] 7th October 2026\n[it:1144#s3] As previously promised, here’s Anthropic’s new fast, low cost model: Introducing Claude Haiku 5.5.\n[it:1144#s4] The previous Haiku, 4.5, was very much showing its age.\n[it:1144#s5] It came out almost a year ago, and was priced at $1/million input and $5/million output—relatively expensive even back then, and a full 10x the price of OpenAI’s GPT-6 Luna, released last month.\n[it:1144#s6] The new Haiku exactly matches the price of GPT-6 Luna—$0.10/$0.50—up to 100,000 tokens.\n[it:1144#s7] Beyond 100,000 tokens the price increases 5x to $0.50/$2.50.\n[it:1144#s8] Luna itself has a price increase at 272,000 tokens but only to $0.20/$0.75.\n[it:1144#s9] Haiku 5.5 also uses a new, less generous tokenizer.\n[it:1144#s10] My Claude Token Counter tool shows that the same long prompt uses around 1.25x as many tokens with Haiku 5.5 compared to Haiku 4.5, so there’s a hidden price increase there.\n[it:1144#s11] If your workloads fit in 100,000 tokens, Haiku is the same price as Luna and reports higher benchmark scores.\n[it:1144#s12] Above 100,000 tokens, Luna looks like a much better deal.\n[it:1144#s13] The most recent release of llm-anthropic finally fixed it so I don’t need to ship a new version of that plugin for every new model.\n[it:1144#s14] I tested the new model like this:\n[it:1144#s15] llm install -U llm-anthropic\n[it:1144#s16] llm anthropic refresh\n[it:1144#s17] llm -m claude-haiku-5.5 \"Generate an SVG of a pelican riding a bicycle\" -o thinking_effort low\n[it:1144#s18] Pelicans\n[it:1144#s19] Here are pelicans for low, medium, high, xhigh, and max.\n[it:1144#s20] The new Haiku doesn’t let you disable reasoning, and defaults to medium.\n[it:1144#s21] I got a good bicycle frame for everything beyond low.\n[it:1144#s22] The low effort pelican cost 0.0936 cents and took 7 seconds.\n[it:1144#s23] This max effort pelican (with a reasoning trace that starts “This is the classic pelican-on-bicycle SVG test...”) took 5 minutes 9 seconds to generate, but still only cost me 3.3826 cents:\n[it:1144#s24] (Since the reasoning trace exhibits awareness of the benchmark, here’s Generate an SVG of an armadillo in fishnet tights jaywalking on Mars (on xhigh), and the same prompt against some other recent models.\n[it:1144#s25] Background on that.)\n[it:1144#s26] For comparison, here’s the pelican I got a year ago from Haiku 4.5 (for 0.7583 cents—Haiku 4.5 did not support reasoning levels).\n[it:1144#s27] It sucked at drawing pelicans:\n[it:1144#s28] And a generous API credit scheme for subscribers\n[it:1144#s29] In addition to Haiku 5.5, Anthropic announced today that they are halving the price of cache reads for Sonnet 5.5.\n[it:1144#s30] They’ve also added API credits to subscription plans:\n[it:1144#s31] Second, this week, we’ll roll out a new monthly API credit to all Max and Team subscribers for use on the Claude Platform.\n[it:1144#s32] Max 5x users will get $100 in credits per month, Max 20x users will get $200, and Team subscribers will receive up to $500, pooled across their users.\n[it:1144#s33] Claiming this is pleasantly easy: navigate to Settings -> Billing and select the API organization that should benefit from the credits every month:\n[it:1144#s34] The API credits exactly match the cost of the subscription itself.\n[it:1144#s35] This is really generous—it makes it much easier for subscribers to use the API.\n[it:1144#s36] Anthropic also let you disable auto-reload for the API, with the consequence that “API requests will stop when your balance runs out”—exactly what you want if you’re planning to burn through those API credits without risk of a nasty billing surprise.\n[it:1144#s37] Note that the monthly credits do not roll over—use them or lose them.\n[it:1144#s38] OpenAI still allow you to use your Codex subscription for personal API use, which works out as a better deal for heavy API users.\n[it:1144#s39] This new credit scheme goes at least some way to overcoming that difference.\n[it:1144#s40] More recent articles\n[it:1144#s41] - We're going to need default hard budget caps on pretty much everything - 3rd October 2026\n[it:1144#s42] - OpenAI DevDay 2026 live blog - 29th September 2026",
+    "title": "Claude Haiku 5.5",
+    "url": "https://www.anthropic.com/claude-haiku-5-5"
+   },
+   {
+    "id": "it:1180",
+    "source": "AI타임스",
+    "text": "[it:1180#s1] 앤트로픽이 가격을 대폭 내리고 성능을 최고 수준으로 끌어올린 소형 모델 '클로드 하이쿠 5.5(Claude Haiku 5.5)'를 출시했다.\n[it:1180#s2] 기업공개(IPO)를 앞두고 AI 라인업을 대대적으로 확장하는 가운데, 경량화·고성능·저비용 모델을 앞세워 기업용 AI 시장 점유율을 대폭 확대하겠다는 전략이다.\n[it:1180#s3] 앤트로픽은 7일(현지시간) 하이쿠 5.5를 공개하며 가장 강조한 것은 비용 효율성과 처리 속도다.\n[it:1180#s4] 이 모델은 요약, 데이터베이스 쿼리, 분류 요청 등 빠르고 반복적인 워크로드를 안정적으로 처리하도록 설계됐다.\n[it:1180#s5] 상위 모델인 '오퍼스 5.5'나 '소네트 5.5'의 하위 에이전트(Sub-agent) 역할을 고도화하는 데 최적화됐다.\n[it:1180#s6] 특히 10만 토큰 이하 요청 시 입력/출력 토큰 가격이 100만 토큰당 각각 0.10달러, 0.50달러로 책정되어 전작 대비 무려 90% 인하됐다.\n[it:1180#s7] 이는 경쟁작인 오픈AI의 'GPT-6 루나'와 동일한 수준이다.\n[it:1180#s8] 단, 10만 토큰을 초과하면 5배인 0.50달러, 2.50달러가 적용되는 단계별 가격 정책이 도입됐다.\n[it:1180#s9] 동시에 하이쿠 모델 최초로 조정 가능한 '작업량 설정(Workload settings)' 기능이 탑재됐다.\n[it:1180#s10] 사용자는 업무 특성에 맞춰 비용과 지능 중 우선순위를 직접 조정할 수 있다.\n[it:1180#s11] 또 고위험 사이버 보안 요청에 관한 안전장치가 내장된 최초의 하이쿠 버전이며, 일반적인 일상 업무에는 영향을 미치지 않는다.\n[it:1180#s12] 필요시 검증 프로그램을 신청해 활용 범위를 넓힐 수도 있다.\n[it:1180#s13] 컨텍스트 창도 기존 20만 토큰에서 100만 토큰으로 대폭 늘어났다.\n[it:1180#s14] 벤치마크에서는 에이전트 역량과 실무 지식 작업에서 'GPT-6 루나'를 뛰어넘는 뛰어난 성과를 보였다.\n[it:1180#s15] 우선 지식 노동 역량을 평가하는 'GDPval-AA v2.1'에서 1620점을 기록해 전작인 하이쿠 4.5(735점)는 물론 GPT-6 루나(1437점)를 크게 넘어섰다.\n[it:1180#s16] 실제 업무 환경을 가늠하는 'AA-브리프케이스 v1.1'에서도 1578점을 올려 GPT-6 루나(1336점) 대비 확실한 우위를 점했다.\n[it:1180#s17] 컴퓨터 및 OS 조작 능력을 측정하는 'OS월드 2.1' 벤치마크에서는 정확도 72.4%를 달성했다.\n[it:1180#s18] 이는 하이쿠 4.5(15.7%)와 GPT-6 루나(48.9%)를 대폭 앞지른 수치다.\n[it:1180#s19] 추론 분야인 '인류의 마지막 시험(HLE)' 항목에서는 도구 미사용 시 45.9%, 도구 사용 시 57.4%를 기록하며 급격한 지능 상승을 입증했다.\n[it:1180#s20] 에이전트 코딩 역량을 가늠하는 '터미널벤치 4.0'에서는 39.2%를 기록해 GPT-6 루나(16.4%)를 제쳤고, 차트 해석 등 시각적 추론 도구 미사용 기준 46.4%를 나타냈다.\n[it:1180#s21] Anthropic has released Claude Haiku 5.5, scoring 43 on the Artificial Analysis Intelligence Index - up 26 points one year after the last Haiku release\n[it:1180#s22] Haiku 5.5 is the first Haiku model with Anthropic’s effort settings and adaptive thinking, and Anthropic has introduced tiered… pic.twitter.com/1HNkQo2dzG\n[it:1180#s23] — Artificial Analysis (@ArtificialAnlys) October 7, 2026\n[it:1180#s24] 독립 AI 분석 기관인 아티피셜 애널리시스의 AI 지수(AAII)에서 43점을 기록했다.\n[it:1180#s25] 불과 1년 전 출시된 전작 대비 26점이나 상승한 수치다.\n[it:1180#s26] 최대 노력 설정 시 GLM-5.3 플래시(42점), 제미나이 3.8 플래시(41점), GPT-6 루나(38점)를 모두 앞질렀으며, 2.8조 매개변수의 오픈 모델 키미 K3(44점)에 육박하는 성과를 냈다.\n[it:1180#s27] 아티피셜 애널리시스는 \"에이전트 기반 지식 작업과 터미널 활용 능력에서 매우 뛰어난 성능을 발휘한다\"고 분석했다.\n[it:1180#s28] 다만 인텔리전스 인덱스 작업당 약 16만2000개의 출력 토큰을 소모해, GPT-6 루나(최대 설정시 약 5만개) 대비 토큰 사용량이 3배 이상 많다는 특징이 지적됐다.\n[it:1180#s29] 아울러 업데이트된 토크나이저가 적용되면서 전작 대비 동일 작업당 소모되는 토큰 수가 전반적으로 소폭 늘어났다.\n[it:1180#s30] 하지만 기본 API 단가가 최대 90% 인하된 덕분에 실제 종합 운영 비용은 평균 75% 절감된다.\n[it:1180#s31] 또 사실적 지식 정확도(AA-Omniscience)는 36%로 제미나이 3.8 플래시(55%)나 GPT-6 루나(44%)보다 낮다.\n[it:1180#s32] 하지만, 정답을 모를 때 이를 인정하는 비율이 높아 오인률(40%)은 타 모델(55~77%)보다 눈에 띄게 낮다.\n[it:1180#s33] 안전 거부 문제로 낮게 측정된 오토메이션벤치-AA(AutomationBench-AA(35%) 평가는 앤트로픽의 수정 작업 후 재평가가 진행될 예정이다.\n[it:1180#s34] 업계와 엔지니어들은 호평을 잇달아 내놓았다.\n[it:1180#s35] 아사나의 에어런 빈 수석 엔지니어는 \"에이전트 워크플로우 처리 지연 시간이 30% 이상 줄고 응답 속도가 최대 2.5배 빨라졌다\"고 밝혔으며, 허브스팟)의 제브 클라포 수석 엔지니어는 \"CRM 감사 작업 테스트에서 92.8%의 최고 점수를 얻었으며 가장 빠른 처리 속도와 최저 오탐률을 보였다\"고 언급했다.\n[it:1180#s36] 코그니션도 자체 에이전트 '데빈 퓨전'의 서브 모델로 하이쿠 5.5를 도입해 비용과 지연 시간을 크게 줄였다고 밝혔다.\n[it:1180#s37] X와 레딧, 개발자 블로그 등 온라인 커뮤니티에서는 \"소형 모델이 과거 플래그십 수준의 추론 성능을 내면서 비용은 10분의 1로 내려갔다\" \"소비자용 앱과 에이전트 서비스 구축에 최적의 카드\"라는 반응이 이어지고 있다.\n[it:1180#s38] 앤트로픽은 이번 하이쿠 5.5 출시와 함께 클로드 소네트 5.5의 캐시 읽기 가격도 50% 인하(100만 토큰당 0.10달러)했다.\n[it:1180#s39] 이에 따라 소네트 5.5 기반 에이전트 작업 실행 비용이 약 20% 줄어들게 된다.\n[it:1180#s40] 구독자를 위한 혜택도 추가됐다.\n[it:1180#s41] 맥스 및 팀 요금제 사용자에게 개발용 API 크레딧을 매월 최대 500달러까지 차등 지급하며, 개발자용 SDK를 업데이트해 컴퓨터 및 브라우저 환경에서의 베타 지원을 본격화했다.\n[it:1180#s42] 클로드 하이쿠 5.5는 앤트로픽 API 플랫폼을 비롯해 아마존웹서비스(AWS), 구글 클라우드, 마이크로소프트 애저 등 주요 클라우드 환경에서 바로 이용할 수 있다.\n[it:1180#s43] 한편, 이번 신작은 앤트로픽이 AI 속도 조절을 주장한 이후 공개한 세 번째 모델이다.\n[it:1180#s44] 지금까지는 오퍼스와 소네트, 하이쿠 등 중소형 모델이 등장했으며, 플래그십 라인업인 '페이블'이나 '미소스'급 첨단 모델은 아직 베일을 벗지 않은 상태다.\n[it:1180#s45] 임대준 기자 ydj@aitimes.com",
+    "title": "앤트로픽, API 비용 최대 90% 낮춘 '클로드 하이쿠 5.5' 공개",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=216044"
+   }
+  ],
+  "previous": {
+   "topic_id": "w40-claude-sonnet-5-5",
+   "title": "Claude Sonnet 5.5, 오퍼스급 지능에 가성비",
+   "summary": "앤트로픽이 Claude Sonnet 5.5를 출시해 오퍼스급 지능(종합 2위 56점)에 기존 가격을 유지하고 작업당 비용을 최대 30% 절감했다. 쟁점은 오픈AI 데브데이 하루 앞선 선제 출시가 개발자 모델 경쟁을 어떻게 바꿀지다.",
+   "headings": [
+    "오퍼스급 지능에 소네트 가격, 작업당 비용 30% 절감",
+    "터미널벤치 70.6%로 Opus 5.5 제친 에이전트 코딩",
+    "도구 호출 묶음 처리로 불필요한 검색·질문 축소",
+    "기업 현장 검증과 오픈AI 데브데이 견제"
+   ]
+  },
+  "aliases": [
+   {
+    "canonical": "Claude Haiku 5.5",
+    "aliases": [
+     "클로드 하이쿠 5.5"
+    ]
+   },
+   {
+    "canonical": "GPT-6 Luna",
+    "aliases": [
+     "GPT-6 루나",
+     "gpt-6-luna"
+    ]
+   }
+  ],
+  "limits": {
+   "sections": [
+    4,
+    7
+   ],
+   "paragraphs_per_section": [
+    1,
+    2
+   ],
+   "paragraph_sentences_max": 4,
+   "paragraph_chars_max": 320,
+   "summary_sentences": [
+    1,
+    2
+   ],
+   "summary_chars_max": 200,
+   "heading_chars_max": 70,
+   "head_tiles_max": 4,
+   "tiles_per_section": [
+    2,
+    3
+   ],
+   "visuals_max": 4,
+   "bars_items": [
+    2,
+    6
+   ],
+   "table_rows": [
+    2,
+    6
+   ],
+   "table_cols": [
+    2,
+    4
+   ],
+   "slides_max": 2,
+   "video_secs_max": 3,
+   "max_refs_per_paragraph": 4
+  },
+  "slide_candidates": [],
+  "no_visuals": false
+ },
+ "expect": {},
+ "note": "2026-W41 실제 토픽 입력(run 20261013-205302-weekly-b981)"
+}

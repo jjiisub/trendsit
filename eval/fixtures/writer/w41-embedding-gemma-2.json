@@ -1,0 +1,87 @@
+{
+ "input": {
+  "plan": {
+   "rank": 3,
+   "angle": "멀티모달 단일 임베딩 공간 통합",
+   "relation": {
+    "type": "new",
+    "topic_id": null
+   }
+  },
+  "evidence": [
+   {
+    "id": "it:1111",
+    "source": "Google DeepMind Blog",
+    "text": "[it:1111#s1] EmbeddingGemma 2: an open, lightweight multimodal embedding model\n[it:1111#s2] We introduced EmbeddingGemma last year to provide a lightweight option for high-quality text embeddings, to help your apps organize, search, and connect information directly on consumer hardware.\n[it:1111#s3] The developer community’s response blew past our expectations.\n[it:1111#s4] With more than 20 million downloads, builders have used it to power smarter on-device search tools and privacy-first retrieval augmented generation (RAG) pipelines.\n[it:1111#s5] Today, we’re launching EmbeddingGemma 2, expanding beyond text to unify code, images, video, and audio in a shared embedding space.\n[it:1111#s6] Built on the Gemma 4 architecture and released under a commercially permissive Apache 2.0 license, EmbeddingGemma 2 has 740 million parameters, making it optimal for on-device inference.\n[it:1111#s7] It can help find a specific video clip from a voice memo, or search through hours of audio recordings based on a text query, all processed by a single, natively multimodal model.\n[it:1111#s8] Built from the same technology as Gemini Embedding models, EmbeddingGemma 2 is:\n[it:1111#s9] - Best-in-class for its size: Achieves leading scores among sub-1B multimodal embedders for its size across benchmarks like MTEB (Massive Text Embedding Benchmark) Code and MAEB (Massive Audio Embedding Benchmark), while matching or outperforming many larger models across text, vision, and audio tasks.\n[it:1111#s10] - Modular by design: Requires as little as 270M parameters for text-only workloads with optional vision (170M) and audio (300M) encoders for full multimodal support.\n[it:1111#s11] - Storage-efficient: Using Matryoshka Representation Learning (MRL), developers can dynamically truncate output vectors from 768 dimensions down to 512, 256, or 128 dimensions.\n[it:1111#s12] This provides up to 6x storage reduction for local vector databases and memory usage.\n[it:1111#s13] - Optimized for on-device performance: Runs efficiently within tight resource constraints.\n[it:1111#s14] With quantization, on a Google Pixel 11 Pro, EmbeddingGemma 2 requires as little as ~191MB active RAM for text-only weights and ~567MB for the full multimodal model.\n[it:1111#s15] - Extended context ready: Features an 8K token context window (4x larger than EmbeddingGemma 1), allowing it to process up to 5.5 minutes of audio, 29 images, 58 video frames, or interleaved combinations thereof directly on local hardware.\n[it:1111#s16] Achieving top-tier quality for code, vision, and audio\n[it:1111#s17] EmbeddingGemma 2 matches the strong multilingual text performance of EmbeddingGemma while delivering a significant 9.92-point improvement on code performance (in MTEB Code, from 68.76 to 78.68), making it well-suited for local codebase indexing, semantic code search, and coding agent retrieval.\n[it:1111#s18] Across image, video, documents, and audio, it sets a new standard in quality-per-parameter for sub-1B models and even outperforms some specialist models more than twice its size.\n[it:1111#s19] Find full evaluation metrics and model information in the EmbeddingGemma 2 model card.\n[it:1111#s20] Enabling semantic search, routing, and retrieval, fully on-device\n[it:1111#s21] EmbeddingGemma 2 brings robust capabilities directly to edge hardware.\n[it:1111#s22] Generating embeddings locally helps ensure data privacy, reduces pipeline latency, and empowers developers to build cross-modal search and retrieval that works entirely offline.\n[it:1111#s23] When paired with generative models such as Gemma 4, EmbeddingGemma 2 enables on-device RAG pipelines that understand complex multimodal data.\n[it:1111#s24] Because EmbeddingGemma 2 is built on Gemma 4 and shares its text tokenizer and audio encoder, developers can run both models together in a unified pipeline with a lower combined total memory footprint.\n[it:1111#s25] To learn how to build on-device search and RAG systems with LiteRT, read the Google AI Edge blog post.\n[it:1111#s26] Getting started with EmbeddingGemma 2\n[it:1111#s27] We worked closely with the following partners to ensure EmbeddingGemma 2 works immediately where you build:\n[it:1111#s28] - Download the models: Find the model weights on Hugging Face and Kaggle, with Gemini Enterprise Agent Platform Model Garden availability coming soon.\n[it:1111#s29] Visit LiteRT Community on Hugging Face for models optimized for on-device.\n[it:1111#s30] - On-device deployment: Develop cross-platform apps with Google AI Edge MediaPipe for turnkey embedding, retrieval & decision tasks or LiteRT for custom model integration.\n[it:1111#s31] Build for the browser with transformers.js or WebGPU.\n[it:1111#s32] - Use your favorite development tools: Serve the model efficiently using transformers, sentence-transformers, MLX, vLLM, llama.cpp, SGLang, Ollama, and LMStudio.\n[it:1111#s33] Store your embedding vectors with Qdrant.\n[it:1111#s34] - Fine-tuning: Follow guidance by Unsloth for how to fine-tune EmbeddingGemma 2 for your use cases.\n[it:1111#s35] Explore our developer guide, documentation, and guides for inference and fine-tuning.",
+    "title": "EmbeddingGemma 2: an open, lightweight multimodal embedding model",
+    "url": "https://deepmind.google/blog/embeddinggemma-2-an-open-lightweight-multimodal-embedding-model/"
+   },
+   {
+    "id": "it:1132",
+    "source": "GeekNews",
+    "text": "[it:1132#s1] EmbeddingGemma 2: an open, lightweight multimodal embedding model\n[it:1132#s2] We introduced EmbeddingGemma last year to provide a lightweight option for high-quality text embeddings, to help your apps organize, search, and connect information directly on consumer hardware.\n[it:1132#s3] The developer community’s response blew past our expectations.\n[it:1132#s4] With more than 20 million downloads, builders have used it to power smarter on-device search tools and privacy-first retrieval augmented generation (RAG) pipelines.\n[it:1132#s5] Today, we’re launching EmbeddingGemma 2, expanding beyond text to unify code, images, video, and audio in a shared embedding space.\n[it:1132#s6] Built on the Gemma 4 architecture and released under a commercially permissive Apache 2.0 license, EmbeddingGemma 2 has 740 million parameters, making it optimal for on-device inference.\n[it:1132#s7] It can help find a specific video clip from a voice memo, or search through hours of audio recordings based on a text query, all processed by a single, natively multimodal model.\n[it:1132#s8] Built from the same technology as Gemini Embedding models, EmbeddingGemma 2 is:\n[it:1132#s9] - Best-in-class for its size: Achieves leading scores among sub-1B multimodal embedders for its size across benchmarks like MTEB (Massive Text Embedding Benchmark) Code and MAEB (Massive Audio Embedding Benchmark), while matching or outperforming many larger models across text, vision, and audio tasks.\n[it:1132#s10] - Modular by design: Requires as little as 270M parameters for text-only workloads with optional vision (170M) and audio (300M) encoders for full multimodal support.\n[it:1132#s11] - Storage-efficient: Using Matryoshka Representation Learning (MRL), developers can dynamically truncate output vectors from 768 dimensions down to 512, 256, or 128 dimensions.\n[it:1132#s12] This provides up to 6x storage reduction for local vector databases and memory usage.\n[it:1132#s13] - Optimized for on-device performance: Runs efficiently within tight resource constraints.\n[it:1132#s14] With quantization, on a Google Pixel 11 Pro, EmbeddingGemma 2 requires as little as ~191MB active RAM for text-only weights and ~567MB for the full multimodal model.\n[it:1132#s15] - Extended context ready: Features an 8K token context window (4x larger than EmbeddingGemma 1), allowing it to process up to 5.5 minutes of audio, 29 images, 58 video frames, or interleaved combinations thereof directly on local hardware.\n[it:1132#s16] Achieving top-tier quality for code, vision, and audio\n[it:1132#s17] EmbeddingGemma 2 matches the strong multilingual text performance of EmbeddingGemma while delivering a significant 9.92-point improvement on code performance (in MTEB Code, from 68.76 to 78.68), making it well-suited for local codebase indexing, semantic code search, and coding agent retrieval.\n[it:1132#s18] Across image, video, documents, and audio, it sets a new standard in quality-per-parameter for sub-1B models and even outperforms some specialist models more than twice its size.\n[it:1132#s19] Find full evaluation metrics and model information in the EmbeddingGemma 2 model card.\n[it:1132#s20] Enabling semantic search, routing, and retrieval, fully on-device\n[it:1132#s21] EmbeddingGemma 2 brings robust capabilities directly to edge hardware.\n[it:1132#s22] Generating embeddings locally helps ensure data privacy, reduces pipeline latency, and empowers developers to build cross-modal search and retrieval that works entirely offline.\n[it:1132#s23] When paired with generative models such as Gemma 4, EmbeddingGemma 2 enables on-device RAG pipelines that understand complex multimodal data.\n[it:1132#s24] Because EmbeddingGemma 2 is built on Gemma 4 and shares its text tokenizer and audio encoder, developers can run both models together in a unified pipeline with a lower combined total memory footprint.\n[it:1132#s25] To learn how to build on-device search and RAG systems with LiteRT, read the Google AI Edge blog post.\n[it:1132#s26] Getting started with EmbeddingGemma 2\n[it:1132#s27] We worked closely with the following partners to ensure EmbeddingGemma 2 works immediately where you build:\n[it:1132#s28] - Download the models: Find the model weights on Hugging Face and Kaggle, with Gemini Enterprise Agent Platform Model Garden availability coming soon.\n[it:1132#s29] Visit LiteRT Community on Hugging Face for models optimized for on-device.\n[it:1132#s30] - On-device deployment: Develop cross-platform apps with Google AI Edge MediaPipe for turnkey embedding, retrieval & decision tasks or LiteRT for custom model integration.\n[it:1132#s31] Build for the browser with transformers.js or WebGPU.\n[it:1132#s32] - Use your favorite development tools: Serve the model efficiently using transformers, sentence-transformers, MLX, vLLM, llama.cpp, SGLang, Ollama, and LMStudio.\n[it:1132#s33] Store your embedding vectors with Qdrant.\n[it:1132#s34] - Fine-tuning: Follow guidance by Unsloth for how to fine-tune EmbeddingGemma 2 for your use cases.\n[it:1132#s35] Explore our developer guide, documentation, and guides for inference and fine-tuning.",
+    "title": "EmbeddingGemma 2 - 개방형 경량 멀티모달 임베딩 모델",
+    "url": "https://news.hada.io/topic?id=34907"
+   },
+   {
+    "id": "it:1183",
+    "source": "AI타임스",
+    "text": "[it:1183#s1] 구글이 기기 안에서 다양한 형태의 데이터를 연결하고 검색할 수 있는 온디바이스 AI 기술을 확장했다.\n[it:1183#s2] 대규모 클라우드 모델에 의존하지 않고도 여러 데이터를 빠르게 처리할 수 있도록 경량화한 멀티모달 임베딩 모델을 선보였다.\n[it:1183#s3] 구글은 6일(현지시간) 스마트폰과 PC 같은 소비자 기기에서 직접 실행할 수 있는 경량 멀티모달 임베딩 모델 ‘임베딩젬마 2(EmbeddingGemma 2)’를 공개했다.\n[it:1183#s4] 텍스트뿐 아니라 코드, 이미지, 비디오, 오디오까지 하나의 벡터 공간에서 처리할 수 있도록 확장해 온디바이스 검색과 검색증강생성(RAG) 활용 범위를 넓힌 것이 특징이다.\n[it:1183#s5] 누적 2000만회 이상 다운로드된 전작의 흥행에 힘입어 멀티모달 영역으로 범위를 전면 확정한 것이다.\n[it:1183#s6] 임베딩 모델은 텍스트나 이미지, 오디오 같은 데이터를 컴퓨터가 이해할 수 있는 수치(벡터)로 변환해 유사도를 비교하고 관련 정보를 빠르게 찾아내는 AI 기술이다.\n[it:1183#s7] 단순 답변 생성을 넘어 검색·추천·RAG 등 AI 서비스 전반의 기초 엔진으로 쓰여 활용 범위가 매우 넓다.\n[it:1183#s8] 임베딩젬마 2는 ‘젬마 4(Gemma 4)’ 아키텍처를 기반으로 개발된 7억4000만(740M) 매개변수 모델이다.\n[it:1183#s9] 아파치 2.0 라이선스로 공개돼 상업적 활용도 가능하다.\n[it:1183#s10] 이 모델은 텍스트·코드 처리용 백본에 2억7000만개, 비전 인코더에 1억7000만개, 오디오 인코더에 3억개의 매개변수를 배분하는 모듈형 구조로 설계됐다.\n[it:1183#s11] 필요한 기능만 선택해 구동할 수 있어 텍스트 전용 작업에서는 전체 모델보다 훨씬 적은 자원만 사용할 수 있다.\n[it:1183#s12] 구글은 임베딩젬마 2가 최대 8192토큰의 컨텍스트를 지원한다고 설명했다.\n[it:1183#s13] 이는 전작보다 4배 늘어난 규모다.\n[it:1183#s14] 한 번의 입력에서 최대 29장의 이미지, 58개의 비디오 프레임, 5.5분 분량의 오디오를 처리할 수 있으며, 여러 형태의 데이터를 섞어 입력하는 것도 가능하다.\n[it:1183#s15] 예를 들어 텍스트로 검색해 특정 사진을 찾거나, 음성 메모를 이용해 관련 비디오 장면을 검색하는 방식이다.\n[it:1183#s16] 이미지와 설명, 동영상이 함께 포함된 상품 정보처럼 서로 다른 데이터를 하나의 벡터 공간에서 비교하고 검색할 수도 있다.\n[it:1183#s17] We’re releasing EmbeddingGemma 2, our first natively multimodal open model engineered for on-device embeddings.\n[it:1183#s18] Built on the Gemma 4 architecture and released under an Apache 2.0 license, it goes beyond text to unify images, video, audio, and code in a single embedding space.\n[it:1183#s19] pic.twitter.com/PBdx42PwS7\n[it:1183#s20] — Google (@Google) October 6, 2026\n[it:1183#s21] 코드 및 음성 검색 성능도 크게 향상됐다.\n[it:1183#s22] MTEB 코드에서 78.68점을 기록해 전작의 68.76점보다 9.92점 올랐다.\n[it:1183#s23] 아울러 대규모 오디오 임베딩 벤치마크(MAEB) 등에서도 10억개 미만 매개변수 모델 중 최고 수준의 성능을 입증했다.\n[it:1183#s24] 구글은 이를 바탕으로 로컬 코드베이스 색인과 의미 기반 코드 검색, 코딩 에이전트의 검색·검색증강 작업 등에 적합하다고 설명했다.\n[it:1183#s25] 저장 공간과 메모리 효율도 개선했다. ‘마트료시카 표현 학습(MRL)’을 적용해 기본 768차원 벡터를 512, 256, 128차원으로 줄일 수 있다.\n[it:1183#s26] 이를 통해 로컬 벡터 데이터베이스의 저장 공간과 메모리 사용량을 최대 6배까지 줄일 수 있다고 구글은 밝혔다.\n[it:1183#s27] 온디바이스 성능도 강조했다.\n[it:1183#s28] 양자화된 모델을 기준으로 구글 픽셀 11 프로에서는 텍스트 전용 모델이 약 191MB의 활성 RAM만 사용하며, 전체 멀티모달 모델은 약 567MB 수준이다.\n[it:1183#s29] 특히 젬마 4와 텍스트 토크나이저 및 오디오 인코더를 공유하므로, 온디바이스 생성 모델과 함께 구동 시 통합 파이프라인의 전체 메모리 점유율을 한층 더 낮출 수 있다.\n[it:1183#s30] 구글은 “온디바이스에서 임베딩을 생성하면 데이터의 개인정보를 보호하고 지연 시간을 줄이면서 완전히 오프라인으로 작동하는 검색과 검색증강 시스템을 구축할 수 있다”고 설명했다.\n[it:1183#s31] 임베딩젬마 2는 허깅페이스와 캐글에서 모델 가중치를 내려받을 수 있으며, MediaPipe와 LiteRT를 이용한 온디바이스 배포도 지원한다.\n[it:1183#s32] Ollama, llama.cpp, vLLM, SGLang 등 주요 개발 도구와의 연동도 제공한다.\n[it:1183#s33] 박찬 기자 cpark@aitimes.com",
+    "title": "구글, 온디바이스 ‘임베딩젬마 2’ 공개…텍스트·이미지·음성 통합 처리",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=216031"
+   }
+  ],
+  "previous": null,
+  "aliases": [
+   {
+    "canonical": "Ollama",
+    "aliases": [
+     "ollama"
+    ]
+   }
+  ],
+  "limits": {
+   "sections": [
+    4,
+    7
+   ],
+   "paragraphs_per_section": [
+    1,
+    2
+   ],
+   "paragraph_sentences_max": 4,
+   "paragraph_chars_max": 320,
+   "summary_sentences": [
+    1,
+    2
+   ],
+   "summary_chars_max": 200,
+   "heading_chars_max": 70,
+   "head_tiles_max": 4,
+   "tiles_per_section": [
+    2,
+    3
+   ],
+   "visuals_max": 4,
+   "bars_items": [
+    2,
+    6
+   ],
+   "table_rows": [
+    2,
+    6
+   ],
+   "table_cols": [
+    2,
+    4
+   ],
+   "slides_max": 2,
+   "video_secs_max": 3,
+   "max_refs_per_paragraph": 4
+  },
+  "slide_candidates": [],
+  "no_visuals": false
+ },
+ "expect": {},
+ "note": "2026-W41 실제 토픽 입력(run 20261013-205302-weekly-b981)"
+}

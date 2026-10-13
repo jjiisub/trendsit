@@ -1,0 +1,639 @@
+{
+ "input": {
+  "loc_lines": [
+   "title: RAG를 에이전트 하네스와 문서 컨텍스트 레이어로 재정의",
+   "summary: LlamaIndex CEO Jerry Liu가 2026년 RAG를 에이전트 하네스와 문서 컨텍스트 레이어로 재정의했다. 쟁점은 ParseBench에서 어떤 파서도 100%에 근접하지 못하는 가운데, 정확도-비용-지연 3개 영역에 맞춰 LightParse를 에이전트 루프에 통합하는 구조다.",
+   "head_tiles[0]: 10T+ pages / 인간이 만든 문서 규모 (PDF·PowerPoint·Word·Excel에 잠긴 페이지 수) (refs vd:274@422)",
+   "head_tiles[1]: 90% / 비정형 문서에 있는 데이터 비중 (세계 데이터 중 PDF·PowerPoint·Word·Excel 등 비정형 문서에 있는 비율) (refs vd:274@525)",
+   "head_tiles[2]: 99%+ / 고정확도 영역 정확도 요구 (가격에 민감하지 않은 고정확도 영역의 요구 수준) (refs vd:274@957)",
+   "head_tiles[3]: 1M docs per day / 저비용 영역 처리량 (정확도가 최소 기준을 넘으면 되는 저비용 영역의 일일 처리량) (refs sl:274@900)",
+   "sections[0].heading: RAG를 에이전트 하네스와 문서 컨텍스트 레이어로 재정의",
+   "sections[0].paragraphs[0]: Jerry Liu(LlamaIndex)는 2026년의 RAG를 에이전트 하네스와 컨텍스트 레이어의 결합으로 정의했다. 단순 Top-K 검색이 아니라, 에이전트가 검색 복잡도를 스스로 처리하고 컨텍스트를 스택 위쪽으로 올리는 구조다. (refs vd:274@25, vd:274@125)",
+   "sections[0].paragraphs[1]: 발표 슬라이드 기준, 2023~2025년 코드로 프로그램을 정의하던 단계에서 2025~2026년 영어로 런북을 정의하는 단계로 넘어가고, 2026년 이후에는 목표와 정렬을 정의하는 방향으로 간다고 설명했다. (refs sl:274@208)",
+   "sections[0].slide: sl:274@873 ()",
+   "sections[1].heading: 에이전트 네이티브 문서 플랫폼의 3층 구조",
+   "sections[1].paragraphs[0]: LlamaIndex는 에이전트 네이티브 문서 플랫폼을 파싱 레이어, 시맨틱·저장 레이어, 에이전틱 워크플로 레이어의 3층으로 구성했다. 파싱 레이어는 10T+ pages의 인간 생성 문서를 정확하고 토큰 효율적인 컨텍스트로 디지털화한다. (refs vd:274@400, vd:274@422)",
+   "sections[1].paragraphs[1]: 시맨틱·저장 레이어는 인간과 에이전트 모두를 위한 문서 관리(편집, 버전, 협업)를 담당하고, 에이전틱 워크플로 레이어는 반복 가능한 문서 워크플로를 통해 정확도를 높이고 비용을 낮춘다. (refs vd:274@425, vd:274@450)",
+   "sections[2].heading: PDF 구조의 기계 해석 난이도와 하이브리드 OCR",
+   "sections[2].paragraphs[0]: PDF는 텍스트를 개별 글리프와 좌표로, 표를 다양한 테두리의 선분으로 저장해 기계가 해석하기 어렵다. 세계 데이터의 90%가 PDF·PowerPoint·Word·Excel 등 비정형 문서에 있으며, 이 문서는 기계가 읽을 수 있는 형태로 설계되지 않았다. (refs vd:274@525, vd:274@525)",
+   "sections[2].paragraphs[1]: Jerry Liu는 결정론적 파이프라인과 VLM을 결합한 하이브리드 방식을 제시했다. 파이프라인은 본문 텍스트를 빠르고 저렴하게 추출하고, VLM은 표와 차트를 처리하며, 에이전틱 검증이 구조화된 출력(markdown + metadata/bounding boxes)을 만든다. (refs vd:274@700, sl:274@680)",
+   "sections[3].heading: ParseBench 벤치마크와 정확도-비용-지연 파레토 곡선",
+   "sections[3].paragraphs[0]: ParseBench는 프런티어 모델, OSS 모델, 전문 파서 제공사(포함 LlamaParse)를 평가하는 엔터프라이즈 문서 벤치마크다. 어떤 파서도 100%에 근접하지 못하며, 벤치마크는 의도적으로 어렵게 설계됐다. (refs sl:274@873, sl:274@900)",
+   "sections[3].paragraphs[1]: 정확도-비용-지연 파레토 곡선은 세 영역으로 나뉜다. 고정확도 영역은 99%+ 정확도를 요구하며 가격에 무관심(예: 금융 데이터룸 추출), 저비용 영역은 1M docs per day 처리량을 요구하며 정확도가 최소 기준을 넘으면 된다(예: 페타바이트 규모 Sharepoint 오프라인 인덱싱), 저지연·저비용 영역은 수 초 내 대량 처리를 요구한다. (refs vd:274@957, vd:274@900, sl:274@900)",
+   "sections[3].table (영역/요구 조건/예시): 정확도-비용-지연 3개 영역별 요구 조건 / note: 발표 슬라이드 기준",
+   "sections[3].table.rows[0]: 고정확도 | 99%+ 정확도, 가격 무관심 | 금융 데이터룸 추출",
+   "sections[3].table.rows[1]: 저비용 | 1M docs per day, 정확도 최소 기준 이상 | Sharepoint 페타바이트 오프라인 인덱싱",
+   "sections[3].table.rows[2]: 저지연·저비용 | 수 초 내 대량 처리, 가격 민감 | 실시간 파일 업로드",
+   "sections[3].slide: sl:274@900 (ParseBench: Overall vs. Cost — LlamaParse, VLMs, Specialized Document Parsers 비교)",
+   "sections[4].heading: LightParse: 에이전트 루프에 통합된 Rust 기반 파서",
+   "sections[4].paragraphs[0]: LightParse는 에이전트 루프의 기본값으로 설계된 빠르고 무료한 파서다. 어떤 데이터셋에서도 극도로 빠르고, 에이전트가 텍스트 검색을 할 수 있을 정도로 충분히 정확하며, 더 깊은 분석이 필요할 때 에이전트가 VLM 기반 OCR 도구로 'zoom-in'할 수 있다. (refs sl:274@1063)",
+   "sections[4].paragraphs[1]: 발표 데모에서 14 page(s)를 0.03s에 파싱하고 JSON(bounding boxes 포함)을 출력했다. VLM 기반 방식은 주로 지연에 무관심한 배치 처리에 적합하며, LightParse는 실시간 파일 업로드 같은 저지연·저비용 영역을 겨냥한다. (refs sl:274@1063, vd:274@957)"
+  ],
+  "page": {
+   "log": "절 5개, 단락 10개, 표 1개, 타일 4개, 슬라이드 1개",
+   "attention": false,
+   "head_tiles": [
+    {
+     "value": "10T+ pages",
+     "label": "인간이 만든 문서 규모",
+     "note": "PDF·PowerPoint·Word·Excel에 잠긴 페이지 수",
+     "refs": [
+      "vd:274@422"
+     ]
+    },
+    {
+     "value": "90%",
+     "label": "비정형 문서에 있는 데이터 비중",
+     "note": "세계 데이터 중 PDF·PowerPoint·Word·Excel 등 비정형 문서에 있는 비율",
+     "refs": [
+      "vd:274@525"
+     ]
+    },
+    {
+     "value": "99%+",
+     "label": "고정확도 영역 정확도 요구",
+     "note": "가격에 민감하지 않은 고정확도 영역의 요구 수준",
+     "refs": [
+      "vd:274@957"
+     ]
+    },
+    {
+     "value": "1M docs per day",
+     "label": "저비용 영역 처리량",
+     "note": "정확도가 최소 기준을 넘으면 되는 저비용 영역의 일일 처리량",
+     "refs": [
+      "sl:274@900"
+     ]
+    }
+   ],
+   "sections": [
+    {
+     "heading": "RAG를 에이전트 하네스와 문서 컨텍스트 레이어로 재정의",
+     "paragraphs": [
+      {
+       "text": "Jerry Liu(LlamaIndex)는 2026년의 RAG를 에이전트 하네스와 컨텍스트 레이어의 결합으로 정의했다. 단순 Top-K 검색이 아니라, 에이전트가 검색 복잡도를 스스로 처리하고 컨텍스트를 스택 위쪽으로 올리는 구조다.",
+       "refs": [
+        "vd:274@25",
+        "vd:274@125"
+       ]
+      },
+      {
+       "text": "발표 슬라이드 기준, 2023~2025년 코드로 프로그램을 정의하던 단계에서 2025~2026년 영어로 런북을 정의하는 단계로 넘어가고, 2026년 이후에는 목표와 정렬을 정의하는 방향으로 간다고 설명했다.",
+       "refs": [
+        "sl:274@208"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": "sl:274@873",
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "에이전트 네이티브 문서 플랫폼의 3층 구조",
+     "paragraphs": [
+      {
+       "text": "LlamaIndex는 에이전트 네이티브 문서 플랫폼을 파싱 레이어, 시맨틱·저장 레이어, 에이전틱 워크플로 레이어의 3층으로 구성했다. 파싱 레이어는 10T+ pages의 인간 생성 문서를 정확하고 토큰 효율적인 컨텍스트로 디지털화한다.",
+       "refs": [
+        "vd:274@400",
+        "vd:274@422"
+       ]
+      },
+      {
+       "text": "시맨틱·저장 레이어는 인간과 에이전트 모두를 위한 문서 관리(편집, 버전, 협업)를 담당하고, 에이전틱 워크플로 레이어는 반복 가능한 문서 워크플로를 통해 정확도를 높이고 비용을 낮춘다.",
+       "refs": [
+        "vd:274@425",
+        "vd:274@450"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "PDF 구조의 기계 해석 난이도와 하이브리드 OCR",
+     "paragraphs": [
+      {
+       "text": "PDF는 텍스트를 개별 글리프와 좌표로, 표를 다양한 테두리의 선분으로 저장해 기계가 해석하기 어렵다. 세계 데이터의 90%가 PDF·PowerPoint·Word·Excel 등 비정형 문서에 있으며, 이 문서는 기계가 읽을 수 있는 형태로 설계되지 않았다.",
+       "refs": [
+        "vd:274@525",
+        "vd:274@525"
+       ]
+      },
+      {
+       "text": "Jerry Liu는 결정론적 파이프라인과 VLM을 결합한 하이브리드 방식을 제시했다. 파이프라인은 본문 텍스트를 빠르고 저렴하게 추출하고, VLM은 표와 차트를 처리하며, 에이전틱 검증이 구조화된 출력(markdown + metadata/bounding boxes)을 만든다.",
+       "refs": [
+        "vd:274@700",
+        "sl:274@680"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "ParseBench 벤치마크와 정확도-비용-지연 파레토 곡선",
+     "paragraphs": [
+      {
+       "text": "ParseBench는 프런티어 모델, OSS 모델, 전문 파서 제공사(포함 LlamaParse)를 평가하는 엔터프라이즈 문서 벤치마크다. 어떤 파서도 100%에 근접하지 못하며, 벤치마크는 의도적으로 어렵게 설계됐다.",
+       "refs": [
+        "sl:274@873",
+        "sl:274@900"
+       ]
+      },
+      {
+       "text": "정확도-비용-지연 파레토 곡선은 세 영역으로 나뉜다. 고정확도 영역은 99%+ 정확도를 요구하며 가격에 무관심(예: 금융 데이터룸 추출), 저비용 영역은 1M docs per day 처리량을 요구하며 정확도가 최소 기준을 넘으면 된다(예: 페타바이트 규모 Sharepoint 오프라인 인덱싱), 저지연·저비용 영역은 수 초 내 대량 처리를 요구한다.",
+       "refs": [
+        "vd:274@957",
+        "vd:274@900",
+        "sl:274@900"
+       ]
+      }
+     ],
+     "visual": "table",
+     "bars": null,
+     "table": {
+      "title": "정확도-비용-지연 3개 영역별 요구 조건",
+      "note": "발표 슬라이드 기준",
+      "columns": [
+       "영역",
+       "요구 조건",
+       "예시"
+      ],
+      "rows": [
+       [
+        "고정확도",
+        "99%+ 정확도, 가격 무관심",
+        "금융 데이터룸 추출"
+       ],
+       [
+        "저비용",
+        "1M docs per day, 정확도 최소 기준 이상",
+        "Sharepoint 페타바이트 오프라인 인덱싱"
+       ],
+       [
+        "저지연·저비용",
+        "수 초 내 대량 처리, 가격 민감",
+        "실시간 파일 업로드"
+       ]
+      ],
+      "refs": [
+       "vd:274@957",
+       "vd:274@900",
+       "sl:274@900"
+      ]
+     },
+     "tiles": [],
+     "events": null,
+     "slide": "sl:274@900",
+     "slide_caption": "ParseBench: Overall vs. Cost — LlamaParse, VLMs, Specialized Document Parsers 비교",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "LightParse: 에이전트 루프에 통합된 Rust 기반 파서",
+     "paragraphs": [
+      {
+       "text": "LightParse는 에이전트 루프의 기본값으로 설계된 빠르고 무료한 파서다. 어떤 데이터셋에서도 극도로 빠르고, 에이전트가 텍스트 검색을 할 수 있을 정도로 충분히 정확하며, 더 깊은 분석이 필요할 때 에이전트가 VLM 기반 OCR 도구로 'zoom-in'할 수 있다.",
+       "refs": [
+        "sl:274@1063"
+       ]
+      },
+      {
+       "text": "발표 데모에서 14 page(s)를 0.03s에 파싱하고 JSON(bounding boxes 포함)을 출력했다. VLM 기반 방식은 주로 지연에 무관심한 배치 처리에 적합하며, LightParse는 실시간 파일 업로드 같은 저지연·저비용 영역을 겨냥한다.",
+       "refs": [
+        "sl:274@1063",
+        "vd:274@957"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    }
+   ],
+   "summary": "LlamaIndex CEO Jerry Liu가 2026년 RAG를 에이전트 하네스와 문서 컨텍스트 레이어로 재정의했다. 쟁점은 ParseBench에서 어떤 파서도 100%에 근접하지 못하는 가운데, 정확도-비용-지연 3개 영역에 맞춰 LightParse를 에이전트 루프에 통합하는 구조다.",
+   "title": "RAG를 에이전트 하네스와 문서 컨텍스트 레이어로 재정의"
+  },
+  "evidence": [
+   {
+    "id": "vd:274@25",
+    "source": "Tech Bridge",
+    "text": "And so today in 2026, we'll kind of talk about three main topics. One is, you know, what is RAG in 2026? Two, basically, that basically decomposes into an agent harness plus a context layer. So kind of going into the modern document context layer for agents, and giving you a little bit of sense of kind of some of the core capabilities today, especially unlocking, you know, the vast trove of document-based data today, and give you a glimpse of what's next.",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "vd:274@125",
+    "source": "Tech Bridge",
+    "text": "One is agent loops and tool use have gone a lot, a lot better, especially as both the models and agent harnesses have increased. And there's basically a cleaner separation now between agent reasoning and how they actually interact with context. If you look at what I call kind of the modern generalized agent, which includes, you know, all your favorite applications and tools out there from Cloud Code, Cloud Cowork, OpenClaw, Codex, and a few others, you know, the retrieval complexity has started",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "sl:274@208",
+    "source": "Tech Bridge",
+    "text": "The Modern Generalized Agent\nToday's stack\n1. Retrieval complexity is in the agent\nlayer: Interleave simple tools (grep + CLI)\nwith semantic search to achieve complex\nresults.\n2. Context is moving up the stack:\nManaging the agent context window →\nconfigure the right MCP servers and skills.\n3. Agent Orchestration is moving up the\nstack:\na. 2023-2025: define programs through\ncode\nb. 2025-2026: define runbooks through\nEnglish\nc. 2026+: define goals and alignment\nPost\nBoris Cherny\nEarly versions of Claude Code used RAG + a vector store, but we\nfound pretty quickly that agentic search generally works better. It is also\nsimpler and doesn't have the same issues around security, privacy,\nstaleness, and reliability.\n5:56 PM · Jan 31, 2026\n12M Views\nPost\nAndrej Karpathy\nLLM Knowledge Bases\nSomething I'm finding very useful recently: using LLMs to build\nknowledge bases of various topics of research interest. In this\ntarget phase of my recent token through/put: going less into\nmultiplying code, and more into maintaining knowledge (at\nmarkdown and images). The latest LLMs are quite good at it.\nTools\n(Research, Code)\nHarness\nSession\nSandbox\nOrchestration\nCalibrating the system prompt",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "vd:274@400",
+    "source": "Tech Bridge",
+    "text": "It contains the document parsing layer, actually digitalizing the vast troves of PDFs, PowerPoints, and Word documents into kind of accurate, token-efficient context and feeding it, you know, either Markdown, metadata, and other forms to actually enable agents to do stuff over your documents. The next is actually what we call the semantic and storage layer, which is kind of like this concept of document management for humans and agents.",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "vd:274@422",
+    "source": "Tech Bridge",
+    "text": "And at the same time, agents are also starting to generate exponentially more data in terms of, you know, more agent-native formats in terms of Markdown and HTML. So, for us, building an agent-native document platform contains three main pieces. It contains the document parsing layer, actually digitalizing the vast troves of PDFs, PowerPoints, and Word documents into kind of accurate, token-efficient context and feeding it, you know, either Markdown, metadata, and other forms to actually enable agents to do stuff over your documents. The next is actually what we call the semantic and storage layer, which is kind of like this concept of document management for humans and agents. Instead of humans opening up Microsoft Word using your file system or file storage, how do you create some sort of agent interface that actually captures, stores all your documents, and enables agents to actually manage and operate over them in various ways? And then there's still room for actually kind of repeatable document workflows that the agent layer, they can actually encode within the, within like this type of platform, too.",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "vd:274@425",
+    "source": "Tech Bridge",
+    "text": "Instead of humans opening up Microsoft Word using your file system or file storage, how do you create some sort of agent interface that actually captures, stores all your documents, and enables agents to actually manage and operate over them in various ways? And then there's still room for actually kind of repeatable document workflows that the agent layer, they can actually encode within the, within like this type of platform, too.",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "vd:274@450",
+    "source": "Tech Bridge",
+    "text": "If there is a repeatable workflow, like invoice processing, KYC, or claims, instead of always offloading it to a generalized agent, how do you actually develop some sort of specialized workflow for it and really carefully tune cost and accuracy to make sure that you achieve your goal? So, when we talk about like the concepts today, in terms of these three layers, we'll talk about this concept of document OCR, which is one of the core concepts of this track,",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "vd:274@525",
+    "source": "Tech Bridge",
+    "text": "and just like a wide set of kind of remaining concepts to actually create a comprehensive piece of software where agents and humans can collaborate on documents and actually do work over them. So, we'll start with the first section, and maybe start kind of with the document OCR piece. First off, you know, document OCR is hard. Some of you might have seen a blog post that we put out a few months ago related to this topic. But the reason this problem even exists is an agent cannot actually take the raw PDF file binary and make sense of it. That's because the way PDFs are actually stored as a format is it's rendered for kind of like display purposes, and not really for, you know, machine consumption in an interpretable manner. They're designed for printing. So, basically, text are represented as almost like individual glyphs with coordinates. Tables are not represented as tables. They're represented as like typically line segments drawn with various types of borders, and also text drawn as certain cell positions. And so, if you're kind of an agent that's trying to make sense of this like document, and not really for, you know, machine consumption in an interpretable manner. They're designed for printing. So, basically, text are represented as almost like individual glyphs with coordinates. Tables are not represented as tables. They're represented as like typically line segments drawn with various types of borders,",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "vd:274@700",
+    "source": "Tech Bridge",
+    "text": "And so for us, we really think about combining both the pipeline-based approaches of deeply understanding the file containers and binaries with the vision-based approaches to help generate, you know, kind of a hybrid approach that we think is at the Pareto frontier of cost and accuracy. A quick note on this, I'll probably just like skim the high level, but the Pareto frontier for document OCR will always be like much more accurate and cheap compared to the Pareto frontier for, you know,",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "sl:274@680",
+    "source": "Tech Bridge",
+    "text": "An Evolution of Approaches\n1. Deterministic Pipelines: Heuristics and ML models\n2. Vision Models\n3. Hybrid Approach (Ours)\npipeline approach\nmodel approach\nhybrid approach\npage image\ntext direction\nchat recog\nlayout analysis\noutput\npage image\n[VLM]\nStructured Output\nPDF page\nlayout detection\nText extraction (body text) fast / $\nVLM processing (tables, charts)\nagentc validation\neach stage independent\nreasons about everything together\nstructured output (markdown + metadata/bounding boxes)\nLlamaindex - Redefine Document Workflows with AI Agents",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "sl:274@873",
+    "source": "Tech Bridge",
+    "text": "ParseBench: An Enterprise Document Benchmark for Agents\nWe evaluate frontier models, OSS models, specialized parse providers (including LlamaParse)\nNo parser gets close to 100%, the benchmark is meant to be hard!\nOverall vs. Cost\nLlamaParse\nVLMs\nSpecialized Document Parsers\nLP Agentic\nLP Cost-Eff\nGemini (high)\nReducto (agentic)\nGemini (mini)\nReducto\nGPT-5.4\nAzure DI\nExtend\nHaku 4.5 (think)\nOpus 4.6\nGoogle DocAI\nGPT-mini (med)\nGemini Pro\nTexttract\nGPT-mini (mini)\nLandimgAI\nHaku 4.5\nOverall score (%)\nCost per page (cents)",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "sl:274@900",
+    "source": "Tech Bridge",
+    "text": "The Accuracy-Cost-Latency Pareto Curve\n1. High Accuracy Regime: require ~99%+ accuracy, price insensitive\n* e.g. financial data room extraction\n2. Low Cost Regime: require 1M docs per day, accuracy above min threshold\n* e.g. offline indexing a petabyte of Sharepoint data for retrieval\n3. Low Latency/Low Cost Regime: require parsing massive volumes in seconds, price sensitive\n* e.g. real-time file uploads to Cowork\nVLM-based approaches are primarily good for latency-insensitive batch processing.\nThey are not great in the agent loop.\nOverall vs. Cost\nLP Agentic\nLlamaParse\nVLMs\nSpecialized Document Parsers\nLP Cost-Eff\nGemini (high)\nReducto (agentic)\nGemini (mini)\nReducto\nGPT-5.4\nAzure Di\nExtend\nHaku 4.5 (think)\nOpus 4.6\nGoogle DocAI\nTexttract\nGPT-mini (med)\nGPT-mini (min)\nHaku 4.5\nLandingAI\nLlamaIndex - Redefine Document Workflows with AI Agents",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "vd:274@957",
+    "source": "Tech Bridge",
+    "text": "This typically means you're willing to pay a little bit more money per page for like deeper agentic reasoning to at least make sure that you get back the information in the right format. There's also like the low cost regime. Let's say you're just trying to index, you know, the million plus documents per day within your, that's, you know, being continually updated within your SharePoint, just for like rag knowledge base search. You know, in these cases, you obviously want it to be not like terribly inaccurate, but even if it's a little bit messed up, it's okay too. Because in the end, if you have a sufficiently good agent, it can always dive deeper into the document and surface the right information with the right citations and grounding. So for these, you know, being able to create some sort of scalable offline indexing pipeline that has the best like cost constraints is something that is optimal. One thing about VLM based approaches though, is that, you know, they're typically not very fast. And I think a lot of times if you have like real time file uploads, let's say you're using cloud coworker, you upload 1000 documents and you need to process it within a minute, like having a bunch of VLMs process that at scale is really tough for basically every single OCR service out there. And to be fair, that includes ours too.",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "vd:274@900",
+    "source": "Tech Bridge",
+    "text": "And ideally you want to cover all the points on the curve to deal with the dynamic distribution of data. various types of documents out there. It's pretty clear, even if you look at this graph, that it's like, you can increase the complexity of the benchmark. And that document understanding is definitely not 100% solved. But, you know, you fundamentally need to kind of advance a lot of the core capabilities to make sure that you're able to process, unlock the vast troves of enterprise context out there. There's kind of like a few different points on this accuracy, cost, latency, Pareto curve. There's what I call like the high accuracy regime, where like, you know, some institutions basically need like 99 to almost 100% accuracy. Because basically the downside of incorrect extraction is you completely mess up your financial model. You completely, you know, you basically get flagged for fraud or a bunch of other really, really bad things. And regulated industries like insurance and financial services, we see this a decent amount. This typically means you're willing to pay a little bit more money per page for like deeper agentic reasoning to at least make sure that you get back the information in the right format.",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "sl:274@1063",
+    "source": "Tech Bridge",
+    "text": "LiteParse: Fast, Free, Surprisingly Good Parsing\nIt is perfect as a default in the\nassistive agent loop:\n- Extremely fast over any set of\n  data\n- Good enough that the agent\n  can do text search\n- The agent can decide to\n  \"zoom-in\" with a VLM-based\n  OCR tool if it needs to do\n  deeper analysis.\nDrop a PDF here or click to browse\nPaste 14 page(s) in 0.03s\nOutput: JSON (with bounding boxes)\nWrap: On\nLlamaIndex - Redefine Document Workflows with AI Agents",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "vd:274#ctx",
+    "source": "Tech Bridge",
+    "text": "요약: LlamaIndex CEO Jerry Liu가 2026년 RAG를 에이전트 하네스와 문서 컨텍스트 레이어로 재정의한다. PDF 등 비정형 문서의 기계 해석 난이도를 설명하고, 파이프라인과 VLM을 결합한 하이브리드 OCR 방식인 LlamaParse와 ParseBench 벤치마크를 소개한다. 고정확도, 저비용, 초저지연이라는 3가지 처리 영역에 맞춰 Rust 기반 파서 LightParse를 에이전트 루프에 통합하는 구조를 제시한다.\n타임라인:\n  0초 개요 및 2026년 RAG 정의\n  79초 단순 Top-K 검색의 한계 (슬라이드)\n  177초 에이전트 하네스와 컨텍스트 스택 변화 (슬라이드)\n  301초 문서 컨텍스트 레이어의 필요성 (슬라이드)\n  398초 에이전트 네이티브 문서 플랫폼 3층 구조 (슬라이드)\n  493초 PDF 구조와 OCR 난이도 (슬라이드)\n  632초 OCR 접근법 진화와 하이브리드 방식 (슬라이드)\n  795초 ParseBench 벤치마크 결과 (슬라이드)\n  894초 정확도-비용-지연 파레토 곡선 (슬라이드)\n  991초 LightParse와 에이전트 루프 통합 (슬라이드)",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "vd:274@447",
+    "source": "Tech Bridge",
+    "text": "and feeding it, you know, either Markdown, metadata, and other forms to actually enable agents to do stuff over your documents. The next is actually what we call the semantic and storage layer, which is kind of like this concept of document management for humans and agents. Instead of humans opening up Microsoft Word using your file system or file storage, how do you create some sort of agent interface that actually captures, stores all your documents, and enables agents to actually manage and operate over them in various ways? And then there's still room for actually kind of repeatable document workflows that the agent layer, they can actually encode within the, within like this type of platform, too. If there is a repeatable workflow, like invoice processing, KYC, or claims, instead of always offloading it to a generalized agent, how do you actually develop some sort of specialized workflow for it and really carefully tune cost and accuracy to make sure that you achieve your goal? So, when we talk about like the concepts today, in terms of these three layers, we'll talk about this concept of document OCR, which is one of the core concepts of this track,",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "vd:274@992",
+    "source": "Tech Bridge",
+    "text": "So for these, you know, being able to create some sort of scalable offline indexing pipeline that has the best like cost constraints is something that is optimal. One thing about VLM based approaches though, is that, you know, they're typically not very fast. And I think a lot of times if you have like real time file uploads, let's say you're using cloud coworker, you upload 1000 documents and you need to process it within a minute, like having a bunch of VLMs process that at scale is really tough for basically every single OCR service out there. And to be fair, that includes ours too. I think in general, there's also some sort of need for an extremely low latency solution so that you can actually process stuff in real time, even if you have like deeper VLM enabled processing for kind of like deeper visual inspection and analysis. And so that's what I call it kind of being in the agent loop. So besides LamaParse, which is kind of our commercial service around like document processing and extraction, we also created this tool called LightParse. It is surprisingly really, really good. I don't know if you've been following some of the Twitter threads, but it is Rust based. It is the fastest open source parser out there.",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "sl:274@78",
+    "source": "Tech Bridge",
+    "text": "RAG in 2026\nLlamaIndex - Redefine Document Workflows with AI Agents",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "sl:274@300",
+    "source": "Tech Bridge",
+    "text": "The Modern\nDocument Context\nLayer for Agents\nLlamaIndex - Redefine Document Workflows with AI Agents",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "sl:274@422",
+    "source": "Tech Bridge",
+    "text": "Building an Agent-Native Document Platform\nAgent\nDocument Context Layer\nParsing Layer\nSemantic and Storage Layer\nAgentic Workflow Layer\nDigitalize the 10T+ pages of human-created documents into accurate, token-efficient context.\nDocument management for humans and agents. Edit, version, and collaborate over documents.\nHillclimb repeatable workflows over documents to optimize accuracy and lower cost.",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "sl:274@447",
+    "source": "Tech Bridge",
+    "text": "Building an Agent-Native Document Platform\nAgent\nDocument Context Layer\nParsing Layer\nSemantic and Storage Layer\nAgentic Workflow Layer\nDigitize the 10T+ pages of human-created documents into accurate, token-efficient context.\nDocument management for humans and agents. Edit, version, and collaborate over documents.\nHillclimb repeatable workflows over documents to optimize accuracy and lower cost.\nLlamaindex - Redefine Document Workflows with AI Agents",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "sl:274@525",
+    "source": "Tech Bridge",
+    "text": "Document OCR is Hard\n90% of the world's data lies in unstructured documents like PDFs, Powerpoints, Word, Excel\nThese documents are not natively machine readable and require machine learning to extract information\nPDF\nThe quick brown fox jumps over the lazy dog.\n[clean text]\nWhat you see\nPDF\nB1 /F0 12 Tf\n10 0 172 740 Tm\n(The quick bro ) Tj\n10 0 168 740 Tm\n(wn ) Tj\n10 0 172 726 Tm\n(fox jumps over ) Tj\nET\nWhat the PDF actually stores\nWhat You See vs. What the PDF Stores\nLlamaindex\nRedefine Document Workflows with AI Agents",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "sl:274@780",
+    "source": "Tech Bridge",
+    "text": "The Document OCR Agent Harness\nLlamaParse: https://cloud.llamaindex.ai/\nSOTA Document OCR\n(LlamaParse)\nIncreased Accuracy:\n- Post-train VLMs with RLVR for tables, charts, hand-writing, etc\n- Agentic judge & refinement\nCost Optimization:\n- Auto-routing (doc complexity model)\n- Model distillation & quantization\n- Direct extraction (optimized PDFium fork)\nLatest Frontier Models\nAccuracy\nCost\nLlamaIndex - Redefine Document Workflows with AI Agents",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "sl:274@892",
+    "source": "Tech Bridge",
+    "text": "ParseBench: An Enterprise Document Benchmark for Agents\nWe evaluate frontier models, OSS models, specialized parse providers (including LlamaParse)\nNo parser gets close to 100%, the benchmark is meant to be hard!\nOverall vs. Cost\nLlamaParse\nVLMs\nSpecialized Document Parsers\nLP Agentic\nLP Cost-Eff\nGemini (high)\nReducto (agentic)\nGemini (min)\nReducto\nGemini Pro\nAzure DI\nGPT-5.4\nExtend\nHaku 4.5 (think)\nOpus 4.6\nGoogle DocAI\nGPT-mini (med)\nTextract\nGPT-mini (min)\nHaku 4.5\nLandingAI\n0.0 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0\nCost per page (cents)\nOverall score (%)\nLlamaIndex - Redefine Document Workflows with AI Agents",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "sl:274@957",
+    "source": "Tech Bridge",
+    "text": "The Accuracy-Cost-Latency Pareto Curve\n1. High Accuracy Regime: require ~99%+ accuracy, price insensitive\n* e.g. financial data room extraction\n2. Low Cost Regime: require 1M docs per day, accuracy above min threshold\n* e.g. offline indexing a petabyte of Sharepoint data for retrieval\n3. Low Latency-Low Cost Regime: require parsing massive volumes in seconds, price sensitive\n* e.g. real-time file uploads to Cowork\nVLM-based approaches are primarily good for latency-insensitive batch processing.\nThey are not great in the agent loop.\nOverall vs. Cost\nLP Agentic\nLP Cost-Eff\nGemini (high)\nReducto (agentic)\nLlamaParse\nVLM\nSpecialized Document Parsers\nGemini (min)\nReducto\nAzure Dr\nGPT-5.4\nExtend\nHaku 4.5 (think)\nOpus 4.6\nGoogle DocAI\nTexttract\nGPT-mini (med)\nGPT-mini (min)\nHaku 4.5\nLandingAI\nGemini Pro\nCost per page (cents)",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "sl:274@992",
+    "source": "Tech Bridge",
+    "text": "The Accuracy-Cost-Latency Pareto Curve\n1. High Accuracy Regime: require ~99%+ accuracy, price insensitive\n* e.g. financial data room extraction\n2. Low Cost Regime: require 1M docs per day, accuracy above min threshold\n* e.g. offline indexing a petabyte of Sharepoint data for retrieval\n3. Low Latency/Low Cost Regime: require parsing massive volumes in seconds, price sensitive\n* e.g. real-time file uploads to Cowork\nVLM-based approaches are primarily good for latency-insensitive batch processing.\nThey are not great in the agent loop.\nOverall vs. Cost\nLP Agentic\nLlamaParse\nVLM\nSpecialized Document Parsers\nLP Cost-Eff\nGemini (high)\nReducto (agentic)\nGemini (mini)\nReducto\nGPT-5.4\nAzure Dr\nExtend\nHaku 4.5 (think)\nOpus 4.6\nGoogle DocAI\nTexttract\nGPT-mini (med)\nGPT-mini (mini)\nHaku 4.5\nLandingAI\nGemini Pro\nOverall score (%)\nCost per page (cents)",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "sl:274@1133",
+    "source": "Tech Bridge",
+    "text": "Document Extraction\nGoal: Schema-based structured extraction over any document, regardless of document complexity or schema complexity.\nUse Cases:\n- Automate human data entry\n- Batch ETL\n- Add metadata for search\nExtraction Modalities:\n- Fast Extraction\n- Agentic Extraction\nGrounding and Semantics:\n- Granular attribution\n- Calibrated Confidence Scores\nOutput Options\nGranular Boundary Boxes Beta\nLine\nWord\nCell\nMarkdown\nAnnotate links\nInline images in markdown\nGranular Bounding Boxes - Available now in LlamaParse.\nLlamaIndex - Redefine Document Workflows with AI Agents",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "sl:274@1188",
+    "source": "Tech Bridge",
+    "text": "Document Search\n2026: Retrieval Harness\nGive access to a full set of retrieval and filesystem tools for full range of operations\n- Keyword search: BM25, grep\n- Semantic search: Vector\n- File operations: Read/scroll\n- Filesystem operations: compose via pipes\nAgents can iteratively crawl context and generate in a multi-turn fashion.\nSemantic Search Alone\nLlamaIndex - Redefine Document Workflows with AI Agents",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "sl:274@1220",
+    "source": "Tech Bridge",
+    "text": "Thanks!\nCome find us at booth #L-G47\nJUNE 29-JULY 2, MOSCONE WEST\nBOOTH L-G47\nAI Engineer\nWorld's Fair\nLlamaIndex\nAlso pickleball\nhttps://luma.com/the-agent-open\nTHE\nAGENT OPEN\nHOSTED BY\nBraintrust\nLlamaIndex\nturbopuffer\nModal\nparallel\nBrowserbase\nCURSOR",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "vd:274@0",
+    "source": "Tech Bridge",
+    "text": "Hey everyone, I'm Jerry, co-founder and CEO of Lama Index, and today I'm excited to give a talk called Building the Document Context Layer for AI Agents. Really big shout out to the AI Engineer World Fair for hosting, and if you've seen some of my earlier talks from the previous AI Engineer conferences, we've kind of traced through a lot of the evolution of how, you know, agent advances have correlated with, you know, how you inject context into evolving applications.",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "vd:274@50",
+    "source": "Tech Bridge",
+    "text": "All right, RAG in 2026. But before that, just a little bit about the company, and I'll kind of get on with the main talk. You might have seen us as a RAG framework. We started in 2023, got pretty popular, kind of create a lot of techniques around like advanced RAG, that type of stuff. Today, we're basically the main document infrastructure for AI agents. We deliver the best platform for agents to actually read and operate over documents, and we see ourselves as unlocking basically the vast troves of document context,",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "vd:274@75",
+    "source": "Tech Bridge",
+    "text": "even as agents and models themselves get better. All right, so what does RAG actually mean in 2026, and how are agents actually inhaling and adjusting context today? This is a snapshot from actually three years ago, when I first gave a talk on this. And naive RAG was basically just building a simple chatbot over your private corpus of data. If you flashback all the way to January of like 2023, you know, this technique basically consisted of you have some corpus",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "vd:274@100",
+    "source": "Tech Bridge",
+    "text": "of documents, you chunk it up, embed it, and put it into a vector database. You do some naive top-k retrieval, and then you generate some stuff with an LLM. All the steps are fixed. You use kind of like a fixed set of techniques. And then with that, you actually get some basic application results by just being able to chat over a corpus of documents. Of course, the agent landscape has changed quite a bit, and quite dramatically since then.",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "vd:274@150",
+    "source": "Tech Bridge",
+    "text": "to get baked into the agent layer. So instead of coming up with a variety of hacks to really work around the limitations of naive top-k retrieval, you can start getting the agent to really reason about, for instance, the best keyword to search for, best, like, you know, search term to actually get back good results. Even if the retrieval tools are basic, the agent can input the right queries to basically loop upon itself and help solve the task at hand.",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "vd:274@175",
+    "source": "Tech Bridge",
+    "text": "Number two, context is moving up the stack. There's been a lot of conversations, I think, for the first two and a half years of Gen.AI of how do you actually manage the agent context window, make sure it doesn't overflow, that type of thing. But I think as, you know, a lot of the evolving techniques, compaction, long context have evolved, I think more and more of the conversation is actually how do you just hook up the right MCP servers and skills and tasks to the agent to enable it to do various types of tasks.",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "vd:274@200",
+    "source": "Tech Bridge",
+    "text": "And so that also applies to agent orchestration, right? Coding agents have gotten better. Abstractions of actually defining what types of tasks and programs you want to build have moved a little bit upwards towards English as opposed to through code. And so maybe in 2023 to 2025, you define programs and you still build stuff via, like, importing Python, using TypeScript through code. It's pretty clear these days more and more people are just building stuff using English,",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "vd:274@225",
+    "source": "Tech Bridge",
+    "text": "whether you're a software engineer or you're in a non-technical function, like go-to-market marketing, and you're defining runbooks through English and kind of like defining the right goals and making sure that AI is aligned on the right task. And we see that carrying over going forward as well. So in terms of just like general evolving knowledge work patterns, and this kind of forms a foundation for how we think about the context layer,",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "vd:274@250",
+    "source": "Tech Bridge",
+    "text": "you know, in the past maybe you could use AI to just like ask simple questions, get it resolved. Today, you're starting to be able to define and solve more end-to-end like tasks just through English and also use English to start compiling repeatable programs to actually execute something at scale. Obviously, there's been a lot of discussion on how this will evolve even more,",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "vd:274@275",
+    "source": "Tech Bridge",
+    "text": "and we do see AI agents as behaving even more autonomously through solving long horizon tasks, looping upon themselves to be able to achieve a goal. So the future will move towards a state where you actually might not even have to define the task in English, but actually more the goal and a scoring rubric, and then the agent will use all available contexts available to it to actually solve the task. So with that overall framing, let's talk about what kind of is a pretty core focus for us as a company,",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "vd:274@300",
+    "source": "Tech Bridge",
+    "text": "which is basically helping to unlock unstructured context to basically feed into these agents even as they get really, really good, both in terms of the core model capabilities as well as the agent harness. And we'll focus a lot on our core focus area, which is document context, but of course there's plenty of other sources of context as well. In fact, we do think context really is everything. In the end, you could have an infinitely smart agent,",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "vd:274@325",
+    "source": "Tech Bridge",
+    "text": "but your ability to actually get value out of this infinitely smart agent that's able to do more and more stuff end-to-end is actually giving it the right things to do. And the right things to do include the actual task, the goal, but also access to the vast troves of organizational context available to it. Whether that is web search, web context, whether that is connectors through tools and skills and MCP servers,",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "vd:274@350",
+    "source": "Tech Bridge",
+    "text": "whether it's connectors through Snowflake or Databricks warehouses, or for us, whether it's access to the vast trove like the 90% of documents are stored within SharePoint, Box, Dropbox, S3, all the unstructured data that's locked up within document containers. And so for us, we care a lot about how do you actually build the right tools and unlock the right context here.",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "vd:274@375",
+    "source": "Tech Bridge",
+    "text": "We see documents as universal containers for unstructured context. There's over 10 trillion-plus pages of human native knowledge locked up within PDFs, PowerPoints, Word documents, and Excel sheets. And at the same time, agents are also starting to generate exponentially more data in terms of, you know, more agent-native formats in terms of Markdown and HTML. So, for us, building an agent-native document platform contains three main pieces.",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "vd:274@475",
+    "source": "Tech Bridge",
+    "text": "to document extraction, document search, and document workflows. There's still a variety of topics yet left unsolved from agent-native document formats, document versioning, document editing, you know, hill climbing as a service, and just like a wide set of kind of remaining concepts to actually create a comprehensive piece of software where agents and humans can collaborate on documents and actually do work over them.",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "vd:274@500",
+    "source": "Tech Bridge",
+    "text": "So, we'll start with the first section, and maybe start kind of with the document OCR piece. First off, you know, document OCR is hard. Some of you might have seen a blog post that we put out a few months ago related to this topic. But the reason this problem even exists is an agent cannot actually take the raw PDF file binary and make sense of it. That's because the way PDFs are actually stored as a format is it's rendered for kind of like display purposes,",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "vd:274@550",
+    "source": "Tech Bridge",
+    "text": "and also text drawn as certain cell positions. And so, if you're kind of an agent that's trying to make sense of this like document, you're going to have a really hard time actually trying to reason about what character and what shapes like map to what. So, the whole point of document OCR, you know, it's been around for like 20 plus years, is to really try to create some sort of digitalized, well interpretable representation that's both interpretable to humans as well as AI agents.",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "vd:274@575",
+    "source": "Tech Bridge",
+    "text": "Also, reading order itself, if you have a multi-column layout, there is no guarantee that the way it's represented in the PDF actually corresponds to the typical ways that humans would read it. Because again, it's basically just an arbitrary sequence of characters drawn with coordinate positions. Related to this, you know, even Word doc parsing is hard. They're a little bit more structured than PDFs, but they're in kind of like this custom bespoke XML format,",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "vd:274@600",
+    "source": "Tech Bridge",
+    "text": "and this applies to PowerPoints as well. It contains more structural information, but still, there's a ton of like fluff. Like, you don't actually need to ingest all the tags to actually have the agent make sense of the Word document. It still needs to infer a bunch of structure from it. It needs like the right kind of, to lift the right metadata around like formatting, semantics, that type of stuff. But also being able to ignore the tags and actually being able to render the document so that the agent can see the overall structure of the page.",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "vd:274@625",
+    "source": "Tech Bridge",
+    "text": "It's still generally a hard problem, and there's a lot of uplift you can get by actually parsing it into a more interpretable format, instead of just using the native OXML and feeding that to an agent. If you're familiar with document understanding, you know, it's been around for quite a bit of time. There's a lot of these like heuristic and pipeline-based approaches, which focused on kind of more, I guess, like human-driven,",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "vd:274@650",
+    "source": "Tech Bridge",
+    "text": "handwritten like techniques to analyze like kind of various pieces of text, group them into clusters and identify tables, paragraphs, and be able to kind of like generate some sort of output representation. A lot of basic techniques if you use open source libraries like PyPDF, PyMUPDF, and of course, like some of the more recent approaches, basically use this type of approach.",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "vd:274@675",
+    "source": "Tech Bridge",
+    "text": "There's also, of course, using a VLM to one-shot a document into text. That's what we call like a vision-based approach. This works decently well, obviously. You know, I think there's kind of a lot of uplift you can get by being able to read the visual structure, but there's a lot of suboptimal pieces about it. It can hallucinate on text-only pages. It costs a ton of money, and also it still lacks a lot of the semantics and grounding that you typically expect with some sort of document processing tool.",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "vd:274@725",
+    "source": "Tech Bridge",
+    "text": "wherever the frontier models are in terms of document understanding. It's because it's a very specific data type, and there's always ways to kind of like distill the latest visual understanding capabilities from, you know, Gemini, GPT, Opus, into kind of a carefully tailored workflow that's able to process your documents at scale and in a highly accurate manner.",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "vd:274@750",
+    "source": "Tech Bridge",
+    "text": "To some extent, that's exactly what we do. You know, we both optimize the underlying like PDF engines plus like Word, PowerPoint, and others. We have an agentic harness that's like carefully tuned for auto routing between cheaper specialized models to frontier models, and also kind of specialized fine-tuned document VLMs that are parameter efficient and focus on specific classes of documents,",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   },
+   {
+    "id": "vd:274",
+    "source": "Tech Bridge",
+    "text": "LlamaIndex CEO Jerry Liu가 2026년 RAG를 에이전트 하네스와 문서 컨텍스트 레이어로 재정의한다. PDF 등 비정형 문서의 기계 해석 난이도를 설명하고, 파이프라인과 VLM을 결합한 하이브리드 OCR 방식인 LlamaParse와 ParseBench 벤치마크를 소개한다. 고정확도, 저비용, 초저지연이라는 3가지 처리 영역에 맞춰 Rust 기반 파서 LightParse를 에이전트 루프에 통합하는 구조를 제시한다.",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": null
+   }
+  ],
+  "angle": "RAG를 에이전트 하네스와 문서 컨텍스트 레이어로 재정의",
+  "previous": null,
+  "code_warnings": [],
+  "round": 1
+ },
+ "expect": {
+  "status": "pass"
+ },
+ "note": "통과한 최종판(깨끗한 초안 가정, 라벨로 확인)"
+}

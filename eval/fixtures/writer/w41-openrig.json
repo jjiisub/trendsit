@@ -1,0 +1,93 @@
+{
+ "input": {
+  "plan": {
+   "rank": 9,
+   "angle": "Claude Code와 Codex 팀 구성 오케스트레이션",
+   "relation": {
+    "type": "new",
+    "topic_id": null
+   }
+  },
+  "evidence": [
+   {
+    "id": "rp:mvschwarz/openrig",
+    "source": "GitHub",
+    "text": "[rp:mvschwarz/openrig#f1] README: A rig wraps your harnesses. Define your agent team in YAML, boot it with one command. Claude Code and Codex in the same rig\n[rp:mvschwarz/openrig#f2] 토픽: agent-orchestration, multi-agent, ai-coding, claude-code, codex-cli\n[rp:mvschwarz/openrig#f3] v0.6.6 2026-10-07 릴리스, 설치 후 operator가 팀을 제안해 즉시 실행하는 개선\n[rp:mvschwarz/openrig#f4] v0.6.5 2026-10-04, v0.6.4 2026-10-02 릴리스\n[rp:mvschwarz/openrig#f5] 최근 7일 커밋 100+, 작성자 8명, 마지막 커밋 2026-10-08\n[rp:mvschwarz/openrig#f6] 기여자 50명, 상위 mvschwarz 1839, v-openrig-build 1304\n[rp:mvschwarz/openrig#f7] 이번 주 글에 openrig 언급 없음\n[rp:mvschwarz/openrig#f8] 뜨는 이유: v0.6.6 릴리스(2026-10-07), 7일 커밋 100+로 개발 활발\n[rp:mvschwarz/openrig#f9] 릴리스 v0.6.6 (2026-10-07): 설치 후 operator가 팀을 제안해 즉시 실행, 팀을 GitHub 폴더 링크로 공유·설치",
+    "title": "mvschwarz/openrig",
+    "url": "https://github.com/mvschwarz/openrig"
+   },
+   {
+    "id": "it:1122",
+    "source": "GeekNews",
+    "text": "[it:1122#s1] A harness wraps a model.\n[it:1122#s2] A rig wraps your harnesses.\n[it:1122#s3] Define your agent team in YAML, boot it with one command.\n[it:1122#s4] Claude Code and Codex in the same rig, managed as one system.\n[it:1122#s5] OpenRig is open-source software for building and running your own network of agents.\n[it:1122#s6] It turns AI coding agents from a pile of terminal sessions into a persistent, organized team.\n[it:1122#s7] Talk to a lead agent about the outcome you want; it can coordinate specialists across teams and bring you results and decisions that need your attention.\n[it:1122#s8] Start with a repository and one useful change, then keep the team's work and context at the same addresses.\n[it:1122#s9] It's the open-source system behind my AI civilization experiments.\n[it:1122#s10] Guide: Getting started · Stuck?\n[it:1122#s11] Help · Questions: Q&A · Updates and demos: @_feralmachine on X\n[it:1122#s12] Start here: the guided first-use path: install, talk to the kernel operator, then choose a team for your first useful change.\n[it:1122#s13] Not setting this up today?\n[it:1122#s14] Get the next walkthrough and occasional OpenRig updates → https://openrig.dev/follow\n[it:1122#s15] Requires Node.js 22 or 24 and tmux, on macOS or Linux.\n[it:1122#s16] On Linux, the distribution's own Node.js can be older (Ubuntu 24.04's is 18); install a supported version with nvm (nvm install 22) or NodeSource.\n[it:1122#s17] On a Mac with Apple silicon, use Node.js 22 (compatibility history).\n[it:1122#s18] On Windows, use WSL2, the Windows route OpenRig supports; native Windows isn't supported.\n[it:1122#s19] OpenRig's automated tests don't run on WSL2 yet; see one user's working setup.\n[it:1122#s20] Launching a rig writes provider hooks and workspace trust settings.\n[it:1122#s21] Before running the commands below, read what OpenRig changes on your machine and back up the relevant files.\n[it:1122#s22] One command.\n[it:1122#s23] This runs OpenRig's install script from the v0.6.8 release.\n[it:1122#s24] It checks Node.js and npm, installs the latest published @openrig/cli with npm install -g, runs the Node.js and SQLite check, then runs rig setup --dry-run and rig setup.\n[it:1122#s25] The first line prints that plan and changes nothing:\n[it:1122#s26] curl -fsSL https://raw.githubusercontent.com/mvschwarz/openrig/v0.6.8/scripts/install.sh | sh -s -- --dry-run\n[it:1122#s27] curl -fsSL https://raw.githubusercontent.com/mvschwarz/openrig/v0.6.8/scripts/install.sh | sh\n[it:1122#s28] If a provider isn't signed in yet, the last step reports FAILED [4/4], and rig setup lists the sign-in under \"Some steps need attention\".\n[it:1122#s29] If the only remaining failures are provider sign-ins, the install steps finished; sign in to each selected provider as below and continue.\n[it:1122#s30] Or step by step:\n[it:1122#s31] npm install -g @openrig/cli\n[it:1122#s32] rig setup --dry-run\n[it:1122#s33] To install with Bun instead, run bun add -g @openrig/cli.\n[it:1122#s34] OpenRig still runs on Node.js, so install Node.js 22 as well.\n[it:1122#s35] Bun may block this package's postinstall script, in which case the Node.js and SQLite check described under what OpenRig changes on your machine does not run at install time.\n[it:1122#s36] npm 11 and later can skip that postinstall script and print npm warn install-scripts naming @openrig/cli.\n[it:1122#s37] That's expected: the CLI still works, and only the Node.js and SQLite check was skipped.\n[it:1122#s38] To run it yourself, use node \"$(npm root -g)/@openrig/cli/scripts/check-abi.mjs\"; rig doctor checks the Node.js version only.\n[it:1122#s39] Choose the working account you already have: Claude Code, Codex, or both.\n[it:1122#s40] Reuse an explicit choice; no second subscription is required.\n[it:1122#s41] rig setup --dry-run previews the broader setup; applying rig setup checks both harnesses and installs a missing one, plus Herdr unless declined with --no-herdr.\n[it:1122#s42] On macOS, the installing agent offers Ghostty once.\n[it:1122#s43] Setup leaves an existing cmux installation alone.\n[it:1122#s44] It is optional for the selected-provider path.\n[it:1122#s45] A team seat with no permission policy, per-seat choice or (for Codex) named profile launches with OpenRig's team default: Claude runs ordinary rig commands, project reads and common tests without prompting, while lifecycle commands such as rig up and rig down still ask; Codex also gets the OpenRig workspace and its pod's state directory as writable directories.\n[it:1122#s46] Before launching, your agent recommends keeping that default, and offers to remember selected OpenRig commands in your native settings only if you want that, at personal project scope unless you explicitly choose user-wide sessions.\n[it:1122#s47] It is not global YOLO or permission to invent work.\n[it:1122#s48] On Yes, the agent adds and verifies native rules; No or no answer keeps the team default and leaves settings unchanged.\n[it:1122#s49] An existing explicit choice is reused.\n[it:1122#s50] Say “Undo the OpenRig command allowances added by this setup” to remove only its additions.\n[it:1122#s51] If permission prompts are slowing you down, consider the workshop bundle.\n[it:1122#s52] It ships with broad access and non-interruptive mode: its agents bypass permission prompts and supported harness warning dialogs.\n[it:1122#s53] The listing and before-install view explain that access before you choose it.\n[it:1122#s54] Check tmux -V and only your selected CLI/login: claude --version plus\n[it:1122#s55] claude auth status, or codex --version plus codex login status.\n[it:1122#s56] If needed,\n[it:1122#s57] sign in once with claude auth login or codex login; do not install or log in\n[it:1122#s58] to an unused provider.\n[it:1122#s59] After installing, your agent opens the OpenRig TUI and the operator for you.\n[it:1122#s60] To get back to them later, ask your agent for OpenRig or your agents in any words.\n[it:1122#s61] After checking the selected login, it runs:\n[it:1122#s62] rig daemon start  # if stopped\n[it:1122#s63] rig terminal open saved:kernel --window\n[it:1122#s64] --window opens a new terminal tab or window itself, or a space in your current\n[it:1122#s65] Herdr session.\n[it:1122#s66] Below 120 measured columns,\n[it:1122#s67] the operator fills the first page; from 120, the dashboard and operator share\n[it:1122#s68] it equally.\n[it:1122#s69] The advisor has a separate tab or tmux window.\n[it:1122#s70] An installing agent can run it from its shell on the daemon's\n[it:1122#s71] desktop; the person copies nothing.\n[it:1122#s72] It uses Herdr when installed, otherwise\n[it:1122#s73] the same layout in plain tmux, and preserves existing conversations.\n[it:1122#s74] rig tui\n[it:1122#s75] is the team dashboard.\n[it:1122#s76] Installation is finished when you are talking to the\n[it:1122#s77] operator; if you choose to talk later, that handoff remains pending.\n[it:1122#s78] If setup stops, read the named step: missing tools and selected-provider logins need their specific setup action.",
+    "title": "OpenRig - Claude Code와 Codex를 팀으로 운영하는 멀티 에이전트 오케스트레이터",
+    "url": "https://news.hada.io/topic?id=34854"
+   }
+  ],
+  "previous": null,
+  "aliases": [
+   {
+    "canonical": "Claude Code",
+    "aliases": [
+     "claude-code"
+    ]
+   },
+   {
+    "canonical": "Codex",
+    "aliases": [
+     "codex",
+     "코덱스"
+    ]
+   },
+   {
+    "canonical": "OpenRig",
+    "aliases": [
+     "openrig"
+    ]
+   }
+  ],
+  "limits": {
+   "sections": [
+    4,
+    7
+   ],
+   "paragraphs_per_section": [
+    1,
+    2
+   ],
+   "paragraph_sentences_max": 4,
+   "paragraph_chars_max": 320,
+   "summary_sentences": [
+    1,
+    2
+   ],
+   "summary_chars_max": 200,
+   "heading_chars_max": 70,
+   "head_tiles_max": 4,
+   "tiles_per_section": [
+    2,
+    3
+   ],
+   "visuals_max": 4,
+   "bars_items": [
+    2,
+    6
+   ],
+   "table_rows": [
+    2,
+    6
+   ],
+   "table_cols": [
+    2,
+    4
+   ],
+   "slides_max": 2,
+   "video_secs_max": 3,
+   "max_refs_per_paragraph": 4
+  },
+  "slide_candidates": [],
+  "no_visuals": false
+ },
+ "expect": {},
+ "note": "2026-W41 실제 토픽 입력(run 20261013-205302-weekly-b981)"
+}

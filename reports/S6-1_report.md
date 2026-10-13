@@ -9,7 +9,7 @@
 (A1 라운드 실행 결과 원문은 구현 세션 보고서 `.workflow/006-s6-1/A1-impl.md`, A2 라운드는 `A2-impl.md`에 남긴다.)
 
 ## 3. 관문 B 결과
-런 뒤(7장) W40·W41 재생성 뒤 리뷰 세션이 라벨로 판정(D-28). 이 보고서 작성 시점에는 아직 없음.
+W40·W41 재생성·발행(2026-10-13) 뒤 리뷰 세션이 라벨로 판정(D-28). 이 보고서 작성 시점에는 아직 없음. 따로 볼 것(handoff 008): 요약·첫 절 제목·head 타일에 같은 수치가 겹치는지(W40 GPT-6.1 Sol은 "5분의 1"·"95%"가 요약·타일·첫 절에 다 나옴), 슬라이드가 그래프·표 위주인지.
 
 ## 4. 결정한 것 (9장 "구현 시점 기본값" + 추가)
 - 문장 나누기(`fulltext.sentences`): 줄바꿈 우선 분리 + 줄 안에서 `.!?` 뒤 공백(다음 글자가 영문/숫자/한글/따옴표/괄호)으로. 소수점·약어는 공백이 없어 안 쪼개짐(완벽한 처리는 아님)
@@ -38,14 +38,32 @@
 - 5.7 "repos 원천 문장 정정"(F74·C-32): A1 라운드 리포트가 "미구현"이라고 적었던 것은 오류였다. `export.py`의 `_repos`는 이미 그 주 모든 `repo_trending` 행과 토픽 근거 레포를 합쳐 돌며(`[*rows, *topic_of]`), 토픽 근거가 아닌 레포만 relevant·설명 기준으로 거른다 — 정정 문장과 같은 동작이다(A2 라운드에서 확인, 006-A1-19 dup)
 - `scripts/s5_eval_fixtures.py`는 v2로 포팅했으나 실DB(실제 weekly 실행 결과)가 없어 끝까지 실행해 보지 못함(런 뒤 ⑥에서 처음 실행됨)
 - (A1 라운드) A10·A11의 미니 바 측정 가끔 깜빡임 — A2 라운드에서 원인을 찾아 고침(gate.js의 미니 바 측정을 `behavior()`가 쓰던 같은 페이지·컨텍스트가 아니라 독립된 새 컨텍스트에서 재도록 분리. 탭 스크롤 측정을 분리했을 때와 같은 이유). 고치기 전 바닐라 코드로도 2/4회 재현됐고, 고친 뒤 10/10회 통과(검증 방법은 A2-impl.md)
+- (런 007) 최종 리뷰 C2 잔여 Medium: 페이지 단위 이슈(`loc="sections"`) 수정이 매번 되돌려져 헛 수정 호출과 거짓 ⚠, 검수자 원문에 slide_fact 수치 빠짐, "MMLU 88.1"처럼 영문 이름 뒤 수치는 숫자 대조 건너뜀, `sections=[]`가 형식 반려가 아니라 작성 실패, revise `table.rows`가 숫자 섞인 행 거부, 지적 없는 add 하나가 스키마를 깨면 같은 revision 전체 버림, writer_revise missing_key "다른 절에 add" 지시와 되돌림 규칙 충돌. 상세 `.workflow/007-s6-1/SUMMARY.md`
+- (런 007) critic.md: 표·절 타일 줄(loc_lines)에 refs가 없어 refs 기반 대조 불가, 5.4 함정 예시(타일 "6개월"·"V2") 없음, missing_diagram 조건(code_warnings "누락 의심")을 코드가 내지 않음
+- (런 007) 예산: 새 파일 17/11(site_v2.json·jpg 3·.gitkeep 3은 런 006 수용), `tests/test_s6_1_write.py` 675줄(3.4 "500줄 넘는 새 파일 없음"이 테스트 포함인지 명세가 정하지 않음), checks.py 450/450
+- (런 뒤 ⑤) 실사이트 `check.py` 18/20: 관문 9 항목 5 "핵심 포인트(첫 절)가 375 첫 화면 안"이 실데이터 3토픽에서 실패(첫 절 위치 836·866·902px > 812). 요약 + 머리 타일이 첫 화면을 차지하는 v2 구조 때문이고 레이아웃이 깨진 것은 아님. 항목 5 기준을 v2에 맞게 바꿀지(예: 요약·타일까지만 첫 화면) 기획 판단
+- (런 뒤 ③) `editor_select`가 검증 2회 실패하면 두 번째 시도가 캐시 적중으로 같은 답을 받아 대체 계획(4토픽)이 됨(W40 1차, 10/10에도 같은 일). `--from-step select --no-cache`로 다시 돌려 7토픽. 재시도 때 캐시를 건너뛰게 할지 다음 사이클
+- (런 뒤 ③) W41 1차에서 OpenRouter 429(qwen3.8-27b 상류 요청 제한)로 작성 6토픽 실패 → `--from-step write --topic`으로 하나씩 다시 써 10토픽 모두 성공. 무인 실행(10/19)에서 같은 일이 나면 그 토픽만 빠지고 발행(5.13)
+- (런 뒤 ⑥) `s5_eval_fixtures.py`·weekly가 `eval/labels/decide.csv`·`aliases.csv`를 다시 써서 사람 라벨이 줄어듦(decide 58→36, aliases 17→7). 커밋본으로 되돌림(재생성본은 `.workflow/007-s6-1/artifacts/`). 라벨 파일을 덮어쓰지 않게 하는 것은 다음 사이클
+- `scripts/s6_1_regen.sh` 실측: ③ W40 뒤 `week_state`의 `sqlite3 -readonly`가 WAL DB에서 -shm이 없을 때 열리지 않아(코드 14) 멈춤 → `-readonly` 제거(c52e0b2). 나머지 단계는 손으로 같은 순서로 이어감
 
 ## 7. 사용액 표
-`bash scripts/s6_1_regen.sh`(③ weekly W40·W41) 실행 전이라 아직 0건. **런 뒤 채움.**
+| 스펙 | 모델 | 호출 | 캐시 적중 | 입력 토큰 | 출력 토큰 | 사용액(달러) |
+|---|---|---|---|---|---|---|
+| S6-1 | qwen/qwen3.8-27b | 215 | 28 | 1225885 | 303776 | 0.725811 |
+
+- 상한 $1.50 중 $0.73. 단계(mvp) $8.39 / $20.00
+- 실행(2026-10-13): 백업 `data/backup/20261013-1506-pre-s6-1.db` → W40 1차(대체 계획 4토픽, $0.14) → W40 `--from-step select --no-cache`(7토픽, 실패 0, ⚠ 7, $0.15, run `20261013-164928-weekly-1b69`) → W41(10토픽 중 429로 6 실패) → 실패 토픽 6개 `--topic` 재작성(최종 10토픽 passed 5·checked 5, run `20261013-205302-weekly-b981`) → publish W40·W41 → `check.py` 18/20(6장)
+- 영상 파일 두 개 모두 있음(슬라이드 포함). 실사이트 캡처 `reports/S6-1/shots/live-webkit-375-{home,topic-table,topic-slide}.png`
+- ⑥ eval 픽스처: writer 17, critic 20, writer_revise 10
 
 ## 7-1. README 갱신 내역
 - 현재 상태 줄에 S6-1 한 줄 추가
 - "사이트" 절에 `trendsit backup`, 슬라이드 설명 한 단락 추가
 - 로드맵에 S6-1 체크 추가
+- (런 뒤) 현재 상태 줄의 S6-1 끝을 "W40·W41 재생성·발행 2026-10-13, 리뷰 대기"로
 
 ## 8. impl-workflow SUMMARY 요약
-(콜드 리뷰·QA 라운드 전이라 비어 있음. 리뷰 세션이 `.workflow/006-s6-1/SUMMARY.md` 생성 뒤 이 자리에 요약을 옮긴다.)
+- 런 006: Phase A 리뷰 3 → B QA 2(A12 PASS) → C 리뷰 2. C2 High 3 잔여로 끝(기획 세션이 code-findings-1·명세 v1.2로 정리)
+- 런 007(명세 v1.2): code-findings-1 R1-01~13 전부 수정 → 리뷰 2회(2회차 High 0) → held 18건 일괄 수정 → A12 QA PASS(finding 0) → C1 리뷰 High 1(held 수정이 만든 revise add 번호 밀림 회귀) → 수정 → C2 리뷰 High 2(새 파일 예산 = 수용분 dup, 검수자가 heading을 대조에서 뺌). heading은 런 뒤 손으로 고치고(4154116·6f9b65c) 리뷰 1회(High 0)
+- 관문 A 전 항목 PASS, pytest 723. 잔여 Medium·optional은 `.workflow/007-s6-1/SUMMARY.md`, 요약은 6장

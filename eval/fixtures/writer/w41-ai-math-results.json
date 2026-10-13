@@ -1,0 +1,73 @@
+{
+ "input": {
+  "plan": {
+   "rank": 7,
+   "angle": "프런티어 모델로 도출한 수학 결과 공개",
+   "relation": {
+    "type": "new",
+    "topic_id": null
+   }
+  },
+  "evidence": [
+   {
+    "id": "it:1102",
+    "source": "OpenAI News",
+    "text": "[it:1102#s1] We’re releasing a broad range of new mathematical results produced by an internal frontier model.\n[it:1102#s2] As we look to improve how we share results with the math community, we’ve been consulting with the independent Advisory Group on Mathematics and Artificial Intelligence at the Institute for Advanced Study(opens in a new window) to develop best practices, and we have drawn on their advice and public recommendations(opens in a new window) to inform how we release these results.\n[it:1102#s3] For this release, we’re publishing the results in a GitHub repository, with protocols for paper revisions and citations.\n[it:1102#s4] We’re continuing to explore other community-hosted alternatives for this release which meet the committee’s guidelines.\n[it:1102#s5] For future releases, we are committed to further improving the quality of the papers via the citations, mathematical exposition, and presentation of the results for better understanding.\n[it:1102#s6] As part of our GitHub repository, we are sharing formalizations of many of the proofs in Lean, a programming language that allows mathematical proofs to be checked by a computer.\n[it:1102#s7] We will update the repository with more formalizations as we obtain them.\n[it:1102#s8] To promote scientific transparency and openness, we are also publishing additional details about how we obtained the results in the repository.\n[it:1102#s9] These include 10 summaries of the model’s reasoning, estimations of compute spent in terms of Pro usage on ChatGPT, and statistics about the number of attempted problems.\n[it:1102#s10] The average result used the equivalent compute of roughly three hours of ChatGPT Pro thinking.\n[it:1102#s11] We want this progress to push the frontier of human knowledge and enable further progress in mathematics.\n[it:1102#s12] We will be funding a series of workshops, conferences, and special programs around the understanding of major results produced by AI—we will share more on this in the near future.\n[it:1102#s13] We want to directly empower scientists with state-of-the-art capabilities and are working to responsibly release the model that produced these results.\n[it:1102#s14] This is why it is important to continue to evaluate our internal frontier models on mathematics and other sciences, so we can accelerate developing the tools to advance those fields.\n[it:1102#s15] We will continue to act on feedback from the community and update our standards for future disclosures of major scientific advancements.",
+    "title": "Sharing AI progress in mathematics",
+    "url": "https://openai.com/index/sharing-ai-progress-in-mathematics"
+   },
+   {
+    "id": "it:1156",
+    "source": "AI타임스",
+    "text": "[og:1156#q1] 원문: 결과 하나를 도출하는 데 사용된 연산량은 평균적으로 ChatGPT Pro가 약 3시간 동안 추론하는 데 쓰는 연산량에 해당합니다.\n[og:1156#q1] (카드 수치, 위 원문에서 뽑음) 결과 하나당 평균 추론 연산량(ChatGPT Pro 기준) [3시간]\n[og:1156#q2] 원문: GitHub 리포지터리에는 다수의 증명을 Lean으로 형식화한 자료도 공유합니다. Lean은 컴퓨터로 수학적 증명을 검증할 수 있게 해 주는 프로그래밍 언어입니다.\n[og:1156#q3] 원문: 과학 연구의 투명성과 개방성을 높이기 위해, 결과를 도출한 과정에 관한 추가 세부 정보도 리포지터리에 공개합니다. 여기에는 모델의 추론 과정 요약 10건, ChatGPT에서의 Pro 사용량으로 환산한 연산량 추정치, 풀이를 시도한 문제 수에 관한 통계가 포함됩니다.\n[og:1156#q3] (카드 수치, 위 원문에서 뽑음) 모델 추론 과정 요약 수 [10건]\n[og:1156#q4] 원문: The current catalogue contains 719 manuscripts organized into 372 families.\n[og:1156#q4] (카드 수치, 위 원문에서 뽑음) GitHub 레포에 포함된 수학 원고 수 [719 manuscripts]\n[og:1156#q4] (카드 수치, 위 원문에서 뽑음) 원고 분류(패밀리) 수 [372 families]\n[og:1156#q5] 원문: Some of the unformalized results could have issues. We will endeavor to fix any such issues quickly.\n[og:1156#q6] 원문: This repository contains mathematical manuscripts and supporting proof artifacts produced by an internal OpenAI model.\n[it:1156#s1] 오픈AI는 미공개 프론티어 모델에 약 4000개의 고난도 수학 연구 문제를 제시하고, 그 과정에서 나온 의미 있는 성과를 722편의 연구 원고(manuscript)로 정리해 6일(현지시간) 공개했습니다.\n[it:1156#s2] 여기에는 정수론과 대수학, 위상수학, 이론 컴퓨터과학 등 여러 분야가 포함됐으며, 722편의 원고는 372개의 관련 결과 군(result family)으로 묶였습니다.\n[it:1156#s3] 증명을 컴퓨터가 검증할 수 있는 프로그래밍 언어인 '린(Lean)'으로 형식화한 자료와 연구 과정에 사용한 연산량, 문제 풀이 시도에 관한 통계도 함께 공개했습니다.\n[it:1156#s4] 이번 연구의 정확한 시작 시점은 오픈AI가 공개하지 않았습니다.\n[it:1156#s5] 따라서 새 내부 모델의 훈련이 시작된 8월 말부터 이번 연구가 진행됐다고 단정하기는 어렵습니다.\n[it:1156#s6] 다만 한 번의 연구에서 수천개의 고난도 연구 문제를 대상으로 AI를 대규모로 활용하고, 그 결과를 수백편의 연구 원고로 정리했다는 점 자체가 주목할 만합니다.\n[it:1156#s7] 이번 발표에서 눈길을 끄는 것은 AI가 수학 난제를 풀어낼만큼 똑똑해졌다는 것만은 아닙니다.\n[it:1156#s8] AI가 과학 연구를 가속한다면 어떤 방식으로 작동할 수 있는지를 보여주는 사례라는 점이 더 중요합니다.\n[it:1156#s9] 오픈AI는 그동안 AI를 과학자를 대신하는 존재가 아니라 과학자의 연구 능력을 크게 확장하는 도구로 설명해 왔습니다.\n[it:1156#s10] 또, 케빈 와일 전 오픈AI 과학 부문 책임자는 지난 5월 워싱턴대학교 강연에서 \"AI를 활용하면 2050년의 과학을 2030년에 할 수도 있다\"고 말했습니다.\n[it:1156#s11] 그리고 이번 수학 연구는 이 말이 무엇을 의미하는지를 비교적 구체적으로 보여줍니다.\n[it:1156#s12] 우선 모델 자체의 추론 능력이 높아졌다는 것이 주목됩니다.\n[it:1156#s13] 세계 최고의 수학자로 꼽히는 테런스 타오 UCLA 수학 교수가 AI를 \"보통이지만, 완전히 무능하지는 않은 대학원생\"에 비유한 것이 불과 2년 전입니다.\n[it:1156#s14] 그러나 최근에는 첨단 모델이 수학자들이 오랫동안 풀지 못했던 문제에서 새로운 결과를 내놓는 사례가 잇따르고 있습니다.\n[it:1156#s15] 대표적인 예가 이달 초 발표한 나비에-스토크스 방정식 관련 연구 결과입니다.\n[it:1156#s16] 여기에 한 문제에 투입할 수 있는 추론 시간과 컴퓨팅이 크게 늘었습니다.\n[it:1156#s17] 오픈AI에 따르면 이번 결과 하나를 만드는 데 평균적으로 챗GPT 프로의 약 3시간에 해당하는 추론 연산량이 사용됐습니다.\n[it:1156#s18] 짧은 질문에 즉시 답하는 챗봇과 달리, AI가 하나의 연구 문제를 놓고 오랜 시간 여러 가능성을 탐색하도록 컴퓨팅을 투입한 것입니다.\n[it:1156#s19] 오픈AI가 지난해 공개한 GPT-5 과학 연구 실험에서도 20분 동안 연구 문제를 돕는 것과 몇 시간 또는 며칠 동안 추론하는 것 사이에는 차이가 큰 것으로 나타났습니다.\n[it:1156#s20] 이런 연구를 AI에 맡길 때 또 하나의 장점은 여러 문제에 컴퓨팅 자원을 병렬로 투입할 수 있다는 점입니다.\n[it:1156#s21] 인간 연구자가 4000개의 문제를 연구한다면 막대한 시간이 필요합니다.\n[it:1156#s22] 반면 AI를 활용하면 개별 문제에 장시간 컴퓨팅을 투입하면서 대규모로 여러 연구 가능성을 탐색할 수 있습니다.\n[it:1156#s23] 이번에 오픈AI가 공개한 722편은 AI가 하나의 문제를 순서대로 해결한 결과가 아닙니다.\n[it:1156#s24] 수천개의 연구 문제에 대규모 컴퓨팅을 투입해 탐색한 결과 가운데 의미 있는 성과를 정리한 것입니다.\n[it:1156#s25] 다만 여기서 722편을 모두 검증된 수학적 성과로 받아들여서는 안 됩니다.\n[it:1156#s26] 오픈AI도 일부 결과에 오류가 있을 수 있으며 추가 검증이 필요하다고 밝혔습니다.\n[it:1156#s27] 결국 과학 연구에서 AI의 가치는 '한 문제를 사람보다 빨리 푸는 것'뿐 아니라 연구자가 직접 시도하기 어려운 규모로 탐색할 수 있는 문제의 수를 늘리는 데서도 나올 수 있습니다.\n[it:1156#s28] AI를 연구 도구와 검증 시스템, 실제 연구 인프라에 연결하는 것도 주목됩니다.\n[it:1156#s29] 이번 수학 연구에서는 린을 이용해 일부 증명을 형식화해 컴퓨터가 검증할 수 있도록 했습니다.\n[it:1156#s30] 오픈AI는 앞으로도 과학자들이 최첨단 AI를 직접 활용할 수 있도록 하고, 내부 프론티어 모델을 수학뿐 아니라 다른 과학 분야에서도 계속 평가하겠다고 밝혔습니다.\n[it:1156#s31] 이 단계가 수학을 넘어 실제 과학으로 확대되면 연구 방식 자체가 달라질 수 있습니다.\n[it:1156#s32] 오픈AI는 지난 7월부터 프론티어 AI를 과학자와 슈퍼컴퓨터, 시뮬레이션, 연구 시설에 연결해 \"수십 년의 과학적 진보를 수년으로 압축하는 것\"을 목표로 제시해 왔습니다.\n[it:1156#s33] 핵심은 더 많은 아이디어를 탐색하고 가설을 더 빨리 시험해 검증된 결과로 옮기는 것입니다.\n[it:1156#s34] 오픈AI뿐 아니라 앤트로픽도 비슷한 방향으로 움직이고 있습니다.\n[it:1156#s35] 앤트로픽은 최근 클로드를 단백질 설계와 생체분자 모델링에 활용한 연구를 잇달아 공개했고, 자체 생물학 연구실을 구축해 AI가 제시한 가설을 실제 실험으로 확인하는 방식도 추진하고 있습니다.\n[it:1156#s36] 이는 단순한 AI 모델의 성능 경쟁과는 다른 흐름입니다.\n[it:1156#s37] AI의 추론 능력이 높아지고 컴퓨팅 투입량이 늘어나는 데 그치지 않습니다.\n[it:1156#s38] 대규모 연구 작업을 병렬화하고, 그 결과를 검증·시뮬레이션·실험 시설과 연결하는 과정이 함께 진행되고 있습니다.\n[it:1156#s39] 케빈 와일이 말한 '2050년의 과학을 2030년에'라는 목표도 결국 이런 구조를 전제로 합니다.\n[it:1156#s40] AI 하나가 인간 과학자를 대체한다는 이야기가 아니라, 연구자 한 명이 할 수 있는 탐색의 양을 AI가 크게 늘리고, 컴퓨팅과 실험 시설을 붙여 그 과정을 계속 반복하는 방식입니다.\n[it:1156#s41] 와일은 실제로 미래의 과학 연구에 대해 \"더 긴 루프가 현실 세계를 통과하게 될 것\"이라며 로봇 실험실을 수평적으로 확장해 24시간 가동하는 방식까지 언급했습니다.\n[it:1156#s42] 물론 이번 수학 연구가 과학 발전을 실제로 몇 년 앞당겼다는 뜻은 아닙니다.\n[it:1156#s43] 오픈AI가 공개한 722편도 모두 검증된 연구 성과를 의미하는 것은 아닙니다.\n[it:1156#s44] 일부 결과는 추가적인 검증이 필요하고, 오픈AI도 일부 결과에 오류가 있을 수 있다고 밝혔습니다.\n[it:1156#s45] AI가 만들어낸 수학적 결과를 어디까지 새로운 연구 성과로 인정할 것인지, 인간 연구자의 검증과 공로를 어떻게 구분할 것인지도 앞으로 논의해야 할 문제입니다.\n[it:1156#s46] 하지만 이번 사례는 AI가 과학 연구를 가속한다는 말이 단순히 더 똑똑한 모델을 만든다는 뜻은 아니라는 점을 보여줍니다.\n[it:1156#s47] 장시간 컴퓨팅을 투입해 많은 연구 가능성을 탐색하고, 그 결과를 형식 검증과 시뮬레이션, 실제 실험으로 연결하는 방식으로 연구 과정 자체를 바꿀 수 있다는 것입니다.\n[it:1156#s48] ‘2050년의 과학을 2030년에’라는 목표가 당장 현실이 됐다는 뜻은 아니지만, 이번 수학 연구는 그 시간을 줄이기 위해 AI가 어떤 방식으로 연구에 투입될 수 있는지를 보여준 사례라고 할 수 있습니다.\n[it:1156#s49] 이어 7일 주요 뉴스입니다.\n[it:1156#s50] ■ 스튜어트 러셀의 경고 \"LLM 정렬 불가능…모방 학습과 RLHF 한계\"\n[it:1156#s51] AI 석학 러셀 교수는 인간의 행동을 모방하는 학습과 RLHF만으로는 LLM을 인간의 목표에 맞추는 데 근본적인 한계가 있다고 지적했습니다.\n[it:1156#s52] 최근 AI 안전 문제가 잇따르는 가운데, 현재의 정렬 방식 자체를 다시 살펴봐야 한다는 경고입니다.\n[it:1156#s53] ■ 미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"\n[it:1156#s54] 미스트랄이 1조500억개 매개변수의 MoE 모델 ‘라지 4’를 공개하며 보안·코딩·에이전트 작업에서 높은 성능을 내세웠습니다.\n[it:1156#s55] 최근 중국 오픈 모델을 중심으로 매개변수 규모를 크게 늘리는 흐름이 이어지는 가운데, 추격에 나선 것으로 볼 수 있습니다.\n[it:1156#s56] ■ 구글, ‘나노 바나나 2.1’ 공개...성능 높이고 비용은 반값으로\n[it:1156#s57] 구글이 이미지 생성·편집 모델 ‘나노 바나나 2.1’을 공개하며 이미지 품질과 참조 이미지 처리 성능을 높이는 동시에 비용을 이전 모델의 절반으로 낮췄습니다.\n[it:1156#s58] 이미지 모델도 성능과 범용성 개선뿐 아니라 사용 비용까지 낮추는 것이 필수가 되는 분위기입니다.\n[it:1156#s59] AI타임스 news@aitimes.com",
+    "title": "[10월8일] “수학 문제 4000개에 AI 투입해 성과”…오픈AI가 보여준 과학연구의 변화",
+    "url": "https://openai.com/ko-KR/index/sharing-ai-progress-in-mathematics/"
+   }
+  ],
+  "previous": null,
+  "aliases": [],
+  "limits": {
+   "sections": [
+    4,
+    7
+   ],
+   "paragraphs_per_section": [
+    1,
+    2
+   ],
+   "paragraph_sentences_max": 4,
+   "paragraph_chars_max": 320,
+   "summary_sentences": [
+    1,
+    2
+   ],
+   "summary_chars_max": 200,
+   "heading_chars_max": 70,
+   "head_tiles_max": 4,
+   "tiles_per_section": [
+    2,
+    3
+   ],
+   "visuals_max": 4,
+   "bars_items": [
+    2,
+    6
+   ],
+   "table_rows": [
+    2,
+    6
+   ],
+   "table_cols": [
+    2,
+    4
+   ],
+   "slides_max": 2,
+   "video_secs_max": 3,
+   "max_refs_per_paragraph": 4
+  },
+  "slide_candidates": [],
+  "no_visuals": false
+ },
+ "expect": {},
+ "note": "2026-W41 실제 토픽 입력(run 20261013-205302-weekly-b981)"
+}

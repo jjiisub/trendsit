@@ -1,0 +1,983 @@
+{
+ "input": {
+  "loc_lines": [
+   "title: Solar Mini 4: 단일 GPU 실행 MoE와 에이전트 작업 최적화",
+   "summary: 업스테이지가 총 35B·활성 3B MoE 구조의 Solar Mini 4를 출시했다. 활성 3B 모델 중 최고 AA Index 24.1점, H100 1장 배포 가능, MiMo-V2.5 대비 작업 완료 비용 43% 절감이 핵심이다.",
+   "head_tiles[0]: 35B / 3B / 총 파라미터 / 활성 파라미터 (MoE 구조, 토큰당 3B만 활성화) (refs it:1034#s2, it:860#s2)",
+   "head_tiles[1]: 24.1점 / AA Intelligence Index (활성 3B 모델 중 최고) (refs it:1034#s6)",
+   "head_tiles[2]: $0.10 / $0.40 / 입력 / 출력 (100만 토큰당) (정가 기준) (refs it:1034#s10)",
+   "head_tiles[3]: H100 80GB 한 장 / 최소 온프레미스 배포 사양 (양자화 모델 기준) (refs it:1034#s37)",
+   "sections[0].heading: 35B MoE 구조로 단일 GPU 배포 가능",
+   "sections[0].paragraphs[0]: Solar Mini 4는 총 35B 파라미터 중 토큰당 3B만 활성화하는 MoE 구조를 적용해 응답 속도를 높이고 운영 비용을 낮췄다. 양자화 모델을 기준으로 H100 80GB 한 장부터 온프레미스 배포가 가능하지만, 배포 시에는 전체 35B 가중치를 메모리에 올려야 한다. (refs it:1034#s2, it:1034#s36, it:1034#s37, it:860#s2)",
+   "sections[1].heading: 활성 3B 모델 중 최고 종합 성능, 대형 모델과 근접 [확인 필요]",
+   "sections[1].paragraphs[0]: Artificial Analysis Intelligence Index v4.3.2에서 24.1점을 기록해 점수가 확인된 활성 3B 모델 가운데 가장 높은 결과를 보였다. 활성 31B인 Gemma 4 31B보다 AA Index가 9.1점 높았고, 활성 55B인 Nemotron 3 Ultra보다도 1.1점 높은 종합 점수를 기록했다. (refs it:1034#s6, it:1034#s14, it:1034#s15)",
+   "sections[1].paragraphs[1]: MiMo-V2.5보다 종합 점수는 0.9점 낮지만, 5분의 1 수준의 활성 파라미터로 근접한 성능을 제공한다. 세부 평가에서는 AA-LCR 83.3, SciCode 47.6, Humanity’s Last Exam 25.8를 기록해 장문 맥락 이해, 코딩, 지식 추론에서 균형 잡힌 성능을 보였다. (refs it:1034#s16, it:1034#s17, it:1034#s18)",
+   "sections[2].heading: 에이전트 작업 벤치마크와 병렬 도구 호출 지원",
+   "sections[2].paragraphs[0]: 실제 SaaS 애플리케이션을 활용해 업무를 수행하는 AutomationBench-AA에서 33.5%, τ³-Banking에서 47.2점을 기록했다. 이 결과는 AA Index v4.3.2와는 별도의 평가다. 도구 호출과 병렬 도구 호출을 지원해 결재 상태와 잔여 일수처럼 독립적인 도구를 한 번에 호출할 수 있다. (refs it:1034#s22, it:1034#s24, it:1034#s25, it:1034#s27)",
+   "sections[3].heading: MiMo-V2.5 대비 작업 완료 비용 43% 낮음",
+   "sections[3].paragraphs[0]: 코드 분석·리뷰, 일정 조율 등 세 가지 작업을 실행한 결과, 1,000세트 완료 비용은 Solar Mini 4가 $1.25, MiMo-V2.5가 $2.20으로 Solar Mini 4가 약 43% 낮았다. 캘린더 조회와 메시지 전송 작업에서는 1,000회 실행 비용이 Solar Mini 4 $0.36, MiMo-V2.5 $0.61로 나타났다. (refs it:1034#s45, it:1034#s46)",
+   "sections[3].paragraphs[1]: MiMo-V2.5는 작업을 완료하는 데 더 많은 입력·출력 토큰을 사용해 전체 비용이 높아졌다. H100 두 장으로 동시 요청 32건을 처리할 때도 요청당 70 tokens/s 이상의 생성 속도를 유지했다. 이 측정은 4K 입력·1K 출력, prefix caching 없이 600초 이상 연속 부하를 적용한 내부 결과다. (refs it:1034#s48, it:1034#s34, it:1034#s38)",
+   "sections[3].bars (단위 달러): 1,000세트 작업 완료 비용 비교 / context: 세 가지 에이전트 작업 각 3회 실행, 정가 기준",
+   "sections[3].bars.items[0]: Solar Mini 4 = 1.25 (it:1034#s45) [강조]",
+   "sections[3].bars.items[1]: MiMo-V2.5 = 2.2 (it:1034#s45)",
+   "sections[4].heading: 프로·미니 투트랙 전략과 API 제공",
+   "sections[4].paragraphs[0]: 업스테이지는 Solar LLM을 프로와 미니로 나누는 투트랙 전략을 본격화했다. 프로는 복잡한 에이전트 작업에, 미니는 업무 자동화와 대량 처리 등 반복 작업에 활용한다. API 정가는 100만 토큰당 입력 $0.10, 캐시 입력 $0.01, 출력 $0.40이며, Upstage Console에서 10월 10일까지 70% 할인된 가격을 적용한다. (refs it:860#s1, it:860#s6, it:1034#s70, it:1034#s71)",
+   "sections[5].heading: 추론 비활성 기본 설정과 검증 절차 권장",
+   "sections[5].paragraphs[0]: Solar Mini 4는 기본적으로 추론을 사용하지 않으며, 다단계 분석이 필요한 작업에서는 reasoning_effort를 조절해 추론을 사용할 수 있다. 추론 수준이 높아질수록 출력 토큰과 응답 시간이 늘어날 수 있어 작업에 필요한 수준부터 적용하는 것을 권장한다. 실제 의사결정에 영향을 주는 업무에서는 모델 출력을 최종 판단으로 사용하지 말고 별도의 검증 절차를 두는 것을 권고한다. (refs it:1034#s55, it:1034#s56, it:1034#s57, it:1034#s94)"
+  ],
+  "page": {
+   "log": "절 6개, 단락 8개, 표 1개, 막대 1개, 타일 4개",
+   "attention": false,
+   "head_tiles": [
+    {
+     "value": "35B / 3B",
+     "label": "총 파라미터 / 활성 파라미터",
+     "note": "MoE 구조, 토큰당 3B만 활성화",
+     "refs": [
+      "it:1034#s2",
+      "it:860#s2"
+     ]
+    },
+    {
+     "value": "24.1점",
+     "label": "AA Intelligence Index",
+     "note": "활성 3B 모델 중 최고",
+     "refs": [
+      "it:1034#s6"
+     ]
+    },
+    {
+     "value": "$0.10 / $0.40",
+     "label": "입력 / 출력 (100만 토큰당)",
+     "note": "정가 기준",
+     "refs": [
+      "it:1034#s10"
+     ]
+    },
+    {
+     "value": "H100 80GB 한 장",
+     "label": "최소 온프레미스 배포 사양",
+     "note": "양자화 모델 기준",
+     "refs": [
+      "it:1034#s37"
+     ]
+    }
+   ],
+   "sections": [
+    {
+     "heading": "35B MoE 구조로 단일 GPU 배포 가능",
+     "paragraphs": [
+      {
+       "text": "Solar Mini 4는 총 35B 파라미터 중 토큰당 3B만 활성화하는 MoE 구조를 적용해 응답 속도를 높이고 운영 비용을 낮췄다. 양자화 모델을 기준으로 H100 80GB 한 장부터 온프레미스 배포가 가능하지만, 배포 시에는 전체 35B 가중치를 메모리에 올려야 한다.",
+       "refs": [
+        "it:1034#s2",
+        "it:1034#s36",
+        "it:1034#s37",
+        "it:860#s2"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "활성 3B 모델 중 최고 종합 성능, 대형 모델과 근접",
+     "paragraphs": [
+      {
+       "text": "Artificial Analysis Intelligence Index v4.3.2에서 24.1점을 기록해 점수가 확인된 활성 3B 모델 가운데 가장 높은 결과를 보였다. 활성 31B인 Gemma 4 31B보다 AA Index가 9.1점 높았고, 활성 55B인 Nemotron 3 Ultra보다도 1.1점 높은 종합 점수를 기록했다.",
+       "refs": [
+        "it:1034#s6",
+        "it:1034#s14",
+        "it:1034#s15"
+       ]
+      },
+      {
+       "text": "MiMo-V2.5보다 종합 점수는 0.9점 낮지만, 5분의 1 수준의 활성 파라미터로 근접한 성능을 제공한다. 세부 평가에서는 AA-LCR 83.3, SciCode 47.6, Humanity’s Last Exam 25.8를 기록해 장문 맥락 이해, 코딩, 지식 추론에서 균형 잡힌 성능을 보였다.",
+       "refs": [
+        "it:1034#s16",
+        "it:1034#s17",
+        "it:1034#s18"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": true
+    },
+    {
+     "heading": "에이전트 작업 벤치마크와 병렬 도구 호출 지원",
+     "paragraphs": [
+      {
+       "text": "실제 SaaS 애플리케이션을 활용해 업무를 수행하는 AutomationBench-AA에서 33.5%, τ³-Banking에서 47.2점을 기록했다. 이 결과는 AA Index v4.3.2와는 별도의 평가다. 도구 호출과 병렬 도구 호출을 지원해 결재 상태와 잔여 일수처럼 독립적인 도구를 한 번에 호출할 수 있다.",
+       "refs": [
+        "it:1034#s22",
+        "it:1034#s24",
+        "it:1034#s25",
+        "it:1034#s27"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "MiMo-V2.5 대비 작업 완료 비용 43% 낮음",
+     "paragraphs": [
+      {
+       "text": "코드 분석·리뷰, 일정 조율 등 세 가지 작업을 실행한 결과, 1,000세트 완료 비용은 Solar Mini 4가 $1.25, MiMo-V2.5가 $2.20으로 Solar Mini 4가 약 43% 낮았다. 캘린더 조회와 메시지 전송 작업에서는 1,000회 실행 비용이 Solar Mini 4 $0.36, MiMo-V2.5 $0.61로 나타났다.",
+       "refs": [
+        "it:1034#s45",
+        "it:1034#s46"
+       ]
+      },
+      {
+       "text": "MiMo-V2.5는 작업을 완료하는 데 더 많은 입력·출력 토큰을 사용해 전체 비용이 높아졌다. H100 두 장으로 동시 요청 32건을 처리할 때도 요청당 70 tokens/s 이상의 생성 속도를 유지했다. 이 측정은 4K 입력·1K 출력, prefix caching 없이 600초 이상 연속 부하를 적용한 내부 결과다.",
+       "refs": [
+        "it:1034#s48",
+        "it:1034#s34",
+        "it:1034#s38"
+       ]
+      }
+     ],
+     "visual": "bars",
+     "bars": {
+      "title": "1,000세트 작업 완료 비용 비교",
+      "context": "세 가지 에이전트 작업 각 3회 실행, 정가 기준",
+      "unit": "달러",
+      "items": [
+       {
+        "label": "Solar Mini 4",
+        "value": "1.25",
+        "ref": "it:1034#s45",
+        "baseline": false,
+        "emphasis": true
+       },
+       {
+        "label": "MiMo-V2.5",
+        "value": "2.2",
+        "ref": "it:1034#s45",
+        "baseline": false,
+        "emphasis": false
+       }
+      ]
+     },
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "프로·미니 투트랙 전략과 API 제공",
+     "paragraphs": [
+      {
+       "text": "업스테이지는 Solar LLM을 프로와 미니로 나누는 투트랙 전략을 본격화했다. 프로는 복잡한 에이전트 작업에, 미니는 업무 자동화와 대량 처리 등 반복 작업에 활용한다. API 정가는 100만 토큰당 입력 $0.10, 캐시 입력 $0.01, 출력 $0.40이며, Upstage Console에서 10월 10일까지 70% 할인된 가격을 적용한다.",
+       "refs": [
+        "it:860#s1",
+        "it:860#s6",
+        "it:1034#s70",
+        "it:1034#s71"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "추론 비활성 기본 설정과 검증 절차 권장",
+     "paragraphs": [
+      {
+       "text": "Solar Mini 4는 기본적으로 추론을 사용하지 않으며, 다단계 분석이 필요한 작업에서는 reasoning_effort를 조절해 추론을 사용할 수 있다. 추론 수준이 높아질수록 출력 토큰과 응답 시간이 늘어날 수 있어 작업에 필요한 수준부터 적용하는 것을 권장한다. 실제 의사결정에 영향을 주는 업무에서는 모델 출력을 최종 판단으로 사용하지 말고 별도의 검증 절차를 두는 것을 권고한다.",
+       "refs": [
+        "it:1034#s55",
+        "it:1034#s56",
+        "it:1034#s57",
+        "it:1034#s94"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    }
+   ],
+   "summary": "업스테이지가 총 35B·활성 3B MoE 구조의 Solar Mini 4를 출시했다. 활성 3B 모델 중 최고 AA Index 24.1점, H100 1장 배포 가능, MiMo-V2.5 대비 작업 완료 비용 43% 절감이 핵심이다.",
+   "title": "Solar Mini 4: 단일 GPU 실행 MoE와 에이전트 작업 최적화"
+  },
+  "evidence": [
+   {
+    "id": "it:1034#s2",
+    "source": "GeekNews",
+    "text": "Solar Mini 4는 업스테이지가 독자적으로 사전학습하고 에이전트 작업에 최적화한 모델입니다. 총 35B 파라미터 중 토큰당 3B만 활성화하는 MoE 구조로 높은 효율성을 제공합니다. Artificial Analysis Intelligence Index 평가에서 활성 3B 모델 중 가장 높은 종합 성능을 기록했습니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s36",
+    "source": "GeekNews",
+    "text": "활성 파라미터 수가 적다고 해서 배포에 필요한 메모리도 같은 비율로 줄어드는 것은 아닙니다. 토큰당 연산에는 3B가 활성화되지만, 모델을 배포할 때는 전체 35B 가중치를 메모리에 올려야 합니다. 온프레미스에서는 양자화 모델을 기준으로 H100 80GB 한 장부터 배포할 수 있습니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s37",
+    "source": "GeekNews",
+    "text": "토큰당 연산에는 3B가 활성화되지만, 모델을 배포할 때는 전체 35B 가중치를 메모리에 올려야 합니다. 온프레미스에서는 양자화 모델을 기준으로 H100 80GB 한 장부터 배포할 수 있습니다. *4K 입력·1K 출력, prefix caching 없이 600초 이상 연속 부하를 적용한 내부 측정 결과입니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:860#s2",
+    "source": "AI타임스",
+    "text": "업스테이지가 1일 소형언어모델(sLM) '솔라 미니 4'를 출시하고, 솔라 LLM을 '프로'와 '미니'로 나누는 투트랙 전략을 본격화한다. 솔라 미니 4는 전체 350억(35B) 매개변수 규모에 전문가 혼합(MoE) 구조를 적용, 추론 시 30억(3B) 매개변수만 활성화함으로써 응답 속도를 높이고 운영 비용을 낮췄다. 아티피셜 애널리시스의 인텔리전스 인덱스(AAII)에서는 종합 24점을 기록하며 활성 매개변수 30억 규모 모델 중 최고 점수를 받았다.",
+    "title": "업스테이지, sLM '솔라 미니 4' 출시... '프로·미니' 투트랙 본격화",
+    "url": null
+   },
+   {
+    "id": "it:1034#s6",
+    "source": "GeekNews",
+    "text": "핵심 기능 - 활성 3B 모델 중 가장 높은 종합 성능: Artificial Analysis Intelligence Index v4.3.2에서 24.1점을 기록해, 비교 대상인 활성 3B 모델 가운데 가장 높은 결과를 보였습니다. - 에이전트 작업에 최적화된 성능: 실제 SaaS 도구를 활용해 업무를 수행하는 AutomationBench-AA에서 22.3%를 기록했으며, 별도의 τ³-Banking 평가에서는 47.2점을 기록했습니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s14",
+    "source": "GeekNews",
+    "text": "이번 평가에서 점수가 확인된 활성 3B 모델 가운데 가장 높은 결과입니다. 활성 파라미터가 31B인 Gemma 4 31B와 비교하면 약 10분의 1만 활성화하면서도 AA Index는 9.1점 높았습니다. 활성 파라미터가 55B인 Nemotron 3 Ultra보다도 1.1점 높은 종합 점수를 기록했습니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s15",
+    "source": "GeekNews",
+    "text": "활성 파라미터가 31B인 Gemma 4 31B와 비교하면 약 10분의 1만 활성화하면서도 AA Index는 9.1점 높았습니다. 활성 파라미터가 55B인 Nemotron 3 Ultra보다도 1.1점 높은 종합 점수를 기록했습니다. MiMo-V2.5보다 종합 점수는 0.9점 낮지만, 5분의 1 수준의 활성 파라미터로 근접한 성능을 제공합니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s16",
+    "source": "GeekNews",
+    "text": "활성 파라미터가 55B인 Nemotron 3 Ultra보다도 1.1점 높은 종합 점수를 기록했습니다. MiMo-V2.5보다 종합 점수는 0.9점 낮지만, 5분의 1 수준의 활성 파라미터로 근접한 성능을 제공합니다. 세부 평가에서는 장문 맥락 추론 능력을 평가하는 AA-LCR에서 83.3, 코드 기반 과학 문제를 다루는 SciCode에서 47.6를 기록했습니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s17",
+    "source": "GeekNews",
+    "text": "MiMo-V2.5보다 종합 점수는 0.9점 낮지만, 5분의 1 수준의 활성 파라미터로 근접한 성능을 제공합니다. 세부 평가에서는 장문 맥락 추론 능력을 평가하는 AA-LCR에서 83.3, 코드 기반 과학 문제를 다루는 SciCode에서 47.6를 기록했습니다. Humanity’s Last Exam에서는 25.8를 기록해 에이전트 작업뿐 아니라 장문 맥락 이해, 코딩, 지식 추론에서도 균형 잡힌 성능을 확인할 수 있습니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s18",
+    "source": "GeekNews",
+    "text": "세부 평가에서는 장문 맥락 추론 능력을 평가하는 AA-LCR에서 83.3, 코드 기반 과학 문제를 다루는 SciCode에서 47.6를 기록했습니다. Humanity’s Last Exam에서는 25.8를 기록해 에이전트 작업뿐 아니라 장문 맥락 이해, 코딩, 지식 추론에서도 균형 잡힌 성능을 확인할 수 있습니다. 실제 워크플로에서 규정을 적용하고 도구를 사용합니다",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s22",
+    "source": "GeekNews",
+    "text": "에이전트는 사용자와 여러 차례 상호작용하면서 규정을 적용하고, 현재 상태를 확인하고, 적절한 도구를 선택해야 합니다. Solar Mini 4는 실제 SaaS 애플리케이션을 활용해 업무를 수행하는 능력을 평가하는 AutomationBench-AA에서 22.3%를 기록했습니다. 정보 조회, 구조화, 상태 확인, 후속 실행이 여러 단계에 걸쳐 이어지는 업무를 평가하는 지표입니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s24",
+    "source": "GeekNews",
+    "text": "정보 조회, 구조화, 상태 확인, 후속 실행이 여러 단계에 걸쳐 이어지는 업무를 평가하는 지표입니다. Solar Mini 4는 이런 능력을 평가하는 τ³-Banking에서 47.2점을 기록했습니다. 이 결과는 Artificial Analysis Intelligence Index v4.3.2와는 별도의 평가 결과입니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s25",
+    "source": "GeekNews",
+    "text": "Solar Mini 4는 이런 능력을 평가하는 τ³-Banking에서 47.2점을 기록했습니다. 이 결과는 Artificial Analysis Intelligence Index v4.3.2와는 별도의 평가 결과입니다. Solar Mini 4는 도구 호출과 병렬 도구 호출을 지원합니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s27",
+    "source": "GeekNews",
+    "text": "Solar Mini 4는 도구 호출과 병렬 도구 호출을 지원합니다. API 요청에서 tools로 사용할 함수를 정의하고 parallel_tool_calls=True로 설정하면, 결재 상태와 잔여 일수를 함께 확인하는 것처럼 서로 독립적인 도구를 한 번에 호출할 수 있습니다. 반복되는 에이전트 작업의 비용을 낮춥니다",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s45",
+    "source": "GeekNews",
+    "text": "두 모델 모두 세 작업의 품질 체크포인트를 통과했습니다. 정가로 계산한 1,000세트의 완료 비용은 Solar Mini 4가 $1.25, MiMo-V2.5가 $2.20으로, Solar Mini 4가 약 43% 낮았습니다. 캘린더에서 일정을 조회하고 참석자에게 메시지를 보내는 다단계 도구 호출 작업에서는 1,000회 실행 비용이 Solar Mini 4 $0.36, MiMo-V2.5 $0.61로 나타났습니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s46",
+    "source": "GeekNews",
+    "text": "정가로 계산한 1,000세트의 완료 비용은 Solar Mini 4가 $1.25, MiMo-V2.5가 $2.20으로, Solar Mini 4가 약 43% 낮았습니다. 캘린더에서 일정을 조회하고 참석자에게 메시지를 보내는 다단계 도구 호출 작업에서는 1,000회 실행 비용이 Solar Mini 4 $0.36, MiMo-V2.5 $0.61로 나타났습니다. 두 모델 모두 일정과 참석자를 확인하고 필요한 메시지를 보낸 뒤 결과를 정리했습니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s48",
+    "source": "GeekNews",
+    "text": "두 모델 모두 일정과 참석자를 확인하고 필요한 메시지를 보낸 뒤 결과를 정리했습니다. 이번 테스트에서 MiMo-V2.5는 작업을 완료하는 데 더 많은 입력·출력 토큰을 사용해 전체 비용이 높아졌습니다. 모델을 반복적으로 호출하는 환경에서는 토큰당 가격과 함께 실제 사용한 토큰과 턴 수를 살펴봐야 합니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s34",
+    "source": "GeekNews",
+    "text": "이를 통해 모델의 전체 용량을 확보하면서도 토큰당 연산량을 줄여 높은 처리량과 비용 효율을 제공합니다. 실제 내부 측정에서 H100 두 장으로 동시 요청 32건을 처리할 때도 요청당 70 tokens/s 이상의 생성 속도를 유지했습니다.* 활성 파라미터 수가 적다고 해서 배포에 필요한 메모리도 같은 비율로 줄어드는 것은 아닙니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s38",
+    "source": "GeekNews",
+    "text": "온프레미스에서는 양자화 모델을 기준으로 H100 80GB 한 장부터 배포할 수 있습니다. *4K 입력·1K 출력, prefix caching 없이 600초 이상 연속 부하를 적용한 내부 측정 결과입니다. 처리량 측정에는 H100 두 장을 사용했으며, 최소 배포 사양과는 별개의 구성입니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:860#s1",
+    "source": "AI타임스",
+    "text": "업스테이지가 1일 소형언어모델(sLM) '솔라 미니 4'를 출시하고, 솔라 LLM을 '프로'와 '미니'로 나누는 투트랙 전략을 본격화한다. 솔라 미니 4는 전체 350억(35B) 매개변수 규모에 전문가 혼합(MoE) 구조를 적용, 추론 시 30억(3B) 매개변수만 활성화함으로써 응답 속도를 높이고 운영 비용을 낮췄다.",
+    "title": "업스테이지, sLM '솔라 미니 4' 출시... '프로·미니' 투트랙 본격화",
+    "url": null
+   },
+   {
+    "id": "it:860#s6",
+    "source": "AI타임스",
+    "text": "특히 양자화를 적용하면 GPU 1장으로 구동할 수 있어 온프레미스 환경에서도 사용 가능하다고 덧붙였다. 이를 통해 솔라 프로는 복잡한 에이전트 작업에, 솔라 미니는 업무 자동화와 대량 처리 등 반복 작업에 활용하며, 기업의 업무 난이도와 처리량에 따라 모델을 조합해 사용할 수 있다는 설명이다. 한편, 솔라 미니 4는 오픈라우터를 통해 API로도 제공되며, 오는 10일까지 API 가격을 70% 할인한다.",
+    "title": "업스테이지, sLM '솔라 미니 4' 출시... '프로·미니' 투트랙 본격화",
+    "url": null
+   },
+   {
+    "id": "it:1034#s70",
+    "source": "GeekNews",
+    "text": "Solar Mini 4는 Upstage Console API, Solar Chat, OpenRouter에서 사용할 수 있으며 온프레미스 배포도 지원합니다. API 정가는 100만 토큰당 입력 $0.10, 캐시 입력 $0.01, 출력 $0.40입니다. Upstage Console에서는 UTC 기준 10월 10일까지 70% 할인된 가격을 적용하며, 10월 11일부터 정상 가격으로 전환됩니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s71",
+    "source": "GeekNews",
+    "text": "API 정가는 100만 토큰당 입력 $0.10, 캐시 입력 $0.01, 출력 $0.40입니다. Upstage Console에서는 UTC 기준 10월 10일까지 70% 할인된 가격을 적용하며, 10월 11일부터 정상 가격으로 전환됩니다. *프로모션 기간과 혜택은 운영 상황에 따라 변경될 수 있습니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s55",
+    "source": "GeekNews",
+    "text": "작업에 맞게 설정하고 연결합니다 Solar Mini 4는 기본적으로 추론을 사용하지 않습니다. 다단계 분석이 필요한 작업에서는 reasoning_effort를 조절해 필요한 만큼 추론을 사용할 수 있습니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s56",
+    "source": "GeekNews",
+    "text": "Solar Mini 4는 기본적으로 추론을 사용하지 않습니다. 다단계 분석이 필요한 작업에서는 reasoning_effort를 조절해 필요한 만큼 추론을 사용할 수 있습니다. 추론 수준이 높아질수록 출력 토큰과 응답 시간이 늘어날 수 있으므로, 작업에 필요한 수준부터 적용하는 것을 권장합니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s57",
+    "source": "GeekNews",
+    "text": "다단계 분석이 필요한 작업에서는 reasoning_effort를 조절해 필요한 만큼 추론을 사용할 수 있습니다. 추론 수준이 높아질수록 출력 토큰과 응답 시간이 늘어날 수 있으므로, 작업에 필요한 수준부터 적용하는 것을 권장합니다. 또한 JSON 모드와 JSON Schema 기반 구조화 출력, 도구 호출과 병렬 도구 호출을 지원해 반복적인 에이전트 워크플로에 연결할 수 있습니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s94",
+    "source": "GeekNews",
+    "text": "안전한 운영을 위해 실제 의사결정에 영향을 주는 업무에서는 모델의 출력을 최종 판단으로 사용하지 말고 별도의 검증 절차를 두는 것을 권장합니다. 운영 환경에 적용하기 전 실제 데이터로 정확도와 실패 유형을 평가해주세요.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s10",
+    "source": "GeekNews",
+    "text": "- 512K 컨텍스트: 최대 512K토큰의 컨텍스트와 128K토큰의 출력을 지원합니다. - 낮은 API 비용: 정가 기준 100만 토큰당 입력 $0.10, 캐시 입력 $0.01, 출력 $0.40에 제공합니다. 활성 3B 모델 중 가장 높은 종합 성능",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s1",
+    "source": "GeekNews",
+    "text": "Solar Mini 4는 업스테이지가 독자적으로 사전학습하고 에이전트 작업에 최적화한 모델입니다. 총 35B 파라미터 중 토큰당 3B만 활성화하는 MoE 구조로 높은 효율성을 제공합니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s3",
+    "source": "GeekNews",
+    "text": "총 35B 파라미터 중 토큰당 3B만 활성화하는 MoE 구조로 높은 효율성을 제공합니다. Artificial Analysis Intelligence Index 평가에서 활성 3B 모델 중 가장 높은 종합 성능을 기록했습니다. 정보를 조회하고 정해진 형식에 맞춰 결과를 만들며 도구를 호출하는 반복 작업을 적은 연산과 비용으로 처리합니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:860#s3",
+    "source": "AI타임스",
+    "text": "솔라 미니 4는 전체 350억(35B) 매개변수 규모에 전문가 혼합(MoE) 구조를 적용, 추론 시 30억(3B) 매개변수만 활성화함으로써 응답 속도를 높이고 운영 비용을 낮췄다. 아티피셜 애널리시스의 인텔리전스 인덱스(AAII)에서는 종합 24점을 기록하며 활성 매개변수 30억 규모 모델 중 최고 점수를 받았다. 솔라 미니 4는 알리바바 '큐원 3.6-35B-A3B', 엔비디아 '네모트론 3.5 라이트닝' 등 동급 모델을 앞섰으며, 활성 매개변수가 더 많은 엔비디아 '네모트론 3 울트라', 구글 '젬마 4 31B', 샤오미 '미모 V2.5'와도 대등하거나 높은 점수를 기록했다.",
+    "title": "업스테이지, sLM '솔라 미니 4' 출시... '프로·미니' 투트랙 본격화",
+    "url": null
+   },
+   {
+    "id": "it:1034#s4",
+    "source": "GeekNews",
+    "text": "Artificial Analysis Intelligence Index 평가에서 활성 3B 모델 중 가장 높은 종합 성능을 기록했습니다. 정보를 조회하고 정해진 형식에 맞춰 결과를 만들며 도구를 호출하는 반복 작업을 적은 연산과 비용으로 처리합니다. 핵심 기능",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:860#s4",
+    "source": "AI타임스",
+    "text": "아티피셜 애널리시스의 인텔리전스 인덱스(AAII)에서는 종합 24점을 기록하며 활성 매개변수 30억 규모 모델 중 최고 점수를 받았다. 솔라 미니 4는 알리바바 '큐원 3.6-35B-A3B', 엔비디아 '네모트론 3.5 라이트닝' 등 동급 모델을 앞섰으며, 활성 매개변수가 더 많은 엔비디아 '네모트론 3 울트라', 구글 '젬마 4 31B', 샤오미 '미모 V2.5'와도 대등하거나 높은 점수를 기록했다. 특히 양자화를 적용하면 GPU 1장으로 구동할 수 있어 온프레미스 환경에서도 사용 가능하다고 덧붙였다.",
+    "title": "업스테이지, sLM '솔라 미니 4' 출시... '프로·미니' 투트랙 본격화",
+    "url": null
+   },
+   {
+    "id": "it:1034#s5",
+    "source": "GeekNews",
+    "text": "정보를 조회하고 정해진 형식에 맞춰 결과를 만들며 도구를 호출하는 반복 작업을 적은 연산과 비용으로 처리합니다. 핵심 기능 - 활성 3B 모델 중 가장 높은 종합 성능: Artificial Analysis Intelligence Index v4.3.2에서 24.1점을 기록해, 비교 대상인 활성 3B 모델 가운데 가장 높은 결과를 보였습니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:860#s5",
+    "source": "AI타임스",
+    "text": "솔라 미니 4는 알리바바 '큐원 3.6-35B-A3B', 엔비디아 '네모트론 3.5 라이트닝' 등 동급 모델을 앞섰으며, 활성 매개변수가 더 많은 엔비디아 '네모트론 3 울트라', 구글 '젬마 4 31B', 샤오미 '미모 V2.5'와도 대등하거나 높은 점수를 기록했다. 특히 양자화를 적용하면 GPU 1장으로 구동할 수 있어 온프레미스 환경에서도 사용 가능하다고 덧붙였다. 이를 통해 솔라 프로는 복잡한 에이전트 작업에, 솔라 미니는 업무 자동화와 대량 처리 등 반복 작업에 활용하며, 기업의 업무 난이도와 처리량에 따라 모델을 조합해 사용할 수 있다는 설명이다.",
+    "title": "업스테이지, sLM '솔라 미니 4' 출시... '프로·미니' 투트랙 본격화",
+    "url": null
+   },
+   {
+    "id": "it:1034#s7",
+    "source": "GeekNews",
+    "text": "- 활성 3B 모델 중 가장 높은 종합 성능: Artificial Analysis Intelligence Index v4.3.2에서 24.1점을 기록해, 비교 대상인 활성 3B 모델 가운데 가장 높은 결과를 보였습니다. - 에이전트 작업에 최적화된 성능: 실제 SaaS 도구를 활용해 업무를 수행하는 AutomationBench-AA에서 22.3%를 기록했으며, 별도의 τ³-Banking 평가에서는 47.2점을 기록했습니다. - 고효율 MoE 구조: 총 35B 파라미터 중 각 토큰을 처리할 때 3B만 활성화합니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:860#s7",
+    "source": "AI타임스",
+    "text": "이를 통해 솔라 프로는 복잡한 에이전트 작업에, 솔라 미니는 업무 자동화와 대량 처리 등 반복 작업에 활용하며, 기업의 업무 난이도와 처리량에 따라 모델을 조합해 사용할 수 있다는 설명이다. 한편, 솔라 미니 4는 오픈라우터를 통해 API로도 제공되며, 오는 10일까지 API 가격을 70% 할인한다. 김성훈 업스테이지 대표는 \"솔라 미니 4는 동급 경쟁 모델을 모두 앞서며 소형 LLM의 새로운 기준을 제시했다\"라며 \"복잡한 에이전트 업무는 프로, 대규모 업무 자동화는 미니로 체계화한 솔라 LLM을 통해 기업이 업무에 가장 알맞은 AI를 선택할 수 있도록 하겠다\"고 말했다.",
+    "title": "업스테이지, sLM '솔라 미니 4' 출시... '프로·미니' 투트랙 본격화",
+    "url": null
+   },
+   {
+    "id": "it:1034#s8",
+    "source": "GeekNews",
+    "text": "- 에이전트 작업에 최적화된 성능: 실제 SaaS 도구를 활용해 업무를 수행하는 AutomationBench-AA에서 22.3%를 기록했으며, 별도의 τ³-Banking 평가에서는 47.2점을 기록했습니다. - 고효율 MoE 구조: 총 35B 파라미터 중 각 토큰을 처리할 때 3B만 활성화합니다. - 512K 컨텍스트: 최대 512K토큰의 컨텍스트와 128K토큰의 출력을 지원합니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:860#s8",
+    "source": "AI타임스",
+    "text": "한편, 솔라 미니 4는 오픈라우터를 통해 API로도 제공되며, 오는 10일까지 API 가격을 70% 할인한다. 김성훈 업스테이지 대표는 \"솔라 미니 4는 동급 경쟁 모델을 모두 앞서며 소형 LLM의 새로운 기준을 제시했다\"라며 \"복잡한 에이전트 업무는 프로, 대규모 업무 자동화는 미니로 체계화한 솔라 LLM을 통해 기업이 업무에 가장 알맞은 AI를 선택할 수 있도록 하겠다\"고 말했다. 김해원 기자 hwkim@aitimes.com",
+    "title": "업스테이지, sLM '솔라 미니 4' 출시... '프로·미니' 투트랙 본격화",
+    "url": null
+   },
+   {
+    "id": "it:1034#s9",
+    "source": "GeekNews",
+    "text": "- 고효율 MoE 구조: 총 35B 파라미터 중 각 토큰을 처리할 때 3B만 활성화합니다. - 512K 컨텍스트: 최대 512K토큰의 컨텍스트와 128K토큰의 출력을 지원합니다. - 낮은 API 비용: 정가 기준 100만 토큰당 입력 $0.10, 캐시 입력 $0.01, 출력 $0.40에 제공합니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:860#s9",
+    "source": "AI타임스",
+    "text": "김성훈 업스테이지 대표는 \"솔라 미니 4는 동급 경쟁 모델을 모두 앞서며 소형 LLM의 새로운 기준을 제시했다\"라며 \"복잡한 에이전트 업무는 프로, 대규모 업무 자동화는 미니로 체계화한 솔라 LLM을 통해 기업이 업무에 가장 알맞은 AI를 선택할 수 있도록 하겠다\"고 말했다. 김해원 기자 hwkim@aitimes.com",
+    "title": "업스테이지, sLM '솔라 미니 4' 출시... '프로·미니' 투트랙 본격화",
+    "url": null
+   },
+   {
+    "id": "it:1034#s11",
+    "source": "GeekNews",
+    "text": "- 낮은 API 비용: 정가 기준 100만 토큰당 입력 $0.10, 캐시 입력 $0.01, 출력 $0.40에 제공합니다. 활성 3B 모델 중 가장 높은 종합 성능 Solar Mini 4는 Artificial Analysis Intelligence Index 평가에서 24.1점을 기록했습니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s12",
+    "source": "GeekNews",
+    "text": "활성 3B 모델 중 가장 높은 종합 성능 Solar Mini 4는 Artificial Analysis Intelligence Index 평가에서 24.1점을 기록했습니다. 이번 평가에서 점수가 확인된 활성 3B 모델 가운데 가장 높은 결과입니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s13",
+    "source": "GeekNews",
+    "text": "Solar Mini 4는 Artificial Analysis Intelligence Index 평가에서 24.1점을 기록했습니다. 이번 평가에서 점수가 확인된 활성 3B 모델 가운데 가장 높은 결과입니다. 활성 파라미터가 31B인 Gemma 4 31B와 비교하면 약 10분의 1만 활성화하면서도 AA Index는 9.1점 높았습니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s19",
+    "source": "GeekNews",
+    "text": "Humanity’s Last Exam에서는 25.8를 기록해 에이전트 작업뿐 아니라 장문 맥락 이해, 코딩, 지식 추론에서도 균형 잡힌 성능을 확인할 수 있습니다. 실제 워크플로에서 규정을 적용하고 도구를 사용합니다 함수 호출 형식을 맞추는 것과 실제 업무를 끝까지 처리하는 것은 다릅니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s20",
+    "source": "GeekNews",
+    "text": "실제 워크플로에서 규정을 적용하고 도구를 사용합니다 함수 호출 형식을 맞추는 것과 실제 업무를 끝까지 처리하는 것은 다릅니다. 에이전트는 사용자와 여러 차례 상호작용하면서 규정을 적용하고, 현재 상태를 확인하고, 적절한 도구를 선택해야 합니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s21",
+    "source": "GeekNews",
+    "text": "함수 호출 형식을 맞추는 것과 실제 업무를 끝까지 처리하는 것은 다릅니다. 에이전트는 사용자와 여러 차례 상호작용하면서 규정을 적용하고, 현재 상태를 확인하고, 적절한 도구를 선택해야 합니다. Solar Mini 4는 실제 SaaS 애플리케이션을 활용해 업무를 수행하는 능력을 평가하는 AutomationBench-AA에서 22.3%를 기록했습니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s23",
+    "source": "GeekNews",
+    "text": "Solar Mini 4는 실제 SaaS 애플리케이션을 활용해 업무를 수행하는 능력을 평가하는 AutomationBench-AA에서 22.3%를 기록했습니다. 정보 조회, 구조화, 상태 확인, 후속 실행이 여러 단계에 걸쳐 이어지는 업무를 평가하는 지표입니다. Solar Mini 4는 이런 능력을 평가하는 τ³-Banking에서 47.2점을 기록했습니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s26",
+    "source": "GeekNews",
+    "text": "이 결과는 Artificial Analysis Intelligence Index v4.3.2와는 별도의 평가 결과입니다. Solar Mini 4는 도구 호출과 병렬 도구 호출을 지원합니다. API 요청에서 tools로 사용할 함수를 정의하고 parallel_tool_calls=True로 설정하면, 결재 상태와 잔여 일수를 함께 확인하는 것처럼 서로 독립적인 도구를 한 번에 호출할 수 있습니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s28",
+    "source": "GeekNews",
+    "text": "API 요청에서 tools로 사용할 함수를 정의하고 parallel_tool_calls=True로 설정하면, 결재 상태와 잔여 일수를 함께 확인하는 것처럼 서로 독립적인 도구를 한 번에 호출할 수 있습니다. 반복되는 에이전트 작업의 비용을 낮춥니다 에이전트의 운영 비용은 토큰 가격뿐 아니라, 하나의 작업을 완료하는 데 필요한 호출 횟수와 각 호출의 처리 효율에 따라 달라집니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s29",
+    "source": "GeekNews",
+    "text": "반복되는 에이전트 작업의 비용을 낮춥니다 에이전트의 운영 비용은 토큰 가격뿐 아니라, 하나의 작업을 완료하는 데 필요한 호출 횟수와 각 호출의 처리 효율에 따라 달라집니다. 정보 조회와 분류, 도구 호출, 결과 정리로 이어지는 작업이 대규모로 반복될수록 이러한 차이는 더 커집니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s30",
+    "source": "GeekNews",
+    "text": "에이전트의 운영 비용은 토큰 가격뿐 아니라, 하나의 작업을 완료하는 데 필요한 호출 횟수와 각 호출의 처리 효율에 따라 달라집니다. 정보 조회와 분류, 도구 호출, 결과 정리로 이어지는 작업이 대규모로 반복될수록 이러한 차이는 더 커집니다. Solar Mini 4는 반복 호출이 많은 환경을 효율적으로 처리하도록 설계했습니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s31",
+    "source": "GeekNews",
+    "text": "정보 조회와 분류, 도구 호출, 결과 정리로 이어지는 작업이 대규모로 반복될수록 이러한 차이는 더 커집니다. Solar Mini 4는 반복 호출이 많은 환경을 효율적으로 처리하도록 설계했습니다. 총 35B 파라미터로 구성된 MoE 모델이지만, 각 토큰을 처리할 때는 3B만 활성화합니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s32",
+    "source": "GeekNews",
+    "text": "Solar Mini 4는 반복 호출이 많은 환경을 효율적으로 처리하도록 설계했습니다. 총 35B 파라미터로 구성된 MoE 모델이지만, 각 토큰을 처리할 때는 3B만 활성화합니다. 이를 통해 모델의 전체 용량을 확보하면서도 토큰당 연산량을 줄여 높은 처리량과 비용 효율을 제공합니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s33",
+    "source": "GeekNews",
+    "text": "총 35B 파라미터로 구성된 MoE 모델이지만, 각 토큰을 처리할 때는 3B만 활성화합니다. 이를 통해 모델의 전체 용량을 확보하면서도 토큰당 연산량을 줄여 높은 처리량과 비용 효율을 제공합니다. 실제 내부 측정에서 H100 두 장으로 동시 요청 32건을 처리할 때도 요청당 70 tokens/s 이상의 생성 속도를 유지했습니다.*",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s35",
+    "source": "GeekNews",
+    "text": "실제 내부 측정에서 H100 두 장으로 동시 요청 32건을 처리할 때도 요청당 70 tokens/s 이상의 생성 속도를 유지했습니다.* 활성 파라미터 수가 적다고 해서 배포에 필요한 메모리도 같은 비율로 줄어드는 것은 아닙니다. 토큰당 연산에는 3B가 활성화되지만, 모델을 배포할 때는 전체 35B 가중치를 메모리에 올려야 합니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s39",
+    "source": "GeekNews",
+    "text": "*4K 입력·1K 출력, prefix caching 없이 600초 이상 연속 부하를 적용한 내부 측정 결과입니다. 처리량 측정에는 H100 두 장을 사용했으며, 최소 배포 사양과는 별개의 구성입니다. MiMo-V2.5와 비교한 작업 완료 비용",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s40",
+    "source": "GeekNews",
+    "text": "처리량 측정에는 H100 두 장을 사용했으며, 최소 배포 사양과는 별개의 구성입니다. MiMo-V2.5와 비교한 작업 완료 비용 실제 에이전트 운영 비용은 토큰 가격뿐 아니라 작업을 완료할 때까지 사용한 토큰과 턴 수에 따라 달라집니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s41",
+    "source": "GeekNews",
+    "text": "MiMo-V2.5와 비교한 작업 완료 비용 실제 에이전트 운영 비용은 토큰 가격뿐 아니라 작업을 완료할 때까지 사용한 토큰과 턴 수에 따라 달라집니다. 이를 확인하기 위해 Solar Mini 4와 MiMo-V2.5로 동일한 에이전트 작업을 수행하고 전체 비용을 비교했습니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s42",
+    "source": "GeekNews",
+    "text": "실제 에이전트 운영 비용은 토큰 가격뿐 아니라 작업을 완료할 때까지 사용한 토큰과 턴 수에 따라 달라집니다. 이를 확인하기 위해 Solar Mini 4와 MiMo-V2.5로 동일한 에이전트 작업을 수행하고 전체 비용을 비교했습니다. 코드 분석과 리뷰, 여러 도구를 연동한 일정 조율 등 세 가지 작업을 각 모델로 세 차례 실행했습니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s43",
+    "source": "GeekNews",
+    "text": "이를 확인하기 위해 Solar Mini 4와 MiMo-V2.5로 동일한 에이전트 작업을 수행하고 전체 비용을 비교했습니다. 코드 분석과 리뷰, 여러 도구를 연동한 일정 조율 등 세 가지 작업을 각 모델로 세 차례 실행했습니다. 두 모델 모두 세 작업의 품질 체크포인트를 통과했습니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s44",
+    "source": "GeekNews",
+    "text": "코드 분석과 리뷰, 여러 도구를 연동한 일정 조율 등 세 가지 작업을 각 모델로 세 차례 실행했습니다. 두 모델 모두 세 작업의 품질 체크포인트를 통과했습니다. 정가로 계산한 1,000세트의 완료 비용은 Solar Mini 4가 $1.25, MiMo-V2.5가 $2.20으로, Solar Mini 4가 약 43% 낮았습니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s47",
+    "source": "GeekNews",
+    "text": "캘린더에서 일정을 조회하고 참석자에게 메시지를 보내는 다단계 도구 호출 작업에서는 1,000회 실행 비용이 Solar Mini 4 $0.36, MiMo-V2.5 $0.61로 나타났습니다. 두 모델 모두 일정과 참석자를 확인하고 필요한 메시지를 보낸 뒤 결과를 정리했습니다. 이번 테스트에서 MiMo-V2.5는 작업을 완료하는 데 더 많은 입력·출력 토큰을 사용해 전체 비용이 높아졌습니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s49",
+    "source": "GeekNews",
+    "text": "이번 테스트에서 MiMo-V2.5는 작업을 완료하는 데 더 많은 입력·출력 토큰을 사용해 전체 비용이 높아졌습니다. 모델을 반복적으로 호출하는 환경에서는 토큰당 가격과 함께 실제 사용한 토큰과 턴 수를 살펴봐야 합니다. 한국어 태스크 3건을 모델별로 각각 3회 실행한 초기 내부 테스트입니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s50",
+    "source": "GeekNews",
+    "text": "모델을 반복적으로 호출하는 환경에서는 토큰당 가격과 함께 실제 사용한 토큰과 턴 수를 살펴봐야 합니다. 한국어 태스크 3건을 모델별로 각각 3회 실행한 초기 내부 테스트입니다. temperature=0 조건이며, 비용은 두 모델 모두 프롬프트 캐싱을 적용하지 않은 것으로 환산했습니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s51",
+    "source": "GeekNews",
+    "text": "한국어 태스크 3건을 모델별로 각각 3회 실행한 초기 내부 테스트입니다. temperature=0 조건이며, 비용은 두 모델 모두 프롬프트 캐싱을 적용하지 않은 것으로 환산했습니다. Solar Mini 4는 Upstage API로 직접 호출했고 MiMo V2.5는 외부 라우터를 거쳤으므로 지연시간은 직접 비교에서 제외했습니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s52",
+    "source": "GeekNews",
+    "text": "temperature=0 조건이며, 비용은 두 모델 모두 프롬프트 캐싱을 적용하지 않은 것으로 환산했습니다. Solar Mini 4는 Upstage API로 직접 호출했고 MiMo V2.5는 외부 라우터를 거쳤으므로 지연시간은 직접 비교에서 제외했습니다. 실제 운영 환경과 작업 난도에 따라 결과는 달라질 수 있습니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s53",
+    "source": "GeekNews",
+    "text": "Solar Mini 4는 Upstage API로 직접 호출했고 MiMo V2.5는 외부 라우터를 거쳤으므로 지연시간은 직접 비교에서 제외했습니다. 실제 운영 환경과 작업 난도에 따라 결과는 달라질 수 있습니다. 작업에 맞게 설정하고 연결합니다",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s54",
+    "source": "GeekNews",
+    "text": "실제 운영 환경과 작업 난도에 따라 결과는 달라질 수 있습니다. 작업에 맞게 설정하고 연결합니다 Solar Mini 4는 기본적으로 추론을 사용하지 않습니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s58",
+    "source": "GeekNews",
+    "text": "추론 수준이 높아질수록 출력 토큰과 응답 시간이 늘어날 수 있으므로, 작업에 필요한 수준부터 적용하는 것을 권장합니다. 또한 JSON 모드와 JSON Schema 기반 구조화 출력, 도구 호출과 병렬 도구 호출을 지원해 반복적인 에이전트 워크플로에 연결할 수 있습니다. 정보 추출과 구조화",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s59",
+    "source": "GeekNews",
+    "text": "또한 JSON 모드와 JSON Schema 기반 구조화 출력, 도구 호출과 병렬 도구 호출을 지원해 반복적인 에이전트 워크플로에 연결할 수 있습니다. 정보 추출과 구조화 계약서에서 주요 항목을 뽑거나, 고객 문의를 분류하거나, 텍스트를 JSON과 표로 변환하는 작업입니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s60",
+    "source": "GeekNews",
+    "text": "정보 추출과 구조화 계약서에서 주요 항목을 뽑거나, 고객 문의를 분류하거나, 텍스트를 JSON과 표로 변환하는 작업입니다. 정해진 스키마를 반복해서 처리해야 할 때 비용을 낮추면서 일관된 형식의 결과를 얻을 수 있습니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s61",
+    "source": "GeekNews",
+    "text": "계약서에서 주요 항목을 뽑거나, 고객 문의를 분류하거나, 텍스트를 JSON과 표로 변환하는 작업입니다. 정해진 스키마를 반복해서 처리해야 할 때 비용을 낮추면서 일관된 형식의 결과를 얻을 수 있습니다. 사내 시스템을 연결한 반복 업무",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s62",
+    "source": "GeekNews",
+    "text": "정해진 스키마를 반복해서 처리해야 할 때 비용을 낮추면서 일관된 형식의 결과를 얻을 수 있습니다. 사내 시스템을 연결한 반복 업무 결재 상태를 조회하고, 사내 규정에 따라 처리 가능 여부를 판단하고, 결과를 정리하는 작업입니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s63",
+    "source": "GeekNews",
+    "text": "사내 시스템을 연결한 반복 업무 결재 상태를 조회하고, 사내 규정에 따라 처리 가능 여부를 판단하고, 결과를 정리하는 작업입니다. 도구 호출과 병렬 도구 호출을 활용해 여러 시스템에 걸친 조회와 실행을 자동화할 수 있습니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s64",
+    "source": "GeekNews",
+    "text": "결재 상태를 조회하고, 사내 규정에 따라 처리 가능 여부를 판단하고, 결과를 정리하는 작업입니다. 도구 호출과 병렬 도구 호출을 활용해 여러 시스템에 걸친 조회와 실행을 자동화할 수 있습니다. 문서 파이프라인의 검증 단계",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s65",
+    "source": "GeekNews",
+    "text": "도구 호출과 병렬 도구 호출을 활용해 여러 시스템에 걸친 조회와 실행을 자동화할 수 있습니다. 문서 파이프라인의 검증 단계 Document Parse와 Information Extract로 얻은 결과를 대조하거나, 누락된 필드를 확인하거나, 정해진 규칙에 따라 후속 처리를 결정하는 작업입니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s66",
+    "source": "GeekNews",
+    "text": "문서 파이프라인의 검증 단계 Document Parse와 Information Extract로 얻은 결과를 대조하거나, 누락된 필드를 확인하거나, 정해진 규칙에 따라 후속 처리를 결정하는 작업입니다. 이미 구조화된 정보를 반복적으로 검증하는 단계에서는 더 큰 모델 대신 비용 효율적인 선택지가 될 수 있습니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s67",
+    "source": "GeekNews",
+    "text": "Document Parse와 Information Extract로 얻은 결과를 대조하거나, 누락된 필드를 확인하거나, 정해진 규칙에 따라 후속 처리를 결정하는 작업입니다. 이미 구조화된 정보를 반복적으로 검증하는 단계에서는 더 큰 모델 대신 비용 효율적인 선택지가 될 수 있습니다. 가격 및 제공 방식",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s68",
+    "source": "GeekNews",
+    "text": "이미 구조화된 정보를 반복적으로 검증하는 단계에서는 더 큰 모델 대신 비용 효율적인 선택지가 될 수 있습니다. 가격 및 제공 방식 Solar Mini 4는 Upstage Console API, Solar Chat, OpenRouter에서 사용할 수 있으며 온프레미스 배포도 지원합니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s69",
+    "source": "GeekNews",
+    "text": "가격 및 제공 방식 Solar Mini 4는 Upstage Console API, Solar Chat, OpenRouter에서 사용할 수 있으며 온프레미스 배포도 지원합니다. API 정가는 100만 토큰당 입력 $0.10, 캐시 입력 $0.01, 출력 $0.40입니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s72",
+    "source": "GeekNews",
+    "text": "Upstage Console에서는 UTC 기준 10월 10일까지 70% 할인된 가격을 적용하며, 10월 11일부터 정상 가격으로 전환됩니다. *프로모션 기간과 혜택은 운영 상황에 따라 변경될 수 있습니다. API로 시작하기",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s73",
+    "source": "GeekNews",
+    "text": "*프로모션 기간과 혜택은 운영 상황에 따라 변경될 수 있습니다. API로 시작하기 OpenAI SDK를 사용하면 몇 줄의 코드로 Solar Mini 4를 호출할 수 있습니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s74",
+    "source": "GeekNews",
+    "text": "API로 시작하기 OpenAI SDK를 사용하면 몇 줄의 코드로 Solar Mini 4를 호출할 수 있습니다. from openai import OpenAI",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s75",
+    "source": "GeekNews",
+    "text": "OpenAI SDK를 사용하면 몇 줄의 코드로 Solar Mini 4를 호출할 수 있습니다. from openai import OpenAI client = OpenAI(",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s76",
+    "source": "GeekNews",
+    "text": "from openai import OpenAI client = OpenAI( api_key=\"UPSTAGE_API_KEY\",",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s77",
+    "source": "GeekNews",
+    "text": "client = OpenAI( api_key=\"UPSTAGE_API_KEY\", base_url=\"https://api.upstage.ai/v1\"",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s78",
+    "source": "GeekNews",
+    "text": "api_key=\"UPSTAGE_API_KEY\", base_url=\"https://api.upstage.ai/v1\" )",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s79",
+    "source": "GeekNews",
+    "text": "base_url=\"https://api.upstage.ai/v1\" ) response = client.chat.completions.create(",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s80",
+    "source": "GeekNews",
+    "text": ") response = client.chat.completions.create( model=\"solar-mini4\",",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s81",
+    "source": "GeekNews",
+    "text": "response = client.chat.completions.create( model=\"solar-mini4\", messages=[",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s82",
+    "source": "GeekNews",
+    "text": "model=\"solar-mini4\", messages=[ {",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s83",
+    "source": "GeekNews",
+    "text": "messages=[ { \"role\": \"user\",",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s84",
+    "source": "GeekNews",
+    "text": "{ \"role\": \"user\", \"content\": \"다음 문서에서 계약 금액과 계약일을 JSON으로 추출하세요. ...\"",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s85",
+    "source": "GeekNews",
+    "text": "\"role\": \"user\", \"content\": \"다음 문서에서 계약 금액과 계약일을 JSON으로 추출하세요. ...\" }",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s86",
+    "source": "GeekNews",
+    "text": "\"content\": \"다음 문서에서 계약 금액과 계약일을 JSON으로 추출하세요. ...\" } ],",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s87",
+    "source": "GeekNews",
+    "text": "} ], response_format={\"type\": \"json_object\"}",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s88",
+    "source": "GeekNews",
+    "text": "], response_format={\"type\": \"json_object\"} )",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s89",
+    "source": "GeekNews",
+    "text": "response_format={\"type\": \"json_object\"} ) print(response.choices[0].message.content)",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s90",
+    "source": "GeekNews",
+    "text": ") print(response.choices[0].message.content) Solar Mini 4는 지금 Upstage Console에서 시작할 수 있습니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s91",
+    "source": "GeekNews",
+    "text": "print(response.choices[0].message.content) Solar Mini 4는 지금 Upstage Console에서 시작할 수 있습니다. 온프레미스 배포를 검토하고 있다면 도입 문의를 통해 환경에 맞는 구성을 확인하세요.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s92",
+    "source": "GeekNews",
+    "text": "Solar Mini 4는 지금 Upstage Console에서 시작할 수 있습니다. 온프레미스 배포를 검토하고 있다면 도입 문의를 통해 환경에 맞는 구성을 확인하세요. 안전한 운영을 위해",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s93",
+    "source": "GeekNews",
+    "text": "온프레미스 배포를 검토하고 있다면 도입 문의를 통해 환경에 맞는 구성을 확인하세요. 안전한 운영을 위해 실제 의사결정에 영향을 주는 업무에서는 모델의 출력을 최종 판단으로 사용하지 말고 별도의 검증 절차를 두는 것을 권장합니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   },
+   {
+    "id": "it:1034#s95",
+    "source": "GeekNews",
+    "text": "실제 의사결정에 영향을 주는 업무에서는 모델의 출력을 최종 판단으로 사용하지 말고 별도의 검증 절차를 두는 것을 권장합니다. 운영 환경에 적용하기 전 실제 데이터로 정확도와 실패 유형을 평가해주세요.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": null
+   }
+  ],
+  "angle": "단일 GPU 실행 가능한 MoE 구조와 에이전트 작업 최적화",
+  "previous": null,
+  "code_warnings": [],
+  "round": 1
+ },
+ "expect": {
+  "status": "reject",
+  "loc": "sections[2].paragraphs[0]",
+  "type": "number_mismatch"
+ },
+ "note": "최종판에 number_mismatch 하나를 심음(sections[2].paragraphs[0])"
+}

@@ -1,0 +1,93 @@
+{
+ "input": {
+  "plan": {
+   "rank": 3,
+   "angle": "24시간 상시 가동 에이전트의 B2B 포지셔닝",
+   "relation": {
+    "type": "new",
+    "topic_id": null
+   }
+  },
+  "evidence": [
+   {
+    "id": "it:10",
+    "source": "OpenAI News",
+    "text": "[it:10#s1] Dots are remarkably capable, always-on agents built to handle everything.\n[it:10#s2] They’re a whole new way to work with AI—one that gets to know what matters to you, is always working on your behalf, and takes important work off your plate so you get more of your time and attention back.\n[it:10#s3] Dots are frontier intelligence that have your back.\n[it:10#s4] Powered by GPT‑6 Astra, they have their own cloud computer, learn from feedback over time, and can work towards your goals 24/7.\n[it:10#s5] Through our ecosystem of plugins, they can readily connect to over 4,000 apps, giving them the tools to help wherever you need them.\n[it:10#s6] Your dot is always within reach, whether it is through ChatGPT, Slack, or Teams.\n[it:10#s7] You can ask questions, explore ideas, and give feedback along the way; or you can simply hop on a voice call when you need to talk something out.\n[it:10#s8] The more you work together, the more your dot learns your preferences, how you think, and what good looks like to you.\n[it:10#s9] The magic of dots is when they bring you work done the way you would do it, sometimes before you even think to ask.\n[it:10#s10] With dots alongside you, ambitious ideas and projects you haven’t had the time or support to pursue start to feel achievable.\n[it:10#s11] Inside OpenAI, we’re getting a glimpse of what work looks like when intelligence is always working by your side.\n[it:10#s12] A bug appears in Slack, and dots immediately start investigating.\n[it:10#s13] A new design arrives, and dots turn it into a working app while the team focuses on customer feedback.\n[it:10#s14] A planning cycle gets underway, and dots keep everyone moving in sync toward the deadline.\n[it:10#s15] Outside OpenAI, an early tester’s dot noticed he’d forgotten to invoice a publication, prepared the invoice, and sent it after his approval.\n[it:10#s16] Today, you can start with your primary dot, give it a name, and make it your own.\n[it:10#s17] Over time, we envision teams of dots working together on your behalf.\n[it:10#s18] We’re beginning to roll out dots across Pro, Business Premium, and Enterprise plans in eligible markets.\n[it:10#s19] We plan to expand dots to more users soon.\n[it:10#s20] We’re also sharing a preview of specialist dots with their own identity for access management, IT-provisioned hardware, and support for deep integrations with a company’s systems of record to allow them to take on well-defined responsibilities inside organizations.\n[it:10#s21] Dots can do nearly anything using their own cloud computer, their own browser, and the apps you’ve connected.\n[it:10#s22] You can open your dot’s computer at any time to inspect its work.\n[it:10#s23] Dots can connect to other devices in addition to their own and you can also give your dot permission to connect and use your laptop, where it can then be useful directly alongside you.\n[it:10#s24] Your dot can take a project and run with it, even while it’s working on several others.\n[it:10#s25] You can keep bringing it new tasks and ideas without having to juggle separate threads or direct every step.\n[it:10#s26] With a dot that knows your goals and standards, you can take on more without directing every step.\n[it:10#s27] Here’s what that looks like:\n[it:10#s28] Working with your dot is as simple as having a conversation.\n[it:10#s29] You can message or call dots in ChatGPT on desktop, web, and mobile.\n[it:10#s30] They can also message you with progress, questions, or decisions that need you.\n[it:10#s31] You can also message your dot in Slack and Teams, with texting coming soon.\n[it:10#s32] Start a project in ChatGPT, share context with the working team in Slack, and let your dot follow through.\n[it:10#s33] Dots carry context across every channel, so your dot will have the full context wherever you reach it.\n[it:10#s34] Dots build on ChatGPT’s protections with additional safety and privacy safeguards for the work they can do.\n[it:10#s35] You can set boundaries, follow progress, and stay involved in decisions that need you.\n[it:10#s36] Each dot works on its own cloud computer, while your computer and its contents stay separate unless you choose to connect it.\n[it:10#s37] For signing into supported websites, dots can use saved passwords without exposing them to the model.\n[it:10#s38] When you aren’t actively working with it, your dot looks for ways to help in the background.\n[it:10#s39] We call this “proactive research”.\n[it:10#s40] It does this by using the apps you’ve already connected with tools that are restricted to be read-only, which means that they can’t send messages, change app content, or control your browser or computer.\n[it:10#s41] Security safeguards built into dots help defend against malicious instructions and monitor for potentially harmful behavior.\n[it:10#s42] If our monitoring system detects a safety concern, it can pause or stop the dot’s work.\n[it:10#s43] You choose which apps dots can access and can manage their permissions through your existing ChatGPT app controls.\n[it:10#s44] Dots start with built-in rules for when to act independently and when to ask for approval.\n[it:10#s45] Custom Rules let you allow specific actions, require approval, or block them.\n[it:10#s46] Built-in safety requirements always apply and you can follow progress, including background work, in Activity View and redirect dots as needed.\n[it:10#s47] We don’t use content from ChatGPT Business, Enterprise, or Edu workspaces to improve our models by default.\n[it:10#s48] On personal ChatGPT plans, you can control whether dots’ conversations and work are used to improve our models(opens in a new window).\n[it:10#s49] We don’t train directly on proactive research or your dot’s notes to itself.\n[it:10#s50] Information from them may be used if it helps inform an eligible conversation or task, depending on your settings.\n[it:10#s51] Dots use auto-review(opens in a new window) to check actions that could affect your accounts or share information against your instructions, Custom Rules, and safety requirements.\n[it:10#s52] This helps determine what work can proceed, what needs approval, and what you must do yourself.\n[it:10#s53] Certain sensitive tasks, such as changing a password, always stay with you.\n[it:10#s54] You can learn more about our safety approach for dots in our dots safety blog, in our Help Center(opens in a new window), and in our system card(opens in a new window).\n[it:10#s55] Dots can still make mistakes, so always review consequential work.\n[it:10#s56] Your dot works on your behalf; specialist dots take on dedicated responsibilities within your organization.",
+    "title": "Introducing dots",
+    "url": "https://openai.com/index/introducing-dots"
+   },
+   {
+    "id": "it:893",
+    "source": "AI타임스",
+    "text": "[it:893#s1] 오픈AI가 24시간 백그라운드에서 상시 가동되는 자율형 AI 에이전트 서비스 '닷츠(dots)'를 공개했다.\n[it:893#s2] 당초 메타의 개인 맞춤형 에이전트 '뮤즈(Muse)'를 겨냥한 제품으로 예상됐으나, 완전히 성격이 다른 기업용 업무 에이전트에 초점을 맞췄다.\n[it:893#s3] 오픈AI는 29일(현지시간) 연례 개발자 행사 '데브데이 2026'에서 20여개의 신규 업데이트 항목 가운데 핵심 카드인 닷츠를 선보였다.\n[it:893#s4] 기존 단발성 질의응답을 넘어 사용자를 대행해 스스로 결정을 내리고 연속적인 업무 프로세스를 관장하는 '상시 가동 에이전트 시스템'을 본격적으로 제품화한 것으로, 이는 출시 전 'o'라는 이름으로 기대를 모았던 프로젝트다.\n[it:893#s5] 최근 큰 인기를 끄는 메타의 뮤즈가 소비자의 일상과 라이프스타일을 밀착 지원하는 B2C AI 비서라면, 닷츠는 독립된 클라우드 가상 컴퓨팅 환경을 할당받아 기업과 전문가의 복잡한 비즈니스 워크플로우를 대행하는 '상시 근무형 B2B 에이전트'로 볼 수 있다.\n[it:893#s6] 샘 알트먼 CEO는 데브데이 키노트 무대에서 \"닷츠에 책임을 부여하면 알아서 백그라운드에서 일을 지속하기 때문에 스마트폰을 확인하는 시간도 줄었다\"며 \"사람을 부속품 취급하는 산업혁명이 아닌, 인간의 역량을 꽃피우는 '새로운 르네상스'로서 AI 에이전트를 바라보고 있다\"고 말했다.\n[it:893#s7] 또 메타의 뮤즈에 대해서는 \"직접 사용해 봤고 훌륭한 제품이지만, 기업 중심의 우리 로드맵에 확신이 있다\"고 밝히며 B2B 에이전트 시장 선점에 대한 자신감을 드러냈다.\n[it:893#s8] 닷츠는 플래그십 모델인 'GPT-6 아스트라'를 기반으로 구동된다.\n[it:893#s9] 단순 대화 응답이나 단발성 명령어 이행에 그쳤던 기존 AI의 한계를 극복하기 위해 기술 구조를 크게 고도화했다.\n[it:893#s10] 우선 닷츠마다 격리된 가상 클라우드 컴퓨터와 전용 브라우저 환경이 부여된다.\n[it:893#s11] 사용자의 컴퓨터나 스마트폰 전원이 꺼져 있어도 백그라운드에서 코드를 작성하고 테스트해 앱을 구현하거나 웹 리서치 및 데이터 수집을 자율 추진한다.\n[it:893#s12] 또 오픈AI 플러그인 생태계를 통해 4000개가 넘는 사내외 응용 프로그램과 연결되며, 챗GPT 웹·앱은 물론 슬랙, 마이크로소프트 팀즈, 문자 메시지 등 기존 업무 채널 전반에서 단일한 대화 맥락을 유지한다.\n[it:893#s13] 단, i메시지 및 RCS를 통한 문자 메시지 기능은 프로 사용자 대상 대기자 명단 신청 형태로 우선 제공된다.\n[it:893#s14] 조직 단위 도입을 위한 전담 사원 형태의 '전문 닷츠(Specialized dots)' 기능도 도입됐다.\n[it:893#s15] 개별 제품에 전용 ID, 시스템 로그인 자격 증명, 사내 DB 접근 권한을 부여해 조달, 청구서 처리, 이메일 마케팅, 고객 지원(CS), 계약서 검토 등 전담 직원이 맡던 B2B 업무 프로세스를 에이전트에 위임할 수 있다.\n[it:893#s16] 보안 레이어도 강화했다.\n[it:893#s17] 저장된 비밀번호를 모델에 직접 노출하지 않고 안전하게 처리하며, 선제적 리서치 진행 시에는 메시지 발송이나 데이터 변경이 불가능한 '읽기 전용' 모드로만 제한 구동된다.\n[it:893#s18] 계정 변경이나 결제 등 민감 업무는 반드시 인간 승인을 거치도록 설계됐으며, 마이크로소프트의 기업 보안 제어 체계인 '에이전트 365' 및 엔터프라이즈 ID 관리 시스템과의 통합 계획도 발표됐다.\n[it:893#s19] 특히 기업 고객을 위해 사내 입력 데이터 및 백그라운드 작업 내역이 모델 학습에 절대 활용되지 않는 엄격한 데이터 프라이버시 정책을 적용, 메타 등 소비자 중심 서비스와 차별화된 보안 기준을 확립했다.\n[it:893#s20] 이와 함께 인간 팀원들과 닷츠 에이전트가 한 공간에 모여 협업 문서를 실시간 공동 편집하고 프로젝트를 관리할 수 있는 전용 협업 워크스페이스 '챗GPT 스페이스(Space)'와 문서 도구 '페이지스(Pages)'가 추가됐다.\n[it:893#s21] 오픈AI는 닷츠 도입에 맞춰 초당 최대 300토큰의 응답 속도를 내는 '울트라패스트(Ultrafast)' 티어가 탑재된 '챗GPT 프로 500(월 500달러)' 플랜을 신설했다.\n[it:893#s22] 닷츠 에이전트는 프로 및 비즈니스 프리미엄 구독자에게 기본 1개가 포함돼 제공된다.\n[it:893#s23] 추가 토큰 소모량이 발생하는 고부하 백그라운드 작업의 경우 요금제별 기본 토큰 한도 초과 시 종량제 형태로 과금되며, 기업용 엔터프라이즈 고객 대상 정식 출시 및 일반 개발자 API 공개는 대기자 명단 거쳐 오는 4분기부터 차례 진행될 예정이다.\n[it:893#s24] 전문가들도 두 제품을 비교하며 메타가 대중적 소비자 시장을 선점하는 사이 오픈AI는 실제 매출에 도움이 되는 기업용 워크플레이스 영역을 정조준했다는 분석을 내놓았다.\n[it:893#s25] 개발자 커뮤니티의 초기 반응은 기대와 우려가 엇갈렸다.\n[it:893#s26] 사용자가 기기를 꺼두어도 슬랙이나 팀즈에서 스스로 업무를 진행하고 완성된 풀리퀘스트(PR)를 제출하는 클라우드 가상 컴퓨터 구조에 대해 \"진정한 의미의 자율형 AI 사원이 등장했다\"는 긍정적 평가가 이어졌다.\n[it:893#s27] 반면 일부는 시연 과정에서 발생한 소폭의 응답 지연 현상과 더불어, 백그라운드 상시 작동 특성상 발생할 수 있는 사내 기밀 유출이나 시스템 오작동 위험에 대한 우려를 표했다.\n[it:893#s28] 특히 최근 에이전트들의 오작동 이슈가 잇따랐던 만큼, 백그라운드 작업을 수행할 때 보안 및 승인 검토 체계가 완벽하게 작동할지에 대해서는 신중한 검증이 필요하다는 지적이 나오고 있다.\n[it:893#s29] 임대준 기자 ydj@aitimes.com",
+    "title": "오픈AI, 24시간 자율 에이전트 '닷츠' 공개…소비자용 아닌 B2B 승부수",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=215779"
+   },
+   {
+    "id": "it:986",
+    "source": "GeekNews",
+    "text": "[og:986#q1] 원문: dots는 모든 일을 처리하도록 설계된, 뛰어난 역량을 갖춘 상시 작동 에이전트입니다.\n[og:986#q2] 원문: GPT‑6 Astra를 기반으로 구동되며 자체 클라우드 컴퓨터를 갖추고, 시간이 지나면서 피드백을 통해 학습하며 24시간 내내 사용자의 목표를 향해 일할 수 있습니다.\n[og:986#q2] (카드 수치, 위 원문에서 뽑음) 상시 작동 시간 [24시간]\n[og:986#q3] 원문: OpenAI의 플러그인 생태계를 통해 4,000개가 넘는 앱에 손쉽게 연결하여 필요한 곳에서 도움을 제공하는 데 필요한 도구를 갖출 수 있습니다.\n[og:986#q3] (카드 수치, 위 원문에서 뽑음) 연결 가능한 앱 수 [4,000개]\n[og:986#q4] 원문: 첫 번째 dot은 추가 비용 없이 Pro 또는 Business Premium 요금제에 포함됩니다.\n[it:986#s1] dots는 모든 일을 처리하도록 설계된, 뛰어난 역량을 갖춘 상시 작동 에이전트입니다.\n[it:986#s2] AI와 함께 일하는 완전히 새로운 방식으로, 여러분이 중요하게 여기는 것을 알아가고, 늘 여러분을 대신해 일하며, 중요한 업무를 맡아 처리해 시간과 집중할 여유를 되찾아 줍니다.\n[it:986#s3] dots는 사용자를 든든하게 뒷받침하는 프런티어 AI입니다.\n[it:986#s4] GPT‑6 Astra를 기반으로 구동되며 자체 클라우드 컴퓨터를 갖추고, 시간이 지나면서 피드백을 통해 학습하며 24시간 내내 사용자의 목표를 향해 일할 수 있습니다.\n[it:986#s5] OpenAI의 플러그인 생태계를 통해 4,000개가 넘는 앱에 손쉽게 연결하여 필요한 곳에서 도움을 제공하는 데 필요한 도구를 갖출 수 있습니다.\n[it:986#s6] ChatGPT, Slack 또는 Teams를 통해 언제든 사용자의 dot과 소통할 수 있습니다.\n[it:986#s7] 질문하고 아이디어를 탐색하며 진행 중에 피드백을 제공할 수 있고, 이야기를 나누고 싶을 때는 간단히 음성 통화를 시작할 수도 있습니다.\n[it:986#s8] 함께 일할수록 dot은 사용자의 선호와 사고방식, 그리고 사용자가 생각하는 좋은 결과물의 기준을 더 잘 이해하게 됩니다.\n[it:986#s9] dots의 진가는 때로는 부탁할 생각조차 하기 전에 사용자가 직접 했을 법한 방식으로 완성된 결과물을 가져다줄 때 드러납니다.\n[it:986#s10] dots가 곁에 있으면 시간이나 지원이 부족해 시도하지 못했던 큰 아이디어와 프로젝트도 실현할 수 있을 것처럼 느껴지기 시작합니다.\n[it:986#s11] OpenAI 내부에서는 AI가 늘 곁에서 함께 일할 때 업무가 어떻게 달라지는지 엿보고 있습니다.\n[it:986#s12] Slack에 버그가 나타나면 dots가 즉시 조사를 시작합니다.\n[it:986#s13] 새로운 디자인이 도착하면 팀이 고객 피드백에 집중하는 동안 dots가 이를 실제로 작동하는 앱으로 구현합니다.\n[it:986#s14] 계획 수립 주기가 시작되면 dots가 팀이 마감일에 맞춰 업무를 계속 진행하도록 돕습니다.\n[it:986#s15] OpenAI 외부의 한 초기 테스터가 사용하는 dot은 테스터가 한 매체에 청구서를 보내는 것을 잊었다는 사실을 알아차리고, 청구서를 작성한 뒤 승인을 받아 발송했습니다.\n[it:986#s16] 오늘부터 기본 dot 하나로 시작해 이름을 붙이고 나만의 dot으로 만들어 보세요.\n[it:986#s17] 앞으로는 여러 dot이 팀을 이루어 사용자를 대신해 함께 일하게 될 것입니다.\n[it:986#s18] 현재 적격 시장의 Pro, Business Premium 및 Enterprise 요금제에 dots를 순차적으로 제공하기 시작했으며, 곧 더 많은 사용자에게 dots를 확대 제공할 예정입니다.\n[it:986#s19] 또한 액세스 관리를 위한 고유 ID를 갖추고, IT에서 제공하는 하드웨어를 사용하며, 기업의 기록 시스템과 심층적으로 통합할 수 있는 전문 dots의 미리 보기도 선보입니다.\n[it:986#s20] 이를 통해 전문 dots가 조직 내에서 명확하게 정의된 책임을 맡을 수 있습니다.\n[it:986#s21] dots는 자체 클라우드 컴퓨터와 자체 브라우저, 그리고 사용자가 연결한 앱을 사용해 거의 모든 작업을 수행할 수 있습니다.\n[it:986#s22] 언제든 dot의 컴퓨터를 열어 작업을 살펴볼 수 있습니다.\n[it:986#s23] Dots는 자체 컴퓨터 외에도 다른 기기에 연결할 수 있으며, dot이 노트북에 연결해 사용할 수 있도록 권한을 부여할 수도 있습니다.\n[it:986#s24] 그러면 dot이 바로 곁에서 도움을 줄 수 있습니다.\n[it:986#s25] 여러분의 dot은 여러 프로젝트를 동시에 진행하면서도 새 프로젝트를 맡아 주도적으로 추진할 수 있습니다.\n[it:986#s26] 별도의 대화들을 번갈아 관리하거나 모든 단계를 지시할 필요 없이, 새로운 작업과 아이디어를 계속 맡길 수 있습니다.\n[it:986#s27] 목표와 기준을 아는 dot과 함께라면, 모든 단계를 지시하지 않고도 더 많은 일을 해낼 수 있습니다.\n[it:986#s28] 어떤 모습인지 살펴보세요.\n[it:986#s29] dot과 함께 일하는 것은 대화를 나누는 것만큼 간단합니다.\n[it:986#s30] 데스크톱, 웹, 모바일의 ChatGPT에서 dot에게 메시지를 보내거나 전화를 걸 수 있습니다.\n[it:986#s31] dot도 진행 상황이나 질문, 사용자의 판단이 필요한 사항을 메시지로 보낼 수 있습니다.\n[it:986#s32] Slack과 Teams에서도 dot에게 메시지를 보낼 수 있으며, 문자 메시지 기능도 곧 제공됩니다.\n[it:986#s33] ChatGPT에서 프로젝트를 시작하고, Slack에서 함께 일하는 팀에 필요한 맥락을 공유한 뒤, dot에 후속 작업을 맡기세요.\n[it:986#s34] dot은 모든 채널에 걸쳐 맥락을 유지하므로, 어디서 연락하든 전체 맥락을 바탕으로 작업합니다.\n[it:986#s35] dots는 ChatGPT의 보호 체계를 바탕으로, 수행할 수 있는 작업에 맞는 추가적인 안전 및 개인정보 보호 장치를 갖추고 있습니다.\n[it:986#s36] 사용자는 작업 범위를 정하고, 진행 상황을 확인하며, 직접 판단이 필요한 결정에 계속 관여할 수 있습니다.\n[it:986#s37] 각 dot은 자체 클라우드 컴퓨터에서 작업하며, 사용자가 연결하기로 선택하지 않는 한 사용자의 컴퓨터와 그 안의 콘텐츠는 분리된 상태로 유지됩니다.\n[it:986#s38] 지원되는 웹사이트에 로그인할 때 dots는 저장된 비밀번호를 모델에 노출하지 않고 사용할 수 있습니다.\n[it:986#s39] 사용자가 dot과 직접 작업하지 않을 때도 dot은 백그라운드에서 도울 방법을 찾습니다.\n[it:986#s40] 이를 '선제적 리서치'라고 합니다.\n[it:986#s41] 이 과정에서 이미 연결한 앱을 읽기 전용으로 제한된 도구를 통해 사용하므로 메시지를 보내거나 앱 콘텐츠를 변경하거나 브라우저 또는 컴퓨터를 제어할 수 없습니다.\n[it:986#s42] dots에 내장된 보안 장치는 악의적인 지시를 방어하고 잠재적으로 유해한 행동을 모니터링하는 데 도움을 줍니다.\n[it:986#s43] 모니터링 시스템이 안전 문제를 감지하면 dot의 작업을 일시 중지하거나 중단할 수 있습니다.\n[it:986#s44] dots가 접근할 앱을 직접 선택하고, 기존 ChatGPT 앱 제어 기능으로 권한을 관리할 수 있습니다.\n[it:986#s45] dots에는 언제 독립적으로 행동하고 언제 승인을 요청해야 하는지 정하는 규칙이 기본으로 내장되어 있습니다.\n[it:986#s46] 맞춤 규칙을 통해 특정 작업을 허용하거나, 승인을 요구하거나, 차단할 수 있습니다.\n[it:986#s47] 내장된 안전 요건은 항상 적용됩니다.\n[it:986#s48] 활동 보기에서 백그라운드 작업을 포함한 진행 상황을 확인하고, 필요에 따라 dots의 작업 방향을 바꿀 수 있습니다.\n[it:986#s49] OpenAI는 기본적으로 ChatGPT Business, Enterprise, Edu 워크스페이스의 콘텐츠를 모델 개선에 사용하지 않습니다.\n[it:986#s50] 개인용 ChatGPT 요금제에서는 dots와 나눈 대화와 작업을 모델 개선(새 창에서 열기)에 사용할지 직접 설정할 수 있습니다.\n[it:986#s51] 선제적 리서치나 dot이 자체적으로 작성한 메모를 직접 학습에 사용하지는 않습니다.\n[it:986#s52] 다만 사용자의 설정에 따라 해당 정보가 모델 개선에 사용될 수 있는 적격 대화나 작업에 도움이 되는 경우에는 사용될 수 있습니다.\n[it:986#s53] dots는 계정에 영향을 주거나 정보를 공유할 수 있는 작업이 사용자의 지시, 맞춤 규칙 및 안전 요건에 부합하는지 자동 검토(새 창에서 열기)를 통해 확인합니다.\n[it:986#s54] 이를 통해 어떤 작업을 진행할 수 있는지, 어떤 작업에 승인이 필요한지, 어떤 작업을 사용자가 직접 수행해야 하는지를 판단합니다.\n[it:986#s55] 비밀번호 변경과 같은 일부 민감한 작업은 항상 사용자가 직접 수행해야 합니다.\n[it:986#s56] dots의 안전을 위한 OpenAI의 접근 방식에 대한 자세한 내용은 dots 안전 블로그, 도움말 센터(새 창에서 열기) 및 시스템 카드(새 창에서 열기)에서 확인할 수 있습니다.\n[it:986#s57] dots도 실수할 수 있으므로 중요한 결과를 초래할 수 있는 작업은 항상 검토하세요.\n[it:986#s58] 사용자의 dot은 사용자를 대신해 업무를 수행하며, 전문 dots는 조직 내에서 특정 업무를 전담합니다.\n[it:986#s59] 회사는 각 dot에 고유한 ID와 인증 정보를 설정하고 업무 수행에 필요한 시스템에 대한 액세스 권한을 부여합니다.\n[it:986#s60] dot은 업무를 수행하면서 새로운 정보에 적응하고 팀의 피드백을 바탕으로 개선됩니다.\n[it:986#s61] OpenAI는 조달, 청구서 처리, 이메일 마케팅, 고객 지원 및 상업 계약 분야에서 진행한 사내 초기 테스트를 통해 얻은 교훈을 바탕으로 개발을 이어가고 있습니다.\n[it:986#s62] 우선 특정 업무에 초점을 맞춘 기업 파일럿 프로그램부터 시작합니다.\n[it:986#s63] OpenAI 엔지니어링 팀이 조직과 직접 협력해 각 dot의 책임, 사용할 수 있는 도구, 사람이 작업을 검토하고 승인하는 방식을 정할 예정입니다.\n[it:986#s64] 전문 dot에 맡기고 싶은 업무가 있다면 알려주세요.\n[it:986#s65] 또한 Microsoft와 협력하여 Agent 365의 기업 거버넌스 및 보안 제어 기능에 전문 dots를 통합하고 있습니다.\n[it:986#s66] 기업이 이미 사용하고 있는 Microsoft 도구를 통해 dots를 관리할 수 있도록 하는 것이 목표입니다.\n[it:986#s67] 오늘부터 지원 지역(새 창에서 열기)의 Pro 및 Business Premium 사용자를 대상으로 ChatGPT에서 dots를 순차적으로 제공합니다.\n[it:986#s68] Enterprise 사용자(Edu 및 Healthcare 포함)는 워크스페이스 관리자가 베타 기능을 활성화하면 체험할 수 있습니다.\n[it:986#s69] 첫 번째 dot은 추가 비용 없이 Pro 또는 Business Premium 요금제에 포함됩니다.\n[it:986#s70] 24시간 내내 대화를 나누고, 생각을 정리하고, 중요한 일을 놓치지 않도록 도와줍니다.\n[it:986#s71] 요금제에는 더 심층적인 작업을 위한 사용량도 포함되며, 출시 후 첫 한 달 동안은 한도가 확대됩니다.\n[it:986#s72] 앞으로는 dots를 추가하고 각 dot의 처리 속도나 월간 작업량을 늘려 작업 결과를 확장할 수 있습니다.\n[it:986#s73] dot과의 대화는 ChatGPT 사용량 한도에 포함되지 않습니다.\n[it:986#s74] dot에게 Codex 또는 ChatGPT Work에서 작업을 시작하거나 관리하도록 요청하면, 해당 작업은 기존과 동일하게 사용량 한도에 포함됩니다.\n[it:986#s75] 시작하려면 ChatGPT 데스크톱 앱이나 데스크톱 브라우저에서 첫 번째 dot을 만들고 앱을 연결한 다음 dot이 자신을 소개하도록 해보세요.\n[it:986#s76] 초기 설정을 마치면 ChatGPT 모바일 앱에서 dot과 메시지를 주고받을 수 있습니다.\n[it:986#s77] dots가 매일 유용하게 쓰이는 데 무엇이 필요한지 배우며 계속 개선해 나가겠습니다.\n[it:986#s78] 그 과정에서 배운 내용을 가능한 범위에서 공유하고, 앞으로 개발할 기능의 방향을 정하는 데 활용하겠습니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": "https://openai.com/ko-KR/index/introducing-dots/"
+   }
+  ],
+  "previous": null,
+  "aliases": [
+   {
+    "canonical": "Dots",
+    "aliases": [
+     "dots"
+    ]
+   },
+   {
+    "canonical": "GPT-6 Astra",
+    "aliases": [
+     "GPT-6 아스트라"
+    ]
+   }
+  ],
+  "limits": {
+   "sections": [
+    4,
+    7
+   ],
+   "paragraphs_per_section": [
+    1,
+    2
+   ],
+   "paragraph_sentences_max": 4,
+   "paragraph_chars_max": 320,
+   "summary_sentences": [
+    1,
+    2
+   ],
+   "summary_chars_max": 200,
+   "heading_chars_max": 70,
+   "head_tiles_max": 4,
+   "tiles_per_section": [
+    2,
+    3
+   ],
+   "visuals_max": 4,
+   "bars_items": [
+    2,
+    6
+   ],
+   "table_rows": [
+    2,
+    6
+   ],
+   "table_cols": [
+    2,
+    4
+   ],
+   "slides_max": 2,
+   "video_secs_max": 3,
+   "max_refs_per_paragraph": 4
+  },
+  "slide_candidates": [],
+  "no_visuals": false
+ },
+ "expect": {},
+ "note": "2026-W40 실제 토픽 입력(run 20261013-164928-weekly-1b69)"
+}

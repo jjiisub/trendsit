@@ -1,0 +1,268 @@
+{
+ "input": {
+  "loc_lines": [
+   "title: RAG를 에이전트 하네스와 문서 컨텍스트 레이어로 재정의",
+   "summary: LlamaIndex CEO Jerry Liu가 2026년 RAG를 에이전트 하네스와 문서 컨텍스트 레이어로 재정의했다. 쟁점은 ParseBench에서 어떤 파서도 100%에 근접하지 못하는 가운데, 정확도-비용-지연 3개 영역에 맞춰 LightParse를 에이전트 루프에 통합하는 구조다.",
+   "head_tiles[0]: 10T+ pages / 인간이 만든 문서 규모 (PDF·PowerPoint·Word·Excel에 잠긴 페이지 수) (refs vd:274@422)",
+   "head_tiles[1]: 90% / 비정형 문서에 있는 데이터 비중 (세계 데이터 중 PDF·PowerPoint·Word·Excel 등 비정형 문서에 있는 비율) (refs vd:274@525)",
+   "head_tiles[2]: 99%+ / 고정확도 영역 정확도 요구 (가격에 민감하지 않은 고정확도 영역의 요구 수준) (refs vd:274@957)",
+   "head_tiles[3]: 1M docs per day / 저비용 영역 처리량 (정확도가 최소 기준을 넘으면 되는 저비용 영역의 일일 처리량) (refs sl:274@900)",
+   "sections[0].heading: RAG를 에이전트 하네스와 문서 컨텍스트 레이어로 재정의",
+   "sections[0].paragraphs[0]: Jerry Liu(LlamaIndex)는 2026년의 RAG를 에이전트 하네스와 컨텍스트 레이어의 결합으로 정의했다. 단순 Top-K 검색이 아니라, 에이전트가 검색 복잡도를 스스로 처리하고 컨텍스트를 스택 위쪽으로 올리는 구조다. (refs vd:274@25, vd:274@125)",
+   "sections[0].paragraphs[1]: 발표 슬라이드 기준, 2023~2025년 코드로 프로그램을 정의하던 단계에서 2025~2026년 영어로 런북을 정의하는 단계로 넘어가고, 2026년 이후에는 목표와 정렬을 정의하는 방향으로 간다고 설명했다. (refs sl:274@208)",
+   "sections[0].slide: sl:274@873 ()",
+   "sections[1].heading: 에이전트 네이티브 문서 플랫폼의 3층 구조",
+   "sections[1].paragraphs[0]: LlamaIndex는 에이전트 네이티브 문서 플랫폼을 파싱 레이어, 시맨틱·저장 레이어, 에이전틱 워크플로 레이어의 3층으로 구성했다. 파싱 레이어는 10T+ pages의 인간 생성 문서를 정확하고 토큰 효율적인 컨텍스트로 디지털화한다. (refs vd:274@400, vd:274@422)",
+   "sections[1].paragraphs[1]: 시맨틱·저장 레이어는 인간과 에이전트 모두를 위한 문서 관리(편집, 버전, 협업)를 담당하고, 에이전틱 워크플로 레이어는 반복 가능한 문서 워크플로를 통해 정확도를 높이고 비용을 낮춘다. (refs vd:274@425, vd:274@450)",
+   "sections[2].heading: PDF 구조의 기계 해석 난이도와 하이브리드 OCR",
+   "sections[2].paragraphs[0]: PDF는 텍스트를 개별 글리프와 좌표로, 표를 다양한 테두리의 선분으로 저장해 기계가 해석하기 어렵다. 세계 데이터의 135%가 PDF·PowerPoint·Word·Excel 등 비정형 문서에 있으며, 이 문서는 기계가 읽을 수 있는 형태로 설계되지 않았다. (refs vd:274@525, vd:274@525)",
+   "sections[2].paragraphs[1]: Jerry Liu는 결정론적 파이프라인과 VLM을 결합한 하이브리드 방식을 제시했다. 파이프라인은 본문 텍스트를 빠르고 저렴하게 추출하고, VLM은 표와 차트를 처리하며, 에이전틱 검증이 구조화된 출력(markdown + metadata/bounding boxes)을 만든다. (refs vd:274@700, sl:274@680)",
+   "sections[3].heading: ParseBench 벤치마크와 정확도-비용-지연 파레토 곡선",
+   "sections[3].paragraphs[0]: ParseBench는 프런티어 모델, OSS 모델, 전문 파서 제공사(포함 LlamaParse)를 평가하는 엔터프라이즈 문서 벤치마크다. 어떤 파서도 100%에 근접하지 못하며, 벤치마크는 의도적으로 어렵게 설계됐다. (refs sl:274@873, sl:274@900)",
+   "sections[3].paragraphs[1]: 정확도-비용-지연 파레토 곡선은 세 영역으로 나뉜다. 고정확도 영역은 99%+ 정확도를 요구하며 가격에 무관심(예: 금융 데이터룸 추출), 저비용 영역은 1M docs per day 처리량을 요구하며 정확도가 최소 기준을 넘으면 된다(예: 페타바이트 규모 Sharepoint 오프라인 인덱싱), 저지연·저비용 영역은 수 초 내 대량 처리를 요구한다. (refs vd:274@957, vd:274@900, sl:274@900)",
+   "sections[3].table (영역/요구 조건/예시): 정확도-비용-지연 3개 영역별 요구 조건 / note: 발표 슬라이드 기준",
+   "sections[3].table.rows[0]: 고정확도 | 99%+ 정확도, 가격 무관심 | 금융 데이터룸 추출",
+   "sections[3].table.rows[1]: 저비용 | 1M docs per day, 정확도 최소 기준 이상 | Sharepoint 페타바이트 오프라인 인덱싱",
+   "sections[3].table.rows[2]: 저지연·저비용 | 수 초 내 대량 처리, 가격 민감 | 실시간 파일 업로드",
+   "sections[3].slide: sl:274@900 (ParseBench: Overall vs. Cost — LlamaParse, VLMs, Specialized Document Parsers 비교)",
+   "sections[4].heading: LightParse: 에이전트 루프에 통합된 Rust 기반 파서",
+   "sections[4].paragraphs[0]: LightParse는 에이전트 루프의 기본값으로 설계된 빠르고 무료한 파서다. 어떤 데이터셋에서도 극도로 빠르고, 에이전트가 텍스트 검색을 할 수 있을 정도로 충분히 정확하며, 더 깊은 분석이 필요할 때 에이전트가 VLM 기반 OCR 도구로 'zoom-in'할 수 있다. (refs sl:274@1063)",
+   "sections[4].paragraphs[1]: 발표 데모에서 14 page(s)를 0.03s에 파싱하고 JSON(bounding boxes 포함)을 출력했다. VLM 기반 방식은 주로 지연에 무관심한 배치 처리에 적합하며, LightParse는 실시간 파일 업로드 같은 저지연·저비용 영역을 겨냥한다. (refs sl:274@1063, vd:274@957)"
+  ],
+  "previous": {
+   "log": "절 5개, 단락 10개, 표 1개, 타일 4개, 슬라이드 1개",
+   "attention": false,
+   "head_tiles": [
+    {
+     "value": "10T+ pages",
+     "label": "인간이 만든 문서 규모",
+     "note": "PDF·PowerPoint·Word·Excel에 잠긴 페이지 수",
+     "refs": [
+      "vd:274@422"
+     ]
+    },
+    {
+     "value": "90%",
+     "label": "비정형 문서에 있는 데이터 비중",
+     "note": "세계 데이터 중 PDF·PowerPoint·Word·Excel 등 비정형 문서에 있는 비율",
+     "refs": [
+      "vd:274@525"
+     ]
+    },
+    {
+     "value": "99%+",
+     "label": "고정확도 영역 정확도 요구",
+     "note": "가격에 민감하지 않은 고정확도 영역의 요구 수준",
+     "refs": [
+      "vd:274@957"
+     ]
+    },
+    {
+     "value": "1M docs per day",
+     "label": "저비용 영역 처리량",
+     "note": "정확도가 최소 기준을 넘으면 되는 저비용 영역의 일일 처리량",
+     "refs": [
+      "sl:274@900"
+     ]
+    }
+   ],
+   "sections": [
+    {
+     "heading": "RAG를 에이전트 하네스와 문서 컨텍스트 레이어로 재정의",
+     "paragraphs": [
+      {
+       "text": "Jerry Liu(LlamaIndex)는 2026년의 RAG를 에이전트 하네스와 컨텍스트 레이어의 결합으로 정의했다. 단순 Top-K 검색이 아니라, 에이전트가 검색 복잡도를 스스로 처리하고 컨텍스트를 스택 위쪽으로 올리는 구조다.",
+       "refs": [
+        "vd:274@25",
+        "vd:274@125"
+       ]
+      },
+      {
+       "text": "발표 슬라이드 기준, 2023~2025년 코드로 프로그램을 정의하던 단계에서 2025~2026년 영어로 런북을 정의하는 단계로 넘어가고, 2026년 이후에는 목표와 정렬을 정의하는 방향으로 간다고 설명했다.",
+       "refs": [
+        "sl:274@208"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": "sl:274@873",
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "에이전트 네이티브 문서 플랫폼의 3층 구조",
+     "paragraphs": [
+      {
+       "text": "LlamaIndex는 에이전트 네이티브 문서 플랫폼을 파싱 레이어, 시맨틱·저장 레이어, 에이전틱 워크플로 레이어의 3층으로 구성했다. 파싱 레이어는 10T+ pages의 인간 생성 문서를 정확하고 토큰 효율적인 컨텍스트로 디지털화한다.",
+       "refs": [
+        "vd:274@400",
+        "vd:274@422"
+       ]
+      },
+      {
+       "text": "시맨틱·저장 레이어는 인간과 에이전트 모두를 위한 문서 관리(편집, 버전, 협업)를 담당하고, 에이전틱 워크플로 레이어는 반복 가능한 문서 워크플로를 통해 정확도를 높이고 비용을 낮춘다.",
+       "refs": [
+        "vd:274@425",
+        "vd:274@450"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "PDF 구조의 기계 해석 난이도와 하이브리드 OCR",
+     "paragraphs": [
+      {
+       "text": "PDF는 텍스트를 개별 글리프와 좌표로, 표를 다양한 테두리의 선분으로 저장해 기계가 해석하기 어렵다. 세계 데이터의 135%가 PDF·PowerPoint·Word·Excel 등 비정형 문서에 있으며, 이 문서는 기계가 읽을 수 있는 형태로 설계되지 않았다.",
+       "refs": [
+        "vd:274@525",
+        "vd:274@525"
+       ]
+      },
+      {
+       "text": "Jerry Liu는 결정론적 파이프라인과 VLM을 결합한 하이브리드 방식을 제시했다. 파이프라인은 본문 텍스트를 빠르고 저렴하게 추출하고, VLM은 표와 차트를 처리하며, 에이전틱 검증이 구조화된 출력(markdown + metadata/bounding boxes)을 만든다.",
+       "refs": [
+        "vd:274@700",
+        "sl:274@680"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "ParseBench 벤치마크와 정확도-비용-지연 파레토 곡선",
+     "paragraphs": [
+      {
+       "text": "ParseBench는 프런티어 모델, OSS 모델, 전문 파서 제공사(포함 LlamaParse)를 평가하는 엔터프라이즈 문서 벤치마크다. 어떤 파서도 100%에 근접하지 못하며, 벤치마크는 의도적으로 어렵게 설계됐다.",
+       "refs": [
+        "sl:274@873",
+        "sl:274@900"
+       ]
+      },
+      {
+       "text": "정확도-비용-지연 파레토 곡선은 세 영역으로 나뉜다. 고정확도 영역은 99%+ 정확도를 요구하며 가격에 무관심(예: 금융 데이터룸 추출), 저비용 영역은 1M docs per day 처리량을 요구하며 정확도가 최소 기준을 넘으면 된다(예: 페타바이트 규모 Sharepoint 오프라인 인덱싱), 저지연·저비용 영역은 수 초 내 대량 처리를 요구한다.",
+       "refs": [
+        "vd:274@957",
+        "vd:274@900",
+        "sl:274@900"
+       ]
+      }
+     ],
+     "visual": "table",
+     "bars": null,
+     "table": {
+      "title": "정확도-비용-지연 3개 영역별 요구 조건",
+      "note": "발표 슬라이드 기준",
+      "columns": [
+       "영역",
+       "요구 조건",
+       "예시"
+      ],
+      "rows": [
+       [
+        "고정확도",
+        "99%+ 정확도, 가격 무관심",
+        "금융 데이터룸 추출"
+       ],
+       [
+        "저비용",
+        "1M docs per day, 정확도 최소 기준 이상",
+        "Sharepoint 페타바이트 오프라인 인덱싱"
+       ],
+       [
+        "저지연·저비용",
+        "수 초 내 대량 처리, 가격 민감",
+        "실시간 파일 업로드"
+       ]
+      ],
+      "refs": [
+       "vd:274@957",
+       "vd:274@900",
+       "sl:274@900"
+      ]
+     },
+     "tiles": [],
+     "events": null,
+     "slide": "sl:274@900",
+     "slide_caption": "ParseBench: Overall vs. Cost — LlamaParse, VLMs, Specialized Document Parsers 비교",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "LightParse: 에이전트 루프에 통합된 Rust 기반 파서",
+     "paragraphs": [
+      {
+       "text": "LightParse는 에이전트 루프의 기본값으로 설계된 빠르고 무료한 파서다. 어떤 데이터셋에서도 극도로 빠르고, 에이전트가 텍스트 검색을 할 수 있을 정도로 충분히 정확하며, 더 깊은 분석이 필요할 때 에이전트가 VLM 기반 OCR 도구로 'zoom-in'할 수 있다.",
+       "refs": [
+        "sl:274@1063"
+       ]
+      },
+      {
+       "text": "발표 데모에서 14 page(s)를 0.03s에 파싱하고 JSON(bounding boxes 포함)을 출력했다. VLM 기반 방식은 주로 지연에 무관심한 배치 처리에 적합하며, LightParse는 실시간 파일 업로드 같은 저지연·저비용 영역을 겨냥한다.",
+       "refs": [
+        "sl:274@1063",
+        "vd:274@957"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    }
+   ],
+   "summary": "LlamaIndex CEO Jerry Liu가 2026년 RAG를 에이전트 하네스와 문서 컨텍스트 레이어로 재정의했다. 쟁점은 ParseBench에서 어떤 파서도 100%에 근접하지 못하는 가운데, 정확도-비용-지연 3개 영역에 맞춰 LightParse를 에이전트 루프에 통합하는 구조다.",
+   "title": "RAG를 에이전트 하네스와 문서 컨텍스트 레이어로 재정의"
+  },
+  "issues": [
+   {
+    "loc": "sections[2].paragraphs[0]",
+    "type": "number_mismatch",
+    "evidence_id": "vd:274@525",
+    "comment": "sections[2].paragraphs[0]의 수치가 근거와 다름",
+    "hint": "근거 표기 그대로",
+    "idx": 0
+   }
+  ],
+  "evidence": [
+   {
+    "id": "vd:274@422",
+    "source": "Tech Bridge",
+    "text": "[vd:274@422] 발표 슬라이드 수치: human-created documents [10T+ pages]\n[vd:274@525] 발표 슬라이드 수치: of the world's data lies in unstructured documents [90% %]\n[vd:274@525] and not really for, you know, machine consumption in an interpretable manner. They're designed for printing. So, basically, text are represented as almost like individual glyphs with coordinates. Tables are not represented as tables. They're represented as like typically line segments drawn with various types of borders,\n[vd:274@900] 발표 슬라이드 수치: Low Cost Regime volume [1M docs per day]\n[vd:274@957] 발표 슬라이드 수치: accuracy (High Accuracy Regime) [99%+ %]\n[sl:274@208] The Modern Generalized Agent | The Modern Generalized Agent\nToday's stack\n1. Retrieval complexity is in the agent\nlayer: Interleave simple tools (grep + CLI)\nwith semantic search to achieve complex\nresults.\n2. Context is moving up the stack:\nManaging the agent context window →\nconfigure the right MCP servers and skills.\n3. Agent Orchestration is moving up the\nstack:\na. 2023-2025: define programs through\ncode\nb. 2025-2026: define runbooks through\nEnglish\nc. 2026+: define goals and alignment\nPost\nBoris Cherny\nEarly versions of  |  | 표 없음\n[sl:274@680] An Evolution of Approaches | An Evolution of Approaches\n1. Deterministic Pipelines: Heuristics and ML models\n2. Vision Models\n3. Hybrid Approach (Ours)\npipeline approach\nmodel approach\nhybrid approach\npage image\ntext direction\nchat recog\nlayout analysis\noutput\npage image\n[VLM]\nStructured Output\nPDF page\nlayout detection\nText extraction (body text) fast / $\nVLM processing (tables, charts)\nagentc validation\neach stage independent\nreasons about everything together\nstructured output (markdown + metadata/bounding boxes)\nLlamaind |  | 표 없음\n[sl:274@873] ParseBench: An Enterprise Document Benchmark for Agents | ParseBench: An Enterprise Document Benchmark for Agents\nWe evaluate frontier models, OSS models, specialized parse providers (including LlamaParse)\nNo parser gets close to 100%, the benchmark is meant to be hard!\nOverall vs. Cost\nLlamaParse\nVLMs\nSpecialized Document Parsers\nLP Agentic\nLP Cost-Eff\nGemini (high)\nReducto (agentic)\nGemini (mini)\nReducto\nGPT-5.4\nAzure DI\nExtend\nHaku 4.5 (think)\nOpus 4.6\nGoogle DocAI\nGPT-mini (med)\nGemini Pro\nTexttract\nGPT-mini (mini)\nLandimgAI\nHaku 4.5\nOverall score  | No parser gets close to: 100%% | 표 없음\n[sl:274@900] The Accuracy-Cost-Latency Pareto Curve | The Accuracy-Cost-Latency Pareto Curve\n1. High Accuracy Regime: require ~99%+ accuracy, price insensitive\n* e.g. financial data room extraction\n2. Low Cost Regime: require 1M docs per day, accuracy above min threshold\n* e.g. offline indexing a petabyte of Sharepoint data for retrieval\n3. Low Latency/Low Cost Regime: require parsing massive volumes in seconds, price sensitive\n* e.g. real-time file uploads to Cowork\nVLM-based approaches are primarily good for latency-insensitive batch processing.\n | High Accuracy Regime accuracy: 99%%; Low Cost Regime volume: 1Mdocs per day | 표 없음\n[sl:274@1063] LiteParse: Fast, Free, Surprisingly Good Parsing | LiteParse: Fast, Free, Surprisingly Good Parsing\nIt is perfect as a default in the\nassistive agent loop:\n- Extremely fast over any set of\n  data\n- Good enough that the agent\n  can do text search\n- The agent can decide to\n  \"zoom-in\" with a VLM-based\n  OCR tool if it needs to do\n  deeper analysis.\nDrop a PDF here or click to browse\nPaste 14 page(s) in 0.03s\nOutput: JSON (with bounding boxes)\nWrap: On\nLlamaIndex - Redefine Document Workflows with AI Agents | Paste 14 page(s) in 0.03s: 14page(s); Paste 14 page(s) in 0.03s: 0.03ss | 표 없음\n[vd:274@25] And so today in 2026, we'll kind of talk about three main topics. One is, you know, what is RAG in 2026? Two, basically, that basically decomposes into an agent harness plus a context layer. So kind of going into the modern document context layer for agents, and giving you a little bit of sense of kind of some of the core capabilities today, especially unlocking, you know, the vast trove of document-based data today, and give you a glimpse of what's next.\n[vd:274@125] One is agent loops and tool use have gone a lot, a lot better, especially as both the models and agent harnesses have increased. And there's basically a cleaner separation now between agent reasoning and how they actually interact with context. If you look at what I call kind of the modern generalized agent, which includes, you know, all your favorite applications and tools out there from Cloud Code, Cloud Cowork, OpenClaw, Codex, and a few others, you know, the retrieval complexity has started\n[vd:274@400] It contains the document parsing layer, actually digitalizing the vast troves of PDFs, PowerPoints, and Word documents into kind of accurate, token-efficient context and feeding it, you know, either Markdown, metadata, and other forms to actually enable agents to do stuff over your documents. The next is actually what we call the semantic and storage layer, which is kind of like this concept of document management for humans and agents.\n[vd:274@425] Instead of humans opening up Microsoft Word using your file system or file storage, how do you create some sort of agent interface that actually captures, stores all your documents, and enables agents to actually manage and operate over them in various ways? And then there's still room for actually kind of repeatable document workflows that the agent layer, they can actually encode within the, within like this type of platform, too.\n[vd:274@450] If there is a repeatable workflow, like invoice processing, KYC, or claims, instead of always offloading it to a generalized agent, how do you actually develop some sort of specialized workflow for it and really carefully tune cost and accuracy to make sure that you achieve your goal? So, when we talk about like the concepts today, in terms of these three layers, we'll talk about this concept of document OCR, which is one of the core concepts of this track,\n[vd:274@700] And so for us, we really think about combining both the pipeline-based approaches of deeply understanding the file containers and binaries with the vision-based approaches to help generate, you know, kind of a hybrid approach that we think is at the Pareto frontier of cost and accuracy. A quick note on this, I'll probably just like skim the high level, but the Pareto frontier for document OCR will always be like much more accurate and cheap compared to the Pareto frontier for, you know,",
+    "title": "[한영자막] AI 에이전트를 위한 문서 컨텍스트 레이어 구축하는 법 — Jerry Liu, LlamaIndex",
+    "url": "https://www.youtube.com/watch?v=S-bRN-avZ4Q"
+   }
+  ],
+  "aliases": []
+ },
+ "expect": {
+  "action": "edit"
+ },
+ "note": "이슈 number(오류를 심음)"
+}

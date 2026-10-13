@@ -1,0 +1,91 @@
+{
+ "input": {
+  "plan": {
+   "rank": 5,
+   "angle": "장시간 작업과 기억 유지, Claude 동시 탑재",
+   "relation": {
+    "type": "follow_up",
+    "topic_id": "w40-gemini-4-argon"
+   }
+  },
+  "evidence": [
+   {
+    "id": "it:1149",
+    "source": "AI타임스",
+    "text": "[it:1149#s1] 구글 클라우드가 기업용 AI 통합 솔루션인 '제미나이 에이전트(Gemini agent)'를 공개하며 차세대 에이전트 시장 주도권 잡기에 나섰다.\n[it:1149#s2] 이번 발표는 단발성 질의응답을 처리하는 대화형 챗봇 단계를 넘어, 기업 내 실질적인 자율 수행 디지털 동료를 구축하려는 구글의 전략적 기조를 잘 보여준다.\n[it:1149#s3] 구글 클라우드는 8일(현지시간) 미국 샌프란시스코에서 '제미나이 앳 워크' 행사를 열고 제미나이 에이전트를 선보였다.\n[it:1149#s4] 순다르 피차이 구글 CEO는 \"제미나이는 현재 월간 활성 사용자(MAU) 수가 10억명이 넘으며, 포춘 100대 기업의 거의 90%가 업무용으로 제미나이 엔터프라이즈를 사용하고 있다\"고 밝혔다.\n[it:1149#s5] 이어 토마스 쿠리안 구글 클라우드 CEO는 새로운 에이전트를 소개하며 \"단순한 지시사항이 아닌 목표를 부여할 수 있다.\n[it:1149#s6] 작업에 가장 적합한 모델을 선택하고 비용 제어 기능이 내장돼 있으며, 기업이 필요로 하는 보안, 관리 및 거버넌스 기능을 갖췄다\"고 설명했다.\n[it:1149#s7] 이 제품의 차별점은 기업 내부의 영구적인 디지털 동료(Coworker Agent)로 기능한다는 점이다.\n[it:1149#s8] 에이전트는 전용 이메일 주소(@agents.company.com)와 지메일, 구글 캘린더, 드라이브 스토리지를 독립적으로 부여받아 동작한다.\n[it:1149#s9] 직원들은 지메일로 업무를 위임하거나 구글 챗 공간에 에이전트를 태그해 공동 작업을 진행할 수 있다.\n[it:1149#s10] 작업 수행 과정에서 발생하는 접근 권한은 팀이 공유한 영역으로 제한되며, AI가 작업을 수행하면 담당자가 아닌 에이전트 이름으로 독립적인 감사 추적 기록이 남는다.\n[it:1149#s11] 아키텍처 측면에서는 진행 중인 작업을 위한 세션 메모리, 축적된 지식을 위한 의미 메모리, 학습된 워크플로를 위한 절차 메모리, 이전 작업 이력을 저장하는 에피소드 메모리 등 4가지 범주의 메모리 시스템을 보유해 사용자가 동일한 맥락을 반복해서 설명할 필요를 없앴다.\n[it:1149#s12] 또 클라우드 환경에서 상시 동작하므로 사용자가 컴퓨터를 꺼도 며칠에 걸친 긴 작업을 중단 없이 자율 수행하며, 필요시 복잡한 임무를 분담할 임시 하위 에이전트(Sub-agent) 팀을 동적으로 생성해 제어한다.\n[it:1149#s13] 타사 모델을 전격 수용했다는 점도 주요 특징이다.\n[it:1149#s14] 자체 플래그십 모델인 '제미나이 4 아르곤'과 '제미나이 플래시 3.8' 외에도, 경쟁사인 앤트로픽의 '클로드 오퍼스 5'와 '클로드 소네트 5.5'를 제미나이 에이전트 플랫폼 내에서 이용할 수 있도록 오픈했다.\n[it:1149#s15] 이는 구글 제미나이 비즈니스 환경에 경쟁사 핵심 모델이 직접 통합되는 사례로, 구글은 이를 통해 기업 고객이 단일 플랫폼 안에서 자사 및 타사 모델을 유연하게 교체해 사용하도록 지원한다.\n[it:1149#s16] 또 지난달 30일 제한적으로 출시된 아르곤이 상용 제품에 탑재되는 사례도 이번이 처음이다.\n[it:1149#s17] 이를 통해 스마트 라우팅(Smart Routing) 기술로 복잡한 추론이 필요한 작업에는 최상위 모델을, 단순 반복 업무에는 경량 모델을 자동으로 연결함으로써 성능 최적화와 비용 절감을 유도한다는 의도다.\n[it:1149#s18] 기업의 도입 장벽인 보안과 비용, 운영 효율성을 통합 해결하는 데 초점을 맞췄다.\n[it:1149#s19] 에이전트 게이트웨이(Agent Gateway)를 통한 실시간 정책 적용과 격리된 에이전트 샌드박스(Agent Sandbox) 환경 내 작업 실행, 암호화 기반의 개별 신원 증명 기술을 적용해 보안 위협을 낮췄다.\n[it:1149#s20] 또 프로젝트 단위의 실시간 비용 상한선(Spend Cap) 설정 기능을 제공해 자율 에이전트의 예산 초과 리스크를 차단한다.\n[it:1149#s21] 나아가 비구조화 데이터를 원본 데이터 위치에서 직접 처리하는 스마트 스토리지를 지원하며 세일즈포스, 스노우플레이크, 빅쿼리 등 기업 핵심 시스템 및 MCP 서버와 연동된다.\n[it:1149#s22] 기존 제미나이 엔터프라이즈 및 워크스페이스 비즈니스 구독 고객에게 추가 비용 없이 에이전트 기능이 제공되는 점도 기업 시장 확장을 노린 핵심 전략이다.\n[it:1149#s23] 제미나이 에이전트는 8일부터 일부 고객을 대상으로 비공개 미리보기(Private Preview)로 제공되며, 조만간 전체 고객으로 확대될 예정이다.\n[it:1149#s24] 사용자는 웹과 모바일, 데스크톱은 물론 구글 워크스페이스, 마이크로소프트 365, 슬랙, 서비스나우 등 기존 업무 환경에서 별도 설정 없이 즉시 에이전트를 호출해 사용할 수 있다.\n[it:1149#s25] 한편, 빅테크 간 업무용 에이전트 시장 경쟁도 가열되고 있다.\n[it:1149#s26] 최근 마이크로소프트(MS)는 대화 지원과 업무 위임을 결합하고 상시 동작하는 '오토파일럿(Autopilot)' 에이전트를 포함한 코파일럿 업데이트를 공개했고, 오픈AI는 '닷츠' 에이전트와 협업 공간 '챗GPT 스페이스'를 선보였다.\n[it:1149#s27] 앤트로픽은 구글 워크스페이스 기본 편집 연동을 강화했으며, 스페이스XAI는 독립 컴퓨터 환경에서 작동하는 '그록 봇'과 '팀 봇'을 출시했다.\n[it:1149#s28] 이 중 MS가 코파일럿 플랫폼에서 자체 모델뿐만 아니라 다양한 타사 모델 지원과 자동 모델 선택(스마트 라우팅) 기능을 함께 선보인 데 이어, 이번에는 구글도 '클로드'를 수용하는 멀티모델 전략으로 맞불을 놨다.\n[it:1149#s29] 이처럼 양사는 업무용 생산성 생태계 안에서 타사 모델까지 유연하게 배치해 작업 난이도별 비용을 절감하고 성능을 최적화하는 멀티모델 오케스트레이션 전략을 차별화 포인트로 내세우고 있다.\n[it:1149#s30] 이처럼 기업용 AI 경쟁은 모델 성능 대결을 넘어, 직원의 업무 환경 깊숙이 침투해 다양한 AI 모델을 자유자재로 조율하는 '업무용 에이전트 플랫폼' 주도권 싸움으로 진화하는 양상이다.\n[it:1149#s31] 임대준 기자 ydj@aitimes.com",
+    "title": "구글, 기업용 '제미나이 에이전트' 출시…'아르곤'·'클로드' 동시 탑재",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=216096"
+   },
+   {
+    "id": "it:1381",
+    "source": "GeekNews",
+    "text": "[og:1381#q1] 원문: In the last year, nearly 500 Google Cloud customers each processed more than one trillion tokens.\n[og:1381#q1] (카드 수치, 위 원문에서 뽑음) 1년 내 1조 토큰 이상 처리한 Google Cloud 고객 수 [500]\n[og:1381#q1] (카드 수치, 위 원문에서 뽑음) 상기 고객들이 처리한 토큰량 [one trillion tokens]\n[og:1381#q2] 원문: Today, nearly 80% of all Google Cloud customers are using our AI products, and nearly 90% of the Fortune 100 use Gemini Enterprise.\n[og:1381#q2] (카드 수치, 위 원문에서 뽑음) AI 제품 사용 중인 Google Cloud 고객 비율 [80%]\n[og:1381#q2] (카드 수치, 위 원문에서 뽑음) Gemini Enterprise 사용 중인 Fortune 100 기업 비율 [90%]\n[og:1381#q3] 원문: today we are excited to announce the Gemini agent: your new single, universal agent for work.\n[og:1381#q4] 원문: It plans the work, uses skills and tools, connects to your systems, and brings back something finished — inside the documents, the inbox, and the developer environments you already work in.\n[og:1381#q5] 원문: It runs in the cloud, meaning it maintains a single set of memories, context, and one personalization graph no matter what device or channel you access it on.\n[og:1381#q6] 원문: Work that takes hours or days keeps running after you close your laptop, and it is still there when you come back.\n[og:1381#q7] 원문: At that kind of scale, organizations have moved past experimentation and are running their business on it.\n[it:1381#s1] Welcome to Gemini at Work 2026: Introducing the Gemini agent\n[it:1381#s2] Thomas Kurian\n[it:1381#s3] CEO, Google Cloud\n[it:1381#s4] Editor’s note: This article is adapted from Thomas Kurian’s keynote address at Gemini at Work 2026.\n[it:1381#s5] It includes a number of announcements:\n[it:1381#s6] - Gemini, a single, universal agent for work that answers your questions, handles your knowledge work, creates your images and media, and writes and runs code.\n[it:1381#s7] - Inline in Workspace, Gemini works directly inside Gmail, Drive, Docs, Slides, Sheets, Chat, and Calendar, carrying the same memory, skills, and controls it has everywhere else.\n[it:1381#s8] - New data and analytics skills that allow both technical teams and everyday business users to use plain-language questions to get to actionable operational insights in minutes.\n[it:1381#s9] - Industry-specific specialization with tools, skills, connectors and knowledge specific for financial services and legal teams.\n[it:1381#s10] - How we secure and govern agents through identity and policy management, authorization and permission controls, secure sandboxing, network gateways, and more.\n[it:1381#s11] - Leading cost controls through multi-model orchestration, Smart Routing, real-time spend caps, and more.\n[it:1381#s12] - Customer use cases that showcase the breadth and depth of our customers around the world.\n[it:1381#s13] Bringing the best technology to all of you is what drives us at Google Cloud.\n[it:1381#s14] In the last year, nearly 500 Google Cloud customers each processed more than one trillion tokens.\n[it:1381#s15] Today, nearly 80% of all Google Cloud customers are using our AI products, and nearly 90% of the Fortune 100 use Gemini Enterprise.\n[it:1381#s16] At that kind of scale, organizations have moved past experimentation and are running their business on it.\n[it:1381#s17] Work now starts in the prompt window.\n[it:1381#s18] To meet this moment, today we are excited to announce the Gemini agent: your new single, universal agent for work.\n[it:1381#s19] It has all of your business context and can be used for everything from knowledge work to answering questions, and from content creation to coding, all from a single prompt box.\n[it:1381#s20] It plans the work, uses skills and tools, connects to your systems, and brings back something finished — inside the documents, the inbox, and the developer environments you already work in.\n[it:1381#s21] It chooses the best model for the job, has built-in cost controls, and most importantly, has the security, administration, and governance required by your company.\n[it:1381#s22] The Gemini agent is your new single, universal agent for work.\n[it:1381#s23] Introducing the Gemini agent\n[it:1381#s24] Gemini answers your questions, handles your knowledge work, creates your images and media, and writes and runs code — all in a single agent and a single API.\n[it:1381#s25] You give it objectives, not instructions.\n[it:1381#s26] You delegate an outcome and come back to finished work.\n[it:1381#s27] For an agent to do that, it has to be connected to your personal workflows, your systems of record, and your enterprise controls.\n[it:1381#s28] Gemini can function as your personal assistant or as a team member, where it works on behalf of a group of people, like a project manager within a team, or on behalf of a specific role in an organization, like an analyst in your finance department.\n[it:1381#s29] The agentic capabilities in Gemini are built around core architectural principles:\n[it:1381#s30] - Unified agent: Gemini is an agent that can answer your questions when you chat with it, work autonomously to complete objectives you assign it, and generate code — all from a single interface.\n[it:1381#s31] You can assign it work, schedule tasks that need to be completed, or have it respond to events.\n[it:1381#s32] - Omnipresent access: Gemini can be accessed from any device including web, iOS and Android mobile devices, Windows and Mac desktops, and any channel (command line, Google Workspace, Microsoft 365, or Slack).\n[it:1381#s33] It can also be integrated into third-party applications and surfaces and operates as a headless agent, meaning it does not need a dedicated user interface.\n[it:1381#s34] - Persistent execution: It runs in the cloud, meaning it maintains a single set of memories, context, and one personalization graph no matter what device or channel you access it on.\n[it:1381#s35] You never have to re-brief it or wonder which machine you told it to do something on.\n[it:1381#s36] Work that takes hours or days keeps running after you close your laptop, and it is still there when you come back.\n[it:1381#s37] - Multi-agent orchestration: Gemini doesn’t work alone.\n[it:1381#s38] It can dynamically create a roster of sub-agents — temporary, job-specific agents, each with their own identity — to tackle multi-step tasks.\n[it:1381#s39] Gemini can communicate with these sub-agents to coordinate workflows, including parallel and sequential steps that can run for hours or days.\n[it:1381#s40] In addition, Gemini can act as a coworker agent — which is more like a team member, with a persistent, defined role and operational presence across days, sessions, and multiple changing responsibilities — and delegate and coordinate tasks.\n[it:1381#s41] Coworker agents have dedicated identities including their own @agents.company.com emails, their own persistent storage, and only have access to the context that you or your team members provide.\n[it:1381#s42] - Deeply contextual: Gemini arrives already knowing your tools, data, and work history.\n[it:1381#s43] Whether you ask it a question, assign it an objective, or have it generate code, Gemini learns from every interaction with you.\n[it:1381#s44] The longer you collaborate with it, the better it understands you and how you work.\n[it:1381#s45] Teams can create dedicated projects to further optimize the context, skills, and tools Gemini uses when it works with you.\n[it:1381#s46] - Model choice flexibility: Gemini is the agent, and the model underneath it is a separate choice.\n[it:1381#s47] It runs each job on the model that fits best — orchestrating across our Gemini family of models and Claude models from Anthropic today, and other leading private and open models in the future — to deliver optimal quality and lower your costs.\n[it:1381#s48] The best model for the task is not always the largest one.\n[it:1381#s49] Matching the model to the work raises accuracy on the difficult jobs and lowers cost on the simple ones.\n[it:1381#s50] And the leading model changes every few months, so keeping that choice open means your context, your skills, and your data stay put when it does.",
+    "title": "구글, 업무용 Gemini 에이전트 발표 — 장시간 작업과 기억 유지, Claude 지원",
+    "url": "https://cloud.google.com/blog/products/ai-machine-learning/welcome-to-gemini-at-work-2026"
+   }
+  ],
+  "previous": {
+   "topic_id": "w40-gemini-4-argon",
+   "title": "Gemini 4 Argon: 에이전트 작업 강화와 출시 기념 가격 구조",
+   "summary": "구글이 출력 토큰 한도 1백만 개와 출시 기념 특가(입력 2달러, 출력 10달러)를 갖춘 Gemini 4 Argon을 Fairwind 프로그램으로 제한 출시했다. 쟁점은 벤치마크 13개 부문 정상에도 일반 API 접근이 제한된 점이다.",
+   "headings": [
+    "출력 토큰 한도 1백만 개로 확장, 단일 트래잭션 장기 추론 지원",
+    "출시 기념 특가: 입력 2달러, 출력 10달러, 캐시 95% 할인",
+    "에이전트 작업 강화: 양자 최적화 40% 개선, 메모리 300 TiB 확보",
+    "제한적 출시: Fairwind 프로그램과 미국 정부 사전 평가 절차",
+    "벤치마크 13개 부문 정상, AAII 종합 53점으로 공동 3위권"
+   ]
+  },
+  "aliases": [
+   {
+    "canonical": "Claude Sonnet 5.5",
+    "aliases": [
+     "클로드 소네트 5.5"
+    ]
+   }
+  ],
+  "limits": {
+   "sections": [
+    4,
+    7
+   ],
+   "paragraphs_per_section": [
+    1,
+    2
+   ],
+   "paragraph_sentences_max": 4,
+   "paragraph_chars_max": 320,
+   "summary_sentences": [
+    1,
+    2
+   ],
+   "summary_chars_max": 200,
+   "heading_chars_max": 70,
+   "head_tiles_max": 4,
+   "tiles_per_section": [
+    2,
+    3
+   ],
+   "visuals_max": 4,
+   "bars_items": [
+    2,
+    6
+   ],
+   "table_rows": [
+    2,
+    6
+   ],
+   "table_cols": [
+    2,
+    4
+   ],
+   "slides_max": 2,
+   "video_secs_max": 3,
+   "max_refs_per_paragraph": 4
+  },
+  "slide_candidates": [],
+  "no_visuals": false
+ },
+ "expect": {},
+ "note": "2026-W41 실제 토픽 입력(run 20261013-205302-weekly-b981)"
+}

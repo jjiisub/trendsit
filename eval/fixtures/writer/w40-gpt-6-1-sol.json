@@ -1,0 +1,119 @@
+{
+ "input": {
+  "plan": {
+   "rank": 1,
+   "angle": "Astra급 지능을 5분의 1 가격으로 제공하며 캐시 입력 비용 절감 폭",
+   "relation": {
+    "type": "new",
+    "topic_id": null
+   }
+  },
+  "evidence": [
+   {
+    "id": "it:8",
+    "source": "OpenAI News",
+    "text": "[it:8#s1] Near-Astra intelligence for a fifth of the price\n[it:8#s2] We’re introducing GPT-6.1 Sol, an upgrade to GPT-6 Sol that nearly matches GPT-6 Astra’s intelligence on agentic coding, computer use, and professional work at one-fifth of Astra’s standard input and output token prices.\n[it:8#s3] Cached input costs just $0.10 per million tokens—95% less than standard input pricing and 50% less than GPT-6 Sol’s cached input pricing—giving developers more room to build and run capable agents that reuse context across requests.\n[it:8#s4] - GPT-6Astra Our most intelligent model for the best results.\n[it:8#s5] - input\n[it:8#s6] - $10.00\n[it:8#s7] - output\n[it:8#s8] - $50.00\n[it:8#s9] - cached input\n[it:8#s10] - $1.00\n[it:8#s11] - GPT-6.1Sol Near-Astra intelligence for a fifth of the price.\n[it:8#s12] - input\n[it:8#s13] - $2.00\n[it:8#s14] - output\n[it:8#s15] - $10.00\n[it:8#s16] - cached input\n[it:8#s17] - $0.10\n[it:8#s18] - GPT-6Luna Fast and efficient everyday work at scale.\n[it:8#s19] - input\n[it:8#s20] - $0.10\n[it:8#s21] - output\n[it:8#s22] - $0.50\n[it:8#s23] - cached input\n[it:8#s24] - $0.01\n[it:8#s25] A more capable Sol across tasks\n[it:8#s26] GPT-6.1 Sol offers a new balance of capability and cost for important everyday work.\n[it:8#s27] It delivers substantial improvements over GPT-6 Sol across complex professional tasks, from writing and debugging code to understanding documents and executing multi-step business workflows.\n[it:8#s28] On several of these evaluations, it approaches GPT-6 Astra’s performance at substantially lower cost.\n[it:8#s29] Coding\n[it:8#s30] On DeepSWE v1.1, which evaluates complex software-engineering tasks in real codebases, GPT-6.1 Sol matches GPT-6 Astra at roughly one-fifth of the cost, while eclipsing GPT-6 Sol’s best score by 6.4 percentage points at a lower reasoning effort and cost.\n[it:8#s31] Professional work\n[it:8#s32] On GDP.pdf, which measures how accurately models answer professional questions using complex PDF documents, including tables, charts, diagrams, and fine-print details, GPT-6.1 Sol scores higher than Opus 5.5 with fallbacks at less than half the cost per task across the tested reasoning settings.\n[it:8#s33] It also approaches GPT-6 Astra’s state-of-the-art performance at roughly one-fifth the cost per task.\n[it:8#s34] On AutomationBench, which measures whether agents correctly complete multi-step business workflows, GPT-6.1 Sol scores 2.2 percentage points above Opus 5.5 at medium reasoning effort, at roughly a third of the cost.\n[it:8#s35] That score is also up 4.8 percentage points from GPT-6 Sol at the same setting.\n[it:8#s36] Computer use\n[it:8#s37] GPT-6.1 Sol also makes substantial progress on tasks that require interacting with computer applications.\n[it:8#s38] On OSWorld 2.0’s offline set, which evaluates agents on demanding computer-use workflows, GPT-6.1 Sol outperforms GPT-6 Sol by seven percentage points at maximum reasoning effort at less than half the cost.\n[it:8#s39] It comes within 2.1 percentage points of Astra’s score at maximum reasoning effort at roughly one-seventh the cost per task.\n[it:8#s40] Scientific research\n[it:8#s41] On Terminal-Bench Science 0.1, which evaluates scientific workflows including data analysis, simulation, and theorem proving, GPT-6.1 Sol more than doubles GPT-6 Sol’s score at maximum reasoning effort at less than half the cost per task.\n[it:8#s42] At maximum effort, GPT-6.1 Sol costs $5.47 per task on average, compared with $23.21 for Opus 5.5 and $23.80 for Astra, delivering substantial scientific capability at over 75% lower cost than either model.\n[it:8#s43] GPT-6 Astra still achieves the highest score among the models tested at 68.1%, and should be used for the most difficult scientific research tasks.\n[it:8#s44] Factuality\n[it:8#s45] GPT-6.1 Sol also improves factual accuracy on difficult prompts.\n[it:8#s46] Its largest factuality improvement over GPT-6 Sol comes at low reasoning effort, where it reduces the share of responses containing a factual error from 11.4% to 7.7%—a reduction of approximately 32%.\n[it:8#s47] Across the tested reasoning settings, its error rate remains within 1.9 percentage points of GPT-6 Astra’s, at less than one-fifth the cost per task.\n[it:8#s48] This evaluation measures the share of answers containing at least one factual error on de-identified conversations where users flagged an earlier model’s error.\n[it:8#s49] These deliberately difficult prompts are not representative of typical usage.\n[it:8#s50] Deploying GPT-6.1 Sol safely\n[it:8#s51] GPT-6.1 Sol shows substantial improvements over GPT-6 Sol in our alignment evaluations, bringing it closer to GPT-6 Astra.\n[it:8#s52] GPT-6.1 Sol is more transparent about its limitations and more reliable at respecting user intent and safety constraints.\n[it:8#s53] In challenging evaluations, it shows lower failure rates than GPT-6 Sol on transparency about broken search tools, respecting explicit restrictions, and avoiding unauthorized outcomes during agentic tasks.\n[it:8#s54] We observed no attempts to bypass an automated safety reviewer, matching GPT-6 Astra and GPT-6 Sol.\n[it:8#s55] Full details can be found in the GPT-6.1 Sol system card addendum(opens in a new window).\n[it:8#s56] The evaluations below deliberately test challenging situations and do not measure failure rates in typical use.\n[it:8#s57] Pricing and availability\n[it:8#s58] GPT-6.1 Sol is available starting today to all Plus, Pro, Business, Enterprise, and Edu users in ChatGPT Work and Codex.\n[it:8#s59] GPT-6.1 Sol is not yet available in Chat.\n[it:8#s60] Developers can also access it through the OpenAI API as gpt-6.1-sol.\n[it:8#s61] Its standard API prices are $2 per million input tokens, $0.10 per million cached input tokens, and $10 per million output tokens.\n[it:8#s62] In the coming days, we’ll also offer GPT-6.1 Sol Ultrafast, with up to 8x faster token generation compared to its standard speed in Codex.\n[it:8#s63] Author\n[it:8#s64] Evaluations of GPT were performed in our research environment or via our API, which may provide slightly different output from production ChatGPT due to differences in the system prompts, tools available, efforts, etc.\n[it:8#s65] Evaluations of competitor models were taken from publicly available reports.",
+    "title": "Introducing GPT-6.1 Sol",
+    "url": "https://openai.com/index/introducing-gpt-6-1-sol"
+   },
+   {
+    "id": "it:895",
+    "source": "AI타임스",
+    "text": "[it:895#s1] 오픈AI가 최상위 플래그십 모델 성능에 근접하면서도 비용을 획기적으로 낮춘 업그레이드 모델 'GPT-6.1 솔(Sol)'을 출시했다.\n[it:895#s2] 샘 알트먼 오픈AI CEO는 29일(현지시간) 샌프란시스코에서 열린 '데브데이 2026' 행사를 통해 새로운 모델을 공개했다.\n[it:895#s3] GPT-6.1 솔은 개발자와 기업 사용자를 겨냥해 에이전트 기반 코딩, 복잡한 문서 분석, 컴퓨터 활용 및 장기 업무 자동화에 특화된 기능을 대폭 강화했다.\n[it:895#s4] 그는 \"우리의 목표는 개발자와 기업이 예산 걱정 없이 가장 유능한 AI 에이전트를 마음껏 구축할 수 있도록 돕는 것\"이라며, 최상위 모델인 아스트라급의 지능을 5분의 1 가격에 제공함으로써 비용 때문에 프런티어 모델 도입을 망설였던 사용자들에게 완전히 새로운 기회를 열어줄 것\"이라고 말했다.\n[it:895#s5] 또 \"반복적 추론과 연속적인 작업이 필요한 멀티스텝 에이전트 시스템에서는 토큰 단가가 무엇보다 중요하다\"며, 이를 통해 개발자들이 동일한 예산으로 훨씬 길고 복잡한 실무 자동화 워크플로우를 구현할 수 있게 되었다고 설명했다.\n[it:895#s6] 실제로 API 이용료는 표준 입력 100만 토큰당 2달러(약 2700원), 출력 100만 토큰당 10달러(약 1만3500원) 수준이다.\n[it:895#s7] 컨텍스트 재사용 시 적용되는 캐시 입력 가격은 100만 토큰당 0.1달러(약 135원)에 불과해, 반복적 요청이 필수적인 AI 에이전트 워크로드 실행 비용을 기존 대비 최고 95%까지 축소했다.\n[it:895#s8] 다만 복잡한 멀티스텝 작업 처리 과정에서 기존 'GPT-6 솔' 대비 출력 토큰을 약간 더 많이 소비하는 특성을 보인다.\n[it:895#s9] 주요 기술 벤치마크에서도 비용 대비 뛰어난 성능 향상이 증명됐다.\n[it:895#s10] 실제 코드베이스 해결 역량을 평가하는 '딥SWE v1.1' 벤치마크에서 5분의 1 비용으로 GPT-6 아스트라와 대등한 점수를 기록했으며, 기존 GPT-6 솔 대비 최고 점수를 6.4%포인트 끌어올렸다.\n[it:895#s11] 복잡한 금융·법률·의료 PDF 문서를 해석하는 'GDP.pdf' 평가에서는 경쟁 모델인 '클로드 오퍼스 5.5'보다 높은 점수를 기록하는 동시에 작업당 처리 비용을 절반 미만으로 줄였다.\n[it:895#s12] 비즈니스 자동화와 실시간 도구 제어 분야에서도 성과를 보였다.\n[it:895#s13] 47개 비즈니스 도구를 활용해 멀티스텝 업무를 평가하는 '오토메이션벤치(AutomationBench) 1.0.6'에서 오퍼스 5.5를 2.2%P 제쳤다.\n[it:895#s14] OS 복합 작동 환경을 측정하는 'OS월드 2.0' 오프라인 세트에서는 아스트라와의 성능 격차를 2.1%P까지 줄이면서 작업당 비용은 7분의 1 수준에 맞췄다.\n[it:895#s15] 사실 정확성 평가에서도 최고 추론 설정 기준 오류율 4.1%를 나타내며 아스트라(4.0%)에 맞먹는 신뢰성을 갖췄다.\n[it:895#s16] 데이터 분석 및 과학 연구 워크플로우를 다루는 '터미널벤치 사이언스(Terminal-Bench Science) 0.1' 평가에서는 작업당 평균 5.47달러의 비용으로 기존 'GPT-6 솔' 대비 2배 이상의 성과를 냈으나, 고난도 연구 작업 영역에서는 GPT-6 아스트라(68.1%, 작업당 23.8달러)가 우위를 유지했다.\n[it:895#s17] 안전성 및 정렬(Alignment) 부문도 개선됐다.\n[it:895#s18] 에이전트 작동 중 검색 도구가 정지했을 때 억지로 환각 답변을 생성하지 않고 사용자에게 문제를 알리는 실패율이 2.1%로, 이전 버전(4.9%)보다 낮아지며 한계 상황에 대한 투명성도 높아졌다.\n[it:895#s19] GPT-6.1 Sol replaces GPT-6 Sol after just 7 days.\n[it:895#s20] It scores 1 point below GPT-6 Astra in the Intelligence Index at less than one quarter of the Cost per Task\n[it:895#s21] Pricing matches GPT-6 Sol at $2/$10 per million input/output tokens, except that the cache read discount rises from 90%… pic.twitter.com/LcuAxgLSBj\n[it:895#s22] — Artificial Analysis (@ArtificialAnlys) September 29, 2026\n[it:895#s23] 아티피셜 애널리시스 인텔리전스 지수(AAII)에서 52점을 기록해 GPT-6 아스트라(53점)보다 지능은 소폭 낮다.\n[it:895#s24] 전체적으로는 오퍼스 5.5(58점)과 소네트 5.5(56점), 페이블 5.1(53점) 등에 이어 5위를 기록했다.\n[it:895#s25] 다만 이전 버전(48점)보다는 4점이나 올랐다.\n[it:895#s26] 오픈AI는 이와 함께 초당 300토큰 이상의 응답 속도를 내는 'GPT-6.1 솔 울트라패스트(Ultrafast)' 등급의 향후 출시 계획도 함께 예고했다.\n[it:895#s27] 이는 대규모 챗봇이나 실시간 인터랙션이 요구되는 엔터프라이즈 환경에서 지연 시간을 대폭 줄여줄 전망이다.\n[it:895#s28] 또 이번에 공개된 플랫폼 '닷(Dot)'과의 연동을 통해 전용 클라우드 컴퓨터에서 상시 가동되는 AI 에이전트를 손쉽게 배포할 수 있는 환경도 함께 구축했다.\n[it:895#s29] 기술 커뮤니티의 초기 반응은 성능과 가격 면에서 시각이 엇갈리고 있다.\n[it:895#s30] 개발자들은 캐시 토큰 할인을 바탕으로 한 에이전트 구축 가성비에 호평을 보내며, 멀티 에이전트 시스템을 대규모로 운용할 때 나타날 비용 절감 효과에 주목했다.\n[it:895#s31] 반면 일부에서는 순수 과학 및 극고난도 연구 영역에서는 아스트라가 여전히 앞서고 있다는 점이나 출력 토큰량이 미세하게 늘어난 점을 지적하며, 이전 GPT-6 솔에서 명칭만 바뀐 마이너 업데이트가 아니냐는 반응을 드러내기도 했다.\n[it:895#s32] GPT-6.1 솔은 현재 일반 챗GPT 서비스가 아닌 '챗GPT 워크'와 '코덱스' 환경, 그리고 오픈AI API(gpt-6.1-sol)를 통해 개발자 및 기업 사용자를 대상으로 제공된다.\n[it:895#s33] 한편, 오픈AI는 당초 이번 데브데이에서 최상위 모델인 'GPT-6.1 아스트라'를 함께 선보이고 10월 중 출시할 예정이었으나, 출시 직전 기만 행동 및 무단 접근 등 에이전트 안전 문제로 출시를 전격 철회·연기함에 따라 효율성을 앞세운 GPT-6.1 솔을 데브데이의 핵심 카드로 제시하게 됐다.\n[it:895#s34] 이와 관련, 알트먼 CEO는 CNBC와의 인터뷰에서 GPT-6.1 아스트라 출시 포기 결정은 ”정상적인 절차”에 해당한다며 ”앞으로 훌륭한 새 모델들을 많이 선보일 것”이라고 말했다.\n[it:895#s35] 임대준 기자 ydj@aitimes.com",
+    "title": "\"아스트라급 지능을 5분의 1 가격에\"…오픈AI, 'GPT-6.1 솔' 공개",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=215778"
+   },
+   {
+    "id": "it:981",
+    "source": "GeekNews",
+    "text": "[og:981#q1] 원문: GPT-6 Sol의 업그레이드 모델인 GPT-6.1 Sol을 소개합니다. 에이전틱 코딩, 컴퓨터 사용 및 전문 업무에서 GPT-6 Astra에 가까운 지능을 제공하면서도 Astra의 표준 입력 및 출력 토큰 가격의 5분의 1 수준으로 이용할 수 있습니다.\n[og:981#q1] (카드 수치, 위 원문에서 뽑음) Astra 대비 표준 입력·출력 토큰 가격 수준 [5분의 1]\n[og:981#q2] 원문: 캐시된 입력은 100만 토큰당 $0.10에 불과해 표준 입력 가격보다 95%, GPT-6 Sol의 캐시된 입력 가격보다 50% 저렴합니다.\n[og:981#q2] (카드 수치, 위 원문에서 뽑음) 캐시된 입력 가격 [$0.10 100만 토큰당]\n[og:981#q2] (카드 수치, 위 원문에서 뽑음) 표준 입력 가격 대비 절감률 [95%]\n[og:981#q2] (카드 수치, 위 원문에서 뽑음) GPT-6 Sol 캐시된 입력 가격 대비 절감률 [50%]\n[og:981#q3] 원문: 실제 코드베이스에서 복잡한 소프트웨어 엔지니어링 작업을 평가하는 DeepSWE v1.1에서 GPT-6.1 Sol은 약 5분의 1 비용으로 GPT-6 Astra와 대등한 성능을 보입니다.\n[og:981#q3] (카드 수치, 위 원문에서 뽑음) DeepSWE v1.1에서 Astra 대비 비용 수준 [5분의 1]\n[og:981#q4] 원문: 고난도 컴퓨터 사용 워크플로에서 에이전트를 평가하는 OSWorld 2.0의 오프라인 세트에서 GPT-6.1 Sol은 최대 추론 강도 설정으로 GPT-6 Sol보다 7%포인트 높은 성능을 보이면서도 비용은 절반 미만입니다.\n[og:981#q4] (카드 수치, 위 원문에서 뽑음) OSWorld 2.0에서 GPT-6 Sol 대비 성능 향상 [7%포인트]\n[og:981#q5] 원문: GPT-6.1 Sol은 오늘부터 모든 Plus, Pro, Business, Enterprise 및 Edu 사용자가 ChatGPT Work와 Codex에서 이용할 수 있습니다.\n[og:981#q6] 원문: 표준 API 가격은 입력 토큰 100만 개당 $2, 캐시된 입력 토큰 100만 개당 $0.10, 출력 토큰 100만 개당 $10입니다.\n[it:981#s1] Astra에 가까운 지능을 5분의 1 가격으로\n[it:981#s2] GPT-6 Sol의 업그레이드 모델인 GPT-6.1 Sol을 소개합니다.\n[it:981#s3] 에이전틱 코딩, 컴퓨터 사용 및 전문 업무에서 GPT-6 Astra에 가까운 지능을 제공하면서도 Astra의 표준 입력 및 출력 토큰 가격의 5분의 1 수준으로 이용할 수 있습니다.\n[it:981#s4] 캐시된 입력은 100만 토큰당 $0.10에 불과해 표준 입력 가격보다 95%, GPT-6 Sol의 캐시된 입력 가격보다 50% 저렴합니다.\n[it:981#s5] 따라서 개발자는 요청 간 컨텍스트를 재사용하는 성능이 뛰어난 에이전트를 더욱 자유롭게 구축하고 운영할 수 있습니다.\n[it:981#s6] - GPT-6Astra 최상의 결과를 위한 가장 지능적인 모델.\n[it:981#s7] - 입력\n[it:981#s8] - US$10.00\n[it:981#s9] - 출력\n[it:981#s10] - US$50.00\n[it:981#s11] - 캐시된 입력\n[it:981#s12] - US$1.00\n[it:981#s13] - GPT-6.1Sol Astra에 버금가는 지능을 5분의 1 가격으로.\n[it:981#s14] - 입력\n[it:981#s15] - US$2.00\n[it:981#s16] - 출력\n[it:981#s17] - US$10.00\n[it:981#s18] - 캐시된 입력\n[it:981#s19] - US$0.10\n[it:981#s20] - GPT-6Luna 대규모 일상 업무도 빠르고 효율적으로.\n[it:981#s21] - 입력\n[it:981#s22] - US$0.10\n[it:981#s23] - 출력\n[it:981#s24] - US$0.50\n[it:981#s25] - 캐시된 입력\n[it:981#s26] - US$0.01\n[it:981#s27] 다양한 작업에서 더 강력해진 Sol\n[it:981#s28] GPT-6.1 Sol은 중요한 일상 업무에서 성능과 비용의 새로운 균형을 제공합니다.\n[it:981#s29] 코드 작성과 디버깅부터 문서 이해, 다단계 비즈니스 워크플로 실행에 이르기까지 복잡한 전문 업무 전반에서 GPT-6 Sol보다 크게 향상된 성능을 제공합니다.\n[it:981#s30] 이러한 평가 중 여러 항목에서 훨씬 낮은 비용으로 GPT-6 Astra에 가까운 성능을 보여줍니다.\n[it:981#s31] 코딩\n[it:981#s32] 실제 코드베이스에서 복잡한 소프트웨어 엔지니어링 작업을 평가하는 DeepSWE v1.1에서 GPT-6.1 Sol은 약 5분의 1 비용으로 GPT-6 Astra와 대등한 성능을 보입니다.\n[it:981#s33] 또한 더 낮은 추론 강도와 비용으로 GPT-6 Sol의 최고 점수를 6.4%포인트 웃돕니다.\n[it:981#s34] 전문 업무\n[it:981#s35] GDP.pdf는 표, 차트, 도표, 작은 글씨로 된 세부 사항 등이 포함된 복잡한 PDF 문서를 활용해 모델이 전문적인 질문에 얼마나 정확하게 답하는지 측정합니다.\n[it:981#s36] 이 평가에서 GPT-6.1 Sol은 테스트한 추론 설정 전반에 걸쳐 폴백을 사용하는 Opus 5.5보다 높은 점수를 기록하면서도 작업당 비용은 절반 미만입니다.\n[it:981#s37] 또한 작업당 비용은 약 5분의 1이면서 GPT-6 Astra의 최첨단 성능에 근접합니다.\n[it:981#s38] 에이전트가 다단계 비즈니스 워크플로를 올바르게 완료하는지 측정하는 AutomationBench에서 GPT-6.1 Sol은 중간 추론 강도 설정으로 Opus 5.5보다 2.2%포인트 높은 점수를 기록하며, 비용은 약 3분의 1입니다.\n[it:981#s39] 이는 같은 설정의 GPT-6 Sol보다도 4.8%포인트 높은 점수입니다.\n[it:981#s40] 컴퓨터 사용\n[it:981#s41] GPT-6.1 Sol은 컴퓨터 애플리케이션과 상호작용해야 하는 작업에서도 상당한 진전을 보입니다.\n[it:981#s42] 고난도 컴퓨터 사용 워크플로에서 에이전트를 평가하는 OSWorld 2.0의 오프라인 세트에서 GPT-6.1 Sol은 최대 추론 강도 설정으로 GPT-6 Sol보다 7%포인트 높은 성능을 보이면서도 비용은 절반 미만입니다.\n[it:981#s43] 최대 추론 강도 설정에서 Astra와의 점수 차이는 2.1%포인트에 불과하며, 작업당 비용은 약 7분의 1입니다.\n[it:981#s44] 과학 연구\n[it:981#s45] 데이터 분석, 시뮬레이션, 정리 증명 등의 과학 워크플로를 평가하는 Terminal-Bench Science 0.1에서 GPT-6.1 Sol은 최대 추론 강도 설정으로 GPT-6 Sol 점수의 2배 이상을 기록하면서도 작업당 비용은 절반 미만입니다.\n[it:981#s46] 최대 추론 강도에서 GPT-6.1 Sol의 평균 작업당 비용은 $5.47입니다.\n[it:981#s47] Opus 5.5의 $23.21, Astra의 $23.80과 비교하면 두 모델보다 75% 이상 낮은 비용으로 뛰어난 과학 연구 역량을 제공합니다.\n[it:981#s48] GPT-6 Astra는 여전히 테스트한 모델 중 가장 높은 68.1%를 기록하므로, 가장 어려운 과학 연구 작업에는 GPT-6 Astra를 사용하는 것이 좋습니다.\n[it:981#s49] 사실 정확성\n[it:981#s50] GPT-6.1 Sol은 까다로운 프롬프트에 대한 사실 정확성도 향상되었습니다.\n[it:981#s51] GPT-6 Sol 대비 사실 정확성이 가장 크게 개선된 것은 낮은 추론 강도에서였으며, 사실 오류가 포함된 응답의 비율을 11.4%에서 7.7%로 낮춰 약 32% 줄였습니다.\n[it:981#s52] 테스트한 모든 추론 설정에서 오류율은 GPT-6 Astra와의 차이가 1.9%포인트 이내로 유지되었으며, 작업당 비용은 GPT-6 Astra의 5분의 1 미만입니다.\n[it:981#s53] 이 평가는 사용자가 이전 모델의 오류를 신고한 대화를 비식별화하여, 사실 오류가 하나 이상 포함된 답변의 비율을 측정합니다.\n[it:981#s54] 의도적으로 난도를 높인 이러한 프롬프트는 일반적인 사용 환경을 대표하지 않습니다.\n[it:981#s55] GPT-6.1 Sol의 안전한 배포\n[it:981#s56] GPT-6.1 Sol은 OpenAI의 정렬 평가에서 GPT-6 Sol보다 크게 개선된 모습을 보이며 GPT-6 Astra에 더 근접했습니다.\n[it:981#s57] GPT-6.1 Sol은 자신의 한계를 더 투명하게 밝히고 사용자 의도와 안전 제약을 더욱 안정적으로 준수합니다.\n[it:981#s58] 까다로운 평가에서 검색 도구가 작동하지 않는 경우 이를 투명하게 알리고, 명시적인 제한을 준수하며, 에이전틱 작업 중 승인되지 않은 결과를 방지하는 항목에서 GPT-6 Sol보다 낮은 실패율을 보였습니다.\n[it:981#s59] GPT-6 Astra 및 GPT-6 Sol과 마찬가지로 자동화된 안전 검토 시스템을 우회하려는 시도는 관찰되지 않았습니다.\n[it:981#s60] 자세한 내용은 GPT-6.1 Sol 시스템 카드 부록(새 창에서 열기)에서 확인할 수 있습니다.\n[it:981#s61] 아래 평가는 의도적으로 까다로운 상황을 테스트한 것으로, 일반적인 사용 환경에서의 실패율을 측정한 것이 아닙니다.\n[it:981#s62] 가격 및 이용 안내\n[it:981#s63] GPT-6.1 Sol은 오늘부터 모든 Plus, Pro, Business, Enterprise 및 Edu 사용자가 ChatGPT Work와 Codex에서 이용할 수 있습니다.\n[it:981#s64] GPT-6.1 Sol은 아직 Chat에서는 이용할 수 없습니다.\n[it:981#s65] 개발자는 OpenAI API에서도 gpt-6.1-sol로 이용할 수 있습니다.\n[it:981#s66] 표준 API 가격은 입력 토큰 100만 개당 $2, 캐시된 입력 토큰 100만 개당 $0.10, 출력 토큰 100만 개당 $10입니다.\n[it:981#s67] 며칠 내로 Codex에서 표준 속도보다 최대 8배 빠르게 토큰을 생성하는 GPT-6.1 Sol Ultrafast도 제공할 예정입니다.",
+    "title": "OpenAI, GPT-6.1 Sol 공개",
+    "url": "https://openai.com/ko-KR/index/introducing-gpt-6-1-sol/"
+   },
+   {
+    "id": "it:158",
+    "source": "Simon Willison's Weblog",
+    "text": "[it:158#s1] 29th September 2026\n[it:158#s2] I'm a bit late with the pelicans because I was live-blogging the keynote: https://simonwillison.net/2026/Sep/29/openai-devday-2026-liv...\n[it:158#s3] Here they are for GPT-6.1-Sol: https://tools.simonwillison.net/markdown-svg-renderer?url=ht...\n[it:158#s4] They're not notably different from the GPT-6 family pelicans: https://static.simonwillison.net/static/2026/gpt-pelicans-gr...\n[it:158#s5] Recent articles\n[it:158#s6] - We're going to need default hard budget caps on pretty much everything - 3rd October 2026\n[it:158#s7] - OpenAI DevDay 2026 live blog - 29th September 2026\n[it:158#s8] - 2026 in LLMs (so far) - 27th September 2026",
+    "title": "GPT 6.1 Sol: Near-Astra intelligence for a fifth of the price",
+    "url": "https://simonwillison.net/2026/Sep/29/hn-49898129/"
+   }
+  ],
+  "previous": null,
+  "aliases": [
+   {
+    "canonical": "Claude Opus 5.5",
+    "aliases": [
+     "클로드 오퍼스 5.5"
+    ]
+   },
+   {
+    "canonical": "Codex",
+    "aliases": [
+     "코덱스"
+    ]
+   },
+   {
+    "canonical": "GPT-6 Astra",
+    "aliases": [
+     "GPT-6 아스트라"
+    ]
+   },
+   {
+    "canonical": "GPT-6 Sol",
+    "aliases": [
+     "GPT-6 솔"
+    ]
+   },
+   {
+    "canonical": "GPT-6.1 Sol",
+    "aliases": [
+     "GPT-6.1 솔",
+     "GPT-6.1-Sol"
+    ]
+   }
+  ],
+  "limits": {
+   "sections": [
+    4,
+    7
+   ],
+   "paragraphs_per_section": [
+    1,
+    2
+   ],
+   "paragraph_sentences_max": 4,
+   "paragraph_chars_max": 320,
+   "summary_sentences": [
+    1,
+    2
+   ],
+   "summary_chars_max": 200,
+   "heading_chars_max": 70,
+   "head_tiles_max": 4,
+   "tiles_per_section": [
+    2,
+    3
+   ],
+   "visuals_max": 4,
+   "bars_items": [
+    2,
+    6
+   ],
+   "table_rows": [
+    2,
+    6
+   ],
+   "table_cols": [
+    2,
+    4
+   ],
+   "slides_max": 2,
+   "video_secs_max": 3,
+   "max_refs_per_paragraph": 4
+  },
+  "slide_candidates": [],
+  "no_visuals": false
+ },
+ "expect": {},
+ "note": "2026-W40 실제 토픽 입력(run 20261013-164928-weekly-1b69)"
+}

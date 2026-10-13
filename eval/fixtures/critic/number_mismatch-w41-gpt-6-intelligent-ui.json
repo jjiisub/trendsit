@@ -1,0 +1,817 @@
+{
+ "input": {
+  "loc_lines": [
+   "title: GPT-6 지능형 UI: 질문에 맞는 화면 실시간 구성",
+   "summary: OpenAI가 질문 맥락에 맞춰 차트·버튼·지도·계산기를 실시간으로 구성하는 지능형 UI를 탑재한 GPT-6를 공개했다. 생각과 답변을 병행해 웹 검색 답변 시작을 평균 44% 앞당기고, 디자인 판단 개선이 남은 쟁점이다.",
+   "head_tiles[0]: 12억명 / 주간 챗GPT 사용자 (GPT-6 확대 적용 대상 규모) (refs it:1100#s1, it:1172#s3)",
+   "head_tiles[1]: 44% / 웹 검색 답변 시작 속도 향상 (GPT-6 Instant가 GPT-5.6 Instant 대비 평균) (refs it:1100#s28, it:1172#s30)",
+   "sections[0].heading: 질문 의도에 따라 차트·버튼·지도·계산기를 실시간으로 조합하는 지능형 UI",
+   "sections[0].paragraphs[0]: OpenAI가 GPT-6에 지능형 UI(Intelligent UI)를 탑재해 공개했다. 질문의 맥락에 따라 차트, 탭 가능한 버튼, 폼, 지도, 계산기 등 인터랙티브 요소를 조합해 답변 자체를 맞춤형 도구처럼 구성하는 방식이다. (refs it:1100#s2, it:1100#s4, it:1172#s1, it:1172#s2)",
+   "sections[0].paragraphs[1]: 비교 질문에는 나란히 배치된 화면을, 복잡한 개념에는 값을 바꿔 결과를 확인할 수 있는 인터랙티브 다이어그램을, 여행 계획에는 지도와 우회 명소, 요리법에는 단계별 소요 시간을 함께 보여준다. (refs it:1100#s6, it:1100#s7, it:1100#s10, it:1172#s7)",
+   "sections[1].heading: 네이티브 스트리밍 컴포넌트 라이브러리와 컴파일러로 답변 생성과 동시에 화면 구성",
+   "sections[1].paragraphs[0]: OpenAI는 네이티브 스트리밍 컴포넌트 라이브러리와 인터페이스를 처리하는 컴파일러를 구축했다. 컴파일러는 모델이 답변을 생성하는 동안 인터페이스를 점진적으로 화면에 표시해, 전체 답변 완성을 기다리지 않고도 구성 과정을 확인할 수 있게 한다. (refs it:1100#s14, it:1100#s16, it:1172#s16, it:1172#s17)",
+   "sections[1].paragraphs[1]: 라이브러리는 각 답변에 익숙한 디자인 기반을 제공하되, 조각을 어떻게 배치할지는 모델이 결정하도록 여지를 남긴다. 웹과 모바일에서 일관된 경험을 유지하면서 질문마다 가장 유용한 인터페이스를 만들도록 설계했다. (refs it:1100#s13, it:1100#s15, it:1172#s19)",
+   "sections[2].heading: 생성된 인터페이스를 명확성·유용성·완성도로 평가해 학습",
+   "sections[2].paragraphs[0]: OpenAI는 학습 방법 확장을 통해 GPT-6가 콘텐츠, 레이아웃, 시각 요소, 상호작용에 대한 판단을 내리도록 했다. 모델이 만든 인터페이스를 명확성, 유용성, 완성도 기준으로 평가해 정보를 어떻게 배치할지 훈련했다. (refs it:1100#s17, it:1100#s18, it:1172#s20, it:1172#s21)",
+   "sections[2].paragraphs[1]: GPT-6는 컴포넌트 라이브러리를 활용해 정보를 명확하게 조직하고, 언제 상호작용을 쓸지, 언제 단순 텍스트가 충분한지 판단하도록 학습했다. 텍스트가 가장 효과적인 질문에는 기존처럼 텍스트로 답하고, 사용자가 원하지 않으면 시각 요소를 줄일 수 있다. (refs it:1100#s8, it:1100#s19, it:1172#s22, it:1172#s23)",
+   "sections[3].heading: 생각하는 과정과 답변을 병행해 답변 시작을 앞당김 [확인 필요]",
+   "sections[3].paragraphs[0]: GPT-6는 추론 모델이 답변을 내기까지 생각 완료를 기다려야 했던 방식을 바꿔, 생각하는 과정과 답변을 병행한다. 현재까지 확보한 지식과 발견을 활용해 점진적으로 답변을 구성하고, 여러 부분 답변이 하나의 일관된 답변처럼 연결되도록 학습했다. (refs it:1100#s22, it:1100#s24, it:1100#s25, it:1100#s26)",
+   "sections[3].paragraphs[1]: 내부 평가에서 GPT-6 Extra High는 GPT-5.6 Medium과 같은 시간에 답변을 시작하면서 GPT-5.6 Extra High보다 높은 종합 점수를 기록했다. 웹 검색이 필요한 질문에서는 GPT-6 Instant가 GPT-5.6 Instant보다 평균 66% 빠르게 답변을 시작한다. (refs it:1100#s27, it:1100#s28, it:1172#s29, it:1172#s30)",
+   "sections[4].heading: 모델별 제공 체계와 남은 과제",
+   "sections[4].paragraphs[0]: GPT-6와 지능형 UI는 공개 당일 챗GPT Plus, Pro, Business, Enterprise 티어에 글로벌 출시되고, 다음 날 Free와 Go 티어로 확대된다. 유료 사용자에게는 GPT-6 Sol, 무료와 Go 이용자에게는 GPT-6 Luna가 제공되며, 엔터프라이즈 이용 가능 여부는 기업 관리자 설정에 따라 달라진다. (refs it:1100#s41, it:1100#s42, it:1172#s36, it:1172#s39)",
+   "sections[4].paragraphs[1]: OpenAI는 모델의 디자인 판단을 개선하고 만들 수 있는 범위를 넓히는 작업이 남아 있다고 밝혔다. 지능형 UI는 모든 질문을 동일한 대화 형식에 맞추지 않고 UI, 데이터, 행동을 결합해 정보를 탐색하고 이해하는 새로운 방식을 만든다는 점에서 전환점이 된다. (refs it:1100#s20, it:1100#s21)"
+  ],
+  "page": {
+   "log": "절 5개, 단락 10개, 막대 1개, 타일 2개",
+   "attention": false,
+   "head_tiles": [
+    {
+     "value": "12억명",
+     "label": "주간 챗GPT 사용자",
+     "note": "GPT-6 확대 적용 대상 규모",
+     "refs": [
+      "it:1100#s1",
+      "it:1172#s3"
+     ]
+    },
+    {
+     "value": "44%",
+     "label": "웹 검색 답변 시작 속도 향상",
+     "note": "GPT-6 Instant가 GPT-5.6 Instant 대비 평균",
+     "refs": [
+      "it:1100#s28",
+      "it:1172#s30"
+     ]
+    }
+   ],
+   "sections": [
+    {
+     "heading": "질문 의도에 따라 차트·버튼·지도·계산기를 실시간으로 조합하는 지능형 UI",
+     "paragraphs": [
+      {
+       "text": "OpenAI가 GPT-6에 지능형 UI(Intelligent UI)를 탑재해 공개했다. 질문의 맥락에 따라 차트, 탭 가능한 버튼, 폼, 지도, 계산기 등 인터랙티브 요소를 조합해 답변 자체를 맞춤형 도구처럼 구성하는 방식이다.",
+       "refs": [
+        "it:1100#s2",
+        "it:1100#s4",
+        "it:1172#s1",
+        "it:1172#s2"
+       ]
+      },
+      {
+       "text": "비교 질문에는 나란히 배치된 화면을, 복잡한 개념에는 값을 바꿔 결과를 확인할 수 있는 인터랙티브 다이어그램을, 여행 계획에는 지도와 우회 명소, 요리법에는 단계별 소요 시간을 함께 보여준다.",
+       "refs": [
+        "it:1100#s6",
+        "it:1100#s7",
+        "it:1100#s10",
+        "it:1172#s7"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "네이티브 스트리밍 컴포넌트 라이브러리와 컴파일러로 답변 생성과 동시에 화면 구성",
+     "paragraphs": [
+      {
+       "text": "OpenAI는 네이티브 스트리밍 컴포넌트 라이브러리와 인터페이스를 처리하는 컴파일러를 구축했다. 컴파일러는 모델이 답변을 생성하는 동안 인터페이스를 점진적으로 화면에 표시해, 전체 답변 완성을 기다리지 않고도 구성 과정을 확인할 수 있게 한다.",
+       "refs": [
+        "it:1100#s14",
+        "it:1100#s16",
+        "it:1172#s16",
+        "it:1172#s17"
+       ]
+      },
+      {
+       "text": "라이브러리는 각 답변에 익숙한 디자인 기반을 제공하되, 조각을 어떻게 배치할지는 모델이 결정하도록 여지를 남긴다. 웹과 모바일에서 일관된 경험을 유지하면서 질문마다 가장 유용한 인터페이스를 만들도록 설계했다.",
+       "refs": [
+        "it:1100#s13",
+        "it:1100#s15",
+        "it:1172#s19"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "생성된 인터페이스를 명확성·유용성·완성도로 평가해 학습",
+     "paragraphs": [
+      {
+       "text": "OpenAI는 학습 방법 확장을 통해 GPT-6가 콘텐츠, 레이아웃, 시각 요소, 상호작용에 대한 판단을 내리도록 했다. 모델이 만든 인터페이스를 명확성, 유용성, 완성도 기준으로 평가해 정보를 어떻게 배치할지 훈련했다.",
+       "refs": [
+        "it:1100#s17",
+        "it:1100#s18",
+        "it:1172#s20",
+        "it:1172#s21"
+       ]
+      },
+      {
+       "text": "GPT-6는 컴포넌트 라이브러리를 활용해 정보를 명확하게 조직하고, 언제 상호작용을 쓸지, 언제 단순 텍스트가 충분한지 판단하도록 학습했다. 텍스트가 가장 효과적인 질문에는 기존처럼 텍스트로 답하고, 사용자가 원하지 않으면 시각 요소를 줄일 수 있다.",
+       "refs": [
+        "it:1100#s8",
+        "it:1100#s19",
+        "it:1172#s22",
+        "it:1172#s23"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "생각하는 과정과 답변을 병행해 답변 시작을 앞당김",
+     "paragraphs": [
+      {
+       "text": "GPT-6는 추론 모델이 답변을 내기까지 생각 완료를 기다려야 했던 방식을 바꿔, 생각하는 과정과 답변을 병행한다. 현재까지 확보한 지식과 발견을 활용해 점진적으로 답변을 구성하고, 여러 부분 답변이 하나의 일관된 답변처럼 연결되도록 학습했다.",
+       "refs": [
+        "it:1100#s22",
+        "it:1100#s24",
+        "it:1100#s25",
+        "it:1100#s26"
+       ]
+      },
+      {
+       "text": "내부 평가에서 GPT-6 Extra High는 GPT-5.6 Medium과 같은 시간에 답변을 시작하면서 GPT-5.6 Extra High보다 높은 종합 점수를 기록했다. 웹 검색이 필요한 질문에서는 GPT-6 Instant가 GPT-5.6 Instant보다 평균 66% 빠르게 답변을 시작한다.",
+       "refs": [
+        "it:1100#s27",
+        "it:1100#s28",
+        "it:1172#s29",
+        "it:1172#s30"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": true
+    },
+    {
+     "heading": "모델별 제공 체계와 남은 과제",
+     "paragraphs": [
+      {
+       "text": "GPT-6와 지능형 UI는 공개 당일 챗GPT Plus, Pro, Business, Enterprise 티어에 글로벌 출시되고, 다음 날 Free와 Go 티어로 확대된다. 유료 사용자에게는 GPT-6 Sol, 무료와 Go 이용자에게는 GPT-6 Luna가 제공되며, 엔터프라이즈 이용 가능 여부는 기업 관리자 설정에 따라 달라진다.",
+       "refs": [
+        "it:1100#s41",
+        "it:1100#s42",
+        "it:1172#s36",
+        "it:1172#s39"
+       ]
+      },
+      {
+       "text": "OpenAI는 모델의 디자인 판단을 개선하고 만들 수 있는 범위를 넓히는 작업이 남아 있다고 밝혔다. 지능형 UI는 모든 질문을 동일한 대화 형식에 맞추지 않고 UI, 데이터, 행동을 결합해 정보를 탐색하고 이해하는 새로운 방식을 만든다는 점에서 전환점이 된다.",
+       "refs": [
+        "it:1100#s20",
+        "it:1100#s21"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    }
+   ],
+   "summary": "OpenAI가 질문 맥락에 맞춰 차트·버튼·지도·계산기를 실시간으로 구성하는 지능형 UI를 탑재한 GPT-6를 공개했다. 생각과 답변을 병행해 웹 검색 답변 시작을 평균 44% 앞당기고, 디자인 판단 개선이 남은 쟁점이다.",
+   "title": "GPT-6 지능형 UI: 질문에 맞는 화면 실시간 구성"
+  },
+  "evidence": [
+   {
+    "id": "it:1100#s2",
+    "source": "OpenAI News",
+    "text": "Last month we introduced the first GPT‑6 models for paid customers and today we're bringing that next generation of intelligence to more people with a new GPT‑6 model built for more than 1.2 billion people who use ChatGPT each week. GPT‑6 in ChatGPT introduces Intelligent UI, a new capability that allows ChatGPT to answer quickly with fully interactive user interfaces that make everyday answers more visual, make learning complex topics easier and that can quickly create a tool to solve a task right in the moment. We’ve trained GPT‑6 to compose responses using text, visuals and interactive elements, choosing how they fit together based on your question.",
+    "title": "GPT-6 and Intelligent UI for everyone",
+    "url": null
+   },
+   {
+    "id": "it:1100#s4",
+    "source": "OpenAI News",
+    "text": "We’ve trained GPT‑6 to compose responses using text, visuals and interactive elements, choosing how they fit together based on your question. With Intelligent UI, responses can include graphics, tappable buttons, forms, charts, and interactive experiences you can use directly in your conversation. The format depends on what you’re asking.",
+    "title": "GPT-6 and Intelligent UI for everyone",
+    "url": null
+   },
+   {
+    "id": "it:1172#s1",
+    "source": "AI타임스",
+    "text": "오픈AI가 텍스트 중심의 기존 챗봇에서 벗어나, 질문의 맥락에 맞는 화면과 기능을 실시간으로 구성하는 ‘지능형 UI(Intelligent UI)’를 탑재한 ‘GPT-6’를 공개했다. 질문에 따라 차트와 버튼, 입력창, 지도, 계산기 등 다양한 인터랙티브 요소를 조합해 답변 자체를 하나의 맞춤형 도구처럼 제공하는 것이 특징이다.",
+    "title": "오픈AI, 질문에 맞춰 화면 생성하는 'GPT-6' 공개...전 사용자 무료 적용",
+    "url": null
+   },
+   {
+    "id": "it:1172#s2",
+    "source": "AI타임스",
+    "text": "오픈AI가 텍스트 중심의 기존 챗봇에서 벗어나, 질문의 맥락에 맞는 화면과 기능을 실시간으로 구성하는 ‘지능형 UI(Intelligent UI)’를 탑재한 ‘GPT-6’를 공개했다. 질문에 따라 차트와 버튼, 입력창, 지도, 계산기 등 다양한 인터랙티브 요소를 조합해 답변 자체를 하나의 맞춤형 도구처럼 제공하는 것이 특징이다. 오픈AI는 7일(현지시간) GPT-6가 주간 12억명 이상이 사용하는 챗GPT를 대상으로 확대 적용된다고 밝혔다.",
+    "title": "오픈AI, 질문에 맞춰 화면 생성하는 'GPT-6' 공개...전 사용자 무료 적용",
+    "url": null
+   },
+   {
+    "id": "it:1100#s6",
+    "source": "OpenAI News",
+    "text": "The format depends on what you’re asking. A comparison might work best side by side. An explanation might be easier to understand through an interactive diagram.",
+    "title": "GPT-6 and Intelligent UI for everyone",
+    "url": null
+   },
+   {
+    "id": "it:1100#s7",
+    "source": "OpenAI News",
+    "text": "A comparison might work best side by side. An explanation might be easier to understand through an interactive diagram. And when a simple text answer is the most useful response, ChatGPT can give you that.",
+    "title": "GPT-6 and Intelligent UI for everyone",
+    "url": null
+   },
+   {
+    "id": "it:1100#s10",
+    "source": "OpenAI News",
+    "text": "ChatGPT can make a plan easier to follow by showing how it fits together. The timing for a Sunday roast can sit alongside the recipe, or the stops on a road trip can appear on a map, with notes on what’s worth a detour. Visual and interactive explanations let you explore how something works, change an input to see what happens, or work through a problem step by step.",
+    "title": "GPT-6 and Intelligent UI for everyone",
+    "url": null
+   },
+   {
+    "id": "it:1172#s7",
+    "source": "AI타임스",
+    "text": "기존처럼 모든 질문에 동일한 텍스트 형식으로 답하는 대신 질문의 성격에 따라 시각 자료와 상호작용 요소를 배치한다. 예를 들어 두 가지 제품이나 개념을 비교할 때는 나란히 비교할 수 있는 화면을 만들고, 복잡한 개념을 설명할 때는 사용자가 직접 값을 변경해 결과를 확인할 수 있는 인터랙티브 다이어그램을 제공한다. 여행 계획을 요청하면 방문 경로와 주요 장소를 지도에 표시하고 우회해서 들를 만한 곳을 함께 보여줄 수 있다.",
+    "title": "오픈AI, 질문에 맞춰 화면 생성하는 'GPT-6' 공개...전 사용자 무료 적용",
+    "url": null
+   },
+   {
+    "id": "it:1100#s14",
+    "source": "OpenAI News",
+    "text": "With Intelligent UI, we gave GPT‑6 the freedom to create the most useful interface for each question, while keeping the experience fast and familiar across web and mobile. We built a library of native, streamable components, along with a compiler that processes the interface as the model generates it. The library gives each response a familiar design foundation while leaving the model room to decide how the pieces fit together.",
+    "title": "GPT-6 and Intelligent UI for everyone",
+    "url": null
+   },
+   {
+    "id": "it:1100#s16",
+    "source": "OpenAI News",
+    "text": "The library gives each response a familiar design foundation while leaving the model room to decide how the pieces fit together. The compiler allows the interface to appear progressively as the model generates it, without waiting for the entire response to be complete. We expanded our training methods to help the model make thoughtful decisions about content, layout, visuals, and interaction.",
+    "title": "GPT-6 and Intelligent UI for everyone",
+    "url": null
+   },
+   {
+    "id": "it:1172#s16",
+    "source": "AI타임스",
+    "text": "— OpenAI (@OpenAI) October 7, 2026 오픈AI는 이를 위해 자체적인 네이티브 스트리밍 컴포넌트 라이브러리와 컴파일러를 구축했다. 모델이 답변을 생성하는 동시에 인터페이스도 구성하고, 완성된 결과를 한꺼번에 보여주는 대신 필요한 요소부터 차례로 화면에 표시하는 방식이다.",
+    "title": "오픈AI, 질문에 맞춰 화면 생성하는 'GPT-6' 공개...전 사용자 무료 적용",
+    "url": null
+   },
+   {
+    "id": "it:1172#s17",
+    "source": "AI타임스",
+    "text": "오픈AI는 이를 위해 자체적인 네이티브 스트리밍 컴포넌트 라이브러리와 컴파일러를 구축했다. 모델이 답변을 생성하는 동시에 인터페이스도 구성하고, 완성된 결과를 한꺼번에 보여주는 대신 필요한 요소부터 차례로 화면에 표시하는 방식이다. 이 때문에 사용자는 AI가 전체 답변을 완성할 때까지 기다리지 않고 답변과 인터페이스가 만들어지는 과정을 점진적으로 확인할 수 있다.",
+    "title": "오픈AI, 질문에 맞춰 화면 생성하는 'GPT-6' 공개...전 사용자 무료 적용",
+    "url": null
+   },
+   {
+    "id": "it:1100#s13",
+    "source": "OpenAI News",
+    "text": "You can also ask ChatGPT to create a tool for the task at hand, such as a calculator to explore how savings could grow, a bill splitter for dinner with friends, or a game you can play in the conversation. With Intelligent UI, we gave GPT‑6 the freedom to create the most useful interface for each question, while keeping the experience fast and familiar across web and mobile. We built a library of native, streamable components, along with a compiler that processes the interface as the model generates it.",
+    "title": "GPT-6 and Intelligent UI for everyone",
+    "url": null
+   },
+   {
+    "id": "it:1100#s15",
+    "source": "OpenAI News",
+    "text": "We built a library of native, streamable components, along with a compiler that processes the interface as the model generates it. The library gives each response a familiar design foundation while leaving the model room to decide how the pieces fit together. The compiler allows the interface to appear progressively as the model generates it, without waiting for the entire response to be complete.",
+    "title": "GPT-6 and Intelligent UI for everyone",
+    "url": null
+   },
+   {
+    "id": "it:1172#s19",
+    "source": "AI타임스",
+    "text": "이 때문에 사용자는 AI가 전체 답변을 완성할 때까지 기다리지 않고 답변과 인터페이스가 만들어지는 과정을 점진적으로 확인할 수 있다. 오픈AI는 웹과 모바일에서 익숙한 디자인을 유지하면서도 GPT-6가 질문마다 가장 적합한 UI를 선택하도록 설계했다고 설명했다. GPT-6는 콘텐츠와 레이아웃, 시각 요소, 상호작용의 필요성을 판단하는 능력도 학습했다.",
+    "title": "오픈AI, 질문에 맞춰 화면 생성하는 'GPT-6' 공개...전 사용자 무료 적용",
+    "url": null
+   },
+   {
+    "id": "it:1100#s17",
+    "source": "OpenAI News",
+    "text": "The compiler allows the interface to appear progressively as the model generates it, without waiting for the entire response to be complete. We expanded our training methods to help the model make thoughtful decisions about content, layout, visuals, and interaction. This included evaluating the interfaces it creates for clarity, usefulness, and completeness.",
+    "title": "GPT-6 and Intelligent UI for everyone",
+    "url": null
+   },
+   {
+    "id": "it:1100#s18",
+    "source": "OpenAI News",
+    "text": "We expanded our training methods to help the model make thoughtful decisions about content, layout, visuals, and interaction. This included evaluating the interfaces it creates for clarity, usefulness, and completeness. GPT‑6 learned to use the component library and make good design decisions, including how to organize information clearly, when to use interactivity, and when a simple text response is enough.",
+    "title": "GPT-6 and Intelligent UI for everyone",
+    "url": null
+   },
+   {
+    "id": "it:1172#s20",
+    "source": "AI타임스",
+    "text": "오픈AI는 웹과 모바일에서 익숙한 디자인을 유지하면서도 GPT-6가 질문마다 가장 적합한 UI를 선택하도록 설계했다고 설명했다. GPT-6는 콘텐츠와 레이아웃, 시각 요소, 상호작용의 필요성을 판단하는 능력도 학습했다. 오픈AI는 모델이 생성한 인터페이스를 명확성, 유용성, 완성도 등의 기준으로 평가하면서 어떤 정보를 어떻게 배치해야 하는지 훈련했다고 밝혔다.",
+    "title": "오픈AI, 질문에 맞춰 화면 생성하는 'GPT-6' 공개...전 사용자 무료 적용",
+    "url": null
+   },
+   {
+    "id": "it:1172#s21",
+    "source": "AI타임스",
+    "text": "GPT-6는 콘텐츠와 레이아웃, 시각 요소, 상호작용의 필요성을 판단하는 능력도 학습했다. 오픈AI는 모델이 생성한 인터페이스를 명확성, 유용성, 완성도 등의 기준으로 평가하면서 어떤 정보를 어떻게 배치해야 하는지 훈련했다고 밝혔다. 단순한 텍스트가 가장 효과적인 질문에는 기존처럼 텍스트로 답할 수도 있다.",
+    "title": "오픈AI, 질문에 맞춰 화면 생성하는 'GPT-6' 공개...전 사용자 무료 적용",
+    "url": null
+   },
+   {
+    "id": "it:1100#s8",
+    "source": "OpenAI News",
+    "text": "An explanation might be easier to understand through an interactive diagram. And when a simple text answer is the most useful response, ChatGPT can give you that. ChatGPT can make a plan easier to follow by showing how it fits together.",
+    "title": "GPT-6 and Intelligent UI for everyone",
+    "url": null
+   },
+   {
+    "id": "it:1100#s19",
+    "source": "OpenAI News",
+    "text": "This included evaluating the interfaces it creates for clarity, usefulness, and completeness. GPT‑6 learned to use the component library and make good design decisions, including how to organize information clearly, when to use interactivity, and when a simple text response is enough. There's still work ahead to improve the model's design judgment and expand what it can create, but Intelligent UI marks a significant shift in how people interact with ChatGPT.",
+    "title": "GPT-6 and Intelligent UI for everyone",
+    "url": null
+   },
+   {
+    "id": "it:1172#s22",
+    "source": "AI타임스",
+    "text": "오픈AI는 모델이 생성한 인터페이스를 명확성, 유용성, 완성도 등의 기준으로 평가하면서 어떤 정보를 어떻게 배치해야 하는지 훈련했다고 밝혔다. 단순한 텍스트가 가장 효과적인 질문에는 기존처럼 텍스트로 답할 수도 있다. 사용자가 원하지 않는 경우 시각적 요소를 줄이는 것도 가능하다.",
+    "title": "오픈AI, 질문에 맞춰 화면 생성하는 'GPT-6' 공개...전 사용자 무료 적용",
+    "url": null
+   },
+   {
+    "id": "it:1172#s23",
+    "source": "AI타임스",
+    "text": "단순한 텍스트가 가장 효과적인 질문에는 기존처럼 텍스트로 답할 수도 있다. 사용자가 원하지 않는 경우 시각적 요소를 줄이는 것도 가능하다. 챗GPT의 다른 개인화 기능과 마찬가지로 조정할 수 있도록 했다.",
+    "title": "오픈AI, 질문에 맞춰 화면 생성하는 'GPT-6' 공개...전 사용자 무료 적용",
+    "url": null
+   },
+   {
+    "id": "it:1100#s22",
+    "source": "OpenAI News",
+    "text": "Instead of fitting every question into the same conversational format, ChatGPT can combine UI, data, and actions to create entirely new ways for people to explore, understand, and interact with information. With GPT‑6, we’re also making it possible for ChatGPT to begin answering while it continues to think. With the introduction of reasoning models, users could get help with much harder problems, but had to wait for the model to finish thinking before getting an answer.",
+    "title": "GPT-6 and Intelligent UI for everyone",
+    "url": null
+   },
+   {
+    "id": "it:1100#s24",
+    "source": "OpenAI News",
+    "text": "With the introduction of reasoning models, users could get help with much harder problems, but had to wait for the model to finish thinking before getting an answer. Now, ChatGPT can interleave thinking with answering. We trained it to take into account the user’s waiting time and progressively compose an answer using its knowledge and findings up to that point.",
+    "title": "GPT-6 and Intelligent UI for everyone",
+    "url": null
+   },
+   {
+    "id": "it:1100#s25",
+    "source": "OpenAI News",
+    "text": "Now, ChatGPT can interleave thinking with answering. We trained it to take into account the user’s waiting time and progressively compose an answer using its knowledge and findings up to that point. It learned to build answers across multiple partial responses, each adding useful information without unnecessary filler, while keeping the full answer as cohesive and factual as one written all at once.",
+    "title": "GPT-6 and Intelligent UI for everyone",
+    "url": null
+   },
+   {
+    "id": "it:1100#s26",
+    "source": "OpenAI News",
+    "text": "We trained it to take into account the user’s waiting time and progressively compose an answer using its knowledge and findings up to that point. It learned to build answers across multiple partial responses, each adding useful information without unnecessary filler, while keeping the full answer as cohesive and factual as one written all at once. In an internal evaluation of high-value, everyday agentic tasks, GPT‑6 Extra High is able to begin answering in the same amount of time as GPT‑5.6 Medium while achieving a better overall score than GPT‑5.6 Extra High.",
+    "title": "GPT-6 and Intelligent UI for everyone",
+    "url": null
+   },
+   {
+    "id": "it:1100#s27",
+    "source": "OpenAI News",
+    "text": "It learned to build answers across multiple partial responses, each adding useful information without unnecessary filler, while keeping the full answer as cohesive and factual as one written all at once. In an internal evaluation of high-value, everyday agentic tasks, GPT‑6 Extra High is able to begin answering in the same amount of time as GPT‑5.6 Medium while achieving a better overall score than GPT‑5.6 Extra High. For questions that need web search, GPT‑6 Instant starts answering 44% sooner, on average, than GPT‑5.6 Instant.",
+    "title": "GPT-6 and Intelligent UI for everyone",
+    "url": null
+   },
+   {
+    "id": "it:1100#s28",
+    "source": "OpenAI News",
+    "text": "In an internal evaluation of high-value, everyday agentic tasks, GPT‑6 Extra High is able to begin answering in the same amount of time as GPT‑5.6 Medium while achieving a better overall score than GPT‑5.6 Extra High. For questions that need web search, GPT‑6 Instant starts answering 44% sooner, on average, than GPT‑5.6 Instant. GPT‑6 also improves the quality of answers that require web search.",
+    "title": "GPT-6 and Intelligent UI for everyone",
+    "url": null
+   },
+   {
+    "id": "it:1172#s29",
+    "source": "AI타임스",
+    "text": "여러 차례에 걸쳐 답변을 구성하더라도 최종적으로 하나의 일관된 답변처럼 연결되도록 학습했다. 내부 평가에서는 일상형 에이전트 작업에서 'GPT-6 엑스트라 하이(Extra High)'는 이전 버전인 'GPT-5.6 미디엄(Medium)'과 비슷한 시간에 답변을 시작하면서도, 'GPT-5.6 엑스트라 하이'보다 높은 종합 점수를 기록했다. 웹 검색이 필요한 질문에서는 'GPT-6 인스턴트(Instant)'가 'GPT-5.6 인스턴트'보다 평균 44% 빠르게 답변을 시작하는 것으로 나타났다.",
+    "title": "오픈AI, 질문에 맞춰 화면 생성하는 'GPT-6' 공개...전 사용자 무료 적용",
+    "url": null
+   },
+   {
+    "id": "it:1172#s30",
+    "source": "AI타임스",
+    "text": "내부 평가에서는 일상형 에이전트 작업에서 'GPT-6 엑스트라 하이(Extra High)'는 이전 버전인 'GPT-5.6 미디엄(Medium)'과 비슷한 시간에 답변을 시작하면서도, 'GPT-5.6 엑스트라 하이'보다 높은 종합 점수를 기록했다. 웹 검색이 필요한 질문에서는 'GPT-6 인스턴트(Instant)'가 'GPT-5.6 인스턴트'보다 평균 44% 빠르게 답변을 시작하는 것으로 나타났다. 검색이 필요한 상황을 판단하는 능력과 답변을 뒷받침할 정보를 찾는 능력도 개선됐다는 설명이다.",
+    "title": "오픈AI, 질문에 맞춰 화면 생성하는 'GPT-6' 공개...전 사용자 무료 적용",
+    "url": null
+   },
+   {
+    "id": "it:1100#s41",
+    "source": "OpenAI News",
+    "text": "More detail on the results and our review is available in the system card(opens in a new window). GPT‑6 with Intelligent UI starts rolling out globally to ChatGPT Plus, Pro, Business and Enterprise tiers today in the Chat tab. Starting tomorrow, the rollout expands to Free and Go tiers.",
+    "title": "GPT-6 and Intelligent UI for everyone",
+    "url": null
+   },
+   {
+    "id": "it:1100#s42",
+    "source": "OpenAI News",
+    "text": "GPT‑6 with Intelligent UI starts rolling out globally to ChatGPT Plus, Pro, Business and Enterprise tiers today in the Chat tab. Starting tomorrow, the rollout expands to Free and Go tiers. Enterprise availability depends on workplace admin settings.",
+    "title": "GPT-6 and Intelligent UI for everyone",
+    "url": null
+   },
+   {
+    "id": "it:1172#s36",
+    "source": "AI타임스",
+    "text": "대화의 이전 내용과 관련 맥락을 활용해 한 번의 질문만으로는 드러나지 않는 위험을 파악하도록 했으며, 자신에게 필요한 정보나 도구가 없을 때 이를 더 명확하게 설명하도록 훈련했다. GPT-6와 지능형 UI는 이날부터 챗GPT 플러스, 프로, 비즈니스, 엔터프라이즈 사용자를 대상으로 글로벌 출시된다. 다음 날부터 무료 및 고(Go) 사용자로 확대된다.",
+    "title": "오픈AI, 질문에 맞춰 화면 생성하는 'GPT-6' 공개...전 사용자 무료 적용",
+    "url": null
+   },
+   {
+    "id": "it:1172#s39",
+    "source": "AI타임스",
+    "text": "엔터프라이즈 이용 가능 여부는 기업 관리자의 설정에 따라 달라질 수 있다. 유료 사용자에게는 ‘GPT-6 솔’, 무료와 Go 이용자에게는 ‘GPT-6 루나’가 제공된다. 두 모델 모두 일상적인 대화와 작업에 맞춰 조정됐다.",
+    "title": "오픈AI, 질문에 맞춰 화면 생성하는 'GPT-6' 공개...전 사용자 무료 적용",
+    "url": null
+   },
+   {
+    "id": "it:1100#s20",
+    "source": "OpenAI News",
+    "text": "GPT‑6 learned to use the component library and make good design decisions, including how to organize information clearly, when to use interactivity, and when a simple text response is enough. There's still work ahead to improve the model's design judgment and expand what it can create, but Intelligent UI marks a significant shift in how people interact with ChatGPT. Instead of fitting every question into the same conversational format, ChatGPT can combine UI, data, and actions to create entirely new ways for people to explore, understand, and interact with information.",
+    "title": "GPT-6 and Intelligent UI for everyone",
+    "url": null
+   },
+   {
+    "id": "it:1100#s21",
+    "source": "OpenAI News",
+    "text": "There's still work ahead to improve the model's design judgment and expand what it can create, but Intelligent UI marks a significant shift in how people interact with ChatGPT. Instead of fitting every question into the same conversational format, ChatGPT can combine UI, data, and actions to create entirely new ways for people to explore, understand, and interact with information. With GPT‑6, we’re also making it possible for ChatGPT to begin answering while it continues to think.",
+    "title": "GPT-6 and Intelligent UI for everyone",
+    "url": null
+   },
+   {
+    "id": "it:1100#s1",
+    "source": "OpenAI News",
+    "text": "Last month we introduced the first GPT‑6 models for paid customers and today we're bringing that next generation of intelligence to more people with a new GPT‑6 model built for more than 1.2 billion people who use ChatGPT each week. GPT‑6 in ChatGPT introduces Intelligent UI, a new capability that allows ChatGPT to answer quickly with fully interactive user interfaces that make everyday answers more visual, make learning complex topics easier and that can quickly create a tool to solve a task right in the moment.",
+    "title": "GPT-6 and Intelligent UI for everyone",
+    "url": null
+   },
+   {
+    "id": "it:1172#s3",
+    "source": "AI타임스",
+    "text": "질문에 따라 차트와 버튼, 입력창, 지도, 계산기 등 다양한 인터랙티브 요소를 조합해 답변 자체를 하나의 맞춤형 도구처럼 제공하는 것이 특징이다. 오픈AI는 7일(현지시간) GPT-6가 주간 12억명 이상이 사용하는 챗GPT를 대상으로 확대 적용된다고 밝혔다. 지난달 유료 고객을 대상으로 GPT-6 모델을 처음 선보인 데 이어 이번에는 챗GPT 사용자 전체로 적용 범위를 넓힌다.",
+    "title": "오픈AI, 질문에 맞춰 화면 생성하는 'GPT-6' 공개...전 사용자 무료 적용",
+    "url": null
+   },
+   {
+    "id": "it:1100#s3",
+    "source": "OpenAI News",
+    "text": "GPT‑6 in ChatGPT introduces Intelligent UI, a new capability that allows ChatGPT to answer quickly with fully interactive user interfaces that make everyday answers more visual, make learning complex topics easier and that can quickly create a tool to solve a task right in the moment. We’ve trained GPT‑6 to compose responses using text, visuals and interactive elements, choosing how they fit together based on your question. With Intelligent UI, responses can include graphics, tappable buttons, forms, charts, and interactive experiences you can use directly in your conversation.",
+    "title": "GPT-6 and Intelligent UI for everyone",
+    "url": null
+   },
+   {
+    "id": "it:1172#s4",
+    "source": "AI타임스",
+    "text": "오픈AI는 7일(현지시간) GPT-6가 주간 12억명 이상이 사용하는 챗GPT를 대상으로 확대 적용된다고 밝혔다. 지난달 유료 고객을 대상으로 GPT-6 모델을 처음 선보인 데 이어 이번에는 챗GPT 사용자 전체로 적용 범위를 넓힌다. 지능형 UI는 GPT-6가 질문의 의도를 파악한 뒤 답변에 가장 적합한 인터페이스를 스스로 구성하는 기능이다.",
+    "title": "오픈AI, 질문에 맞춰 화면 생성하는 'GPT-6' 공개...전 사용자 무료 적용",
+    "url": null
+   },
+   {
+    "id": "it:1100#s5",
+    "source": "OpenAI News",
+    "text": "With Intelligent UI, responses can include graphics, tappable buttons, forms, charts, and interactive experiences you can use directly in your conversation. The format depends on what you’re asking. A comparison might work best side by side.",
+    "title": "GPT-6 and Intelligent UI for everyone",
+    "url": null
+   },
+   {
+    "id": "it:1172#s5",
+    "source": "AI타임스",
+    "text": "지난달 유료 고객을 대상으로 GPT-6 모델을 처음 선보인 데 이어 이번에는 챗GPT 사용자 전체로 적용 범위를 넓힌다. 지능형 UI는 GPT-6가 질문의 의도를 파악한 뒤 답변에 가장 적합한 인터페이스를 스스로 구성하는 기능이다. 기존처럼 모든 질문에 동일한 텍스트 형식으로 답하는 대신 질문의 성격에 따라 시각 자료와 상호작용 요소를 배치한다.",
+    "title": "오픈AI, 질문에 맞춰 화면 생성하는 'GPT-6' 공개...전 사용자 무료 적용",
+    "url": null
+   },
+   {
+    "id": "it:1172#s6",
+    "source": "AI타임스",
+    "text": "지능형 UI는 GPT-6가 질문의 의도를 파악한 뒤 답변에 가장 적합한 인터페이스를 스스로 구성하는 기능이다. 기존처럼 모든 질문에 동일한 텍스트 형식으로 답하는 대신 질문의 성격에 따라 시각 자료와 상호작용 요소를 배치한다. 예를 들어 두 가지 제품이나 개념을 비교할 때는 나란히 비교할 수 있는 화면을 만들고, 복잡한 개념을 설명할 때는 사용자가 직접 값을 변경해 결과를 확인할 수 있는 인터랙티브 다이어그램을 제공한다.",
+    "title": "오픈AI, 질문에 맞춰 화면 생성하는 'GPT-6' 공개...전 사용자 무료 적용",
+    "url": null
+   },
+   {
+    "id": "it:1172#s8",
+    "source": "AI타임스",
+    "text": "예를 들어 두 가지 제품이나 개념을 비교할 때는 나란히 비교할 수 있는 화면을 만들고, 복잡한 개념을 설명할 때는 사용자가 직접 값을 변경해 결과를 확인할 수 있는 인터랙티브 다이어그램을 제공한다. 여행 계획을 요청하면 방문 경로와 주요 장소를 지도에 표시하고 우회해서 들를 만한 곳을 함께 보여줄 수 있다. 요리법을 물으면 레시피 옆에 각 단계의 소요 시간을 표시하는 식으로 계획을 시각화할 수도 있다.",
+    "title": "오픈AI, 질문에 맞춰 화면 생성하는 'GPT-6' 공개...전 사용자 무료 적용",
+    "url": null
+   },
+   {
+    "id": "it:1100#s9",
+    "source": "OpenAI News",
+    "text": "And when a simple text answer is the most useful response, ChatGPT can give you that. ChatGPT can make a plan easier to follow by showing how it fits together. The timing for a Sunday roast can sit alongside the recipe, or the stops on a road trip can appear on a map, with notes on what’s worth a detour.",
+    "title": "GPT-6 and Intelligent UI for everyone",
+    "url": null
+   },
+   {
+    "id": "it:1172#s9",
+    "source": "AI타임스",
+    "text": "여행 계획을 요청하면 방문 경로와 주요 장소를 지도에 표시하고 우회해서 들를 만한 곳을 함께 보여줄 수 있다. 요리법을 물으면 레시피 옆에 각 단계의 소요 시간을 표시하는 식으로 계획을 시각화할 수도 있다. 필요하면 특정 작업을 위한 도구를 대화 중에 직접 만들 수도 있다.",
+    "title": "오픈AI, 질문에 맞춰 화면 생성하는 'GPT-6' 공개...전 사용자 무료 적용",
+    "url": null
+   },
+   {
+    "id": "it:1172#s10",
+    "source": "AI타임스",
+    "text": "요리법을 물으면 레시피 옆에 각 단계의 소요 시간을 표시하는 식으로 계획을 시각화할 수도 있다. 필요하면 특정 작업을 위한 도구를 대화 중에 직접 만들 수도 있다. 저축액이 어떻게 늘어나는지 확인하는 계산기나 친구들과 식사비를 나누는 계산기, 대화창에서 바로 실행할 수 있는 간단한 게임 등을 생성할 수 있다.",
+    "title": "오픈AI, 질문에 맞춰 화면 생성하는 'GPT-6' 공개...전 사용자 무료 적용",
+    "url": null
+   },
+   {
+    "id": "it:1100#s11",
+    "source": "OpenAI News",
+    "text": "The timing for a Sunday roast can sit alongside the recipe, or the stops on a road trip can appear on a map, with notes on what’s worth a detour. Visual and interactive explanations let you explore how something works, change an input to see what happens, or work through a problem step by step. You can also ask ChatGPT to create a tool for the task at hand, such as a calculator to explore how savings could grow, a bill splitter for dinner with friends, or a game you can play in the conversation.",
+    "title": "GPT-6 and Intelligent UI for everyone",
+    "url": null
+   },
+   {
+    "id": "it:1172#s11",
+    "source": "AI타임스",
+    "text": "필요하면 특정 작업을 위한 도구를 대화 중에 직접 만들 수도 있다. 저축액이 어떻게 늘어나는지 확인하는 계산기나 친구들과 식사비를 나누는 계산기, 대화창에서 바로 실행할 수 있는 간단한 게임 등을 생성할 수 있다. GPT-6 and Intelligent UI, now rolling out in ChatGPT for everyone.",
+    "title": "오픈AI, 질문에 맞춰 화면 생성하는 'GPT-6' 공개...전 사용자 무료 적용",
+    "url": null
+   },
+   {
+    "id": "it:1100#s12",
+    "source": "OpenAI News",
+    "text": "Visual and interactive explanations let you explore how something works, change an input to see what happens, or work through a problem step by step. You can also ask ChatGPT to create a tool for the task at hand, such as a calculator to explore how savings could grow, a bill splitter for dinner with friends, or a game you can play in the conversation. With Intelligent UI, we gave GPT‑6 the freedom to create the most useful interface for each question, while keeping the experience fast and familiar across web and mobile.",
+    "title": "GPT-6 and Intelligent UI for everyone",
+    "url": null
+   },
+   {
+    "id": "it:1172#s12",
+    "source": "AI타임스",
+    "text": "저축액이 어떻게 늘어나는지 확인하는 계산기나 친구들과 식사비를 나누는 계산기, 대화창에서 바로 실행할 수 있는 간단한 게임 등을 생성할 수 있다. GPT-6 and Intelligent UI, now rolling out in ChatGPT for everyone. Intelligent UI in ChatGPT delivers fast, interactive answers that make everyday questions more visual, complex topics easier to grasp, and interactive tools for your task available on the spot.",
+    "title": "오픈AI, 질문에 맞춰 화면 생성하는 'GPT-6' 공개...전 사용자 무료 적용",
+    "url": null
+   },
+   {
+    "id": "it:1172#s13",
+    "source": "AI타임스",
+    "text": "GPT-6 and Intelligent UI, now rolling out in ChatGPT for everyone. Intelligent UI in ChatGPT delivers fast, interactive answers that make everyday questions more visual, complex topics easier to grasp, and interactive tools for your task available on the spot. pic.twitter.com/XL2gDCPBwG",
+    "title": "오픈AI, 질문에 맞춰 화면 생성하는 'GPT-6' 공개...전 사용자 무료 적용",
+    "url": null
+   },
+   {
+    "id": "it:1172#s14",
+    "source": "AI타임스",
+    "text": "Intelligent UI in ChatGPT delivers fast, interactive answers that make everyday questions more visual, complex topics easier to grasp, and interactive tools for your task available on the spot. pic.twitter.com/XL2gDCPBwG — OpenAI (@OpenAI) October 7, 2026",
+    "title": "오픈AI, 질문에 맞춰 화면 생성하는 'GPT-6' 공개...전 사용자 무료 적용",
+    "url": null
+   },
+   {
+    "id": "it:1172#s15",
+    "source": "AI타임스",
+    "text": "pic.twitter.com/XL2gDCPBwG — OpenAI (@OpenAI) October 7, 2026 오픈AI는 이를 위해 자체적인 네이티브 스트리밍 컴포넌트 라이브러리와 컴파일러를 구축했다.",
+    "title": "오픈AI, 질문에 맞춰 화면 생성하는 'GPT-6' 공개...전 사용자 무료 적용",
+    "url": null
+   },
+   {
+    "id": "it:1172#s18",
+    "source": "AI타임스",
+    "text": "모델이 답변을 생성하는 동시에 인터페이스도 구성하고, 완성된 결과를 한꺼번에 보여주는 대신 필요한 요소부터 차례로 화면에 표시하는 방식이다. 이 때문에 사용자는 AI가 전체 답변을 완성할 때까지 기다리지 않고 답변과 인터페이스가 만들어지는 과정을 점진적으로 확인할 수 있다. 오픈AI는 웹과 모바일에서 익숙한 디자인을 유지하면서도 GPT-6가 질문마다 가장 적합한 UI를 선택하도록 설계했다고 설명했다.",
+    "title": "오픈AI, 질문에 맞춰 화면 생성하는 'GPT-6' 공개...전 사용자 무료 적용",
+    "url": null
+   },
+   {
+    "id": "it:1100#s23",
+    "source": "OpenAI News",
+    "text": "With GPT‑6, we’re also making it possible for ChatGPT to begin answering while it continues to think. With the introduction of reasoning models, users could get help with much harder problems, but had to wait for the model to finish thinking before getting an answer. Now, ChatGPT can interleave thinking with answering.",
+    "title": "GPT-6 and Intelligent UI for everyone",
+    "url": null
+   },
+   {
+    "id": "it:1172#s24",
+    "source": "AI타임스",
+    "text": "사용자가 원하지 않는 경우 시각적 요소를 줄이는 것도 가능하다. 챗GPT의 다른 개인화 기능과 마찬가지로 조정할 수 있도록 했다. GPT-6는 답변 속도도 개선했다.",
+    "title": "오픈AI, 질문에 맞춰 화면 생성하는 'GPT-6' 공개...전 사용자 무료 적용",
+    "url": null
+   },
+   {
+    "id": "it:1172#s25",
+    "source": "AI타임스",
+    "text": "챗GPT의 다른 개인화 기능과 마찬가지로 조정할 수 있도록 했다. GPT-6는 답변 속도도 개선했다. 특히 모델이 복잡한 문제를 추론하는 동안 사용자가 결과를 기다려야 했던 기존 방식에서 벗어나, 생각하는 과정과 답변을 병행할 수 있도록 했다.",
+    "title": "오픈AI, 질문에 맞춰 화면 생성하는 'GPT-6' 공개...전 사용자 무료 적용",
+    "url": null
+   },
+   {
+    "id": "it:1172#s26",
+    "source": "AI타임스",
+    "text": "GPT-6는 답변 속도도 개선했다. 특히 모델이 복잡한 문제를 추론하는 동안 사용자가 결과를 기다려야 했던 기존 방식에서 벗어나, 생각하는 과정과 답변을 병행할 수 있도록 했다. 이 모델은 현재까지 확보한 정보와 추론 결과를 활용해 먼저 유용한 내용을 답하고, 이후 추가로 얻은 정보를 이용해 답변을 계속 보완한다.",
+    "title": "오픈AI, 질문에 맞춰 화면 생성하는 'GPT-6' 공개...전 사용자 무료 적용",
+    "url": null
+   },
+   {
+    "id": "it:1172#s27",
+    "source": "AI타임스",
+    "text": "특히 모델이 복잡한 문제를 추론하는 동안 사용자가 결과를 기다려야 했던 기존 방식에서 벗어나, 생각하는 과정과 답변을 병행할 수 있도록 했다. 이 모델은 현재까지 확보한 정보와 추론 결과를 활용해 먼저 유용한 내용을 답하고, 이후 추가로 얻은 정보를 이용해 답변을 계속 보완한다. 여러 차례에 걸쳐 답변을 구성하더라도 최종적으로 하나의 일관된 답변처럼 연결되도록 학습했다.",
+    "title": "오픈AI, 질문에 맞춰 화면 생성하는 'GPT-6' 공개...전 사용자 무료 적용",
+    "url": null
+   },
+   {
+    "id": "it:1172#s28",
+    "source": "AI타임스",
+    "text": "이 모델은 현재까지 확보한 정보와 추론 결과를 활용해 먼저 유용한 내용을 답하고, 이후 추가로 얻은 정보를 이용해 답변을 계속 보완한다. 여러 차례에 걸쳐 답변을 구성하더라도 최종적으로 하나의 일관된 답변처럼 연결되도록 학습했다. 내부 평가에서는 일상형 에이전트 작업에서 'GPT-6 엑스트라 하이(Extra High)'는 이전 버전인 'GPT-5.6 미디엄(Medium)'과 비슷한 시간에 답변을 시작하면서도, 'GPT-5.6 엑스트라 하이'보다 높은 종합 점수를 기록했다.",
+    "title": "오픈AI, 질문에 맞춰 화면 생성하는 'GPT-6' 공개...전 사용자 무료 적용",
+    "url": null
+   },
+   {
+    "id": "it:1100#s29",
+    "source": "OpenAI News",
+    "text": "For questions that need web search, GPT‑6 Instant starts answering 44% sooner, on average, than GPT‑5.6 Instant. GPT‑6 also improves the quality of answers that require web search. It makes better decisions about when to look something up and more reliably finds information that supports its answer.",
+    "title": "GPT-6 and Intelligent UI for everyone",
+    "url": null
+   },
+   {
+    "id": "it:1100#s30",
+    "source": "OpenAI News",
+    "text": "GPT‑6 also improves the quality of answers that require web search. It makes better decisions about when to look something up and more reliably finds information that supports its answer. In an internal evaluation of difficult problems, GPT‑6 correctly addressed the key aspect of the user’s question more often than GPT‑5.6.",
+    "title": "GPT-6 and Intelligent UI for everyone",
+    "url": null
+   },
+   {
+    "id": "it:1100#s31",
+    "source": "OpenAI News",
+    "text": "It makes better decisions about when to look something up and more reliably finds information that supports its answer. In an internal evaluation of difficult problems, GPT‑6 correctly addressed the key aspect of the user’s question more often than GPT‑5.6. As we bring more intelligent AI to more people, we work to improve how it recognizes real-world risks, how honestly it responds, and how well it respects the limits that people set.",
+    "title": "GPT-6 and Intelligent UI for everyone",
+    "url": null
+   },
+   {
+    "id": "it:1172#s31",
+    "source": "AI타임스",
+    "text": "웹 검색이 필요한 질문에서는 'GPT-6 인스턴트(Instant)'가 'GPT-5.6 인스턴트'보다 평균 44% 빠르게 답변을 시작하는 것으로 나타났다. 검색이 필요한 상황을 판단하는 능력과 답변을 뒷받침할 정보를 찾는 능력도 개선됐다는 설명이다. 안전성도 강화했다.",
+    "title": "오픈AI, 질문에 맞춰 화면 생성하는 'GPT-6' 공개...전 사용자 무료 적용",
+    "url": null
+   },
+   {
+    "id": "it:1100#s32",
+    "source": "OpenAI News",
+    "text": "In an internal evaluation of difficult problems, GPT‑6 correctly addressed the key aspect of the user’s question more often than GPT‑5.6. As we bring more intelligent AI to more people, we work to improve how it recognizes real-world risks, how honestly it responds, and how well it respects the limits that people set. GPT‑6 makes progress in each of these areas, building on several of Astra’s safety advances to better resist attempts to bypass its safety training, follow safeguards, and be clearer about what it can and can’t do relative to GPT‑5.6 Sol.",
+    "title": "GPT-6 and Intelligent UI for everyone",
+    "url": null
+   },
+   {
+    "id": "it:1172#s32",
+    "source": "AI타임스",
+    "text": "검색이 필요한 상황을 판단하는 능력과 답변을 뒷받침할 정보를 찾는 능력도 개선됐다는 설명이다. 안전성도 강화했다. 여러 차례의 대화를 통해 안전장치를 우회하려는 공격에 대한 저항력을 높였으며, 사이버 공격과 생물학적 위협, 폭력 등 고위험 영역에서 AI가 악용되는 것을 막기 위한 안전 학습을 강화했다.",
+    "title": "오픈AI, 질문에 맞춰 화면 생성하는 'GPT-6' 공개...전 사용자 무료 적용",
+    "url": null
+   },
+   {
+    "id": "it:1100#s33",
+    "source": "OpenAI News",
+    "text": "As we bring more intelligent AI to more people, we work to improve how it recognizes real-world risks, how honestly it responds, and how well it respects the limits that people set. GPT‑6 makes progress in each of these areas, building on several of Astra’s safety advances to better resist attempts to bypass its safety training, follow safeguards, and be clearer about what it can and can’t do relative to GPT‑5.6 Sol. We updated its safety training based on lessons from real-world use to strengthen protections against high-risk misuse involving cyberattacks, biological threats, and violence.",
+    "title": "GPT-6 and Intelligent UI for everyone",
+    "url": null
+   },
+   {
+    "id": "it:1172#s33",
+    "source": "AI타임스",
+    "text": "안전성도 강화했다. 여러 차례의 대화를 통해 안전장치를 우회하려는 공격에 대한 저항력을 높였으며, 사이버 공격과 생물학적 위협, 폭력 등 고위험 영역에서 AI가 악용되는 것을 막기 위한 안전 학습을 강화했다. 동시에 정상적인 요청을 불필요하게 거부하는 문제를 줄이는 데도 초점을 맞췄다.",
+    "title": "오픈AI, 질문에 맞춰 화면 생성하는 'GPT-6' 공개...전 사용자 무료 적용",
+    "url": null
+   },
+   {
+    "id": "it:1100#s34",
+    "source": "OpenAI News",
+    "text": "GPT‑6 makes progress in each of these areas, building on several of Astra’s safety advances to better resist attempts to bypass its safety training, follow safeguards, and be clearer about what it can and can’t do relative to GPT‑5.6 Sol. We updated its safety training based on lessons from real-world use to strengthen protections against high-risk misuse involving cyberattacks, biological threats, and violence. In adversarial testing, GPT‑6 showed stronger resistance to attempts to bypass its safety training, particularly attacks that adapt across multiple turns.",
+    "title": "GPT-6 and Intelligent UI for everyone",
+    "url": null
+   },
+   {
+    "id": "it:1172#s34",
+    "source": "AI타임스",
+    "text": "여러 차례의 대화를 통해 안전장치를 우회하려는 공격에 대한 저항력을 높였으며, 사이버 공격과 생물학적 위협, 폭력 등 고위험 영역에서 AI가 악용되는 것을 막기 위한 안전 학습을 강화했다. 동시에 정상적인 요청을 불필요하게 거부하는 문제를 줄이는 데도 초점을 맞췄다. 대화의 이전 내용과 관련 맥락을 활용해 한 번의 질문만으로는 드러나지 않는 위험을 파악하도록 했으며, 자신에게 필요한 정보나 도구가 없을 때 이를 더 명확하게 설명하도록 훈련했다.",
+    "title": "오픈AI, 질문에 맞춰 화면 생성하는 'GPT-6' 공개...전 사용자 무료 적용",
+    "url": null
+   },
+   {
+    "id": "it:1100#s35",
+    "source": "OpenAI News",
+    "text": "We updated its safety training based on lessons from real-world use to strengthen protections against high-risk misuse involving cyberattacks, biological threats, and violence. In adversarial testing, GPT‑6 showed stronger resistance to attempts to bypass its safety training, particularly attacks that adapt across multiple turns. GPT‑6 is also trained to respond safely in higher-risk scenarios while avoiding unnecessary refusals of harmless requests.",
+    "title": "GPT-6 and Intelligent UI for everyone",
+    "url": null
+   },
+   {
+    "id": "it:1172#s35",
+    "source": "AI타임스",
+    "text": "동시에 정상적인 요청을 불필요하게 거부하는 문제를 줄이는 데도 초점을 맞췄다. 대화의 이전 내용과 관련 맥락을 활용해 한 번의 질문만으로는 드러나지 않는 위험을 파악하도록 했으며, 자신에게 필요한 정보나 도구가 없을 때 이를 더 명확하게 설명하도록 훈련했다. GPT-6와 지능형 UI는 이날부터 챗GPT 플러스, 프로, 비즈니스, 엔터프라이즈 사용자를 대상으로 글로벌 출시된다.",
+    "title": "오픈AI, 질문에 맞춰 화면 생성하는 'GPT-6' 공개...전 사용자 무료 적용",
+    "url": null
+   },
+   {
+    "id": "it:1100#s36",
+    "source": "OpenAI News",
+    "text": "In adversarial testing, GPT‑6 showed stronger resistance to attempts to bypass its safety training, particularly attacks that adapt across multiple turns. GPT‑6 is also trained to respond safely in higher-risk scenarios while avoiding unnecessary refusals of harmless requests. This includes using conversation history and relevant context to recognize risks that may not be apparent from a single prompt.",
+    "title": "GPT-6 and Intelligent UI for everyone",
+    "url": null
+   },
+   {
+    "id": "it:1100#s37",
+    "source": "OpenAI News",
+    "text": "GPT‑6 is also trained to respond safely in higher-risk scenarios while avoiding unnecessary refusals of harmless requests. This includes using conversation history and relevant context to recognize risks that may not be apparent from a single prompt. We ran alignment evaluations throughout training, assessing honesty and responses to safety restrictions.",
+    "title": "GPT-6 and Intelligent UI for everyone",
+    "url": null
+   },
+   {
+    "id": "it:1172#s37",
+    "source": "AI타임스",
+    "text": "GPT-6와 지능형 UI는 이날부터 챗GPT 플러스, 프로, 비즈니스, 엔터프라이즈 사용자를 대상으로 글로벌 출시된다. 다음 날부터 무료 및 고(Go) 사용자로 확대된다. 엔터프라이즈 이용 가능 여부는 기업 관리자의 설정에 따라 달라질 수 있다.",
+    "title": "오픈AI, 질문에 맞춰 화면 생성하는 'GPT-6' 공개...전 사용자 무료 적용",
+    "url": null
+   },
+   {
+    "id": "it:1100#s38",
+    "source": "OpenAI News",
+    "text": "This includes using conversation history and relevant context to recognize risks that may not be apparent from a single prompt. We ran alignment evaluations throughout training, assessing honesty and responses to safety restrictions. GPT‑6 is better at recognizing and communicating the limits of its own capabilities, including when it lacks the information or tools needed to answer.",
+    "title": "GPT-6 and Intelligent UI for everyone",
+    "url": null
+   },
+   {
+    "id": "it:1172#s38",
+    "source": "AI타임스",
+    "text": "다음 날부터 무료 및 고(Go) 사용자로 확대된다. 엔터프라이즈 이용 가능 여부는 기업 관리자의 설정에 따라 달라질 수 있다. 유료 사용자에게는 ‘GPT-6 솔’, 무료와 Go 이용자에게는 ‘GPT-6 루나’가 제공된다.",
+    "title": "오픈AI, 질문에 맞춰 화면 생성하는 'GPT-6' 공개...전 사용자 무료 적용",
+    "url": null
+   },
+   {
+    "id": "it:1100#s39",
+    "source": "OpenAI News",
+    "text": "We ran alignment evaluations throughout training, assessing honesty and responses to safety restrictions. GPT‑6 is better at recognizing and communicating the limits of its own capabilities, including when it lacks the information or tools needed to answer. More detail on the results and our review is available in the system card(opens in a new window).",
+    "title": "GPT-6 and Intelligent UI for everyone",
+    "url": null
+   },
+   {
+    "id": "it:1100#s40",
+    "source": "OpenAI News",
+    "text": "GPT‑6 is better at recognizing and communicating the limits of its own capabilities, including when it lacks the information or tools needed to answer. More detail on the results and our review is available in the system card(opens in a new window). GPT‑6 with Intelligent UI starts rolling out globally to ChatGPT Plus, Pro, Business and Enterprise tiers today in the Chat tab.",
+    "title": "GPT-6 and Intelligent UI for everyone",
+    "url": null
+   },
+   {
+    "id": "it:1172#s40",
+    "source": "AI타임스",
+    "text": "유료 사용자에게는 ‘GPT-6 솔’, 무료와 Go 이용자에게는 ‘GPT-6 루나’가 제공된다. 두 모델 모두 일상적인 대화와 작업에 맞춰 조정됐다. 이번 업데이트는 챗GPT의 채팅 경험에 적용되며, 업무용 ‘챗GPT 워크’와 코딩용 ‘코덱스’를 구동하는 모델은 변경되지 않는다.",
+    "title": "오픈AI, 질문에 맞춰 화면 생성하는 'GPT-6' 공개...전 사용자 무료 적용",
+    "url": null
+   },
+   {
+    "id": "it:1172#s41",
+    "source": "AI타임스",
+    "text": "두 모델 모두 일상적인 대화와 작업에 맞춰 조정됐다. 이번 업데이트는 챗GPT의 채팅 경험에 적용되며, 업무용 ‘챗GPT 워크’와 코딩용 ‘코덱스’를 구동하는 모델은 변경되지 않는다. 박찬 기자 cpark@aitimes.com",
+    "title": "오픈AI, 질문에 맞춰 화면 생성하는 'GPT-6' 공개...전 사용자 무료 적용",
+    "url": null
+   },
+   {
+    "id": "it:1172#s42",
+    "source": "AI타임스",
+    "text": "이번 업데이트는 챗GPT의 채팅 경험에 적용되며, 업무용 ‘챗GPT 워크’와 코딩용 ‘코덱스’를 구동하는 모델은 변경되지 않는다. 박찬 기자 cpark@aitimes.com",
+    "title": "오픈AI, 질문에 맞춰 화면 생성하는 'GPT-6' 공개...전 사용자 무료 적용",
+    "url": null
+   },
+   {
+    "id": "it:1100#s43",
+    "source": "OpenAI News",
+    "text": "Starting tomorrow, the rollout expands to Free and Go tiers. Enterprise availability depends on workplace admin settings. GPT‑6 in ChatGPT is powered by GPT‑6 Sol for Plus, Pro, Business, and Enterprise tiers, and GPT‑6 Luna for Free and Go tiers.",
+    "title": "GPT-6 and Intelligent UI for everyone",
+    "url": null
+   }
+  ],
+  "angle": "질문 맥락에 맞는 화면 실시간 구성",
+  "previous": null,
+  "code_warnings": [],
+  "round": 1
+ },
+ "expect": {
+  "status": "reject",
+  "loc": "sections[3].paragraphs[1]",
+  "type": "number_mismatch"
+ },
+ "note": "최종판에 number_mismatch 하나를 심음(sections[3].paragraphs[1])"
+}
