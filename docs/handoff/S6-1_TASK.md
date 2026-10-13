@@ -411,7 +411,7 @@ review: 그대로(max_rounds 3, same_issue_repeat_to_check 2, duplicate_point_si
 - 콜드 리뷰(R3, `.workflow/007-s6-1/R3-review.md`) 반영: 이름 패턴(`translit_pattern`)에도 식별자 보호(실DB `w40-deepseek-harness`에서 `@deepseek-ai/…` 훼손 2건 확인 — W40을 다시 쓰지 않으면 남음), 2글자 음차는 조사 없이 나올 때만·1글자는 낱말 단위 제외("솔로"·"라지만" 보호), 병기 중복 "X(X)" 정리, 영상 2개 이상 토픽은 근거로 채우지 않음(작성자 값만), 작성자 선택 구간이 cap에 밀리지 않음. 첫 절 지침은 "summary 사건을 다루되 문장을 되풀이하지 않고 세부를 더함"으로(검수자 절차 0과의 모순 해소)
 - 3.3 갱신: `trendsit/brief/aliases.py`(음차 패턴의 정본 위치)와 `.github/workflows/ci.yml` 수정 허용
 
-### 5.15 v1.3 추가(리뷰 세션 2026-10-14, 코드 지적 `.workflow/planning/s6-1/code-findings-2.md`)
+### 5.15 v1.3 추가(리뷰 세션 2026-10-14, 코드 지적 `.workflow/planning/s6-1/code-findings-2.md`. 이번 범위는 1·2·4와 R2-04, 3은 MVP 뒤)
 | # | 무엇 | 요구 |
 |---|---|---|
 | 1 | 검수자 원문 | 5.2의 "`it:#s` → 그 문장 ± 1문장"은 유지하되 **구성원 하나에 문서 하나**: 같은 구성원의 창을 합쳐(겹치면 한 번) 문장 순서대로, 줄마다 근거 id. slide_fact는 사실 줄 + 기존 ±30초 창 |
