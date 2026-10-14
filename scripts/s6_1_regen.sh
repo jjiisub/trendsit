@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
-# S6-1 7장 런 뒤 ①~⑤를 한 번에(D-46). 실DB에 쓴다(backup·weekly·publish): 사용자 승인 뒤에만 돌린다.
+# S6-1 7장 런 뒤 ①~⑤를 한 번에(D-46, 5.14-12로 W41만). 실DB에 쓴다(backup·weekly·publish): 사용자 승인 뒤에만 돌린다.
 # 한 단계라도 실패하면(명령 실패 또는 비용 상한 초과) 거기서 멈추고 종료 코드 1. 사용: bash scripts/s6_1_regen.sh
+# 5.14-12(사용자 결정 2026-10-14): W41만 --from-step write로 다시 쓰고 publish. W40은 다시 쓰지 않고
+# (예전 TopicPage로 남아 v2 전용 export·build가 못 읽음, D-31 하위 호환 없음) publish도 하지 않는다 —
+# W40을 다시 쓸지는 W41 결과를 보고 따로 결정(사용자)한다.
 set -Eeu  # -E: 함수 안 실패에도 ERR trap이 걸림(007-A2-17, check_cost·week_state 포함)
 cd "$(dirname "$0")/.."
 
@@ -37,14 +40,14 @@ check_cost() {  # 합 ≤ 1.50(2장), 넘으면 멈춤
 
 # weekly --force는 시작하자마자 그 주를 published → done으로 푼다. v1.2부터 토픽 일부만 failed(partial)여도
 # weeks.status는 done이라 publish를 받지만, 토픽 전부 failed거나 예산 중단이면 done이 안 돼 거부(2)된다.
-# 그러면 두 주가 미발행으로 남으므로 여기서 멈추고 되돌릴 방법을 안내한다(이전 current_run_id로 복구).
+# 그러면 그 주가 미발행으로 남으므로 여기서 멈추고 되돌릴 방법을 안내한다(이전 current_run_id로 복구).
 check_week_publishable() {  # ③ 각 weekly 뒤: week prev_state("status|current_run_id")
   local week="$1" prev="$2" now status
   now=$(week_state "$week")
   status="${now%%|*}"
   if [ "$status" != "done" ] && [ "$status" != "published" ]; then
     echo "주 ${week}이 발행 가능 상태가 아님: $status(= 토픽 전부 실패 또는 예산 중단, publish 거부됨)" >&2
-    echo "복구: data/backup/의 pre-s6-1 백업(②)으로 되돌리거나, 아래로 이전 판을 되돌린 뒤 publish를 다시 시도할 것:" >&2
+    echo "복구: data/backup/의 pre-s6-1c 백업(②)으로 되돌리거나, 아래로 이전 판을 되돌린 뒤 publish를 다시 시도할 것:" >&2
     echo "  sqlite3 $DB \"UPDATE weeks SET status='${prev%%|*}', current_run_id='${prev##*|}' WHERE week='$week'\"" >&2
     return 1  # 007-A2-17: exit는 ERR trap을 안 거치므로 return으로(set -Ee가 전파)
   fi
@@ -57,26 +60,20 @@ for vid in S-bRN-avZ4Q D7q8fa589FY; do
   fi
 done
 
-echo "== ② trendsit backup --tag pre-s6-1 =="
-uv run python -m trendsit backup --tag pre-s6-1
+echo "== ② trendsit backup --tag pre-s6-1c =="
+uv run python -m trendsit backup --tag pre-s6-1c
 
-echo "== ③ weekly --force --spec S6-1(W40, W41) =="
-prev40=$(week_state 2026-W40)
-FORCED+=("2026-W40|$prev40")
-uv run --extra embed python -m trendsit weekly --week 2026-W40 --force --spec S6-1
-check_cost
-check_week_publishable 2026-W40 "$prev40"
+echo "== ③ weekly --from-step write --force --spec S6-1(W41만, 5.14-12) =="
 prev41=$(week_state 2026-W41)
 FORCED+=("2026-W41|$prev41")
-uv run --extra embed python -m trendsit weekly --week 2026-W41 --force --spec S6-1
+uv run --extra embed python -m trendsit weekly --week 2026-W41 --from-step write --force --spec S6-1
 check_cost
 check_week_publishable 2026-W41 "$prev41"
 
-echo "== ④ 읽기본 확인(손으로 reports/S5_brief/briefing_<week>.md 훑기) =="
-echo "reports/S5_brief/briefing_2026-W40.md, briefing_2026-W41.md을 열어 작성 실패·⚠ 수를 리포트에 적을 것"
+echo "== ④ 읽기본 확인(손으로 reports/S5_brief/briefing_2026-W41.md 훑기) =="
+echo "reports/S5_brief/briefing_2026-W41.md을 열어 작성 실패·⚠ 수를 리포트에 적을 것"
 
-echo "== ⑤ publish → check.py(실사이트) → WebKit 375 캡처 =="
-uv run python -m trendsit publish --week 2026-W40
+echo "== ⑤ publish(W41만) → check.py(실사이트) → WebKit 375 캡처 =="
 uv run python -m trendsit publish --week 2026-W41
 python3 site_src/check.py
 echo "실사이트(trendsit.jiseop.com) 홈·토픽 2개(표·슬라이드) 캡처를 reports/S6-1/shots/에 손으로 추가할 것"
