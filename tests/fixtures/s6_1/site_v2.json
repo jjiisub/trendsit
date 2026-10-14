@@ -1279,73 +1279,896 @@
  },
  "runs": [
   {
-   "id": "r41",
-   "kind": "weekly",
-   "week": "2026-w41",
-   "at": "2026-10-12T07:00:00+09:00",
-   "duration_min": 14.0,
+   "id": "n42",
+   "kind": "nightly",
+   "at": "2026-10-13T02:00:06+09:00",
+   "end": "2026-10-13T02:13:55+09:00",
+   "duration_sec": 829,
+   "day": "2026-10-13",
+   "week": "2026-w42",
+   "mode": "auto",
    "status": "ok",
-   "cost_usd": 0.0612,
-   "summary": "토픽 5개 발행, 검수 반려 1회, 확인 필요 1문장",
-   "fallback_select": true,
-   "counts": {
-    "candidates": 9,
-    "related": {
-     "follow_up": 1,
-     "new": 4,
-     "duplicate": 0
-    },
-    "selected": 5,
-    "evidence_ids": 62,
-    "review": {
-     "passed_first": 4,
-     "rejected": 1,
-     "needs_check": 1
-    },
-    "published": 5,
-    "written": 5
+   "cost_usd": 0.1299,
+   "current": false,
+   "label": "nightly 10.12",
+   "sub": false,
+   "topic_id": null,
+   "result": {
+    "steps": 7,
+    "failed": 0
+   },
+   "summary": {
+    "collected": 55,
+    "filter_keep": 35,
+    "cards": 24,
+    "deep_text": 5,
+    "video": 2,
+    "repo": 8,
+    "exit_nonzero": 0
    },
    "steps": [
     {
-     "role": "plan",
-     "text": "후보 9개 중 5개 선정",
-     "t": "07:02",
+     "t": "02:00",
+     "name": "collect",
+     "who": [
+      {
+       "kind": "code",
+       "role": null,
+       "model": null,
+       "n": null
+      }
+     ],
+     "line": "new 55 / sources 9 / failed 0",
+     "duration_sec": 93,
+     "cost_usd": null,
      "attention": false,
-     "fallback": true
+     "detail": [
+      {
+       "type": "list",
+       "items": [
+        "aitimes 28",
+        "github_trending 11",
+        "geeknews 8",
+        "github_releases 6",
+        "techbridge 2",
+        "anthropic, deepmind, openai, simonw 0"
+       ]
+      }
+     ]
     },
     {
-     "role": "writer",
-     "text": "절 5개, 근거 id 12개",
-     "t": "07:05",
-     "attention": false
+     "t": "02:01",
+     "name": "filter",
+     "who": [
+      {
+       "kind": "code",
+       "role": null,
+       "model": null,
+       "n": null
+      }
+     ],
+     "line": "31건(새 임베딩 31, 10.6초): keep 25, drop 6 [excluded:태양광 2, keyword_pass 25, no_keyword 2], 같은 URL 연결 0",
+     "duration_sec": 24,
+     "cost_usd": null,
+     "attention": false,
+     "detail": [
+      {
+       "type": "kv",
+       "items": [
+        [
+         "filter_status",
+         "pass 25 / filtered 6"
+        ],
+        [
+         "filter_reason",
+         "keyword_pass 25 / excluded:태양광 2 / no_keyword 2 / excluded:스포츠 1 / excluded:주가 1"
+        ]
+       ]
+      }
+     ]
     },
     {
-     "role": "critic",
-     "text": "1차 반려: 수치가 근거와 단위가 달라 수정 요청",
-     "t": "07:09",
-     "attention": true
+     "t": "02:02",
+     "name": "summarize",
+     "who": [
+      {
+       "kind": "llm",
+       "role": "item_card",
+       "model": "qwen3.8-27b",
+       "n": 24
+      }
+     ],
+     "line": "item_card 24 / attention 3",
+     "duration_sec": 234,
+     "cost_usd": 0.05,
+     "attention": false,
+     "detail": [
+      {
+       "type": "kv",
+       "items": [
+        [
+         "tokens_in",
+         "61000"
+        ],
+        [
+         "tokens_out",
+         "12000"
+        ],
+        [
+         "cost_usd",
+         "0.05"
+        ],
+        [
+         "attention",
+         "3"
+        ]
+       ]
+      }
+     ]
     },
     {
-     "role": "weekly",
-     "text": "토픽 5개 발행",
-     "t": "07:14",
-     "attention": false
+     "t": "02:05",
+     "name": "plan",
+     "who": [
+      {
+       "kind": "llm",
+       "role": "editor_plan",
+       "model": "qwen3.8-27b",
+       "n": null
+      }
+     ],
+     "line": "text_queue 5 / video_queue 2 / repo_queue 8",
+     "duration_sec": 29,
+     "cost_usd": 0.004,
+     "attention": true,
+     "detail": [
+      {
+       "type": "list",
+       "items": [
+        "text_queue / MoE 라우팅 안정화 논문 (AI타임스) / relevance high, 원본이 arXiv 논문으로 직접 확인 가능 / depth 2",
+        "text_queue / Decisions API 0.1a0 (OpenAI) / relevance high, 원본이 공식 블로그 / depth 2",
+        "video_queue / 코딩 에이전트 PR 처리 실무 (YouTube) / 64분 초과로 60분 구간 지정, 자동 자막만 / whisper",
+        "repo_queue / NousResearch/hermes-agent / 추적 레포 릴리스(v0.21.7) 발생 / 2"
+       ]
+      },
+      {
+       "type": "kv",
+       "items": [
+        [
+         "log",
+         "영상 10편 중 4편(60분 구간 1), 글 5건, 레포 8개"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "t": "02:06",
+     "name": "deep_text",
+     "who": [
+      {
+       "kind": "agent",
+       "role": "text_analyst",
+       "model": "qwen3.8-27b",
+       "n": 5
+      }
+     ],
+     "line": "items 5 / tool 20",
+     "duration_sec": 148,
+     "cost_usd": 0.039,
+     "attention": false,
+     "detail": [
+      {
+       "type": "table",
+       "head": [
+        "항목",
+        "원본 추적 경로",
+        "깊이",
+        "대조"
+       ],
+       "rows": [
+        [
+         "MoE 라우팅 안정화 논문",
+         "arxiv.org",
+         "2",
+         "AI타임스 → arxiv 초록(깊이 2), 수치 4개·주장 3개 일치"
+        ],
+        [
+         "Hermes Agent v0.21.7",
+         "github.com → docs.hermes.example",
+         "2",
+         "GeekNews → GitHub 릴리스, 수치 5개 모두 일치"
+        ],
+        [
+         "서피스 랩톱 울트라 온디바이스",
+         "microsoft.com",
+         "1",
+         "원문 미공개, 못 찾음"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "t": "02:08",
+     "name": "video",
+     "who": [
+      {
+       "kind": "agent",
+       "role": "video_analyst",
+       "model": "qwen3.8-27b",
+       "n": 2
+      }
+     ],
+     "line": "video 2 / digests 2",
+     "duration_sec": 182,
+     "cost_usd": 0.01,
+     "attention": false,
+     "detail": [
+      {
+       "type": "list",
+       "items": [
+        "코딩 에이전트 PR 처리 실무 / mode whisper / span 0.0~3600.0 / segments 707 / quality ok",
+        "에이전트 스킬 작성과 MCP 배포 / mode whisper / span 0.0~1057.261 / segments 240 / quality ok / frames 3"
+       ]
+      }
+     ]
+    },
+    {
+     "t": "02:11",
+     "name": "repo_analyze",
+     "who": [
+      {
+       "kind": "agent",
+       "role": "repo_analyst",
+       "model": "qwen3.8-27b",
+       "n": 8
+      }
+     ],
+     "line": "repos 8 / tool 44",
+     "duration_sec": 118,
+     "cost_usd": 0.027,
+     "attention": false,
+     "detail": [
+      {
+       "type": "list",
+       "items": [
+        "NousResearch/hermes-agent: v0.21.7 릴리스, 커밋 100+, 관련",
+        "mattpocock/skills: v1.3.1 릴리스, 커밋 46, 글 0건, 관련",
+        "외 6개"
+       ]
+      }
+     ]
+    },
+    {
+     "t": "02:13",
+     "name": "export + build",
+     "who": [
+      {
+       "kind": "code",
+       "role": null,
+       "model": null,
+       "n": null
+      }
+     ],
+     "line": "exit 0",
+     "duration_sec": 3,
+     "cost_usd": null,
+     "attention": false,
+     "detail": []
     }
    ]
+  },
+  {
+   "id": "r41a",
+   "kind": "weekly",
+   "at": "2026-10-12T07:00:03+09:00",
+   "end": "2026-10-12T07:20:00+09:00",
+   "duration_sec": 1197,
+   "day": "2026-10-12",
+   "week": "2026-w41",
+   "mode": "auto",
+   "status": "ok",
+   "cost_usd": 0.098,
+   "current": false,
+   "label": "from cluster",
+   "sub": false,
+   "topic_id": null,
+   "result": {
+    "clusters": 143,
+    "candidates": 20,
+    "selected": 3,
+    "topics": 3,
+    "code_rejects": 2,
+    "check_topics": 1
+   },
+   "summary": {
+    "clusters": 143,
+    "candidates": 20,
+    "selected": 3,
+    "topics": 3,
+    "published": null,
+    "rounds": {
+     "1": 1,
+     "2": 2,
+     "3": 0
+    },
+    "code_rejects": 2,
+    "critic_rejects": 0,
+    "check_topics": 1
+   },
+   "steps": [
+    {
+     "t": "07:00",
+     "name": "evidence",
+     "who": [
+      {
+       "kind": "code",
+       "role": null,
+       "model": null,
+       "n": null
+      }
+     ],
+     "line": "근거 자격 글 150, 영상 9, 레포 7",
+     "duration_sec": 1,
+     "cost_usd": null,
+     "attention": false,
+     "detail": []
+    },
+    {
+     "t": "07:19",
+     "name": "weekly 끝",
+     "who": [
+      {
+       "kind": "code",
+       "role": null,
+       "model": null,
+       "n": null
+      }
+     ],
+     "line": "2026-W41 weekly 끝: 토픽 3개",
+     "duration_sec": 1197,
+     "cost_usd": 0.098,
+     "attention": false,
+     "detail": []
+    }
+   ]
+  },
+  {
+   "id": "r41",
+   "kind": "weekly",
+   "at": "2026-10-10T23:42:21+09:00",
+   "end": "2026-10-10T23:57:46+09:00",
+   "duration_sec": 925,
+   "day": "2026-10-10",
+   "week": "2026-w41",
+   "mode": "manual",
+   "status": "ok",
+   "cost_usd": 0.102,
+   "current": true,
+   "label": "from cluster",
+   "sub": false,
+   "topic_id": null,
+   "result": {
+    "clusters": 143,
+    "candidates": 20,
+    "selected": 3,
+    "topics": 3,
+    "code_rejects": 2,
+    "check_topics": 1
+   },
+   "summary": {
+    "clusters": 143,
+    "candidates": 20,
+    "selected": 3,
+    "topics": 3,
+    "published": 3,
+    "rounds": {
+     "1": 1,
+     "2": 2,
+     "3": 0
+    },
+    "code_rejects": 2,
+    "critic_rejects": 0,
+    "check_topics": 1
+   },
+   "steps": [
+    {
+     "t": "23:42",
+     "name": "evidence",
+     "who": [
+      {
+       "kind": "code",
+       "role": null,
+       "model": null,
+       "n": null
+      }
+     ],
+     "line": "근거 자격 글 141, 영상 8, 레포 7 / 제외 카드 없음 50, digest 없음 8",
+     "duration_sec": 0,
+     "cost_usd": null,
+     "attention": false,
+     "detail": [
+      {
+       "type": "kv",
+       "items": [
+        [
+         "counts",
+         "text 141 / video 8 / github 7"
+        ],
+        [
+         "excluded",
+         "no_card 50 / no_digest 8 / irrelevant_repo 0"
+        ],
+        [
+         "영상 관련성",
+         "high 6, mid 2"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "t": "23:42",
+     "name": "normalize",
+     "who": [
+      {
+       "kind": "code",
+       "role": null,
+       "model": null,
+       "n": null
+      }
+     ],
+     "line": "별칭 자동 승인 2, 후보 0, decide 0",
+     "duration_sec": null,
+     "cost_usd": null,
+     "attention": false,
+     "detail": [
+      {
+       "type": "kv",
+       "items": [
+        [
+         "candidates",
+         "0"
+        ],
+        [
+         "auto_approved",
+         "2"
+        ]
+       ]
+      },
+      {
+       "type": "list",
+       "items": [
+        "클로드 하이쿠 5.5 → Claude Haiku 5.5 / 음차·약어 사전",
+        "제미나이 → Gemini"
+       ]
+      }
+     ]
+    },
+    {
+     "t": "23:42",
+     "name": "cluster + decide",
+     "who": [
+      {
+       "kind": "code",
+       "role": null,
+       "model": null,
+       "n": null
+      },
+      {
+       "kind": "llm",
+       "role": "decide",
+       "model": "qwen3.8-27b",
+       "n": 58
+      }
+     ],
+     "line": "묶음 143개(토픽 후보 137, 레포만 6), 2채널 이상 1, decide 58회 / attention 1",
+     "duration_sec": 170,
+     "cost_usd": 0.018,
+     "attention": true,
+     "detail": [
+      {
+       "type": "kv",
+       "items": [
+        [
+         "clusters",
+         "143"
+        ],
+        [
+         "candidates",
+         "137"
+        ],
+        [
+         "multi_channel",
+         "1"
+        ],
+        [
+         "decide_calls",
+         "58"
+        ]
+       ]
+      },
+      {
+       "type": "table",
+       "head": [
+        "a",
+        "b",
+        "판정",
+        "이유",
+        "확신도"
+       ],
+       "rows": [
+        [
+         "OpenAI 불량 에이전트, 위키미디어 활동 (GeekNews)",
+         "오픈AI 에이전트와 5월 위키데이터 장애 (AI타임스)",
+         "같음",
+         "둘 다 OpenAI 에이전트가 위키미디어에서 일으킨 활동과 5월 장애 연관성을 다룸",
+         "0.95"
+        ],
+        [
+         "Decisions API와 gpt-6-luna (OpenAI)",
+         "Claude Haiku 5.5 (Anthropic)",
+         "다름",
+         "다른 회사의 다른 모델",
+         "0.95"
+        ],
+        [
+         "MAI-코드-1.1 플래시 온디바이스 (AI타임스)",
+         "서피스 랩톱 울트라 공개 (TechBridge)",
+         "다름",
+         "같은 발표 이벤트지만 a는 모델 최적화, b는 하드웨어 발표",
+         "0.80"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "t": "23:45",
+     "name": "editor_select",
+     "who": [
+      {
+       "kind": "llm",
+       "role": "editor_select",
+       "model": "qwen3.8-27b",
+       "n": null
+      }
+     ],
+     "line": "후보 20개 중 3개 선정, 후속 1",
+     "duration_sec": 69,
+     "cost_usd": 0.007,
+     "attention": false,
+     "detail": [
+      {
+       "type": "kv",
+       "items": [
+        [
+         "source",
+         "model"
+        ],
+        [
+         "reconciled",
+         "c1557 select → drop(other)"
+        ],
+        [
+         "past",
+         "new 2 / follow_up 1 / duplicate 0"
+        ]
+       ]
+      },
+      {
+       "type": "table",
+       "head": [
+        "순위",
+        "후보",
+        "판정",
+        "이유"
+       ],
+       "rows": [
+        [
+         "1",
+         "미스트랄, 1조500억 파라미터 MoE 모델 Mistral Large 4",
+         "select",
+         "글 3건, 구체적 수치 있음"
+        ],
+        [
+         "2",
+         "Claude Haiku 5.5 출시, 90% 가격 인하와 토크나이저 변경",
+         "select",
+         "글 2건, 수치 막대 하나"
+        ],
+        [
+         "3",
+         "Google DeepMind, 멀티모달 임베딩 모델 EmbeddingGemma 2",
+         "select",
+         "글 1건, 출처 하나"
+        ],
+        [
+         "-",
+         "학회 발표 요약",
+         "drop(thin)",
+         "글 1건, 발표 요약만 있어 토픽 페이지 분량 부족"
+        ],
+        [
+         "-",
+         "AI 규제 청문회",
+         "drop(low_relevance)",
+         "관심 주제 밖"
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "t": "23:46",
+     "name": "writer ⇄ critic",
+     "who": [
+      {
+       "kind": "llm",
+       "role": "writer",
+       "model": "qwen3.8-27b",
+       "n": 3
+      },
+      {
+       "kind": "llm",
+       "role": "critic",
+       "model": "qwen3.8-27b",
+       "n": 3
+      },
+      {
+       "kind": "llm",
+       "role": "writer_revise",
+       "model": "qwen3.8-27b",
+       "n": 2
+      }
+     ],
+     "line": "topics 3 / rounds 1 ×1, 2 ×2 / code_rejects 2 / critic_rejects 0 / check_topics 1",
+     "duration_sec": 672,
+     "cost_usd": 0.077,
+     "attention": true,
+     "detail": [
+      {
+       "type": "topics",
+       "items": [
+        {
+         "rank": 1,
+         "title": "미스트랄, 1조500억 파라미터 MoE 모델 Mistral Large 4",
+         "topic_id": "w41-mistral-large-4",
+         "status": "checked",
+         "final_round": 2,
+         "tokens_in": 6100,
+         "tokens_out": 1100,
+         "cost_usd": 0.009,
+         "chain": [
+          [
+           "writer",
+           "절 5개, 단락 6개, 표 1개, 타일 2개"
+          ],
+          [
+           "code",
+           "반려 2"
+          ],
+          [
+           "writer_revise",
+           "이슈 2개 중 수정 2"
+          ],
+          [
+           "critic",
+           "원자 사실 26개 모두 지지"
+          ],
+          [
+           "code",
+           "checked 1"
+          ]
+         ],
+         "issues": [
+          [
+           "points[0]",
+           "format",
+           "points[0]이 문장으로 끝남('…밝혔다.')",
+           "edit"
+          ],
+          [
+           "overview",
+           "format",
+           "overview 금지 표현: 핵심이다",
+           "edit"
+          ]
+         ]
+        },
+        {
+         "rank": 2,
+         "title": "Claude Haiku 5.5 출시, 90% 가격 인하와 토크나이저 변경",
+         "topic_id": "w41-claude-haiku-5-5",
+         "status": "passed",
+         "final_round": 1,
+         "tokens_in": 3800,
+         "tokens_out": 900,
+         "cost_usd": 0.005,
+         "chain": [
+          [
+           "writer",
+           "절 3개, 단락 4개"
+          ],
+          [
+           "critic",
+           "원자 사실 18개 모두 지지"
+          ],
+          [
+           "code",
+           "passed"
+          ]
+         ],
+         "issues": []
+        },
+        {
+         "rank": 3,
+         "title": "Google DeepMind, 멀티모달 임베딩 모델 EmbeddingGemma 2",
+         "topic_id": "w41-embedding-gemma-2",
+         "status": "passed",
+         "final_round": 2,
+         "tokens_in": 4300,
+         "tokens_out": 1000,
+         "cost_usd": 0.006,
+         "chain": [
+          [
+           "writer",
+           "절 2개, 단락 2개"
+          ],
+          [
+           "code",
+           "반려 1"
+          ],
+          [
+           "writer_revise",
+           "이슈 1개 중 수정 1"
+          ],
+          [
+           "critic",
+           "원자 사실 9개 모두 지지"
+          ],
+          [
+           "code",
+           "passed"
+          ]
+         ],
+         "issues": [
+          [
+           "타일 2",
+           "number_mismatch",
+           "'90%'의 조건 누락",
+           "edit"
+          ]
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "t": "23:57",
+     "name": "weekly 끝",
+     "who": [
+      {
+       "kind": "code",
+       "role": null,
+       "model": null,
+       "n": null
+      }
+     ],
+     "line": "2026-W41 weekly 끝: 토픽 3개",
+     "duration_sec": 925,
+     "cost_usd": 0.102,
+     "attention": false,
+     "detail": [
+      {
+       "type": "kv",
+       "items": [
+        [
+         "evidence",
+         "0.3"
+        ],
+        [
+         "cluster",
+         "170.1"
+        ],
+        [
+         "select",
+         "68.7"
+        ],
+        [
+         "write_review",
+         "672.2"
+        ],
+        [
+         "total",
+         "925.0"
+        ]
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "steps-2026-10-08",
+   "kind": "steps",
+   "at": "2026-10-08T06:42:00+09:00",
+   "end": "2026-10-08T18:00:00+09:00",
+   "duration_sec": 40680,
+   "day": "2026-10-08",
+   "week": "2026-w41",
+   "mode": "manual",
+   "status": "partial",
+   "cost_usd": 0.9467,
+   "current": false,
+   "label": "steps",
+   "sub": false,
+   "topic_id": null,
+   "result": {
+    "kinds": {
+     "collect": {
+      "ok": 5,
+      "partial": 1
+     },
+     "filter": {
+      "ok": 1
+     },
+     "plan": {
+      "ok": 2
+     }
+    }
+   },
+   "summary": null,
+   "steps": []
   }
  ],
  "run_weeks": [
   {
+   "week": "2026-w42",
+   "label": "10월 3주차",
+   "range": "10.12 ~ 10.18",
+   "status": "open",
+   "nightly_days": 1,
+   "weekly": {
+    "total": 0,
+    "full": 0,
+    "partial": 0,
+    "topic": 0
+   },
+   "published_at": null,
+   "current_run_id": null
+  },
+  {
    "week": "2026-w41",
    "label": "10월 2주차",
    "range": "10.5 ~ 10.11",
-   "nightly": 0,
-   "nightly_failed": 0,
-   "collected": 54,
-   "candidates": 9,
-   "published": 5,
-   "rejected": 1,
-   "needs_check": 1
+   "status": "published",
+   "nightly_days": 0,
+   "weekly": {
+    "total": 2,
+    "full": 2,
+    "partial": 0,
+    "topic": 0
+   },
+   "published_at": "2026-10-12T07:10:00+09:00",
+   "current_run_id": "r41"
+  },
+  {
+   "week": "2026-w40",
+   "label": "10월 1주차",
+   "range": "9.28 ~ 10.4",
+   "status": "published",
+   "nightly_days": 0,
+   "weekly": {
+    "total": 0,
+    "full": 0,
+    "partial": 0,
+    "topic": 0
+   },
+   "published_at": "2026-10-05T07:10:00+09:00",
+   "current_run_id": null
   }
  ]
 }

@@ -125,7 +125,8 @@ def test_a1_structure_and_only_published(tmp_path):
     # C-1: 발행 주(W41)만. W40 주·토픽·레포·실행은 없음
     assert [w["id"] for w in site["weeks"]] == ["2026-w41"]
     assert {t["week"] for t in site["topics"]} == {"2026-w41"} and {r["week"] for r in site["repos"]} == {"2026-w41"}
-    assert {r["id"] for r in site["runs"]} == {"n1", "n-skip", "r41"}  # 발행 안 된 주(W42)의 nightly(n-w42)는 C-1에 따라 뺀다
+    # D-12: steps가 빈 nightly(n-skip 건너뜀, n-w42 범위 없음)는 안 낸다. 발행 안 된 W40은 run(r40)이 있어 진행 주로 run_weeks에 든다(5.2-1)
+    assert {r["id"] for r in site["runs"]} == {"n1", "r40", "r41"}
     w = site["weeks"][0]
     assert w == {"id": "2026-w41", "label": "10월 2주차", "range": "10.5 ~ 10.11",
                  "published_at": "2026-10-12T07:10:00+09:00", "collected": {"text": 2, "video": 0, "github": 0},
@@ -150,15 +151,21 @@ def test_a1_structure_and_only_published(tmp_path):
     assert kw["weeks"] == ["2026-w41"] and next(i for i in kw["items"] if i["id"] == "agent")["mentions"] == [1]
     assert next(i for i in kw["items"] if i["id"] == "agent")["topics"] == ["w41-a", "w41-b"]
     run = next(r for r in site["runs"] if r["id"] == "r41")
-    assert run["counts"] == {"candidates": 9, "related": {"follow_up": 1, "new": 1, "duplicate": 0}, "selected": 2, "evidence_ids": 4, "written": 0,
-                             "review": {"passed_first": 1, "rejected": 1, "needs_check": 1}, "published": 2}  # written(D-37)은 steps(writer,code) 행이 없어 0. 확인 필요는 화면에 표시되는 수(w41-b points[0])
-    assert [s["role"] for s in run["steps"]] == ["writer", "critic"] and run["steps"][1]["attention"] is True
-    assert run["steps"][1]["detail"]["draft"] == "초안" and "detail" not in run["steps"][0]
+    assert (run["kind"], run["week"], run["mode"], run["current"], run["label"], run["sub"], run["topic_id"]) == ("weekly", "2026-w41", "manual", True, "", True, None)
+    assert run["result"] == {"clusters": None, "candidates": 9, "selected": 2, "topics": None, "code_rejects": 1, "check_topics": None}
+    assert run["summary"] == {"clusters": None, "candidates": 9, "selected": 2, "topics": None, "published": 2, "rounds": {"1": 1, "2": 1},
+                              "code_rejects": 1, "critic_rejects": 0, "check_topics": None}  # published = 현재판이면 사이트에 실리는 토픽 수
+    assert [(s["name"], s["t"], s["attention"]) for s in run["steps"]] == [("writer ⇄ critic", "07:02", True)]  # steps 두 행(writer, critic llm)이 한 단계
     night = next(r for r in site["runs"] if r["id"] == "n1")
-    assert night["cost_usd"] == 0.1 and night["week"] == "2026-w41" and night["summary"] == "날 1개, 단계 2개 중 실패 1개"  # 비용은 summary_json 값
-    assert night["steps"][1] == {"role": "plan", "text": "2026-10-06 계획 실패", "attention": True}  # 매일 수집 steps에는 시각 t가 없다(원천 없음)
-    assert site["run_weeks"] == [{"week": "2026-w41", "label": "10월 2주차", "range": "10.5 ~ 10.11", "nightly": 2, "nightly_failed": 1,  # 건너뜀(skipped)은 실패로 세지 않음
-                                  "collected": 2, "candidates": 9, "published": 2, "rejected": 1, "needs_check": 1}]
+    assert (night["label"], night["mode"], night["week"], night["status"], night["cost_usd"], night["result"]) == (
+        "nightly 10.6", "auto", "2026-w41", "partial", 0.1, {"steps": 2, "failed": 1})  # 비용은 summary_json 값
+    assert [(s["name"], s["line"], s["attention"], s["detail"]) for s in night["steps"]] == [
+        ("collect", "exit 0", False, []), ("plan", "exit 1", True, [])]  # 하위 run이 없으면 line만(오류 원문은 내지 않음)
+    assert [rw["week"] for rw in site["run_weeks"]] == ["2026-w41", "2026-w40"]
+    assert site["run_weeks"][0] == {"week": "2026-w41", "label": "10월 2주차", "range": "10.5 ~ 10.11", "status": "published", "nightly_days": 1,
+                                    "weekly": {"total": 1, "full": 0, "partial": 1, "topic": 0}, "published_at": "2026-10-12T07:10:00+09:00",
+                                    "current_run_id": "r41"}
+    assert site["run_weeks"][1]["status"] == "done" and site["run_weeks"][1]["published_at"] is None
 
 
 def test_a1_with_week_includes_unpublished_week_and_export_failures_keep_file(tmp_path):
@@ -166,6 +173,7 @@ def test_a1_with_week_includes_unpublished_week_and_export_failures_keep_file(tm
     out = tmp_path / "site.json"
     export(db, out, with_week="2026-W40")
     assert [w["id"] for w in json.loads(out.read_text())["weeks"]] == ["2026-w41", "2026-w40"]
+    assert [rw["status"] for rw in json.loads(out.read_text())["run_weeks"]] == ["published", "published"]  # with_week의 주도 발행 주로 센다
     before = out.read_text()
     # C-2 위반: 포인트 refs가 비면 실패하고 기존 파일은 그대로
     db.conn.execute("UPDATE topic_evidence SET evidence_id='zz' WHERE run_id='r41' AND topic_id='w41-a' AND evidence_id='it:2#q1'")
@@ -178,20 +186,6 @@ def test_a1_with_week_includes_unpublished_week_and_export_failures_keep_file(tm
     with pytest.raises(ExportError):
         export(make_db(tmp_path / "x", published=()), out)
     assert out.read_text() == before
-
-
-def test_weekly_counts_written_ignores_budget_stop_record_without_topic_id(tmp_path):
-    """006-A2-35: role.py가 예산 초과 때 남기는 중단 기록(detail에 topic_id 없음)은 counts.written에 안 셈(이중 집계 방지)."""
-    from trendsit.export import _weekly_counts
-
-    db = DB(tmp_path / "t.db")
-    db.conn.execute("INSERT INTO runs(id, kind, started_at) VALUES ('r','weekly','2026-10-12T00:00:00+09:00')")
-    db.conn.execute("INSERT INTO steps(run_id, seq, t, role, kind, detail) VALUES ('r', 1, 't', 'writer', 'code', ?)",
-                    (json.dumps({"topic_id": "w41-a"}),))
-    db.conn.execute("INSERT INTO steps(run_id, seq, t, role, kind, detail) VALUES ('r', 2, 't', 'writer', 'code', ?)",
-                    (json.dumps({"attempt": 1}),))  # role.py의 BudgetExceeded 중단 기록(topic_id 없음)
-    c = _weekly_counts(db, "r", {}, 0, 0)
-    assert c["written"] == 1
 
 
 def test_topic_ref_slots_covers_tiles_table_events_not_just_paragraphs():

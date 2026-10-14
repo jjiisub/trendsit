@@ -58,32 +58,39 @@ def on_sigterm(signum: int, frame: Any) -> None:
     raise SystemExit(128 + signal.SIGTERM)
 
 
-def publish(db: DB, week: str, runner: Build = run_subprocess) -> int:
-    """export → 사이트 빌드 → weeks.status 'published', published_at. 0 성공, 1 export·빌드 실패, 2 대상 아님.
+def rebuild_site(db: DB, runner: Build = run_subprocess, with_week: str | None = None) -> int:
+    """export → 사이트 빌드 → data/site.json 교체. 0 성공, 1 export·빌드 실패(stderr 한 줄). weeks 행은 읽기만 한다.
 
-    아직 done인 그 주도 담아야 해서 export는 공개 CLI가 아니라 여기서 함수로 부른다(with_week). 결과는 임시 파일로 받아
-    그 파일로 빌드하고, 성공했을 때만 data/site.json으로 바꾼다(실패하면 미발행 주가 site.json에 남지 않음).
+    결과는 임시 파일로 받아 그 파일로 빌드하고, 성공했을 때만 data/site.json으로 바꾼다(실패하면 미발행 주가 site.json에 남지 않음).
+    with_week: 아직 done인 그 주도 담는다(publish가 상태를 바꾸기 전에 export·build를 돌리기 위한 것).
     """
-    row = db.conn.execute("SELECT status FROM weeks WHERE week=?", (week,)).fetchone()
-    if row is None or row["status"] not in ("done", "published"):
-        print(f"발행 불가: {week} 상태 {row['status'] if row else '없음'} (done 또는 published만)", file=sys.stderr)
-        return 2
     final = db.path.parent / "site.json"
     tmp = final.with_name(final.name + ".new")
     try:
         try:
-            export_site(db, tmp, week)
+            export_site(db, tmp, with_week)
         except Exception as e:  # noqa: BLE001 - export가 무엇으로 죽든 상태는 그대로 두고 1 + 이유 한 줄(C-3)
-            print(f"export 실패: {type(e).__name__}: {e}"[:300].replace("\n", " "), file=sys.stderr)
+            print(f"사이트 재생성 실패: export {type(e).__name__}: {e}"[:300].replace("\n", " "), file=sys.stderr)
             return 1
         code, out, err = runner([*BUILD_CMD, "--data", str(tmp)])
         if code != 0:
             last = next((x for x in reversed((err or out).strip().splitlines()) if x.strip()), "")
-            print(f"사이트 빌드 실패(종료 코드 {code}): {last[:200]}", file=sys.stderr)
+            print(f"사이트 재생성 실패: 빌드 종료 코드 {code}: {last[:200]}", file=sys.stderr)
             return 1
         os.replace(tmp, final)
     finally:
         tmp.unlink(missing_ok=True)
+    return 0
+
+
+def publish(db: DB, week: str, runner: Build = run_subprocess) -> int:
+    """rebuild_site(그 주 포함) → weeks.status 'published', published_at. 0 성공, 1 export·빌드 실패, 2 대상 아님."""
+    row = db.conn.execute("SELECT status FROM weeks WHERE week=?", (week,)).fetchone()
+    if row is None or row["status"] not in ("done", "published"):
+        print(f"발행 불가: {week} 상태 {row['status'] if row else '없음'} (done 또는 published만)", file=sys.stderr)
+        return 2
+    if rebuild_site(db, runner, week):
+        return 1
     with db.conn:
         db.conn.execute("UPDATE weeks SET status='published', published_at=? WHERE week=?", (now_kst(), week))
     print(f"발행: {week}")
@@ -210,11 +217,12 @@ def nightly(db: DB, cfg: OpsConfig, *, day: date | None = None, now: datetime | 
         if not got:
             return _skipped(db, "nightly", _tag(today - timedelta(days=1)),
                             {"days": [], "steps": [], "cost_usd": 0.0})
-        return _nightly_locked(db, cfg, day, now, runner, data_dir)
+        return _nightly_locked(db, cfg, day, now, runner, data_dir, rebuild=True)
 
 
-def _nightly_locked(db: DB, cfg: OpsConfig, day: date | None, now: datetime, runner: Runner, data_dir: Path) -> int:
-    """잠금을 쥔 채로 부른다(nightly, ops weekly의 앞 단계)."""
+def _nightly_locked(db: DB, cfg: OpsConfig, day: date | None, now: datetime, runner: Runner, data_dir: Path,
+                    rebuild: bool = False) -> int:
+    """잠금을 쥔 채로 부른다(nightly, ops weekly의 앞 단계). rebuild: 끝에 사이트만 다시 만든다(weekly는 publish가 빌드하므로 안 씀)."""
     today = now.date()
     days = [day] if day else catchup_days(db, cfg, today)
     tr = Tracer(db, "nightly", _tag(days[-1] if days else today - timedelta(days=1)),
@@ -253,7 +261,33 @@ def _nightly_locked(db: DB, cfg: OpsConfig, day: date | None, now: datetime, run
     print(f"nightly {status}: 날 {len(tried)}개, 단계 {len(log.steps)}개 중 실패 {len(bad)}개")
     for s in bad:
         print(f"  실패 {s['name']} {s['day'] or ''}: {s['error']}", file=sys.stderr)
+    if rebuild and days:  # 범위 없는 nightly는 사이트가 바뀔 일이 없다. SIGTERM·예외로 나가는 경로(finally 뒤)에서는 부르지 않는다
+        _rebuild_after(db, tr.run_id, log)
     return 0 if status == "ok" else 1
+
+
+def _rebuild_after(db: DB, run_id: str, log: StepLog) -> None:
+    """nightly 끝에 사이트만 다시 만들고(export → build → site.json), 결과를 그 nightly 행의 summary_json.site로만 남긴다.
+    실패해도 nightly status·종료 코드·steps는 그대로(C-8). 이 nightly 자신의 export + build 단계는 다음 재생성부터 화면에 나온다."""
+    codes: list[int] = []
+
+    def run(cmd: list[str]) -> tuple[int, str, str]:
+        res = _logged(log, cmd)
+        codes.append(res[0])
+        return res
+
+    t0 = time.monotonic()
+    try:
+        code = rebuild_site(db, run)
+        if code and codes:
+            code = codes[-1]  # 빌드가 실패했으면 그 종료 코드(시간 초과 124)
+    except Exception as e:  # noqa: BLE001 - 끝 단계는 nightly 결과를 바꾸지 않는다
+        print(f"사이트 재생성 실패: {type(e).__name__}: {e}"[:300].replace("\n", " "), file=sys.stderr)
+        code = 1
+    site = {"exit": code, "sec": round(time.monotonic() - t0, 1)}
+    with db.conn:
+        db.conn.execute("UPDATE runs SET summary_json=json_set(summary_json, '$.site', json(?)) WHERE id=?",
+                        (json.dumps(site), run_id))
 
 
 def _queue_step(log: StepLog, d: date, tag: list[str], data_dir: Path, name: str) -> None:
