@@ -34,6 +34,10 @@ W40·W41 재생성·발행(2026-10-13) 뒤 리뷰 세션이 라벨로 판정(D-2
 - `.cmpt td.em`(5.8 CSS 목록) 정의는 추가했지만, Table에 셀 단위 강조(emphasis) 데이터가 없어 `build.py`가 그 클래스를 실제로 내는 곳은 없다(007-A1-11/A2-24). 데이터 원천을 정하는 건 설계 결정이라 이번 범위에서는 CSS만
 
 ## 6. 남은 문제 (미해결)
+- (런 008, MVP 뒤로 미룸 — 사용자 결정 2026-10-14) code-findings-2 R2-03 페이지 단위 형식 이슈, R2-05 revise add 격리, R2-06 missing_key 지시, R2-08 영문+공백 수치 대조, R2-09 sections=[], R2-11 A4·A6 테스트, R2-12 autofix 전후 값·읽기본 영상 구간·"누락 의심" 문구, R2-13 음차 사람 이름, R2-14 문체 괄호 끝
+- (런 008 잔여) `scripts/s5_gate_b.py`: judge_final KeyError(NG-7이라 안 돎), 기본 경로가 추적 `eval/labels`를 비우고 `diagram_labels.json`을 덮어씀, 도식 지표가 bars·events만. 음차 이름 패턴의 일반어 보호 없음("솔라 패널", "제미나이 플래시 메모리"). check_points가 summary ⚠를 안 셈
+- (런 008 판정) `trendsit/brief/report.py`·`tests/test_s5_cluster.py`는 3.4 목록 밖이지만 5.15-4(라벨 보존)를 하려면 라벨 csv를 쓰는 유일한 모듈을 고쳐야 해서 수용. 5.15-4는 사람 라벨 행·칸 보존으로 해석(출력 칸은 다시 씀)
+- (재생성) `s6_1_regen.sh`는 토픽 일부가 실패해도 발행함(5.13 무인 정책과 같음). 손 재생성에서는 실패가 있으면 발행 전에 멈추는 편이 나음
 - **verify_s5.sh B5·A23("순 감소 아님")**: S5-1 리팩터 전용 불변식으로, 이 브랜치 시작 커밋(5cca090, S6a·S6b 병합 직후)부터 이미 깨져 있었다(`git diff --stat bed7887 5cca090 -- trendsit roles skills`로 확인: 1534줄 추가 > 784줄 삭제). `reports/S6b_report.md`도 같은 이유로 verify_s5.sh 전체를 자기 게이트에서 뺐다. S6-1이 기능 스펙이라 net 코드가 느는 것은 불가피하므로, `verify_s6-1.sh`의 A11은 이 두 항목만 예외로 두고 넘어간다(값·채점표는 바꾸지 않음). 다음 사이클에서 B5·A23을 "S5-1 기준"이 아니라 "직전 스펙 기준"으로 바꾸거나 삭제하는 것을 설계 세션에 제안
 - 5.7 "repos 원천 문장 정정"(F74·C-32): A1 라운드 리포트가 "미구현"이라고 적었던 것은 오류였다. `export.py`의 `_repos`는 이미 그 주 모든 `repo_trending` 행과 토픽 근거 레포를 합쳐 돌며(`[*rows, *topic_of]`), 토픽 근거가 아닌 레포만 relevant·설명 기준으로 거른다 — 정정 문장과 같은 동작이다(A2 라운드에서 확인, 006-A1-19 dup)
 - `scripts/s5_eval_fixtures.py`는 v2로 포팅했으나 실DB(실제 weekly 실행 결과)가 없어 끝까지 실행해 보지 못함(런 뒤 ⑥에서 처음 실행됨)
@@ -56,6 +60,42 @@ W40·W41 재생성·발행(2026-10-13) 뒤 리뷰 세션이 라벨로 판정(D-2
 - 실행(2026-10-13): 백업 `data/backup/20261013-1506-pre-s6-1.db` → W40 1차(대체 계획 4토픽, $0.14) → W40 `--from-step select --no-cache`(7토픽, 실패 0, ⚠ 7, $0.15, run `20261013-164928-weekly-1b69`) → W41(10토픽 중 429로 6 실패) → 실패 토픽 6개 `--topic` 재작성(최종 10토픽 passed 5·checked 5, run `20261013-205302-weekly-b981`) → publish W40·W41 → `check.py` 18/20(6장)
 - 영상 파일 두 개 모두 있음(슬라이드 포함). 실사이트 캡처 `reports/S6-1/shots/live-webkit-375-{home,topic-table,topic-slide}.png`
 - ⑥ eval 픽스처: writer 17, critic 20, writer_revise 10
+
+### 7-2. v1.3 W41 재생성(2026-10-14, 런 008 뒤)
+- 백업 `data/backup/20261014-1201-pre-s6-1c.db` → `weekly --week 2026-W41 --from-step write --force`(묶기·선별 그대로 10토픽) → 1차는 OpenRouter 429로 작성 7토픽 실패, 그대로 발행돼 실사이트 W41이 3토픽인 상태가 약 2시간 → 실패 토픽을 `--topic`으로 하나씩(60초 간격, 최대 3회) 다시 써 10토픽 모두 성공(passed 6·checked 4, 최종 run `20261014-141318-weekly-3b09`) → publish W41 → 실사이트 `check.py` 20/20(관문 9 항목 5 새 기준 통과)
+- 사용액 S6-1 $0.87 / $1.50(이번 재생성 약 $0.15)
+- 캡처 `reports/S6-1/shots/live-v13-webkit-375-topic-{table,video}.png`
+
+전(10/13 발행본, run b981 계열)
+| 토픽 | visual | 형광 | ⚠ | 검수 호출 | 검수 입력 최대 토큰 | 이슈 | 잘림 |
+|---|---|---|---|---|---|---|---|
+| w41-mistral-large-4 | 1 | 0 | 1 | 1 | 14663 | 0 | 0 |
+| w41-gpt-6-intelligent-ui | 1 | 0 | 1 | 1 | 14857 | 0 | 0 |
+| w41-embedding-gemma-2 | 2 | 0 | 1 | 2 | 18412 | 0 | 1 |
+| w41-claude-haiku-5-5 | 3 | 0 | 2 | 1 | 16945 | 0 | 0 |
+| w41-gemini-agent-enterprise | 2 | 1 | 0 | 0 | 0 | 0 | 0 |
+| w41-decision-1 | 3 | 0 | 1 | 3 | 16538 | 4 | 1 |
+| w41-ai-math-results | 1 | 0 | 0 | 1 | 14734 | 0 | 0 |
+| w41-openai-rogue-agent | 1 | 0 | 0 | 1 | 6968 | 0 | 0 |
+| w41-openrig | 1 | 0 | 0 | 2 | 12321 | 0 | 1 |
+| w41-ai-code-workflow | 0 | 0 | 0 | 1 | 5683 | 0 | 0 |
+
+후(v1.3)
+| 토픽 | visual | 형광 | ⚠ | 검수 호출 | 검수 입력 최대 토큰 | 이슈 | 잘림 |
+|---|---|---|---|---|---|---|---|
+| w41-mistral-large-4 | 2 | 0 | 2 | 1 | 7716 | 0 | 0 |
+| w41-gpt-6-intelligent-ui | 1 | 4 | 1 | 1 | 7288 | 0 | 0 |
+| w41-embedding-gemma-2 | 3 | 0 | 1 | 1 | 8723 | 0 | 0 |
+| w41-claude-haiku-5-5 | 4 | 2 | 0 | 1 | 8534 | 0 | 0 |
+| w41-gemini-agent-enterprise | 2 | 2 | 0 | 1 | 7604 | 0 | 0 |
+| w41-decision-1 | 3 | 0 | 0 | 1 | 8154 | 0 | 0 |
+| w41-ai-math-results | 1 | 1 | 0 | 1 | 6933 | 0 | 0 |
+| w41-openai-rogue-agent | 1 | 1 | 1 | 1 | 4520 | 0 | 0 |
+| w41-openrig | 2 | 1 | 0 | 1 | 6923 | 0 | 0 |
+| w41-ai-code-workflow | 0 | 4 | 0 | 1 | 5261 | 0 | 0 |
+
+- visual 칸은 절 visual + 머리 타일(있으면 1). 형광은 `==…==` 쌍 수. ⚠는 토픽 `checks` 수. 검수 수치는 현재판 토픽을 쓴 run의 critic 호출
+- 읽는 법: 검수자 입력 최대 토큰이 평균 약 1.5만 → 약 0.7만으로 절반(R2-01), 잘림 2 → 0, 검수 없이 발행된 토픽 1(gemini-agent-enterprise, 429) → 0(R2-02). 도식 평균 1.5 → 1.9, 형광 1 → 15(10토픽 중 7). **검수자 이슈는 여전히 0**(10토픽 모두 "원자 사실 전부 지지"). 입력을 줄여도 같은 모델 검수는 거의 반려하지 않음 → 관문 B 재채점으로 판단
 
 ## 7-1. README 갱신 내역
 - 현재 상태 줄에 S6-1 한 줄 추가
