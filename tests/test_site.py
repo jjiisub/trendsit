@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
 import subprocess
 import sys
@@ -227,18 +228,18 @@ def test_a12_publish_runs_export_then_build_and_failure_keeps_site(tmp_path):
         return r.returncode, r.stdout, r.stderr
 
     assert ops.publish(db, "2026-W41", runner) == 0
-    assert calls == ["build:site.json.new"] and ops.BUILD_CMD[0] == sys.executable  # 시스템 python3가 아니라 trendsit을 부른 python
+    assert calls == [f"build:site.json.{os.getpid()}.new"] and ops.BUILD_CMD[0] == sys.executable  # 시스템 python3가 아니라 trendsit을 부른 python
     row = db.conn.execute("SELECT status, published_at FROM weeks WHERE week='2026-W41'").fetchone()
     assert row["status"] == "published" and (site_dir / "week/2026-w41/index.html").is_file()
     assert (site_dir / "topic/w41-a/index.html").is_file()
-    assert [w["id"] for w in json.loads(data.read_text(encoding="utf-8"))["weeks"]] == ["2026-w41"] and not (tmp_path / "site.json.new").exists()
+    assert [w["id"] for w in json.loads(data.read_text(encoding="utf-8"))["weeks"]] == ["2026-w41"] and not list(tmp_path.glob("site.json.*.new"))
     before, data_before = tree_hash(site_dir), data.read_bytes()
     # 다음 주 발행에서 build가 실패하면: site/ 바이트 그대로, 상태 그대로(done), data/site.json에 미발행 주가 남지 않음
     corrupt["on"] = True
     assert ops.publish(db, "2026-W40", runner) == 1
-    assert tree_hash(site_dir) == before and data.read_bytes() == data_before and not (tmp_path / "site.json.new").exists()
+    assert tree_hash(site_dir) == before and data.read_bytes() == data_before and not list(tmp_path.glob("site.json.*.new"))
     assert db.conn.execute("SELECT status FROM weeks WHERE week='2026-W40'").fetchone()[0] == "done"
-    assert calls == ["build:site.json.new"] * 2
+    assert calls == [f"build:site.json.{os.getpid()}.new"] * 2
 
 
 def test_f75_approx_week_home_note_and_no_week_stars_and_empty_notes(site):
@@ -246,7 +247,7 @@ def test_f75_approx_week_home_note_and_no_week_stars_and_empty_notes(site):
     assert w39.count("주간 기록이 없어 월간 목록으로 대신한다") == 1 and "monthly-a" in w39
     assert 'class="rp-s"' not in w39  # 별 수가 없는 레포에는 "이번 주 별" 줄이 없음
     assert "이 주는 트렌딩 기록이 없다" in (site / "week/2026-w41/index.html").read_text(encoding="utf-8")  # 레포 0개 주
-    assert "매일 실행 기록 없음(손으로 실행)" in (site / "runs/2026-w41/index.html").read_text(encoding="utf-8")  # nightly 0개 주
+    assert not (site / "runs/weeks").exists() and (site / "runs/2026-w41/index.html").is_file()  # S7a: /runs/가 주차별 표(옛 /runs/weeks/ 없음)
 
 
 def test_f79_site_old_not_restored_when_input_invalid(tmp_path):
@@ -271,7 +272,7 @@ def test_f53_publish_export_exception_returns_1_and_keeps_state(tmp_path, monkey
     err = capsys.readouterr().err.strip().splitlines()
     assert len(err) == 1 and "KeyError" in err[0]
     assert db.conn.execute("SELECT status FROM weeks WHERE week='2026-W41'").fetchone()[0] == "done"
-    assert not (tmp_path / "site.json").exists() and not (tmp_path / "site.json.new").exists()
+    assert not (tmp_path / "site.json").exists() and not list(tmp_path.glob("site.json.*.new"))
 
 
 # ---------- F01 끝 어절 묶기: 원문 어절 단위 ----------
@@ -477,14 +478,10 @@ def test_f39_only_http_urls_become_links(tmp_path):
     assert 'href="https://' in (out / "topic/w41-mid/index.html").read_text(encoding="utf-8")
 
 
-# ---------- F29 실행 1건: 레일 = steps의 역할 문장, counts = 키-값 ----------
-def test_f29_run_page_rail_is_steps_and_counts_are_kv(site):
+# ---------- F29 실행 1건: 레일 묶음 + 단계 목록(접힘 0) ----------
+def test_f29_run_page_rails_and_steps_list(site):
     d = dom(site, "runs/2026-w41/r41")
-    rail = d.find("ol", "rail")
-    assert len(rail) == 1 and len([e for e in d.find("li") if inside(e, cls="rail")]) == 3  # 픽스처 steps 3개
+    assert len(d.find("div", "rail-g")) == 2 and len(d.find("li", "st")) == 6  # 픽스처 r41: 레일 2묶음, 단계 6
     html = (site / "runs/2026-w41/r41/index.html").read_text(encoding="utf-8")
-    assert "1차 반려: 수치가 근거와 단위가 달라 수정 요청" in html and html.count('class="check">확인 필요') == 1
-    kv = html[html.index('<dl class="kv">', html.index("요약")):]
-    assert all(x in kv for x in ("<dt>후보</dt><dd>9</dd>", "<dt>선정</dt><dd>3</dd>", "<dt>근거 id</dt><dd>41</dd>", "<dt>1차 통과</dt><dd>2</dd>",
-                                 "<dt>반려</dt><dd>1</dd>", "<dt>확인 필요</dt><dd>3</dd>", "<dt>발행</dt><dd>3</dd>"))
-    assert html.count("<h2>반려 비교</h2>") == 1 and "<h3>초안</h3>" in html
+    assert "<details" not in html and html.count('class="check">attention') == 2 and "<h2>steps 6 " in html
+    assert '<span class="k">clusters</span><span class="v">143</span>' in html and '<span class="k">published</span><span class="v">3</span>' in html

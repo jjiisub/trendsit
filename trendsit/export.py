@@ -1,4 +1,4 @@
-"""S6a export: DB → data/site.json (예시 JSON 최상위 구조, published 주만).
+"""S6a export: DB → data/site.json (예시 JSON 최상위 구조, published 주만. runs·run_weeks는 S7a export_runs).
 
 토픽은 briefing.export_topic()을 그대로 쓴다. 칸마다 원천이 없으면 칸을 빼고(화면에서도 빠짐), published 주가 없거나
 토픽 출처 번호(C-2)가 어긋나면 ExportError로 파일을 쓰지 않는다(기존 site.json 유지).
@@ -8,13 +8,14 @@ from __future__ import annotations
 
 import json
 import os
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 from pathlib import Path
 from typing import Any
 
 from .brief.briefing import export_topic, sources_index
 from .core import config
 from .core.db import DB, now_kst
+from .export_runs import build_runs
 
 APPROX_NOTE = "trending monthly approx"
 SIGNAL_LABELS = {"trending": "트렌딩", "rising": "급상승", "release": "릴리스", "needs_check": "확인 필요"}
@@ -110,113 +111,6 @@ def _repos(db: DB, week: str, run_id: str, topics: list[dict[str, Any]]) -> list
     return out
 
 
-def _page_checks(t: dict[str, Any]) -> list[str]:
-    """절 밖에서 화면에 표시되는 확인 필요 위치(build의 shown_checks와 같은 규칙, S6-1 v2: summary·title만)."""
-    return [c for c in t.get("checks", []) if c in ("summary", "title")]
-
-
-# ---------- 실행 기록(5.6) ----------
-def _hm(ts: str) -> str:
-    return ts[11:16]
-
-
-def _minutes(start: str, end: str | None) -> float | None:
-    return round((datetime.fromisoformat(end) - datetime.fromisoformat(start)).total_seconds() / 60, 1) if end else None
-
-
-def _weekly_counts(db: DB, run_id: str, summary: dict[str, Any], published: int, needs_check: int) -> dict[str, Any]:
-    c: dict[str, Any] = {}
-    sel, past, rev = summary.get("select") or {}, (summary.get("cluster") or {}).get("past"), summary.get("review") or {}
-    if "candidates" in sel:
-        c["candidates"] = sel["candidates"]
-    if past:
-        c["related"] = {k: past.get(k, 0) for k in ("follow_up", "new", "duplicate")}
-    if "selected" in sel:
-        c["selected"] = sel["selected"]
-    c["evidence_ids"] = db.conn.execute("SELECT COUNT(DISTINCT evidence_id) FROM topic_evidence WHERE run_id=?", (run_id,)).fetchone()[0]
-    # 006-A2-35: 예산 초과로 멈출 때 role.py가 남기는 중단 기록(detail에 topic_id 없음)은 세지 않음(이중 집계 방지)
-    c["written"] = db.conn.execute("SELECT COUNT(*) FROM steps WHERE run_id=? AND role='writer' AND kind='code' "
-                                   "AND json_extract(detail,'$.topic_id') IS NOT NULL", (run_id,)).fetchone()[0]
-    if rev.get("rounds"):
-        c["review"] = {"passed_first": rev["rounds"].get("1", 0), "rejected": rev.get("code_rejects", 0) + rev.get("critic_rejects", 0),
-                       "needs_check": needs_check}
-    c["published"] = published
-    return c
-
-
-def _weekly_summary(c: dict[str, Any]) -> str:
-    rev = c.get("review")
-    return f"토픽 {c['published']}개 발행" + (f", 검수 반려 {rev['rejected']}회, 확인 필요 {rev['needs_check']}문장" if rev else "")
-
-
-def _night_week(r: Any, summary: dict[str, Any]) -> str:
-    """매일 수집의 주차: 처리한 마지막 날이 속한 ISO 주(02:00 실행은 어제까지를 처리하므로 기록이 없으면 시작일의 전날)."""
-    days = summary.get("days")
-    d = date.fromisoformat(days[-1]) if days else date.fromisoformat(r["started_at"][:10]) - timedelta(days=1)
-    y, w, _ = d.isocalendar()
-    return week_id(f"{y}-W{w:02d}")
-
-
-def _run(db: DB, r: Any, published: dict[str, tuple[int, int]]) -> dict[str, Any]:
-    """runs 행 하나. 주간은 steps 표(역할 문장, 확인 표시), 매일은 summary_json.steps(단계, 종료 코드)."""
-    summary = _json(r["summary_json"]) or {}
-    out: dict[str, Any] = {"id": r["id"], "kind": r["kind"], "at": r["started_at"], "duration_min": _minutes(r["started_at"], r["finished_at"]),
-                           "status": r["status"], "cost_usd": round(summary["cost_usd"] if r["kind"] == "nightly" and "cost_usd" in summary else r["cost_usd"], 4)}  # 매일 수집은 하위 프로세스 run이 비용을 가져 summary_json.cost_usd(숫자)에. 주간의 그 칸은 단계별 dict
-    if r["kind"] == "weekly":
-        out["week"] = week_id(r["week"])
-        out["counts"] = _weekly_counts(db, r["id"], summary, *published[r["week"]])
-        out["summary"] = _weekly_summary(out["counts"])
-        plan_row = db.conn.execute("SELECT source FROM briefing_plans WHERE run_id=? ORDER BY id DESC LIMIT 1", (r["id"],)).fetchone()
-        if plan_row and plan_row["source"] == "fallback":  # D-37-인접(C-30): 선별이 대체 계획으로 돈 run
-            out["fallback_select"] = True
-        steps = []
-        for s in db.conn.execute("SELECT t, role, text, attention, detail FROM steps WHERE run_id=? AND text IS NOT NULL ORDER BY seq", (r["id"],)):
-            step: dict[str, Any] = {"role": s["role"], "text": s["text"], "t": _hm(s["t"]), "attention": bool(s["attention"])}
-            d = _json(s["detail"])
-            if isinstance(d, dict) and "draft" in d and "evidence" in d:  # 반려 비교는 detail에 초안·근거가 있을 때만
-                step["detail"] = d
-            steps.append(step)
-        out["steps"] = steps
-    else:
-        out["week"] = _night_week(r, summary)
-        steps = summary.get("steps") or []
-        bad = [s for s in steps if s.get("exit")]
-        out["summary"] = f"날 {len(summary.get('days') or [])}개, 단계 {len(steps)}개 중 실패 {len(bad)}개"
-        out_steps = []
-        for s in steps:
-            step: dict[str, Any] = {"role": s["name"], "text": (f"{s['day']} " if s.get("day") else "") + (s.get("error") or f"성공, {s.get('sec', 0)}초"),
-                                    "attention": bool(s.get("exit"))}
-            if s.get("name") == "plan" and s.get("day"):  # C-30: 그날 계획이 대체 계획(점수 순)으로 돈 경우
-                plan_row = db.conn.execute("SELECT source FROM plans WHERE day=? ORDER BY id DESC LIMIT 1", (s["day"],)).fetchone()
-                if plan_row and plan_row["source"] == "fallback":
-                    step["fallback"] = True
-            out_steps.append(step)
-        out["steps"] = out_steps
-    return out
-
-
-def _runs(db: DB, weeks: list[dict[str, Any]], counts: dict[str, tuple[int, int]]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
-    published = counts  # 주 → (발행 토픽 수, 화면에 표시되는 확인 필요 수)
-    ids = [w["_run_id"] for w in weeks]
-    marks = ",".join("?" * len(ids))
-    rows = db.conn.execute(f"SELECT * FROM runs WHERE kind='nightly' OR id IN ({marks}) ORDER BY started_at DESC", ids).fetchall()
-    runs = [_run(db, r, published) for r in rows]
-    ids_ok = {w["id"] for w in weeks}
-    runs = [r for r in runs if r["kind"] != "nightly" or r["week"] in ids_ok]  # C-1: 발행 주의 nightly만(명세 5.1 표의 "전부"보다 C-1이 앞)
-    by_id = {r["id"]: r for r in runs}
-    rws = []
-    for w in weeks:
-        wk = w["_db_week"]
-        nights = [r for r in runs if r["kind"] == "nightly" and r["week"] == w["id"]]
-        c = by_id[w["_run_id"]].get("counts", {})
-        rev = c.get("review", {})
-        rws.append({"week": w["id"], "label": w["label"], "range": w["range"], "nightly": len(nights),
-                    "nightly_failed": sum(r["status"] in ("partial", "failed", "stopped") for r in nights), "collected": sum(w["collected"].values()),
-                    "candidates": c.get("candidates"), "published": published[wk][0], "rejected": rev.get("rejected"),
-                    "needs_check": rev.get("needs_check")})
-    return runs, [{k: v for k, v in r.items() if v is not None} for r in rws]
-
-
 # ---------- 소스(5.1) ----------
 def _sources(db: DB, weeks: list[dict[str, Any]], members: dict[str, set[tuple[str, str]]]) -> list[dict[str, Any]]:
     out = []
@@ -288,7 +182,7 @@ def build(db: DB, with_week: str | None = None) -> dict[str, Any]:
                            "ORDER BY week DESC", (with_week,)).fetchall()
     if not rows:
         raise ExportError("published 주가 없음")
-    weeks, topics, repos, members, counts = [], [], [], {}, {}
+    weeks, topics, repos, members = [], [], [], {}
     for r in rows:
         wk = r["week"]
         label, rng, start, end = week_label(wk)
@@ -297,7 +191,6 @@ def build(db: DB, with_week: str | None = None) -> dict[str, Any]:
         approx = db.conn.execute("SELECT EXISTS(SELECT 1 FROM repo_trending t JOIN runs x ON x.id=t.run_id WHERE t.week=? AND x.note=?)",
                                  (wk, APPROX_NOTE)).fetchone()[0]
         members[wk] = _used_members(db, wk, r["current_run_id"], [t["id"] for t in ts])
-        counts[wk] = (len(ts), sum(bool(s.get("check")) for t in ts for s in t["sections"]) + sum(len(_page_checks(t)) for t in ts))
         cited = {(s["channel"], s["url"] or s["title"]) for t in ts for s in t["sources"]}
         weeks.append({"id": week_id(wk), "label": label, "range": rng,
                       "published_at": r["published_at"] or now_kst(), "collected": collected, "topic_ids": [t["id"] for t in ts],
@@ -305,7 +198,7 @@ def build(db: DB, with_week: str | None = None) -> dict[str, Any]:
                       "_db_week": wk, "_run_id": r["current_run_id"], "_start": start, "_end": end})
         topics += ts
         repos += _repos(db, wk, r["current_run_id"], ts)
-    runs, run_weeks = _runs(db, weeks, counts)
+    runs, run_weeks = build_runs(db, weeks, week_label)
     site = {
         "meta": {"product": "TrendsIT", "generated_at": now_kst()[:10], "signal_labels": SIGNAL_LABELS,
                  "channel_labels": {"text": "글", "video": "영상", "github": "GitHub"},

@@ -70,24 +70,22 @@ def test_keyword_topic_links_capped_at_5_with_overflow_count(site):
     assert ", 외 2개" in out
 
 
-# ---------- 5.1-3 실행 1건 ----------
-def test_run_meta_line_published_and_written_counts(tmp_path):
+# ---------- 5.1-3 실행 1건(S7a): 머리 레일 published와 run_weeks current ----------
+def test_run_rail_published_and_run_weeks_current(tmp_path):
     db = make_db(tmp_path, published=("2026-W41",))
-    db.conn.execute("INSERT INTO steps(run_id, seq, t, role, kind, text, attention, detail) VALUES ('r41', 100, "
-                    "'2026-10-12T07:12:00+09:00', 'writer', 'code', 'w41-a: passed, 1라운드', 0, '{\"topic_id\":\"w41-a\"}')")
-    db.conn.execute("INSERT INTO steps(run_id, seq, t, role, kind, text, attention, detail) VALUES ('r41', 101, "
-                    "'2026-10-12T07:13:00+09:00', 'writer', 'code', 'w41-b: checked, 2라운드', 0, '{\"topic_id\":\"w41-b\"}')")
-    db.conn.commit()
     site = export_build(db)
     run = next(r for r in site["runs"] if r["id"] == "r41")
-    assert run["counts"]["written"] == 2
+    assert run["current"] is True and run["summary"]["published"] == 2
+    assert next(w for w in site["run_weeks"] if w["week"] == "2026-w41")["current_run_id"] == "r41"
     sys.path.insert(0, str(ROOT / "site_src"))
     import build as b
+    import build_runs
 
     b.load(site)
     b.C.css_name = "x.css"
-    html = b.render_run(run)
-    assert '<p class="meta">이 주 발행 2개 / 이 실행이 쓴 토픽 2개</p>' in html
+    assert '<span class="k">published</span><span class="v">2</span>' in build_runs.render_run(b, run)
+    other = dict(run, id="x", current=False, summary=dict(run["summary"], published=None))
+    assert 'class="k">published' not in build_runs.render_run(b, other)  # 현재판이 아니면 레일에 published 없음
 
 
 # ---------- 5.1-4 출처: 채널 머리 제거, 단일 목록 ----------
@@ -106,24 +104,27 @@ def test_repo_meta_line_uses_slash_separator_not_middle_dot(site):
     assert " / " in m.group(0) or "class=\"check\"" in m.group(0)
 
 
-# ---------- 5.1-8 대체 계획 표시 ----------
+# ---------- 5.1-8 대체 계획 표시(S7a: 선별 source·plan fallback이 단계 줄에) ----------
 def test_fallback_select_shows_meta_line_and_plan_step_shows_suffix(tmp_path):
     db = make_db(tmp_path, published=("2026-W41",))
-    db.conn.execute("INSERT INTO briefing_plans(run_id, week, source, plan_json) VALUES ('r41','2026-W41','fallback','{}')")
-    db.conn.execute("INSERT INTO plans(day, run_id, source, plan_json) VALUES ('2026-10-06','n1','fallback','{}')")
+    db.conn.execute("INSERT INTO steps(run_id, seq, t, role, kind, text, attention, detail) VALUES ('r41', 50, '2026-10-12T07:03:00+09:00', "
+                    "'editor_select', 'code', '후보 9개 중 2개 선정', 0, '{\"source\": \"fallback\"}')")
+    db.conn.execute("INSERT INTO plans(day, run_id, source, plan_json) VALUES ('2026-10-06','n1','fallback','{\"text_queue\": []}')")
     db.conn.commit()
     site = export_build(db)
     run = next(r for r in site["runs"] if r["id"] == "r41")
-    assert run.get("fallback_select") is True
+    sel = next(s for s in run["steps"] if s["name"] == "editor_select")
+    assert sel["line"].endswith(" / fallback") and ["source", "fallback"] in sel["detail"][0]["items"]
     night = next(r for r in site["runs"] if r["id"] == "n1")
-    assert any(s.get("fallback") for s in night["steps"])
+    plan = next(s for s in night["steps"] if s["name"] == "plan")
+    assert " / fallback" in plan["line"]
     sys.path.insert(0, str(ROOT / "site_src"))
     import build as b
+    import build_runs
 
     b.load(site)
     b.C.css_name = "x.css"
-    assert "선별 대체 계획(점수 순)" in b.render_run(run)
-    assert "(대체 계획)" in b.render_run(night)
+    assert "/ fallback" in build_runs.render_run(b, run) and "/ fallback" in build_runs.render_run(b, night)
 
 
 # ---------- 5.1-9 backup ----------

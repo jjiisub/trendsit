@@ -110,6 +110,8 @@ uv run python -m trendsit backup [--tag 글자]                # data/trendsit.d
 
 **토픽 상세(S6-1)**: 상세는 "한 페이지 보고서"다. 요약(리드) → 핵심 수치 타일 → 절(포인트 문장이 제목, 단락 1~2개, 필요한 절에만 타일·표·막대·사건 흐름 하나) → 출처. 영상 토픽은 절마다 그 구간으로 가는 타임라인 링크와 코드가 고른 슬라이드 이미지(최대 2장, `ffmpeg`로 `data/slides/`에 저장)가 붙는다. 작성자는 카드 인용이 아니라 원문 문장(`it:{item_id}#s{n}`)을 근거로 바로 쓴다. `data/slides/`는 git 제외, `site/assets/slides/`로 build가 복사한다.
 
+**실행 기록(S7a)**: `/runs/`는 주차별 표(주차·기간·nightly n/7·weekly·publish 시각), 주차를 누르면 `/runs/<주>/`에 그 주의 날 → run 표(시각·자동/수동·run·결과·시간/비용·상태, 하위 run은 `└`), run을 누르면 `/runs/<주>/<run>/`에 수치 레일과 단계 목록(누가: 코드 또는 LLM 역할·모델, 한 줄 결과, decide 판정·선별 이유·토픽별 작성⇄검수 체인과 반려 표까지 접힘 없이)이 나온다. 새 기록을 만들지 않고 `runs`·`steps`·`cluster_pairs` 등 DB에 있는 행에서 `export`가 뽑는다(오류 원문은 종료 코드·상태만). 매일 02:00 `ops nightly`가 끝나면 사이트만 다시 만들어(export → build → `data/site.json` 교체, 주 상태·발행 시각 불변, 실패해도 nightly 결과 불변, 결과는 그 nightly 행 `summary_json.site`) 실행 기록이 그날 것으로 바뀐다. 손으로는 `uv run python -m trendsit publish --site-only`.
+
 그 밖의 명령: 수집 항목 보기 `items [--week 2026-W40] [--status pass]`, 기록된 호출 다시 실행 `role --replay <step_id> [--model 별칭]`, 평가 `eval <역할> [--model 별칭]`, 실행 기록 보기 `trace <run_id>`. 전체 명령표와 동작 방식은 [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
 
 ## 5. 사용 예시 / 결과물

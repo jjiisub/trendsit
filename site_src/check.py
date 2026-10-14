@@ -23,7 +23,11 @@ ROOT = SRC.parent
 FIXTURE = ROOT / "tests" / "fixtures" / "site" / "site.json"
 FORBIDDEN_TEXT = ("동작 안 함", "예시")
 OPS_BANNED = ("button", "form", "input", "select", "textarea")
-VOID = {"meta", "link", "br", "img", "input", "hr", "source"}
+BANNED = re.compile(r"Traceback|/Users/|(?<![A-Za-z0-9_])data/|\.py:|Bearer|localhost|\bsk-[A-Za-z0-9_-]{8,}")  # 단어 속 `metadata/`·`task-` 같은 낱말은 아님
+STATE_WORDS = {"ok", "partial", "failed", "running", "stopped", "published"}
+D11_WORDS = ("손", "정상", "건너뜀")
+MAX_SITE_JSON = 3 * 1024 * 1024  # C-6
+VOID = {"meta", "link", "br", "img", "input", "hr", "source", "col"}
 results = []
 
 
@@ -105,9 +109,13 @@ def is_internal(href):
 
 def _check_markup_links(site, data, pages, files):
     """A7 페이지 존재, M-1 마크업, M-2 근거 id 노출, C-3 내부 링크, A5 링크 규칙. 계속 돌아도 되면 True."""
-    check("A7 페이지 존재: 홈, 소스, 키워드, 실행 기록(주차별·이번 주차·1건)",
-          all((site / p).exists() for p in ("index.html", "sources/index.html", "keywords/index.html", "runs/index.html", "runs/weeks/index.html"))
-          and any(f.parent.parent.parent.name == "runs" for f in files), f"html {len(files)}개")
+    runs_pages = ["runs/index.html", *(f'runs/{w["week"]}/index.html' for w in data["run_weeks"]),
+                  *(f'runs/{r["week"]}/{r["id"]}/index.html' for r in data["runs"] if r["kind"] != "steps")]
+    missing = [p for p in ("index.html", "sources/index.html", "keywords/index.html", *runs_pages) if not (site / p).exists()]
+    stale = (site / "runs" / "weeks").exists()
+    n_run_pages = len([f for f in files if f.relative_to(site).parts[0] == "runs"])
+    check("A7 페이지 존재: 홈, 소스, 키워드, 실행 기록(주차별·주마다 run 목록·run 1건마다, C-3), runs/weeks/ 없음",
+          not missing and not stale and n_run_pages == len(runs_pages), f"html {len(files)}개, 없는 것 {missing[:2]}, runs 쪽 {n_run_pages}/{len(runs_pages)}")
     broken = [f"{page_url(site, f)} 중첩 어긋남 {p.mismatch}" for f, p in pages.items() if p.mismatch or p.open]
     # 빌드가 만든 깨짐만: 엔티티가 태그로 쪼개짐(&#<span ..>x27</span>;). 데이터 원문 글자(<span, &amp;)는 &lt;span, &amp;amp;로 나가므로 걸리지 않음
     broken += [f"{page_url(site, f)} 엔티티가 태그로 쪼개짐" for f in pages if re.search(r"&#?\w*<", f.read_text(encoding="utf-8"))]
@@ -231,12 +239,44 @@ def _check_s6_1_content(site, data, pages):
     check("A9 &t= 시점 링크(.vgo·.vtl·.simg 안)는 그 토픽 영상 출처 URL로 시작", not bad_t, "; ".join(bad_t[:3]))
 
 
+def _check_s7a_runs(site, data, pages):
+    """S7a 5.4: 관리 화면 금칙 문자열(C-4), details 0(C-9), run 1건 글자 칸 300자(C-5), 상태 글자 어휘, D-11 금지 낱말."""
+    raw = {f: f.read_text(encoding="utf-8") for f in pages}  # C-4: 생성 HTML 전체
+    admin = {f: p for f, p in pages.items() if f.relative_to(site).parts[0] in ("runs", "sources", "keywords")}
+    ban = [f"{page_url(site, f)} {m[0]}" for f, t in raw.items() for m in [BANNED.search(t)] if m]
+    check("C-4 생성 HTML 전체 금칙 문자열(Traceback·/Users/·data/·.py:·sk-키·Bearer·localhost) 0", not ban, "; ".join(ban[:3]))
+    det = [page_url(site, f) for f, p in pages.items() if p.tags.get("details")]
+    check("C-9 <details> 0(접힘 없음)", not det, "; ".join(det[:3]))
+    long = []
+    for f, t in raw.items():
+        if f.relative_to(site).parts[0] != "runs" or f.parent.parent.name == "runs":
+            continue
+        for m in re.finditer(r'<(?:td|dd|li)(?: class="num")?>(.*?)</(?:td|dd|li)>', t, re.S):
+            cell = html.unescape(re.sub(r"<[^>]+>", "", m[1]))
+            if len(cell) > 300 and "st-d" in t:
+                long.append(f"{page_url(site, f)} {len(cell)}자")
+    check("C-5 run 1건 글자 칸(table 셀·list 항목·kv 값) 300자 이하", not long, "; ".join(long[:3]))
+    states = sorted({s for f, t in raw.items() if f.relative_to(site).parts[0] == "runs" for s in re.findall(r'<span class="state[^"]*">([^<]*)</span>', t)} - STATE_WORDS)
+    check("D-11 runs 상태 글자는 ok·partial·failed·running·stopped·published뿐", not states, ", ".join(states[:5]))
+    own = sorted(data_strings(data), key=len, reverse=True)
+    hits = []
+    for f, p in admin.items():
+        if f.relative_to(site).parts[0] != "runs":
+            continue
+        text = "".join(p.text)
+        for x in own:
+            text = text.replace(x, "")
+        hits += [f"{page_url(site, f)} '{w}'" for w in D11_WORDS if w in text]
+    check("D-11 runs 화면이 만든 글에 '손'·'정상'·'건너뜀' 0(데이터 본문 제외)", not hits, "; ".join(hits[:3]))
+
+
 def static_checks(site, data, pages):
     files = sorted(site.rglob("*.html"))
     if not _check_markup_links(site, data, pages, files):
         return
     _check_fonts_css_ops(site, data, pages, files)
     _check_s6_1_content(site, data, pages)
+    _check_s7a_runs(site, data, pages)
 
 
 def data_strings(data):
@@ -295,10 +335,16 @@ def pick_pages(data):
     most = max(ts, key=lambda t: len(t["sources"]))
     pages = [{"name": "home", "path": "/"}]
     pages += [{"name": f'topic {t["id"]}', "path": f'/topic/{t["id"]}/', "topic": True, "longTopic": t is most} for t in chosen]
-    run = next((r for r in data["runs"] if r["kind"] == "weekly" and r.get("week")), None)
-    pages += [{"name": "sources", "path": "/sources/"}, {"name": "keywords", "path": "/keywords/"}]
-    if run:
-        pages.append({"name": "run", "path": f'/runs/{run["week"]}/{run["id"]}/'})
+    pages += [{"name": "sources", "path": "/sources/"}, {"name": "keywords", "path": "/keywords/"}, {"name": "runs", "path": "/runs/"}]
+    if data["runs"]:  # run 목록 1쪽(run이 가장 많은 주), weekly from cluster 1건(단계가 가장 많은 것), nightly 1건
+        busiest = max(data["run_weeks"], key=lambda w: sum(r["week"] == w["week"] for r in data["runs"]))
+        pages.append({"name": "run list", "path": f'/runs/{busiest["week"]}/'})
+    full = [r for r in data["runs"] if r["kind"] == "weekly" and r["label"] == "from cluster"]
+    night = [r for r in data["runs"] if r["kind"] == "nightly"]
+    for name, rs in (("run weekly", full), ("run nightly", night)):
+        if rs:
+            r = max(rs, key=lambda r: len(r["steps"]))
+            pages.append({"name": name, "path": f'/runs/{r["week"]}/{r["id"]}/'})
     return pages
 
 
@@ -340,10 +386,10 @@ def browser_checks(site, data):
             miss = gate9(g, 812)
             if e["topic"] and e["vw"] == 375 and not (g["pointsTop"] is not None and g["pointsTop"] < 812):
                 miss.append(f'5 본문 시작(머리 타일·첫 절)이 첫 화면 밖({g["pointsTop"]})')
-            if g["cmptOverflowBad"]:
-                miss.append(f'표(.cmpt-wrap)가 자신만 가로 스크롤하지 않음 {g["cmptOverflowBad"]}건(5.9)')
-            if g["imgBad"]:
-                miss.append(f'이미지 로드 실패(naturalWidth 0) {g["imgBad"]}건(5.9)')
+            if e["vw"] == 1280 and g["rtWrapBad"]:
+                miss.append(f'1280에서 .rt 셀 줄바꿈 {g["rtWrapBad"]}건(S7a)')
+            for k, m in (("cmptOverflowBad", "표(.cmpt-wrap)가 자신만 가로 스크롤하지 않음(5.9)"), ("imgBad", "이미지 로드 실패(naturalWidth 0)(5.9)"), ("rtOverlapBad", "375에서 .rt 셀 글자 겹침 쌍(S7a)")):
+                miss += [f"{m} {g[k]}건"] if g[k] else []
             if e["vw"] == 375 and g["tileOverflowBad"]:
                 miss.append(f'375에서 타일 글자 잘림 {g["tileOverflowBad"]}건(5.9)')
             bad += [f'{e["vw"]} {e["page"]}: {m}' for m in miss]
@@ -398,6 +444,8 @@ def main():
             check("검사 대상", False, f"{site} 또는 {data_path} 없음")
         else:
             data = json.loads(data_path.read_text(encoding="utf-8"))
+            size = data_path.stat().st_size
+            check("C-6 site.json 크기 3MB 이하", size <= MAX_SITE_JSON, f"{size / 1024:.0f}KB")
             pages = {f: parse(f) for f in sorted(site.rglob("*.html"))}
             for step in (lambda: static_checks(site, data, pages), lambda: browser_checks(site, data)):
                 try:

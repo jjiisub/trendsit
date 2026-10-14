@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import time
 from datetime import date, datetime
 from types import SimpleNamespace
@@ -163,7 +164,8 @@ def test_b2_step_order_and_args(db, tmp_path):
     q = str(tmp_path / "tmp" / "video-queue-2026-10-12.json")
     rq = str(tmp_path / "tmp" / "repo-queue-2026-10-12.json")
     assert code == 0
-    assert [tail(c) for c in fake.cmds] == [
+    assert fake.cmds[-1][: len(ops.BUILD_CMD)] == ops.BUILD_CMD  # S7a: nightly 끝에 사이트만 다시 만든다(5.1-1)
+    assert [tail(c) for c in fake.cmds[:-1]] == [
         ["collect", "--since", "2026-10-11", "--until", "2026-10-14", "--spec", w],
         ["filter", "--since", "2026-10-12", "--until", "2026-10-13", "--spec", w],
         ["summarize", "--since", "2026-10-12", "--until", "2026-10-13", "--spec", w],
@@ -181,7 +183,7 @@ def test_b2_step_order_and_args(db, tmp_path):
     assert json.loads(open(rq).read()) == repo_q  # 계획의 레포 큐만(이미 카드 있는 레포는 계획이 뺌)
     video = next(c for c in fake.cmds if "video" in tail(c)[:1])
     assert video[:5] == ["uv", "run", "--extra", "video", "python"]  # video만 --extra video
-    assert all(c[:5] == PREFIX for c in fake.cmds if "video" not in tail(c)[:1])
+    assert all(c[:5] == PREFIX for c in fake.cmds[:-1] if "video" not in tail(c)[:1])
     assert json.loads(open(q).read()) == VIDEO_Q
     assert (tmp_path / "logs" / "ops" / "2026-10-14-nightly.log").exists()
 
@@ -207,7 +209,8 @@ def test_b3_partial_failure_continues(db, tmp_path):
     row = nightly_rows(db)[-1]
     assert row["status"] == "partial" and row["spec"] == "RUN-2026-W42"
     s = row["summary"]
-    assert set(s) == {"days", "steps", "cost_usd"} and s["days"] == ["2026-10-12", "2026-10-13"]
+    assert set(s) == {"days", "steps", "cost_usd", "site"} and s["days"] == ["2026-10-12", "2026-10-13"]
+    assert s["site"]["exit"] == 0 and isinstance(s["site"]["sec"], float)  # S7a: 단계 실패와 별개로 끝 단계는 돈다
     assert s["cost_usd"] == pytest.approx(0.42)  # plan 두 번 0.21씩
     assert all(set(x) >= {"name", "day", "exit", "sec"} for x in s["steps"])
     bad = [x for x in s["steps"] if x["exit"] != 0]
@@ -588,3 +591,77 @@ def test_step_log_separates_last_output_line_from_exit_marker(db, tmp_path):
         "__call__": lambda self, cmd, timeout=None: (0, "개행 없는 출력", "") if tail(cmd)[0] == "collect" else Fake.__call__(self, cmd, timeout)})(db))
     log = (tmp_path / "logs" / "ops" / "2026-10-13-nightly.log").read_text()
     assert "개행 없는 출력\n== 종료 코드 0" in log
+
+
+# ---------- S7a 5.1-1 nightly 끝 사이트 재생성 (A1, C-7·C-8) ----------
+def _tables(db):
+    return {t: [tuple(r) for r in db.conn.execute(f"SELECT * FROM {t} ORDER BY 1")] for t in ("weeks", "topics", "steps")}
+
+
+def _site_exit(db):
+    return nightly_rows(db)[-1]["summary"]["site"]["exit"]
+
+
+def test_s7a_nightly_rebuilds_site_after_run_and_keeps_weeks(db, tmp_path):
+    db.conn.execute("INSERT INTO weeks(week, start_day, end_day, status, current_run_id, published_at) "
+                    "VALUES ('2026-W41','2026-10-05','2026-10-11','published','r41','2026-10-12T07:10:00+09:00')")
+    db.conn.commit()
+    before = _tables(db)
+    code, fake = run_night(db, tmp_path, at(2026, 10, 14))
+    row = nightly_rows(db)[-1]
+    assert code == 0 and row["status"] == "ok" and EXPORTS == [None]  # 그 주를 따로 담지 않는 export
+    assert [c[-1] for c in fake.cmds if c[: len(ops.BUILD_CMD)] == ops.BUILD_CMD] == [str(tmp_path / f"site.json.{os.getpid()}.new")]
+    assert row["summary"]["site"]["exit"] == 0 and (tmp_path / "site.json").read_text() == "{}" and not list(tmp_path.glob("site.json.*.new"))
+    assert "site" not in {s["name"] for s in row["summary"]["steps"]}  # steps·status 계산·따라잡기에 영향 0
+    assert _tables(db) == before  # C-7: weeks(status·published_at·current_run_id) 불변
+    assert fake.timeouts[-1] == CFG.step_timeout_min * 60  # 시간 상한 = step_timeout_min(새 칸 없음)
+
+
+def _night_in(tmp_path, name, runner_cls=Fake, **kw):
+    """폴더 하나(DB·site.json·데이터)에서 nightly 한 번. site.json은 '옛 것'으로 미리 둔다."""
+    (tmp_path / name).mkdir()
+    (tmp_path / name / "site.json").write_text("옛 것")
+    d = DB(tmp_path / name / "t.db")
+    code = ops.nightly(d, CFG, now=at(2026, 10, 14), runner=runner_cls(d), data_dir=tmp_path / name, **kw)
+    return d, code, nightly_rows(d)[-1]
+
+
+def test_s7a_rebuild_failure_is_isolated_from_nightly(tmp_path, monkeypatch, capsys):
+    """C-8: 빌드 실패·시간 초과·export 예외여도 nightly status·종료 코드·steps는 그대로, site.json은 교체되지 않는다."""
+    d0, base_code, base = _night_in(tmp_path, "base")
+    assert (tmp_path / "base" / "site.json").read_text() == "{}"  # 정상이면 교체됨
+    for bad in (1, ops.TIMEOUT_CODE):
+        class Fails(Fake):
+            code = bad
+
+            def __call__(self, cmd, timeout=None):
+                return (self.code, "", "빌드 오류 한 줄") if cmd[: len(ops.BUILD_CMD)] == ops.BUILD_CMD else super().__call__(cmd, timeout)
+
+        d, code, row = _night_in(tmp_path, f"fail{bad}", Fails)
+        assert (code, row["status"], row["summary"]["steps"]) == (base_code, base["status"], base["summary"]["steps"])
+        assert row["summary"]["site"]["exit"] == bad and (tmp_path / f"fail{bad}" / "site.json").read_text() == "옛 것"
+    assert "사이트 재생성 실패: 빌드 종료 코드 1: 빌드 오류 한 줄" in capsys.readouterr().err
+
+    def boom(db_, out, with_week=None):
+        raise RuntimeError("export 폭발")
+
+    monkeypatch.setattr(ops, "export_site", boom)
+    d, code, row = _night_in(tmp_path, "export")
+    assert (code, row["status"], row["summary"]["site"]["exit"]) == (0, "ok", 1) and (tmp_path / "export" / "site.json").read_text() == "옛 것"
+    assert "사이트 재생성 실패: export RuntimeError" in capsys.readouterr().err
+    monkeypatch.setattr(ops, "rebuild_site", lambda *a, **k: boom(*a))  # rebuild_site 자체가 예외로 죽어도 nightly는 그대로
+    d, code, row = _night_in(tmp_path, "raise")
+    assert (code, row["status"], row["summary"]["site"]["exit"]) == (0, "ok", 1)
+
+
+def test_s7a_skipped_empty_and_weekly_paths_do_not_rebuild(db, tmp_path):
+    run_night(db, tmp_path, at(2026, 10, 14))
+    code, fake = run_night(db, tmp_path, at(2026, 10, 14))  # 범위 없음
+    assert code == 0 and fake.cmds == [] and "site" not in nightly_rows(db)[-1]["summary"]
+    with ops.ops_lock(tmp_path):  # 잠금을 못 얻어 건너뜀
+        code, fake = run_night(db, tmp_path, at(2026, 10, 20))
+    assert code == 3 and fake.cmds == []
+    # ops weekly: 앞 단계 nightly 따라잡기는 빌드하지 않고, publish의 빌드 1회뿐
+    fake = Fake(db)
+    assert ops.weekly(db, CFG, now=at(2026, 10, 19, 7), runner=fake, data_dir=tmp_path / "w") == 0
+    assert sum(c[: len(ops.BUILD_CMD)] == ops.BUILD_CMD for c in fake.cmds) == 1 and EXPORTS[-1] == "2026-W42"

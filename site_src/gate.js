@@ -125,6 +125,19 @@ async function gateInBrowser([weights, tokens]) {
     }
   }
   g.imgBad = [...document.querySelectorAll('img')].filter((img) => img.complete && img.naturalWidth === 0).length;
+  // S7a: 1024 이상에서 run 표 셀(③ steps 줄의 긴 결과 칸 제외)은 한 줄(줄 높이 × 1.5 이하)
+  g.rtWrapBad = [...document.querySelectorAll('.rt tbody tr:not(.rt-day):not(.tr-steps) td')].filter((td) => {
+    const cs = getComputedStyle(td);
+    return vw >= 1024 && td.scrollHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom) > parseFloat(cs.lineHeight) * 1.5;
+  }).length;
+  // S7a: 375에서 run 표 한 줄 안의 셀끼리 글자가 겹치면 안 된다
+  const rg = (el) => { const r = document.createRange(); r.selectNodeContents(el); return [...r.getClientRects()].filter((x) => x.width > 0); };
+  const hit = (a, b) => a.some((x) => b.some((y) => x.left < y.right - 0.5 && y.left < x.right - 0.5 && x.top < y.bottom - 0.5 && y.top < x.bottom - 0.5));
+  g.rtOverlapBad = vw !== 375 ? 0 : [...document.querySelectorAll('.rt tbody tr:not(.rt-day)')].reduce((n, tr) => {
+    const c = [...tr.cells].map(rg);
+    for (let i = 0; i < c.length; i++) for (let j = i + 1; j < c.length; j++) if (hit(c[i], c[j])) n++;
+    return n;
+  }, 0);
   g.tileOverflowBad = [...document.querySelectorAll('.tiles .tile-v, .tiles .tile-l, .tiles .tile-s')].filter((el) => el.scrollWidth > el.clientWidth + 1).length;
   return g;
 }
@@ -177,7 +190,7 @@ async function behavior(browser, longTopic, homePath) {
     // 화면 안에 함께 보이는 인용 번호들(마우스가 정확히 올라간 시각부터 재려고 좌표로 움직임)
     await page.evaluate(() => { const r = document.querySelector('.dp .cite > .ref').getBoundingClientRect(); window.scrollTo(0, window.scrollY + r.top - 150); });
     await sleep(100);
-    const pos = await page.evaluate(() => [...document.querySelectorAll('.cite > .ref')].map((a, i) => { const r = a.getBoundingClientRect(); return { i, x: r.x + r.width / 2, y: r.y + r.height / 2, ok: r.top > 0 && r.bottom < innerHeight }; }).filter((p) => p.ok));
+    const pos = await page.evaluate(() => [...document.querySelectorAll('.cite > .ref')].map((a, i) => { const r = a.getBoundingClientRect(); const x = r.x + r.width / 2, y = r.y + r.height / 2; return { i, x, y, ok: r.top > 0 && r.bottom < innerHeight && a.contains(document.elementFromPoint(x, y)) }; }).filter((p) => p.ok)); // 미니 바에 가린 번호는 뺌
     const A = pos[0];
     await page.mouse.move(2, 2);
     await sleep(300);

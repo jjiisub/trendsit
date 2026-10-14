@@ -90,7 +90,7 @@ def test_b8_publish_success_and_build_failure_and_not_ready(tmp_path):
     status, at = week_row(db)
     assert status == "published" and at and "T" in at
     assert calls[-1][:-2] == ops.BUILD_CMD and calls[-1][-2] == "--data" and EXPORTS[-1] == "2026-W41"  # export(그 주 포함) 먼저, 다음 빌드
-    assert (tmp_path / "site.json").read_text() == "{}" and not (tmp_path / "site.json.new").exists()  # 성공 때만 site.json 교체
+    assert (tmp_path / "site.json").read_text() == "{}" and not list(tmp_path.glob("site.json.*.new"))  # 성공 때만 site.json 교체
 
     first = at
     assert ops.publish(db, "2026-W41", build(0)) == 0  # 다시 발행: published_at만 갱신
@@ -174,4 +174,4 @@ def test_publish_export_failure_leaves_status_and_site_json(tmp_path, monkeypatc
     (tmp_path / "site.json").write_text("옛 것")
     db = weeks_db(tmp_path, "done")
     assert ops.publish(db, "2026-W41", lambda cmd: pytest.fail("빌드를 부르면 안 됨")) == 1
-    assert tuple(week_row(db)) == ("done", None) and (tmp_path / "site.json").read_text() == "옛 것" and not (tmp_path / "site.json.new").exists()
+    assert tuple(week_row(db)) == ("done", None) and (tmp_path / "site.json").read_text() == "옛 것" and not list(tmp_path.glob("site.json.*.new"))

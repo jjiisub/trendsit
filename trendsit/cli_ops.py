@@ -22,8 +22,20 @@ def _day(v: str) -> date:
 
 def cmd_publish(args: argparse.Namespace) -> int:
     from .core.db import open_db
-    from .ops import publish
+    from .ops import publish, rebuild_site
 
+    if args.site_only:
+        if args.week:
+            print("publish: --site-only와 --week는 둘 중 하나만", file=sys.stderr)
+            return 2
+        from .core import config
+        from .ops import run_subprocess
+
+        limit = config.load("ops.yaml").step_timeout_min * 60  # 5.7: nightly 끝 재생성과 같은 시간 상한 1회
+        return rebuild_site(open_db(), lambda cmd: run_subprocess(cmd, limit))
+    if not args.week:
+        print("publish: --week 또는 --site-only가 필요함", file=sys.stderr)
+        return 2
     return publish(open_db(), args.week)
 
 
@@ -89,8 +101,9 @@ def cmd_ops(args: argparse.Namespace) -> int:
 
 
 def register(sub: Any) -> None:
-    p = sub.add_parser("publish", help="주간 브리핑 발행(S6b): 사이트 빌드 후 weeks.status published")
-    p.add_argument("--week", type=_week, required=True)
+    p = sub.add_parser("publish", help="주간 브리핑 발행(S6b): 사이트 빌드 후 weeks.status published. --site-only: 사이트만 다시 만듦(상태 불변)")
+    p.add_argument("--week", type=_week)
+    p.add_argument("--site-only", action="store_true")
     p.set_defaults(fn=cmd_publish)
 
     e = sub.add_parser("export", help="사이트 데이터(S6a): DB → data/site.json(발행된 주만). 실패하면 기존 파일을 그대로 둔다")
