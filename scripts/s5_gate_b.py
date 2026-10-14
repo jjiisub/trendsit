@@ -81,14 +81,14 @@ def judge_final(weeks: list[str], only: set[str] | None = None, prev: dict | Non
     """두 주 현재판 최종 페이지를 judge(질문 Q1~Q4) + 원자 사실 judge로 채점. 작성자가 받은 입력을 같은 코드로 다시 조립."""
     from eval import graders
     from scripts.s5_eval_fixtures import week_topics
-    from trendsit.brief.write import evidence_docs, previous_topic, raw_evidence, writer_limits
+    from trendsit.brief.fulltext import raw_evidence
+    from trendsit.brief.write import evidence_docs, previous_topic, writer_limits
     from trendsit.core import config
     from trendsit.core.artifacts import Document
     from trendsit.core.artifacts_brief import PlanBrief, Relation, WriterInput
     from trendsit.core.context import open_ctx
 
     cfg = config.load("brief.yaml")
-    window = config.load("video.yaml").align_window_sec
     ctx = open_ctx("eval", spec="S5", note="관문 B 최종판 judge(W40 + W41)")
     out = dict(prev or {})
     try:
@@ -105,7 +105,7 @@ def judge_final(weeks: list[str], only: set[str] | None = None, prev: dict | Non
                                   aliases=t["aliases"], limits=writer_limits(cfg, t["n_sources"]))
                 # judge 입력은 근거 원문(COMMON 2: 요약 칸이 아니라). 작성자 입력과 같은 id, 글자는 검수자와 같은 원문
                 raw = [Document(id=d.id, source=d.source, title=d.title, url=d.url,
-                                text=raw_evidence(ctx.db, d.id, t["pack"][d.id], window)) for d in inp.evidence]
+                                text=raw_evidence(ctx.db, d.id, t["pack"][d.id])) for d in inp.evidence]
                 r = graders.llm_grade("writer", inp.model_copy(update={"evidence": raw}), t["page"].model_dump(), ctx)
                 out[tp.topic_id] = {"week": w, "status": t["status"], "verdicts": r["verdicts"], "scores": r["scores"],
                                     "facts": r.get("facts")}

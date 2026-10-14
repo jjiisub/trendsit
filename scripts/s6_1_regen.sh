@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # S6-1 7장 런 뒤 ①~⑤를 한 번에(D-46, 5.14-12로 W41만). 실DB에 쓴다(backup·weekly·publish): 사용자 승인 뒤에만 돌린다.
 # 한 단계라도 실패하면(명령 실패 또는 비용 상한 초과) 거기서 멈추고 종료 코드 1. 사용: bash scripts/s6_1_regen.sh
-# 5.14-12(사용자 결정 2026-10-14): W41만 --from-step write로 다시 쓰고 publish. W40은 다시 쓰지 않고
-# (예전 TopicPage로 남아 v2 전용 export·build가 못 읽음, D-31 하위 호환 없음) publish도 하지 않는다 —
-# W40을 다시 쓸지는 W41 결과를 보고 따로 결정(사용자)한다.
+# 5.14-12(사용자 결정 2026-10-14): W41만 --from-step write로 다시 쓰고 publish. W40은 다시 쓰지 않는다
+# (A3-13: W40 현재판은 이미 v2라 못 읽는 문제는 아님 — publish가 전체 site.json을 다시 뽑아 W41 발행만으로도
+# W40에 5.14 1·2·10이 반영됨). W40을 다시 쓸지는 W41 결과를 보고 따로 결정(사용자)한다.
 set -Eeu  # -E: 함수 안 실패에도 ERR trap이 걸림(007-A2-17, check_cost·week_state 포함)
 cd "$(dirname "$0")/.."
 

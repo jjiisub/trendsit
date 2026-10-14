@@ -27,7 +27,7 @@ sys.path.insert(0, str(ROOT))
 from trendsit.brief import aliases as al  # noqa: E402
 from trendsit.brief import select as sel  # noqa: E402
 from trendsit.brief.evidence import cap_pack, pack_index, week_evidence  # noqa: E402
-from trendsit.brief.fulltext import raw_evidence  # noqa: E402
+from trendsit.brief.fulltext import critic_documents  # noqa: E402
 from trendsit.brief.write import (  # noqa: E402
     alias_lines,
     evidence_docs,
@@ -164,9 +164,10 @@ def _dump_critic(db: DB, done: list) -> int:
             break
 
         def crit_inp(page: TopicPage, t=t) -> dict:
-            order = [e for e in refs_of(page) if e in t["pack"]] + [e for e in t["pack"] if e not in refs_of(page)]
-            ev = [Document(id=e, source=t["pack"][e][0].source.get("site") or "", title=t["pack"][e][0].source.get("title"),
-                           text=raw_evidence(db, e, t["pack"][e])) for e in order]
+            # A2-4/A3-2: 운영 경로(write._run_critic)와 같은 순서·필터·조립으로(5.15-1 문서 비대화 방지가 eval에도)
+            raw_ids = [e for e in t["pack"] if not all(it.kind in ("summary", "context") for it in t["pack"][e])]
+            order = [e for e in refs_of(page) if e in raw_ids] + [e for e in raw_ids if e not in refs_of(page)]
+            ev = critic_documents(db, order, t["pack"])
             return CriticInput(loc_lines=loc_lines(page), page=page, evidence=ev, angle=t["topic"].angle,
                                code_warnings=[], round=1).model_dump()
 
