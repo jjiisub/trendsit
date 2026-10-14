@@ -125,6 +125,11 @@ async function gateInBrowser([weights, tokens]) {
     }
   }
   g.imgBad = [...document.querySelectorAll('img')].filter((img) => img.complete && img.naturalWidth === 0).length;
+  // S7a: 1024 이상에서 run 표 셀(③ steps 줄의 긴 결과 칸 제외)은 한 줄(줄 높이 × 1.5 이하)
+  g.rtWrapBad = [...document.querySelectorAll('.rt tbody tr:not(.rt-day):not(.tr-steps) td')].filter((td) => {
+    const cs = getComputedStyle(td);
+    return vw >= 1024 && td.scrollHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom) > parseFloat(cs.lineHeight) * 1.5;
+  }).length;
   g.tileOverflowBad = [...document.querySelectorAll('.tiles .tile-v, .tiles .tile-l, .tiles .tile-s')].filter((el) => el.scrollWidth > el.clientWidth + 1).length;
   return g;
 }

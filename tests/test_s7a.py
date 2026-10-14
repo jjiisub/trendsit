@@ -404,3 +404,100 @@ def test_fixture_site_covers_the_boundaries_of_5_5():
     nightly = [r for r in runs if r["kind"] == "nightly"]
     assert any(s["name"] == "export + build" for r in nightly for s in r["steps"]) and any(r["steps"] and s["name"].startswith("plan 10.") for r in nightly for s in r["steps"])
     assert any(w["published_at"] for w in d["run_weeks"])
+
+
+# ---------- A4·A5 화면 파싱(픽스처 빌드) ----------
+@pytest.fixture(scope="module")
+def fx_site(tmp_path_factory):
+    import subprocess
+    import sys
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[1]
+    out = tmp_path_factory.mktemp("s7a") / "site"
+    r = subprocess.run([sys.executable, str(root / "site_src/build.py"), "--data", str(root / FIXTURES[0]), "--out", str(out)], capture_output=True, text=True)
+    assert r.returncode == 0, r.stderr
+    return out
+
+
+def fx_data():
+    from pathlib import Path
+
+    return json.loads((Path(__file__).resolve().parents[1] / FIXTURES[0]).read_text(encoding="utf-8"))
+
+
+def page_dom(site, rel):
+    from tests.test_site import dom
+
+    return dom(site, rel)
+
+
+def cells(el_list):
+    return [e["text"].strip() for e in el_list]
+
+
+def test_a4_weeks_table_and_week_list(fx_site):
+    data = fx_data()
+    d = page_dom(fx_site, "runs")
+    assert not (fx_site / "runs/weeks").exists()
+    heads = [e["text"] for e in d.find("th") if e["chain"] and e["chain"][-1][0] == "tr"][:5]
+    assert heads[:5] == ["주차", "기간", "nightly", "weekly", "publish"]
+    rows = d.find("tr")
+    assert len(rows) - 1 == len(data["run_weeks"]) and "10.12 07:10" in (fx_site / "runs/index.html").read_text(encoding="utf-8")
+    assert [e["href"] for e in d.find("a") if e["href"] and e["href"].startswith("/runs/") and e["href"] != "/runs/"] == [f'/runs/{w["week"]}/' for w in data["run_weeks"]]
+    # 주 목록: 날 행 머리 수 = 날 수, run 줄 수 = runs(그 주) + publish 1, tr.tr-sub = sub run 수, .cur 1, ③ 줄 링크 없음, 이전·다음 주 링크
+    wk = page_dom(fx_site, "runs/2026-w41")
+    runs = [r for r in data["runs"] if r["week"] == "2026-w41"]
+    days = {r["day"] for r in runs} | {"2026-10-12"}
+    assert len(wk.find("tr", "rt-day")) == len(days) == 4
+    body_rows = [e for e in wk.find("tr") if "rt-day" not in e["cls"]][1:]
+    assert len(body_rows) == len(runs) + 1
+    assert len(wk.find("tr", "tr-sub")) == sum(r["sub"] for r in runs) == 2
+    assert len(wk.find("span", "cur")) == 1
+    text = (fx_site / "runs/2026-w41/index.html").read_text(encoding="utf-8")
+    assert "steps</span></td>" in text and 'href="/runs/2026-w41/steps' not in text
+    assert 'href="/runs/2026-w40/"' in text and 'href="/runs/2026-w42/"' in text  # 이전·다음 주
+    # 결과 열 3종 형식
+    assert "143 <span class=\"sep\">→</span> 20" in text and "topics 1 / steps 6" in text and "steps 5 / exit≠0 1" in text
+    assert "collect ×6 (ok 5, partial 1) / filter ×1 / plan ×2" in text
+    assert "publish</span> <span class=\"dim\">weeks.published_at</span>" in text and "current r41" in text
+
+
+def test_a5_run_page_weekly_and_nightly(fx_site):
+    data = fx_data()
+    for rid, week, groups, n_steps in (("r41", "2026-w41", 2, 6), ("n42", "2026-w42", 3, 8)):
+        run = next(r for r in data["runs"] if r["id"] == rid)
+        d = page_dom(fx_site, f"runs/{week}/{rid}")
+        html = (fx_site / f"runs/{week}/{rid}/index.html").read_text(encoding="utf-8")
+        crumb = [e for e in d.find("a") if e["chain"] and "crumb" in e["chain"][-1][1]]
+        assert [e["href"] for e in crumb] == ["/runs/", f"/runs/{week}/"]  # 빵부스러기 링크 2개
+        assert len(d.find("div", "rail-g")) == groups and len(d.find("li", "st")) == n_steps == len(run["steps"])
+        assert len(d.find("span", "check")) - len([t for b in run["steps"] for blk in b["detail"] if blk["type"] == "topics" for t in blk["items"] if t["status"] == "checked"]) == sum(s["attention"] for s in run["steps"])
+        assert "<details" not in html
+        assert '<span class="who">code</span>' in html
+    w = (fx_site / "runs/2026-w41/r41/index.html").read_text(encoding="utf-8")
+    assert '<code class="ic">llm / decide / qwen3.8-27b ×58</code>' in w
+    assert len(page_dom(fx_site, "runs/2026-w41/r41").find("div", "tp")) == 3 and w.count("<th scope=\"col\">위치</th>") == 2  # 토픽 3, 반려 표는 이슈 있는 2개
+    assert w.count('class="tp-chain"') == 3 and "<u>" not in w
+    n = (fx_site / "runs/2026-w42/n42/index.html").read_text(encoding="utf-8")
+    assert '<span class="k">collected</span><span class="v">55</span>' in n and "export + build" in n and n.count('class="rail seq"') == 1
+
+
+def test_build_rejects_contract_violations_and_keeps_site(tmp_path):
+    """5.7: kind steps인데 steps가 비어 있지 않거나 run_weeks에 없는 주의 run이면 BuildError, 기존 site/는 그대로."""
+    import subprocess
+    import sys
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[1]
+    site = tmp_path / "site"
+    site.mkdir()
+    (site / "keep.txt").write_text("옛 사이트")
+    for n, mutate in enumerate((lambda d: next(r for r in d["runs"] if r["kind"] == "steps").update(steps=[{"t": "x"}]),
+                                lambda d: d["runs"][0].update(week="2026-w01"))):
+        d = fx_data()
+        mutate(d)
+        p = tmp_path / f"bad{n}.json"
+        p.write_text(json.dumps(d, ensure_ascii=False), encoding="utf-8")
+        r = subprocess.run([sys.executable, str(root / "site_src/build.py"), "--data", str(p), "--out", str(site)], capture_output=True, text=True)
+        assert r.returncode == 1 and "BuildError" in r.stderr and (site / "keep.txt").read_text() == "옛 사이트"

@@ -61,8 +61,8 @@ if msg=$(a1 2>&1); then pass A1a "run_ops fetch+reset 뒤 ops 실행, setup이 m
 pt A1b "trendsit backup(임시 DB, 원본 해시 동일, 사본 integrity ok, 같은 이름 거부, --tag)" tests/test_s6_1_site.py -k "backup"
 
 # A2(화면): 홈 탭 앵커, 키워드 캡, 실행 1건 메타, 출처 단일 목록, 레포 메타, 대체 계획 표시
-pt A2 "작은 보완 화면(홈 탭 앵커 D-1·D-40, 키워드 5개+외n개, 실행 1건 메타, 출처 단일 목록 QA-11, 레포 메타 QA-14, 대체 계획 C-30)" \
-  tests/test_s6_1_site.py -k "tab_anchor or keyword_topic_links or run_meta_line or source_list_is_single or repo_meta_line or fallback_select"
+pt A2 "작은 보완 화면(홈 탭 앵커 D-1·D-40, 키워드 5개+외n개, run 1건 머리 레일 published와 run_weeks current, 출처 단일 목록 QA-11, 레포 메타 QA-14, 대체 계획 C-30)" \
+  tests/test_s6_1_site.py -k "tab_anchor or keyword_topic_links or run_rail_published or source_list_is_single or repo_meta_line or fallback_select"
 
 # ---------- S-2: 작성·검수 v2 ----------
 cc=$(uv run --quiet python -m trendsit check-config 2>&1)

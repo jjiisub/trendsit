@@ -14,14 +14,14 @@ import sys
 import tempfile
 from types import SimpleNamespace
 
+import build_runs
+
 SRC = pathlib.Path(__file__).resolve().parent
 ROOT = SRC.parent
 SITE_URL = "https://trendsit.jiseop.com"
 DEFAULT_DESC = "로컬 AI가 매주 정리하는 개인 기술 브리핑"
 CH_ORDER = ["text", "video", "github"]
-KIND_LABELS = {"weekly": "주간 브리핑", "nightly": "매일 수집"}
 STATUS_LABELS = {"ok": "정상", "partial": "일부 실패", "failed": "실패", "skipped": "건너뜀", "stopped": "중단", "running": "실행 중"}
-STATUS_ALERT = {"partial", "failed", "stopped"}
 TABS = [("briefing", "/", "브리핑"), ("sources", "/sources/", "소스"), ("keywords", "/keywords/", "키워드"), ("runs", "/runs/", "실행 기록")]
 CHK_CSS = ".chk{font-size:var(--fs-xs);color:var(--c-muted);margin-left:var(--sp-1);white-space:nowrap}\n"  # 확인 필요 표기(D-9, DESIGN 7장)
 FONT_CSS = "".join(
@@ -518,70 +518,6 @@ def render_keywords():
                     table(["이름", "별칭", "최근 4주 언급 수", "관련 토픽"], rows, nums=(2,)))
 
 
-def run_path(r):
-    return f'/runs/{r["week"]}/{r["id"]}/'
-
-
-def minutes_text(m):
-    return "-" if m is None else f"{round(m)}분" if m >= 1 else f"{round(m * 60)}초"
-
-
-def render_runs_weeks():
-    rows = []
-    for rw in C.d["run_weeks"]:
-        night = f'{rw["nightly"]}회' + (f', 실패 {rw["nightly_failed"]}' if rw["nightly_failed"] else "") if rw["nightly"] else "기록 없음"
-        cell = lambda k: str(rw[k]) if rw.get(k) is not None else "-"  # noqa: E731
-        rows.append([f'<a href="/runs/{rw["week"]}/">{esc(rw["label"])}</a> <span class="dim">{esc(rw["range"])}</span>', night,
-                     cell("collected"), cell("candidates"), cell("published"), cell("rejected"), cell("needs_check")])
-    return ops_page("실행 기록", "runs", "/runs/weeks/", '주차별. 주차를 누르면 그 주의 실행 목록',
-                    table(["주차", "매일 수집", "수집", "후보", "발행", "반려", "확인 필요"], rows, nums=(2, 3, 4, 5, 6)))
-
-
-def render_runs_week(rw, path):
-    runs = sorted((r for r in C.d["runs"] if r.get("week") == rw["week"]), key=lambda r: r["at"], reverse=True)
-    rows = [[f'<a href="{run_path(r)}">{mdhm(r["at"])}</a>', KIND_LABELS.get(r["kind"], r["kind"]),
-             state(STATUS_LABELS.get(r["status"], r["status"]), r["status"] in STATUS_ALERT), minutes_text(r["duration_min"]), esc(r["summary"])]
-            for r in runs]
-    n_alert = sum(r["status"] in STATUS_ALERT for r in runs)
-    inner = f'<p class="todo"><b>확인할 것</b> 일부 실패·실패한 실행 {n_alert}건</p>'
-    if not rw["nightly"]:
-        inner += '<p class="meta">매일 실행 기록 없음(손으로 실행)</p>'
-    inner += table(["시각", "종류", "상태", "걸린 시간", "요약"], rows)
-    return ops_page(f'실행 기록 {rw["label"]}', "runs", path, f'{esc(rw["range"])} {SEP} <a href="/runs/weeks/">주차별 보기</a>', inner)
-
-
-def render_run(r):
-    rw = C.rws[r["week"]]
-    kind = KIND_LABELS.get(r["kind"], r["kind"])
-    cost = r.get("cost_usd")
-    kv = [("시작", mdhm(r["at"])), ("걸린 시간", minutes_text(r["duration_min"])), ("상태", STATUS_LABELS.get(r["status"], r["status"])),
-          ("비용", f"${cost:.4f}" if cost and cost < 0.1 else f"${cost or 0:.2f}"), ("요약", r["summary"])]
-    inner = '<dl class="kv">' + "".join(f"<dt>{k}</dt><dd>{esc(v)}</dd>" for k, v in kv) + "</dl>"
-    if r.get("fallback_select"):  # C-30: 선별이 대체 계획(점수 순)으로 돈 run
-        inner += '<p class="meta">선별 대체 계획(점수 순)</p>'
-    c = r.get("counts") or {}
-    rev = c.get("review") or {}
-    if c:  # D-37: 이 주 발행 n개 / 이 실행이 쓴 토픽 m개
-        inner += f'<p class="meta">이 주 발행 {c.get("published", 0)}개 / 이 실행이 쓴 토픽 {c.get("written", 0)}개</p>'
-    cells = [("후보", c.get("candidates")), ("선정", c.get("selected")), ("근거 id", c.get("evidence_ids")), ("1차 통과", rev.get("passed_first")),
-             ("반려", rev.get("rejected")), ("확인 필요", rev.get("needs_check")), ("발행", c.get("published"))]
-    inner += '<dl class="kv">' + "".join(f"<dt>{k}</dt><dd>{v}</dd>" for k, v in cells if v is not None) + "</dl>" if c else ""
-    if c.get("related"):
-        rel = c["related"]
-        inner += f'<p class="meta">과거 대조: 후속 {rel["follow_up"]} {SEP} 신규 {rel["new"]} {SEP} 중복 {rel["duplicate"]}</p>'
-    if r.get("steps"):  # 단계 레일: steps의 역할 문장(확인이 필요한 단계만 .check)
-        lis = "".join(f'<li><span class="k">{esc(" ".join(x for x in (s.get("t"), s.get("role")) if x))}</span>'
-                      f'<span class="v">{esc(s["text"] + (" (대체 계획)" if s.get("fallback") else ""))}</span>'
-                      + ('<span class="check">확인 필요</span>' if s.get("attention") else "") + "</li>" for s in r["steps"])
-        inner += f'<h2>단계 기록</h2><ol class="rail">{lis}</ol>'
-    cmps = [s["detail"] for s in r.get("steps") or [] if s.get("detail")]
-    if cmps:
-        inner += "<h2>반려 비교</h2>" + "".join(
-            f'<div class="cmp"><div><h3>초안</h3><p>{esc(d["draft"])}</p></div><div><h3>근거</h3><p>{esc(d["evidence"])}</p></div>'
-            + (f'<div><h3>수정</h3><p>{esc(d["fixed"])}</p></div>' if d.get("fixed") else "") + "</div>" for d in cmps)
-    return ops_page(f'{kind} {mdhm(r["at"])}', "runs", run_path(r), f'<a href="/runs/{rw["week"]}/">{esc(rw["label"])} 실행 목록</a>', inner)
-
-
 # ---------------------------------------------------------------- 빌드
 def build_into(out):
     C.out = out
@@ -610,14 +546,7 @@ def build_into(out):
         write(f'topic/{t["id"]}/index.html', render_topic(t))
     write("sources/index.html", render_sources())
     write("keywords/index.html", render_keywords())
-    write("runs/weeks/index.html", render_runs_weeks())
-    for i, rw in enumerate(C.d["run_weeks"]):
-        write(f'runs/{rw["week"]}/index.html', render_runs_week(rw, f'/runs/{rw["week"]}/'))
-        if i == 0:
-            write("runs/index.html", render_runs_week(rw, "/runs/"))
-    for r in C.d["runs"]:
-        if r.get("week") in C.rws:
-            write(f'runs/{r["week"]}/{r["id"]}/index.html', render_run(r))
+    build_runs.render_all(sys.modules[__name__])
 
 
 def build(data_path, out_path):
