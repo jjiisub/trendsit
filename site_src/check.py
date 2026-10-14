@@ -388,10 +388,8 @@ def browser_checks(site, data):
                 miss.append(f'5 본문 시작(머리 타일·첫 절)이 첫 화면 밖({g["pointsTop"]})')
             if e["vw"] == 1280 and g["rtWrapBad"]:
                 miss.append(f'1280에서 .rt 셀 줄바꿈 {g["rtWrapBad"]}건(S7a)')
-            if g["cmptOverflowBad"]:
-                miss.append(f'표(.cmpt-wrap)가 자신만 가로 스크롤하지 않음 {g["cmptOverflowBad"]}건(5.9)')
-            if g["imgBad"]:
-                miss.append(f'이미지 로드 실패(naturalWidth 0) {g["imgBad"]}건(5.9)')
+            for k, m in (("cmptOverflowBad", "표(.cmpt-wrap)가 자신만 가로 스크롤하지 않음(5.9)"), ("imgBad", "이미지 로드 실패(naturalWidth 0)(5.9)"), ("rtOverlapBad", "375에서 .rt 셀 글자 겹침 쌍(S7a)")):
+                miss += [f"{m} {g[k]}건"] if g[k] else []
             if e["vw"] == 375 and g["tileOverflowBad"]:
                 miss.append(f'375에서 타일 글자 잘림 {g["tileOverflowBad"]}건(5.9)')
             bad += [f'{e["vw"]} {e["page"]}: {m}' for m in miss]

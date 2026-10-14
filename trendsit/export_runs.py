@@ -385,7 +385,7 @@ NIGHT: dict[str, tuple[str, Callable[..., tuple]]] = {
 
 def _nightly_detail(db: DB, d: dict[str, Any]) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     sj, days, r = d["_sj"], d["_days"], d["_row"]
-    subs = db.conn.execute("SELECT * FROM runs WHERE spec=? AND started_at>=? AND started_at<=? AND id!=? ORDER BY started_at",
+    subs = db.conn.execute("SELECT * FROM runs WHERE spec=? AND started_at>=? AND started_at<? AND id!=? ORDER BY started_at",
                            (r["spec"], r["started_at"], _iso(r["finished_at"]) or "9", r["id"])).fetchall()
     by_day = _day_runs(subs, days)
     steps = []

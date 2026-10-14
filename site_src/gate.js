@@ -130,6 +130,14 @@ async function gateInBrowser([weights, tokens]) {
     const cs = getComputedStyle(td);
     return vw >= 1024 && td.scrollHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom) > parseFloat(cs.lineHeight) * 1.5;
   }).length;
+  // S7a: 375에서 run 표 한 줄 안의 셀끼리 글자가 겹치면 안 된다
+  const rg = (el) => { const r = document.createRange(); r.selectNodeContents(el); return [...r.getClientRects()].filter((x) => x.width > 0); };
+  const hit = (a, b) => a.some((x) => b.some((y) => x.left < y.right - 0.5 && y.left < x.right - 0.5 && x.top < y.bottom - 0.5 && y.top < x.bottom - 0.5));
+  g.rtOverlapBad = vw !== 375 ? 0 : [...document.querySelectorAll('.rt tbody tr:not(.rt-day)')].reduce((n, tr) => {
+    const c = [...tr.cells].map(rg);
+    for (let i = 0; i < c.length; i++) for (let j = i + 1; j < c.length; j++) if (hit(c[i], c[j])) n++;
+    return n;
+  }, 0);
   g.tileOverflowBad = [...document.querySelectorAll('.tiles .tile-v, .tiles .tile-l, .tiles .tile-s')].filter((el) => el.scrollWidth > el.clientWidth + 1).length;
   return g;
 }

@@ -313,6 +313,25 @@ def test_a3_multi_day_nightly_pairs_sub_runs_by_day(tmp_path):
     assert [s["detail"][0]["items"] for s in steps[2:]] == [["o/11 카드"], ["o/12 카드"]]
 
 
+def test_a3_sub_run_starting_at_nightly_end_belongs_to_the_next_nightly(tmp_path):
+    """연달아 돈 nightly: 앞 nightly 끝과 같은 초에 시작한 하위 run은 뒤 nightly 것이다(끝 경계 미만)."""
+    db = DB(tmp_path / "t.db")
+    c = db.conn
+    run(c, "n3", "nightly", "2026-10-13T02:00:00+09:00", "2026-10-13T03:00:00+09:00", spec="RUN-2026-W42", summary={
+        "days": ["2026-10-12"], "steps": [{"name": "repo_analyze", "day": "2026-10-12", "exit": 0, "sec": 1.0}]})
+    for rid, at in (("in", "02:30:00"), ("next", "03:00:00")):
+        run(c, rid, "repo-analyze", f"2026-10-13T{at}+09:00", spec="RUN-2026-W42", note="repo-analyze 2026-W42")
+        c.execute("INSERT INTO repo_cards(week, full_name, card_json, run_id) VALUES ('2026-W42',?,?,?)", (f"o/{rid}", json.dumps({"log": f"o/{rid} 카드"}), rid))
+    c.commit()
+    from trendsit.export_runs import _nightly, _nightly_detail
+
+    row = c.execute("SELECT * FROM runs WHERE id='n3'").fetchone()
+    d = _nightly(row, json.loads(row["summary_json"]))
+    d["_row"] = row
+    _, steps = _nightly_detail(db, d)
+    assert [s["detail"][0]["items"] for s in steps if s["name"] == "repo_analyze"] == [["o/in 카드"]]
+
+
 # ---------- A1 publish --site-only ----------
 def test_a1_publish_site_only_exit_codes_and_weeks_unchanged(tmp_path, monkeypatch, capsys):
     """CLI 끝까지: 실제 export + 가짜 빌드 명령(python -c)으로 0 / 빌드 실패 1 / --week와 같이 쓰면 2. weeks 행은 그대로."""

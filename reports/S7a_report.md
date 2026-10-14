@@ -20,7 +20,7 @@
 - `item_cards v2`·`repo_cards` 한 줄: `log` → `summary` → 첫 글자 칸 순. 실측 repo_cards는 `log`(풀네임으로 시작해서 풀네임이 겹치면 붙이지 않음), item_cards v2는 `log`
 - 시각 열이 없는 nightly 단계의 `t`: 하위 run 시작 시각, 하위 run이 없으면 nightly 시작 시각. 여러 날 nightly의 날 단위 단계 이름은 `plan 10.10`처럼 날을 붙인다(하위 run 짝짓기는 plan run 노트의 날짜를 기준점으로 그 뒤 시작한 deep-text·video·repo-analyze run을 그날에)
 - nightly label 여러 날: `nightly 10.10~10.11`
-- 목록 모바일 두 줄 grid: 1줄 시각 / 자동·수동 / run / 시간·비용 / 상태, 2줄 결과(FINAL의 5열 순서 그대로, 시간·비용을 1줄로)
+- 목록 모바일 두 줄 grid: 1줄 시각 / 자동·수동 / run / 상태, 2줄 결과(왼쪽)·시간/비용(오른쪽). FINAL 375 캡처 배치. 처음에 시간·비용을 1줄에 뒀다가 WebKit 375에서 하위 run 줄과 글자가 겹쳐 2줄로 옮겼다(009-B1-01)
 - plan 단계 상세: `list` 블록(제목 칸이 계약에 없어) 항목 앞에 `text_queue / `·`video_queue / `·`repo_queue / `를 붙여 구분
 - 사용자 결정: 토픽 1개 재실행 run 쪽은 그 run 것만(누적치 안 씀, NG-6). 결과 칸은 `topics 1 / steps n`, `writer ⇄ critic` 단계 line은 그 run의 토픽 블록에서(`topics 1 / rounds <final_round> / code_rejects <반려 수> / critic_rejects <비평 반려 수> / check_topics <0|1>`), `summary`는 `published`만(현재판이면 발행 토픽 수, 아니면 null이고 둘 다 null이면 레일 없음)
 - weekly `summary.published`는 `weeks` 행 기준 현재판 run이고 그 주가 이번 export에 담길 때만(= 사이트에 실리는 토픽 수 = `weeks[].topic_count`), 아니면 null
@@ -38,6 +38,7 @@
 - C-4 금칙 문자열 검사는 생성 HTML 전체를 본다(`sk-`는 키 모양 `sk-` + 영숫자 8자 이상만). 실DB 사본의 토픽 페이지 포함 129쪽에서 오탐 0
 - 목록의 publish 줄 자동/수동 칸은 `-`(어느 쪽인지 기록이 없음)
 - 지금 DB에서 weekly run 100건 중 W40·W41 외 `week` 없는 것 1건은 안 나온다(5.2 대로)
+- 5.2-3 하위 run 끝 경계 ≤ → <(사용자 결정 10/14, 연속 nightly 중복 합산). 시작 경계는 `>=` 그대로, 비교는 `_iso(finished_at)` 거침
 - export_runs.py 줄 예산 450→470(사용자 결정 10/14, 사유: run 단위 격리 + 토픽 run 자기 수치, 461줄)
 
 ## 6. 남은 문제 (미해결)
