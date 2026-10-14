@@ -190,7 +190,7 @@ async function behavior(browser, longTopic, homePath) {
     // 화면 안에 함께 보이는 인용 번호들(마우스가 정확히 올라간 시각부터 재려고 좌표로 움직임)
     await page.evaluate(() => { const r = document.querySelector('.dp .cite > .ref').getBoundingClientRect(); window.scrollTo(0, window.scrollY + r.top - 150); });
     await sleep(100);
-    const pos = await page.evaluate(() => [...document.querySelectorAll('.cite > .ref')].map((a, i) => { const r = a.getBoundingClientRect(); return { i, x: r.x + r.width / 2, y: r.y + r.height / 2, ok: r.top > 0 && r.bottom < innerHeight }; }).filter((p) => p.ok));
+    const pos = await page.evaluate(() => [...document.querySelectorAll('.cite > .ref')].map((a, i) => { const r = a.getBoundingClientRect(); const x = r.x + r.width / 2, y = r.y + r.height / 2; return { i, x, y, ok: r.top > 0 && r.bottom < innerHeight && a.contains(document.elementFromPoint(x, y)) }; }).filter((p) => p.ok)); // 미니 바에 가린 번호는 뺌
     const A = pos[0];
     await page.mouse.move(2, 2);
     await sleep(300);

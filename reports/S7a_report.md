@@ -42,9 +42,11 @@
 - nightly 끝 재생성 호출 위치: 명세는 `finally` 안이었으나 그 뒤 정상 종료 경로에서 부른다(근거는 4장: `finally`에 넣으면 SIGTERM의 `SystemExit` 경로에서도 최대 step_timeout_min짜리 하위 프로세스가 돌아 launchd 강제 종료에 끊긴다. 009-A1-09 거부, 009-C1-04)
 - gate.js에 375 `.rt` 셀 겹침 측정을 더했다(명세는 375 넘침 0만). B1 QA High(목록 시간·비용이 하위 run 줄과 겹침) 회귀 방지로 오케스트레이터가 지시(009-C1-12)
 - export_runs.py 줄 예산 450→470(사용자 결정 10/14, 사유: run 단위 격리 + 토픽 run 자기 수치, 결정 당시 461줄, 최종 466줄)
+- (리뷰 세션 10/14) **PC 폭을 모든 쪽 960px 하나로**: `tokens.css` PC `--maxw` 960(명세 "tokens.css 불변" 예외, 사용자 결정), `.ops{--maxw:960px}` 삭제, PC 읽기 글(`.ts`·`.it-s`·`.dp`)만 `--fs-md`(17px). 헤더 nav와 본문 양 끝이 모든 쪽에서 맞는다(실DB 129쪽 × Chromium·WebKit × 375·768·1024·1280·1440 끝 차이 0, 넘침 0, 1280 `.rt` 셀 줄바꿈 0(③ 줄 제외)). 관리 화면은 원래 960이라 S7a 표 열 폭 그대로. 비교 근거는 기획 폴더 `claude/s7_폭시안/`, 캡처 `reports/S7a/shots/pc960_*_1280.png`
+- (리뷰 세션 10/14) gate.js 툴팁 동작 검사: 화면 안 인용 번호 중 **미니 바에 가린 것은 뺀다**(`elementFromPoint`). 폭이 넓어져 타일의 인용 번호가 검사 스크롤 위치에서 미니 바 밑에 놓였고, 검사가 그 번호를 골라 실패했다(툴팁 자체는 정상). 기준(0.15초·0.6초·1초·동시에 하나)은 그대로
 
 ## 6. 남은 문제 (미해결)
-- 형식만 맞고 실재하지 않는 주 id(`2026-W99`)를 가진 weekly run이 DB에 1건 있으면 `week_label` ValueError로 export 전체가 실패한다(run 격리 밖, 009-C2-01). 실DB 해당 0건이고 정상 CLI 경로로는 잘 생기지 않지만, 생기면 nightly 재생성·`publish --week`가 1로 끝난다
+- ~~실재하지 않는 주 id(`2026-W99`) weekly run 1건이면 export 전체 실패(009-C2-01)~~ → 리뷰 세션이 고침: 후보 단계에서 `week_label`을 불러 그 run만 뺀다(run 단위 격리 안, `test_broken_run_rows_do_not_stop_export`에 사례 추가, 고치기 전 실패 확인)
 - `brief weekly --force`로 발행이 풀린 주(done, published_at NULL)는 다음 02:00 재생성 때 공개 사이트에서 빠진다(명세 밖 시나리오, 009-C2-02, 기획 판단)
 - 별칭(normalize) 목록: `aliases`가 `UNIQUE(canonical, alias)`라 run_id가 덮여 옛 run 쪽은 목록 0, 최근 run에 몰림(NG-3 안에서는 못 고침, 009-B1-03)
 - 375 주차별 표(`/runs/`)는 표 안쪽 가로 스크롤로 weekly 열부터 가려 보인다(페이지 넘침은 0, NG-5 모바일 디자인 검토 대상)

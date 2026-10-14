@@ -236,6 +236,7 @@ body{counter-reset:dsec}
  .top .nav{max-width:var(--maxw);margin:0 auto}
  .tabs{margin:var(--sp-3) 0 0;padding:0;gap:var(--sp-2)}
  .tabs a{font-size:var(--fs-md);padding:0 var(--sp-1)}
+ .ts,.it-s,.dp{font-size:var(--fs-md)} /* 폭 960에서 읽기 글만 17px(한 줄 약 53자) */
 }
 
 /* ==========================================================
@@ -359,6 +360,5 @@ body{counter-reset:dsec}
  .tp-b{padding-left:0}
 }
 @media (min-width:1024px){
- .ops{--maxw:960px}
  .dtable-wrap{margin:0;padding:0}
 }

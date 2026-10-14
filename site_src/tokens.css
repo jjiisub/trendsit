@@ -44,7 +44,7 @@
   --target-lg:44px;   /* 내비·탭·이전/다음 */
   --radius-s:4px;     /* 배지, 막대, 인라인 코드 */
   --radius-m:8px;     /* 도식, 툴팁 (이보다 큰 반경 금지) */
-  --maxw:720px;       /* 읽기 한 열 */
+  --maxw:720px;       /* 한 열(헤더·모든 쪽 공통). PC 960 */
   --gutter:20px;      /* 모바일 좌우 여백 (PC 32px) */
   --sticky-offset:72px; /* 앵커 이동 시 미니 바에 가리지 않는 여유 */
 
@@ -56,4 +56,4 @@
   /* 쌓임 */
   --z-tabs:2; --z-mini:3; --z-tip:10;
 }
-@media (min-width:1024px){:root{--gutter:32px}}
+@media (min-width:1024px){:root{--gutter:32px;--maxw:960px}}
