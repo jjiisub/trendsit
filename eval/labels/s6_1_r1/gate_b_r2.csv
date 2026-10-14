@@ -1,0 +1,11 @@
+topic_id,section,type,label,note,labeler
+w41-mistral-large-4,page,fixed,pass,"재작성(run ba4a): 사이벤치·사이버짐 원문 표기, 영문 철자 짐작 없음. ⚠ 3곳(코드·검수 판정)",opus-5.5
+w41-openai-rogue-agent,page,fixed,pass,"재작성(run d171): 드루 푸사테리 원문 표기, 요약 형광 1",opus-5.5
+w41-ai-code-workflow,sections[3],translation,pass,"Coordination → 조율(1차 '조류' 해소)",opus-5.5
+w41-openrig,page,identifier,pass,"@openrig/cli·v-openrig-build 보존, lifecycle 원어",opus-5.5
+w41-ai-math-results,sections[4],unsupported,pass,"1차 근거 밖 문장 없음",opus-5.5
+w41-gemini-agent-enterprise,page,translit,pass,"표·본문 모두 Gemini 4 Argon, 검수 수행",opus-5.5
+w41-decision-1,summary,overclaim,minor,"둘째 문장 '일반화·보정 신뢰도가 핵심 검증 항목'은 근거보다 쟁점화",opus-5.5
+w41-gpt-6-intelligent-ui,head_tiles[1],number,minor,"note 비교 방향 뒤바뀜(GPT-6 Instant 대비 GPT-5.6) — 값 44%는 일치",opus-5.5
+w41-claude-haiku-5-5,head_tiles,duplicate,minor,"75%·43점이 절 제목에 반복(6토픽 같은 유형, MVP 뒤)",opus-5.5
+w41-embedding-gemma-2,head_tiles,duplicate,minor,"740M·78.68 절 제목 반복",opus-5.5
