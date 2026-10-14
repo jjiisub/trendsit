@@ -272,6 +272,27 @@ def test_critic_documents_still_merges_it_sentence_windows_when_og_quote_is_mixe
     assert "[og:1#q1] 원본 인용이다." in lines  # 나머지 id도 같은 문서에 각자 줄로
 
 
+def test_critic_documents_video_id_matches_evidence_docs_rule(tmp_path):
+    """A1-9: 영상 문서 id는 evidence_docs와 같은 규칙(vd:{item_id}, member 키 vd:{video_id}와 다름), url도 포함."""
+    db = DB(tmp_path / "t.db")
+    src = {"site": "YouTube", "title": "t", "url": "https://youtu.be/ABC"}
+    pack = {"vd:905@100": [EvidenceItem("vd:905@100", "vd:ABC", "video", "transcript", "전사다.", src)],
+            "sl:905@100": [EvidenceItem("sl:905@100", "vd:ABC", "video", "slide_read", "판독이다.", src)]}
+    docs = fulltext.critic_documents(db, ["vd:905@100", "sl:905@100"], pack)
+    assert len(docs) == 1 and docs[0].id == "vd:905" and docs[0].url == "https://youtu.be/ABC"
+
+
+def test_critic_documents_falls_back_to_pack_text_when_item_text_is_gone(tmp_path):
+    """A1-10: item_texts가 없어졌어도(만료) pack 항목 자체의 글(캡처 시점 문장)로 그 줄을 채운다(빈 문서 아님)."""
+    db = DB(tmp_path / "t.db")
+    db.conn.execute("INSERT INTO items(id, source_id, channel, external_id, url, title, day, week) VALUES "
+                    "(1,'s','text','e','http://x','t','2026-10-06','2026-W41')")
+    src = {"site": "GeekNews", "title": "t"}
+    pack = {"it:1#s2": [EvidenceItem("it:1#s2", "it:1", "text", "sentence", "캡처된 둘째 문장이다.", src)]}
+    docs = fulltext.critic_documents(db, ["it:1#s2"], pack)
+    assert docs[0].text == "[it:1#s2] 캡처된 둘째 문장이다."
+
+
 def test_evidence_docs_skips_summary_and_claim_kinds():
     p = {"vd:1": [EvidenceItem("vd:1", "vd:X", "video", "summary", "요약", {})]}
     assert evidence_docs(p) == []

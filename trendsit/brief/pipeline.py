@@ -299,7 +299,9 @@ def compute_summary(db: DB, run_id: str) -> dict[str, Any]:
         "write": {"topics": len(topics), "failed": sum(t["status"] == "failed" for t in topics)},
         "review": {"rounds": {str(k): sum(1 for t in topics if t["final_round"] == k) for k in (1, 2, 3)},
                    "code_rejects": sum(1 for v in verdicts if v["checker"] == "code" and v["status"] == "reject"),
-                   "critic_rejects": sum(1 for v in verdicts if v["checker"] == "critic" and v["status"] == "reject"),
+                   # A1-11/A3-10: 검수 실패(재시도까지 실패)도 reject로 저장되지만 fact_support가 없어 구분됨(5.15-2)
+                   "critic_rejects": sum(1 for v in verdicts if v["checker"] == "critic" and v["status"] == "reject"
+                                        and json.loads(v["autofix_json"] or "{}").get("fact_support") is not None),
                    "autofixes": autofixes, "reverts": reverts, "issues": issue_types, "check_points": check_points,
                    "check_topics": sum(1 for t in topics if json.loads(t["checks_json"] or "[]"))},
         "cost_usd": cost,

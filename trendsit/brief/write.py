@@ -216,9 +216,8 @@ def _rounds(ctx: Ctx, res: TopicResult, topic: Applied, winp: WriterInput, pack:
             res.rounds.append(log)
             verdict, err, vsid = _run_critic(ctx, res, topic, winp, pack, page, rnd, cr.warnings)
             if verdict is None:  # 5.15-2: 재시도까지 실패하면 검수 없이 통과시키지 않고 summary check=true(⚠)
-                res.attention.append(f"검수 실패: {err}")
+                fulltext.mark_critic_failure(res.attention, err, check_locs)
                 res.rounds.append(RoundLog(rnd, "critic", "reject", [], step_id=vsid))
-                check_locs.add("summary")
                 res.page, res.final_round = page, rnd
                 break
             log = _critic_log(rnd, verdict, vsid)
@@ -249,11 +248,12 @@ def _rounds(ctx: Ctx, res: TopicResult, topic: Applied, winp: WriterInput, pack:
 def _critic_unseen_pages(ctx: Ctx, res: TopicResult, topic: Applied, winp: WriterInput, pack: dict[str, list[EvidenceItem]],
                          final: TopicPage, check_locs: set[str], cfg: BriefConfig) -> None:
     rnd = res.final_round or cfg.review.max_rounds
-    verdict, _err, vsid = _run_critic(ctx, res, topic, winp, pack, final, rnd, [])
-    if verdict is not None:
-        res.rounds.append(_critic_log(rnd, verdict, vsid))
-        if verdict.status == "reject":
-            check_locs |= {top_loc(normalize_loc(final, i.loc)) for i in verdict.issues}
+    verdict, err, vsid = _run_critic(ctx, res, topic, winp, pack, final, rnd, [])
+    if verdict is None:  # A1-3/A2-2/A3-1: 코드 반려만 거친 토픽도 검수 실패는 summary check=true+attention
+        return fulltext.mark_critic_failure(res.attention, err, check_locs)
+    res.rounds.append(_critic_log(rnd, verdict, vsid))
+    if verdict.status == "reject":
+        check_locs |= {top_loc(normalize_loc(final, i.loc)) for i in verdict.issues}
 
 
 def _drop_code_bad_sections(res: TopicResult, final: TopicPage, pack: dict[str, list[EvidenceItem]], cfg: BriefConfig,

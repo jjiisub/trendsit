@@ -427,6 +427,47 @@ def test_critic_llm_error_retries_once_then_flags_summary_check(week, monkeypatc
     assert calls[:3] == ["writer", "critic", "critic"]  # 1회 실패 + 30초 뒤 재시도 1회(그래도 실패)
 
 
+def test_critic_call_failure_is_not_counted_as_a_review_reject(week, monkeypatch):
+    """A1-11/A3-10: 검수 호출 실패(LLMError)는 verdicts에 reject로 남지만 실제 반려가 아니므로 실행 요약
+    critic_rejects에는 안 셈(fact_support 없음으로 구분)."""
+    from trendsit.brief import write as wr
+    from trendsit.core.errors import LLMError
+
+    ctx, cids = week
+    responses = [plan(cids), page(1, "Argon이 DeepSWE에서 77.9% 기록했다")]
+    for i in (2, 3, 4):
+        responses += [page(i, f"{TITLES[i]} 근거 문장 요약 정리했다"), verdict([])]
+    ctx.llm.transport.responses = [response(r) for r in responses]
+    monkeypatch.setattr(wr.time, "sleep", lambda s: None)
+    stub_run_role(monkeypatch, wr, lambda n, role: LLMError("HTTP 429") if n in (2, 3) else None)
+    ctx.tracer = Tracer(ctx.db, "weekly", "S0")
+    summary = pipeline.run_weekly("2026-W41", ctx, from_step="select", embedder=HashEmbedder(), cfg=CFG)
+    assert summary["review"]["critic_rejects"] == 0
+
+
+def test_critic_unseen_pages_failure_flags_summary_check(week, monkeypatch):
+    """A1-3/A2-2/A3-1: 매 라운드 코드가 반려해 critic을 한 번도 못 부른 토픽도, 사후(_critic_unseen_pages)
+    검수가 재시도까지 실패하면 summary check=true(⚠)+attention '검수 실패'로 남긴다(전엔 아무 표시가 없었음)."""
+    from trendsit.brief import write as wr
+    from trendsit.core.errors import LLMError
+
+    ctx, cids = week
+    p1 = json.loads(page(1, "Argon이 DeepSWE에서 77.9% 기록했다"))
+    p1["sections"][0]["heading"] = ""  # 필수 칸 비어 있음 → 코드가 매 라운드 반려(critic은 안 부름)
+    responses = [plan(cids), json.dumps(p1, ensure_ascii=False), revision([])]
+    for i in (2, 3, 4):
+        responses += [page(i, f"{TITLES[i]} 근거 문장 요약 정리했다"), verdict([])]
+    ctx.llm.transport.responses = [response(r) for r in responses]
+    monkeypatch.setattr(wr.time, "sleep", lambda s: None)
+    calls = stub_run_role(monkeypatch, wr, lambda n, role: LLMError("HTTP 429") if n in (3, 4) else None)
+    ctx.tracer = Tracer(ctx.db, "weekly", "S0")
+    pipeline.run_weekly("2026-W41", ctx, from_step="select", embedder=HashEmbedder(), cfg=CFG)
+    run_id = ctx.tracer.run_id
+    t1 = ctx.db.conn.execute("SELECT status, checks_json FROM topics WHERE run_id=? AND rank=1", (run_id,)).fetchone()
+    assert calls[:4] == ["writer", "writer_revise", "critic", "critic"]  # critic은 _critic_unseen_pages에서만
+    assert t1["status"] == "checked" and "summary" in json.loads(t1["checks_json"])
+
+
 def test_f2_diagram_with_only_critic_issue_is_kept_with_check(week):
     """시각 요소는 코드가 확인한 형식·수치 오류일 때만 뺀다. 검수자 의미 지적만 두 번 남으면 두고 ⚠(반영 확인 리뷰 F2)."""
     ctx, cids = week

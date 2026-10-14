@@ -172,6 +172,15 @@ def critic_documents(db: DB, order: list[str], pack: dict[str, list[EvidenceItem
                 merged = {f"it:{item_id}#s{n}": sents[n - 1] for n in nums}
         lines = [f"[{eid}] {t}" for eid, t in merged.items()]
         lines += [f"[{e}] {t}" for e in ids if e not in merged and (t := raw_evidence(db, e, pack[e]))]
-        docs.append(Document(id=member, source=first.source.get("site") or first.channel,
-                             title=first.source.get("title"), text="\n".join(lines)))
+        # A1-9: 영상 문서 id는 evidence_docs와 같은 규칙으로 vd:{item_id}(member 키는 vd:{video_id}라 다름), url도 포함
+        iid = next((m[1] for e in ids if (m := re.match(r"^(?:vd|sl):(\d+)", e))), None) if first.channel == "video" else None
+        docs.append(Document(id=f"vd:{iid}" if iid else member, source=first.source.get("site") or first.channel,
+                             title=first.source.get("title"), url=first.source.get("url"), text="\n".join(lines)))
     return docs
+
+
+def mark_critic_failure(attention: list[str], err: str | None, check_locs: set[str]) -> None:
+    """검수자 호출이 재시도까지 실패하면(5.15-2) summary check=true(⚠)+attention "검수 실패"만 남긴다(write.py의
+    _rounds·_critic_unseen_pages 두 경로가 함께 쓴다, A1-3/A2-2/A3-1)."""
+    attention.append(f"검수 실패: {err}")
+    check_locs.add("summary")
