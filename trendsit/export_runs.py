@@ -428,6 +428,7 @@ def build_runs(db: DB, weeks: list[dict[str, Any]], week_label: Callable[[str], 
         try:
             sj = _j(r["summary_json"]) or {}
             if r["kind"] == "weekly" and r["week"]:
+                week_label(r["week"].upper())  # 실재하지 않는 주 id(2026-W99)는 ValueError → 이 run만 뺀다(009-C2-01)
                 w = wrow.get(r["week"].lower())
                 d = _weekly(db, r, sj, w["current_run_id"] if w else None)
             else:

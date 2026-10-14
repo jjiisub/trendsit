@@ -652,8 +652,10 @@ def test_broken_run_rows_do_not_stop_export(tmp_path, capsys):
     run(c, "bad-json", "nightly", "2026-10-13T03:00:00+09:00", "2026-10-13T03:10:00+09:00", spec="RUN-2026-W42")
     c.execute("UPDATE runs SET summary_json='{' WHERE id='bad-json'")
     run(c, "bad-tz", "weekly", "2026-10-13 04:00:00", "2026-10-13 04:05:00", note="weekly 2026-W41 from select", week="2026-W41")
+    run(c, "bad-week", "weekly", "2026-10-13 05:00:00+09:00", "2026-10-13 05:05:00+09:00", note="weekly 2026-W99 from cluster", week="2026-W99")
     c.commit()
     runs = by_id(build(db))
-    assert "bad-json" not in runs and "n-new" in runs and "w-auto" in runs
-    assert "run bad-json 를 뺌: JSONDecodeError" in capsys.readouterr().err
+    assert "bad-json" not in runs and "bad-week" not in runs and "n-new" in runs and "w-auto" in runs
+    err = capsys.readouterr().err
+    assert "run bad-json 를 뺌: JSONDecodeError" in err and "run bad-week 를 뺌: ValueError" in err  # C2-01: 없는 주 id도 그 run만
     assert runs["bad-tz"]["duration_sec"] == 300
