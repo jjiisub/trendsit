@@ -46,7 +46,7 @@ def _iso(ts: str | None) -> str | None:
 
 
 def _sec(start: str, end: str | None) -> int | None:
-    return round((datetime.fromisoformat(_iso(end)) - datetime.fromisoformat(start)).total_seconds()) if end else None
+    return round((datetime.fromisoformat(_iso(end)) - datetime.fromisoformat(_iso(start))).total_seconds()) if end else None
 
 
 def _md(day: str) -> str:
@@ -150,7 +150,7 @@ def _weekly_detail(db: DB, d: dict[str, Any], ex: dict[str, Any]) -> tuple[dict[
     dur, cost = (sj.get(k) if isinstance(sj.get(k), dict) else {} for k in ("duration_sec", "cost_usd"))
     steps = [x for x in (by.get("evidence") and _s_evidence(by, dur), by.get("normalize") and _s_normalize(db, by, rid),
                          by.get("cluster") and _s_cluster(db, by, rid, dur, cost), by.get("editor_select") and _s_select(db, by, rid, sj, dur, cost),
-                         _s_write(db, by, rid, sj, dur, cost, bool(d["topic_id"])), _s_end(by, dur, cost)) if x]
+                         _s_write(db, by, rid, sj, dur, cost, d["topic_id"]), _s_end(by, dur, cost)) if x]
     pub = ex[d["week"]]["topic_count"] if d["current"] and d["week"] in ex else None  # 현재판이면 사이트에 실리는 토픽 수
     if d["topic_id"]:  # 토픽 1개 재실행 run: summary_json은 주 누적치라 published만(NG-6)
         return ({"published": pub} if pub is not None else None), steps
@@ -213,8 +213,9 @@ def _s_select(db: DB, by: dict[str, list[Any]], rid: str, sj: dict[str, Any], du
                  ((llm or es)[-1]["text"] or "") + fb, dur.get("select"), cost.get("editor_select"), any(s["attention"] for s in es), detail)
 
 
-def _topic_blocks(db: DB, by: dict[str, list[Any]], rid: str) -> list[dict[str, Any]]:
-    """토픽 경계 = writer code 행(detail.topic_id). 그 행 이전, 직전 경계 이후의 writer·writer_revise·critic 행들이 그 토픽."""
+def _topic_blocks(db: DB, by: dict[str, list[Any]], rid: str, tid: str | None = None) -> list[dict[str, Any]]:
+    """토픽 경계 = writer code 행(detail.topic_id). 그 행 이전, 직전 경계 이후의 writer·writer_revise·critic 행들이 그 토픽.
+    마지막 경계 뒤에 남은 행(중단·진행 중)은 경계 없는 블록 하나로(D-20)."""
     seq = sorted((s for r in ("writer", "writer_revise", "critic") for s in by.get(r, [])), key=lambda s: s["seq"])
     revise = {s["seq"]: _j(s["output"]) for s in db.conn.execute(
         "SELECT seq, output FROM steps WHERE run_id=? AND role='writer_revise' AND output IS NOT NULL", (rid,))}
@@ -227,7 +228,7 @@ def _topic_blocks(db: DB, by: dict[str, list[Any]], rid: str) -> list[dict[str, 
             continue
         out.append(_topic(seg, dt, meta.get(dt["topic_id"]), revise, len(out) + 1))
         seg = []
-    return out
+    return out + ([_topic(seg, {"topic_id": tid or "-"}, None, revise, len(out) + 1)] if seg else [])
 
 
 def _topic(seg: list[Any], dt: dict[str, Any], t: Any, revise: dict[int, Any], n: int) -> dict[str, Any]:
@@ -256,19 +257,19 @@ def _topic(seg: list[Any], dt: dict[str, Any], t: Any, revise: dict[int, Any], n
 
 
 def _s_write(db: DB, by: dict[str, list[Any]], rid: str, sj: dict[str, Any], dur: dict[str, Any], cost: dict[str, Any],
-             single: bool = False) -> dict[str, Any] | None:
+             tid: str | None = None) -> dict[str, Any] | None:
     rows = [s for r in ("writer", "writer_revise", "critic") for s in by.get(r, [])]
     if not rows:
         return None
-    topics = _topic_blocks(db, by, rid)
+    topics = _topic_blocks(db, by, rid, tid)
     rev = _dig(sj, "review") or {}
     rounds = ", ".join(f"{k} ×{v}" for k, v in (rev.get("rounds") or {}).items() if v)
     line = " / ".join([f"topics {len(topics)}"] + ([f"rounds {rounds}"] if rounds else []) +
                       [f"{k} {rev[k]}" for k in ("code_rejects", "critic_rejects", "check_topics") if k in rev])
-    if single and topics:  # 토픽 1개 run: review는 주 누적치(NG-6)라 쓰지 않고 이 run의 토픽 블록으로
+    if tid:  # 토픽 1개 run: review는 주 누적치(NG-6)라 경계 행이 없어도 쓰지 않고 이 run의 토픽 블록으로
         t = topics[0]
         cr = sum(c[0] == "code" and c[1].startswith("반려") for c in t["chain"])
-        line = (f"topics 1 / rounds {t['final_round']} / code_rejects {cr} / "
+        line = (f"topics 1 / rounds {'-' if t['final_round'] is None else t['final_round']} / code_rejects {cr} / "
                 f"critic_rejects {sum(c[0] == 'writer_revise' for c in t['chain']) - cr} / check_topics {int(t['status'] == 'checked')}")
     who = [_who("llm", r, llm[0]["model"], len(llm)) for r in ("writer", "critic", "writer_revise")
            if (llm := [s for s in by.get(r, []) if s["kind"] == "llm"])]
@@ -424,12 +425,16 @@ def build_runs(db: DB, weeks: list[dict[str, Any]], week_label: Callable[[str], 
     wrow = {r["week"].lower(): r for r in db.conn.execute("SELECT * FROM weeks")}
     cands = []
     for r in db.conn.execute("SELECT * FROM runs WHERE kind IN ('nightly','weekly') ORDER BY started_at DESC"):
-        sj = _j(r["summary_json"]) or {}
-        if r["kind"] == "weekly" and r["week"]:
-            w = wrow.get(r["week"].lower())
-            d = _weekly(db, r, sj, w["current_run_id"] if w else None)
-        else:
-            d = _nightly(r, sj) if r["kind"] == "nightly" else None
+        try:
+            sj = _j(r["summary_json"]) or {}
+            if r["kind"] == "weekly" and r["week"]:
+                w = wrow.get(r["week"].lower())
+                d = _weekly(db, r, sj, w["current_run_id"] if w else None)
+            else:
+                d = _nightly(r, sj) if r["kind"] == "nightly" else None
+        except Exception as e:  # noqa: BLE001 - 깨진 run 1건은 그 run만 뺀다(5.7 run 단위 격리)
+            print(f"export: run {r['id']} 를 뺌: {type(e).__name__}", file=sys.stderr)
+            continue
         if d:
             d["_row"] = r
             cands.append(d)

@@ -622,3 +622,38 @@ def test_topic_rerun_run_shows_only_its_own_numbers(tmp_path):
     assert html.count('class="rail-g"') == 1 and '<span class="k">published</span><span class="v">2</span>' in html and "clusters" not in html
     other = dict(r, summary=None)
     assert 'class="rails"' not in build_runs.render_run(b, other)  # published도 null이면 레일 없음
+
+
+def test_topic_run_without_boundary_row_never_uses_week_totals(tmp_path):
+    """C1-01·02: 경계 행이 없는 토픽 run(중단)도 주 누적치를 쓰지 않고, 마지막 경계 뒤 행은 블록 하나로 낸다."""
+    db = make_db(tmp_path)
+    c = db.conn
+    c.execute("UPDATE runs SET note='weekly 2026-W41 from write topic w41-a' WHERE id='r41'")
+    c.execute("DELETE FROM steps WHERE run_id='r41'")
+    step(c, "r41", 1, "writer", "llm", "절 3개", model="m")
+    step(c, "r41", 2, "critic", "llm", "원자 사실 9개 모두 지지", model="m")
+    c.commit()
+    st = by_id(build(db))["r41"]["steps"][0]
+    assert st["line"].startswith("topics 1 / rounds - / code_rejects 0")  # 주 누적치(rounds ×n 등)가 아님
+    assert [c[0] for c in st["detail"][0]["items"][0]["chain"]] == ["writer", "critic", "code"]
+    # 전체 weekly: 경계 뒤에 남은 행도 둘째 블록으로
+    c.execute("UPDATE runs SET note='weekly 2026-W41 from cluster' WHERE id='r41'")
+    step(c, "r41", 3, "writer", "code", "w41-a: passed", detail={"topic_id": "w41-a", "rounds": []})
+    step(c, "r41", 4, "writer", "llm", "절 2개", model="m")
+    c.commit()
+    items = by_id(build(db))["r41"]["steps"][0]["detail"][0]["items"]
+    assert [i["topic_id"] for i in items] == ["w41-a", "-"] and items[1]["chain"][0] == ["writer", "절 2개"]
+
+
+def test_broken_run_rows_do_not_stop_export(tmp_path, capsys):
+    """C1-03: 깨진 summary_json·시간대 없는 started_at 1건이 export 전체를 막지 않는다."""
+    db = selection_db(tmp_path)
+    c = db.conn
+    run(c, "bad-json", "nightly", "2026-10-13T03:00:00+09:00", "2026-10-13T03:10:00+09:00", spec="RUN-2026-W42")
+    c.execute("UPDATE runs SET summary_json='{' WHERE id='bad-json'")
+    run(c, "bad-tz", "weekly", "2026-10-13 04:00:00", "2026-10-13 04:05:00", note="weekly 2026-W41 from select", week="2026-W41")
+    c.commit()
+    runs = by_id(build(db))
+    assert "bad-json" not in runs and "n-new" in runs and "w-auto" in runs
+    assert "run bad-json 를 뺌: JSONDecodeError" in capsys.readouterr().err
+    assert runs["bad-tz"]["duration_sec"] == 300
