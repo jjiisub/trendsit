@@ -177,6 +177,39 @@ def test_label_sheets_keep_filled_labels(tmp_path, monkeypatch):
     assert list(csv.DictReader((tmp_path / "aliases.csv").open()))[0]["alias"] == "클로드"
 
 
+def test_write_label_sheets_keeps_old_rows_missing_from_a_narrower_rerun(tmp_path, monkeypatch):
+    """A1-6/A2-3/A3-6: 재실행이 더 적은 쌍·별칭을 내도(묶기 결과가 달라짐) 사람이 라벨을 채운 옛 행은
+    write_label_sheets를 거쳐도 지워지지 않는다(5.15-4)."""
+    import csv
+
+    from trendsit.brief import report as rp
+    from trendsit.brief.aliases import AliasRow, AliasTable
+    from trendsit.brief.cluster import ClusterResult, Pair
+    from trendsit.brief.weekly import ClusterStage
+
+    monkeypatch.setattr(rp, "LABELS", tmp_path)
+    ms = {"it:1": m("it:1"), "it:2": m("it:2"), "it:3": m("it:3")}
+    p1 = Pair("it:1", "it:2", 0.7, False, route="decide", decided=True, same=True, confidence=0.9, reason="같음")
+    p2 = Pair("it:1", "it:3", 0.6, False, route="decide", decided=True, same=False, confidence=0.8, reason="다름")
+    res = ClusterResult("2026-W41", [], [p1, p2], {}, [], 1, 0, 0, ms)
+    aliases = AliasTable([AliasRow("Claude", "클로드", "candidate", "x"), AliasRow("Gemini", "제미나이", "candidate", "y")])
+    rp.write_label_sheets(ClusterStage("r", None, aliases, res, {}, []))  # type: ignore[arg-type]
+    rows = {r["alias"]: r for r in csv.DictReader((tmp_path / "aliases.csv").open())}
+    rows["제미나이"]["label"], rows["제미나이"]["labeler"] = "ok", "opus-5.5"
+    with (tmp_path / "aliases.csv").open("w", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=list(next(iter(rows.values()))))
+        w.writeheader()
+        w.writerows(rows.values())
+    # 재실행: it:1-it:3 쌍·'제미나이' 별칭이 이번엔 안 나옴(새 rows에 없음)
+    res2 = ClusterResult("2026-W41", [], [p1], {}, [], 1, 0, 0, ms)
+    aliases2 = AliasTable([AliasRow("Claude", "클로드", "candidate", "x")])
+    rp.write_label_sheets(ClusterStage("r2", None, aliases2, res2, {}, []))  # type: ignore[arg-type]
+    decided = {(r["a"], r["b"]) for r in csv.DictReader((tmp_path / "decide.csv").open())}
+    labeled = {r["alias"]: r["label"] for r in csv.DictReader((tmp_path / "aliases.csv").open())}
+    assert ("it:1", "it:3") in decided  # 옛 쌍이 남음
+    assert labeled.get("제미나이") == "ok"  # 사람 라벨이 지워지지 않음
+
+
 def test_two_repos_never_merge():
     cl, asked, _ = run([m("rp:a/x", "github"), m("rp:b/y", "github")], {("rp:a/x", "rp:b/y"): 0.95})
     assert groups(cl) == [["rp:a/x"], ["rp:b/y"]] and not asked
