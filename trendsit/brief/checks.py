@@ -163,12 +163,14 @@ def _canonical_names_and_spacing(page: TopicPage, canon: dict[str, str],
     """별칭 → 정본(긴 표기부터), 음차 표기 → 정본, 그 뒤 공백·문장부호 정리(한 번에 돈다). 시각 요소 글자도(v1.3)."""
     def names(new: str) -> str:
         for alias in sorted(canon, key=len, reverse=True):  # @scope/pkg·계정 이름 안은 안 바꿈(v1.3: @openrig/cli)
-            pat = rf"(?<![A-Za-z0-9@/_.-]){re.escape(alias)}(?![A-Za-z0-9]|[-/_.@][A-Za-z0-9])"
+            # A1-13/A3-8: 5.14-4 문구대로 — 앞 @/_.-+영숫자, 뒤 /_-+영숫자인 자리(경계 1글자)는 바꾸지 않음
+            pat = rf"(?<![A-Za-z0-9@/_.-]){re.escape(alias)}(?![A-Za-z0-9/_-])"
             if alias and re.search(pat, new) and canon[alias] not in new:
                 new = re.sub(pat, canon[alias], new)
         for tp, target in translit:
             new = tp.sub(target, new)
-        return re.sub(r"([A-Za-z][\w.+-]*(?: [\w.+-]+)*)\(\1\)", r"\1", new)  # 병기가 같아진 "Anthropic(Anthropic)" 정리
+        # 병기가 같아진 "Anthropic(Anthropic)" 정리(A1-12/A3-9: 앞 경계 없이 낱말 중간부터 매치하지 않게)
+        return re.sub(r"(?<![\w.+-])([A-Za-z][\w.+-]*(?: [\w.+-]+)*)\(\1\)", r"\1", new)
     page = _canon_visuals(page, names, fixes)
     for loc, text in _canon_slots(page):
         new = names(text)

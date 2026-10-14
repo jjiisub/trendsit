@@ -102,3 +102,32 @@ def test_name_and_word_patterns_keep_identifiers_and_short_words():
 def test_section_secs_no_derivation_for_multi_video():
     s = SimpleNamespace(video_secs=[0], paragraphs=[SimpleNamespace(refs=["vd:5@330"])])
     assert _section_secs(s, [0, 300], cap=3, derive=False) == [0]
+
+
+def test_section_secs_dedupes_writer_choice_before_capping():
+    """A3-17: 작성자가 같은 초를 중복으로 내도 cap 자리를 잡아먹지 않는다."""
+    s = SimpleNamespace(video_secs=[100, 100], paragraphs=[SimpleNamespace(refs=["vd:5@310"])])
+    assert _section_secs(s, [0, 100, 300], cap=2) == [100, 300]
+
+
+def test_word_level_transliteration_covers_wider_particle_boundary():
+    """A1-4/A3-4: 뒤 경계를 조사 목록이 아니라 '이어지는 한글이면 통과'로 넓혀, 겹조사·서술격 조사도 바뀐다."""
+    text = "제미나이와의 비교, 앤트로픽까지·앤트로픽에게·마이크로소프트라는 평가, 앤트로픽이다."
+    out = fix(page([sec(text)])).sections[0].paragraphs[0].text
+    assert "Gemini와의" in out and "Anthropic까지" in out and "Anthropic에게" in out
+    assert "Microsoft라는" in out and "Anthropic이다" in out
+
+
+def test_ambiguous_common_words_are_not_converted_as_standalone_words():
+    """A1-8/A2-8: Flash·Solar·Argon·Large는 일반 외래어와 겹쳐 낱말 단독으로는 안 바꾼다(이름 패턴에서만)."""
+    text = "플래시 메모리와 솔라 패널, 아르곤 가스, 라지 사이즈를 비교했다."
+    out = fix(page([sec(text)])).sections[0].paragraphs[0].text
+    assert out == text
+
+
+def test_canonical_name_guard_matches_spec_back_boundary_exactly():
+    """A1-13/A3-8: 5.14-4 "뒤가 / _ -·영숫자" 그대로 — 그 중 하나만 바로 이어져도 막고, 명세에 없는 '.'은 막지 않는다."""
+    out = fix(page([sec("openrig- 기반과 openrig/ 경로, openrig_ 묶음, openrig.ai 문서다.")]), canon={"openrig": "OpenRig"})
+    text = out.sections[0].paragraphs[0].text
+    assert "openrig- 기반" in text and "openrig/ 경로" in text and "openrig_ 묶음" in text
+    assert "OpenRig.ai" in text

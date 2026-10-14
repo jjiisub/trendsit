@@ -37,11 +37,14 @@ def norm_key(name: str) -> str:
 
 
 _SEP = re.compile(r"([\s\-_/]+)")
-# 한글 경계: 앞은 글자가 아니고, 뒤는 글자가 아니거나 조사(솔루션의 '솔'은 잡지 않음)
-# 식별자 보호(v1.3): @scope/pkg·URL·계정 이름 안(앞이 @ / _ . -, 뒤가 - / _ . @ + 영숫자)은 바꾸지 않는다
+# 한글 경계: 앞은 글자가 아니고, 뒤는 글자가 아니거나 조사(솔루션의 '솔'은 잡지 않음). A1-4/A3-4: 겹조사·서술격
+# 조사까지 잡게 조사를 1회 이상 이어 붙이고(으로는·에서의 등은 기존 조사 합성으로 커버), 목록도 넓힘
+# 식별자 보호(v1.3·A1-13/A3-8: 명세 5.14-4 그대로): 앞이 @ / _ . - + 영숫자, 뒤가 / _ - + 영숫자인 자리는 안 바꿈
 _BEFORE = r"(?<![0-9A-Za-z가-힣@/_.\-])"
-_GUARD = r"(?![\-/_.@][0-9A-Za-z])"
-_AFTER = r"(?=$|[^0-9A-Za-z가-힣]|(?:으로|에서|보다|처럼|은|는|이|가|을|를|의|에|와|과|도|로|만)(?:$|[^가-힣]))"
+_GUARD = r"(?![\-/_0-9A-Za-z])"
+_PARTICLE = (r"(?:으로|에서|보다|처럼|까지|부터|에게|이라는|라는|이며|이고|이나|하고|랑|은|는|이|가|을|를|"
+            r"의|에|와|과|도|로|만|나|다)")
+_AFTER = rf"(?=$|[^0-9A-Za-z가-힣]|{_PARTICLE}+(?:$|[^가-힣]))"
 
 
 def _alts(translit: dict[str, str]) -> dict[str, list[str]]:
@@ -73,12 +76,19 @@ def translit_pattern(name: str, translit: dict[str, str]) -> re.Pattern[str] | N
     return re.compile(_BEFORE + r"[\s\-]?".join(parts) + _GUARD + _AFTER, re.IGNORECASE)
 
 
+_AMBIGUOUS_COMMON = {"Flash": "메모리", "Solar": "패널", "Argon": "가스", "Large": "사이즈"}  # A1-8/A2-8:
+# 일반 외래어 뒤에 오는 낱말(플래시 메모리·솔라 패널·아르곤 가스·라지 사이즈)이면 이름이 아니라 일반어로 보고 안 바꿈.
+# 모델명 뒤(제미나이 4 아르곤)처럼 이 낱말이 안 이어지면 그대로 바뀐다
+
+
 def word_patterns(translit: dict[str, str]) -> list[tuple[re.Pattern[str], str]]:
     """사전 낱말 하나하나의 음차 → 영문(S6-1 v1.3). 토픽 이름에 안 걸린 단독 낱말("제미나이는", "앤트로픽의")도 원문 표기로."""
     out = []
     for en, ko in translit.items():  # 2글자는 조사 없이 나올 때만("솔로"·"라지만" 보호), 1글자("솔")는 이름 패턴에서만
+        guard = rf"(?!\s*{_AMBIGUOUS_COMMON[en]})" if en in _AMBIGUOUS_COMMON else ""
         for k in sorted((k for k in ko.split("|") if len(k) >= 2), key=len, reverse=True):
-            out.append((re.compile(_BEFORE + re.escape(k) + _GUARD + (_AFTER if len(k) >= 3 else r"(?=$|[^0-9A-Za-z가-힣]|\d)")), en))
+            after = _AFTER if len(k) >= 3 else r"(?=$|[^0-9A-Za-z가-힣]|\d)"
+            out.append((re.compile(_BEFORE + re.escape(k) + _GUARD + guard + after), en))
     return out
 
 

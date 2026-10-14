@@ -102,7 +102,7 @@ def _visual_of(s: Any, refs: Any, by_eid: dict[str, str]) -> dict[str, Any]:
 def _section_secs(s: Any, starts: list[int], cap: int, derive: bool = True) -> list[int]:
     """작성자가 고른 video_secs 뒤에, 그 절 단락 근거의 초(vd:·sl: …@초)가 든 타임라인 구간 시작 초를 덧붙인다(v1.3).
     작성자가 칸을 거의 비워 두어(W40·W41 영상 토픽 9절 중 1절) 근거에서 코드로 채운다. 타임라인에 있는 초만, 시간순 cap개까지."""
-    mine = [sec for sec in s.video_secs if sec in starts]
+    mine = list(dict.fromkeys(sec for sec in s.video_secs if sec in starts))  # A3-17: 중복 먼저 지움(cap 자리 안 뺏김)
     derived = []
     for r in (r for p in s.paragraphs for r in p.refs):
         if derive and (m := re.match(r"^(?:vd|sl):\d+@(\d+)$", r)) and (before := [t for t in starts if t <= int(m[1])]):
