@@ -65,7 +65,7 @@ def rebuild_site(db: DB, runner: Build = run_subprocess, with_week: str | None =
     with_week: 아직 done인 그 주도 담는다(publish가 상태를 바꾸기 전에 export·build를 돌리기 위한 것).
     """
     final = db.path.parent / "site.json"
-    tmp = final.with_name(final.name + ".new")
+    tmp = final.with_name(f"{final.name}.{os.getpid()}.new")  # 프로세스마다 다른 임시 이름(nightly 재생성과 손 실행이 겹쳐도 서로 안 지움)
     try:
         try:
             export_site(db, tmp, with_week)

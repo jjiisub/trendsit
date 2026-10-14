@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import time
 from datetime import date, datetime
 from types import SimpleNamespace
@@ -609,8 +610,8 @@ def test_s7a_nightly_rebuilds_site_after_run_and_keeps_weeks(db, tmp_path):
     code, fake = run_night(db, tmp_path, at(2026, 10, 14))
     row = nightly_rows(db)[-1]
     assert code == 0 and row["status"] == "ok" and EXPORTS == [None]  # 그 주를 따로 담지 않는 export
-    assert [c[-1] for c in fake.cmds if c[: len(ops.BUILD_CMD)] == ops.BUILD_CMD] == [str(tmp_path / "site.json.new")]
-    assert row["summary"]["site"]["exit"] == 0 and (tmp_path / "site.json").read_text() == "{}" and not (tmp_path / "site.json.new").exists()
+    assert [c[-1] for c in fake.cmds if c[: len(ops.BUILD_CMD)] == ops.BUILD_CMD] == [str(tmp_path / f"site.json.{os.getpid()}.new")]
+    assert row["summary"]["site"]["exit"] == 0 and (tmp_path / "site.json").read_text() == "{}" and not list(tmp_path.glob("site.json.*.new"))
     assert "site" not in {s["name"] for s in row["summary"]["steps"]}  # steps·status 계산·따라잡기에 영향 0
     assert _tables(db) == before  # C-7: weeks(status·published_at·current_run_id) 불변
     assert fake.timeouts[-1] == CFG.step_timeout_min * 60  # 시간 상한 = step_timeout_min(새 칸 없음)

@@ -31,7 +31,7 @@ chk A6 "공개 금칙(C-4)·details 0(C-9)·300자(C-5)·상태 어휘·D-11 낱
 chk A7 "관문 9 Chromium·WebKit(375·768·1280, 대상에 run 목록·weekly·nightly, 1280 .rt 셀 줄바꿈 0, 375 넘침 0)" 'A8 관문' 'A9 관문'
 if [ "$c_rc" = 0 ]; then pass C-all "check.py --fixture 종료 코드 0: $(tail -1 "$TMP/check")"; else fail C-all "check.py --fixture 종료 코드 $c_rc: $(grep -E '^FAIL' "$TMP/check" | head -2 | tr '\n' ' ')"; fi
 
-# A6 뒤쪽: 실DB가 있으면 읽기 전용 사본(sqlite backup)을 export → build → check(금칙·3MB·셀 줄바꿈). 실DB·site/는 건드리지 않는다
+# A6 뒤쪽: 실DB가 있으면 읽기 전용 사본(sqlite backup)을 export(크기 C-6) → build → 금칙(C-4) 정적 검사. 실DB·site/는 건드리지 않는다
 a6real() {
   [ -f data/trendsit.db ] || { echo "(실DB 없음: 건너뜀)"; return 0; }
   local R=$TMP/real
@@ -49,9 +49,22 @@ from trendsit.export import export
 export(DB(Path(sys.argv[1]) / "trendsit.db"), Path(sys.argv[1]) / "site.json")
 PY
   [ -d data/slides ] && cp -r data/slides "$R/slides"
+  local kb=$(($(wc -c <"$R/site.json") / 1024))
+  [ "$kb" -le 3072 ] || { echo "실DB export ${kb}KB > 3MB(C-6)"; return 1; }
   uv run --quiet python site_src/build.py --data "$R/site.json" --out "$R/site" >/dev/null || { echo "실DB 빌드 실패"; return 1; }
-  uv run --quiet python site_src/check.py --site "$R/site" --data "$R/site.json" >"$R/check" 2>&1 || { echo "실DB check: $(grep -E '^FAIL' "$R/check" | head -3 | tr '\n' ' ')"; return 1; }
-  echo "실DB export $(($(wc -c <"$R/site.json") / 1024))KB, check $(tail -1 "$R/check")"
+  # 금칙(C-4)은 정적 검사만(브라우저 관문은 --fixture가 맡는다)
+  uv run --quiet python - "$R/site" "$R/site.json" <<'PY' || return 1
+import pathlib, sys
+sys.path.insert(0, "site_src")
+import check
+site = pathlib.Path(sys.argv[1])
+pages = {f: check.parse(f) for f in sorted(site.rglob("*.html"))}
+ban = [f.relative_to(site).as_posix() + " " + m[0] for f in pages for m in [check.BANNED.search(f.read_text(encoding="utf-8"))] if m]
+if ban:
+    print("실DB 금칙 문자열:", ban[:3])
+    sys.exit(1)
+PY
+  echo "실DB export ${kb}KB, 생성 HTML 금칙 0"
 }
 if msg=$(a6real 2>&1); then pass A6b "실DB 사본 export·build·check: $msg"; else fail A6b "$msg"; fi
 

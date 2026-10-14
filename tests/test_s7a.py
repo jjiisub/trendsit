@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 
 import pytest
 
@@ -241,7 +242,7 @@ def test_a3_weekly_full_run_steps(tmp_path):
     assert (a["tokens_in"], a["tokens_out"], a["cost_usd"]) == (2200, 600, 0.035)
     assert a["chain"] == [["writer", "절 3개, 단락 4개"], ["code", "반려 2"], ["writer_revise", "이슈 2개 중 수정 1"], ["critic", "원자 사실 9개 모두 지지"], ["code", "passed"]]
     assert a["issues"] == [["points[0]", "format", "가" * 300, "edit"], ["overview", "format", "금지 표현", "-"]]  # 수정이 없는 지적은 `-`
-    assert b["chain"] == [["writer", "절 2개"], ["code", "중단"], ["critic", "원자 사실 4개 모두 지지"], ["code", "checked 1"]] and b["issues"] == []
+    assert b["chain"] == [["writer", "절 2개"], ["code", "stopped"], ["critic", "원자 사실 4개 모두 지지"], ["code", "checked 1"]] and b["issues"] == []
     assert end["line"] == "2026-W41 weekly 끝: 토픽 2개" and end["duration_sec"] == 651 and end["cost_usd"] == 0.1
     assert r["summary"] == {"clusters": 5, "candidates": 3, "selected": 2, "topics": 2, "published": None, "rounds": {"1": 1, "2": 1, "3": 0},
                             "code_rejects": 1, "critic_rejects": 0, "check_topics": 1}
@@ -325,7 +326,7 @@ def test_a1_publish_site_only_exit_codes_and_weeks_unchanged(tmp_path, monkeypat
     monkeypatch.setattr(ops, "BUILD_CMD", [sys.executable, "-c", "pass"])  # 뒤에 --data <임시 파일>이 붙는다
     assert cli.main(["publish", "--site-only"]) == 0
     site = json.loads((tmp_path / "site.json").read_text())
-    assert site["run_weeks"] and not (tmp_path / "site.json.new").exists()
+    assert site["run_weeks"] and not list(tmp_path.glob("site.json.*.new"))
     assert [tuple(r) for r in db.conn.execute("SELECT * FROM weeks ORDER BY week")] == before  # status·published_at·current_run_id 불변
     monkeypatch.setattr(ops, "BUILD_CMD", [sys.executable, "-c", "import sys; sys.stderr.write('빌드 오류\\n'); sys.exit(1)"])
     old = (tmp_path / "site.json").read_text()
@@ -509,3 +510,96 @@ def test_evidence_ids_in_free_text_are_rewritten_for_public_pages():
 
     assert _cap("'2'가 it:8#q5에 없음 ([og:982#q4], vd:ab-1@209)") == "'2'가 it 8에 없음 (og 982, vd ab-1)"
     assert _cap({"a": ["x" * 400]}) == {"a": ["x" * 300]}
+
+
+# ---------- A-held: run 단위 격리, nightly_days, 작은 정정 ----------
+def test_one_broken_run_does_not_stop_export_and_unknown_step_names_are_line_only(tmp_path, capsys):
+    """5.7: 한 run의 원천이 이상하면 그 run만 빈 상세, 모르는 nightly 단계 이름은 KeyError 없이 line만. 나머지 run은 그대로."""
+    db = detail_db(tmp_path)
+    c = db.conn
+    run(c, "broken", "weekly", "2026-10-11T22:00:00+09:00", "2026-10-11T22:05:00+09:00", note="weekly 2026-W41 from cluster", week="2026-W41")
+    step(c, "broken", 1, "writer_revise", "llm", "이슈")
+    step(c, "broken", 2, "writer", "code", "w41-x: passed", detail={"topic_id": "w41-x", "rounds": [{"status": "reject"}]})  # checker 칸 없음
+    sj = json.loads(c.execute("SELECT summary_json FROM runs WHERE id='nf'").fetchone()[0])
+    sj["steps"].insert(1, {"name": "rss_extra", "day": None, "exit": 0, "sec": 2.0})
+    c.execute("UPDATE runs SET summary_json=? WHERE id='nf'", (json.dumps(sj),))
+    c.commit()
+    runs = by_id(build(db))
+    assert (runs["broken"]["steps"], runs["broken"]["summary"]) == ([], None) and runs["broken"]["label"] == "from cluster"
+    assert "run broken 상세를 뺌: KeyError" in capsys.readouterr().err
+    assert names(runs["nf"]) == ["collect", "rss_extra", "filter", "summarize", "plan", "deep_text", "video", "repo_analyze", "export + build"]
+    assert runs["nf"]["steps"][1]["line"] == "exit 0" and len(runs["wf"]["steps"]) == 6  # 다른 run은 정상
+
+
+def test_nightly_days_counts_every_nightly_across_week_boundary(tmp_path):
+    db = selection_db(tmp_path)
+    run(db.conn, "n-cross", "nightly", "2026-10-13T08:00:00+09:00", "2026-10-13T08:10:00+09:00", spec="RUN-2026-W41",
+        summary={"days": ["2026-10-11", "2026-10-13"], "steps": [{"name": "collect", "day": None, "exit": 0, "sec": 1.0}]})  # 일(W41) + 화(W42), 귀속은 W41
+    db.conn.commit()
+    rw = {r["week"]: r for r in build(db)["run_weeks"]}
+    assert rw["2026-w42"]["nightly_days"] == 2 and rw["2026-w41"]["nightly_days"] == 4  # W42: 10.12(n-new)·10.13(n-cross의 둘째 날)
+
+
+def test_small_spec_fixes(tmp_path):
+    db = detail_db(tmp_path)
+    c = db.conn
+    c.execute("INSERT INTO cluster_pairs(run_id, a, b, sim, cross_channel, decided, answer, confidence, reason) VALUES ('wf','vd:NOPE','rp:o/z',0.5,1,1,0,0.5,'r')")
+    c.execute("INSERT INTO steps(run_id, seq, t, role, kind, text) VALUES ('nf-summarize', 9, 't', 'other_role', 'llm', 'x')")  # 카드가 아닌 llm 행
+    c.execute("UPDATE item_cards SET card_json=? WHERE item_id=11", (json.dumps({"log": "l", "trail": [{"url": "https://a.example/1"}, {"url": "https://www.a.example/2", "depth": 1},
+                                                                              {"url": "https://b.example/"}, {"url": "https://a.example/3", "depth": 2}]}),))
+    c.commit()
+    r = by_id(build(db))
+    assert r["wf"]["steps"][2]["detail"][1]["rows"][-1][:2] == ["item NOPE", "o/z"]  # 5.7: 참조 없는 영상도 `item <n>`
+    assert r["nf"]["summary"]["cards"] == 2  # role item_card llm 행만
+    assert r["nf"]["steps"][4]["detail"][0]["rows"][0][1] == "a.example → b.example → a.example"  # 연속 중복만 합침
+    assert ["code", "stopped"] in r["wf"]["steps"][4]["detail"][0]["items"][1]["chain"]
+
+
+def test_site_only_uses_step_timeout_and_unique_temp_name(tmp_path, monkeypatch):
+    from trendsit import cli
+
+    db = make_db(tmp_path)
+    monkeypatch.setattr("trendsit.core.db.open_db", lambda *a, **k: db)
+    seen = []
+
+    def fake(cmd, timeout=None):
+        seen.append((cmd[-1], timeout))
+        return 0, "", ""
+
+    monkeypatch.setattr(ops, "run_subprocess", fake)
+    assert cli.main(["publish", "--site-only"]) == 0
+    from trendsit.core import config
+
+    assert seen == [(str(tmp_path / f"site.json.{os.getpid()}.new"), config.load("ops.yaml").step_timeout_min * 60)]
+
+
+def test_topic_rerun_run_shows_only_its_own_numbers(tmp_path):
+    """사용자 결정: 토픽 1개 재실행 run은 그 run 것만. line은 토픽 블록에서, summary는 published만(주 누적치 금지, NG-6)."""
+    import sys
+    from pathlib import Path
+
+    db = make_db(tmp_path)
+    c = db.conn
+    c.execute("UPDATE runs SET note='weekly 2026-W41 from write topic w41-a' WHERE id='r41'")  # 현재판이 토픽 1개 run
+    c.execute("DELETE FROM steps WHERE run_id='r41'")
+    step(c, "r41", 1, "writer", "llm", "절 3개", model="m")
+    step(c, "r41", 2, "writer_revise", "llm", "이슈 2개 중 수정 2", model="m", output={"changed": []})
+    step(c, "r41", 3, "critic", "llm", "원자 사실 9개 모두 지지", model="m")
+    step(c, "r41", 4, "writer", "code", "w41-a: checked", detail={"topic_id": "w41-a", "checks": ["x"], "rounds": [
+        {"round": 1, "checker": "code", "status": "reject", "issues": [{"loc": "points[0]", "type": "format", "comment": "c"}]},
+        {"round": 2, "checker": "critic", "status": "pass", "issues": []}]})
+    c.commit()
+    site = build(db)
+    r = by_id(site)["r41"]
+    assert r["steps"][0]["line"] == "topics 1 / rounds 2 / code_rejects 1 / critic_rejects 0 / check_topics 1"  # review 누적치(rounds 1·2 합 등)가 아님
+    assert r["summary"] == {"published": 2} and r["topic_id"] == "w41-a"
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "site_src"))
+    import build as b
+    import build_runs
+
+    b.load(site)
+    b.C.css_name = "x.css"
+    html = build_runs.render_run(b, r)
+    assert html.count('class="rail-g"') == 1 and '<span class="k">published</span><span class="v">2</span>' in html and "clusters" not in html
+    other = dict(r, summary=None)
+    assert 'class="rails"' not in build_runs.render_run(b, other)  # published도 null이면 레일 없음

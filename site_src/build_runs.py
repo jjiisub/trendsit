@@ -105,13 +105,13 @@ def render_week(b, rw, idx):
     runs = [r for r in b.C.d["runs"] if r["week"] == rw["week"]]
     days = {}
     for r in runs:
-        days.setdefault(r["day"], []).append((r["at"], run_row(b, r)))
+        days.setdefault(r["day"], []).append((r["at"], run_row(b, r), 1))
     if rw["published_at"]:
-        days.setdefault(rw["published_at"][:10], []).append((rw["published_at"], publish_row(b, rw)))
+        days.setdefault(rw["published_at"][:10], []).append((rw["published_at"], publish_row(b, rw), 0))
     body = ""
     for day in sorted(days, reverse=True):
         rows = sorted(days[day], key=lambda x: x[0], reverse=True)
-        body += (f'<tr class="rt-day"><th scope="rowgroup" colspan="6">{day_text(day)} <span class="dim">run {len(rows)}</span></th></tr>'
+        body += (f'<tr class="rt-day"><th scope="rowgroup" colspan="6">{day_text(day)} <span class="dim">run {sum(x[2] for x in rows)}</span></th></tr>'
                  + "".join(x[1] for x in rows))
     head = ("<colgroup><col class=\"c-t\"><col class=\"c-m\"><col class=\"c-run\"><col><col class=\"c-x\"><col class=\"c-s\"></colgroup>"
             '<thead><tr><th scope="col">시각</th><th scope="col">자동/수동</th><th scope="col">run</th><th scope="col">결과</th>'
@@ -137,6 +137,8 @@ def k_text(n):
 def rail_group(b, title, items):
     """items: (이름, 값) 목록. 값이 None인 것은 뺀다. 이름·값 사이는 줄어드는 순서면 →로 이어 붙이는 .seq는 title에 ' → '가 있을 때."""
     items = [(k, v) for k, v in items if v is not None]
+    if not items:
+        return ""
     lis = "".join(f'<li><span class="k">{b.esc(k)}</span><span class="v">{b.esc(v)}</span></li>' for k, v in items)
     seq = " seq" if " → " in title else ""
     return f'<div class="rail-g"><p class="rail-t">{b.esc(title)}</p><ol class="rail{seq}">{lis}</ol></div>'
@@ -176,7 +178,7 @@ def topic_html(b, i, t):
     status = f'<span class="check">{b.esc(t["status"])}</span>' if t["status"] == "checked" else b.esc(t["status"] or "-")
     meta = b.SEP.join([f'rounds {t["final_round"] if t["final_round"] is not None else "-"}', status, f'in {k_text(t["tokens_in"])}',
                        f'out {k_text(t["tokens_out"])}', cost_text(t["cost_usd"])])
-    chain = ARR.join(f'<span class="nb{" hit" if n == "code" and x.startswith(("반려", "checked", "failed", "중단")) else ""}">{b.esc(n)}</span> {b.esc(x)}'
+    chain = ARR.join(f'<span class="nb{" hit" if n == "code" and x.startswith(("반려", "checked", "failed", "stopped")) else ""}">{b.esc(n)}</span> {b.esc(x)}'
                      for n, x in t["chain"])
     issues = table_html(b, ["위치", "종류", "지적", "수정"], t["issues"]) if t["issues"] else ""
     return (f'<div class="tp"><div class="tp-s"><span class="tp-n">{t["rank"]}</span><span><span class="tp-h">{b.esc(t["title"])}</span> '
@@ -211,10 +213,10 @@ def render_run(b, r):
     rw = b.C.rws[r["week"]]
     title = f'weekly {r["week"].upper()}' if r["kind"] == "weekly" else r["label"]
     crumb = b.SEP.join([f'<a href="/runs/">실행 기록</a>', f'<a href="/runs/{r["week"]}/">{b.esc(rw["label"])}</a>', b.esc(title)])
-    sub = [f'{day_text(r["day"])} {hm(r["at"])}', mode_text(r["mode"]), status_html(b, r["status"])] + ([b.esc(r["label"])] if r["kind"] == "weekly" else [])
+    sub = [f'{day_text(r["day"])} {hm(r["at"])}', mode_text(r["mode"]), status_html(b, r["status"])]
     n_att = sum(s["attention"] for s in r["steps"])
     inner = (f'<div class="ph rh"><p class="meta crumb">{crumb}</p><h1>{b.esc(title)}</h1><p class="meta">{b.SEP.join(sub)}</p>'
-             f'<div class="rails">{rails_html(b, r)}</div></div><h2>steps {len(r["steps"])} <span class="meta">attention {n_att}</span></h2>'
+             f'{f"<div class=\"rails\">{rails_html(b, r)}</div>" if r["summary"] else ""}</div><h2>steps {len(r["steps"])} <span class="meta">attention {n_att}</span></h2>'
              f'<ol class="steps">{"".join(step_html(b, s) for s in r["steps"])}</ol>')
     return b.page(f"{title} 실행 기록 - TrendsIT", f'<main class="wrap ops">{inner}</main>', "runs", run_path(r))
 

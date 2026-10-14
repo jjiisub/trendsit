@@ -28,7 +28,11 @@ def cmd_publish(args: argparse.Namespace) -> int:
         if args.week:
             print("publish: --site-only와 --week는 둘 중 하나만", file=sys.stderr)
             return 2
-        return rebuild_site(open_db())
+        from .core import config
+        from .ops import run_subprocess
+
+        limit = config.load("ops.yaml").step_timeout_min * 60  # 5.7: nightly 끝 재생성과 같은 시간 상한 1회
+        return rebuild_site(open_db(), lambda cmd: run_subprocess(cmd, limit))
     if not args.week:
         print("publish: --week 또는 --site-only가 필요함", file=sys.stderr)
         return 2

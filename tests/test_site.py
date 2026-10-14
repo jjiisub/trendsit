@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
 import subprocess
 import sys
@@ -227,18 +228,18 @@ def test_a12_publish_runs_export_then_build_and_failure_keeps_site(tmp_path):
         return r.returncode, r.stdout, r.stderr
 
     assert ops.publish(db, "2026-W41", runner) == 0
-    assert calls == ["build:site.json.new"] and ops.BUILD_CMD[0] == sys.executable  # 시스템 python3가 아니라 trendsit을 부른 python
+    assert calls == [f"build:site.json.{os.getpid()}.new"] and ops.BUILD_CMD[0] == sys.executable  # 시스템 python3가 아니라 trendsit을 부른 python
     row = db.conn.execute("SELECT status, published_at FROM weeks WHERE week='2026-W41'").fetchone()
     assert row["status"] == "published" and (site_dir / "week/2026-w41/index.html").is_file()
     assert (site_dir / "topic/w41-a/index.html").is_file()
-    assert [w["id"] for w in json.loads(data.read_text(encoding="utf-8"))["weeks"]] == ["2026-w41"] and not (tmp_path / "site.json.new").exists()
+    assert [w["id"] for w in json.loads(data.read_text(encoding="utf-8"))["weeks"]] == ["2026-w41"] and not list(tmp_path.glob("site.json.*.new"))
     before, data_before = tree_hash(site_dir), data.read_bytes()
     # 다음 주 발행에서 build가 실패하면: site/ 바이트 그대로, 상태 그대로(done), data/site.json에 미발행 주가 남지 않음
     corrupt["on"] = True
     assert ops.publish(db, "2026-W40", runner) == 1
-    assert tree_hash(site_dir) == before and data.read_bytes() == data_before and not (tmp_path / "site.json.new").exists()
+    assert tree_hash(site_dir) == before and data.read_bytes() == data_before and not list(tmp_path.glob("site.json.*.new"))
     assert db.conn.execute("SELECT status FROM weeks WHERE week='2026-W40'").fetchone()[0] == "done"
-    assert calls == ["build:site.json.new"] * 2
+    assert calls == [f"build:site.json.{os.getpid()}.new"] * 2
 
 
 def test_f75_approx_week_home_note_and_no_week_stars_and_empty_notes(site):
@@ -271,7 +272,7 @@ def test_f53_publish_export_exception_returns_1_and_keeps_state(tmp_path, monkey
     err = capsys.readouterr().err.strip().splitlines()
     assert len(err) == 1 and "KeyError" in err[0]
     assert db.conn.execute("SELECT status FROM weeks WHERE week='2026-W41'").fetchone()[0] == "done"
-    assert not (tmp_path / "site.json").exists() and not (tmp_path / "site.json.new").exists()
+    assert not (tmp_path / "site.json").exists() and not list(tmp_path.glob("site.json.*.new"))
 
 
 # ---------- F01 끝 어절 묶기: 원문 어절 단위 ----------

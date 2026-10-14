@@ -23,7 +23,7 @@ ROOT = SRC.parent
 FIXTURE = ROOT / "tests" / "fixtures" / "site" / "site.json"
 FORBIDDEN_TEXT = ("동작 안 함", "예시")
 OPS_BANNED = ("button", "form", "input", "select", "textarea")
-BANNED_STRINGS = ("Traceback", "/Users/", "data/", ".py:", "sk-", "Bearer", "localhost")
+BANNED = re.compile(r"Traceback|/Users/|(?<![A-Za-z0-9_])data/|\.py:|Bearer|localhost|\bsk-[A-Za-z0-9_-]{8,}")  # 단어 속 `metadata/`·`task-` 같은 낱말은 아님
 STATE_WORDS = {"ok", "partial", "failed", "running", "stopped", "published"}
 D11_WORDS = ("손", "정상", "건너뜀")
 MAX_SITE_JSON = 3 * 1024 * 1024  # C-6
@@ -241,10 +241,10 @@ def _check_s6_1_content(site, data, pages):
 
 def _check_s7a_runs(site, data, pages):
     """S7a 5.4: 관리 화면 금칙 문자열(C-4), details 0(C-9), run 1건 글자 칸 300자(C-5), 상태 글자 어휘, D-11 금지 낱말."""
+    raw = {f: f.read_text(encoding="utf-8") for f in pages}  # C-4: 생성 HTML 전체
     admin = {f: p for f, p in pages.items() if f.relative_to(site).parts[0] in ("runs", "sources", "keywords")}
-    raw = {f: f.read_text(encoding="utf-8") for f in admin}
-    ban = [f"{page_url(site, f)} {w}" for f, t in raw.items() for w in BANNED_STRINGS if w in t]
-    check("C-4 관리 화면 금칙 문자열(Traceback·/Users/·data/·.py:·sk-·Bearer·localhost) 0", not ban, "; ".join(ban[:3]))
+    ban = [f"{page_url(site, f)} {m[0]}" for f, t in raw.items() for m in [BANNED.search(t)] if m]
+    check("C-4 생성 HTML 전체 금칙 문자열(Traceback·/Users/·data/·.py:·sk-키·Bearer·localhost) 0", not ban, "; ".join(ban[:3]))
     det = [page_url(site, f) for f, p in pages.items() if p.tags.get("details")]
     check("C-9 <details> 0(접힘 없음)", not det, "; ".join(det[:3]))
     long = []

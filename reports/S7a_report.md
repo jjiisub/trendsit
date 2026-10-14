@@ -16,25 +16,26 @@
 
 ## 4. 결정한 것 (9장 "구현 시점 기본값" + 추가)
 - `build_runs.py`가 `build.py` 도구를 쓰는 방식: `render_all(b)`에 build 모듈을 인자로 넘긴다(`sys.modules[__name__]`). `build.py`는 `python site_src/build.py`로도 실행돼 `from build import …`를 하면 두 번째 모듈이 생겨 `C`가 갈라지므로
-- 토픽 블록 체인 글자: writer·writer_revise·critic은 steps `text` 그대로(`writer 절 5개, …`), 코드 검사는 `code 반려 n`(그 revise에 해당하는 반려 라운드가 code일 때 그 이슈 수), 중간 중단 기록은 `code 중단`, 끝은 `code <status>`(확인 필요 수가 있으면 뒤에 숫자). 반려 표 "수정" 열은 writer_revise `changed`의 같은 loc `action`(edit·delete·add), 없으면 `-`
+- 토픽 블록 체인 글자: writer·writer_revise·critic은 steps `text` 그대로(`writer 절 5개, …`), 코드 검사는 `code 반려 n`(그 revise에 해당하는 반려 라운드가 code일 때 그 이슈 수), 중간 중단 기록은 `code stopped`(코드 행에 상태가 없어 runs 상태 어휘로), 끝은 `code <status>`(확인 필요 수가 있으면 뒤에 숫자). 반려 표 "수정" 열은 writer_revise `changed`의 같은 loc `action`(edit·delete·add), 없으면 `-`
 - `item_cards v2`·`repo_cards` 한 줄: `log` → `summary` → 첫 글자 칸 순. 실측 repo_cards는 `log`(풀네임으로 시작해서 풀네임이 겹치면 붙이지 않음), item_cards v2는 `log`
 - 시각 열이 없는 nightly 단계의 `t`: 하위 run 시작 시각, 하위 run이 없으면 nightly 시작 시각. 여러 날 nightly의 날 단위 단계 이름은 `plan 10.10`처럼 날을 붙인다(하위 run 짝짓기는 plan run 노트의 날짜를 기준점으로 그 뒤 시작한 deep-text·video·repo-analyze run을 그날에)
 - nightly label 여러 날: `nightly 10.10~10.11`
 - 목록 모바일 두 줄 grid: 1줄 시각 / 자동·수동 / run / 시간·비용 / 상태, 2줄 결과(FINAL의 5열 순서 그대로, 시간·비용을 1줄로)
 - plan 단계 상세: `list` 블록(제목 칸이 계약에 없어) 항목 앞에 `text_queue / `·`video_queue / `·`repo_queue / `를 붙여 구분
-- 토픽 1개 재실행 run은 `summary` null: summary_json이 주 누적치라(NG-6) 레일에 누적 수치가 나오면 오해를 부른다. 화면은 `topics 1 / steps n`만
+- 사용자 결정: 토픽 1개 재실행 run 쪽은 그 run 것만(누적치 안 씀, NG-6). 결과 칸은 `topics 1 / steps n`, `writer ⇄ critic` 단계 line은 그 run의 토픽 블록에서(`topics 1 / rounds <final_round> / code_rejects <반려 수> / critic_rejects <비평 반려 수> / check_topics <0|1>`), `summary`는 `published`만(현재판이면 발행 토픽 수, 아니면 null이고 둘 다 null이면 레일 없음)
 - weekly `summary.published`는 `weeks` 행 기준 현재판 run이고 그 주가 이번 export에 담길 때만(= 사이트에 실리는 토픽 수 = `weeks[].topic_count`), 아니면 null
 - 라벨의 괄호 꼬리("(중단: C-21 …)")는 뗀다(note가 서술형이라 D-11)
 - 검수 지적 등 자유 글에 섞인 근거 id(`it:8#q5`, `[og:982#q4]`)는 export에서 `it 8`·`og 982` 꼴로 바꾼다. 실DB에서 check M-2가 걸려 발견(스펙 5.7의 `item <n>` 규칙을 지적·이유 글에도 확장)
 - 시간대 없는 끝 시각(실DB 1건 `2026-10-14 06:59:08`)은 KST로 보고 `+09:00`을 붙인다
-- nightly 끝 재생성은 `finally` 안이 아니라 그 뒤(정상 종료 경로)에서 부른다. SIGTERM·예외로 나가는 경로에서 사이트를 만들지 않으려고. 호출은 `nightly()`가 넘기는 `rebuild=True`일 때만이라 `ops weekly`의 따라잡기 nightly는 안 부른다(5.1-1: weekly는 publish가 빌드)
+- nightly 끝 재생성은 `finally` 안이 아니라 그 뒤(정상 종료 경로)에서 부른다(리뷰 009-A1-09 거부). `finally`에 넣으면 SIGTERM(launchd 종료)으로 `SystemExit`가 올라오는 경로에서도 재생성(하위 프로세스, 최대 step_timeout_min)이 돌아 종료가 launchd의 강제 종료 대기시간을 넘기고 중간에 SIGKILL로 끊긴다. 일반 예외 경로는 이미 `failed`로 마감된 run이라 재생성할 이유도 없다. 호출은 `nightly()`가 넘기는 `rebuild=True`일 때만이라 `ops weekly`의 따라잡기 nightly는 안 부른다(5.1-1: weekly는 publish가 빌드)
 - `rebuild_site(db, runner, with_week)`: publish가 공유하려고 `with_week` 인자를 더했다. 오류 메시지는 둘 다 `사이트 재생성 실패: …` 한 형식(기존 publish의 `export 실패`·`사이트 빌드 실패` 문구는 없어짐, 테스트는 종료 코드만 봄)
-- `trendsit publish`는 `--week`와 `--site-only` 중 하나가 없으면 종료 2
+- `trendsit publish`는 `--week`와 `--site-only` 중 하나가 없으면 종료 2. `--site-only`는 `step_timeout_min`을 timeout으로 넘기고 임시 파일은 `site.json.<pid>.new`(잠금 없이 이름만 고유)
+- run 단위 격리: 한 run의 상세 계산이 예외면 그 run은 `summary` null·`steps` []로 내고 stderr 한 줄, 모르는 nightly 단계 이름은 line만(`exit n`)
 
 ## 5. 스펙과 다르게 한 것과 이유
-- gate.js 1280 셀 줄바꿈 측정에서 ③ steps 줄(`tr.tr-steps`)의 결과 칸은 뺐다. `collect ×7 / filter ×4 (ok 3, partial 1) / …`는 실데이터에서 길이가 정해지지 않아 한 줄을 보장할 수 없고 FINAL 캡처도 줄바꿈한다. 나머지 `.rt` 셀(nightly·weekly·publish 줄)은 줄바꿈 0을 요구한다
+- gate.js 1280 셀 줄바꿈 측정에서 ③ steps 줄(`tr.tr-steps`)은 뺐다. 먼저 예외 없이 가는 길을 시도했으나(③ 글자 줄이기) 실DB 사본 실측(1280, 결과 칸 폭 약 263px)에서 10.9 ③ 줄의 결과 칸이 129자라 4줄, 10.8이 92자라 3줄로 나온다(`collect ×7 (ok 3, partial 4) / deep-text ×1 / filter ×4 / plan ×1 / summarize ×3 (ok 2, running 1) / video ×25 (ok 24, running 1)` 꼴). kind 7종 × 상태 수라 한 줄에 넣을 길이가 아니고 FINAL 캡처도 같다. 같은 사본에서 ③ 줄을 뺀 나머지 `.rt` 셀(nightly·weekly·publish 줄)은 줄바꿈 0이다. 그래서 예외를 유지한다(셀 높이 실측: 4.0줄·3.0줄)
 - 이 nightly 자신의 `export + build` 단계는 그 nightly의 export 시점에 `summary_json.site`가 아직 없어 그 run 쪽 화면에는 다음 재생성(다음 nightly 또는 `publish --site-only`) 때부터 나온다(5.1-1 "결과는 summary_json.site로만 남긴다"와 export가 먼저 도는 순서의 귀결)
-- check.py 금칙 문자열 검사는 `runs/`·`sources/`·`keywords/` 화면만 본다(토픽 본문은 기사 내용이라 `data/` 같은 낱말이 정당하게 나올 수 있음). C-4의 "생성 HTML 전체"보다 좁다
+- C-4 금칙 문자열 검사는 생성 HTML 전체를 본다(`sk-`는 키 모양 `sk-` + 영숫자 8자 이상만). 실DB 사본의 토픽 페이지 포함 129쪽에서 오탐 0
 - 목록의 publish 줄 자동/수동 칸은 `-`(어느 쪽인지 기록이 없음)
 - 지금 DB에서 weekly run 100건 중 W40·W41 외 `week` 없는 것 1건은 안 나온다(5.2 대로)
 

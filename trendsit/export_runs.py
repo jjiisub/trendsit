@@ -5,9 +5,11 @@ from __future__ import annotations
 
 import json
 import re
+import sys
 from collections import Counter, defaultdict
 from collections.abc import Callable
 from datetime import date, datetime
+from itertools import groupby
 from typing import Any
 from urllib.parse import urlsplit
 
@@ -84,7 +86,7 @@ def _title(db: DB, member: str) -> str:
     where = "i.id=?" if kind == "it" else "i.id=(SELECT item_id FROM videos WHERE video_id=?)"
     r = db.conn.execute(f"SELECT i.title, s.name FROM items i LEFT JOIN sources s ON s.id=i.source_id WHERE {where}", (key,)).fetchone()
     if not r or not r["title"]:
-        return f"{'item' if kind == 'it' else 'video'} {key}"
+        return f"item {key}"
     return f"{r['title']} ({r['name']})" if r["name"] else r["title"]
 
 
@@ -130,7 +132,7 @@ def _step_groups(db: DB) -> list[dict[str, Any]]:
     out = []
     for day, rs in days.items():
         kinds = {k: Counter(r["status"] for r in rs if r["kind"] == k) for k in STEP_KINDS if any(r["kind"] == k for r in rs)}
-        ends = [r["finished_at"] for r in rs if r["finished_at"]]
+        ends = [_iso(r["finished_at"]) for r in rs if r["finished_at"]]
         first = dict(rs[0]) | {"finished_at": max(ends, default=None), "status": "ok" if all(r["status"] == "ok" for r in rs) else "partial"}
         out.append(_common(first, "steps", _iso_week(day), "manual", sum(r["cost_usd"] or 0 for r in rs), "steps", id=f"steps-{day}",
                            result={"kinds": {k: dict(sorted(c.items(), key=lambda x: (x[0] != "ok", x[0]))) for k, c in kinds.items()}}))
@@ -148,11 +150,11 @@ def _weekly_detail(db: DB, d: dict[str, Any], ex: dict[str, Any]) -> tuple[dict[
     dur, cost = (sj.get(k) if isinstance(sj.get(k), dict) else {} for k in ("duration_sec", "cost_usd"))
     steps = [x for x in (by.get("evidence") and _s_evidence(by, dur), by.get("normalize") and _s_normalize(db, by, rid),
                          by.get("cluster") and _s_cluster(db, by, rid, dur, cost), by.get("editor_select") and _s_select(db, by, rid, sj, dur, cost),
-                         _s_write(db, by, rid, sj, dur, cost), _s_end(by, dur, cost)) if x]
-    if d["topic_id"]:
-        return None, steps
-    rev = _dig(sj, "review") or {}
+                         _s_write(db, by, rid, sj, dur, cost, bool(d["topic_id"])), _s_end(by, dur, cost)) if x]
     pub = ex[d["week"]]["topic_count"] if d["current"] and d["week"] in ex else None  # 현재판이면 사이트에 실리는 토픽 수
+    if d["topic_id"]:  # 토픽 1개 재실행 run: summary_json은 주 누적치라 published만(NG-6)
+        return ({"published": pub} if pub is not None else None), steps
+    rev = _dig(sj, "review") or {}
     res = d["result"]
     return {"clusters": res["clusters"], "candidates": res["candidates"], "selected": res["selected"], "topics": res["topics"], "published": pub,
             "rounds": rev.get("rounds"), "code_rejects": rev.get("code_rejects"), "critic_rejects": rev.get("critic_rejects"),
@@ -237,7 +239,7 @@ def _topic(seg: list[Any], dt: dict[str, Any], t: Any, revise: dict[int, Any], n
     k = 0
     for s in seg:
         if s["kind"] == "code":
-            chain.append(["code", "중단"])
+            chain.append(["code", "stopped"])
             continue
         if s["role"] == "writer_revise":
             rj = rejects[k] if k < len(rejects) else None
@@ -253,7 +255,8 @@ def _topic(seg: list[Any], dt: dict[str, Any], t: Any, revise: dict[int, Any], n
             "tokens_out": sum(s["tokens_out"] or 0 for s in llm), "cost_usd": round(sum(s["cost_usd"] or 0 for s in llm), 4), "chain": chain, "issues": issues}
 
 
-def _s_write(db: DB, by: dict[str, list[Any]], rid: str, sj: dict[str, Any], dur: dict[str, Any], cost: dict[str, Any]) -> dict[str, Any] | None:
+def _s_write(db: DB, by: dict[str, list[Any]], rid: str, sj: dict[str, Any], dur: dict[str, Any], cost: dict[str, Any],
+             single: bool = False) -> dict[str, Any] | None:
     rows = [s for r in ("writer", "writer_revise", "critic") for s in by.get(r, [])]
     if not rows:
         return None
@@ -262,6 +265,11 @@ def _s_write(db: DB, by: dict[str, list[Any]], rid: str, sj: dict[str, Any], dur
     rounds = ", ".join(f"{k} ×{v}" for k, v in (rev.get("rounds") or {}).items() if v)
     line = " / ".join([f"topics {len(topics)}"] + ([f"rounds {rounds}"] if rounds else []) +
                       [f"{k} {rev[k]}" for k in ("code_rejects", "critic_rejects", "check_topics") if k in rev])
+    if single and topics:  # 토픽 1개 run: review는 주 누적치(NG-6)라 쓰지 않고 이 run의 토픽 블록으로
+        t = topics[0]
+        cr = sum(c[0] == "code" and c[1].startswith("반려") for c in t["chain"])
+        line = (f"topics 1 / rounds {t['final_round']} / code_rejects {cr} / "
+                f"critic_rejects {sum(c[0] == 'writer_revise' for c in t['chain']) - cr} / check_topics {int(t['status'] == 'checked')}")
     who = [_who("llm", r, llm[0]["model"], len(llm)) for r in ("writer", "critic", "writer_revise")
            if (llm := [s for s in by.get(r, []) if s["kind"] == "llm"])]
     c = sum(cost.get(k) or 0 for k in ("writer", "writer_revise", "critic"))
@@ -343,7 +351,7 @@ def _b_deep(db: DB, runs: list[Any], day: str | None, days: list[str]) -> tuple:
     for c in _q(db, "SELECT i.title, c.card_json, c.model FROM item_cards c JOIN items i ON i.id=c.item_id WHERE c.version=2 AND c.run_id IN (?) ORDER BY c.item_id", runs):
         card = _j(c["card_json"]) or {}
         trail = card.get("trail") or []
-        rows.append([c["title"] or "-", " → ".join(dict.fromkeys(urlsplit(t.get("url") or "").netloc.removeprefix("www.") for t in trail)) or "-", max((t.get("depth") or 0 for t in trail), default="-"), card.get("log") or ""])
+        rows.append([c["title"] or "-", " → ".join(k for k, _ in groupby(urlsplit(t.get("url") or "").netloc.removeprefix("www.") for t in trail)) or "-", max((t.get("depth") or 0 for t in trail), default="-"), card.get("log") or ""])
     return ([_who("agent", "text_analyst", _agg(db, runs, "MAX(model)"), len(rows))],
             f"items {len(rows)} / tool {_agg(db, runs, 'COUNT(*)', " AND kind='tool'") or 0}", [_table(["항목", "원본 추적 경로", "깊이", "대조"], rows)], False)
 
@@ -378,12 +386,12 @@ NIGHT: dict[str, tuple[str, Callable[..., tuple]]] = {
 def _nightly_detail(db: DB, d: dict[str, Any]) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     sj, days, r = d["_sj"], d["_days"], d["_row"]
     subs = db.conn.execute("SELECT * FROM runs WHERE spec=? AND started_at>=? AND started_at<=? AND id!=? ORDER BY started_at",
-                           (r["spec"], r["started_at"], r["finished_at"] or "9", r["id"])).fetchall()
+                           (r["spec"], r["started_at"], _iso(r["finished_at"]) or "9", r["id"])).fetchall()
     by_day = _day_runs(subs, days)
     steps = []
     for st in sj["steps"]:
         name, day = st["name"], st.get("day")
-        kind, build = NIGHT[name]
+        kind, build = NIGHT.get(name, (name, lambda *a: ([_who("code")], "", [], False)))  # 모르는 단계 이름은 line만(5.7)
         runs = by_day.get((kind, day), []) if day else [s for s in subs if s["kind"] == kind]
         who, line, detail, attention = build(db, runs, day, days)
         if not runs and name != "plan":  # 하위 run이 없으면 line만(summary_json.steps의 exit)
@@ -405,7 +413,7 @@ def _night_summary(db: DB, d: dict[str, Any], subs: list[Any]) -> dict[str, Any]
     plans = [_plan_row(db, x)[1] for x in days]
     keep = db.conn.execute("SELECT COUNT(*) FROM items WHERE filter_status='pass' AND day BETWEEN ? AND ?", (min(days), max(days))).fetchone()[0]
     return {"collected": _q(db, "SELECT COALESCE(SUM(n_new),0) FROM fetch_log WHERE run_id IN (?)", coll)[0][0] if coll else 0, "filter_keep": keep,
-            "cards": _agg(db, summ, "COUNT(*)", " AND kind='llm'") or 0, "deep_text": sum(len(p.get("text_queue") or []) for p in plans),
+            "cards": _agg(db, summ, "COUNT(*)", " AND kind='llm' AND role='item_card'") or 0, "deep_text": sum(len(p.get("text_queue") or []) for p in plans),
             "video": sum(len(p.get("video_queue") or []) for p in plans), "repo": sum(len(p.get("repo_queue") or []) for p in plans),
             "exit_nonzero": d["result"]["failed"]}
 
@@ -429,10 +437,14 @@ def build_runs(db: DB, weeks: list[dict[str, Any]], week_label: Callable[[str], 
     all_weeks = set(ex) | {c["week"] for c in cands}  # 발행 주 ∪ run이 있는 주(진행 주)
     runs = sorted(cands, key=lambda c: c["at"], reverse=True)
     for d in runs:
-        if d["kind"] == "weekly":
-            d["summary"], d["steps"] = _weekly_detail(db, d, ex)
-        elif d["kind"] == "nightly":
-            d["summary"], d["steps"] = _nightly_detail(db, d)
+        try:
+            if d["kind"] == "weekly":
+                d["summary"], d["steps"] = _weekly_detail(db, d, ex)
+            elif d["kind"] == "nightly":
+                d["summary"], d["steps"] = _nightly_detail(db, d)
+        except Exception as e:  # noqa: BLE001 - 한 run의 원천이 이상해도 다른 run·쪽은 만든다(5.7 run 단위 격리)
+            print(f"export: run {d['id']} 상세를 뺌: {type(e).__name__}", file=sys.stderr)
+            d["summary"], d["steps"] = None, []
     run_weeks = [_run_week(wk, ex, wrow, runs, week_label) for wk in sorted(all_weeks, reverse=True)]
     return [{k: v for k, v in d.items() if not k.startswith("_")} for d in runs], run_weeks
 
@@ -443,7 +455,7 @@ def _run_week(wk: str, ex: dict[str, Any], wrow: dict[str, Any], runs: list[dict
     weekly = [r for r in in_week if r["kind"] == "weekly"]
     w = wrow.get(wk)
     return {"week": wk, "label": label, "range": rng, "status": "published" if wk in ex else (w["status"] if w else "open"),
-            "nightly_days": len({x for r in in_week if r["kind"] == "nightly" for x in r["_days"] if _iso_week(x) == wk}),
+            "nightly_days": len({x for r in runs if r["kind"] == "nightly" for x in r["_days"] if _iso_week(x) == wk}),
             "weekly": {"total": len(weekly), "full": sum(not r["sub"] for r in weekly), "partial": sum(1 for r in weekly if r["sub"] and not r["topic_id"]),
                        "topic": sum(1 for r in weekly if r["topic_id"])},
             "published_at": ex[wk]["published_at"] if wk in ex else None, "current_run_id": w["current_run_id"] if w else None}
