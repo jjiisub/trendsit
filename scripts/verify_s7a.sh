@@ -21,13 +21,14 @@ pt A3 "run 1건 상세 칸(weekly 6단계·nightly 8단계 name·who·line·deta
 pt A4 "주차별 표(5열·행 수·링크)·주 목록(날 행 머리 수, run 줄 = runs + publish, tr-sub, .cur 1, 결과 열 3종, ③ 줄 링크 없음, 이전·다음 주, /runs/weeks/ 없음)" tests/test_s7a.py -k "a4_"
 pt A5 "run 1건(빵부스러기 링크 2, 레일 묶음 수, li.st 수 = steps, who 글자·code.ic, .check 수 = attention, 토픽 블록·체인·반려 표, <details> 0), 계약 위반은 BuildError" tests/test_s7a.py -k "a5_ or build_rejects"
 if uv run --quiet python site_src/check.py --fixture >"$TMP/check" 2>&1; then c_rc=0; else c_rc=$?; fi
-chk() {  # chk <항목> <check.py 줄 정규식>...: 그 줄이 하나 이상 있고 FAIL이 없어야 PASS
+chk() {  # chk <항목> <check.py 줄 정규식>...: 패턴마다 그 줄이 하나 이상 있고 FAIL이 없어야 PASS
   local id=$1 desc=$2; shift 2
-  local lines
+  local lines p miss=""
+  for p in "$@"; do grep -qE "^(PASS|FAIL) $p " "$TMP/check" || miss="$miss [$p 결과 줄 없음]"; done
   lines=$(grep -E "^(PASS|FAIL) ($(IFS='|'; echo "$*")) " "$TMP/check")
-  if [ -n "$lines" ] && ! echo "$lines" | grep -q '^FAIL'; then pass "$id" "$desc: $(echo "$lines" | wc -l | tr -d ' ')건 PASS"; else fail "$id" "$desc: ${lines:-결과 줄 없음}"; fi
+  if [ -z "$miss" ] && [ -n "$lines" ] && ! echo "$lines" | grep -q '^FAIL'; then pass "$id" "$desc: $(echo "$lines" | wc -l | tr -d ' ')건 PASS"; else fail "$id" "$desc:${miss} ${lines:-결과 줄 없음}"; fi
 }
-chk A6 "공개 금칙(C-4)·details 0(C-9)·300자(C-5)·상태 어휘·D-11 낱말·site.json 3MB(C-6), A7 페이지 존재(C-3)" 'A7 페이지' 'C-4 관리' 'C-9 <details>' 'C-5 run' 'D-11 runs' 'C-6 site'
+chk A6 "공개 금칙(C-4)·details 0(C-9)·300자(C-5)·상태 어휘·D-11 낱말·site.json 3MB(C-6), A7 페이지 존재(C-3)" 'A7 페이지' 'C-4 생성' 'C-9 <details>' 'C-5 run' 'D-11 runs' 'C-6 site\.json'
 chk A7 "관문 9 Chromium·WebKit(375·768·1280, 대상에 run 목록·weekly·nightly, 1280 .rt 셀 줄바꿈 0, 375 넘침 0)" 'A8 관문' 'A9 관문'
 if [ "$c_rc" = 0 ]; then pass C-all "check.py --fixture 종료 코드 0: $(tail -1 "$TMP/check")"; else fail C-all "check.py --fixture 종료 코드 $c_rc: $(grep -E '^FAIL' "$TMP/check" | head -2 | tr '\n' ' ')"; fi
 

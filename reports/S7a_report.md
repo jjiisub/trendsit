@@ -7,8 +7,8 @@
 `bash scripts/verify_s7a.sh`(A0~A11, 0원) 전 항목 PASS는 구현 세션 마지막 실행 기준(원문은 `.workflow/009-s7a/A1-impl.md`). 게이트 전체 소요 시간은 그 보고서에 적는다. 항목별 수단:
 - A1~A3(S-1): `tests/test_ops.py`·`tests/test_s7a.py`·`tests/test_export.py`. A4~A5(S-2): `tests/test_s7a.py` 화면 파싱. A6·A7: `site_src/check.py --fixture`(27항목, Chromium·WebKit 375·768·1280) + 실DB 사본 export·build·check(A6b)
 - A8: pytest 전체(건너뜀 0), `verify_s6a.sh`, `verify_s6b.sh`. `verify_s6-1.sh`(개정 A2 포함)는 게이트 밖에서 S-3 끝 1회: 아래 6장 "verify_s6-1 결과"
-- A9: build.py 601줄(≤700), build_runs.py 234(≤500), export.py 221(≤350), export_runs.py 449(≤450), check.py 468(≤480), 함수 ≤60줄, `render_run` 0, 버린 CSS 조각 0, `<details>` 0, 새 환경 변수 0
-- A10(실측 QA)은 qa-verifier 몫. `reports/S7a/shots/`에는 구현 세션이 픽스처 빌드를 Chromium 1280/375로 찍은 5장(`fixture_*.png`)만 있다(A11의 4장 조건용). QA가 실DB 캡처로 채운다
+- A9: build.py 601줄(≤700), build_runs.py 236(≤500), export.py 221(≤350), export_runs.py 466(≤470, 사용자 결정으로 450→470), check.py 466(≤480), 함수 ≤60줄, `render_run` 0, 버린 CSS 조각 0, `<details>` 0, 새 환경 변수 0
+- A10(실측 QA, qa-verifier): B1 FAIL(375 WebKit 하위 run 줄 글자 겹침, High) → 수정 → B2 PASS 13/13 → C1 수정 뒤 재확인 PASS(결함 주입 12/12). `reports/S7a/shots/`는 실DB 읽기 전용 사본 캡처 17장(weeks·list_w40/w41/w42·weekly·weekly_c716·nightly·topic_rerun, 1280·375, 그리고 WebKit 375 부분 캡처 `list_w41_375_webkit.png`. 375 캡처의 엔진별 측정은 `.workflow/009-s7a/artifacts/a10-b2/`). 구현 세션의 픽스처 캡처 `fixture_*.png` 5장은 지웠다
 - A11: README 단락, `CLAUDE.md` 진행 블록 줄, `AGENTS.md` 출력 형식 줄, 이 리포트 8장
 
 ## 3. 관문 B 결과
@@ -35,18 +35,22 @@
 ## 5. 스펙과 다르게 한 것과 이유
 - gate.js 1280 셀 줄바꿈 측정에서 ③ steps 줄(`tr.tr-steps`)은 뺐다. 먼저 예외 없이 가는 길을 시도했으나(③ 글자 줄이기) 실DB 사본 실측(1280, 결과 칸 폭 약 263px)에서 10.9 ③ 줄의 결과 칸이 129자라 4줄, 10.8이 92자라 3줄로 나온다(`collect ×7 (ok 3, partial 4) / deep-text ×1 / filter ×4 / plan ×1 / summarize ×3 (ok 2, running 1) / video ×25 (ok 24, running 1)` 꼴). kind 7종 × 상태 수라 한 줄에 넣을 길이가 아니고 FINAL 캡처도 같다. 같은 사본에서 ③ 줄을 뺀 나머지 `.rt` 셀(nightly·weekly·publish 줄)은 줄바꿈 0이다. 그래서 예외를 유지한다(셀 높이 실측: 4.0줄·3.0줄)
 - 이 nightly 자신의 `export + build` 단계는 그 nightly의 export 시점에 `summary_json.site`가 아직 없어 그 run 쪽 화면에는 다음 재생성(다음 nightly 또는 `publish --site-only`) 때부터 나온다(5.1-1 "결과는 summary_json.site로만 남긴다"와 export가 먼저 도는 순서의 귀결)
-- C-4 금칙 문자열 검사는 생성 HTML 전체를 본다(`sk-`는 키 모양 `sk-` + 영숫자 8자 이상만). 실DB 사본의 토픽 페이지 포함 129쪽에서 오탐 0
+- C-4 금칙 문자열 검사는 생성 HTML 전체를 본다(`sk-`는 키 모양 `sk-` + 영숫자·`_`·`-` 8자 이상만, `data/`는 앞에 영숫자·밑줄이 없을 때만 — 기사 본문 `metadata/` 오탐 때문). 실DB 사본의 토픽 페이지 포함 129쪽에서 오탐 0. 반대로 토픽 본문 URL의 `/data/`는 걸릴 수 있다(지금 0건)
 - 목록의 publish 줄 자동/수동 칸은 `-`(어느 쪽인지 기록이 없음)
 - 지금 DB에서 weekly run 100건 중 W40·W41 외 `week` 없는 것 1건은 안 나온다(5.2 대로)
 - 5.2-3 하위 run 끝 경계 ≤ → <(사용자 결정 10/14, 연속 nightly 중복 합산). 시작 경계는 `>=` 그대로, 비교는 `_iso(finished_at)` 거침
 - nightly 끝 재생성 호출 위치: 명세는 `finally` 안이었으나 그 뒤 정상 종료 경로에서 부른다(근거는 4장: `finally`에 넣으면 SIGTERM의 `SystemExit` 경로에서도 최대 step_timeout_min짜리 하위 프로세스가 돌아 launchd 강제 종료에 끊긴다. 009-A1-09 거부, 009-C1-04)
 - gate.js에 375 `.rt` 셀 겹침 측정을 더했다(명세는 375 넘침 0만). B1 QA High(목록 시간·비용이 하위 run 줄과 겹침) 회귀 방지로 오케스트레이터가 지시(009-C1-12)
-- export_runs.py 줄 예산 450→470(사용자 결정 10/14, 사유: run 단위 격리 + 토픽 run 자기 수치, 461줄)
+- export_runs.py 줄 예산 450→470(사용자 결정 10/14, 사유: run 단위 격리 + 토픽 run 자기 수치, 결정 당시 461줄, 최종 466줄)
 
 ## 6. 남은 문제 (미해결)
-- A10(실DB 읽기 전용 캡처 QA)은 qa-verifier 몫: 토픽 1개 재실행 run, running run 줄, ③ 묶음 줄(줄바꿈 허용), 진행 주 페이지(weekly 0)를 적대적으로 볼 것
+- 형식만 맞고 실재하지 않는 주 id(`2026-W99`)를 가진 weekly run이 DB에 1건 있으면 `week_label` ValueError로 export 전체가 실패한다(run 격리 밖, 009-C2-01). 실DB 해당 0건이고 정상 CLI 경로로는 잘 생기지 않지만, 생기면 nightly 재생성·`publish --week`가 1로 끝난다
+- `brief weekly --force`로 발행이 풀린 주(done, published_at NULL)는 다음 02:00 재생성 때 공개 사이트에서 빠진다(명세 밖 시나리오, 009-C2-02, 기획 판단)
+- 별칭(normalize) 목록: `aliases`가 `UNIQUE(canonical, alias)`라 run_id가 덮여 옛 run 쪽은 목록 0, 최근 run에 몰림(NG-3 안에서는 못 고침, 009-B1-03)
+- 375 주차별 표(`/runs/`)는 표 안쪽 가로 스크롤로 weekly 열부터 가려 보인다(페이지 넘침은 0, NG-5 모바일 디자인 검토 대상)
+- 레일 `filter keep`(export 시점 items 상태)과 filter 단계 줄의 keep(그 run 시점)이 다를 수 있다(실DB 10.13 41 vs 36)
+- 새 375 겹침 관문은 `--fixture` 데이터의 run 줄이 짧아 회귀를 못 잡는다(실DB 기준 재측정은 `.workflow/009-s7a/artifacts/a10/overlap375.js`)
 - `running`인 채 남은 run(10.9 weekly 2건, 10.7 collect 2건 등)은 글자 그대로 `running`(NG-7)
-- `reports/S7a/shots/`의 `fixture_*.png`는 QA 캡처가 들어오면 지워도 된다
 - 실DB export에서 일부 `cluster_pairs.reason`이 `대체 출력: LLMError`(디코드 실패 대체값)로 나온다. 오류 원문은 아니고 DB 값 그대로(D-7: 종류만). 거슬리면 S7b에서 사전으로
 
 verify_s6-1 결과(S-3 끝 1회, A2 개정 포함): `PASS A0 … A13` 전 항목 PASS, 종료 코드 0(A2 "run 1건 머리 레일 published와 run_weeks current" 6 passed, A10 check.py --fixture 27/27, A11 verify_s6a·s6b·s5 --fast 0). B5·A23 예외 그대로.
@@ -62,7 +66,8 @@ C-6 실측(실DB `data/trendsit.db`를 `sqlite3 backup`으로 읽어 만든 사�
 변경 파일: 기존 17(상한 18) — `trendsit/{export,ops,cli_ops}.py`, `site_src/{build.py,check.py,gate.js,trendsit.css}`, `tests/{test_export,test_site,test_ops,test_s6_1_site}.py`, `tests/fixtures/{site/site.json,s6_1/site_v2.json}`, `scripts/verify_s6-1.sh`, `README.md`, `CLAUDE.md`, `AGENTS.md`. 새 파일 6(상한 6) — `trendsit/export_runs.py`, `site_src/build_runs.py`, `tests/test_s7a.py`, `scripts/verify_s7a.sh`, `reports/S7a_report.md`, `reports/S7a/shots/`. 의존성 추가 0.
 
 ## 8. impl-workflow SUMMARY 요약
-(구현 라운드 A1 기준. 리뷰·QA 라운드 결과는 `.workflow/009-s7a/SUMMARY.md`로 오케스트레이터가 이어 적는다.)
+런 `.workflow/009-s7a`: 리뷰 A1 1회(High 0 → held 16 일괄), QA B 2회(B1 High 1 → 수정 → B2 PASS), 최종 리뷰 C 2회(C1 High 1·Medium 2 → 수정 → C1 QA PASS → C2 High 0). 사용자 결정 3(토픽 run 쪽 그 run 것만, export_runs 470줄, 하위 run 끝 경계 <). 잔여 Medium 2(6장 첫 두 항목). 상세 `.workflow/009-s7a/SUMMARY.md`
 - S-1 `c1f7b87`: `rebuild_site`·nightly 끝 호출·`publish --site-only`, `export_runs.py`, 픽스처 2개 새 계약, 테스트
 - S-2 `13a1486`: `build_runs.py`, CSS, check·gate 개정, 옛 문구 테스트 교체
-- S-3: 회귀·구조 검사·문서·shots·이 리포트
+- S-3 `5040813`: 회귀·구조 검사·문서·이 리포트
+- 리뷰 반영 `a2989a8`(held 일괄)·`5f286a1`(줄 예산)·`f129d72`(B1: 모바일 2줄 grid, 375 겹침 관문, 끝 경계 <)·`4d9e0be`(C1: 토픽 run 경계 없는 중단, 남은 행 블록, 후보 단위 격리)
