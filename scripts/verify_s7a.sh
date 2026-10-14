@@ -31,4 +31,75 @@ chk A6 "공개 금칙(C-4)·details 0(C-9)·300자(C-5)·상태 어휘·D-11 낱
 chk A7 "관문 9 Chromium·WebKit(375·768·1280, 대상에 run 목록·weekly·nightly, 1280 .rt 셀 줄바꿈 0, 375 넘침 0)" 'A8 관문' 'A9 관문'
 if [ "$c_rc" = 0 ]; then pass C-all "check.py --fixture 종료 코드 0: $(tail -1 "$TMP/check")"; else fail C-all "check.py --fixture 종료 코드 $c_rc: $(grep -E '^FAIL' "$TMP/check" | head -2 | tr '\n' ' ')"; fi
 
+# A6 뒤쪽: 실DB가 있으면 읽기 전용 사본(sqlite backup)을 export → build → check(금칙·3MB·셀 줄바꿈). 실DB·site/는 건드리지 않는다
+a6real() {
+  [ -f data/trendsit.db ] || { echo "(실DB 없음: 건너뜀)"; return 0; }
+  local R=$TMP/real
+  mkdir -p "$R" && uv run --quiet python - "$R/trendsit.db" <<'PY' || { echo "실DB 사본 실패"; return 1; }
+import sqlite3, sys
+src = sqlite3.connect("file:data/trendsit.db?mode=ro", uri=True)
+dst = sqlite3.connect(sys.argv[1])
+src.backup(dst)
+PY
+  uv run --quiet python - "$R" <<'PY' || { echo "실DB export 실패"; return 1; }
+import sys
+from pathlib import Path
+from trendsit.core.db import DB
+from trendsit.export import export
+export(DB(Path(sys.argv[1]) / "trendsit.db"), Path(sys.argv[1]) / "site.json")
+PY
+  [ -d data/slides ] && cp -r data/slides "$R/slides"
+  uv run --quiet python site_src/build.py --data "$R/site.json" --out "$R/site" >/dev/null || { echo "실DB 빌드 실패"; return 1; }
+  uv run --quiet python site_src/check.py --site "$R/site" --data "$R/site.json" >"$R/check" 2>&1 || { echo "실DB check: $(grep -E '^FAIL' "$R/check" | head -3 | tr '\n' ' ')"; return 1; }
+  echo "실DB export $(($(wc -c <"$R/site.json") / 1024))KB, check $(tail -1 "$R/check")"
+}
+if msg=$(a6real 2>&1); then pass A6b "실DB 사본 export·build·check: $msg"; else fail A6b "$msg"; fi
+
+# ---------- S-3: 회귀·구조·문서 ----------
+echo "== A8 회귀(시간이 걸림: pytest 전체, verify_s6a.sh, verify_s6b.sh) =="
+out=$(uv run --quiet pytest -q 2>&1 | tail -1)
+if [[ "$out" == *passed* && "$out" != *failed* && "$out" != *error* && "$out" != *skipped* ]]; then pass A8a "pytest 전체, 건너뜀 0 ($out)"; else fail A8a "pytest 전체: $out"; fi
+for n in 6a 6b; do
+  if bash "scripts/verify_s$n.sh" >"$TMP/s$n" 2>&1; then pass "A8-$n" "verify_s$n.sh 종료 코드 0"; else fail "A8-$n" "verify_s$n.sh: $(grep '^FAIL' "$TMP/s$n" | head -3 | tr '\n' ' ')"; fi
+done
+
+# A9 줄 수·함수 길이(verify_s5 B4 방식)·grep(C-11, 3.4)
+a9() {
+  local n bad=""
+  n=$(wc -l <site_src/build.py); [ "$n" -le 700 ] || bad="$bad build.py $n줄"
+  n=$(wc -l <site_src/build_runs.py); [ "$n" -le 500 ] || bad="$bad build_runs.py $n줄"
+  n=$(wc -l <trendsit/export.py); [ "$n" -le 350 ] || bad="$bad export.py $n줄"
+  n=$(wc -l <trendsit/export_runs.py); [ "$n" -le 450 ] || bad="$bad export_runs.py $n줄"
+  n=$(wc -l <site_src/check.py); [ "$n" -le 480 ] || bad="$bad check.py $n줄"
+  local longfn
+  longfn=$(uv run --quiet python - <<'PY'
+import ast
+for path in ("trendsit/export_runs.py", "trendsit/export.py", "trendsit/ops.py", "trendsit/cli_ops.py", "site_src/build.py", "site_src/build_runs.py", "site_src/check.py"):
+    for n in ast.walk(ast.parse(open(path, encoding="utf-8").read())):
+        if isinstance(n, ast.FunctionDef) and n.end_lineno - n.lineno + 1 > 60:
+            print(f"{path}:{n.name}:{n.end_lineno - n.lineno + 1}")
+PY
+)
+  [ -z "$longfn" ] || bad="$bad 60줄 넘는 함수 $longfn"
+  grep -q 'render_run\b' site_src/build.py && bad="$bad build.py에 render_run"
+  grep -qE '\.v[2-5]\b|\.c-from|r-from' site_src/trendsit.css && bad="$bad CSS에 버린 안 조각"
+  grep -q '<details' site_src/build.py site_src/build_runs.py && bad="$bad <details>"
+  git diff "$(git merge-base HEAD origin/main 2>/dev/null || echo main)" -- trendsit site_src | grep -E '^\+.*(os\.environ|getenv)' && bad="$bad 새 환경 변수"
+  [ -z "$bad" ] || { echo "$bad"; return 1; }
+}
+if msg=$(a9 2>&1); then pass A9 "줄 수(build ≤700, build_runs ≤500, export ≤350, export_runs ≤450, check ≤480)·함수 ≤60줄·render_run 0·버린 CSS 조각 0·details 0·새 환경 변수 0"; else fail A9 "$msg"; fi
+
+# A11 문서
+a11() {
+  grep -q '실행 기록(S7a)' README.md && grep -q 'publish --site-only' README.md && grep -q '/runs/<주>/<run>/' README.md || { echo "README 실행 기록 단락(쪽 3종·nightly 끝 재생성·publish --site-only) 없음"; return 1; }
+  grep -q 'S7a' CLAUDE.md || { echo "CLAUDE.md에 S7a 진행 블록 줄 없음"; return 1; }
+  grep -q 'S7a_TASK.md` 5.2' AGENTS.md || { echo "AGENTS.md 출력 형식 줄에 5.2 참조 없음"; return 1; }
+  for n in 1 2 3 4 5 6 7 8; do grep -q "^## $n\\." reports/S7a_report.md 2>/dev/null || { echo "reports/S7a_report.md에 $n장 없음"; return 1; }; done
+  grep -q 'C-6' reports/S7a_report.md || { echo "리포트에 C-6 실측 크기 없음"; return 1; }
+  local shots
+  shots=$(ls reports/S7a/shots/*.png 2>/dev/null | wc -l | tr -d ' ')
+  [ "${shots:-0}" -ge 4 ] || { echo "reports/S7a/shots/ png ${shots:-0}장(4장 이상 필요: A10 QA 산출물)"; return 1; }
+}
+if out=$(a11 2>&1); then pass A11 "README 실행 기록 단락, CLAUDE.md·AGENTS.md, reports/S7a_report.md 8장(C-6 크기 포함), shots ≥4장"; else fail A11 "$out"; fi
+
 exit $FAILED

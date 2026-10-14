@@ -14,6 +14,7 @@ from urllib.parse import urlsplit
 from .core.db import DB
 
 CAP = 300
+EVIDENCE_ID = re.compile(r"\[?\b(it|og|vd|rp|sl):([A-Za-z0-9_./-]+)(?:#[A-Za-z0-9]+|@\d+)?\]?")  # 검수 지적에 섞인 근거 id: 공개 화면에는 `it 8` 꼴로(M-2)
 STEP_KINDS = ("collect", "filter", "summarize", "plan", "deep-text", "video", "repo-analyze")
 
 
@@ -29,7 +30,7 @@ def _dig(d: Any, *path: str) -> Any:
 
 def _cap(x: Any) -> Any:
     if isinstance(x, str):
-        return x[:CAP]
+        return EVIDENCE_ID.sub(lambda m: f"{m[1]} {m[2]}", x)[:CAP]
     if isinstance(x, list):
         return [_cap(v) for v in x]
     if isinstance(x, dict):

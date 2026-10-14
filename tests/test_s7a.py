@@ -501,3 +501,11 @@ def test_build_rejects_contract_violations_and_keeps_site(tmp_path):
         p.write_text(json.dumps(d, ensure_ascii=False), encoding="utf-8")
         r = subprocess.run([sys.executable, str(root / "site_src/build.py"), "--data", str(p), "--out", str(site)], capture_output=True, text=True)
         assert r.returncode == 1 and "BuildError" in r.stderr and (site / "keep.txt").read_text() == "옛 사이트"
+
+
+def test_evidence_ids_in_free_text_are_rewritten_for_public_pages():
+    """검수 지적·이유에 섞인 근거 id(M-2)는 `it 8` 꼴로 바꾸고 300자에서 자른다."""
+    from trendsit.export_runs import _cap
+
+    assert _cap("'2'가 it:8#q5에 없음 ([og:982#q4], vd:ab-1@209)") == "'2'가 it 8에 없음 (og 982, vd ab-1)"
+    assert _cap({"a": ["x" * 400]}) == {"a": ["x" * 300]}
