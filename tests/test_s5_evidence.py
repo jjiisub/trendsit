@@ -254,6 +254,24 @@ def test_critic_documents_merges_overlapping_sentence_windows_into_one_doc(tmp_p
     assert docs[0].text.splitlines() == ["[it:1#s1] 하나다.", "[it:1#s2] 둘이다.", "[it:1#s3] 셋이다.", "[it:1#s4] 넷이다."]
 
 
+def test_critic_documents_still_merges_it_sentence_windows_when_og_quote_is_mixed_in(tmp_path):
+    """008-A1-1: 글 구성원에 og:(또는 #q) id가 하나라도 섞이면 it:#s 병합이 통째로 건너뛰이던 버그. it:#s는
+    여전히 창을 합쳐 한 줄씩(겹친 창 중복 없이), og: 등 나머지 id는 각자 줄로 같은 구성원 문서 하나에 담는다."""
+    db = DB(tmp_path / "t.db")
+    db.conn.execute("INSERT INTO items(id, source_id, channel, external_id, url, title, day, week) VALUES "
+                    "(1,'s','text','e','http://x','t','2026-10-06','2026-W41')")
+    db.conn.execute("INSERT INTO item_texts(item_id, text) VALUES (1, '하나다. 둘이다. 셋이다. 넷이다. 다섯이다.')")
+    src = {"site": "GeekNews", "title": "t"}
+    pack = {"it:1#s2": [EvidenceItem("it:1#s2", "it:1", "text", "sentence", "둘이다.", src)],
+            "it:1#s3": [EvidenceItem("it:1#s3", "it:1", "text", "sentence", "셋이다.", src)],
+            "og:1#q1": [EvidenceItem("og:1#q1", "it:1", "text", "quote", "원본 인용이다.", src)]}
+    docs = fulltext.critic_documents(db, ["it:1#s2", "it:1#s3", "og:1#q1"], pack)
+    assert len(docs) == 1 and docs[0].id == "it:1"
+    lines = docs[0].text.splitlines()
+    assert lines.count("[it:1#s2] 둘이다.") == 1 and lines.count("[it:1#s3] 셋이다.") == 1  # 겹친 창이 중복되지 않음
+    assert "[og:1#q1] 원본 인용이다." in lines  # 나머지 id도 같은 문서에 각자 줄로
+
+
 def test_evidence_docs_skips_summary_and_claim_kinds():
     p = {"vd:1": [EvidenceItem("vd:1", "vd:X", "video", "summary", "요약", {})]}
     assert evidence_docs(p) == []

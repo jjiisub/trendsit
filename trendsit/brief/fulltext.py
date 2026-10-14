@@ -153,6 +153,7 @@ def raw_evidence(db: DB, eid: str, items: list[EvidenceItem]) -> str:
 def critic_documents(db: DB, order: list[str], pack: dict[str, list[EvidenceItem]]) -> list[Document]:
     """검수자 원문(write.py가 씀, 5.2·5.15-1): 근거 id마다 따로가 아니라 구성원(member)마다 문서 하나.
     it:#s 창(±1문장)은 같은 구성원 안에서 겹치면 한 번으로 합쳐 문장 순서대로 담고, 줄마다 원래 문장 id를 유지한다.
+    같은 구성원에 og:·#q 등 다른 id가 섞여도(008-A1-1) it:#s만 따로 합치고 나머지는 각자 id 줄로 같은 문서에 담는다.
     slide_fact·sl:·전사 묶음·레포 사실은 raw_evidence() 결과를 id를 붙여 그대로 줄로 쌓는다."""
     by_member: dict[str, list[str]] = {}
     for e in order:
@@ -160,15 +161,17 @@ def critic_documents(db: DB, order: list[str], pack: dict[str, list[EvidenceItem
     docs = []
     for member, ids in by_member.items():
         first = pack[ids[0]][0]
-        sent = [m for e in ids if (m := re.match(r"^it:(\d+)#s(\d+)$", e))]
-        if sent and len(sent) == len(ids):
-            item_id = int(sent[0][1])
+        sent = [(e, m) for e in ids if (m := re.match(r"^it:(\d+)#s(\d+)$", e))]
+        merged: dict[str, str] = {}
+        if sent:
+            item_id = int(sent[0][1][1])
             row = db.conn.execute("SELECT text FROM item_texts WHERE item_id=?", (item_id,)).fetchone()
             sents = sentences(row["text"]) if row and row["text"] else []
-            nums = sorted({n for m in sent for n in range(max(1, int(m[2]) - 1), min(len(sents), int(m[2]) + 1) + 1)})
-            lines = [f"[it:{item_id}#s{n}] {sents[n - 1]}" for n in nums] if sents else []
-        else:
-            lines = [f"[{e}] {t}" for e in ids if (t := raw_evidence(db, e, pack[e]))]
+            if sents:
+                nums = sorted({n for _, m in sent for n in range(max(1, int(m[2]) - 1), min(len(sents), int(m[2]) + 1) + 1)})
+                merged = {f"it:{item_id}#s{n}": sents[n - 1] for n in nums}
+        lines = [f"[{eid}] {t}" for eid, t in merged.items()]
+        lines += [f"[{e}] {t}" for e in ids if e not in merged and (t := raw_evidence(db, e, pack[e]))]
         docs.append(Document(id=member, source=first.source.get("site") or first.channel,
                              title=first.source.get("title"), text="\n".join(lines)))
     return docs
