@@ -13,8 +13,11 @@ from dataclasses import dataclass, field
 from datetime import date
 from typing import Any
 
+from ..core import config
+from ..core.artifacts import Document
 from ..core.budget import estimate_tokens
 from ..core.db import DB
+from . import fulltext, slides
 
 Channel = str  # text / video / github
 RELEVANCE_RANK = {"high": 0, "mid": 1, "low": 2}
@@ -27,7 +30,7 @@ class EvidenceItem:
     id: str
     member: str
     channel: Channel
-    kind: str  # quote / number / claim / slide_fact / timeline / summary / repo_field
+    kind: str  # sentence / quote / number / slide_fact / slide_read / transcript / context / summary / repo_field
     text: str
     source: dict[str, Any]
     value: str | None = None
@@ -59,6 +62,8 @@ class Member:
     items: list[EvidenceItem] = field(default_factory=list)
     item_id: int | None = None
     corrections: dict[str, str] = field(default_factory=dict)  # 영상 안에서만 쓰는 표기 교정(잘못 들은 말 → 화면 표기)
+    slide_candidates: list[str] = field(default_factory=list)  # 영상만: 슬라이드 후보 sl: id(slides.py, 최대 slides_max)
+    timeline: list[dict[str, Any]] = field(default_factory=list)  # 영상만: digest.timeline 그대로(C-4 video_secs 검사용)
 
 
 @dataclass
@@ -87,7 +92,8 @@ def _first_sentence(text: str) -> str:
 
 
 def _card_items(item_id: int, card: dict[str, Any], prefix: str, member: str, source: dict[str, Any]) -> list[EvidenceItem]:
-    """글 카드 → 근거. quote가 근거 id의 주인이고, 수치·주장은 그 quote id로 붙는다. summary는 글 단위 id."""
+    """글 카드 → og: 근거(v2 원본 문서, 5.2 그대로). quote가 근거 id의 주인이고, 수치·주장은 그 quote id로 붙는다.
+    summary는 글 단위 id. it: 원문은 fulltext.article_lines가 담당(아래 text_members)."""
     out: list[EvidenceItem] = []
     qid = {q["n"]: f"{prefix}:{item_id}#q{q['n']}" for q in card.get("quotes") or []}
     for q in card.get("quotes") or []:
@@ -107,7 +113,9 @@ def _card_items(item_id: int, card: dict[str, Any], prefix: str, member: str, so
 
 
 def text_members(db: DB, week: str) -> tuple[list[Member], int]:
-    """item_card가 있는 글(같은 URL로 묶인 것은 기준 항목 하나). v2에 원본(origin)이 있으면 v2 근거(og:)."""
+    """item_card가 있는 글(같은 URL로 묶인 것은 기준 항목 하나). it: 근거는 원문 문장(fulltext, D-27, S6-1 5.2).
+    원문이 없거나 만료면 카드 인용(it:#q{n})으로 대체 + attention(member.corrections에 "원문 없음" 기록 없이 Member
+    생성 뒤 write.py가 pack 비교로 판단하기보다, 여기서 바로 폴백 아이템을 만든다). v2 원본(og:)이 있으면 함께 준다."""
     rows = db.conn.execute(
         "SELECT i.id, i.title, i.url, i.day, s.name AS site, "
         "(SELECT card_json FROM item_cards c WHERE c.item_id=i.id AND c.version=1) AS v1, "
@@ -115,6 +123,7 @@ def text_members(db: DB, week: str) -> tuple[list[Member], int]:
         "FROM items i LEFT JOIN sources s ON s.id=i.source_id "
         "WHERE i.week=? AND i.channel='text' AND i.id NOT IN (SELECT item_id FROM item_same_as WHERE canonical_id!=item_id) "
         "ORDER BY i.id", (week,)).fetchall()
+    text_chars = config.load("brief.yaml").write.input.text_chars
     out, no_card = [], 0
     for r in rows:
         if not r["v1"]:
@@ -125,24 +134,33 @@ def text_members(db: DB, week: str) -> tuple[list[Member], int]:
         member = f"it:{r['id']}"
         source = {"site": r["site"], "title": r["title"], "date": r["day"], "url": r["url"]}
         use_v2 = bool(v2 and v2.get("origin") and v2.get("quotes"))
-        items = _card_items(r["id"], v1, "it", member, source)
+        sent_lines, no_text = fulltext.article_lines(db, r["id"], text_chars)
+        if sent_lines:
+            items = [EvidenceItem(eid, member, "text", "sentence", text, source) for eid, text in sent_lines]
+        else:  # 원문 없음(만료 포함): 카드 인용으로 대체 + attention(write.py가 모음)
+            items = _card_items(r["id"], v1, "it", member, source)
         if use_v2:  # 원본 문장(og:)을 앞에. 글 자체 인용도 근거로 남김(원본과 다른 점을 쓸 수 있게)
             items = _card_items(r["id"], v2, "og", member, source | {"origin": v2["origin"]}) + items
         card = v2 if use_v2 else v1
-        out.append(Member(member, "text", r["title"], _first_sentence(card.get("summary") or v1.get("summary") or ""),
-                          card.get("summary") or v1.get("summary") or "", v1.get("relevance") or "low",
-                          list(v1.get("entities") or []), list(v1.get("keywords") or []), source, items, r["id"]))
+        m = Member(member, "text", r["title"], _first_sentence(card.get("summary") or v1.get("summary") or ""),
+                   card.get("summary") or v1.get("summary") or "", v1.get("relevance") or "low",
+                   list(v1.get("entities") or []), list(v1.get("keywords") or []), source, items, r["id"])
+        if no_text:
+            m.corrections["_no_text"] = "1"  # write.py가 attention "원문 없음: it:{id}"을 내는 신호(필드 재사용, 새 칸 추가 없음)
+        out.append(m)
     return out, no_card
 
 
 def video_members(db: DB, week: str) -> tuple[list[Member], int]:
-    """VideoDigest가 있는 영상. 근거: 슬라이드 전용 수치(claim만, P4-1), 핵심 포인트, 타임라인, 요약.
+    """VideoDigest가 있는 영상(S6-1 5.2 v2). 근거: 슬라이드 전용 수치(claim만, P4-1), 슬라이드 판독(sl:), 전사 25초
+    묶음(vd:@묶음 시작 초), 요약+타임라인(근거 id 없음, context). key_points(핵심 포인트)는 v2에서 더는 주지 않는다(D-27).
     표기 쌍(name_pairs)은 그 영상 안에서만 쓰는 교정이고 전역 별칭으로 올리지 않는다."""
     rows = db.conn.execute(
         "SELECT i.id, i.title, i.url, i.day, s.name AS site, v.video_id, "
         "(SELECT digest_json FROM video_digests d WHERE d.item_id=i.id) AS digest "
         "FROM items i JOIN videos v ON v.item_id=i.id LEFT JOIN sources s ON s.id=i.source_id "
         "WHERE i.week=? AND i.channel='video' ORDER BY i.id", (week,)).fetchall()
+    cfg = config.load("brief.yaml").write
     out, no_digest = [], 0
     for r in rows:
         if not r["digest"]:
@@ -151,17 +169,14 @@ def video_members(db: DB, week: str) -> tuple[list[Member], int]:
         d = json.loads(r["digest"])
         member = f"vd:{r['video_id']}"
         source = {"site": r["site"], "title": r["title"], "date": r["day"], "url": r["url"]}
-        items = []
+        items = [EvidenceItem(f"vd:{r['id']}#ctx", member, "video", "context", fulltext.video_context_text(d), source)]
         for f in d.get("slide_only_facts") or []:
             items.append(EvidenceItem(f["evidence"], member, "video", "slide_fact", f["fact"], source,
                                       value=f["value"], unit=f.get("unit") or "", sec=f["sec"]))
-        for kp in d.get("key_points") or []:
-            if kp.get("evidence"):
-                sec = int(kp["evidence"][0].rsplit("@", 1)[1])
-                items.append(EvidenceItem(kp["evidence"][0], member, "video", "claim", kp["text"], source, sec=sec))
-        for t in d.get("timeline") or []:
-            items.append(EvidenceItem(f"vd:{r['id']}@{t['sec']}", member, "video", "timeline", t["label"], source,
-                                      sec=t["sec"]))
+        for eid, text in fulltext.slide_read_lines(db, r["id"], r["video_id"]):
+            items.append(EvidenceItem(eid, member, "video", "slide_read", text, source, sec=int(eid.rsplit("@", 1)[1])))
+        for eid, text in fulltext.transcript_group_lines(db, r["id"], r["video_id"], cfg.input.transcript_chars):
+            items.append(EvidenceItem(eid, member, "video", "transcript", text, source, sec=int(eid.rsplit("@", 1)[1])))
         if d.get("summary") and d["summary"] != "내용 없음":
             items.append(EvidenceItem(f"vd:{r['id']}", member, "video", "summary", d["summary"], source))
         names = [p["screen"] for p in d.get("name_pairs") or []]
@@ -169,12 +184,15 @@ def video_members(db: DB, week: str) -> tuple[list[Member], int]:
             "SELECT keyword_id FROM item_keywords WHERE item_id=? ORDER BY keyword_id", (r["id"],))]
         out.append(Member(member, "video", r["title"], _first_sentence(d.get("summary") or ""), d.get("summary") or "",
                           "high", names, kws, source, items, r["id"],
-                          corrections={p["spoken"]: p["screen"] for p in d.get("name_pairs") or []}))
+                          corrections={p["spoken"]: p["screen"] for p in d.get("name_pairs") or []},
+                          slide_candidates=slides.candidates(r["id"], d.get("slides") or [], cfg.slides_max),
+                          timeline=list(d.get("timeline") or [])))
     return out, no_digest
 
 
 def repo_members(db: DB, week: str) -> tuple[list[Member], int]:
-    """relevant=true RepoCard. 근거: 하는 일 한 문장(oneliner), 신호, 이번 주 별, 릴리스."""
+    """relevant=true RepoCard. 근거(S6-1 5.2 v2, rp:{name}#f{n}): evidence[].fact 순서대로 → 뜨는 이유 → 릴리스
+    (fulltext.repo_fact_lines). 하는 일(oneliner)·이번 주 별은 명세 밖이라 근거 줄로 주지 않는다(006-A2-10)."""
     rows = db.conn.execute(
         "SELECT c.full_name, c.card_json, t.stars_this_week, t.rank, t.keywords, r.description, o.output_json AS oneliner "
         "FROM repo_cards c LEFT JOIN repo_trending t ON t.week=c.week AND t.full_name=c.full_name "
@@ -187,20 +205,11 @@ def repo_members(db: DB, week: str) -> tuple[list[Member], int]:
             irrelevant += 1
             continue
         name = r["full_name"]
-        member = rid = f"rp:{name}"
+        member = f"rp:{name}"
         line = (json.loads(r["oneliner"]).get("oneliner") if r["oneliner"] else "") or (r["description"] or "")
         source = {"site": "GitHub", "title": name, "date": None, "url": f"https://github.com/{name}"}
-        items = [EvidenceItem(rid, member, "github", "repo_field", f"하는 일: {line}", source)]
-        items.append(EvidenceItem(rid, member, "github", "repo_field", f"신호: {card.get('signal')}", source))
-        if r["stars_this_week"] is not None:
-            items.append(EvidenceItem(rid, member, "github", "repo_field", "이번 주 별", source,
-                                      value=f"{r['stars_this_week']:,}", unit="개"))
-        if card.get("why_trending"):
-            items.append(EvidenceItem(rid, member, "github", "repo_field", f"뜨는 이유: {card['why_trending']}", source))
-        rel = card.get("release")
-        if rel:
-            items.append(EvidenceItem(rid, member, "github", "repo_field",
-                                      f"릴리스 {rel['tag']} ({rel['date']}): {rel['line']}", source))
+        items = [EvidenceItem(eid, member, "github", "repo_field", text, source)
+                for eid, text in fulltext.repo_fact_lines(name, card)]
         owner, repo = name.split("/", 1)
         out.append(Member(member, "github", name, line, " ".join(x for x in (line, r["description"] or "") if x),
                           "high", [repo, name], sorted(json.loads(r["keywords"] or "{}")), source, items))
@@ -213,6 +222,40 @@ def week_evidence(db: DB, week: str) -> WeekEvidence:
     repos, irrelevant = repo_members(db, week)
     members = {m.key: m for m in [*texts, *videos, *repos]}
     return WeekEvidence(week, members, {"no_card": no_card, "no_digest": no_digest, "irrelevant_repo": irrelevant})
+
+
+_LINE_LABEL = {"quote": "원문: ", "number": "(카드 수치, 위 원문에서 뽑음) ", "slide_fact": "발표 슬라이드 수치: "}
+_SKIP_KINDS = ("summary", "claim")  # 카드 요약·핵심 포인트는 원문이 아니라 작성자에게 주지 않음(리뷰 R2 계승)
+
+
+def _line(it: EvidenceItem) -> str | None:
+    if it.kind == "context":
+        return it.text  # 요약+타임라인(근거 id 없음, 참고용)
+    if it.kind in _SKIP_KINDS:
+        return None
+    v = f" [{it.value}{(' ' + it.unit) if it.unit else ''}]" if it.value else ""
+    return f"[{it.id}] {_LINE_LABEL.get(it.kind, '')}{it.text}{v}"
+
+
+def evidence_docs(pack: dict[str, list[EvidenceItem]]) -> list[Document]:
+    """근거 id마다 줄 하나, 구성원(member)마다 문서 하나(COMMON 6.1-4, S6-1 5.2 D-27, write.py가 씀). og:·it: 등
+    접두어가 섞여도 같은 member 문서에 함께 담긴다. 줄 순서는 구성원 안에서 Member.items 조립 순서 그대로."""
+    by_member: dict[str, list[EvidenceItem]] = {}
+    for items in pack.values():
+        for it in items:
+            by_member.setdefault(it.member, []).append(it)
+    docs = []
+    for member, items in by_member.items():
+        lines = [ln for it in items if (ln := _line(it)) is not None]
+        if not lines:
+            continue
+        src = items[0].source
+        # 5.2: 영상 Document id는 vd:{item_id}(member 키는 vd:{video_id}). 첫 항목은 늘 video_members()가 붙인
+        # vd:{item_id}#ctx(context)라 거기서 떼어 쓴다(006-C1-11)
+        doc_id = items[0].id.split("#", 1)[0] if items[0].channel == "video" else member
+        docs.append(Document(id=doc_id, source=src.get("site") or items[0].channel, title=src.get("title"),
+                             url=src.get("url"), text="\n".join(lines)))
+    return docs
 
 
 def pack_index(items: list[EvidenceItem]) -> dict[str, list[EvidenceItem]]:
@@ -239,7 +282,7 @@ def cap_pack(members: list[Member], max_tokens: int) -> tuple[list[EvidenceItem]
                       key=lambda m: (m.channel in seen_channels, RELEVANCE_RANK.get(m.relevance, 3), m.key))
         for m in turn:
             g = queues[m.key].pop(0)
-            cost = sum(estimate_tokens(x.as_dict()) for x in g)
+            cost = sum(estimate_tokens(_line(x) or "") for x in g)
             if total + cost <= max_tokens:
                 kept += g
                 total += cost

@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import json
 import os
-import re
 from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Any
@@ -60,15 +59,32 @@ def _topics(db: DB, week: str, run_id: str) -> list[dict[str, Any]]:
     for r in rows.fetchall():
         t = export_topic(db, run_id, r["topic_id"], srcs)
         ids = {s["id"] for s in t["sources"]}
-        for i, p in enumerate(t["points"]):
-            if not p["refs"] or not set(p["refs"]) <= ids:
-                raise ExportError(f"C-2 위반: {t['id']} points[{i}] refs={p['refs']} (출처 {sorted(ids)})")
+        for loc, refs in _topic_ref_slots(t):
+            if not refs or not set(refs) <= ids:
+                raise ExportError(f"C-2 위반: {t['id']} {loc} refs={refs} (출처 {sorted(ids)})")
         out.append(t)
     return out
 
 
+def _topic_ref_slots(t: dict[str, Any]) -> list[tuple[str, list[str]]]:
+    """토픽의 refs 칸 전부(C-2 검사용): 단락은 refs 1개 이상 필수, 나머지는 있으면 검사."""
+    slots = [(f"head_tiles[{i}]", x["refs"]) for i, x in enumerate(t["head_tiles"])]
+    for i, s in enumerate(t["sections"]):
+        slots += [(f"sections[{i}].paragraphs[{j}]", p["refs"]) for j, p in enumerate(s["paragraphs"])]
+        v = s["visual"]
+        if v and v["type"] == "bars" and v.get("ref"):
+            slots.append((f"sections[{i}].bars", [v["ref"]]))
+        elif v and v["type"] == "table":
+            slots.append((f"sections[{i}].table", v["refs"]))
+        elif v and v["type"] == "tiles":
+            slots += [(f"sections[{i}].tiles[{k}]", x["refs"]) for k, x in enumerate(v["items"])]
+        elif v and v["type"] == "events":
+            slots += [(f"sections[{i}].events.items[{k}]", [x["ref"]]) for k, x in enumerate(v["items"]) if x.get("ref")]
+    return slots
+
+
 def _repos(db: DB, week: str, run_id: str, topics: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """그 주 트렌딩(관련 있는 것) + 토픽 근거로 쓴 레포. 설명(what)은 repo_oneliners."""
+    """그 주 모든 수집 run 행(repo_trending) 중 카드 relevant 또는 설명 있는 것 + 토픽 근거로 쓴 레포(5.7 F74 정정). 설명(what)은 repo_oneliners."""
     topic_of: dict[str, str] = {}
     for t in topics:  # rank 순이라 먼저 쓴 토픽이 이김
         for (m,) in db.conn.execute("SELECT DISTINCT member FROM topic_evidence WHERE run_id=? AND topic_id=? AND member LIKE 'rp:%'",
@@ -95,8 +111,8 @@ def _repos(db: DB, week: str, run_id: str, topics: list[dict[str, Any]]) -> list
 
 
 def _page_checks(t: dict[str, Any]) -> list[str]:
-    """포인트 밖에서 화면에 표시되는 확인 필요 위치(build의 shown_checks와 같은 규칙)."""
-    return [c for c in t.get("checks", []) if c in ("overview", "summary") or re.fullmatch(r"concepts\[\d+\]", c)]
+    """절 밖에서 화면에 표시되는 확인 필요 위치(build의 shown_checks와 같은 규칙, S6-1 v2: summary·title만)."""
+    return [c for c in t.get("checks", []) if c in ("summary", "title")]
 
 
 # ---------- 실행 기록(5.6) ----------
@@ -118,6 +134,9 @@ def _weekly_counts(db: DB, run_id: str, summary: dict[str, Any], published: int,
     if "selected" in sel:
         c["selected"] = sel["selected"]
     c["evidence_ids"] = db.conn.execute("SELECT COUNT(DISTINCT evidence_id) FROM topic_evidence WHERE run_id=?", (run_id,)).fetchone()[0]
+    # 006-A2-35: 예산 초과로 멈출 때 role.py가 남기는 중단 기록(detail에 topic_id 없음)은 세지 않음(이중 집계 방지)
+    c["written"] = db.conn.execute("SELECT COUNT(*) FROM steps WHERE run_id=? AND role='writer' AND kind='code' "
+                                   "AND json_extract(detail,'$.topic_id') IS NOT NULL", (run_id,)).fetchone()[0]
     if rev.get("rounds"):
         c["review"] = {"passed_first": rev["rounds"].get("1", 0), "rejected": rev.get("code_rejects", 0) + rev.get("critic_rejects", 0),
                        "needs_check": needs_check}
@@ -147,6 +166,9 @@ def _run(db: DB, r: Any, published: dict[str, tuple[int, int]]) -> dict[str, Any
         out["week"] = week_id(r["week"])
         out["counts"] = _weekly_counts(db, r["id"], summary, *published[r["week"]])
         out["summary"] = _weekly_summary(out["counts"])
+        plan_row = db.conn.execute("SELECT source FROM briefing_plans WHERE run_id=? ORDER BY id DESC LIMIT 1", (r["id"],)).fetchone()
+        if plan_row and plan_row["source"] == "fallback":  # D-37-인접(C-30): 선별이 대체 계획으로 돈 run
+            out["fallback_select"] = True
         steps = []
         for s in db.conn.execute("SELECT t, role, text, attention, detail FROM steps WHERE run_id=? AND text IS NOT NULL ORDER BY seq", (r["id"],)):
             step: dict[str, Any] = {"role": s["role"], "text": s["text"], "t": _hm(s["t"]), "attention": bool(s["attention"])}
@@ -160,8 +182,16 @@ def _run(db: DB, r: Any, published: dict[str, tuple[int, int]]) -> dict[str, Any
         steps = summary.get("steps") or []
         bad = [s for s in steps if s.get("exit")]
         out["summary"] = f"날 {len(summary.get('days') or [])}개, 단계 {len(steps)}개 중 실패 {len(bad)}개"
-        out["steps"] = [{"role": s["name"], "text": (f"{s['day']} " if s.get("day") else "") + (s.get("error") or f"성공, {s.get('sec', 0)}초"),
-                         "attention": bool(s.get("exit"))} for s in steps]
+        out_steps = []
+        for s in steps:
+            step: dict[str, Any] = {"role": s["name"], "text": (f"{s['day']} " if s.get("day") else "") + (s.get("error") or f"성공, {s.get('sec', 0)}초"),
+                                    "attention": bool(s.get("exit"))}
+            if s.get("name") == "plan" and s.get("day"):  # C-30: 그날 계획이 대체 계획(점수 순)으로 돈 경우
+                plan_row = db.conn.execute("SELECT source FROM plans WHERE day=? ORDER BY id DESC LIMIT 1", (s["day"],)).fetchone()
+                if plan_row and plan_row["source"] == "fallback":
+                    step["fallback"] = True
+            out_steps.append(step)
+        out["steps"] = out_steps
     return out
 
 
@@ -267,7 +297,7 @@ def build(db: DB, with_week: str | None = None) -> dict[str, Any]:
         approx = db.conn.execute("SELECT EXISTS(SELECT 1 FROM repo_trending t JOIN runs x ON x.id=t.run_id WHERE t.week=? AND x.note=?)",
                                  (wk, APPROX_NOTE)).fetchone()[0]
         members[wk] = _used_members(db, wk, r["current_run_id"], [t["id"] for t in ts])
-        counts[wk] = (len(ts), sum(bool(p.get("check")) for t in ts for p in t["points"]) + sum(len(_page_checks(t)) for t in ts))
+        counts[wk] = (len(ts), sum(bool(s.get("check")) for t in ts for s in t["sections"]) + sum(len(_page_checks(t)) for t in ts))
         cited = {(s["channel"], s["url"] or s["title"]) for t in ts for s in t["sources"]}
         weeks.append({"id": week_id(wk), "label": label, "range": rng,
                       "published_at": r["published_at"] or now_kst(), "collected": collected, "topic_ids": [t["id"] for t in ts],

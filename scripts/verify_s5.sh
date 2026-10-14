@@ -95,13 +95,13 @@ pt A7 "묶기(채널 넘는 조건, confidence 미달, 평균 연결, 레포만 
 
 pt A8 "선별 검증(리드 1, 개수 범위, 범위 밖 합치기·나누기 거부, relation은 과거 대조 후보 안, 입력 순서 cluster_id, reason 값·채널 수 대조, 재시도·대체, 점수 동점은 관심 유사도(C-21 수정), 영상 자리(C-20))" \
   tests/test_s5_select_checks.py tests/test_s5_weekly.py -k "valid or reject or max_topics or order or reason or slug or retries or reconcile or c20 or c21 or r14"
-pt A9 "코드 검사(수치 대조 값 비교·제목·도식 칸까지·단위 환산 미허용, 빈 단위, anchor, 도식 상한, 금지어(평가어·해요체), contributions 채널, points 자르기, 음차 정본, 자동 수정은 반려 아님, 경고)" \
-  tests/test_s5_select_checks.py tests/test_s5_evidence.py -k "clean or number or anchor or forbidden or alias or unknown or warnings or noun or reset or unit or bar or r3 or r4 or r11 or f1 or f3 or f7 or f11 or g2 or g3 or g7 or h1"
-pt A10 "라운드(상한 3, 코드 반려도 셈, 같은 이슈 2회 check, 지적 안 된 칸 되돌림, 1부터 센 위치 바로잡기, 원자 사실 0개 판정 거부, 도식은 코드 확인 오류만 뺌, 목록 위치 add·채널 없는 기여 문장)" tests/test_s5_weekly.py tests/test_s5_select_checks.py -k "rounds or one_based or empty_atoms or f2 or diagram_issue or g6"
+pt A9 "코드 검사(S6-1 v2 기준: 수치 대조 값 비교·제목·시각 요소 칸까지·단위 환산 미허용, 빈 단위, visual 구조, 상한, 금지어(평가어·해요체), refs 실재, sections 자르기, 음차 정본, 자동 수정은 반려 아님, 경고)" \
+  tests/test_s6_1_write.py tests/test_s5_evidence.py -k "check_passes or check_rejects or check_accepts or autofix or page_refs or alias_replacement or r11_transliteration"
+pt A10 "라운드(S6-1 v2 기준: 상한 3, 코드 반려도 셈, 같은 이슈 2회 check, 지적 안 된 칸 되돌림, 1부터 센 위치 바로잡기, 원자 사실 0개 판정 거부, 시각 요소는 코드 확인 오류만 뺌, sections add·delete)" tests/test_s5_weekly.py tests/test_s6_1_write.py -k "rounds or one_based or empty_atoms or f2 or diagram_issue or apply_revision"
 pt A11 "저장(마이그레이션 30~35, 재실행 run 보존·current_run_id, topic_evidence = 최종판 refs, 토픽 수준 확인 필요)" \
   tests/test_s5_weekly.py tests/test_s5_cluster.py -k "rounds or stage_cluster"
 pt A12 "실행 요약 JSON 형식과 표에서 다시 계산한 값 일치" tests/test_s5_weekly.py -k rounds
-pt A13 "저장값만으로 예시 JSON 토픽 칸(매핑 함수 초안: numbers·events·og 출처 origin·checks)" tests/test_s5_weekly.py -k "rounds or export"
+pt A13 "저장값만으로 사이트 데이터 토픽 칸(S6-1 v2 기준: 매핑 함수 초안: bars·events·og 출처 origin·checks)" tests/test_s5_weekly.py -k "rounds or export"
 
 # A14 문서: README S5, 리포트 체크리스트, reports/eval 역할·모델별 최신 1개(라벨이 가리키는 실행은 예외)
 labeled=$(grep -ho 'reports/eval/[a-z_]*_[0-9-]*\.json' eval/labels/* 2>/dev/null | sort -u)
@@ -117,11 +117,10 @@ else
   fail A14 "README/리포트/eval 정리 확인:${over}"
 fi
 
-# ---------- S5-1a: 리팩터 불변(프롬프트, 코드 검사 결과, CLI 도움말) ----------
-# B1 코드 검사 결과 차이 == 의도한 제거 표(S5-1b 5.1). S5-1a A16(불변)을 대체
-if uv run --quiet python scripts/s5_1_golden.py --out "$TMP/g.json" --before reports/S5-1/golden_before.json \
-     --removals reports/S5-1/intended_removals.json >"$TMP/b1" 2>&1; then
-  pass B1 "코드 검사 결과 차이(W40·W41 현재판 모든 라운드) == reports/S5-1/intended_removals.json $(grep -c '"topic_id"' reports/S5-1/intended_removals.json)건"
+# ---------- S6-1 5.11: 골든 회귀(v2 픽스처, 실DB·LLM 없음, D-31) ----------
+# B1 코드 검사 결과가 reports/S6-1/golden.json과 완전히 같음(이후 스펙 회귀용)
+if uv run --quiet python scripts/s5_1_golden.py --out "$TMP/g.json" --golden reports/S6-1/golden.json >"$TMP/b1" 2>&1; then
+  pass B1 "코드 검사 결과(v2 픽스처) == reports/S6-1/golden.json"
 else
   fail B1 "$(head -1 "$TMP/b1")"
 fi
@@ -173,8 +172,8 @@ sys.exit(0 if list(SPECULATIVE) == json.load(open('reports/S5-1/speculative_befo
 else
   fail B6 "금지 표현 목록 달라짐"
 fi
-pt B8 "작성자 입력 limits(소스 1개 [2,3], 2개 이상 [3,6], 값은 brief.yaml에서, 없으면 검증 오류)" tests/test_s5_select_checks.py -k writer_limits
-pt B9 "검수자·수정 입력 렌더에 같은 포인트 문장이 한 번만" tests/test_s5_select_checks.py -k render_no_page_dup
+pt B8 "작성자 입력 limits(S6-1 v2 기준: 소스 1개 [3,5], 2개 이상 [4,7], 값은 brief.yaml에서, 없으면 검증 오류)" tests/test_s6_1_write.py -k writer_limits
+pt B9 "검수자·수정 입력 렌더에 같은 단락 문장이 한 번만(S6-1 v2 기준)" tests/test_s6_1_write.py -k render_no_page_dup
 # B10 md 중복: <data> 처리 문장 0, writer.md에 diagrams.md·style_ko.md와 같은 줄 0, 설정 숫자 0
 md_dup=$(grep -n '<data>' roles/*.md
          awk 'length($0) > 20' roles/writer.md | grep -Fxf skills/diagrams.md -f skills/style_ko.md

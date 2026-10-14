@@ -81,8 +81,8 @@ def _log_topic(tr: Any, t: sel.Applied, res: wr.TopicResult) -> None:
     tr.step(kind="code", role="writer",
             text=f"{t.topic_id}: {res.status}, {res.final_round}라운드" + (f", 확인 필요 {res.attention[0]}" if res.attention else ""),
             attention=res.status != "passed" or bool(res.attention),
-            detail={"topic_id": t.topic_id, "evidence": res.evidence_ids, "truncated": res.dropped_ids,
-                    "dropped_diagrams": res.dropped_diagrams, "checks": res.checks,
+            detail={"topic_id": t.topic_id, "evidence": res.evidence_ids, "dropped_evidence": res.dropped_ids,
+                    "no_visuals": res.no_visuals, "dropped_diagrams": res.dropped_diagrams, "checks": res.checks,
                     "n_sources": res.n_sources, "costs": res.costs, "rounds": [
                         {"round": lg.round, "checker": lg.checker, "status": lg.status, "issues": lg.issues,
                          "reverts": lg.reverts, "autofix": len(lg.autofix)} for lg in res.rounds]})
@@ -167,8 +167,9 @@ def _close(ctx: Ctx, week: str, t0: float, dur: dict[str, float], n_topics: int 
     with db.conn:
         db.conn.execute("UPDATE runs SET summary_json=? WHERE id=?", (json.dumps(summary, ensure_ascii=False), run_id))
         if not ctx.stopped and (until or summary["status"] != "failed"):
-            status = ({"select": "selected", "write": "written"}[until] if until
-                      else {"done": "done", "partial": "written"}[summary["status"]])
+            # v1.2 5.13: 예산 중단이 아니고 성공 토픽 ≥1(partial도 포함)이면 weeks는 done(publish가 막히지 않게).
+            # runs.status·summary_json은 그대로 partial
+            status = {"select": "selected", "write": "written"}[until] if until else "done"
             db.conn.execute("UPDATE weeks SET status=?, current_run_id=? WHERE week=?", (status, run_id, week))
     return summary
 
@@ -214,6 +215,42 @@ def _detail(db: DB, run_id: str, role: str, prefix: str = "") -> list[dict[str, 
         (run_id, role, prefix + "%"))]
 
 
+def _drop_counts(plan: dict[str, Any], fallback: bool) -> tuple[dict[str, int], dict[str, int]]:
+    """누가 뺐나(리뷰 R8): 모델이 직접 / 코드 정리(reconcile) / 대체 계획(점수 순)."""
+    drops = {k: 0 for k in ("duplicate", "low_relevance", "thin", "other")}
+    drops_by = {"model": 0, "code": 0, "fallback": 0}
+    for d in plan.get("decisions", []):
+        if d.get("action") == "drop":
+            drops[d.get("drop_reason") or "other"] = drops.get(d.get("drop_reason") or "other", 0) + 1
+            by = "fallback" if fallback else "code" if sel.RECONCILE_MARK in (d.get("reason") or "") else "model"
+            drops_by[by] += 1
+    return drops, drops_by
+
+
+def _review_counts(db: DB, run_id: str, verdicts: list[Any]) -> tuple[dict[str, int], int, int]:
+    issue_types = {k: 0 for k in ("unsupported", "number_mismatch", "overclaim", "missing_key", "wrong_ref", "overuse",
+                                  "missing_diagram")}
+    autofixes = reverts = 0
+    for v in verdicts:
+        for it in json.loads(v["issues_json"] or "[]"):
+            if v["checker"] == "critic" and it["type"] in issue_types:
+                issue_types[it["type"]] += 1
+        a = json.loads(v["autofix_json"] or "{}")
+        autofixes += len(a.get("autofix") or [])
+        reverts += a.get("reverts") or 0
+    return issue_types, autofixes, reverts
+
+
+def _check_points(db: DB, run_id: str, topics: list[Any]) -> int:
+    n = 0
+    for t in topics:
+        r = db.conn.execute("SELECT page_json FROM topic_pages WHERE run_id=? AND topic_id=? ORDER BY round DESC LIMIT 1",
+                            (run_id, t["topic_id"])).fetchone()
+        if r:
+            n += sum(1 for s in json.loads(r["page_json"]).get("sections", []) if s.get("check"))
+    return n
+
+
 def compute_summary(db: DB, run_id: str) -> dict[str, Any]:
     """표(clusters, cluster_pairs, briefing_plans, topics, topic_pages, verdicts, steps)에서 실행 요약을 다시 계산한다."""
     run = db.conn.execute("SELECT week, started_at FROM runs WHERE id=?", (run_id,)).fetchone()
@@ -232,32 +269,10 @@ def compute_summary(db: DB, run_id: str) -> dict[str, Any]:
     topics = db.conn.execute("SELECT topic_id, status, final_round, checks_json FROM topics WHERE run_id=?", (run_id,)).fetchall()
     verdicts = db.conn.execute("SELECT checker, status, issues_json, autofix_json FROM verdicts WHERE run_id=?",
                                (run_id,)).fetchall()
-    drops = {k: 0 for k in ("duplicate", "low_relevance", "thin", "other")}
-    # 누가 뺐나(리뷰 R8): 모델이 직접 / 코드 정리(reconcile: topics에 없는 select를 drop으로) / 대체 계획(점수 순)
-    drops_by = {"model": 0, "code": 0, "fallback": 0}
     fallback = bool(plan_row) and plan_row["source"] == "fallback"
-    for d in plan.get("decisions", []):
-        if d.get("action") == "drop":
-            drops[d.get("drop_reason") or "other"] = drops.get(d.get("drop_reason") or "other", 0) + 1
-            by = "fallback" if fallback else "code" if sel.RECONCILE_MARK in (d.get("reason") or "") else "model"
-            drops_by[by] += 1
-    issue_types = {k: 0 for k in ("unsupported", "number_mismatch", "overclaim", "missing_key", "wrong_ref", "overuse",
-                                  "missing_diagram")}
-    autofixes = reverts = 0
-    for v in verdicts:
-        for it in json.loads(v["issues_json"] or "[]"):
-            if v["checker"] == "critic" and it["type"] in issue_types:
-                issue_types[it["type"]] += 1
-        a = json.loads(v["autofix_json"] or "{}")
-        autofixes += len(a.get("autofix") or [])
-        reverts += a.get("reverts") or 0
-    check_points = 0
-    for t in topics:
-        r = db.conn.execute("SELECT page_json FROM topic_pages WHERE run_id=? AND topic_id=? ORDER BY round DESC LIMIT 1",
-                            (run_id, t["topic_id"])).fetchone()
-        if r:
-            check_points += sum(1 for p in json.loads(r["page_json"]).get("points", []) if p.get("check"))
-    writers = _detail(db, run_id, "writer")
+    drops, drops_by = _drop_counts(plan, fallback)
+    issue_types, autofixes, reverts = _review_counts(db, run_id, verdicts)
+    check_points = _check_points(db, run_id, topics)
     cost = {k: round(float(db.conn.execute("SELECT COALESCE(SUM(cost_usd),0) FROM steps WHERE run_id=? AND role=?",
                                            (run_id, k)).fetchone()[0] or 0), 6) for k in ROLES}
     cost["total"] = round(sum(cost.values()), 6)
@@ -267,8 +282,7 @@ def compute_summary(db: DB, run_id: str) -> dict[str, Any]:
         "week": week, "model": _model(db, run_id), "status": "stopped" if end.get("stopped") else run_status(topics),
         "cluster_run": cluster_run,
         "evidence": {"items": ev.get("counts", {"text": 0, "video": 0, "github": 0}),
-                     "excluded": ev.get("excluded", {"no_card": 0, "no_digest": 0, "irrelevant_repo": 0}),
-                     "truncated_topics": sum(1 for w in writers if w.get("truncated"))},
+                     "excluded": ev.get("excluded", {"no_card": 0, "no_digest": 0, "irrelevant_repo": 0})},
         "aliases": {"candidates": norm.get("counts", {}).get("candidates", 0),
                     "auto_approved": norm.get("counts", {}).get("auto_approved", 0),
                     "decide_calls": len(norm.get("decide", []))},
@@ -285,7 +299,9 @@ def compute_summary(db: DB, run_id: str) -> dict[str, Any]:
         "write": {"topics": len(topics), "failed": sum(t["status"] == "failed" for t in topics)},
         "review": {"rounds": {str(k): sum(1 for t in topics if t["final_round"] == k) for k in (1, 2, 3)},
                    "code_rejects": sum(1 for v in verdicts if v["checker"] == "code" and v["status"] == "reject"),
-                   "critic_rejects": sum(1 for v in verdicts if v["checker"] == "critic" and v["status"] == "reject"),
+                   # A1-11/A3-10: 검수 실패(재시도까지 실패)도 reject로 저장되지만 fact_support가 없어 구분됨(5.15-2)
+                   "critic_rejects": sum(1 for v in verdicts if v["checker"] == "critic" and v["status"] == "reject"
+                                        and json.loads(v["autofix_json"] or "{}").get("fact_support") is not None),
                    "autofixes": autofixes, "reverts": reverts, "issues": issue_types, "check_points": check_points,
                    "check_topics": sum(1 for t in topics if json.loads(t["checks_json"] or "[]"))},
         "cost_usd": cost,

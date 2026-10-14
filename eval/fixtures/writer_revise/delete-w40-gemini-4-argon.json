@@ -1,0 +1,301 @@
+{
+ "input": {
+  "loc_lines": [
+   "title: Gemini 4 Argon: 에이전트 작업 강화와 출시 기념 가격 구조",
+   "summary: 구글이 출력 토큰 한도 1백만 개와 출시 기념 특가(입력 2달러, 출력 10달러)를 갖춘 Gemini 4 Argon을 Fairwind 프로그램으로 제한 출시했다. 쟁점은 벤치마크 13개 부문 정상에도 일반 API 접근이 제한된 점이다.",
+   "head_tiles[0]: 1백만 개 / 출력 토큰 한도 (기존 6만 4천개에서 확장) (refs it:18#s21, it:997#s23)",
+   "head_tiles[1]: 2달러 / 입력 토큰 1백만 개당 가격 (출시 기념 특가) (refs it:18#s9, it:997#s9)",
+   "head_tiles[2]: 10달러 / 출력 토큰 1백만 개당 가격 (출시 기념 특가) (refs it:18#s9, it:997#s9)",
+   "head_tiles[3]: 95% / 캐시 입력 토큰 할인율 (입력 토큰 가격 대비) (refs it:18#s9, it:997#s9)",
+   "sections[0].heading: 출력 토큰 한도 1백만 개로 확장, 단일 트래잭션 장기 추론 지원",
+   "sections[0].paragraphs[0]: 구글은 더 길고 복잡한 활용 사례를 뒷받침하기 위해 Gemini 4 Argon의 출력 토큰 한도를 기존 6만 4천개에서 업계 최고 수준인 1백만 개로 대폭 확장했다. 단일 실행 경로 내에서 수십만 토큰을 생성할 수 있는 여유 공간이 확보되면서, 까다로운 과제도 한 번에 해결할 수 있는 한 차원 더 깊은 추론 성능을 제공한다. (refs it:18#s21, it:18#s22, it:997#s23, it:997#s24)",
+   "sections[1].heading: 출시 기념 특가: 입력 2달러, 출력 10달러, 캐시 95% 할인",
+   "sections[1].paragraphs[0]: Gemini 4 Argon은 출시 기념 특가로 입력 토큰 1백만 개당 2달러, 출력 토큰 1백만 개당 10달러에 제공된다. 캐시된 입력 토큰은 입력 토큰 가격 대비 95% 할인된 금액으로 이용할 수 있다. (refs it:18#s9, it:997#s9)",
+   "sections[1].paragraphs[1]: AI타임스는 프로모션 종료 후 정가로 입력 4달러, 출력 20달러로 전환될 예정이라고 보도했다. 이 가격은 GPT-6 Astra 대비 5분의 1, Claude Opus 5.5의 절반 수준이라고 평가받았다. (refs it:864#s38, it:864#s37)",
+   "sections[1].table (구분/입력/출력): 출시 기념 특가와 정가 비교 / note: 1백만 토큰당",
+   "sections[1].table.rows[0]: 출시 기념 특가 | 2달러 | 10달러",
+   "sections[1].table.rows[1]: 정가(프로모션 종료 후) | 4달러 | 20달러",
+   "sections[2].heading: 에이전트 작업 강화: 양자 최적화 40% 개선, 메모리 300 TiB 확보",
+   "sections[2].paragraphs[0]: 양자 컴퓨팅 연구에서 Argon은 시공간 자원(큐비트 × 게이트) 최적화에서 기존 발표된 베이스라인을 몇 분 만에 40% 이상 뛰어넘었다. 데이터센터 메모리 최적화에서는 전체 서버군의 프로파일링 텔레메트리를 분석해 300 TiB 이상의 메모리를 확보했으며, 총 절감 규모는 500 TiB에서 최대 1 PiB에 이를 것으로 예상된다. (refs it:18#s14, it:18#s15, it:997#s14, it:997#s16)",
+   "sections[2].paragraphs[1]: 대규모 코드베이스 마이그레이션에서는 re2, libgav1 등 핵심 라이브러리부터 80만 줄 이상의 Fuchsia OS Zircon 커널에 이르기까지 C/C++ 코드베이스를 Rust로 전환하는 작업을 수행하고 있다. libgav1의 경우 3만 2천 줄의 SIMD 코드를 안전한 Rust 코드로 대체해 동일한 비디오 출력 품질을 유지하면서 기존 Rust 버전 대비 2.7배 빠르게 작동하도록 만들었다. (refs it:18#s16, it:18#s18, it:18#s19, it:997#s17)",
+   "sections[3].heading: 제한적 출시: Fairwind 프로그램과 미국 정부 사전 평가 절차",
+   "sections[3].paragraphs[0]: Gemini 4 Argon은 Fairwind Program을 통해 사전 검증된 사이버 보안 방어 파트너 및 미국 정부의 출시 전 평가 프로세스 참가자에게만 초기 접근 권한을 우선 부여했다. 코레이 카부쿠오글루 수석 부사장은 \"첨단 기술을 안전하게 공개하려면 단계적인 접근 방식이 필요하다\"라며 초기 테스터 피드백을 수집해 guardrails를 개선할 것이라고 밝혔다. (refs it:18#s2, it:18#s5, it:18#s7, it:864#s3)",
+   "sections[3].paragraphs[1]: 개발자, 기업 및 일반 이용자에 대한 API 배포는 추후 단계적으로 진행할 계획이다. 기술 커뮤니티에서는 엔터프라이즈 및 에이전트 성능에서 반격을 이루어냈다는 긍정적 평가와 함께, 실질적인 일반 API 사용 접근이 제한된 점을 지적하는 목소리가 교차하고 있다. (refs it:864#s4, it:864#s40, it:997#s63)",
+   "sections[4].heading: 벤치마크 13개 부문 정상, AAII 종합 53점으로 공동 3위권",
+   "sections[4].paragraphs[0]: 구글이 공개한 18개 주요 벤치마크 중 Gemini 4 Argon은 12개 부문 단독 1위, 1개 부문 공동 1위를 기록하며 총 13개 부문에서 정상을 차지했다. DeepSWE v1.1에서 77.9%, AutomationBench에서 51.3%, LVBench에서 91.7%를 기록했다. (refs it:864#s12, it:18#s26, it:18#s30, it:18#s33)",
+   "sections[4].paragraphs[1]: 독립 평가 기관 Artificial Analysis의 지능 지수(AAII)에서는 종합 53점으로 GPT-6 Astra 및 Fable 5.1 등과 공동 3위권을 이뤘다. 고난도 과학·터미널 제어 영역에서 GPT-6 Astra와 Claude Opus 5.5에 밀려 순수 지능 종합 점수에서는 1위를 놓쳤지만, 할인 가격 기준으로 작업당 비용을 60% 수준으로 낮추면서도 인텔리전스 지수에서 GPT-6 Astra와 동률을 기록해 가성비 측면에서 높은 평가를 받았다., 이용약관 조항에 따른 조치로 미국 사용자부터 적용 (refs it:864#s24, it:864#s26, it:864#s28)"
+  ],
+  "previous": {
+   "log": "절 5개, 단락 8개, 표 1개, 타일 4개",
+   "attention": false,
+   "head_tiles": [
+    {
+     "value": "1백만 개",
+     "label": "출력 토큰 한도",
+     "note": "기존 6만 4천개에서 확장",
+     "refs": [
+      "it:18#s21",
+      "it:997#s23"
+     ]
+    },
+    {
+     "value": "2달러",
+     "label": "입력 토큰 1백만 개당 가격",
+     "note": "출시 기념 특가",
+     "refs": [
+      "it:18#s9",
+      "it:997#s9"
+     ]
+    },
+    {
+     "value": "10달러",
+     "label": "출력 토큰 1백만 개당 가격",
+     "note": "출시 기념 특가",
+     "refs": [
+      "it:18#s9",
+      "it:997#s9"
+     ]
+    },
+    {
+     "value": "95%",
+     "label": "캐시 입력 토큰 할인율",
+     "note": "입력 토큰 가격 대비",
+     "refs": [
+      "it:18#s9",
+      "it:997#s9"
+     ]
+    }
+   ],
+   "sections": [
+    {
+     "heading": "출력 토큰 한도 1백만 개로 확장, 단일 트래잭션 장기 추론 지원",
+     "paragraphs": [
+      {
+       "text": "구글은 더 길고 복잡한 활용 사례를 뒷받침하기 위해 Gemini 4 Argon의 출력 토큰 한도를 기존 6만 4천개에서 업계 최고 수준인 1백만 개로 대폭 확장했다. 단일 실행 경로 내에서 수십만 토큰을 생성할 수 있는 여유 공간이 확보되면서, 까다로운 과제도 한 번에 해결할 수 있는 한 차원 더 깊은 추론 성능을 제공한다.",
+       "refs": [
+        "it:18#s21",
+        "it:18#s22",
+        "it:997#s23",
+        "it:997#s24"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "출시 기념 특가: 입력 2달러, 출력 10달러, 캐시 95% 할인",
+     "paragraphs": [
+      {
+       "text": "Gemini 4 Argon은 출시 기념 특가로 입력 토큰 1백만 개당 2달러, 출력 토큰 1백만 개당 10달러에 제공된다. 캐시된 입력 토큰은 입력 토큰 가격 대비 95% 할인된 금액으로 이용할 수 있다.",
+       "refs": [
+        "it:18#s9",
+        "it:997#s9"
+       ]
+      },
+      {
+       "text": "AI타임스는 프로모션 종료 후 정가로 입력 4달러, 출력 20달러로 전환될 예정이라고 보도했다. 이 가격은 GPT-6 Astra 대비 5분의 1, Claude Opus 5.5의 절반 수준이라고 평가받았다.",
+       "refs": [
+        "it:864#s38",
+        "it:864#s37"
+       ]
+      }
+     ],
+     "visual": "table",
+     "bars": null,
+     "table": {
+      "title": "출시 기념 특가와 정가 비교",
+      "note": "1백만 토큰당",
+      "columns": [
+       "구분",
+       "입력",
+       "출력"
+      ],
+      "rows": [
+       [
+        "출시 기념 특가",
+        "2달러",
+        "10달러"
+       ],
+       [
+        "정가(프로모션 종료 후)",
+        "4달러",
+        "20달러"
+       ]
+      ],
+      "refs": [
+       "it:18#s9",
+       "it:864#s38"
+      ]
+     },
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "에이전트 작업 강화: 양자 최적화 40% 개선, 메모리 300 TiB 확보",
+     "paragraphs": [
+      {
+       "text": "양자 컴퓨팅 연구에서 Argon은 시공간 자원(큐비트 × 게이트) 최적화에서 기존 발표된 베이스라인을 몇 분 만에 40% 이상 뛰어넘었다. 데이터센터 메모리 최적화에서는 전체 서버군의 프로파일링 텔레메트리를 분석해 300 TiB 이상의 메모리를 확보했으며, 총 절감 규모는 500 TiB에서 최대 1 PiB에 이를 것으로 예상된다.",
+       "refs": [
+        "it:18#s14",
+        "it:18#s15",
+        "it:997#s14",
+        "it:997#s16"
+       ]
+      },
+      {
+       "text": "대규모 코드베이스 마이그레이션에서는 re2, libgav1 등 핵심 라이브러리부터 80만 줄 이상의 Fuchsia OS Zircon 커널에 이르기까지 C/C++ 코드베이스를 Rust로 전환하는 작업을 수행하고 있다. libgav1의 경우 3만 2천 줄의 SIMD 코드를 안전한 Rust 코드로 대체해 동일한 비디오 출력 품질을 유지하면서 기존 Rust 버전 대비 2.7배 빠르게 작동하도록 만들었다.",
+       "refs": [
+        "it:18#s16",
+        "it:18#s18",
+        "it:18#s19",
+        "it:997#s17"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "제한적 출시: Fairwind 프로그램과 미국 정부 사전 평가 절차",
+     "paragraphs": [
+      {
+       "text": "Gemini 4 Argon은 Fairwind Program을 통해 사전 검증된 사이버 보안 방어 파트너 및 미국 정부의 출시 전 평가 프로세스 참가자에게만 초기 접근 권한을 우선 부여했다. 코레이 카부쿠오글루 수석 부사장은 \"첨단 기술을 안전하게 공개하려면 단계적인 접근 방식이 필요하다\"라며 초기 테스터 피드백을 수집해 guardrails를 개선할 것이라고 밝혔다.",
+       "refs": [
+        "it:18#s2",
+        "it:18#s5",
+        "it:18#s7",
+        "it:864#s3"
+       ]
+      },
+      {
+       "text": "개발자, 기업 및 일반 이용자에 대한 API 배포는 추후 단계적으로 진행할 계획이다. 기술 커뮤니티에서는 엔터프라이즈 및 에이전트 성능에서 반격을 이루어냈다는 긍정적 평가와 함께, 실질적인 일반 API 사용 접근이 제한된 점을 지적하는 목소리가 교차하고 있다.",
+       "refs": [
+        "it:864#s4",
+        "it:864#s40",
+        "it:997#s63"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "벤치마크 13개 부문 정상, AAII 종합 53점으로 공동 3위권",
+     "paragraphs": [
+      {
+       "text": "구글이 공개한 18개 주요 벤치마크 중 Gemini 4 Argon은 12개 부문 단독 1위, 1개 부문 공동 1위를 기록하며 총 13개 부문에서 정상을 차지했다. DeepSWE v1.1에서 77.9%, AutomationBench에서 51.3%, LVBench에서 91.7%를 기록했다.",
+       "refs": [
+        "it:864#s12",
+        "it:18#s26",
+        "it:18#s30",
+        "it:18#s33"
+       ]
+      },
+      {
+       "text": "독립 평가 기관 Artificial Analysis의 지능 지수(AAII)에서는 종합 53점으로 GPT-6 Astra 및 Fable 5.1 등과 공동 3위권을 이뤘다. 고난도 과학·터미널 제어 영역에서 GPT-6 Astra와 Claude Opus 5.5에 밀려 순수 지능 종합 점수에서는 1위를 놓쳤지만, 할인 가격 기준으로 작업당 비용을 60% 수준으로 낮추면서도 인텔리전스 지수에서 GPT-6 Astra와 동률을 기록해 가성비 측면에서 높은 평가를 받았다., 이용약관 조항에 따른 조치로 미국 사용자부터 적용",
+       "refs": [
+        "it:864#s24",
+        "it:864#s26",
+        "it:864#s28"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    }
+   ],
+   "summary": "구글이 출력 토큰 한도 1백만 개와 출시 기념 특가(입력 2달러, 출력 10달러)를 갖춘 Gemini 4 Argon을 Fairwind 프로그램으로 제한 출시했다. 쟁점은 벤치마크 13개 부문 정상에도 일반 API 접근이 제한된 점이다.",
+   "title": "Gemini 4 Argon: 에이전트 작업 강화와 출시 기념 가격 구조"
+  },
+  "issues": [
+   {
+    "loc": "sections[4].paragraphs[1]",
+    "type": "unsupported",
+    "evidence_id": null,
+    "comment": "sections[4].paragraphs[1]의 '이용약관 조항에 따른 조치로 미국 사용자부터 적용'이 근거 원문에 없음",
+    "hint": "근거에 있는 내용만 남기거나 삭제",
+    "idx": 0
+   }
+  ],
+  "evidence": [
+   {
+    "id": "it:18",
+    "source": "Google DeepMind Blog",
+    "text": "[it:18#s2] Today, we’re announcing our new frontier model, Gemini 4 Argon, which is rolling out to a set of trusted cyber defenders through our Fairwind Program.\n[it:18#s5] Safely releasing frontier capabilities at this level requires a phased approach.\n[it:18#s7] government’s voluntary process for pre-release model access while we gradually expand access.\n[it:18#s9] Argon will launch at an introductory price 1 of $2 per million input tokens and $10 per million output tokens, with cached input tokens priced at 95% off input token price.\n[it:18#s14] In one example, it beat the published baseline by 40% in a matter of minutes.\n[it:18#s15] - Memory efficiency: A team of Argon agents analyzed fleet-wide profiling telemetry to autonomously identify and apply memory optimizations across Google’s data centers, freeing up over 300 TiB of memory once rolled out, with an estimated 500 TiB to 1 PiB in total savings.\n[it:18#s16] - Large Scale Codebase Migrations and Optimizations: Argon agents are working on migrating C/C++ codebases to Rust across Google — scaling from tens of thousands of lines in core libraries like re2, libgav1 up to 800K+ lines for the Fuchsia Zircon kernel.\n[it:18#s18] For libgav1, Google's open source software for decoding video, Argon agents took an existing Rust port and replaced 32K lines of SIMD code by running many rounds of profile-guided experiments, studying the compiler's output, producing safe Rust so the compiler would vectorize it automatically.\n[it:18#s19] The end result is a memory-safe video decoder that runs 2.7x faster than the Rust port, with identical video output, bringing it closer to the optimized C++.\n[it:18#s21] To support Gemini 4 Argon’s capabilities across longer, more complex use cases, we are significantly expanding the model’s output token limit to an industry-leading 1M tokens, up from the previous 64K tokens.\n[it:18#s22] When the model has the headroom to think deeply and generate hundreds of thousands of tokens in a single trajectory, it adds a new level of depth in reasoning to solve tough problems in one go.\n[it:18#s26] It sets a new state of the art on DeepSWE v1.1 (77.9%), which measures a model’s performance in real-world long-horizon software engineering tasks.\n[it:18#s30] On AutomationBench, Zapier’s benchmark measuring end-to-end execution across core business functions, Argon ranks #1 with a score of 51.3%.\n[it:18#s33] For example, on LVBench, which measures long video understanding, Argon is state of the art with a score of 91.7%.",
+    "title": "Gemini 4 Argon: our next era of frontier intelligence",
+    "url": "https://deepmind.google/blog/gemini-4-argon-our-next-era-of-frontier-intelligence/"
+   },
+   {
+    "id": "it:864",
+    "source": "AI타임스",
+    "text": "[it:864#s3] 구글은 30일(현지시간) 제미나이 4 아르곤을 소개하며 '페어윈드(Fairwind)' 프로그램을 통해 사전 검증된 사이버 보안 방어 파트너 및 미국 정부의 출시 전 평가 프로세스 참가자에게만 초기 접근 권한을 우선 부여했다.\n[it:864#s4] 구글 AI 울트라 구독자와 개발자 및 기업 대상 일반 API 배포는 추후 단계적으로 진행할 계획이다.\n[it:864#s12] 구글이 공개한 18개 주요 벤치마크 중 제미나이 4 아르곤은 12개 부문 단독 1위, 1개 부문 공동 1위를 기록하며 총 13개 부문에서 정상을 차지했다.\n[it:864#s24] 독립 평가 기관인 아티피셜 애널리시스의 지능 지수(AAII)에서는 종합 53점으로 GPT-6 아스트라 및 페이블 5.1 등과 공동 3위권을 이뤘다.\n[it:864#s26] 이 때문에 제미나이 4 아르곤은 고난도 과학·터미널 제어 영역에서 GPT-6 아스트라와 클로드 오퍼스 5.5에 밀려 순수 지능 종합 점수에서는 1위를 놓쳤다.\n[it:864#s28] 아티피셜 애널리시스는 \"할인 가격 기준으로 작업당 비용을 60% 수준으로 낮추면서도 인텔리전스 지수에서 GPT-6 아스트라와 동률을 기록했다\"며 \"구글이 선두권 3대 연구소로서의 지능 입지를 성공적으로 탈환했다\"고 분석했다.\n[it:864#s37] 이는 GPT-6 아스트라 대비 5분의 1 가격이며, 클로드 오퍼스 5.5의 절반 가격이다.\n[it:864#s38] 프로모션 종료 후에는 입력 4달러, 출력 20달러의 정가로 전환될 예정이다.\n[it:864#s40] 레딧과 X 등에서는 구글이 엔터프라이즈 및 에이전트 성능에서 확실한 반격을 이루어냈다는 긍정적 평가가 쏟아졌지만, \"그림의 떡\"이라며 실질적인 일반 API 사용 접근이 제한된 점을 지적하는 목소리가 강하게 제기됐다.",
+    "title": "구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\"",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=215821"
+   },
+   {
+    "id": "it:997",
+    "source": "GeekNews",
+    "text": "[it:997#s9] 아르곤은 출시 기념 특가1로 입력 토큰 1백만 개당 2달러, 출력 토큰 1백만 개당 10달러에 제공되며, 캐시된 입력 토큰은 입력 토큰 가격 대비 95% 할인된 금액으로 이용할 수 있습니다.\n[it:997#s14] 일례로, 아르곤은 기존 발표된 베이스라인 성능을 불과 몇 분 만에 40% 이상 뛰어넘는 성과를 거두었습니다.\n[it:997#s16] 배포 이후 300 TiB 이상의 메모리를 확보할 수 있게 되었으며, 총 절감 규모는 500 TiB에서 최대 1 PiB에 이를 것으로 예상됩니다.\n[it:997#s17] - 대규모 코드베이스 마이그레이션 및 최적화: 아르곤 에이전트는 ‘re2’, ‘libgav1’과 같은 수만 줄 규모의 핵심 라이브러리부터 80만 줄 이상의 Fuchsia OS Zircon 커널에 이르기까지, 구글 전반의 C/C++ 코드베이스를 러스트(Rust)로 전환하는 작업을 수행하고 있습니다.\n[it:997#s23] 구글은 더 길고 복잡한 활용 사례에서도 제미나이 4 아르곤의 역량을 충분히 뒷받침할 수 있도록, 모델의 출력 토큰 한도를 기존 6만 4천개에서 업계 최고 수준인 1백만 개로 대폭 확장했습니다.\n[it:997#s24] 제미나이 4 아르곤은 단일 실행 경로 내에서 깊이 있게 사고하고 수십만 개의 토큰을 생성할 수 있는 여유 공간을 확보하게 되면서, 까다로운 과제도 한 번에 해결할 수 있는 한 차원 더 깊은 추론 성능을 제공합니다.\n[it:997#s63] 유료 API 이용자 및 구글 AI 울트라(Google AI Ultra) 구독자를 시작으로, 개발자, 엔터프라이즈, 일반 이용자에게 순차적으로 모델을 공개하기에 앞서, 실제 환경에서의 평가와 피드백을 통해 시스템을 한층 더 강화할 수 있도록 도움을 주고 계신 초기 사이버 보안 방어자 및 신뢰할 수 있는 테스터 여러분께 깊은 감사를 전합니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": "https://news.hada.io/topic?id=34588"
+   }
+  ],
+  "aliases": [
+   {
+    "canonical": "Claude Opus 5.5",
+    "aliases": [
+     "클로드 오퍼스 5.5"
+    ]
+   },
+   {
+    "canonical": "GPT-6 Astra",
+    "aliases": [
+     "GPT-6 아스트라"
+    ]
+   },
+   {
+    "canonical": "Gemini 4 Argon",
+    "aliases": [
+     "제미나이 4 아르곤"
+    ]
+   }
+  ]
+ },
+ "expect": {
+  "action": "edit"
+ },
+ "note": "이슈 delete(오류를 심음)"
+}

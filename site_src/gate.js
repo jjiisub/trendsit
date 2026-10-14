@@ -12,7 +12,7 @@ const TOKENS = [...new Set(tokenCss.match(/--c-[a-z-]+:\s*#[0-9a-fA-F]{6}/g).map
 const WEIGHTS = ['400', '500'];
 
 // 관문 9의 9항목 측정(drafts/shoot.py의 GATE_JS, 이 사이트의 토큰·클래스에 맞게). 브라우저 안에서 실행
-function gateInBrowser([weights, tokens]) {
+async function gateInBrowser([weights, tokens]) {
   const vw = document.documentElement.clientWidth;
   const g = {};
   g.overflow = document.documentElement.scrollWidth - vw;
@@ -41,7 +41,7 @@ function gateInBrowser([weights, tokens]) {
   }
   g.lowContrast = low.slice(0, 10);
   g.lowContrastN = low.length;
-  const bodySel = '.it-s, .ts, .ov, .pt-x, .cc dd, .cb dd, .rp-w';
+  const bodySel = '.it-s, .ts, .dp, .rp-w';
   const bad = [];
   for (const el of document.querySelectorAll(bodySel)) {
     const cs = getComputedStyle(el);
@@ -85,7 +85,7 @@ function gateInBrowser([weights, tokens]) {
   };
   g.hlMidBreaks = [];
   for (const m of document.querySelectorAll('mark.hl')) g.hlMidBreaks.push(...midBreaks(m));
-  const pt = document.querySelector('.sec-pt');
+  const pt = document.querySelector('.tiles, .dsec');  // v1.3: 본문 시작 = 머리 타일 또는 첫 절(문서 순서 첫 것)
   g.pointsTop = pt ? Math.round(pt.getBoundingClientRect().top + window.scrollY) : null;
   const small = [];
   for (const a of document.querySelectorAll('a.ref')) {
@@ -114,6 +114,18 @@ function gateInBrowser([weights, tokens]) {
   for (let i = 1; i < hs.length; i++) if (hs[i] > hs[i - 1] + 1) skip++;
   g.headingSkips = skip + (hs[0] === 1 ? 0 : 1);
   g.titleAttrs = document.querySelectorAll('[title]:not(link)').length;
+  // S6-1 5.9: 표는 자신만 가로로 스크롤(overflow-x), 이미지는 로드됨, 375에서 타일 글자 안 잘림
+  g.cmptOverflowBad = [...document.querySelectorAll('.cmpt-wrap')].filter((el) => !['auto', 'scroll'].includes(getComputedStyle(el).overflowX)).length;
+  // 006-C1-15: loading="lazy"인 슬라이드 img는 화면 밖이면 아직 요청 전이라 complete가 false라 위 판정에서 늘 빠진다.
+  // 화면으로 스크롤해 decode()까지 기다린 뒤에 봐야 실제 로드 실패를 잡는다
+  for (const img of document.querySelectorAll('img')) {
+    if (!img.complete) {
+      img.scrollIntoView();
+      await img.decode().catch(() => {});
+    }
+  }
+  g.imgBad = [...document.querySelectorAll('img')].filter((img) => img.complete && img.naturalWidth === 0).length;
+  g.tileOverflowBad = [...document.querySelectorAll('.tiles .tile-v, .tiles .tile-l, .tiles .tile-s')].filter((el) => el.scrollWidth > el.clientWidth + 1).length;
   return g;
 }
 
@@ -145,7 +157,7 @@ async function touch(browser, topicPath) {
   const ctx = await browser.newContext({ viewport: { width: 375, height: 812 }, isMobile: true, hasTouch: true });
   const page = await ctx.newPage();
   await page.goto(base + topicPath, { waitUntil: 'networkidle' });
-  const first = page.locator('.pt-x a.ref').first();
+  const first = page.locator('.dp a.ref').first();
   const href = await first.getAttribute('href');
   await first.tap();
   await page.waitForTimeout(200);
@@ -163,7 +175,7 @@ async function behavior(browser, longTopic, homePath) {
   b.cites = nCites;
   if (nCites >= 2) {
     // 화면 안에 함께 보이는 인용 번호들(마우스가 정확히 올라간 시각부터 재려고 좌표로 움직임)
-    await page.evaluate(() => { const r = document.querySelector('.pt-x .cite > .ref').getBoundingClientRect(); window.scrollTo(0, window.scrollY + r.top - 150); });
+    await page.evaluate(() => { const r = document.querySelector('.dp .cite > .ref').getBoundingClientRect(); window.scrollTo(0, window.scrollY + r.top - 150); });
     await sleep(100);
     const pos = await page.evaluate(() => [...document.querySelectorAll('.cite > .ref')].map((a, i) => { const r = a.getBoundingClientRect(); return { i, x: r.x + r.width / 2, y: r.y + r.height / 2, ok: r.top > 0 && r.bottom < innerHeight }; }).filter((p) => p.ok));
     const A = pos[0];
@@ -190,17 +202,9 @@ async function behavior(browser, longTopic, homePath) {
       b.only = await page.evaluate(() => [...document.querySelectorAll('.cite > .tip')].map((t, i) => { const cs = getComputedStyle(t); return cs.visibility === 'visible' && parseFloat(cs.opacity) > 0.5 ? i : -1; }).filter((i) => i >= 0));
     }
   }
-  // 미니 바: 맨 위에서는 숨김, 제목이 위로 빠지면 보임
-  await page.mouse.move(2, 2);
-  await page.evaluate(() => window.scrollTo(0, 0));
-  await sleep(150);
-  b.miniTop = await page.evaluate(() => { const m = document.querySelector('.mini'); return m ? getComputedStyle(m).visibility : null; });
-  await page.evaluate(() => window.scrollTo(0, 1400));
-  await sleep(300);
-  b.miniScrolled = await page.evaluate(() => { const m = document.querySelector('.mini'); if (!m) return null; const r = m.getBoundingClientRect(); return { visibility: getComputedStyle(m).visibility, top: Math.round(r.top), height: Math.round(r.height), scrollY: Math.round(window.scrollY) }; });
   await page.close();
   // 탭: 기본은 토픽, #repos면 레포
-  const panel = (pg) => pg.evaluate(() => ({ topics: getComputedStyle(document.querySelector('#topics')).display, repos: getComputedStyle(document.querySelector('#repos')).display }));
+  const panel = (pg) => pg.evaluate(() => ({ topics: getComputedStyle(document.querySelector('#panel-topics')).visibility, repos: getComputedStyle(document.querySelector('#panel-repos')).visibility }));
   page = await ctx.newPage();
   await page.goto(base + homePath, { waitUntil: 'networkidle' });
   b.tabDefault = await panel(page);
@@ -213,16 +217,53 @@ async function behavior(browser, longTopic, homePath) {
   return b;
 }
 
+// 미니 바(PC 상세, S6a): 맨 위에서는 숨김, 제목이 위로 빠지면 보임. 독립된 새 컨텍스트·새 페이지에서 바로
+// 스크롤해 측정한다(behavior()의 툴팁 측정에서 이미 스크롤·마우스 조작을 거친 같은 페이지로 재 측정하면
+// animation-timeline:view()의 진행도 계산이 그 이전 scrollTo들의 영향을 받아 가끔 틀어짐, O01).
+async function miniBar(browser, longTopic) {
+  const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  const page = await ctx.newPage();
+  await page.goto(base + longTopic, { waitUntil: 'networkidle' });
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await sleep(150);
+  const miniTop = await page.evaluate(() => { const m = document.querySelector('.mini'); return m ? getComputedStyle(m).visibility : null; });
+  await page.evaluate(() => window.scrollTo(0, 1400));
+  await sleep(300);
+  const miniScrolled = await page.evaluate(() => { const m = document.querySelector('.mini'); if (!m) return null; const r = m.getBoundingClientRect(); return { visibility: getComputedStyle(m).visibility, top: Math.round(r.top), height: Math.round(r.height), scrollY: Math.round(window.scrollY) }; });
+  await ctx.close();
+  return { miniTop, miniScrolled };
+}
+
+// D-1·D-40·C-10: 두 탭을 실제로 눌렀을 때 스크롤 위치가 거의 같고(.tabs 바로 위 0높이 앵커) .nav가 가려지지 않음.
+// behavior()와 독립된 컨텍스트에서(같은 컨텍스트를 더 오래 잡고 있으면 미니 바 view-timeline 측정에 영향이 있었음)
+async function tabAnchorScroll(browser, homePath, viewport) {
+  const ctx = await browser.newContext({ viewport, isMobile: viewport.width < 768, hasTouch: viewport.width < 768 });
+  const page = await ctx.newPage();
+  const scrollState = () => ({ y: Math.round(window.scrollY), navTop: Math.round(document.querySelector('.nav').getBoundingClientRect().top) });
+  await page.goto(base + homePath, { waitUntil: 'networkidle' });
+  await page.click('.tb-t');
+  await sleep(50);
+  const topics = await page.evaluate(scrollState);
+  await page.click('.tb-r');
+  await sleep(50);
+  const repos = await page.evaluate(scrollState);
+  await ctx.close();
+  return { topics, repos, diff: Math.abs(topics.y - repos.y) };
+}
+
 (async () => {
   const out = { gates: [], external: [] };
   const chromium = await pw.chromium.launch();
   await gates(chromium, 'chromium', [[375, 812, true], [768, 1024, false], [1280, 900, false]], out.gates, out.external);
   const longTopic = (pages.find((p) => p.longTopic) || pages.find((p) => p.topic)).path;
   out.behavior = await behavior(chromium, longTopic, pages[0].path);
+  out.behavior.tabScroll = await tabAnchorScroll(chromium, pages[0].path, { width: 1280, height: 900 });
+  Object.assign(out.behavior, await miniBar(chromium, longTopic));
   await chromium.close();
   const webkit = await pw.webkit.launch();
   await gates(webkit, 'webkit', [[375, 812, true], [1280, 900, false]], out.gates, out.external);
   out.touch = await touch(webkit, pages.find((p) => p.topic).path);
+  out.tabScrollMobile = await tabAnchorScroll(webkit, pages[0].path, { width: 375, height: 812 });
   await webkit.close();
   out.tokens = TOKENS;
   process.stdout.write(JSON.stringify(out));

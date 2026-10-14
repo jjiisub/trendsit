@@ -1,159 +1,356 @@
 {
  "input": {
   "loc_lines": [
-   "title: Mistral Large 4: 1조500억 MoE 오픈웨이트 공개",
-   "summary: Mistral이 1조500억 매개변수 MoE 모델 Mistral Large 4를 공개 프리뷰 API로 출시하고, 오픈웨이트를 ==이달 말 공개 예정==으로 발표했다. AAII 38점으로 GPT-6 루나와 동급이며, 사이버 보안과 코딩 벤치마크에서 경쟁 오픈 모델을 앞선다.",
-   "overview: Mistral이 1조500억 매개변수 MoE 구조의 오픈웨이트 모델 Mistral Large 4(ML4)를 공개 프리뷰 API로 출시했다. ==오픈웨이트는 이달 말 공개==를 약속했으며, AAII 38점으로 GPT-6 루나와 동급, 사이버 보안 벤치마크에서 경쟁 오픈 모델을 앞선다. API 요금은 입력 100만 토큰당 1.36달러, 출력 4.18달러로 책정됐다.",
-   "points[0]: Mistral Large 4(ML4)가 총 1조500억 매개변수 MoE 구조로 공개되며, 토큰당 활성화되는 매개변수는 490억개임 (refs it:1046#q4)",
-   "points[1]: 공개 프리뷰 API는 Mistral Studio에서 이용 가능하며, 오픈웨이트는 ==이달 말 공개== 예정임 (refs og:1046#q1, it:1046#q2)",
-   "points[2]: AAII 지능 지수에서 38점을 기록해 GPT-6 루나(38점)와 동급이며, 딥시크-V4.1 플래시(39점)와도 경쟁할 만한 수준임 (refs it:1198#q3)",
-   "points[3]: AA 사이버 지수에서 50%를 기록해 GLM-5.3-플래시와 동률, 키미 K3와 딥시크 V4.1 플래시를 앞섬 (refs it:1198#q4)",
-   "points[4]: API 요금은 입력 100만 토큰당 1.36달러, 출력 100만 토큰당 4.18달러, 캐시된 입력 100만 토큰당 0.14달러로 책정됨 (refs it:1198#q6)",
-   "points[5]: 유럽 자체 데이터센터에서 3,800개 NVIDIA Grace Blackwell GPU로 학습했으며, 코딩 에이전트 종합 지표 49.8%를 기록함 (refs og:1046#q3, it:1198#q5)",
-   "numbers[0] (anchor 3): ML4가 GPT-6 루나와 AAII 동급, 딥시크-V4.1 플래시와 1점 차 / context: Artificial Analysis 지능 지수(AAII)에서 3개 모델의 점수 비교 [it:1198#q3]",
-   "numbers[0].items[0]: Mistral Large 4 = 38 (it:1198#q3)",
-   "numbers[0].items[1]: GPT-6 루나 = 38 (it:1198#q3)",
-   "numbers[0].items[2]: 딥시크-V4.1 플래시 = 39 (it:1198#q3)",
-   "numbers[1] (anchor 5): 입력·출력·캐시 입력 3종 요금 구조 / context: Mistral Large 4 API 요금, 100만 토큰당 기준 [it:1198#q6]",
-   "numbers[1].items[0]: 입력 = 1.36 (it:1198#q6)",
-   "numbers[1].items[1]: 출력 = 4.18 (it:1198#q6)",
-   "numbers[1].items[2]: 캐시된 입력 = 0.14 (it:1198#q6)",
-   "concepts[0]: MoE (Sparse Mixture of Experts) - 총 매개변수 중 추론 시 토큰당 일부만 활성화하는 구조. ML4는 총 1조500억개 중 490억개 활성화",
-   "concepts[1]: AAII (Artificial Analysis Intelligence Index) - Artificial Analysis가 산출하는 모델 지능 종합 지수. ML4는 38점"
+   "title: Mistral 라지 4: 1조500억개 MoE와 10월 27일 오픈웨이트 공개",
+   "summary: Mistral이 1조500억개 MoE 구조의 '라지 4'를 공개 프리뷰로 내놓고 10월 27일 가중치 공개를 예고했다. AAII 38점으로 GPT-6 Luna와 동급이나, 벤치마크 수치는 아직 독립 검증이 남아 있다.",
+   "head_tiles[0]: 1조500억개 / 총 매개변수 (희소 전문가 혼합(MoE) 구조) (refs it:1198#s5)",
+   "head_tiles[1]: 490억개 / 활성 매개변수 (토큰당 추론 시 활성화) (refs it:1198#s6)",
+   "sections[0].heading: 1조500억개 MoE 구조, 490억개 활성 매개변수로 추론",
+   "sections[0].paragraphs[0]: Mistral은 10월 6일 오픈웨이트 모델 'Mistral 라지 4(ML4)'를 공개했다. 총 1조500억개의 매개변수를 갖춘 희소 전문가 혼합(MoE) 모델이며, 실제 추론 과정에서 토큰당 활성화되는 매개변수는 490억개다. 160개 이상의 언어를 지원하고 이미지 입력을 포함한 멀티모달 처리가 가능하다. (refs it:1198#s52)",
+   "sections[1].heading: 유럽 자체 데이터센터에서 3,800개 GPU로 두 달 학습",
+   "sections[1].paragraphs[0]: 이 모델은 유럽 내 자체 데이터센터에서 엔비디아 그레이스 블랙웰 GPU 3,800대를 이용해 처음부터(from Scratch) 두 달에 걸쳐 학습했다. 공개 프리뷰도 같은 인프라에서 제공한다. 컨텍스트 창은 최대 100만 토큰이다. (refs it:1198#s9, it:1198#s10, it:1198#s8)",
+   "sections[2].heading: 10월 27일 가중치 공개, 아키텍처와 사후 학습 방법 동시 발표",
+   "sections[2].paragraphs[0]: 현재는 API를 통한 공개 프리뷰 단계로, 개발자와 사이버 보안 전문가, 정부 당국 등을 대상으로 약 3주간 테스트와 강화학습(RL)을 진행한 뒤 이달 27일 모델 가중치를 공개할 예정이다. 가중치가 공개되면 기업과 정부기관이 자체 클라우드나 온프레미스 환경에서 모델을 직접 운영하고 커스터마이징할 수 있게 된다. (refs it:1198#s4, it:1198#s51)",
+   "sections[2].paragraphs[1]: Mistral은 27일 가중치를 공개하면서 모델 아키텍처와 추가 벤치마크, 사후 학습 방법도 함께 공개할 예정이다. 오픈웨이트 모델이라는 점은 기업과 정부 기관이 데이터를 자체 환경에 배포해 보안 정책에 맞게 운영할 수 있게 하는 차별점으로 꼽힌다. (refs it:1198#s50, it:1198#s26)",
+   "sections[3].heading: AAII 38점으로 GPT-6 Luna와 동급, 오픈웨이트 최상위권",
+   "sections[3].paragraphs[0]: ML4는 아티피셜 에널리시스 지능 지수(AAII)에서 38점을 기록했다. 이는 GPT-6 Luna(38점)와 비슷한 수준이며, DeepSeek-V4.1 Flash(39점)와도 경쟁할 만한 성능이다. Mistral은 \"ML4는 오픈웨이트 모델의 최전선에 있다\"고 밝혔다. (refs it:1198#s20, it:1198#s21, it:1198#s18)",
+   "sections[4].heading: 사이버 보안·코딩·금융 벤치마크, 독립 검증 전제",
+   "sections[4].paragraphs[0]: AA 사이버 지수에서 50%를 기록해 GLM-5.3-Flash와 동률을 이뤘으며, 사이벤치에서 93%, 사이버짐-E2E에서 82%를 기록했다. 코딩 에이전트 종합 지표에서는 49.8%를 기록했고, 금융·회계 업무 평가 핀치에서는 67%를 기록했다. (refs it:1198#s23, it:1198#s24, it:1198#s31, it:1198#s43)",
+   "sections[4].paragraphs[1]: 다만 이 수치들은 아직 독립적으로 모두 검증된 결과는 아니다. 벤치마크는 모델 자체뿐 아니라 에이전트 구성과 평가 환경에 따라 결과가 달라질 수 있다. 전문가 블라인드 평가에서는 5점 만점에 3.74점으로 평가 대상 5개 모델 가운데 2위를 기록했다. (refs it:1198#s34, it:1198#s35, it:1198#s37, it:1198#s38)",
+   "sections[5].heading: API 프리뷰 가격, 입력 100만 토큰당 1.36달러",
+   "sections[5].paragraphs[0]: 라지 4의 API는 현재 공개 프리뷰 형태로 제공된다. 요금 정책은 입력 토큰 100만개당 1.36달러, 출력 토큰 100만개당 4.18달러로 설정됐으며, 캐시된 입력은 100만개당 0.14달러로 책정됐다. (refs it:1198#s48, it:1198#s49)"
   ],
   "page": {
-   "log": "포인트 6개, 수치 그룹 2개, 근거 id 12개",
+   "log": "절 6개, 단락 8개, 표 0개, 타일 3개",
    "attention": false,
-   "points": [
+   "head_tiles": [
     {
-     "text": "Mistral Large 4(ML4)가 총 1조500억 매개변수 MoE 구조로 공개되며, 토큰당 활성화되는 매개변수는 490억개임",
+     "value": "1조500억개",
+     "label": "총 매개변수",
+     "note": "희소 전문가 혼합(MoE) 구조",
      "refs": [
-      "it:1046#q4"
-     ],
-     "check": false
-    },
-    {
-     "text": "공개 프리뷰 API는 Mistral Studio에서 이용 가능하며, 오픈웨이트는 ==이달 말 공개== 예정임",
-     "refs": [
-      "og:1046#q1",
-      "it:1046#q2"
-     ],
-     "check": false
-    },
-    {
-     "text": "AAII 지능 지수에서 38점을 기록해 GPT-6 루나(38점)와 동급이며, 딥시크-V4.1 플래시(39점)와도 경쟁할 만한 수준임",
-     "refs": [
-      "it:1198#q3"
-     ],
-     "check": false
-    },
-    {
-     "text": "AA 사이버 지수에서 50%를 기록해 GLM-5.3-플래시와 동률, 키미 K3와 딥시크 V4.1 플래시를 앞섬",
-     "refs": [
-      "it:1198#q4"
-     ],
-     "check": false
-    },
-    {
-     "text": "API 요금은 입력 100만 토큰당 1.36달러, 출력 100만 토큰당 4.18달러, 캐시된 입력 100만 토큰당 0.14달러로 책정됨",
-     "refs": [
-      "it:1198#q6"
-     ],
-     "check": false
-    },
-    {
-     "text": "유럽 자체 데이터센터에서 3,800개 NVIDIA Grace Blackwell GPU로 학습했으며, 코딩 에이전트 종합 지표 49.8%를 기록함",
-     "refs": [
-      "og:1046#q3",
-      "it:1198#q5"
-     ],
-     "check": false
-    }
-   ],
-   "numbers": [
-    {
-     "anchor": 3,
-     "group": "aaii",
-     "title": "ML4가 GPT-6 루나와 AAII 동급, 딥시크-V4.1 플래시와 1점 차",
-     "context": "Artificial Analysis 지능 지수(AAII)에서 3개 모델의 점수 비교 [it:1198#q3]",
-     "unit": "점",
-     "items": [
-      {
-       "label": "Mistral Large 4",
-       "value": "38",
-       "ref": "it:1198#q3",
-       "baseline": false,
-       "emphasis": true
-      },
-      {
-       "label": "GPT-6 루나",
-       "value": "38",
-       "ref": "it:1198#q3",
-       "baseline": false,
-       "emphasis": false
-      },
-      {
-       "label": "딥시크-V4.1 플래시",
-       "value": "39",
-       "ref": "it:1198#q3",
-       "baseline": false,
-       "emphasis": false
-      }
+      "it:1198#s5"
      ]
     },
     {
-     "anchor": 5,
-     "group": "pricing",
-     "title": "입력·출력·캐시 입력 3종 요금 구조",
-     "context": "Mistral Large 4 API 요금, 100만 토큰당 기준 [it:1198#q6]",
-     "unit": "달러/100만 토큰",
-     "items": [
-      {
-       "label": "입력",
-       "value": "1.36",
-       "ref": "it:1198#q6",
-       "baseline": false,
-       "emphasis": false
-      },
-      {
-       "label": "출력",
-       "value": "4.18",
-       "ref": "it:1198#q6",
-       "baseline": false,
-       "emphasis": false
-      },
-      {
-       "label": "캐시된 입력",
-       "value": "0.14",
-       "ref": "it:1198#q6",
-       "baseline": false,
-       "emphasis": false
-      }
+     "value": "490억개",
+     "label": "활성 매개변수",
+     "note": "토큰당 추론 시 활성화",
+     "refs": [
+      "it:1198#s6"
      ]
     }
    ],
-   "events": [],
-   "contributions": [],
-   "concepts": [
+   "sections": [
     {
-     "term": "MoE (Sparse Mixture of Experts)",
-     "desc": "총 매개변수 중 추론 시 토큰당 일부만 활성화하는 구조. ML4는 총 1조500억개 중 490억개 활성화"
+     "heading": "1조500억개 MoE 구조, 490억개 활성 매개변수로 추론",
+     "paragraphs": [
+      {
+       "text": "Mistral은 10월 6일 오픈웨이트 모델 'Mistral 라지 4(ML4)'를 공개했다. 총 1조500억개의 매개변수를 갖춘 희소 전문가 혼합(MoE) 모델이며, 실제 추론 과정에서 토큰당 활성화되는 매개변수는 490억개다. 160개 이상의 언어를 지원하고 이미지 입력을 포함한 멀티모달 처리가 가능하다.",
+       "refs": [
+        "it:1198#s52"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
     },
     {
-     "term": "AAII (Artificial Analysis Intelligence Index)",
-     "desc": "Artificial Analysis가 산출하는 모델 지능 종합 지수. ML4는 38점"
+     "heading": "유럽 자체 데이터센터에서 3,800개 GPU로 두 달 학습",
+     "paragraphs": [
+      {
+       "text": "이 모델은 유럽 내 자체 데이터센터에서 엔비디아 그레이스 블랙웰 GPU 3,800대를 이용해 처음부터(from Scratch) 두 달에 걸쳐 학습했다. 공개 프리뷰도 같은 인프라에서 제공한다. 컨텍스트 창은 최대 100만 토큰이다.",
+       "refs": [
+        "it:1198#s9",
+        "it:1198#s10",
+        "it:1198#s8"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "10월 27일 가중치 공개, 아키텍처와 사후 학습 방법 동시 발표",
+     "paragraphs": [
+      {
+       "text": "현재는 API를 통한 공개 프리뷰 단계로, 개발자와 사이버 보안 전문가, 정부 당국 등을 대상으로 약 3주간 테스트와 강화학습(RL)을 진행한 뒤 이달 27일 모델 가중치를 공개할 예정이다. 가중치가 공개되면 기업과 정부기관이 자체 클라우드나 온프레미스 환경에서 모델을 직접 운영하고 커스터마이징할 수 있게 된다.",
+       "refs": [
+        "it:1198#s4",
+        "it:1198#s51"
+       ]
+      },
+      {
+       "text": "Mistral은 27일 가중치를 공개하면서 모델 아키텍처와 추가 벤치마크, 사후 학습 방법도 함께 공개할 예정이다. 오픈웨이트 모델이라는 점은 기업과 정부 기관이 데이터를 자체 환경에 배포해 보안 정책에 맞게 운영할 수 있게 하는 차별점으로 꼽힌다.",
+       "refs": [
+        "it:1198#s50",
+        "it:1198#s26"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "AAII 38점으로 GPT-6 Luna와 동급, 오픈웨이트 최상위권",
+     "paragraphs": [
+      {
+       "text": "ML4는 아티피셜 에널리시스 지능 지수(AAII)에서 38점을 기록했다. 이는 GPT-6 Luna(38점)와 비슷한 수준이며, DeepSeek-V4.1 Flash(39점)와도 경쟁할 만한 성능이다. Mistral은 \"ML4는 오픈웨이트 모델의 최전선에 있다\"고 밝혔다.",
+       "refs": [
+        "it:1198#s20",
+        "it:1198#s21",
+        "it:1198#s18"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "사이버 보안·코딩·금융 벤치마크, 독립 검증 전제",
+     "paragraphs": [
+      {
+       "text": "AA 사이버 지수에서 50%를 기록해 GLM-5.3-Flash와 동률을 이뤘으며, 사이벤치에서 93%, 사이버짐-E2E에서 82%를 기록했다. 코딩 에이전트 종합 지표에서는 49.8%를 기록했고, 금융·회계 업무 평가 핀치에서는 67%를 기록했다.",
+       "refs": [
+        "it:1198#s23",
+        "it:1198#s24",
+        "it:1198#s31",
+        "it:1198#s43"
+       ]
+      },
+      {
+       "text": "다만 이 수치들은 아직 독립적으로 모두 검증된 결과는 아니다. 벤치마크는 모델 자체뿐 아니라 에이전트 구성과 평가 환경에 따라 결과가 달라질 수 있다. 전문가 블라인드 평가에서는 5점 만점에 3.74점으로 평가 대상 5개 모델 가운데 2위를 기록했다.",
+       "refs": [
+        "it:1198#s34",
+        "it:1198#s35",
+        "it:1198#s37",
+        "it:1198#s38"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "API 프리뷰 가격, 입력 100만 토큰당 1.36달러",
+     "paragraphs": [
+      {
+       "text": "라지 4의 API는 현재 공개 프리뷰 형태로 제공된다. 요금 정책은 입력 토큰 100만개당 1.36달러, 출력 토큰 100만개당 4.18달러로 설정됐으며, 캐시된 입력은 100만개당 0.14달러로 책정됐다.",
+       "refs": [
+        "it:1198#s48",
+        "it:1198#s49"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
     }
    ],
-   "overview": "Mistral이 1조500억 매개변수 MoE 구조의 오픈웨이트 모델 Mistral Large 4(ML4)를 공개 프리뷰 API로 출시했다. ==오픈웨이트는 이달 말 공개==를 약속했으며, AAII 38점으로 GPT-6 루나와 동급, 사이버 보안 벤치마크에서 경쟁 오픈 모델을 앞선다. API 요금은 입력 100만 토큰당 1.36달러, 출력 4.18달러로 책정됐다.",
-   "summary": "Mistral이 1조500억 매개변수 MoE 모델 Mistral Large 4를 공개 프리뷰 API로 출시하고, 오픈웨이트를 ==이달 말 공개 예정==으로 발표했다. AAII 38점으로 GPT-6 루나와 동급이며, 사이버 보안과 코딩 벤치마크에서 경쟁 오픈 모델을 앞선다.",
-   "title": "Mistral Large 4: 1조500억 MoE 오픈웨이트 공개"
+   "summary": "Mistral이 1조500억개 MoE 구조의 '라지 4'를 공개 프리뷰로 내놓고 10월 27일 가중치 공개를 예고했다. AAII 38점으로 GPT-6 Luna와 동급이나, 벤치마크 수치는 아직 독립 검증이 남아 있다.",
+   "title": "Mistral 라지 4: 1조500억개 MoE와 10월 27일 오픈웨이트 공개"
   },
   "evidence": [
    {
-    "id": "it:1046#q4",
-    "source": "Simon Willison's Weblog",
-    "text": "It's a huge improvement on last December's Mistral Large 3, which drew this terrible pelican and scored 9 on AA.",
-    "title": "Introducing Mistral Large 4: Le chonk",
+    "id": "it:1198#s52",
+    "source": "AI타임스",
+    "text": "가중치가 공개되면 기업과 정부기관이 자체 클라우드나 온프레미스 환경에서 모델을 직접 운영하고 커스터마이징할 수 있게 된다. 박찬 기자 cpark@aitimes.com",
+    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "url": null
+   },
+   {
+    "id": "it:1198#s9",
+    "source": "AI타임스",
+    "text": "컨텍스트 창은 최대 100만 토큰이다. 이 모델을 유럽 내 자체 데이터센터에서 엔비디아 그레이스 블랙웰 GPU 3800대를 이용해 처음부터(from Scratch) 두 달에 걸쳐 학습했다. 공개 프리뷰도 같은 인프라에서 제공한다.",
+    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "url": null
+   },
+   {
+    "id": "it:1198#s10",
+    "source": "AI타임스",
+    "text": "이 모델을 유럽 내 자체 데이터센터에서 엔비디아 그레이스 블랙웰 GPU 3800대를 이용해 처음부터(from Scratch) 두 달에 걸쳐 학습했다. 공개 프리뷰도 같은 인프라에서 제공한다. 업계에서는 미국 빅테크의 폐쇄형 모델 및 중국계 오픈 모델에 맞서 유럽의 기술 주권(AI Sovereignty)을 확보하려는 미스트랄의 핵심 전략 카드로 평가하고 있다.",
+    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "url": null
+   },
+   {
+    "id": "it:1198#s8",
+    "source": "AI타임스",
+    "text": "160개 이상의 언어를 지원하며, 이미지 입력을 포함한 멀티모달 처리가 가능하다. 컨텍스트 창은 최대 100만 토큰이다. 이 모델을 유럽 내 자체 데이터센터에서 엔비디아 그레이스 블랙웰 GPU 3800대를 이용해 처음부터(from Scratch) 두 달에 걸쳐 학습했다.",
+    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "url": null
+   },
+   {
+    "id": "it:1198#s4",
+    "source": "AI타임스",
+    "text": "미스트랄은 6일(현지시간) 오픈웨이트 모델 '미스트랄 라지 4(ML4·Mistral Large 4)'를 공개했다. 현재는 API를 통한 공개 프리뷰 단계로, 개발자와 사이버 보안 전문가, 정부 당국 등을 대상으로 약 3주간 테스트와 강화학습(RL)을 진행한 뒤 이달 27일 모델 가중치를 공개할 예정이다. 라지 4는 총 1조500억개의 매개변수를 갖춘 희소 전문가 혼합(MoE) 모델이다.",
+    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "url": null
+   },
+   {
+    "id": "it:1198#s51",
+    "source": "AI타임스",
+    "text": "미스트랄은 오는 27일 가중치를 공개하면서 모델 아키텍처와 추가 벤치마크, 사후 학습 방법도 공개할 예정이다. 가중치가 공개되면 기업과 정부기관이 자체 클라우드나 온프레미스 환경에서 모델을 직접 운영하고 커스터마이징할 수 있게 된다. 박찬 기자 cpark@aitimes.com",
+    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "url": null
+   },
+   {
+    "id": "it:1198#s50",
+    "source": "AI타임스",
+    "text": "요금 정책은 입력 토큰 100만개당 1.36달러, 출력 토큰 100만개당 4.18달러로 설정됐으며, 캐시된 입력은 100만개당 0.14달러로 책정돼 높은 가격 경쟁력을 확보했다. 미스트랄은 오는 27일 가중치를 공개하면서 모델 아키텍처와 추가 벤치마크, 사후 학습 방법도 공개할 예정이다. 가중치가 공개되면 기업과 정부기관이 자체 클라우드나 온프레미스 환경에서 모델을 직접 운영하고 커스터마이징할 수 있게 된다.",
+    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "url": null
+   },
+   {
+    "id": "it:1198#s26",
+    "source": "AI타임스",
+    "text": "오픈웨이트 모델이라는 점도 사이버 보안 분야에서 중요한 차별점으로 꼽았다. 기업과 정부 기관이 모델을 자체 클라우드나 온프레미스 환경에 배포해 데이터 유출 걱정 없이 조직의 고유한 보안 정책에 맞게 운영할 수 있기 때문이다. Mistral has released Mistral Large 4, scoring 38 on the Artificial Analysis Intelligence Index; France is back to having the most intelligent model from outside the US and China@MistralAI has released Mistral Large 4 in Research Public Preview, with plans to release the weights… pic.twitter.com/pzGQujfDlH",
+    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "url": null
+   },
+   {
+    "id": "it:1198#s20",
+    "source": "AI타임스",
+    "text": "특히 코딩과 사이버 보안, 금융, 제조, 과학, 에이전트 작업, 이미지 분석 등 전문 분야에서 높은 성능을 보인다고 강조했다. ML4는 아티피셜 에널리시스 지능 지수(AAII)에서 38점을 기록했다. 이는 'GPT-6 루나(38점)'와 비슷한 수준이며, '딥시크-V4.1 플래시(39점)'와도 경쟁할 만한 성능이다.",
+    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "url": null
+   },
+   {
+    "id": "it:1198#s21",
+    "source": "AI타임스",
+    "text": "ML4는 아티피셜 에널리시스 지능 지수(AAII)에서 38점을 기록했다. 이는 'GPT-6 루나(38점)'와 비슷한 수준이며, '딥시크-V4.1 플래시(39점)'와도 경쟁할 만한 성능이다. 사이버 보안은 가장 강하게 내세우는 분야다.",
+    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "url": null
+   },
+   {
+    "id": "it:1198#s18",
+    "source": "AI타임스",
+    "text": "— Mistral AI (@MistralAI) October 6, 2026 이 회사는 \"ML4는 오픈웨이트 모델의 최전선에 있다\"고 밝혔다. 특히 코딩과 사이버 보안, 금융, 제조, 과학, 에이전트 작업, 이미지 분석 등 전문 분야에서 높은 성능을 보인다고 강조했다.",
+    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "url": null
+   },
+   {
+    "id": "it:1198#s23",
+    "source": "AI타임스",
+    "text": "사이버 보안은 가장 강하게 내세우는 분야다. AA 사이버 지수에서 50%를 기록해 'GLM-5.3-플래시'와 동률을 기록했으며, '키미 K3'와 딥시크 V4.1 플래시 등을 앞섰다. 또 '사이벤치'에서 93%, '사이버짐-E2E'에서 82%의 점수를 기록했다.",
+    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "url": null
+   },
+   {
+    "id": "it:1198#s24",
+    "source": "AI타임스",
+    "text": "AA 사이버 지수에서 50%를 기록해 'GLM-5.3-플래시'와 동률을 기록했으며, '키미 K3'와 딥시크 V4.1 플래시 등을 앞섰다. 또 '사이벤치'에서 93%, '사이버짐-E2E'에서 82%의 점수를 기록했다. 오픈웨이트 모델이라는 점도 사이버 보안 분야에서 중요한 차별점으로 꼽았다.",
+    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "url": null
+   },
+   {
+    "id": "it:1198#s31",
+    "source": "AI타임스",
+    "text": "'딥SWE v1.1'에서 61.7%, 'SWE-아틀라스-QnA'에서 59.4%, '터미널-벤치 4.0'에서 28.3%를 기록했다. 코딩 에이전트 종합 지표에서는 49.8%를 기록했다고 밝혔다. 이는 오픈 웨이트 모델 진영에서는 최고 수준(SOTA)급이며, 최상위 폐쇄형 모델들과 비교하면 상위권~중상위권 위치에 해당한다.",
+    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "url": null
+   },
+   {
+    "id": "it:1198#s43",
+    "source": "AI타임스",
+    "text": "외부 평가기관 발스 AI의 공개 자료에서는 키미 K3가 12.92%, '미모 V2.6 프로'가 10.83%, GLM-5.3이 8.33%로 나타나 라지 4가 이들 오픈 웨이트 모델을 앞선 것으로 볼 수 있다. 금융·회계 업무를 평가하는 핀치에서는 67%를 기록했다고 미스트랄은 밝혔다. 이 벤치마크는 스프레드시트와 문서, 검색, 모델링, 보고서 작성 등 실제 기업 업무에 가까운 장기 작업 384개로 구성돼 있다.",
+    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "url": null
+   },
+   {
+    "id": "it:1198#s34",
+    "source": "AI타임스",
+    "text": "실제로 딥SWE의 공개 리더보드에서는 모델별 최적 설정을 적용하면 GLM-5.3과 키미 K3가 약 69%, 'GPT-6 아스트라'와 '제미나이 3.8 플래시' '클로드 오퍼스 5' 등이 약 74% 수준으로 나타난다. 다만 이 수치들은 아직 독립적으로 모두 검증된 결과는 아니다. 미스트랄이 공개한 비교 자료에서는 일부 경쟁 오픈 모델보다 높은 점수를 기록했지만, 벤치마크는 모델 자체뿐 아니라 에이전트 구성과 평가 환경에 따라 결과가 달라질 수 있다.",
+    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "url": null
+   },
+   {
+    "id": "it:1198#s35",
+    "source": "AI타임스",
+    "text": "다만 이 수치들은 아직 독립적으로 모두 검증된 결과는 아니다. 미스트랄이 공개한 비교 자료에서는 일부 경쟁 오픈 모델보다 높은 점수를 기록했지만, 벤치마크는 모델 자체뿐 아니라 에이전트 구성과 평가 환경에 따라 결과가 달라질 수 있다. 전문가의 블라인드 평가에서는 비교적 긍정적인 결과가 나왔다.",
+    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "url": null
+   },
+   {
+    "id": "it:1198#s37",
+    "source": "AI타임스",
+    "text": "전문가의 블라인드 평가에서는 비교적 긍정적인 결과가 나왔다. 미스트랄이 서지AI와 진행한 평가에서 전문 평가자들은 5점 만점에 3.74점을 줬다. 이는 평가 대상 5개 모델 가운데 2위로, GLM-5.3의 3.60점과 키미 K3의 3.59점을 앞섰다.",
+    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "url": null
+   },
+   {
+    "id": "it:1198#s38",
+    "source": "AI타임스",
+    "text": "미스트랄이 서지AI와 진행한 평가에서 전문 평가자들은 5점 만점에 3.74점을 줬다. 이는 평가 대상 5개 모델 가운데 2위로, GLM-5.3의 3.60점과 키미 K3의 3.59점을 앞섰다. 다만 클로드 오퍼스 5의 4.22점에는 미치지 못했다.",
+    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "url": null
+   },
+   {
+    "id": "it:1198#s48",
+    "source": "AI타임스",
+    "text": "특히 시각적 위치 지정 능력을 평가하는 '덴스200'에서 42%를 기록해 일부 최상위 모델을 앞섰다고 설명했다. 라지 4의 API는 현재 공개 프리뷰 형태로 제공된다. 요금 정책은 입력 토큰 100만개당 1.36달러, 출력 토큰 100만개당 4.18달러로 설정됐으며, 캐시된 입력은 100만개당 0.14달러로 책정돼 높은 가격 경쟁력을 확보했다.",
+    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "url": null
+   },
+   {
+    "id": "it:1198#s49",
+    "source": "AI타임스",
+    "text": "라지 4의 API는 현재 공개 프리뷰 형태로 제공된다. 요금 정책은 입력 토큰 100만개당 1.36달러, 출력 토큰 100만개당 4.18달러로 설정됐으며, 캐시된 입력은 100만개당 0.14달러로 책정돼 높은 가격 경쟁력을 확보했다. 미스트랄은 오는 27일 가중치를 공개하면서 모델 아키텍처와 추가 벤치마크, 사후 학습 방법도 공개할 예정이다.",
+    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "url": null
+   },
+   {
+    "id": "it:1198#s5",
+    "source": "AI타임스",
+    "text": "현재는 API를 통한 공개 프리뷰 단계로, 개발자와 사이버 보안 전문가, 정부 당국 등을 대상으로 약 3주간 테스트와 강화학습(RL)을 진행한 뒤 이달 27일 모델 가중치를 공개할 예정이다. 라지 4는 총 1조500억개의 매개변수를 갖춘 희소 전문가 혼합(MoE) 모델이다. 이 가운데 실제 추론 과정에서 토큰당 활성화되는 매개변수는 490억개다.",
+    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "url": null
+   },
+   {
+    "id": "it:1198#s6",
+    "source": "AI타임스",
+    "text": "라지 4는 총 1조500억개의 매개변수를 갖춘 희소 전문가 혼합(MoE) 모델이다. 이 가운데 실제 추론 과정에서 토큰당 활성화되는 매개변수는 490억개다. 160개 이상의 언어를 지원하며, 이미지 입력을 포함한 멀티모달 처리가 가능하다.",
+    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
     "url": null
    },
    {
@@ -164,52 +361,17 @@
     "url": null
    },
    {
-    "id": "it:1046#q2",
+    "id": "it:1198#s1",
+    "source": "AI타임스",
+    "text": "프랑스의 미스트랄 AI가 내부 별칭 '르 총크(Le Chonk)'로 불리는 차세대 플래그십 AI 모델을 공개했다. '뚱뚱한 고양이'를 뜻하는 이 별칭은 1조개가 넘는 매개변수를 가진 거대 모델의 규모감을 위트 있게 표현한 것이다.",
+    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "url": null
+   },
+   {
+    "id": "it:1048#s1",
     "source": "Simon Willison's Weblog",
-    "text": "The preview is available via their API. They promise to release the open weights model at the \"end of this month\".",
-    "title": "Introducing Mistral Large 4: Le chonk",
-    "url": null
-   },
-   {
-    "id": "it:1198#q3",
-    "source": "AI타임스",
-    "text": "ML4는 아티피셜 에널리시스 지능 지수(AAII)에서 38점을 기록했다. 이는 'GPT-6 루나(38점)'와 비슷한 수준이며, '딥시크-V4.1 플래시(39점)'와도 경쟁할 만한 성능이다.",
-    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
-    "url": null
-   },
-   {
-    "id": "it:1198#q4",
-    "source": "AI타임스",
-    "text": "AA 사이버 지수에서 50%를 기록해 'GLM-5.3-플래시'와 동률을 기록했으며, '키미 K3'와 딥시크 V4.1 플래시 등을 앞섰다.",
-    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
-    "url": null
-   },
-   {
-    "id": "it:1198#q6",
-    "source": "AI타임스",
-    "text": "요금 정책은 입력 토큰 100만개당 1.36달러, 출력 토큰 100만개당 4.18달러로 설정됐으며, 캐시된 입력은 100만개당 0.14달러로 책정돼 높은 가격 경쟁력을 확보했다.",
-    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
-    "url": null
-   },
-   {
-    "id": "og:1046#q3",
-    "source": "Simon Willison's Weblog",
-    "text": "ML4 was trained from scratch on 3,800 NVIDIA Grace Blackwell GPUs in Mistral’s own datacenters in Europe.",
-    "title": "Introducing Mistral Large 4: Le chonk",
-    "url": null
-   },
-   {
-    "id": "it:1198#q5",
-    "source": "AI타임스",
-    "text": "'딥SWE v1.1'에서 61.7%, 'SWE-아틀라스-QnA'에서 59.4%, '터미널-벤치 4.0'에서 28.3%를 기록했다. 코딩 에이전트 종합 지표에서는 49.8%를 기록했다고 밝혔다.",
-    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
-    "url": null
-   },
-   {
-    "id": "it:1198#q1",
-    "source": "AI타임스",
-    "text": "미스트랄은 6일(현지시간) 오픈웨이트 모델 '미스트랄 라지 4(ML4·Mistral Large 4)'를 공개했다.",
-    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "text": "6th October 2026 wren6991: The benchmark is saturated.",
+    "title": "Mistral Large 4",
     "url": null
    },
    {
@@ -220,10 +382,38 @@
     "url": null
    },
    {
-    "id": "it:1198#q2",
+    "id": "it:1198#s2",
     "source": "AI타임스",
-    "text": "라지 4는 총 1조500억개의 매개변수를 갖춘 희소 전문가 혼합(MoE) 모델이다. 이 가운데 실제 추론 과정에서 토큰당 활성화되는 매개변수는 490억개다.",
+    "text": "프랑스의 미스트랄 AI가 내부 별칭 '르 총크(Le Chonk)'로 불리는 차세대 플래그십 AI 모델을 공개했다. '뚱뚱한 고양이'를 뜻하는 이 별칭은 1조개가 넘는 매개변수를 가진 거대 모델의 규모감을 위트 있게 표현한 것이다. 미스트랄은 6일(현지시간) 오픈웨이트 모델 '미스트랄 라지 4(ML4·Mistral Large 4)'를 공개했다.",
     "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "url": null
+   },
+   {
+    "id": "it:1048#s2",
+    "source": "Simon Willison's Weblog",
+    "text": "6th October 2026 wren6991: The benchmark is saturated. Frontier models are tested with an armadillo in fishnet tights jaywalking on Mars.",
+    "title": "Mistral Large 4",
+    "url": null
+   },
+   {
+    "id": "og:1046#q3",
+    "source": "Simon Willison's Weblog",
+    "text": "ML4 was trained from scratch on 3,800 NVIDIA Grace Blackwell GPUs in Mistral’s own datacenters in Europe.",
+    "title": "Introducing Mistral Large 4: Le chonk",
+    "url": null
+   },
+   {
+    "id": "it:1198#s3",
+    "source": "AI타임스",
+    "text": "'뚱뚱한 고양이'를 뜻하는 이 별칭은 1조개가 넘는 매개변수를 가진 거대 모델의 규모감을 위트 있게 표현한 것이다. 미스트랄은 6일(현지시간) 오픈웨이트 모델 '미스트랄 라지 4(ML4·Mistral Large 4)'를 공개했다. 현재는 API를 통한 공개 프리뷰 단계로, 개발자와 사이버 보안 전문가, 정부 당국 등을 대상으로 약 3주간 테스트와 강화학습(RL)을 진행한 뒤 이달 27일 모델 가중치를 공개할 예정이다.",
+    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "url": null
+   },
+   {
+    "id": "it:1048#s3",
+    "source": "Simon Willison's Weblog",
+    "text": "wren6991: The benchmark is saturated. Frontier models are tested with an armadillo in fishnet tights jaywalking on Mars. OK well I couldn't resist this one:",
+    "title": "Mistral Large 4",
     "url": null
    },
    {
@@ -234,35 +424,372 @@
     "url": null
    },
    {
+    "id": "it:1048#s4",
+    "source": "Simon Willison's Weblog",
+    "text": "Frontier models are tested with an armadillo in fishnet tights jaywalking on Mars. OK well I couldn't resist this one: llm -m claude-opus-5.5 'Generate an SVG of an armadillo in fishnet tights jaywalking on Mars'",
+    "title": "Mistral Large 4",
+    "url": null
+   },
+   {
     "id": "it:1046",
     "source": "Simon Willison's Weblog",
-    "text": "Mistral 공식 발표에 따르면 Mistral Large 4(ML4, 'le Chonk')는 1조 파라미터, 520억 활성 파라미터 규모로 Mistral Studio에서 공개 프리뷰 API로 출시되며, 오픈웨이트는 이달 말 공개 예정이다. 3,800개 NVIDIA Grace Blackwell GPU로 유럽 자체 데이터센터에서 학습했다. 원래 글의 Artificial Analysis 점수(38, 9)와 DeepSeek 4.1 Flash(552B) 비교, 프런티어 대비 6개월 격차 평가는 Simon Willison 블로그 자체 평가로 Mistral 공식 발표에는 해당 수치가 없다.\nMistral이 1조 파라미터 규모 Mistral Large 4 프리뷰를 API로 출시했으며, 오픈웨이트 모델은 이달 말 공개를 약속했다. Artificial Analysis 점수는 38점으로 이전 모델 대비 크게 향상되어, 프런티어 모델 대비 약 6개월 격차 수준으로 평가된다.",
+    "text": "Mistral 공식 발표에 따르면 Mistral Large 4(ML4, 'le Chonk')는 1조 파라미터, 520억 활성 파라미터 규모로 Mistral Studio에서 공개 프리뷰 API로 출시되며, 오픈웨이트는 이달 말 공개 예정이다. 3,800개 NVIDIA Grace Blackwell GPU로 유럽 자체 데이터센터에서 학습했다. 원래 글의 Artificial Analysis 점수(38, 9)와 DeepSeek 4.1 Flash(552B) 비교, 프런티어 대비 6개월 격차 평가는 Simon Willison 블로그 자체 평가로 Mistral 공식 발표에는 해당 수치가 없다.",
     "title": "Introducing Mistral Large 4: Le chonk",
     "url": null
    },
    {
-    "id": "it:1046#q1",
+    "id": "it:1048#s5",
     "source": "Simon Willison's Weblog",
-    "text": "Today they're releasing a preview of Mistral Large 4, a 1 trillion parameter, 49 billion active parameter model trained on their own cluster of 3,800 NVIDIA Grace Blackwell GPUs.",
+    "text": "OK well I couldn't resist this one: llm -m claude-opus-5.5 'Generate an SVG of an armadillo in fishnet tights jaywalking on Mars' llm -m gpt-6.1-sol 'Generate an SVG of an armadillo in fishnet tights jaywalking on Mars'",
+    "title": "Mistral Large 4",
+    "url": null
+   },
+   {
+    "id": "it:1046#s1",
+    "source": "Simon Willison's Weblog",
+    "text": "6th October 2026 - Link Blog Introducing Mistral Large 4: Le chonk (via) Mistral are back in the game.",
     "title": "Introducing Mistral Large 4: Le chonk",
     "url": null
    },
    {
-    "id": "it:1198",
+    "id": "it:1048#s6",
+    "source": "Simon Willison's Weblog",
+    "text": "llm -m claude-opus-5.5 'Generate an SVG of an armadillo in fishnet tights jaywalking on Mars' llm -m gpt-6.1-sol 'Generate an SVG of an armadillo in fishnet tights jaywalking on Mars' llm -m gemini-3.8-flash 'Generate an SVG of an armadillo in fishnet tights jaywalking on Mars'",
+    "title": "Mistral Large 4",
+    "url": null
+   },
+   {
+    "id": "it:1046#s2",
+    "source": "Simon Willison's Weblog",
+    "text": "6th October 2026 - Link Blog Introducing Mistral Large 4: Le chonk (via) Mistral are back in the game. Today they're releasing a preview of Mistral Large 4, a 1 trillion parameter, 49 billion active parameter model trained on their own cluster of 3,800 NVIDIA Grace Blackwell GPUs.",
+    "title": "Introducing Mistral Large 4: Le chonk",
+    "url": null
+   },
+   {
+    "id": "it:1198#s7",
     "source": "AI타임스",
-    "text": "미스트랄이 1조500억 매개변수 MoE 구조의 오픈웨이트 모델 '미스트랄 라지 4'를 공개했다. AAII 38점으로 GPT-6 루나와 동급이며, 사이버 보안과 코딩 에이전트 벤치마크에서 경쟁 오픈 모델을 앞섰다. API 요금은 입력 100만 토큰당 1.36달러, 출력 100만 토큰당 4.18달러다.",
+    "text": "이 가운데 실제 추론 과정에서 토큰당 활성화되는 매개변수는 490억개다. 160개 이상의 언어를 지원하며, 이미지 입력을 포함한 멀티모달 처리가 가능하다. 컨텍스트 창은 최대 100만 토큰이다.",
+    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "url": null
+   },
+   {
+    "id": "it:1048#s7",
+    "source": "Simon Willison's Weblog",
+    "text": "llm -m gpt-6.1-sol 'Generate an SVG of an armadillo in fishnet tights jaywalking on Mars' llm -m gemini-3.8-flash 'Generate an SVG of an armadillo in fishnet tights jaywalking on Mars' llm -m mistral/mistral-large-4 'Generate an SVG of an armadillo in fishnet tights jaywalking on Mars'",
+    "title": "Mistral Large 4",
+    "url": null
+   },
+   {
+    "id": "it:1046#s3",
+    "source": "Simon Willison's Weblog",
+    "text": "Introducing Mistral Large 4: Le chonk (via) Mistral are back in the game. Today they're releasing a preview of Mistral Large 4, a 1 trillion parameter, 49 billion active parameter model trained on their own cluster of 3,800 NVIDIA Grace Blackwell GPUs. The preview is available via their API.",
+    "title": "Introducing Mistral Large 4: Le chonk",
+    "url": null
+   },
+   {
+    "id": "it:1048#s8",
+    "source": "Simon Willison's Weblog",
+    "text": "llm -m gemini-3.8-flash 'Generate an SVG of an armadillo in fishnet tights jaywalking on Mars' llm -m mistral/mistral-large-4 'Generate an SVG of an armadillo in fishnet tights jaywalking on Mars' Default reasoning levels for each: https://tools.simonwillison.net/markdown-svg-renderer?url=ht...",
+    "title": "Mistral Large 4",
+    "url": null
+   },
+   {
+    "id": "it:1046#s4",
+    "source": "Simon Willison's Weblog",
+    "text": "Today they're releasing a preview of Mistral Large 4, a 1 trillion parameter, 49 billion active parameter model trained on their own cluster of 3,800 NVIDIA Grace Blackwell GPUs. The preview is available via their API. They promise to release the open weights model at the \"end of this month\".",
+    "title": "Introducing Mistral Large 4: Le chonk",
+    "url": null
+   },
+   {
+    "id": "it:1048#s9",
+    "source": "Simon Willison's Weblog",
+    "text": "llm -m mistral/mistral-large-4 'Generate an SVG of an armadillo in fishnet tights jaywalking on Mars' Default reasoning levels for each: https://tools.simonwillison.net/markdown-svg-renderer?url=ht... Recent articles",
+    "title": "Mistral Large 4",
+    "url": null
+   },
+   {
+    "id": "it:1046#s5",
+    "source": "Simon Willison's Weblog",
+    "text": "The preview is available via their API. They promise to release the open weights model at the \"end of this month\". The model only supports two reasoning levels - \"none\" and \"high\" - via the Mistral API.",
+    "title": "Introducing Mistral Large 4: Le chonk",
+    "url": null
+   },
+   {
+    "id": "it:1048#s10",
+    "source": "Simon Willison's Weblog",
+    "text": "Default reasoning levels for each: https://tools.simonwillison.net/markdown-svg-renderer?url=ht... Recent articles - Claude Haiku 5.5 - 7th October 2026",
+    "title": "Mistral Large 4",
+    "url": null
+   },
+   {
+    "id": "it:1046#s6",
+    "source": "Simon Willison's Weblog",
+    "text": "They promise to release the open weights model at the \"end of this month\". The model only supports two reasoning levels - \"none\" and \"high\" - via the Mistral API. Here are both pelicans - the \"high\" one looks better, though surprisingly it only used 2,717 output tokens compared to \"none\" which used 3,275:",
+    "title": "Introducing Mistral Large 4: Le chonk",
+    "url": null
+   },
+   {
+    "id": "it:1198#s11",
+    "source": "AI타임스",
+    "text": "공개 프리뷰도 같은 인프라에서 제공한다. 업계에서는 미국 빅테크의 폐쇄형 모델 및 중국계 오픈 모델에 맞서 유럽의 기술 주권(AI Sovereignty)을 확보하려는 미스트랄의 핵심 전략 카드로 평가하고 있다. Meet Mistral Large 4, aka Le Chonk.",
+    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "url": null
+   },
+   {
+    "id": "it:1048#s11",
+    "source": "Simon Willison's Weblog",
+    "text": "Recent articles - Claude Haiku 5.5 - 7th October 2026 - We're going to need default hard budget caps on pretty much everything - 3rd October 2026",
+    "title": "Mistral Large 4",
+    "url": null
+   },
+   {
+    "id": "it:1046#s7",
+    "source": "Simon Willison's Weblog",
+    "text": "The model only supports two reasoning levels - \"none\" and \"high\" - via the Mistral API. Here are both pelicans - the \"high\" one looks better, though surprisingly it only used 2,717 output tokens compared to \"none\" which used 3,275: On Artificial Analysis it scores 38, just behind DeepSeek 4.1 Flash, which is a 552B model.",
+    "title": "Introducing Mistral Large 4: Le chonk",
+    "url": null
+   },
+   {
+    "id": "it:1198#s12",
+    "source": "AI타임스",
+    "text": "업계에서는 미국 빅테크의 폐쇄형 모델 및 중국계 오픈 모델에 맞서 유럽의 기술 주권(AI Sovereignty)을 확보하려는 미스트랄의 핵심 전략 카드로 평가하고 있다. Meet Mistral Large 4, aka Le Chonk. • 1T parameters, natively multimodal.",
+    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "url": null
+   },
+   {
+    "id": "it:1048#s12",
+    "source": "Simon Willison's Weblog",
+    "text": "- Claude Haiku 5.5 - 7th October 2026 - We're going to need default hard budget caps on pretty much everything - 3rd October 2026 - OpenAI DevDay 2026 live blog - 29th September 2026",
+    "title": "Mistral Large 4",
+    "url": null
+   },
+   {
+    "id": "it:1046#s8",
+    "source": "Simon Willison's Weblog",
+    "text": "Here are both pelicans - the \"high\" one looks better, though surprisingly it only used 2,717 output tokens compared to \"none\" which used 3,275: On Artificial Analysis it scores 38, just behind DeepSeek 4.1 Flash, which is a 552B model. It's a huge improvement on last December's Mistral Large 3, which drew this terrible pelican and scored 9 on AA.",
+    "title": "Introducing Mistral Large 4: Le chonk",
+    "url": null
+   },
+   {
+    "id": "it:1198#s13",
+    "source": "AI타임스",
+    "text": "Meet Mistral Large 4, aka Le Chonk. • 1T parameters, natively multimodal. 49B active.",
+    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "url": null
+   },
+   {
+    "id": "it:1048#s13",
+    "source": "Simon Willison's Weblog",
+    "text": "- We're going to need default hard budget caps on pretty much everything - 3rd October 2026 - OpenAI DevDay 2026 live blog - 29th September 2026",
+    "title": "Mistral Large 4",
+    "url": null
+   },
+   {
+    "id": "it:1046#s9",
+    "source": "Simon Willison's Weblog",
+    "text": "On Artificial Analysis it scores 38, just behind DeepSeek 4.1 Flash, which is a 552B model. It's a huge improvement on last December's Mistral Large 3, which drew this terrible pelican and scored 9 on AA. It's certainly not a Fable-class model, but it's great to see Mistral put out a model that's back to being maybe about 6 months behind the frontier.",
+    "title": "Introducing Mistral Large 4: Le chonk",
+    "url": null
+   },
+   {
+    "id": "it:1198#s14",
+    "source": "AI타임스",
+    "text": "• 1T parameters, natively multimodal. 49B active. It is the best open weights model from US or Europe on aggregated benchmarks.",
+    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "url": null
+   },
+   {
+    "id": "it:1046#s10",
+    "source": "Simon Willison's Weblog",
+    "text": "It's a huge improvement on last December's Mistral Large 3, which drew this terrible pelican and scored 9 on AA. It's certainly not a Fable-class model, but it's great to see Mistral put out a model that's back to being maybe about 6 months behind the frontier. Recent articles",
+    "title": "Introducing Mistral Large 4: Le chonk",
+    "url": null
+   },
+   {
+    "id": "it:1198#s15",
+    "source": "AI타임스",
+    "text": "49B active. It is the best open weights model from US or Europe on aggregated benchmarks. • State-of-the-art on critical workloads, including cyber defense, manufacturing and finance and it surpasses… pic.twitter.com/Jr5Z11mxEv",
+    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "url": null
+   },
+   {
+    "id": "it:1046#s11",
+    "source": "Simon Willison's Weblog",
+    "text": "It's certainly not a Fable-class model, but it's great to see Mistral put out a model that's back to being maybe about 6 months behind the frontier. Recent articles - Claude Haiku 5.5 - 7th October 2026",
+    "title": "Introducing Mistral Large 4: Le chonk",
+    "url": null
+   },
+   {
+    "id": "it:1198#s16",
+    "source": "AI타임스",
+    "text": "It is the best open weights model from US or Europe on aggregated benchmarks. • State-of-the-art on critical workloads, including cyber defense, manufacturing and finance and it surpasses… pic.twitter.com/Jr5Z11mxEv — Mistral AI (@MistralAI) October 6, 2026",
+    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "url": null
+   },
+   {
+    "id": "it:1046#s12",
+    "source": "Simon Willison's Weblog",
+    "text": "Recent articles - Claude Haiku 5.5 - 7th October 2026 - We're going to need default hard budget caps on pretty much everything - 3rd October 2026",
+    "title": "Introducing Mistral Large 4: Le chonk",
+    "url": null
+   },
+   {
+    "id": "it:1198#s17",
+    "source": "AI타임스",
+    "text": "• State-of-the-art on critical workloads, including cyber defense, manufacturing and finance and it surpasses… pic.twitter.com/Jr5Z11mxEv — Mistral AI (@MistralAI) October 6, 2026 이 회사는 \"ML4는 오픈웨이트 모델의 최전선에 있다\"고 밝혔다.",
+    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "url": null
+   },
+   {
+    "id": "it:1046#s13",
+    "source": "Simon Willison's Weblog",
+    "text": "- Claude Haiku 5.5 - 7th October 2026 - We're going to need default hard budget caps on pretty much everything - 3rd October 2026 - OpenAI DevDay 2026 live blog - 29th September 2026",
+    "title": "Introducing Mistral Large 4: Le chonk",
+    "url": null
+   },
+   {
+    "id": "it:1046#s14",
+    "source": "Simon Willison's Weblog",
+    "text": "- We're going to need default hard budget caps on pretty much everything - 3rd October 2026 - OpenAI DevDay 2026 live blog - 29th September 2026",
+    "title": "Introducing Mistral Large 4: Le chonk",
+    "url": null
+   },
+   {
+    "id": "it:1198#s19",
+    "source": "AI타임스",
+    "text": "이 회사는 \"ML4는 오픈웨이트 모델의 최전선에 있다\"고 밝혔다. 특히 코딩과 사이버 보안, 금융, 제조, 과학, 에이전트 작업, 이미지 분석 등 전문 분야에서 높은 성능을 보인다고 강조했다. ML4는 아티피셜 에널리시스 지능 지수(AAII)에서 38점을 기록했다.",
+    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "url": null
+   },
+   {
+    "id": "it:1198#s22",
+    "source": "AI타임스",
+    "text": "이는 'GPT-6 루나(38점)'와 비슷한 수준이며, '딥시크-V4.1 플래시(39점)'와도 경쟁할 만한 성능이다. 사이버 보안은 가장 강하게 내세우는 분야다. AA 사이버 지수에서 50%를 기록해 'GLM-5.3-플래시'와 동률을 기록했으며, '키미 K3'와 딥시크 V4.1 플래시 등을 앞섰다.",
+    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "url": null
+   },
+   {
+    "id": "it:1198#s25",
+    "source": "AI타임스",
+    "text": "또 '사이벤치'에서 93%, '사이버짐-E2E'에서 82%의 점수를 기록했다. 오픈웨이트 모델이라는 점도 사이버 보안 분야에서 중요한 차별점으로 꼽았다. 기업과 정부 기관이 모델을 자체 클라우드나 온프레미스 환경에 배포해 데이터 유출 걱정 없이 조직의 고유한 보안 정책에 맞게 운영할 수 있기 때문이다.",
+    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "url": null
+   },
+   {
+    "id": "it:1198#s27",
+    "source": "AI타임스",
+    "text": "기업과 정부 기관이 모델을 자체 클라우드나 온프레미스 환경에 배포해 데이터 유출 걱정 없이 조직의 고유한 보안 정책에 맞게 운영할 수 있기 때문이다. Mistral has released Mistral Large 4, scoring 38 on the Artificial Analysis Intelligence Index; France is back to having the most intelligent model from outside the US and China@MistralAI has released Mistral Large 4 in Research Public Preview, with plans to release the weights… pic.twitter.com/pzGQujfDlH — Artificial Analysis (@ArtificialAnlys) October 6, 2026",
+    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "url": null
+   },
+   {
+    "id": "it:1198#s28",
+    "source": "AI타임스",
+    "text": "Mistral has released Mistral Large 4, scoring 38 on the Artificial Analysis Intelligence Index; France is back to having the most intelligent model from outside the US and China@MistralAI has released Mistral Large 4 in Research Public Preview, with plans to release the weights… pic.twitter.com/pzGQujfDlH — Artificial Analysis (@ArtificialAnlys) October 6, 2026 코딩과 에이전트 성능에서도 높은 점수를 제시했다.",
+    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "url": null
+   },
+   {
+    "id": "it:1198#s29",
+    "source": "AI타임스",
+    "text": "— Artificial Analysis (@ArtificialAnlys) October 6, 2026 코딩과 에이전트 성능에서도 높은 점수를 제시했다. '딥SWE v1.1'에서 61.7%, 'SWE-아틀라스-QnA'에서 59.4%, '터미널-벤치 4.0'에서 28.3%를 기록했다.",
+    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "url": null
+   },
+   {
+    "id": "it:1198#s30",
+    "source": "AI타임스",
+    "text": "코딩과 에이전트 성능에서도 높은 점수를 제시했다. '딥SWE v1.1'에서 61.7%, 'SWE-아틀라스-QnA'에서 59.4%, '터미널-벤치 4.0'에서 28.3%를 기록했다. 코딩 에이전트 종합 지표에서는 49.8%를 기록했다고 밝혔다.",
+    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "url": null
+   },
+   {
+    "id": "it:1198#s32",
+    "source": "AI타임스",
+    "text": "코딩 에이전트 종합 지표에서는 49.8%를 기록했다고 밝혔다. 이는 오픈 웨이트 모델 진영에서는 최고 수준(SOTA)급이며, 최상위 폐쇄형 모델들과 비교하면 상위권~중상위권 위치에 해당한다. 실제로 딥SWE의 공개 리더보드에서는 모델별 최적 설정을 적용하면 GLM-5.3과 키미 K3가 약 69%, 'GPT-6 아스트라'와 '제미나이 3.8 플래시' '클로드 오퍼스 5' 등이 약 74% 수준으로 나타난다.",
+    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "url": null
+   },
+   {
+    "id": "it:1198#s33",
+    "source": "AI타임스",
+    "text": "이는 오픈 웨이트 모델 진영에서는 최고 수준(SOTA)급이며, 최상위 폐쇄형 모델들과 비교하면 상위권~중상위권 위치에 해당한다. 실제로 딥SWE의 공개 리더보드에서는 모델별 최적 설정을 적용하면 GLM-5.3과 키미 K3가 약 69%, 'GPT-6 아스트라'와 '제미나이 3.8 플래시' '클로드 오퍼스 5' 등이 약 74% 수준으로 나타난다. 다만 이 수치들은 아직 독립적으로 모두 검증된 결과는 아니다.",
+    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "url": null
+   },
+   {
+    "id": "it:1198#s36",
+    "source": "AI타임스",
+    "text": "미스트랄이 공개한 비교 자료에서는 일부 경쟁 오픈 모델보다 높은 점수를 기록했지만, 벤치마크는 모델 자체뿐 아니라 에이전트 구성과 평가 환경에 따라 결과가 달라질 수 있다. 전문가의 블라인드 평가에서는 비교적 긍정적인 결과가 나왔다. 미스트랄이 서지AI와 진행한 평가에서 전문 평가자들은 5점 만점에 3.74점을 줬다.",
+    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "url": null
+   },
+   {
+    "id": "it:1198#s39",
+    "source": "AI타임스",
+    "text": "이는 평가 대상 5개 모델 가운데 2위로, GLM-5.3의 3.60점과 키미 K3의 3.59점을 앞섰다. 다만 클로드 오퍼스 5의 4.22점에는 미치지 못했다. 법률과 금융 분야에서도 높은 성능을 강조했다.",
+    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "url": null
+   },
+   {
+    "id": "it:1198#s40",
+    "source": "AI타임스",
+    "text": "다만 클로드 오퍼스 5의 4.22점에는 미치지 못했다. 법률과 금융 분야에서도 높은 성능을 강조했다. 하비의 리걸 에이전트 벤치마크에서는 15%의 과제 통과율을 기록했다.",
+    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "url": null
+   },
+   {
+    "id": "it:1198#s41",
+    "source": "AI타임스",
+    "text": "법률과 금융 분야에서도 높은 성능을 강조했다. 하비의 리걸 에이전트 벤치마크에서는 15%의 과제 통과율을 기록했다. 외부 평가기관 발스 AI의 공개 자료에서는 키미 K3가 12.92%, '미모 V2.6 프로'가 10.83%, GLM-5.3이 8.33%로 나타나 라지 4가 이들 오픈 웨이트 모델을 앞선 것으로 볼 수 있다.",
+    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "url": null
+   },
+   {
+    "id": "it:1198#s42",
+    "source": "AI타임스",
+    "text": "하비의 리걸 에이전트 벤치마크에서는 15%의 과제 통과율을 기록했다. 외부 평가기관 발스 AI의 공개 자료에서는 키미 K3가 12.92%, '미모 V2.6 프로'가 10.83%, GLM-5.3이 8.33%로 나타나 라지 4가 이들 오픈 웨이트 모델을 앞선 것으로 볼 수 있다. 금융·회계 업무를 평가하는 핀치에서는 67%를 기록했다고 미스트랄은 밝혔다.",
+    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "url": null
+   },
+   {
+    "id": "it:1198#s44",
+    "source": "AI타임스",
+    "text": "금융·회계 업무를 평가하는 핀치에서는 67%를 기록했다고 미스트랄은 밝혔다. 이 벤치마크는 스프레드시트와 문서, 검색, 모델링, 보고서 작성 등 실제 기업 업무에 가까운 장기 작업 384개로 구성돼 있다. 멀티모달 능력도 주요 특징이다.",
+    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "url": null
+   },
+   {
+    "id": "it:1198#s45",
+    "source": "AI타임스",
+    "text": "이 벤치마크는 스프레드시트와 문서, 검색, 모델링, 보고서 작성 등 실제 기업 업무에 가까운 장기 작업 384개로 구성돼 있다. 멀티모달 능력도 주요 특징이다. 모델은 복잡한 문서와 차트, 자연 이미지뿐 아니라 위성·항공 이미지와 엔지니어링 도면 등을 분석할 수 있다.",
+    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "url": null
+   },
+   {
+    "id": "it:1198#s46",
+    "source": "AI타임스",
+    "text": "멀티모달 능력도 주요 특징이다. 모델은 복잡한 문서와 차트, 자연 이미지뿐 아니라 위성·항공 이미지와 엔지니어링 도면 등을 분석할 수 있다. 특히 시각적 위치 지정 능력을 평가하는 '덴스200'에서 42%를 기록해 일부 최상위 모델을 앞섰다고 설명했다.",
+    "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
+    "url": null
+   },
+   {
+    "id": "it:1198#s47",
+    "source": "AI타임스",
+    "text": "모델은 복잡한 문서와 차트, 자연 이미지뿐 아니라 위성·항공 이미지와 엔지니어링 도면 등을 분석할 수 있다. 특히 시각적 위치 지정 능력을 평가하는 '덴스200'에서 42%를 기록해 일부 최상위 모델을 앞섰다고 설명했다. 라지 4의 API는 현재 공개 프리뷰 형태로 제공된다.",
     "title": "미스트랄, 1조 매개변수 ‘라지 4’ 공개...\"사이버 보안·오픈 모델 최상위\"",
     "url": null
    }
   ],
-  "angle": "1조 파라미터 MoE 모델의 오픈웨이트 전략",
+  "angle": "1조 파라미터 MoE 구조와 오픈웨이트 공개 일정",
+  "previous": null,
   "code_warnings": [],
   "round": 1
  },
  "expect": {
   "status": "reject",
-  "loc": "points[0]",
+  "loc": "sections[0].paragraphs[0]",
   "type": "wrong_ref"
  },
- "note": "최종판에 wrong_ref 하나를 심음(points[0])"
+ "note": "최종판에 wrong_ref 하나를 심음(sections[0].paragraphs[0])"
 }

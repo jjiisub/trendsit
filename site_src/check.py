@@ -37,11 +37,16 @@ class Page(HTMLParser):
         super().__init__(convert_charrefs=True)
         self.tags, self.links, self.ids, self.titles, self.text, self.classes, self.pn = {}, [], set(), 0, [], [], []
         self.open, self.mismatch = [], 0  # 태그 중첩 어긋남 수
+        self.tiles, self._tiles_stack = [], []  # .tiles 블록마다 (n{k} 선언값, 실제 .tile 자식 수)
+        self.class_stack = []  # self.open과 같은 깊이로 쌓는 조상 class 집합(006-C1-17: &t= 링크 범위를 영상 타임라인 조각으로 좁힘)
+        self.timeline_links = []  # .vgo·.vtl·.simg 안에서 나온 href만(글 출처의 &t= 쿼리 오탐 방지)
 
     def handle_starttag(self, tag, attrs):
         a = dict(attrs)
+        cls = set(a.get("class", "").split())
         if tag not in VOID:
             self.open.append(tag)
+            self.class_stack.append(cls)
         self.tags[tag] = self.tags.get(tag, 0) + 1
         if "id" in a:
             self.ids.add(a["id"])
@@ -49,8 +54,15 @@ class Page(HTMLParser):
             self.titles += 1
         if "class" in a:
             self.classes.append((tag, a["class"].split()))
-        if tag == "a" and {"pn-prev", "pn-next"} & set(a.get("class", "").split()):
+            if tag == "div" and "tiles" in cls:
+                n = next((c[1:] for c in cls if c.startswith("n") and c[1:].isdigit()), None)
+                self._tiles_stack.append({"depth": len(self.open), "n": n, "count": 0})
+            elif tag == "div" and "tile" in cls and self._tiles_stack and len(self.open) == self._tiles_stack[-1]["depth"] + 1:
+                self._tiles_stack[-1]["count"] += 1
+        if tag == "a" and {"pn-prev", "pn-next"} & cls:
             self.pn.append(a["href"])
+        if tag == "a" and "href" in a and {"vgo", "vtl", "simg"} & {c for frame in self.class_stack for c in frame}:
+            self.timeline_links.append(a["href"])
         for k in ("href", "src"):
             if a.get(k) is not None:
                 self.links.append((tag, a.get("rel", ""), k, a[k]))
@@ -58,13 +70,19 @@ class Page(HTMLParser):
     def handle_endtag(self, tag):
         if tag in VOID:
             return
+        if tag == "div" and self._tiles_stack and len(self.open) == self._tiles_stack[-1]["depth"]:
+            e = self._tiles_stack.pop()
+            self.tiles.append((e["n"], e["count"]))
         if self.open and self.open[-1] == tag:
             self.open.pop()
+            self.class_stack.pop()
         else:
             self.mismatch += 1
             if tag in self.open:
-                while self.open.pop() != tag:
-                    pass
+                while True:
+                    popped, _ = self.open.pop(), self.class_stack.pop()
+                    if popped == tag:
+                        break
 
     def handle_data(self, data):
         self.text.append(data)
@@ -85,8 +103,8 @@ def is_internal(href):
     return not re.match(r"^([a-z][a-z0-9+.-]*:|//)", href, re.I)
 
 
-def static_checks(site, data, pages):
-    files = sorted(site.rglob("*.html"))
+def _check_markup_links(site, data, pages, files):
+    """A7 페이지 존재, M-1 마크업, M-2 근거 id 노출, C-3 내부 링크, A5 링크 규칙. 계속 돌아도 되면 True."""
     check("A7 페이지 존재: 홈, 소스, 키워드, 실행 기록(주차별·이번 주차·1건)",
           all((site / p).exists() for p in ("index.html", "sources/index.html", "keywords/index.html", "runs/index.html", "runs/weeks/index.html"))
           and any(f.parent.parent.parent.name == "runs" for f in files), f"html {len(files)}개")
@@ -94,8 +112,9 @@ def static_checks(site, data, pages):
     # 빌드가 만든 깨짐만: 엔티티가 태그로 쪼개짐(&#<span ..>x27</span>;). 데이터 원문 글자(<span, &amp;)는 &lt;span, &amp;amp;로 나가므로 걸리지 않음
     broken += [f"{page_url(site, f)} 엔티티가 태그로 쪼개짐" for f in pages if re.search(r"&#?\w*<", f.read_text(encoding="utf-8"))]
     check("M-1 마크업 무결성: 태그 중첩 어긋남 0, 엔티티가 태그로 쪼개진 곳 0", not broken, "; ".join(broken[:3]))
-    leak = [page_url(site, f) for f in pages if re.search(r"\[it:\d+|#q\d+", f.read_text(encoding="utf-8"))]
-    check("M-2 내부 근거 id([it:8#q2] 등) 노출 0", not leak, "; ".join(leak[:3]))
+    leak = [page_url(site, f) for f in pages
+           if re.search(r"\[(?:it|og|vd|rp|sl):[\w./#@:-]+|#q\d+|#f\d+", f.read_text(encoding="utf-8"))]
+    check("M-2 내부 근거 id([it:8#q2]·sl:·vd:·rp:#f· 등) 노출 0", not leak, "; ".join(leak[:3]))
     # C-3 내부 링크의 대상 파일·앵커
     bad = []
     for f, p in pages.items():
@@ -119,7 +138,7 @@ def static_checks(site, data, pages):
     absent = [f"{page_url(site, f)}" for f in [*first, *(site / "week" / w["id"] / "index.html" for w in weeks), *(site / "topic" / t["id"] / "index.html" for t in data["topics"])] if f not in pages]
     if absent:  # site.json과 site/가 어긋남(예: 발행 중 실패로 한쪽만 바뀜): 트레이스백 대신 실패로 기록
         check("A5 링크 규칙", False, f"data에는 있고 site/에는 없는 페이지: {', '.join(absent[:3])}")
-        return
+        return False
     ok1 = all("지난 주차" not in "".join(pages[f].text) for f in first)
     ok2 = all(any(h == f'/week/{weeks[i + 1]["id"]}/' for _, _, _, h in pages[site / "week" / w["id"] / "index.html"].links)
               for i, w in enumerate(weeks[:-1]))
@@ -137,7 +156,11 @@ def static_checks(site, data, pages):
             bad.append(f'{t["id"]} 이전·다음이 다른 주로 이어짐')
     check("A5 첫 주에 지난 주차 링크 없음, 대상 없는 follow_up은 링크 없음, 이전·다음은 같은 주 안", ok1 and ok2 and not bad,
           "; ".join(bad[:3]) or ("" if ok1 and ok2 else f"지난 주차 링크 오류 첫 주 {ok1} 나머지 {ok2}"))
-    # C-4, A6 외부 요청·글꼴·CSS
+    return True
+
+
+def _check_fonts_css_ops(site, data, pages, files):
+    """C-4 외부 요청, A6 글꼴·CSS, C-5·C-7 관리 화면, A7 금지 문구."""
     css_files = sorted((site / "assets").glob("*.css"))
     css = "\n".join(f.read_text(encoding="utf-8") for f in css_files)
     ext = []
@@ -155,7 +178,6 @@ def static_checks(site, data, pages):
           weights == ["400", "500"] and len(faces) == 2 and len(names) == 1 and re.fullmatch(r"trendsit\.[0-9a-f]{10}\.css", names[0])
           and not googles and (site / "assets/fonts/Pretendard-Regular.woff2").is_file() and (site / "assets/fonts/Pretendard-Medium.woff2").is_file(),
           f"faces {len(faces)} weights {weights} css {names} google {googles}")
-    # C-5, C-7(title 속성) 관리 화면 조작 요소, 문구
     banned = [f"{page_url(site, f)} <{t}>" for f, p in pages.items() for t in OPS_BANNED if p.tags.get(t)]
     check("C-5 button·form·input·select·textarea 0", not banned, "; ".join(banned[:3]))
     own = [s for s in data_strings(data) if any(w in s for w in FORBIDDEN_TEXT)]
@@ -167,6 +189,54 @@ def static_checks(site, data, pages):
         hits += [f"{page_url(site, f)} '{w}'" for w in FORBIDDEN_TEXT if w in text]
     check("A7 '동작 안 함'·'예시' 문구 0(사이트 전체, 데이터 본문 제외)", not hits, "; ".join(hits[:3]))
     check("C-7 title 속성 0", not any(p.titles for p in pages.values()))
+
+
+def _check_s6_1_content(site, data, pages):
+    """S6-1 5.9: 옛 섹션 제목·h3.src-g, 슬라이드 img, .tiles 자식 수, C-9 .chk 수, &t= 링크."""
+    all_data = sorted(data_strings(data), key=len, reverse=True)
+    old_titles = []
+    for f, p in pages.items():
+        text = "".join(p.text)
+        for s in all_data:
+            text = text.replace(s, "")
+        old_titles += [f"{page_url(site, f)} '{w}'" for w in ("개요", "핵심 포인트", "핵심 개념", "소스별로 더한 것") if w in text]
+    src_g = [page_url(site, f) for f, p in pages.items() if any(c == "src-g" for _, cls in p.classes for c in cls)]
+    check("A9 옛 섹션 제목(개요·핵심 포인트·핵심 개념·소스별로 더한 것) 0, h3.src-g 0", not old_titles and not src_g,
+          "; ".join((old_titles + src_g)[:3]))
+    bad_img = []
+    for f, p in pages.items():
+        for tag, _rel, k, href in p.links:
+            if tag == "img" and k == "src":
+                if not href.startswith("/assets/slides/"):
+                    bad_img.append(f"{page_url(site, f)} img src {href}")
+                elif not (site / href.lstrip("/")).is_file():
+                    bad_img.append(f"{page_url(site, f)} img 파일 없음 {href}")
+    check("A9 슬라이드 img src는 /assets/slides/뿐이고 파일 존재", not bad_img, "; ".join(bad_img[:3]))
+    bad_tiles = [f"{page_url(site, f)} .tiles n{n} 실제 {cnt}개" for f, p in pages.items() for n, cnt in p.tiles
+                if n is None or not 1 <= int(n) <= 4 or int(n) != cnt]
+    check("A9 .tiles 자식 수 1~4와 n{k} 클래스 일치", not bad_tiles, "; ".join(bad_tiles[:3]))
+    topics = {t["id"]: t for t in data["topics"]}
+    bad_chk, bad_t = [], []
+    for tid, t in topics.items():
+        f = site / "topic" / tid / "index.html"
+        if f not in pages:
+            continue
+        want = sum(1 for s in t["sections"] if s.get("check")) + sum(1 for c in t.get("checks", []) if c in ("summary", "title"))
+        got = sum(1 for _, cls in pages[f].classes if "chk" in cls)
+        if got != want:
+            bad_chk.append(f"{tid} got={got} want={want}")
+        vids = [s["url"] for s in t["sources"] if s["channel"] == "video" and s.get("url")]
+        bad_t += [f"{tid} {h}" for h in pages[f].timeline_links if "&t=" in h and not any(h.startswith(u) for u in vids)]
+    check("C-9 .chk 수 = site.json의 확인 필요 수", not bad_chk, "; ".join(bad_chk[:3]))
+    check("A9 &t= 시점 링크(.vgo·.vtl·.simg 안)는 그 토픽 영상 출처 URL로 시작", not bad_t, "; ".join(bad_t[:3]))
+
+
+def static_checks(site, data, pages):
+    files = sorted(site.rglob("*.html"))
+    if not _check_markup_links(site, data, pages, files):
+        return
+    _check_fonts_css_ops(site, data, pages, files)
+    _check_s6_1_content(site, data, pages)
 
 
 def data_strings(data):
@@ -204,11 +274,22 @@ def find_playwright():
 
 
 def pick_pages(data):
-    """측정할 페이지: 홈, 토픽 3(제목이 가장 긴 것, 출처 가장 많은 것, 출처 가장 적은 것), 소스, 키워드, 실행 기록 1건."""
+    """측정할 페이지: 홈, 토픽 3(제목이 가장 긴 것, 출처 가장 많은 것, 출처 가장 적은 것) + 타일 1~4개·표·슬라이드·
+    영상 타임라인 토픽 각 1개(있으면, 5.9), 소스, 키워드, 실행 기록 1건."""
     ts = data["topics"]
     chosen = []
     for key in (lambda t: len(t["title"]), lambda t: len(t["sources"]), lambda t: -len(t["sources"])):
         t = next((t for t in sorted(ts, key=key, reverse=True) if t not in chosen), None)
+        if t:
+            chosen.append(t)
+    for n in (1, 2, 3, 4):
+        t = next((t for t in ts if len(t.get("head_tiles") or []) == n and t not in chosen), None)
+        if t:
+            chosen.append(t)
+    for pred in (lambda t: any((s.get("visual") or {}).get("type") == "table" for s in t["sections"]),
+                lambda t: any(s.get("slide") for s in t["sections"]),
+                lambda t: any(s.get("video_secs") for s in t["sections"])):
+        t = next((t for t in ts if pred(t) and t not in chosen), None)
         if t:
             chosen.append(t)
     most = max(ts, key=lambda t: len(t["sources"]))
@@ -255,9 +336,16 @@ def browser_checks(site, data):
     for name, eng, aid in (("chromium", "Chromium 375·768·1280", "A8"), ("webkit", "WebKit 375(모바일·터치)·1280", "A9")):
         bad = []
         for e in (x for x in out["gates"] if x["browser"] == name):
-            miss = gate9(e["gate"], 812)
-            if e["topic"] and e["vw"] == 375 and not (e["gate"]["pointsTop"] is not None and e["gate"]["pointsTop"] < 812):
-                miss.append(f'5 핵심 포인트가 첫 화면 밖({e["gate"]["pointsTop"]})')
+            g = e["gate"]
+            miss = gate9(g, 812)
+            if e["topic"] and e["vw"] == 375 and not (g["pointsTop"] is not None and g["pointsTop"] < 812):
+                miss.append(f'5 본문 시작(머리 타일·첫 절)이 첫 화면 밖({g["pointsTop"]})')
+            if g["cmptOverflowBad"]:
+                miss.append(f'표(.cmpt-wrap)가 자신만 가로 스크롤하지 않음 {g["cmptOverflowBad"]}건(5.9)')
+            if g["imgBad"]:
+                miss.append(f'이미지 로드 실패(naturalWidth 0) {g["imgBad"]}건(5.9)')
+            if e["vw"] == 375 and g["tileOverflowBad"]:
+                miss.append(f'375에서 타일 글자 잘림 {g["tileOverflowBad"]}건(5.9)')
             bad += [f'{e["vw"]} {e["page"]}: {m}' for m in miss]
         n = sum(x["browser"] == name for x in out["gates"])
         extra = ""
@@ -275,10 +363,21 @@ def browser_checks(site, data):
         (b.get("lingers"), "벗어나자마자 닫힘(0.6초 유지 아님)"), (b.get("closed"), "1초 뒤에도 안 닫힘"), (b.get("only") == [b.get("expectOnly")], f'동시에 하나가 아님 {b.get("only")} 기대 {b.get("expectOnly")}'),
         (b.get("miniTop") == "hidden", f'맨 위에서 미니 바가 보임({b.get("miniTop")})'),
         (ms.get("visibility") == "visible" and 0 <= ms.get("top", -1) < ms.get("height", 0), f"제목이 빠져도 미니 바가 안 보임({ms})"),
-        (b["tabDefault"] == {"topics": "block", "repos": "none"}, f'기본 탭 {b["tabDefault"]}'),
-        (b["tabRepos"] == {"topics": "none", "repos": "block"}, f'#repos 탭 {b["tabRepos"]}'),
-        (b["tabClick"] == {"topics": "none", "repos": "block"}, f'탭 클릭 {b["tabClick"]}')) if not ok]
+        (b["tabDefault"] == {"topics": "visible", "repos": "hidden"}, f'기본 탭 {b["tabDefault"]}'),
+        (b["tabRepos"] == {"topics": "hidden", "repos": "visible"}, f'#repos 탭 {b["tabRepos"]}'),
+        (b["tabClick"] == {"topics": "hidden", "repos": "visible"}, f'탭 클릭 {b["tabClick"]}'),
+        (b["tabScroll"]["diff"] <= 1, f'두 탭의 scrollY 차 {b["tabScroll"]["diff"]}px(C-10)'),
+        (b["tabScroll"]["topics"]["navTop"] >= 0 and b["tabScroll"]["repos"]["navTop"] >= 0,
+         f'탭 이동 뒤 .nav가 화면 밖(D-40) {b["tabScroll"]}')) if not ok]
     check("A10 동작(Chromium 1280): 툴팁 0.15초 뒤·0.6초 유지·1초 뒤 닫힘·동시에 하나, 탭(기본·#repos), 미니 바", not problems, "; ".join(problems))
+    _check_mobile_tab_scroll(out["tabScrollMobile"])
+
+
+def _check_mobile_tab_scroll(tm):
+    mobile_problems = [m for ok, m in (
+        (tm["diff"] <= 1, f'두 탭의 scrollY 차 {tm["diff"]}px(C-10, WebKit 375)'),
+        (tm["topics"]["navTop"] >= 0 and tm["repos"]["navTop"] >= 0, f'탭 이동 뒤 .nav가 화면 밖(D-40, WebKit 375) {tm}')) if not ok]
+    check("A10 동작(WebKit 375): 탭 클릭 scrollY 차 1px 이하·.nav 안 가려짐(5.9)", not mobile_problems, "; ".join(mobile_problems))
 
 
 def main():

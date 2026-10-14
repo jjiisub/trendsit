@@ -1,0 +1,998 @@
+{
+ "input": {
+  "loc_lines": [
+   "title: MS 디시전-1·오픈AI Decisions API, 구조화된 의사결정 특화 공개",
+   "summary: MS가 구조화된 의사결정 특화 모델 '디시전-1'을 공개하고, 오픈AI도 Decisions API를 정식 출시했다. GPT-6 Sol 대비 최대 35배 빠른 속도와 1.3%의 낮은 판단 변동률이 핵심이며, 출력 토큰 무료 정책이 비용 경쟁력을 더한다.",
+   "head_tiles[0]: 35배 / GPT-6 Sol 대비 속도 (P50 지연 기준) (refs it:1377#s8, it:1377#s19)",
+   "head_tiles[1]: 1.3% / 평균 결정 변동률 (8가지 입력 변형 평가) (refs it:1377#s33, it:1342#s11)",
+   "head_tiles[2]: 0.042달러 / 입력 토큰 100만개당 가격 (출력 토큰 무료) (refs it:1342#s24)",
+   "sections[0].heading: 구조화된 의사결정 특화 모델 공개, 오픈AI도 API 정식 출시",
+   "sections[0].paragraphs[0]: 마이크로소프트(MS)는 9일 구조화된 의사결정 작업에 특화한 AI 모델 '마이크로소프트 디시전-1(Microsoft-Decision-1)'을 공개했다. 이 모델은 모델 선택과 요청 분류, 작업 우선순위 지정, 결과 검증, 에이전트 제어 등 다양한 작업에서 기존 대형언어모델(LLM)보다 빠르고 효율적인 의사결정을 지원한다. 한편 오픈AI는 'Decisions API(Decisions API)'를 7일 공개 베타 버전으로 정식 출시했다. (refs it:1342#s2, it:1342#s4, it:1342#s29)",
+   "sections[1].heading: 고정 선택지에 보정 확률 점수 반환, 3만2000 토큰 컨텍스트 처리",
+   "sections[1].paragraphs[0]: 디시전-1은 고정된 선택지에 대한 보정 확률 점수를 한 번의 추론으로 산출하도록 설계됐다. 예/아니요 판정, 객관식 선택, 등급 평가를 지원하며, 평가 기준표에 따라 AI 응답이나 에이전트의 행동을 채점할 수도 있다. 최대 3만2000 토큰의 긴 입력 컨텍스트를 한 번에 처리할 수 있어 방대한 로그나 문서 검토에서 강점을 보인다. (refs it:1342#s5, it:1342#s6, it:1342#s8)",
+   "sections[1].paragraphs[1]: MS는 이 모델이 반환하는 보정된 확률 점수를 활용해 확신도가 높으면 자동으로 작업을 처리하고, 애매한 경우 사람에게 검토를 요청하거나 재시도·우회하는 제어 레이어로 활용할 수 있다고 설명했다. 오픈AI의 Decisions API도 텍스트나 이미지 분석 시 산문 형태의 답변 대신 정해진 선택지나 확률, 점수만을 반환하여 소프트웨어가 즉시 처리할 수 있도록 지원한다. (refs it:1342#s9, it:1342#s30)",
+   "sections[2].heading: 36개 벤치마크 최고 정확도, GPT-6 Sol 대비 최대 35배 속도",
+   "sections[2].paragraphs[0]: 학습 데이터에 포함되지 않은 평가 항목을 활용해 약 15만개의 질문과 36개 벤치마크에서 성능을 검증한 결과, 비교 대상 가운데 가장 높은 정확도를 기록했다. 속도도 가장 빨랐으며, 디시전-1이 2위 모델인 '퀘옛-1.0-라지(Quyet-1.0-Large)'보다 4.5배, GPT-6 Sol보다 최대 35배 빠르게 작동했다고 MS는 설명했다. (refs it:1342#s13, it:1342#s14, it:1342#s15)",
+   "sections[2].paragraphs[1]: MS 공식 블로그 기준 P50 지연은 GPT-6 Sol보다 약 35배 빠르고, 2위인 H2O-Lightning-4B v1.1보다 2.5배 빠르다. 오픈AI의 Decisions API도 GPT-6 Luna를 거치는 기존 리스폰스 API 방식 대비 약 10배 빠른 응답 속도를 제공한다. (refs it:1377#s8, it:1377#s19, it:1342#s30)",
+   "sections[2].bars (단위 배): GPT-6 Sol 대비 속도 비교 / context: 디시전-1과 비교 대상 모델의 상대 속도",
+   "sections[2].bars.items[0]: 디시전-1 vs GPT-6 Sol = 35 (it:1377#s8) [강조]",
+   "sections[2].bars.items[1]: 디시전-1 vs H2O-Lightning-4B v1.1 = 2.5 (it:1377#s8)",
+   "sections[2].bars.items[2]: 디시전-1 vs Quyet-1.0-Large = 4.5 (it:1342#s15)",
+   "sections[3].heading: 입력 변형 시 판단 변동률 1.3%, 선택지 순서 변경 시 변동 없음",
+   "sections[3].paragraphs[0]: 모델의 정확도뿐 아니라 일관성과 신뢰도도 주요 설계 목표로 삼았다. 동일한 요청의 표현이나 선택지 순서, 형식 등을 바꿔도 결과가 달라지지 않는지 평가한 결과, 8가지 방식으로 입력을 변형했을 때 판단이 바뀌는 비율은 평균 2%였다. 선택지 설명을 바꾸거나 순서를 뒤집고 섞은 경우에는 판단이 바뀌지 않았다. (refs it:1342#s10, it:1342#s11, it:1342#s12)",
+   "sections[4].heading: X박스·코파일럿 내부 적용, GPT-6 Sol 대비 14배 속도·200분의 1 비용 [확인 필요]",
+   "sections[4].paragraphs[0]: X박스 연구팀은 설문과 스팀(Steam), X 등에 올라온 1만건 이상의 사용자 의견을 주제별로 분류하는 데 디시전-1을 활용했다. GPT-6 Sol과 비슷한 수준의 품질을 유지하면서 처리 속도는 14배 이상 빨랐고 비용은 200분의 1 수준으로 줄었다. 코파일럿 팀의 응답 품질 평가에서도 디시전-1은 GPT-6 Luna와 경쟁할 만한 품질을 보이면서 속도는 100배 빨랐다. (refs it:1342#s19, it:1342#s20, it:1342#s21)",
+   "sections[4].paragraphs[1]: 긴급 장애 대응을 위한 지식 검색에서도 기존 LLM보다 빠르고 나은 성능을 보였으며, MS 디스커버리의 과학 실험 계획 조정 작업에서는 LLM 기반 평가보다 일관성이 46배 높았다. 안전성 평가에서는 유해 콘텐츠와 탈옥 시도, 프롬프트 인젝션 등을 포함한 11개 벤치마크의 5250개 요청을 테스트해 유해한 요청을 거부하면서도 정상적인 요청에 대한 활용성을 유지했다. (refs it:1342#s22, it:1342#s16, it:1342#s17)",
+   "sections[4].table (팀/비교 대상/품질/속도·비용): 내부 적용 사례별 성능 비교 / note: MS 내부 팀별 디시전-1 적용 결과",
+   "sections[4].table.rows[0]: X박스 연구팀 | GPT-6 Sol | 비슷한 수준 | 14배 이상 빠름, 200분의 1 비용",
+   "sections[4].table.rows[1]: 코파일럿 팀 | GPT-6 Luna | 경쟁할 만한 수준 | 100배 빠름",
+   "sections[4].table.rows[2]: MS 디스커버리 | LLM 기반 평가 | - | 일관성 46배 높음",
+   "sections[5].heading: 큐원3.5-9B 기반, 향후 MAI·오픈AI 모델로 확장 예정",
+   "sections[5].paragraphs[0]: 초기 버전은 '큐원3.5-9B'를 기반으로 구축됐으며, 앞으로 마이크로소프트의 'MAI'와 오픈AI의 다른 모델을 기반으로도 확장할 계획이다. 디시전-1은 MS 파운드리와 오픈라우터를 통해 이용할 수 있으며, 입력 토큰 가격은 100만개당 0.042달러이고 출력 토큰은 무료다. (refs it:1342#s3, it:1342#s23, it:1342#s24)"
+  ],
+  "page": {
+   "log": "절 6개, 단락 9개, 막대 1개, 표 1개, 타일 3개",
+   "attention": false,
+   "head_tiles": [
+    {
+     "value": "35배",
+     "label": "GPT-6 Sol 대비 속도",
+     "note": "P50 지연 기준",
+     "refs": [
+      "it:1377#s8",
+      "it:1377#s19"
+     ]
+    },
+    {
+     "value": "1.3%",
+     "label": "평균 결정 변동률",
+     "note": "8가지 입력 변형 평가",
+     "refs": [
+      "it:1377#s33",
+      "it:1342#s11"
+     ]
+    },
+    {
+     "value": "0.042달러",
+     "label": "입력 토큰 100만개당 가격",
+     "note": "출력 토큰 무료",
+     "refs": [
+      "it:1342#s24"
+     ]
+    }
+   ],
+   "sections": [
+    {
+     "heading": "구조화된 의사결정 특화 모델 공개, 오픈AI도 API 정식 출시",
+     "paragraphs": [
+      {
+       "text": "마이크로소프트(MS)는 9일 구조화된 의사결정 작업에 특화한 AI 모델 '마이크로소프트 디시전-1(Microsoft-Decision-1)'을 공개했다. 이 모델은 모델 선택과 요청 분류, 작업 우선순위 지정, 결과 검증, 에이전트 제어 등 다양한 작업에서 기존 대형언어모델(LLM)보다 빠르고 효율적인 의사결정을 지원한다. 한편 오픈AI는 'Decisions API(Decisions API)'를 7일 공개 베타 버전으로 정식 출시했다.",
+       "refs": [
+        "it:1342#s2",
+        "it:1342#s4",
+        "it:1342#s29"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "고정 선택지에 보정 확률 점수 반환, 3만2000 토큰 컨텍스트 처리",
+     "paragraphs": [
+      {
+       "text": "디시전-1은 고정된 선택지에 대한 보정 확률 점수를 한 번의 추론으로 산출하도록 설계됐다. 예/아니요 판정, 객관식 선택, 등급 평가를 지원하며, 평가 기준표에 따라 AI 응답이나 에이전트의 행동을 채점할 수도 있다. 최대 3만2000 토큰의 긴 입력 컨텍스트를 한 번에 처리할 수 있어 방대한 로그나 문서 검토에서 강점을 보인다.",
+       "refs": [
+        "it:1342#s5",
+        "it:1342#s6",
+        "it:1342#s8"
+       ]
+      },
+      {
+       "text": "MS는 이 모델이 반환하는 보정된 확률 점수를 활용해 확신도가 높으면 자동으로 작업을 처리하고, 애매한 경우 사람에게 검토를 요청하거나 재시도·우회하는 제어 레이어로 활용할 수 있다고 설명했다. 오픈AI의 Decisions API도 텍스트나 이미지 분석 시 산문 형태의 답변 대신 정해진 선택지나 확률, 점수만을 반환하여 소프트웨어가 즉시 처리할 수 있도록 지원한다.",
+       "refs": [
+        "it:1342#s9",
+        "it:1342#s30"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "36개 벤치마크 최고 정확도, GPT-6 Sol 대비 최대 35배 속도",
+     "paragraphs": [
+      {
+       "text": "학습 데이터에 포함되지 않은 평가 항목을 활용해 약 15만개의 질문과 36개 벤치마크에서 성능을 검증한 결과, 비교 대상 가운데 가장 높은 정확도를 기록했다. 속도도 가장 빨랐으며, 디시전-1이 2위 모델인 '퀘옛-1.0-라지(Quyet-1.0-Large)'보다 4.5배, GPT-6 Sol보다 최대 35배 빠르게 작동했다고 MS는 설명했다.",
+       "refs": [
+        "it:1342#s13",
+        "it:1342#s14",
+        "it:1342#s15"
+       ]
+      },
+      {
+       "text": "MS 공식 블로그 기준 P50 지연은 GPT-6 Sol보다 약 35배 빠르고, 2위인 H2O-Lightning-4B v1.1보다 2.5배 빠르다. 오픈AI의 Decisions API도 GPT-6 Luna를 거치는 기존 리스폰스 API 방식 대비 약 10배 빠른 응답 속도를 제공한다.",
+       "refs": [
+        "it:1377#s8",
+        "it:1377#s19",
+        "it:1342#s30"
+       ]
+      }
+     ],
+     "visual": "bars",
+     "bars": {
+      "title": "GPT-6 Sol 대비 속도 비교",
+      "context": "디시전-1과 비교 대상 모델의 상대 속도",
+      "unit": "배",
+      "items": [
+       {
+        "label": "디시전-1 vs GPT-6 Sol",
+        "value": "35",
+        "ref": "it:1377#s8",
+        "baseline": false,
+        "emphasis": true
+       },
+       {
+        "label": "디시전-1 vs H2O-Lightning-4B v1.1",
+        "value": "2.5",
+        "ref": "it:1377#s8",
+        "baseline": false,
+        "emphasis": false
+       },
+       {
+        "label": "디시전-1 vs Quyet-1.0-Large",
+        "value": "4.5",
+        "ref": "it:1342#s15",
+        "baseline": false,
+        "emphasis": false
+       }
+      ]
+     },
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "입력 변형 시 판단 변동률 1.3%, 선택지 순서 변경 시 변동 없음",
+     "paragraphs": [
+      {
+       "text": "모델의 정확도뿐 아니라 일관성과 신뢰도도 주요 설계 목표로 삼았다. 동일한 요청의 표현이나 선택지 순서, 형식 등을 바꿔도 결과가 달라지지 않는지 평가한 결과, 8가지 방식으로 입력을 변형했을 때 판단이 바뀌는 비율은 평균 2%였다. 선택지 설명을 바꾸거나 순서를 뒤집고 섞은 경우에는 판단이 바뀌지 않았다.",
+       "refs": [
+        "it:1342#s10",
+        "it:1342#s11",
+        "it:1342#s12"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "X박스·코파일럿 내부 적용, GPT-6 Sol 대비 14배 속도·200분의 1 비용",
+     "paragraphs": [
+      {
+       "text": "X박스 연구팀은 설문과 스팀(Steam), X 등에 올라온 1만건 이상의 사용자 의견을 주제별로 분류하는 데 디시전-1을 활용했다. GPT-6 Sol과 비슷한 수준의 품질을 유지하면서 처리 속도는 14배 이상 빨랐고 비용은 200분의 1 수준으로 줄었다. 코파일럿 팀의 응답 품질 평가에서도 디시전-1은 GPT-6 Luna와 경쟁할 만한 품질을 보이면서 속도는 100배 빨랐다.",
+       "refs": [
+        "it:1342#s19",
+        "it:1342#s20",
+        "it:1342#s21"
+       ]
+      },
+      {
+       "text": "긴급 장애 대응을 위한 지식 검색에서도 기존 LLM보다 빠르고 나은 성능을 보였으며, MS 디스커버리의 과학 실험 계획 조정 작업에서는 LLM 기반 평가보다 일관성이 46배 높았다. 안전성 평가에서는 유해 콘텐츠와 탈옥 시도, 프롬프트 인젝션 등을 포함한 11개 벤치마크의 5250개 요청을 테스트해 유해한 요청을 거부하면서도 정상적인 요청에 대한 활용성을 유지했다.",
+       "refs": [
+        "it:1342#s22",
+        "it:1342#s16",
+        "it:1342#s17"
+       ]
+      }
+     ],
+     "visual": "table",
+     "bars": null,
+     "table": {
+      "title": "내부 적용 사례별 성능 비교",
+      "note": "MS 내부 팀별 디시전-1 적용 결과",
+      "columns": [
+       "팀",
+       "비교 대상",
+       "품질",
+       "속도·비용"
+      ],
+      "rows": [
+       [
+        "X박스 연구팀",
+        "GPT-6 Sol",
+        "비슷한 수준",
+        "14배 이상 빠름, 200분의 1 비용"
+       ],
+       [
+        "코파일럿 팀",
+        "GPT-6 Luna",
+        "경쟁할 만한 수준",
+        "100배 빠름"
+       ],
+       [
+        "MS 디스커버리",
+        "LLM 기반 평가",
+        "-",
+        "일관성 46배 높음"
+       ]
+      ],
+      "refs": [
+       "it:1342#s20",
+       "it:1342#s21",
+       "it:1342#s22"
+      ]
+     },
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": true
+    },
+    {
+     "heading": "큐원3.5-9B 기반, 향후 MAI·오픈AI 모델로 확장 예정",
+     "paragraphs": [
+      {
+       "text": "초기 버전은 '큐원3.5-9B'를 기반으로 구축됐으며, 앞으로 마이크로소프트의 'MAI'와 오픈AI의 다른 모델을 기반으로도 확장할 계획이다. 디시전-1은 MS 파운드리와 오픈라우터를 통해 이용할 수 있으며, 입력 토큰 가격은 100만개당 0.042달러이고 출력 토큰은 무료다.",
+       "refs": [
+        "it:1342#s3",
+        "it:1342#s23",
+        "it:1342#s24"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    }
+   ],
+   "summary": "MS가 구조화된 의사결정 특화 모델 '디시전-1'을 공개하고, 오픈AI도 Decisions API를 정식 출시했다. GPT-6 Sol 대비 최대 35배 빠른 속도와 1.3%의 낮은 판단 변동률이 핵심이며, 출력 토큰 무료 정책이 비용 경쟁력을 더한다.",
+   "title": "MS 디시전-1·오픈AI Decisions API, 구조화된 의사결정 특화 공개"
+  },
+  "evidence": [
+   {
+    "id": "it:1342#s2",
+    "source": "AI타임스",
+    "text": "마이크로소프트(MS)가 AI 에이전트의 의사결정을 빠르고 효율적으로 처리하는 전용 모델을 공개했다. MS는 9일(현지시간) 구조화된 의사결정 작업에 특화한 AI 모델 '마이크로소프트 디시전-1(Microsoft-Decision-1)'을 공개했다. 초기 버전은 '큐원3.5-9B'를 기반으로 구축됐으며, 앞으로 마이크로소프트의 'MAI'와 오픈AI의 다른 모델을 기반으로도 확장할 계획이다.",
+    "title": "MS, 에이전트 의사결정 특화 모델 ‘디시전-1’ 공개…오픈AI도 API 정식 출시",
+    "url": null
+   },
+   {
+    "id": "it:1342#s4",
+    "source": "AI타임스",
+    "text": "초기 버전은 '큐원3.5-9B'를 기반으로 구축됐으며, 앞으로 마이크로소프트의 'MAI'와 오픈AI의 다른 모델을 기반으로도 확장할 계획이다. 이 모델은 모델 선택과 요청 분류, 작업 우선순위 지정, 결과 검증, 에이전트 제어 등 다양한 작업에서 기존 대형언어모델(LLM)보다 빠르고 효율적인 의사결정을 지원한다. 고정된 선택지에 대한 보정(calibration) 확률 점수를 한 번의 추론으로 산출하도록 설계됐다.",
+    "title": "MS, 에이전트 의사결정 특화 모델 ‘디시전-1’ 공개…오픈AI도 API 정식 출시",
+    "url": null
+   },
+   {
+    "id": "it:1342#s29",
+    "source": "AI타임스",
+    "text": "— OpenAI Developers (@OpenAIDevs) October 6, 2026 한편, 오픈AI는 지난달 데브데이 행사에서 제한적 프리뷰로 선보였던 '디시전스 API(Decisions API)'를 7일 공개 베타 버전으로 정식 출시했다. 'GPT-6 루나'를 거치는 기존 '리스폰스 API(Responses API)' 방식 대비 약 10배 빠른 응답 속도를 제공하는 이 API는 텍스트나 이미지 분석 시 산문 형태의 답변 대신 정해진 선택지나 확률, 점수만을 반환하여 소프트웨어가 즉시 처리할 수 있도록 지원한다.",
+    "title": "MS, 에이전트 의사결정 특화 모델 ‘디시전-1’ 공개…오픈AI도 API 정식 출시",
+    "url": null
+   },
+   {
+    "id": "it:1342#s5",
+    "source": "AI타임스",
+    "text": "이 모델은 모델 선택과 요청 분류, 작업 우선순위 지정, 결과 검증, 에이전트 제어 등 다양한 작업에서 기존 대형언어모델(LLM)보다 빠르고 효율적인 의사결정을 지원한다. 고정된 선택지에 대한 보정(calibration) 확률 점수를 한 번의 추론으로 산출하도록 설계됐다. 예/아니요 판정, 객관식 선택, 등급 평가를 지원하며, 평가 기준표에 따라 AI 응답이나 에이전트의 행동을 채점할 수도 있다.",
+    "title": "MS, 에이전트 의사결정 특화 모델 ‘디시전-1’ 공개…오픈AI도 API 정식 출시",
+    "url": null
+   },
+   {
+    "id": "it:1342#s6",
+    "source": "AI타임스",
+    "text": "고정된 선택지에 대한 보정(calibration) 확률 점수를 한 번의 추론으로 산출하도록 설계됐다. 예/아니요 판정, 객관식 선택, 등급 평가를 지원하며, 평가 기준표에 따라 AI 응답이나 에이전트의 행동을 채점할 수도 있다. 개발자는 구조화된 API 호출을 통해 결과를 받아 기존 애플리케이션과 AI 에이전트, 업무 흐름에 적용할 수 있다.",
+    "title": "MS, 에이전트 의사결정 특화 모델 ‘디시전-1’ 공개…오픈AI도 API 정식 출시",
+    "url": null
+   },
+   {
+    "id": "it:1342#s8",
+    "source": "AI타임스",
+    "text": "개발자는 구조화된 API 호출을 통해 결과를 받아 기존 애플리케이션과 AI 에이전트, 업무 흐름에 적용할 수 있다. 특히 최대 3만2000 토큰의 긴 입력 컨텍스트를 한 번에 처리할 수 있어, 방대한 로그나 문서 검토에서 강점을 보인다. MS는 이 모델이 반환하는 보정된 확률 점수를 활용해 \"확신도가 높으면 자동으로 작업을 처리하고, 애매한 경우 사람에게 검토를 요청하거나 재시도·우회하는 제어 레이어로 효과적으로 활용할 수 있다\"고 전했다.",
+    "title": "MS, 에이전트 의사결정 특화 모델 ‘디시전-1’ 공개…오픈AI도 API 정식 출시",
+    "url": null
+   },
+   {
+    "id": "it:1342#s9",
+    "source": "AI타임스",
+    "text": "특히 최대 3만2000 토큰의 긴 입력 컨텍스트를 한 번에 처리할 수 있어, 방대한 로그나 문서 검토에서 강점을 보인다. MS는 이 모델이 반환하는 보정된 확률 점수를 활용해 \"확신도가 높으면 자동으로 작업을 처리하고, 애매한 경우 사람에게 검토를 요청하거나 재시도·우회하는 제어 레이어로 효과적으로 활용할 수 있다\"고 전했다. 모델의 정확도뿐 아니라 일관성과 신뢰도도 주요 설계 목표로 삼았다.",
+    "title": "MS, 에이전트 의사결정 특화 모델 ‘디시전-1’ 공개…오픈AI도 API 정식 출시",
+    "url": null
+   },
+   {
+    "id": "it:1342#s30",
+    "source": "AI타임스",
+    "text": "한편, 오픈AI는 지난달 데브데이 행사에서 제한적 프리뷰로 선보였던 '디시전스 API(Decisions API)'를 7일 공개 베타 버전으로 정식 출시했다. 'GPT-6 루나'를 거치는 기존 '리스폰스 API(Responses API)' 방식 대비 약 10배 빠른 응답 속도를 제공하는 이 API는 텍스트나 이미지 분석 시 산문 형태의 답변 대신 정해진 선택지나 확률, 점수만을 반환하여 소프트웨어가 즉시 처리할 수 있도록 지원한다. 박찬 기자 cpark@aitimes.com",
+    "title": "MS, 에이전트 의사결정 특화 모델 ‘디시전-1’ 공개…오픈AI도 API 정식 출시",
+    "url": null
+   },
+   {
+    "id": "it:1342#s13",
+    "source": "AI타임스",
+    "text": "선택지 설명을 바꾸거나 순서를 뒤집고 섞은 경우에는 판단이 바뀌지 않았다고 밝혔다. 학습 데이터에 포함되지 않은 평가 항목을 활용해 약 15만개의 질문과 36개 벤치마크에서 성능을 검증한 결과, 비교 대상 가운데 가장 높은 정확도를 기록했다. 속도도 가장 빨랐다.",
+    "title": "MS, 에이전트 의사결정 특화 모델 ‘디시전-1’ 공개…오픈AI도 API 정식 출시",
+    "url": null
+   },
+   {
+    "id": "it:1342#s14",
+    "source": "AI타임스",
+    "text": "학습 데이터에 포함되지 않은 평가 항목을 활용해 약 15만개의 질문과 36개 벤치마크에서 성능을 검증한 결과, 비교 대상 가운데 가장 높은 정확도를 기록했다. 속도도 가장 빨랐다. 측정 결과 디시전-1이 2위 모델인 '퀘옛-1.0-라지(Quyet-1.0-Large)'보다 4.5배, 'GPT-6 솔'보다 최대 35배 빠르게 작동했다고 설명했다.",
+    "title": "MS, 에이전트 의사결정 특화 모델 ‘디시전-1’ 공개…오픈AI도 API 정식 출시",
+    "url": null
+   },
+   {
+    "id": "it:1342#s15",
+    "source": "AI타임스",
+    "text": "속도도 가장 빨랐다. 측정 결과 디시전-1이 2위 모델인 '퀘옛-1.0-라지(Quyet-1.0-Large)'보다 4.5배, 'GPT-6 솔'보다 최대 35배 빠르게 작동했다고 설명했다. 안전성 평가에서는 유해 콘텐츠와 탈옥 시도, 프롬프트 인젝션 등을 포함한 11개 벤치마크의 5250개 요청을 테스트했다.",
+    "title": "MS, 에이전트 의사결정 특화 모델 ‘디시전-1’ 공개…오픈AI도 API 정식 출시",
+    "url": null
+   },
+   {
+    "id": "it:1377#s8",
+    "source": "GeekNews",
+    "text": "Microsoft-Decision-1 achieved the highest accuracy in our 36-benchmark comparison, spanning nearly 150,000 questions across benchmarks kept blind from training. And in our benchmarking, it was the fastest measured: 2.5 times quicker than H2O-Lightning-4B v1.1, the runner-up, and 35 times quicker than GPT-6 Sol. Editor’s note: This post was updated from the original to add benchmarks for Jev on accuracy and calibration.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s19",
+    "source": "GeekNews",
+    "text": "For example, adding just 100 milliseconds to each of 20 sequential decisions adds two seconds to the overall workflow. Microsoft-Decision-1 P50 latency is ~35x faster than GPT-6 Sol. 2.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1342#s10",
+    "source": "AI타임스",
+    "text": "MS는 이 모델이 반환하는 보정된 확률 점수를 활용해 \"확신도가 높으면 자동으로 작업을 처리하고, 애매한 경우 사람에게 검토를 요청하거나 재시도·우회하는 제어 레이어로 효과적으로 활용할 수 있다\"고 전했다. 모델의 정확도뿐 아니라 일관성과 신뢰도도 주요 설계 목표로 삼았다. 동일한 요청의 표현이나 선택지 순서, 형식 등을 바꿔도 결과가 달라지지 않는지 평가한 결과, 8가지 방식으로 입력을 변형했을 때 판단이 바뀌는 비율은 평균 1.3%였다.",
+    "title": "MS, 에이전트 의사결정 특화 모델 ‘디시전-1’ 공개…오픈AI도 API 정식 출시",
+    "url": null
+   },
+   {
+    "id": "it:1342#s11",
+    "source": "AI타임스",
+    "text": "모델의 정확도뿐 아니라 일관성과 신뢰도도 주요 설계 목표로 삼았다. 동일한 요청의 표현이나 선택지 순서, 형식 등을 바꿔도 결과가 달라지지 않는지 평가한 결과, 8가지 방식으로 입력을 변형했을 때 판단이 바뀌는 비율은 평균 1.3%였다. 선택지 설명을 바꾸거나 순서를 뒤집고 섞은 경우에는 판단이 바뀌지 않았다고 밝혔다.",
+    "title": "MS, 에이전트 의사결정 특화 모델 ‘디시전-1’ 공개…오픈AI도 API 정식 출시",
+    "url": null
+   },
+   {
+    "id": "it:1342#s12",
+    "source": "AI타임스",
+    "text": "동일한 요청의 표현이나 선택지 순서, 형식 등을 바꿔도 결과가 달라지지 않는지 평가한 결과, 8가지 방식으로 입력을 변형했을 때 판단이 바뀌는 비율은 평균 1.3%였다. 선택지 설명을 바꾸거나 순서를 뒤집고 섞은 경우에는 판단이 바뀌지 않았다고 밝혔다. 학습 데이터에 포함되지 않은 평가 항목을 활용해 약 15만개의 질문과 36개 벤치마크에서 성능을 검증한 결과, 비교 대상 가운데 가장 높은 정확도를 기록했다.",
+    "title": "MS, 에이전트 의사결정 특화 모델 ‘디시전-1’ 공개…오픈AI도 API 정식 출시",
+    "url": null
+   },
+   {
+    "id": "it:1342#s19",
+    "source": "AI타임스",
+    "text": "실제 업무 적용에서도 속도와 비용 절감 효과가 확인됐다. X박스 연구팀은 설문과 스팀(Steam), X 등에 올라온 1만건 이상의 사용자 의견을 주제별로 분류하는 데 디시전-1을 활용했다. GPT-6 솔과 비슷한 수준의 품질을 유지하면서 처리 속도는 14배 이상 빨랐고 비용은 200분의 1 수준으로 줄었다.",
+    "title": "MS, 에이전트 의사결정 특화 모델 ‘디시전-1’ 공개…오픈AI도 API 정식 출시",
+    "url": null
+   },
+   {
+    "id": "it:1342#s20",
+    "source": "AI타임스",
+    "text": "X박스 연구팀은 설문과 스팀(Steam), X 등에 올라온 1만건 이상의 사용자 의견을 주제별로 분류하는 데 디시전-1을 활용했다. GPT-6 솔과 비슷한 수준의 품질을 유지하면서 처리 속도는 14배 이상 빨랐고 비용은 200분의 1 수준으로 줄었다. 코파일럿 팀의 응답 품질 평가에서도 디시전-1은 'GPT-5.6 루나'와 경쟁할 만한 품질을 보이면서 속도는 100배 빨랐다.",
+    "title": "MS, 에이전트 의사결정 특화 모델 ‘디시전-1’ 공개…오픈AI도 API 정식 출시",
+    "url": null
+   },
+   {
+    "id": "it:1342#s21",
+    "source": "AI타임스",
+    "text": "GPT-6 솔과 비슷한 수준의 품질을 유지하면서 처리 속도는 14배 이상 빨랐고 비용은 200분의 1 수준으로 줄었다. 코파일럿 팀의 응답 품질 평가에서도 디시전-1은 'GPT-5.6 루나'와 경쟁할 만한 품질을 보이면서 속도는 100배 빨랐다. 긴급 장애 대응을 위한 지식 검색에서도 기존 LLM보다 빠르고 나은 성능을 보였으며, MS 디스커버리의 과학 실험 계획 조정 작업에서는 LLM 기반 평가보다 일관성이 46배 높았다고 MS는 밝혔다.",
+    "title": "MS, 에이전트 의사결정 특화 모델 ‘디시전-1’ 공개…오픈AI도 API 정식 출시",
+    "url": null
+   },
+   {
+    "id": "it:1342#s22",
+    "source": "AI타임스",
+    "text": "코파일럿 팀의 응답 품질 평가에서도 디시전-1은 'GPT-5.6 루나'와 경쟁할 만한 품질을 보이면서 속도는 100배 빨랐다. 긴급 장애 대응을 위한 지식 검색에서도 기존 LLM보다 빠르고 나은 성능을 보였으며, MS 디스커버리의 과학 실험 계획 조정 작업에서는 LLM 기반 평가보다 일관성이 46배 높았다고 MS는 밝혔다. 디시전-1은 MS 파운드리와 오픈라우터를 통해 이용할 수 있다.",
+    "title": "MS, 에이전트 의사결정 특화 모델 ‘디시전-1’ 공개…오픈AI도 API 정식 출시",
+    "url": null
+   },
+   {
+    "id": "it:1342#s16",
+    "source": "AI타임스",
+    "text": "측정 결과 디시전-1이 2위 모델인 '퀘옛-1.0-라지(Quyet-1.0-Large)'보다 4.5배, 'GPT-6 솔'보다 최대 35배 빠르게 작동했다고 설명했다. 안전성 평가에서는 유해 콘텐츠와 탈옥 시도, 프롬프트 인젝션 등을 포함한 11개 벤치마크의 5250개 요청을 테스트했다. 유해한 요청을 거부하면서도 정상적인 요청에 대한 활용성을 유지했다는 설명이다.",
+    "title": "MS, 에이전트 의사결정 특화 모델 ‘디시전-1’ 공개…오픈AI도 API 정식 출시",
+    "url": null
+   },
+   {
+    "id": "it:1342#s17",
+    "source": "AI타임스",
+    "text": "안전성 평가에서는 유해 콘텐츠와 탈옥 시도, 프롬프트 인젝션 등을 포함한 11개 벤치마크의 5250개 요청을 테스트했다. 유해한 요청을 거부하면서도 정상적인 요청에 대한 활용성을 유지했다는 설명이다. 실제 업무 적용에서도 속도와 비용 절감 효과가 확인됐다.",
+    "title": "MS, 에이전트 의사결정 특화 모델 ‘디시전-1’ 공개…오픈AI도 API 정식 출시",
+    "url": null
+   },
+   {
+    "id": "it:1342#s3",
+    "source": "AI타임스",
+    "text": "MS는 9일(현지시간) 구조화된 의사결정 작업에 특화한 AI 모델 '마이크로소프트 디시전-1(Microsoft-Decision-1)'을 공개했다. 초기 버전은 '큐원3.5-9B'를 기반으로 구축됐으며, 앞으로 마이크로소프트의 'MAI'와 오픈AI의 다른 모델을 기반으로도 확장할 계획이다. 이 모델은 모델 선택과 요청 분류, 작업 우선순위 지정, 결과 검증, 에이전트 제어 등 다양한 작업에서 기존 대형언어모델(LLM)보다 빠르고 효율적인 의사결정을 지원한다.",
+    "title": "MS, 에이전트 의사결정 특화 모델 ‘디시전-1’ 공개…오픈AI도 API 정식 출시",
+    "url": null
+   },
+   {
+    "id": "it:1342#s23",
+    "source": "AI타임스",
+    "text": "긴급 장애 대응을 위한 지식 검색에서도 기존 LLM보다 빠르고 나은 성능을 보였으며, MS 디스커버리의 과학 실험 계획 조정 작업에서는 LLM 기반 평가보다 일관성이 46배 높았다고 MS는 밝혔다. 디시전-1은 MS 파운드리와 오픈라우터를 통해 이용할 수 있다. 입력 토큰 가격은 100만개당 0.042달러이며, 출력 토큰은 무료다.",
+    "title": "MS, 에이전트 의사결정 특화 모델 ‘디시전-1’ 공개…오픈AI도 API 정식 출시",
+    "url": null
+   },
+   {
+    "id": "it:1342#s24",
+    "source": "AI타임스",
+    "text": "디시전-1은 MS 파운드리와 오픈라우터를 통해 이용할 수 있다. 입력 토큰 가격은 100만개당 0.042달러이며, 출력 토큰은 무료다. Let your app choose the right model, tool, or action in near real-time with Decisions API, now available to all developers in public beta.",
+    "title": "MS, 에이전트 의사결정 특화 모델 ‘디시전-1’ 공개…오픈AI도 API 정식 출시",
+    "url": null
+   },
+   {
+    "id": "it:1377#s33",
+    "source": "GeekNews",
+    "text": "We perturb the same request in eight ways and measure how often the decision flips. Microsoft-Decision-1 changes its decision on 1.3% of perturbations on average with zero flips when option descriptions are paraphrased or when options are reversed or shuffled. 4.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1342#s1",
+    "source": "AI타임스",
+    "text": "마이크로소프트(MS)가 AI 에이전트의 의사결정을 빠르고 효율적으로 처리하는 전용 모델을 공개했다. MS는 9일(현지시간) 구조화된 의사결정 작업에 특화한 AI 모델 '마이크로소프트 디시전-1(Microsoft-Decision-1)'을 공개했다.",
+    "title": "MS, 에이전트 의사결정 특화 모델 ‘디시전-1’ 공개…오픈AI도 API 정식 출시",
+    "url": null
+   },
+   {
+    "id": "og:1377#q1",
+    "source": "GeekNews",
+    "text": "Today we’re introducing Microsoft-Decision-1, our new model for fast decision-scoring, available in Microsoft Foundry and through OpenRouter.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "og:1377#q2",
+    "source": "GeekNews",
+    "text": "Microsoft-Decision-1 achieved the highest accuracy in our 36-benchmark comparison, spanning nearly 150,000 questions across benchmarks kept blind from training.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "og:1377#q3",
+    "source": "GeekNews",
+    "text": "And in our benchmarking, it was the fastest measured: 2.5 times quicker than H2O-Lightning-4B v1.1, the runner-up, and 35 times quicker than GPT-6 Sol.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "og:1377#q4",
+    "source": "GeekNews",
+    "text": "To build Microsoft-Decision-1, we post trained Qwen3.5-9B for fast, single-pass decision scoring and will soon rebase it on other models, including Microsoft AI (MAI) and OpenAI.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "og:1377#q5",
+    "source": "GeekNews",
+    "text": "Microsoft-Decision-1 changes its decision on 1.3% of perturbations on average with zero flips when option descriptions are paraphrased or when options are reversed or shuffled.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "og:1377#q6",
+    "source": "GeekNews",
+    "text": "XBOX Research used Microsoft-Decision-1 to process more than 10,000 open-ended pieces of feedback and reviews from surveys, STEAM, and Twitter/X",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1342#s7",
+    "source": "AI타임스",
+    "text": "예/아니요 판정, 객관식 선택, 등급 평가를 지원하며, 평가 기준표에 따라 AI 응답이나 에이전트의 행동을 채점할 수도 있다. 개발자는 구조화된 API 호출을 통해 결과를 받아 기존 애플리케이션과 AI 에이전트, 업무 흐름에 적용할 수 있다. 특히 최대 3만2000 토큰의 긴 입력 컨텍스트를 한 번에 처리할 수 있어, 방대한 로그나 문서 검토에서 강점을 보인다.",
+    "title": "MS, 에이전트 의사결정 특화 모델 ‘디시전-1’ 공개…오픈AI도 API 정식 출시",
+    "url": null
+   },
+   {
+    "id": "it:1377",
+    "source": "GeekNews",
+    "text": "Microsoft 공식 블로그에 따르면 Microsoft-Decision-1은 Microsoft Foundry와 OpenRouter에서 제공되는 빠른 의사결정 점수화 모델로, 36개 벤치마크(약 150,000개 질문)에서 최고 정확도를 기록했으며 H2O-Lightning-4B v1.1보다 2.5배, GPT-6 Sol보다 35배 빠르다. Qwen3.5-9B 기반 후학습 모델로, 입력 변형에 대한 평균 결정 변동률은 1.3%이며 옵션 재술어화·순서 변경 시에는 결정이 바뀌지 않는다. XBOX Research는 이 모델로 10,000건 이상의 오픈엔드 피드백을 연구자가 정한 테마로 분류했다.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s1",
+    "source": "GeekNews",
+    "text": "Decision models are quickly emerging as an important new category in AI. Unlike LLMs, which are designed to generate text or reason through complex problems, decision models are purpose-built to deliver structured outputs that software can immediately act on.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s2",
+    "source": "GeekNews",
+    "text": "Decision models are quickly emerging as an important new category in AI. Unlike LLMs, which are designed to generate text or reason through complex problems, decision models are purpose-built to deliver structured outputs that software can immediately act on. And once you understand that capability—making decisions and classifying things at very low cost with high performance—all kinds of useful tasks get unlocked.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s3",
+    "source": "GeekNews",
+    "text": "Unlike LLMs, which are designed to generate text or reason through complex problems, decision models are purpose-built to deliver structured outputs that software can immediately act on. And once you understand that capability—making decisions and classifying things at very low cost with high performance—all kinds of useful tasks get unlocked. Today we’re introducing Microsoft-Decision-1, our new model for fast decision-scoring, available in Microsoft Foundry and through OpenRouter.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s4",
+    "source": "GeekNews",
+    "text": "And once you understand that capability—making decisions and classifying things at very low cost with high performance—all kinds of useful tasks get unlocked. Today we’re introducing Microsoft-Decision-1, our new model for fast decision-scoring, available in Microsoft Foundry and through OpenRouter. This model is designed for routing, classification, prioritization, verification, and workflow control, making it easier to incorporate decision intelligence into existing applications, agents, and workflows in a secure, trusted environment.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s5",
+    "source": "GeekNews",
+    "text": "Today we’re introducing Microsoft-Decision-1, our new model for fast decision-scoring, available in Microsoft Foundry and through OpenRouter. This model is designed for routing, classification, prioritization, verification, and workflow control, making it easier to incorporate decision intelligence into existing applications, agents, and workflows in a secure, trusted environment. Microsoft-Decision-1 delivers top performance in latency and quality on structured decision tasks to outperform both LLMs and other decision models.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s6",
+    "source": "GeekNews",
+    "text": "This model is designed for routing, classification, prioritization, verification, and workflow control, making it easier to incorporate decision intelligence into existing applications, agents, and workflows in a secure, trusted environment. Microsoft-Decision-1 delivers top performance in latency and quality on structured decision tasks to outperform both LLMs and other decision models. Microsoft-Decision-1 achieved the highest accuracy in our 36-benchmark comparison, spanning nearly 150,000 questions across benchmarks kept blind from training.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s7",
+    "source": "GeekNews",
+    "text": "Microsoft-Decision-1 delivers top performance in latency and quality on structured decision tasks to outperform both LLMs and other decision models. Microsoft-Decision-1 achieved the highest accuracy in our 36-benchmark comparison, spanning nearly 150,000 questions across benchmarks kept blind from training. And in our benchmarking, it was the fastest measured: 2.5 times quicker than H2O-Lightning-4B v1.1, the runner-up, and 35 times quicker than GPT-6 Sol.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s9",
+    "source": "GeekNews",
+    "text": "And in our benchmarking, it was the fastest measured: 2.5 times quicker than H2O-Lightning-4B v1.1, the runner-up, and 35 times quicker than GPT-6 Sol. Editor’s note: This post was updated from the original to add benchmarks for Jev on accuracy and calibration. How Microsoft-Decision-1 works",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s10",
+    "source": "GeekNews",
+    "text": "Editor’s note: This post was updated from the original to add benchmarks for Jev on accuracy and calibration. How Microsoft-Decision-1 works To build Microsoft-Decision-1, we post trained Qwen3.5-9B for fast, single-pass decision scoring and will soon rebase it on other models, including Microsoft AI (MAI) and OpenAI.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1342#s18",
+    "source": "AI타임스",
+    "text": "유해한 요청을 거부하면서도 정상적인 요청에 대한 활용성을 유지했다는 설명이다. 실제 업무 적용에서도 속도와 비용 절감 효과가 확인됐다. X박스 연구팀은 설문과 스팀(Steam), X 등에 올라온 1만건 이상의 사용자 의견을 주제별로 분류하는 데 디시전-1을 활용했다.",
+    "title": "MS, 에이전트 의사결정 특화 모델 ‘디시전-1’ 공개…오픈AI도 API 정식 출시",
+    "url": null
+   },
+   {
+    "id": "it:1377#s11",
+    "source": "GeekNews",
+    "text": "How Microsoft-Decision-1 works To build Microsoft-Decision-1, we post trained Qwen3.5-9B for fast, single-pass decision scoring and will soon rebase it on other models, including Microsoft AI (MAI) and OpenAI. When given a fixed set of answer options, Microsoft-Decision-1 provides a calibrated probability score for each option.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s12",
+    "source": "GeekNews",
+    "text": "To build Microsoft-Decision-1, we post trained Qwen3.5-9B for fast, single-pass decision scoring and will soon rebase it on other models, including Microsoft AI (MAI) and OpenAI. When given a fixed set of answer options, Microsoft-Decision-1 provides a calibrated probability score for each option. The model supports yes/no, multiple-choice, and rating options, as well as rubric-based grading of AI responses and agent actions, all through a simple structured API call.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s13",
+    "source": "GeekNews",
+    "text": "When given a fixed set of answer options, Microsoft-Decision-1 provides a calibrated probability score for each option. The model supports yes/no, multiple-choice, and rating options, as well as rubric-based grading of AI responses and agent actions, all through a simple structured API call. To build a reliable decision model, we had to address several challenges:",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s14",
+    "source": "GeekNews",
+    "text": "The model supports yes/no, multiple-choice, and rating options, as well as rubric-based grading of AI responses and agent actions, all through a simple structured API call. To build a reliable decision model, we had to address several challenges: 1.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s15",
+    "source": "GeekNews",
+    "text": "To build a reliable decision model, we had to address several challenges: 1. Speed",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s16",
+    "source": "GeekNews",
+    "text": "1. Speed Each decision adds delay, especially when one step depends on another.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s17",
+    "source": "GeekNews",
+    "text": "Speed Each decision adds delay, especially when one step depends on another. For example, adding just 100 milliseconds to each of 20 sequential decisions adds two seconds to the overall workflow.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1342#s25",
+    "source": "AI타임스",
+    "text": "입력 토큰 가격은 100만개당 0.042달러이며, 출력 토큰은 무료다. Let your app choose the right model, tool, or action in near real-time with Decisions API, now available to all developers in public beta. The Decisions API makes decisions up to 10x faster than GPT-6 Luna through the Responses API.",
+    "title": "MS, 에이전트 의사결정 특화 모델 ‘디시전-1’ 공개…오픈AI도 API 정식 출시",
+    "url": null
+   },
+   {
+    "id": "it:1377#s18",
+    "source": "GeekNews",
+    "text": "Each decision adds delay, especially when one step depends on another. For example, adding just 100 milliseconds to each of 20 sequential decisions adds two seconds to the overall workflow. Microsoft-Decision-1 P50 latency is ~35x faster than GPT-6 Sol.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1342#s26",
+    "source": "AI타임스",
+    "text": "Let your app choose the right model, tool, or action in near real-time with Decisions API, now available to all developers in public beta. The Decisions API makes decisions up to 10x faster than GPT-6 Luna through the Responses API. pic.twitter.com/zhgRVzJ3aP",
+    "title": "MS, 에이전트 의사결정 특화 모델 ‘디시전-1’ 공개…오픈AI도 API 정식 출시",
+    "url": null
+   },
+   {
+    "id": "it:1342#s27",
+    "source": "AI타임스",
+    "text": "The Decisions API makes decisions up to 10x faster than GPT-6 Luna through the Responses API. pic.twitter.com/zhgRVzJ3aP — OpenAI Developers (@OpenAIDevs) October 6, 2026",
+    "title": "MS, 에이전트 의사결정 특화 모델 ‘디시전-1’ 공개…오픈AI도 API 정식 출시",
+    "url": null
+   },
+   {
+    "id": "it:1377#s20",
+    "source": "GeekNews",
+    "text": "Microsoft-Decision-1 P50 latency is ~35x faster than GPT-6 Sol. 2. Quality that generalizes",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1342#s28",
+    "source": "AI타임스",
+    "text": "pic.twitter.com/zhgRVzJ3aP — OpenAI Developers (@OpenAIDevs) October 6, 2026 한편, 오픈AI는 지난달 데브데이 행사에서 제한적 프리뷰로 선보였던 '디시전스 API(Decisions API)'를 7일 공개 베타 버전으로 정식 출시했다.",
+    "title": "MS, 에이전트 의사결정 특화 모델 ‘디시전-1’ 공개…오픈AI도 API 정식 출시",
+    "url": null
+   },
+   {
+    "id": "it:1377#s21",
+    "source": "GeekNews",
+    "text": "2. Quality that generalizes It’s easy to overfit a model for one benchmark or one type of decision task.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s22",
+    "source": "GeekNews",
+    "text": "Quality that generalizes It’s easy to overfit a model for one benchmark or one type of decision task. We need to know whether that quality carries over to various tasks the model wasn’t trained on.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s23",
+    "source": "GeekNews",
+    "text": "It’s easy to overfit a model for one benchmark or one type of decision task. We need to know whether that quality carries over to various tasks the model wasn’t trained on. That’s why we evaluated Microsoft-Decision-1 across dozens of benchmarks kept blinded from training, spanning routing, ranking, long context, multilingual and out-of-distribution tasks, reasoning, and safety.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1342#s31",
+    "source": "AI타임스",
+    "text": "'GPT-6 루나'를 거치는 기존 '리스폰스 API(Responses API)' 방식 대비 약 10배 빠른 응답 속도를 제공하는 이 API는 텍스트나 이미지 분석 시 산문 형태의 답변 대신 정해진 선택지나 확률, 점수만을 반환하여 소프트웨어가 즉시 처리할 수 있도록 지원한다. 박찬 기자 cpark@aitimes.com",
+    "title": "MS, 에이전트 의사결정 특화 모델 ‘디시전-1’ 공개…오픈AI도 API 정식 출시",
+    "url": null
+   },
+   {
+    "id": "it:1377#s24",
+    "source": "GeekNews",
+    "text": "We need to know whether that quality carries over to various tasks the model wasn’t trained on. That’s why we evaluated Microsoft-Decision-1 across dozens of benchmarks kept blinded from training, spanning routing, ranking, long context, multilingual and out-of-distribution tasks, reasoning, and safety. We also took several of the top public models on the popular open leaderboard JevBench and tested them across 36 additional public and private benchmarks.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s25",
+    "source": "GeekNews",
+    "text": "That’s why we evaluated Microsoft-Decision-1 across dozens of benchmarks kept blinded from training, spanning routing, ranking, long context, multilingual and out-of-distribution tasks, reasoning, and safety. We also took several of the top public models on the popular open leaderboard JevBench and tested them across 36 additional public and private benchmarks. Microsoft-Decision-1 performed the best across these broader sets of benchmarks, demonstrating strong generalization.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s26",
+    "source": "GeekNews",
+    "text": "We also took several of the top public models on the popular open leaderboard JevBench and tested them across 36 additional public and private benchmarks. Microsoft-Decision-1 performed the best across these broader sets of benchmarks, demonstrating strong generalization. 3.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s27",
+    "source": "GeekNews",
+    "text": "Microsoft-Decision-1 performed the best across these broader sets of benchmarks, demonstrating strong generalization. 3. Robustness",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s28",
+    "source": "GeekNews",
+    "text": "3. Robustness Equivalent inputs should produce equivalent decisions.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s29",
+    "source": "GeekNews",
+    "text": "Robustness Equivalent inputs should produce equivalent decisions. In production, states and instructions get paraphrased, option descriptions change, choices are reordered, keys change, and harmless formatting noise appears.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s30",
+    "source": "GeekNews",
+    "text": "Equivalent inputs should produce equivalent decisions. In production, states and instructions get paraphrased, option descriptions change, choices are reordered, keys change, and harmless formatting noise appears. None of those changes should materially alter the decision.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s31",
+    "source": "GeekNews",
+    "text": "In production, states and instructions get paraphrased, option descriptions change, choices are reordered, keys change, and harmless formatting noise appears. None of those changes should materially alter the decision. We perturb the same request in eight ways and measure how often the decision flips.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s32",
+    "source": "GeekNews",
+    "text": "None of those changes should materially alter the decision. We perturb the same request in eight ways and measure how often the decision flips. Microsoft-Decision-1 changes its decision on 1.3% of perturbations on average with zero flips when option descriptions are paraphrased or when options are reversed or shuffled.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s34",
+    "source": "GeekNews",
+    "text": "Microsoft-Decision-1 changes its decision on 1.3% of perturbations on average with zero flips when option descriptions are paraphrased or when options are reversed or shuffled. 4. Probability and confidence calibration",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s35",
+    "source": "GeekNews",
+    "text": "4. Probability and confidence calibration The probability itself is part of the API, not just a ranking score.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s36",
+    "source": "GeekNews",
+    "text": "Probability and confidence calibration The probability itself is part of the API, not just a ranking score. Applications use confidence to decide when to act, defer, or ask for review, so a 90% prediction should be right about nine times out of 10 on representative cases.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s37",
+    "source": "GeekNews",
+    "text": "The probability itself is part of the API, not just a ranking score. Applications use confidence to decide when to act, defer, or ask for review, so a 90% prediction should be right about nine times out of 10 on representative cases. 5.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s38",
+    "source": "GeekNews",
+    "text": "Applications use confidence to decide when to act, defer, or ask for review, so a 90% prediction should be right about nine times out of 10 on representative cases. 5. Safety",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s39",
+    "source": "GeekNews",
+    "text": "5. Safety A decision model should recognize harmful requests without needlessly blocking harmless ones.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s40",
+    "source": "GeekNews",
+    "text": "Safety A decision model should recognize harmful requests without needlessly blocking harmless ones. We tested Microsoft-Decision-1 on 5,250 requests across 11 benchmarks, covering harmful content, jailbreak attempts, and prompt injection, and found that the model successfully refused harmful behavior while retaining a high degree of utility.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s41",
+    "source": "GeekNews",
+    "text": "A decision model should recognize harmful requests without needlessly blocking harmless ones. We tested Microsoft-Decision-1 on 5,250 requests across 11 benchmarks, covering harmful content, jailbreak attempts, and prompt injection, and found that the model successfully refused harmful behavior while retaining a high degree of utility. Demo examples",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s42",
+    "source": "GeekNews",
+    "text": "We tested Microsoft-Decision-1 on 5,250 requests across 11 benchmarks, covering harmful content, jailbreak attempts, and prompt injection, and found that the model successfully refused harmful behavior while retaining a high degree of utility. Demo examples Classification is a key use case for decision models.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s43",
+    "source": "GeekNews",
+    "text": "Demo examples Classification is a key use case for decision models. Check out how accurately and quickly Microsoft-Decision-1 can categorize a variety of queries compared to GPT-6 Sol:",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s44",
+    "source": "GeekNews",
+    "text": "Classification is a key use case for decision models. Check out how accurately and quickly Microsoft-Decision-1 can categorize a variety of queries compared to GPT-6 Sol: Decision models can also be efficient for computer use scenarios.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s45",
+    "source": "GeekNews",
+    "text": "Check out how accurately and quickly Microsoft-Decision-1 can categorize a variety of queries compared to GPT-6 Sol: Decision models can also be efficient for computer use scenarios. This demo shows how fast Microsoft-Decision-1 can complete the task of buying a backpack compared to GPT-6 Sol:",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s46",
+    "source": "GeekNews",
+    "text": "Decision models can also be efficient for computer use scenarios. This demo shows how fast Microsoft-Decision-1 can complete the task of buying a backpack compared to GPT-6 Sol: How we’re testing Microsoft-Decision-1 internally",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s47",
+    "source": "GeekNews",
+    "text": "This demo shows how fast Microsoft-Decision-1 can complete the task of buying a backpack compared to GPT-6 Sol: How we’re testing Microsoft-Decision-1 internally Here are some of the ways we’ve been testing Microsoft-Decision-1 internally, with a lot more to come.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s48",
+    "source": "GeekNews",
+    "text": "How we’re testing Microsoft-Decision-1 internally Here are some of the ways we’ve been testing Microsoft-Decision-1 internally, with a lot more to come. Labeling data",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s49",
+    "source": "GeekNews",
+    "text": "Here are some of the ways we’ve been testing Microsoft-Decision-1 internally, with a lot more to come. Labeling data XBOX Research used Microsoft-Decision-1 to process more than 10,000 open-ended pieces of feedback and reviews from surveys, STEAM, and Twitter/X and sort them into a fixed set of themes established by researchers to understand what people are saying about different games, launches, streams, and more.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s50",
+    "source": "GeekNews",
+    "text": "Labeling data XBOX Research used Microsoft-Decision-1 to process more than 10,000 open-ended pieces of feedback and reviews from surveys, STEAM, and Twitter/X and sort them into a fixed set of themes established by researchers to understand what people are saying about different games, launches, streams, and more. They found Microsoft-Decision-1 to be competitive on quality with GPT-6 Sol while running over 14 times faster and 200 times less expensive.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s51",
+    "source": "GeekNews",
+    "text": "XBOX Research used Microsoft-Decision-1 to process more than 10,000 open-ended pieces of feedback and reviews from surveys, STEAM, and Twitter/X and sort them into a fixed set of themes established by researchers to understand what people are saying about different games, launches, streams, and more. They found Microsoft-Decision-1 to be competitive on quality with GPT-6 Sol while running over 14 times faster and 200 times less expensive. Quality control",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s52",
+    "source": "GeekNews",
+    "text": "They found Microsoft-Decision-1 to be competitive on quality with GPT-6 Sol while running over 14 times faster and 200 times less expensive. Quality control The Copilot team measures the quality of chat and agentic responses.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s53",
+    "source": "GeekNews",
+    "text": "Quality control The Copilot team measures the quality of chat and agentic responses. Their testing found Microsoft-Decision-1 to be competitive with GPT5.6 Luna and 100 times faster.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s54",
+    "source": "GeekNews",
+    "text": "The Copilot team measures the quality of chat and agentic responses. Their testing found Microsoft-Decision-1 to be competitive with GPT5.6 Luna and 100 times faster. Incident response",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s55",
+    "source": "GeekNews",
+    "text": "Their testing found Microsoft-Decision-1 to be competitive with GPT5.6 Luna and 100 times faster. Incident response Our on-call engineers use AI to retrieve relevant knowledge to respond to live incidents across logs, ticketing systems, calls, messages, and other data sources.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s56",
+    "source": "GeekNews",
+    "text": "Incident response Our on-call engineers use AI to retrieve relevant knowledge to respond to live incidents across logs, ticketing systems, calls, messages, and other data sources. Microsoft-Decision-1 performed better and faster than an LLM for knowledge retrieval.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s57",
+    "source": "GeekNews",
+    "text": "Our on-call engineers use AI to retrieve relevant knowledge to respond to live incidents across logs, ticketing systems, calls, messages, and other data sources. Microsoft-Decision-1 performed better and faster than an LLM for knowledge retrieval. Scientific discovery",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s58",
+    "source": "GeekNews",
+    "text": "Microsoft-Decision-1 performed better and faster than an LLM for knowledge retrieval. Scientific discovery Microsoft Discovery implements an adaptive replanning feature where an agent evaluates a previous experiment, revises its approach based on rubric grades, and repeats until it has completed its objectives.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s59",
+    "source": "GeekNews",
+    "text": "Scientific discovery Microsoft Discovery implements an adaptive replanning feature where an agent evaluates a previous experiment, revises its approach based on rubric grades, and repeats until it has completed its objectives. Microsoft-Decision-1 scored as 46 times more consistent than the LLM-based score at three times the speed and resulted in nearly four times the speed on adaptive replanning",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s60",
+    "source": "GeekNews",
+    "text": "Microsoft Discovery implements an adaptive replanning feature where an agent evaluates a previous experiment, revises its approach based on rubric grades, and repeats until it has completed its objectives. Microsoft-Decision-1 scored as 46 times more consistent than the LLM-based score at three times the speed and resulted in nearly four times the speed on adaptive replanning Faster, more reliable planning could significantly impact outcomes for long-running scientific experiments.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s61",
+    "source": "GeekNews",
+    "text": "Microsoft-Decision-1 scored as 46 times more consistent than the LLM-based score at three times the speed and resulted in nearly four times the speed on adaptive replanning Faster, more reliable planning could significantly impact outcomes for long-running scientific experiments. Those are just a small handful of examples.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   },
+   {
+    "id": "it:1377#s62",
+    "source": "GeekNews",
+    "text": "Faster, more reliable planning could significantly impact outcomes for long-running scientific experiments. Those are just a small handful of examples. There are many more potential use cases for Microsoft-Decision-1.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": null
+   }
+  ],
+  "angle": "구조화된 의사결정 작업 특화",
+  "previous": null,
+  "code_warnings": [],
+  "round": 1
+ },
+ "expect": {
+  "status": "reject",
+  "loc": "sections[3].paragraphs[0]",
+  "type": "number_mismatch"
+ },
+ "note": "최종판에 number_mismatch 하나를 심음(sections[3].paragraphs[0])"
+}

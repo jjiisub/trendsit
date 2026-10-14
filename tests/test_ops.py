@@ -324,6 +324,16 @@ def test_b10_previous_iso_week(db, tmp_path, now, week):
     assert not any("--force" in c for c in fake.cmds)  # C-8
 
 
+def test_b10_partial_week_done_still_goes_to_publish(db, tmp_path):
+    """007-A2-31: v1.2 5.13 — weekly가 토픽 일부만 failed(partial)여도 weeks는 done이라 ops.weekly가 끝까지
+    publish로 간다(토픽 전부 실패·예산 중단만 거부). weeks.status가 done인 경로를 ops.weekly로 직접 확인."""
+    fake = Fake(db, weekly_status="done")  # pipeline._close가 partial도 done으로 올림(R1-03)
+    week = "2026-W42"
+    assert ops.weekly(db, NO_CATCHUP, now=at(2026, 10, 19, 7), runner=fake, data_dir=tmp_path) == 0
+    assert EXPORTS == [week] and fake.cmds[-1][:len(ops.BUILD_CMD)] == ops.BUILD_CMD  # publish까지 진행
+    assert db.conn.execute("SELECT status FROM weeks WHERE week=?", (week,)).fetchone()[0] == "published"
+
+
 def test_b10_weekly_failure_does_not_publish(db, tmp_path):
     fake = Fake(db, fail={"weekly"})
     assert ops.weekly(db, NO_CATCHUP, now=at(2026, 10, 19, 7), runner=fake, data_dir=tmp_path) == 1

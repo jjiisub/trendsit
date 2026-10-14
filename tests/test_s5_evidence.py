@@ -7,12 +7,17 @@ import re
 
 import pytest
 
+from tests.conftest import FakeTransport, make_ctx, response
 from trendsit.brief import aliases as al
+from trendsit.brief import fulltext
+from trendsit.brief import write as wr
 from trendsit.brief.evidence import EvidenceItem, Member, cap_pack, week_evidence
+from trendsit.brief.select import Applied
+from trendsit.brief.write import evidence_docs
 from trendsit.core import config
 from trendsit.core.db import DB
 
-ID = re.compile(r"^(it:\d+(#q\d+)?|og:\d+#q\d+|vd:\d+(@\d+)?|rp:[\w.-]+/[\w.-]+)$")
+ID = re.compile(r"^(it:\d+(#q\d+)?|og:\d+#q\d+|vd:\d+(@\d+|#ctx)?|sl:\d+@\d+|rp:[\w.-]+/[\w.-]+(#f\d+)?)$")
 
 
 def _card(n_quotes: int = 2, relevance: str = "high", entities=("OpenAI",)) -> str:
@@ -129,19 +134,23 @@ def test_numbers_inside_names_block_spelling_only_approval():
     assert not t.approved()
 
 
+def _v2_page(text: str, summary: str = "s다."):
+    from trendsit.core.artifacts_brief import Para, Section, TopicPage
+
+    return TopicPage(head_tiles=[], sections=[Section(heading="h", paragraphs=[Para(text=text, refs=["it:1#q1"])],
+                                                      visual="none")], summary=summary, title="t", log="l")
+
+
 def test_alias_replacement_respects_word_boundaries():
     from trendsit.brief import checks
-    from trendsit.core.artifacts_brief import Point, TopicPage
 
-    p = TopicPage(points=[Point(text="Aider와 AI 도구 비교 정리 내용", refs=["r"])], numbers=[], events=[], contributions=[],
-                  concepts=[], overview="o다.", summary="s다.", title="t", log="l")
-    fixed, _ = checks.autofix(p, config.load("brief.yaml"), {"AI": "인공지능"})
-    assert fixed.points[0].text == "Aider와 인공지능 도구 비교 정리 내용"
+    p = _v2_page("Aider와 AI 도구 비교 정리 내용")
+    fixed, _ = checks.autofix(p, config.load("brief.yaml"), {"AI": "인공지능"}, [], set(), 10)
+    assert fixed.sections[0].paragraphs[0].text == "Aider와 인공지능 도구 비교 정리 내용"
 
 
 def test_r11_transliteration_aliases_and_autofix():
     from trendsit.brief import checks
-    from trendsit.core.artifacts_brief import Point, TopicPage
 
     tr = {"Luna": "루나", "Flash": "플래시", "DeepSeek": "딥시크"}
     ms = [Member(f"it:{i}", "text", "", "", "", "high", [n], [], {})
@@ -155,8 +164,180 @@ def test_r11_transliteration_aliases_and_autofix():
         assert pat.sub("X", f"{text}가 나왔다") == "X가 나왔다"
     assert al.translit_pattern("Sol", {"Sol": "솔"}).sub("X", "솔루션과 솔은") == "솔루션과 X은"  # 낱말 안은 아님
     assert al.to_original("클로드 소네트 5.5", {"Claude": "클로드", "Sonnet": "소넷|소네트"}) == "Claude Sonnet 5.5"
-    page = TopicPage(points=[Point(text="딥시크-V4.1 플래시 공개, 가격 인하함", refs=["it:1#q1"])], numbers=[], events=[],
-                     contributions=[], concepts=[], overview="a다. b다.", summary="딥시크-V4.1 플래시가 나왔다.", title="t",
-                     log="l", attention=False)
-    fixed, _ = checks.autofix(page, config.load("brief.yaml"), {}, translit=canon_pat)
-    assert fixed.summary == "DeepSeek V4.1 Flash가 나왔다." and fixed.points[0].text.startswith("DeepSeek V4.1 Flash")
+    page = _v2_page("딥시크-V4.1 플래시 공개, 가격 인하함", "딥시크-V4.1 플래시가 나왔다.")
+    fixed, _ = checks.autofix(page, config.load("brief.yaml"), {}, [], set(), 10, translit=canon_pat)
+    assert fixed.summary == "DeepSeek V4.1 Flash가 나왔다." and fixed.sections[0].paragraphs[0].text.startswith("DeepSeek V4.1 Flash")
+
+
+# ---------- 근거 공급(fulltext.py, S6-1 5.2, 파일을 옮김: test_s6_1_write.py 500줄 상한) ----------
+def test_fulltext_sentences_split_on_newline_and_terminal_punct():
+    text = "첫 문장이다. 둘째 문장이다!\n새 줄 문장이다?"
+    assert fulltext.sentences(text) == ["첫 문장이다.", "둘째 문장이다!", "새 줄 문장이다?"]
+
+
+def test_fulltext_cap_sentences_keeps_at_least_one():
+    assert fulltext.cap_sentences(["가" * 100], 10) == ["가" * 100]
+    assert fulltext.cap_sentences(["가" * 10, "나" * 10], 15) == ["가" * 10]
+
+
+def test_article_lines_builds_sentence_ids_and_missing_text_flag(tmp_path):
+    db = DB(tmp_path / "t.db")
+    db.conn.execute("INSERT INTO items(id, source_id, channel, external_id, url, title, day, week) VALUES "
+                    "(1,'s','text','e','http://x','t','2026-10-06','2026-W41')")
+    db.conn.execute("INSERT INTO item_texts(item_id, text) VALUES (1, '첫 문장이다. 둘째 문장이다.')")
+    lines, no_text = fulltext.article_lines(db, 1, 10000)
+    assert lines == [("it:1#s1", "첫 문장이다."), ("it:1#s2", "둘째 문장이다.")] and not no_text
+    lines2, no_text2 = fulltext.article_lines(db, 99, 10000)
+    assert lines2 == [] and no_text2
+
+
+def test_raw_evidence_sl_falls_back_to_given_line_when_ocr_empty(tmp_path):
+    """006-A2-20: OCR 글자가 비어도(수치만 있는 슬라이드) raw_evidence가 빈 글자 대신 작성자가 받은 판독 줄을 돌려준다."""
+    db = DB(tmp_path / "t.db")
+    db.conn.execute("INSERT INTO items(id, source_id, channel, external_id, url, title, day, week) VALUES "
+                    "(1,'s','video','e','http://x','t','2026-10-06','2026-W41')")
+    db.conn.execute("INSERT INTO videos(item_id, video_id) VALUES (1, 'v1')")
+    db.conn.execute("INSERT INTO video_frames(video_id, t, reading_json) VALUES ('v1', 100, ?)",
+                    ('{"frame_kind":"slide","title":"제목","ocr_text":"","numbers":[{"value":"1"}],"table":null}',))
+    [(eid, text)] = fulltext.slide_read_lines(db, 1, "v1")
+    item = EvidenceItem(eid, "vd:v1", "video", "slide_read", text, {})
+    out = fulltext.raw_evidence(db, eid, [item])
+    assert out == text and out != ""
+
+
+def test_raw_evidence_keeps_both_sides_when_slide_fact_and_transcript_id_collide(tmp_path):
+    """006-A2-8: slide_fact vd:{id}@{sec}가 전사 묶음과 같은 sec(25의 배수)면 id가 겹친다. raw_evidence가
+    ±30초 창(slide_fact)뿐 아니라 겹친 전사 묶음 원문(items[1:])도 잃지 않고 이어 붙인다."""
+    db = DB(tmp_path / "t.db")
+    db.conn.execute("INSERT INTO items(id, source_id, channel, external_id, url, title, day, week) VALUES "
+                    "(1,'s','video','e','http://x','t','2026-10-06','2026-W41')")
+    db.conn.execute("INSERT INTO videos(item_id, video_id) VALUES (1, 'v1')")
+    db.conn.execute('INSERT INTO video_segments(video_id, idx, start, "end", text) VALUES '
+                    "('v1', 0, 510, 525, '창 안 발화다.')")
+    src = {"site": "GeekNews", "title": "t"}
+    slide_fact = EvidenceItem("vd:1@525", "vd:v1", "video", "slide_fact", "발표 슬라이드 수치: 1위", src, value="1", unit="위")
+    transcript = EvidenceItem("vd:1@525", "vd:v1", "video", "transcript", "전사 묶음 원문이다.", src)
+    out = fulltext.raw_evidence(db, "vd:1@525", [slide_fact, transcript])
+    assert "창 안 발화다." in out and "전사 묶음 원문이다." in out
+    assert "발표 슬라이드 수치: 1위" in out  # R2-07: 사실 줄 자체도 창 전사와 함께 들어가야 함
+
+
+def test_repo_fact_lines_order_fact_then_trending_then_release():
+    card = {"evidence": [{"fact": "하는 일"}, {"fact": "별 1.6k"}], "why_trending": "릴리스 때문",
+            "release": {"tag": "v1", "date": "2026-10-01", "line": "첫 출시"}}
+    out = fulltext.repo_fact_lines("a/b", card)
+    assert [eid for eid, _ in out] == ["rp:a/b#f1", "rp:a/b#f2", "rp:a/b#f3", "rp:a/b#f4"]
+    assert "뜨는 이유" in out[2][1] and "릴리스 v1" in out[3][1]
+
+
+def test_evidence_docs_groups_by_member_one_document():
+    src = {"site": "GeekNews", "title": "t"}
+    p = {"it:1#s1": [EvidenceItem("it:1#s1", "it:1", "text", "sentence", "첫 문장.", src)],
+         "it:1#s2": [EvidenceItem("it:1#s2", "it:1", "text", "sentence", "둘째 문장.", src)]}
+    docs = evidence_docs(p)
+    assert len(docs) == 1 and docs[0].id == "it:1"
+    assert "[it:1#s1]" in docs[0].text and "[it:1#s2]" in docs[0].text
+
+
+def test_critic_documents_merges_overlapping_sentence_windows_into_one_doc(tmp_path):
+    """R2-01(5.15-1): 같은 구성원의 it:#s 창(±1문장)은 겹치면 한 번으로 합쳐 구성원마다 문서 하나로(문서 3배 비대화 방지)."""
+    db = DB(tmp_path / "t.db")
+    db.conn.execute("INSERT INTO items(id, source_id, channel, external_id, url, title, day, week) VALUES "
+                    "(1,'s','text','e','http://x','t','2026-10-06','2026-W41')")
+    db.conn.execute("INSERT INTO item_texts(item_id, text) VALUES (1, '하나다. 둘이다. 셋이다. 넷이다. 다섯이다.')")
+    src = {"site": "GeekNews", "title": "t"}
+    pack = {"it:1#s2": [EvidenceItem("it:1#s2", "it:1", "text", "sentence", "둘이다.", src)],
+            "it:1#s3": [EvidenceItem("it:1#s3", "it:1", "text", "sentence", "셋이다.", src)]}
+    docs = fulltext.critic_documents(db, ["it:1#s2", "it:1#s3"], pack)
+    assert len(docs) == 1 and docs[0].id == "it:1"
+    assert docs[0].text.count("둘이다") == 1 and docs[0].text.count("셋이다") == 1  # 겹친 창이 한 번만
+    assert docs[0].text.splitlines() == ["[it:1#s1] 하나다.", "[it:1#s2] 둘이다.", "[it:1#s3] 셋이다.", "[it:1#s4] 넷이다."]
+
+
+def test_critic_documents_still_merges_it_sentence_windows_when_og_quote_is_mixed_in(tmp_path):
+    """008-A1-1: 글 구성원에 og:(또는 #q) id가 하나라도 섞이면 it:#s 병합이 통째로 건너뛰이던 버그. it:#s는
+    여전히 창을 합쳐 한 줄씩(겹친 창 중복 없이), og: 등 나머지 id는 각자 줄로 같은 구성원 문서 하나에 담는다."""
+    db = DB(tmp_path / "t.db")
+    db.conn.execute("INSERT INTO items(id, source_id, channel, external_id, url, title, day, week) VALUES "
+                    "(1,'s','text','e','http://x','t','2026-10-06','2026-W41')")
+    db.conn.execute("INSERT INTO item_texts(item_id, text) VALUES (1, '하나다. 둘이다. 셋이다. 넷이다. 다섯이다.')")
+    src = {"site": "GeekNews", "title": "t"}
+    pack = {"it:1#s2": [EvidenceItem("it:1#s2", "it:1", "text", "sentence", "둘이다.", src)],
+            "it:1#s3": [EvidenceItem("it:1#s3", "it:1", "text", "sentence", "셋이다.", src)],
+            "og:1#q1": [EvidenceItem("og:1#q1", "it:1", "text", "quote", "원본 인용이다.", src)]}
+    docs = fulltext.critic_documents(db, ["it:1#s2", "it:1#s3", "og:1#q1"], pack)
+    assert len(docs) == 1 and docs[0].id == "it:1"
+    lines = docs[0].text.splitlines()
+    assert lines.count("[it:1#s2] 둘이다.") == 1 and lines.count("[it:1#s3] 셋이다.") == 1  # 겹친 창이 중복되지 않음
+    assert "[og:1#q1] 원본 인용이다." in lines  # 나머지 id도 같은 문서에 각자 줄로
+
+
+def test_critic_documents_video_id_matches_evidence_docs_rule(tmp_path):
+    """A1-9: 영상 문서 id는 evidence_docs와 같은 규칙(vd:{item_id}, member 키 vd:{video_id}와 다름), url도 포함."""
+    db = DB(tmp_path / "t.db")
+    src = {"site": "YouTube", "title": "t", "url": "https://youtu.be/ABC"}
+    pack = {"vd:905@100": [EvidenceItem("vd:905@100", "vd:ABC", "video", "transcript", "전사다.", src)],
+            "sl:905@100": [EvidenceItem("sl:905@100", "vd:ABC", "video", "slide_read", "판독이다.", src)]}
+    docs = fulltext.critic_documents(db, ["vd:905@100", "sl:905@100"], pack)
+    assert len(docs) == 1 and docs[0].id == "vd:905" and docs[0].url == "https://youtu.be/ABC"
+
+
+def test_critic_documents_falls_back_to_pack_text_when_item_text_is_gone(tmp_path):
+    """A1-10: item_texts가 없어졌어도(만료) pack 항목 자체의 글(캡처 시점 문장)로 그 줄을 채운다(빈 문서 아님)."""
+    db = DB(tmp_path / "t.db")
+    db.conn.execute("INSERT INTO items(id, source_id, channel, external_id, url, title, day, week) VALUES "
+                    "(1,'s','text','e','http://x','t','2026-10-06','2026-W41')")
+    src = {"site": "GeekNews", "title": "t"}
+    pack = {"it:1#s2": [EvidenceItem("it:1#s2", "it:1", "text", "sentence", "캡처된 둘째 문장이다.", src)]}
+    docs = fulltext.critic_documents(db, ["it:1#s2"], pack)
+    assert docs[0].text == "[it:1#s2] 캡처된 둘째 문장이다."
+
+
+def test_evidence_docs_skips_summary_and_claim_kinds():
+    p = {"vd:1": [EvidenceItem("vd:1", "vd:X", "video", "summary", "요약", {})]}
+    assert evidence_docs(p) == []
+
+
+def test_evidence_docs_video_document_id_uses_item_id_not_video_id():
+    """006-C1-11: 5.2 영상 Document id는 vd:{item_id}. member 키는 vd:{video_id}(묶음 구분용)라 서로 다르다."""
+    src = {"site": "YouTube", "title": "t"}
+    p = {"vd:905#ctx": [EvidenceItem("vd:905#ctx", "vd:S-bRN-avZ4Q", "video", "context", "요약+타임라인.", src)],
+         "vd:905@120": [EvidenceItem("vd:905@120", "vd:S-bRN-avZ4Q", "video", "transcript", "120초 전사.", src)]}
+    docs = evidence_docs(p)
+    assert len(docs) == 1 and docs[0].id == "vd:905"  # video_id(S-bRN-avZ4Q)가 아니라 item_id(905)
+
+
+# ---------- 006-A3-1: write.py가 checks.run_checks를 키워드 인자로 불러야 함(영상·음차 토픽이 끝까지 돌아야 함) ----------
+def _sec_v2(heading: str, text: str, refs: list[str], video_secs: list[int] | None = None) -> dict:
+    return {"heading": heading, "paragraphs": [{"text": text, "refs": refs}], "visual": "none", "bars": None,
+            "table": None, "tiles": [], "events": None, "slide": None, "slide_caption": "",
+            "video_secs": video_secs or [], "check": False}
+
+
+def test_write_topic_video_and_transliteration_runs_to_completion(tmp_path):
+    """006-A3-1: run_checks 위치 인자가 어긋나면 영상 토픽(timeline_secs 있음)에서 TypeError로 실패하고,
+    음차(클로드→Claude) 자동 수정도 적용되지 않는다. write_topic이 끝까지 돌고 두 가지가 모두 고쳐짐을 확인한다."""
+    src = {"site": "YouTube", "title": "발표", "date": "2026-10-06"}
+    member = Member("vd:v1", "video", "발표", "", "", "high", ["Claude"], [], src,
+                     items=[EvidenceItem("vd:v1@10", "vd:v1", "video", "transcript", "발표 전사 묶음이다.", src)],
+                     timeline=[{"sec": 10, "label": "시작", "slide": False}])
+    topic = Applied("t1", 1, True, [1], ["vd:v1"], "new", None, "", "출시")
+    page_json = json.dumps({
+        "head_tiles": [],
+        "sections": [
+            _sec_v2("클로드 발표 핵심", "클로드가 발표했다.", ["vd:v1@10"], video_secs=[10]),
+            _sec_v2("둘째 요점", "영상에서 다룬 내용이다.", ["vd:v1@10"]),
+            _sec_v2("셋째 요점", "전사 묶음을 근거로 정리했다.", ["vd:v1@10"]),
+        ],
+        "summary": "클로드가 발표했다. 전사 내용을 다뤘다.",
+        "title": "클로드 발표 정리", "log": "l", "attention": False,
+    }, ensure_ascii=False)
+    verdict_json = json.dumps({"atoms": [{"loc": "sections[0]", "fact": "f", "evidence_id": "vd:v1@10", "supported": True}],
+                               "fact_support": {"total": 1, "supported": 1}, "issues": [],
+                               "status": "pass", "log": "l", "attention": False}, ensure_ascii=False)
+    ctx = make_ctx(tmp_path, FakeTransport([response(page_json), response(verdict_json)]), spec_cap=1.0)
+    ctx.no_cache = True
+    res = wr.write_topic(ctx, topic, {"vd:v1": member}, al.AliasTable([]), config.load("brief.yaml"))
+    assert res.status in ("passed", "checked"), res.attention
+    assert res.page is not None and res.page.sections[0].video_secs == [10]  # C-4: 실제 타임라인 sec은 지워지지 않음
+    assert "Claude" in res.page.summary and "클로드" not in res.page.summary  # 음차 → 정본 자동 수정 적용

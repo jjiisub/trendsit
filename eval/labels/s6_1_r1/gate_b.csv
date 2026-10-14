@@ -1,0 +1,25 @@
+topic_id,section,type,label,note,labeler
+w41-gemini-agent-enterprise,summary,unsupported,minor,"""핵심 차별점이다""는 근거에 없는 평가(검수자 429 실패로 검수 없이 발행)",opus-5.5
+w41-gemini-agent-enterprise,head_tiles[1],number,minor,"원문 nearly 500 → ""500개""(약 누락)",opus-5.5
+w41-gemini-agent-enterprise,sections[3].table,translit,fail,"표는 '제미나이 4 아르곤', 본문은 Gemini 4 Argon",opus-5.5
+w41-mistral-large-4,page,duplicate,fail,"1조500억개 MoE가 요약·타일·S0 제목·S0 단락에 4번",opus-5.5
+w41-mistral-large-4,title,translit,fail,"Mistral 라지 4",opus-5.5
+w41-openrig,sections[3].heading,unsupported,fail,"lifecycle → ""리라이프""(오역)",opus-5.5
+w41-openrig,sections[1-2],code_autofix,fail,"정본 치환이 식별자 변경: @openrig/cli → @OpenRig/cli, v-openrig-build → v-OpenRig-build",opus-5.5
+w41-openrig,head_tiles[0],overuse,minor,"7일 커밋 100+ (개수 세기), S1 P1과 중복",opus-5.5
+w41-claude-haiku-5-5,sections[5],duplicate,fail,"남은 쟁점 절이 S0·S1·S4 내용 반복, 75%가 4번",opus-5.5
+w41-claude-haiku-5-5,sections[2-3],translit,fail,"하이쿠·소네트·앤트로픽",opus-5.5
+w41-openai-rogue-agent,sections[3],speaker,fail,"영문 원문 Simon Willison → 시몬 윌리슨",opus-5.5
+w41-openai-rogue-agent,sections[0],duplicate,minor,"P0·P1이 같은 확인 사실 반복, S1 P1이 타일 반복",opus-5.5
+w41-gpt-6-intelligent-ui,page,pass,pass,"",opus-5.5
+w41-ai-math-results,sections[4].paragraphs[0],unsupported,fail,"""과학자를 대신하는 존재가 아니라 연구 능력을 확장하는 도구로 설명"" 근거 없음",opus-5.5
+w41-ai-math-results,head_tiles[3],overuse,minor,"372 결과 군(개수 세기)",opus-5.5
+w41-embedding-gemma-2,sections[2].bars,duplicate,minor,"head_tiles[2] 78.68이 절 막대·제목·단락에 반복",opus-5.5
+w41-decision-1,sections[4],unsupported,check,"GPT-5.6 루나 → GPT-6 Luna. 검수자가 잡았으나 수정 실패 → ⚠ 발행(C-24)",opus-5.5
+w41-decision-1,sections[2],conflict,minor,"2위 모델이 근거마다 다름(Quyet 4.5배 / H2O 2.5배), 불일치 언급 없음",opus-5.5
+w41-ai-code-workflow,sections[3].paragraphs[1],unsupported,fail,"Coordination → ""조류""(오역)",opus-5.5
+w40-llamaindex-context,sections[4],unsupported,fail,"슬라이드 표기 LiteParse → LightParse(제목·절)",opus-5.5
+w40-llamaindex-context,sections[2].paragraphs[0],unsupported,minor,"PDF 글리프·좌표 문장이 단 근거(90% 수치 줄)에 없음",opus-5.5
+w40-solar-mini-4,page,pass,pass,"",opus-5.5
+w40-gemini-4-argon,sections[1].table,duplicate,minor,"head_tiles 2달러·10달러가 표·S1 단락·요약에 반복. 절 제목 오타 트래잭션",opus-5.5
+w40-claude-sonnet-5-5,sections[3].paragraphs[1],style,minor,"""주목된다""(평가형 마무리)",opus-5.5

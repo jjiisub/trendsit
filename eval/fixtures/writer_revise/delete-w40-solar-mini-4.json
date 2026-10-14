@@ -1,0 +1,281 @@
+{
+ "input": {
+  "loc_lines": [
+   "title: Solar Mini 4: 단일 GPU 실행 MoE와 에이전트 작업 최적화",
+   "summary: 업스테이지가 총 35B·활성 3B MoE 구조의 Solar Mini 4를 출시했다. 활성 3B 모델 중 최고 AA Index 24.1점, H100 1장 배포 가능, MiMo-V2.5 대비 작업 완료 비용 43% 절감이 핵심이다.",
+   "head_tiles[0]: 35B / 3B / 총 파라미터 / 활성 파라미터 (MoE 구조, 토큰당 3B만 활성화) (refs it:1034#s2, it:860#s2)",
+   "head_tiles[1]: 24.1점 / AA Intelligence Index (활성 3B 모델 중 최고) (refs it:1034#s6)",
+   "head_tiles[2]: $0.10 / $0.40 / 입력 / 출력 (100만 토큰당) (정가 기준) (refs it:1034#s10)",
+   "head_tiles[3]: H100 80GB 한 장 / 최소 온프레미스 배포 사양 (양자화 모델 기준) (refs it:1034#s37)",
+   "sections[0].heading: 35B MoE 구조로 단일 GPU 배포 가능",
+   "sections[0].paragraphs[0]: Solar Mini 4는 총 35B 파라미터 중 토큰당 3B만 활성화하는 MoE 구조를 적용해 응답 속도를 높이고 운영 비용을 낮췄다. 양자화 모델을 기준으로 H100 80GB 한 장부터 온프레미스 배포가 가능하지만, 배포 시에는 전체 35B 가중치를 메모리에 올려야 한다. (refs it:1034#s2, it:1034#s36, it:1034#s37, it:860#s2)",
+   "sections[1].heading: 활성 3B 모델 중 최고 종합 성능, 대형 모델과 근접 [확인 필요]",
+   "sections[1].paragraphs[0]: Artificial Analysis Intelligence Index v4.3.2에서 24.1점을 기록해 점수가 확인된 활성 3B 모델 가운데 가장 높은 결과를 보였다. 활성 31B인 Gemma 4 31B보다 AA Index가 9.1점 높았고, 활성 55B인 Nemotron 3 Ultra보다도 1.1점 높은 종합 점수를 기록했다. (refs it:1034#s6, it:1034#s14, it:1034#s15)",
+   "sections[1].paragraphs[1]: MiMo-V2.5보다 종합 점수는 0.9점 낮지만, 5분의 1 수준의 활성 파라미터로 근접한 성능을 제공한다. 세부 평가에서는 AA-LCR 83.3, SciCode 47.6, Humanity’s Last Exam 25.8를 기록해 장문 맥락 이해, 코딩, 지식 추론에서 균형 잡힌 성능을 보였다. (refs it:1034#s16, it:1034#s17, it:1034#s18)",
+   "sections[2].heading: 에이전트 작업 벤치마크와 병렬 도구 호출 지원",
+   "sections[2].paragraphs[0]: 실제 SaaS 애플리케이션을 활용해 업무를 수행하는 AutomationBench-AA에서 22.3%, τ³-Banking에서 47.2점을 기록했다. 이 결과는 AA Index v4.3.2와는 별도의 평가다. 도구 호출과 병렬 도구 호출을 지원해 결재 상태와 잔여 일수처럼 독립적인 도구를 한 번에 호출할 수 있다. (refs it:1034#s22, it:1034#s24, it:1034#s25, it:1034#s27)",
+   "sections[3].heading: MiMo-V2.5 대비 작업 완료 비용 43% 낮음",
+   "sections[3].paragraphs[0]: 코드 분석·리뷰, 일정 조율 등 세 가지 작업을 실행한 결과, 1,000세트 완료 비용은 Solar Mini 4가 $1.25, MiMo-V2.5가 $2.20으로 Solar Mini 4가 약 43% 낮았다. 캘린더 조회와 메시지 전송 작업에서는 1,000회 실행 비용이 Solar Mini 4 $0.36, MiMo-V2.5 $0.61로 나타났다. (refs it:1034#s45, it:1034#s46)",
+   "sections[3].paragraphs[1]: MiMo-V2.5는 작업을 완료하는 데 더 많은 입력·출력 토큰을 사용해 전체 비용이 높아졌다. H100 두 장으로 동시 요청 32건을 처리할 때도 요청당 70 tokens/s 이상의 생성 속도를 유지했다. 이 측정은 4K 입력·1K 출력, prefix caching 없이 600초 이상 연속 부하를 적용한 내부 결과다. (refs it:1034#s48, it:1034#s34, it:1034#s38)",
+   "sections[3].bars (단위 달러): 1,000세트 작업 완료 비용 비교 / context: 세 가지 에이전트 작업 각 3회 실행, 정가 기준",
+   "sections[3].bars.items[0]: Solar Mini 4 = 1.25 (it:1034#s45) [강조]",
+   "sections[3].bars.items[1]: MiMo-V2.5 = 2.2 (it:1034#s45)",
+   "sections[4].heading: 프로·미니 투트랙 전략과 API 제공",
+   "sections[4].paragraphs[0]: 업스테이지는 Solar LLM을 프로와 미니로 나누는 투트랙 전략을 본격화했다. 프로는 복잡한 에이전트 작업에, 미니는 업무 자동화와 대량 처리 등 반복 작업에 활용한다. API 정가는 100만 토큰당 입력 $0.10, 캐시 입력 $0.01, 출력 $0.40이며, Upstage Console에서 10월 10일까지 70% 할인된 가격을 적용한다. (refs it:860#s1, it:860#s6, it:1034#s70, it:1034#s71)",
+   "sections[5].heading: 추론 비활성 기본 설정과 검증 절차 권장",
+   "sections[5].paragraphs[0]: Solar Mini 4는 기본적으로 추론을 사용하지 않으며, 다단계 분석이 필요한 작업에서는 reasoning_effort를 조절해 추론을 사용할 수 있다. 추론 수준이 높아질수록 출력 토큰과 응답 시간이 늘어날 수 있어 작업에 필요한 수준부터 적용하는 것을 권장한다. 실제 의사결정에 영향을 주는 업무에서는 모델 출력을 최종 판단으로 사용하지 말고 별도의 검증 절차를 두는 것을 권고한다., 이용약관 조항에 따른 조치로 미국 사용자부터 적용 (refs it:1034#s55, it:1034#s56, it:1034#s57, it:1034#s94)"
+  ],
+  "previous": {
+   "log": "절 6개, 단락 8개, 표 1개, 막대 1개, 타일 4개",
+   "attention": false,
+   "head_tiles": [
+    {
+     "value": "35B / 3B",
+     "label": "총 파라미터 / 활성 파라미터",
+     "note": "MoE 구조, 토큰당 3B만 활성화",
+     "refs": [
+      "it:1034#s2",
+      "it:860#s2"
+     ]
+    },
+    {
+     "value": "24.1점",
+     "label": "AA Intelligence Index",
+     "note": "활성 3B 모델 중 최고",
+     "refs": [
+      "it:1034#s6"
+     ]
+    },
+    {
+     "value": "$0.10 / $0.40",
+     "label": "입력 / 출력 (100만 토큰당)",
+     "note": "정가 기준",
+     "refs": [
+      "it:1034#s10"
+     ]
+    },
+    {
+     "value": "H100 80GB 한 장",
+     "label": "최소 온프레미스 배포 사양",
+     "note": "양자화 모델 기준",
+     "refs": [
+      "it:1034#s37"
+     ]
+    }
+   ],
+   "sections": [
+    {
+     "heading": "35B MoE 구조로 단일 GPU 배포 가능",
+     "paragraphs": [
+      {
+       "text": "Solar Mini 4는 총 35B 파라미터 중 토큰당 3B만 활성화하는 MoE 구조를 적용해 응답 속도를 높이고 운영 비용을 낮췄다. 양자화 모델을 기준으로 H100 80GB 한 장부터 온프레미스 배포가 가능하지만, 배포 시에는 전체 35B 가중치를 메모리에 올려야 한다.",
+       "refs": [
+        "it:1034#s2",
+        "it:1034#s36",
+        "it:1034#s37",
+        "it:860#s2"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "활성 3B 모델 중 최고 종합 성능, 대형 모델과 근접",
+     "paragraphs": [
+      {
+       "text": "Artificial Analysis Intelligence Index v4.3.2에서 24.1점을 기록해 점수가 확인된 활성 3B 모델 가운데 가장 높은 결과를 보였다. 활성 31B인 Gemma 4 31B보다 AA Index가 9.1점 높았고, 활성 55B인 Nemotron 3 Ultra보다도 1.1점 높은 종합 점수를 기록했다.",
+       "refs": [
+        "it:1034#s6",
+        "it:1034#s14",
+        "it:1034#s15"
+       ]
+      },
+      {
+       "text": "MiMo-V2.5보다 종합 점수는 0.9점 낮지만, 5분의 1 수준의 활성 파라미터로 근접한 성능을 제공한다. 세부 평가에서는 AA-LCR 83.3, SciCode 47.6, Humanity’s Last Exam 25.8를 기록해 장문 맥락 이해, 코딩, 지식 추론에서 균형 잡힌 성능을 보였다.",
+       "refs": [
+        "it:1034#s16",
+        "it:1034#s17",
+        "it:1034#s18"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": true
+    },
+    {
+     "heading": "에이전트 작업 벤치마크와 병렬 도구 호출 지원",
+     "paragraphs": [
+      {
+       "text": "실제 SaaS 애플리케이션을 활용해 업무를 수행하는 AutomationBench-AA에서 22.3%, τ³-Banking에서 47.2점을 기록했다. 이 결과는 AA Index v4.3.2와는 별도의 평가다. 도구 호출과 병렬 도구 호출을 지원해 결재 상태와 잔여 일수처럼 독립적인 도구를 한 번에 호출할 수 있다.",
+       "refs": [
+        "it:1034#s22",
+        "it:1034#s24",
+        "it:1034#s25",
+        "it:1034#s27"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "MiMo-V2.5 대비 작업 완료 비용 43% 낮음",
+     "paragraphs": [
+      {
+       "text": "코드 분석·리뷰, 일정 조율 등 세 가지 작업을 실행한 결과, 1,000세트 완료 비용은 Solar Mini 4가 $1.25, MiMo-V2.5가 $2.20으로 Solar Mini 4가 약 43% 낮았다. 캘린더 조회와 메시지 전송 작업에서는 1,000회 실행 비용이 Solar Mini 4 $0.36, MiMo-V2.5 $0.61로 나타났다.",
+       "refs": [
+        "it:1034#s45",
+        "it:1034#s46"
+       ]
+      },
+      {
+       "text": "MiMo-V2.5는 작업을 완료하는 데 더 많은 입력·출력 토큰을 사용해 전체 비용이 높아졌다. H100 두 장으로 동시 요청 32건을 처리할 때도 요청당 70 tokens/s 이상의 생성 속도를 유지했다. 이 측정은 4K 입력·1K 출력, prefix caching 없이 600초 이상 연속 부하를 적용한 내부 결과다.",
+       "refs": [
+        "it:1034#s48",
+        "it:1034#s34",
+        "it:1034#s38"
+       ]
+      }
+     ],
+     "visual": "bars",
+     "bars": {
+      "title": "1,000세트 작업 완료 비용 비교",
+      "context": "세 가지 에이전트 작업 각 3회 실행, 정가 기준",
+      "unit": "달러",
+      "items": [
+       {
+        "label": "Solar Mini 4",
+        "value": "1.25",
+        "ref": "it:1034#s45",
+        "baseline": false,
+        "emphasis": true
+       },
+       {
+        "label": "MiMo-V2.5",
+        "value": "2.2",
+        "ref": "it:1034#s45",
+        "baseline": false,
+        "emphasis": false
+       }
+      ]
+     },
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "프로·미니 투트랙 전략과 API 제공",
+     "paragraphs": [
+      {
+       "text": "업스테이지는 Solar LLM을 프로와 미니로 나누는 투트랙 전략을 본격화했다. 프로는 복잡한 에이전트 작업에, 미니는 업무 자동화와 대량 처리 등 반복 작업에 활용한다. API 정가는 100만 토큰당 입력 $0.10, 캐시 입력 $0.01, 출력 $0.40이며, Upstage Console에서 10월 10일까지 70% 할인된 가격을 적용한다.",
+       "refs": [
+        "it:860#s1",
+        "it:860#s6",
+        "it:1034#s70",
+        "it:1034#s71"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "추론 비활성 기본 설정과 검증 절차 권장",
+     "paragraphs": [
+      {
+       "text": "Solar Mini 4는 기본적으로 추론을 사용하지 않으며, 다단계 분석이 필요한 작업에서는 reasoning_effort를 조절해 추론을 사용할 수 있다. 추론 수준이 높아질수록 출력 토큰과 응답 시간이 늘어날 수 있어 작업에 필요한 수준부터 적용하는 것을 권장한다. 실제 의사결정에 영향을 주는 업무에서는 모델 출력을 최종 판단으로 사용하지 말고 별도의 검증 절차를 두는 것을 권고한다., 이용약관 조항에 따른 조치로 미국 사용자부터 적용",
+       "refs": [
+        "it:1034#s55",
+        "it:1034#s56",
+        "it:1034#s57",
+        "it:1034#s94"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    }
+   ],
+   "summary": "업스테이지가 총 35B·활성 3B MoE 구조의 Solar Mini 4를 출시했다. 활성 3B 모델 중 최고 AA Index 24.1점, H100 1장 배포 가능, MiMo-V2.5 대비 작업 완료 비용 43% 절감이 핵심이다.",
+   "title": "Solar Mini 4: 단일 GPU 실행 MoE와 에이전트 작업 최적화"
+  },
+  "issues": [
+   {
+    "loc": "sections[5].paragraphs[0]",
+    "type": "unsupported",
+    "evidence_id": null,
+    "comment": "sections[5].paragraphs[0]의 '이용약관 조항에 따른 조치로 미국 사용자부터 적용'이 근거 원문에 없음",
+    "hint": "근거에 있는 내용만 남기거나 삭제",
+    "idx": 0
+   }
+  ],
+  "evidence": [
+   {
+    "id": "it:860",
+    "source": "AI타임스",
+    "text": "[it:860#s1] 업스테이지가 1일 소형언어모델(sLM) '솔라 미니 4'를 출시하고, 솔라 LLM을 '프로'와 '미니'로 나누는 투트랙 전략을 본격화한다.\n[it:860#s2] 솔라 미니 4는 전체 350억(35B) 매개변수 규모에 전문가 혼합(MoE) 구조를 적용, 추론 시 30억(3B) 매개변수만 활성화함으로써 응답 속도를 높이고 운영 비용을 낮췄다.\n[it:860#s6] 이를 통해 솔라 프로는 복잡한 에이전트 작업에, 솔라 미니는 업무 자동화와 대량 처리 등 반복 작업에 활용하며, 기업의 업무 난이도와 처리량에 따라 모델을 조합해 사용할 수 있다는 설명이다.",
+    "title": "업스테이지, sLM '솔라 미니 4' 출시... '프로·미니' 투트랙 본격화",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=215826"
+   },
+   {
+    "id": "it:1034",
+    "source": "GeekNews",
+    "text": "[it:1034#s2] 총 35B 파라미터 중 토큰당 3B만 활성화하는 MoE 구조로 높은 효율성을 제공합니다.\n[it:1034#s6] - 활성 3B 모델 중 가장 높은 종합 성능: Artificial Analysis Intelligence Index v4.3.2에서 24.1점을 기록해, 비교 대상인 활성 3B 모델 가운데 가장 높은 결과를 보였습니다.\n[it:1034#s14] 활성 파라미터가 31B인 Gemma 4 31B와 비교하면 약 10분의 1만 활성화하면서도 AA Index는 9.1점 높았습니다.\n[it:1034#s15] 활성 파라미터가 55B인 Nemotron 3 Ultra보다도 1.1점 높은 종합 점수를 기록했습니다.\n[it:1034#s16] MiMo-V2.5보다 종합 점수는 0.9점 낮지만, 5분의 1 수준의 활성 파라미터로 근접한 성능을 제공합니다.\n[it:1034#s17] 세부 평가에서는 장문 맥락 추론 능력을 평가하는 AA-LCR에서 83.3, 코드 기반 과학 문제를 다루는 SciCode에서 47.6를 기록했습니다.\n[it:1034#s18] Humanity’s Last Exam에서는 25.8를 기록해 에이전트 작업뿐 아니라 장문 맥락 이해, 코딩, 지식 추론에서도 균형 잡힌 성능을 확인할 수 있습니다.\n[it:1034#s22] Solar Mini 4는 실제 SaaS 애플리케이션을 활용해 업무를 수행하는 능력을 평가하는 AutomationBench-AA에서 22.3%를 기록했습니다.\n[it:1034#s24] Solar Mini 4는 이런 능력을 평가하는 τ³-Banking에서 47.2점을 기록했습니다.\n[it:1034#s25] 이 결과는 Artificial Analysis Intelligence Index v4.3.2와는 별도의 평가 결과입니다.\n[it:1034#s27] API 요청에서 tools로 사용할 함수를 정의하고 parallel_tool_calls=True로 설정하면, 결재 상태와 잔여 일수를 함께 확인하는 것처럼 서로 독립적인 도구를 한 번에 호출할 수 있습니다.\n[it:1034#s34] 실제 내부 측정에서 H100 두 장으로 동시 요청 32건을 처리할 때도 요청당 70 tokens/s 이상의 생성 속도를 유지했습니다.*\n[it:1034#s36] 토큰당 연산에는 3B가 활성화되지만, 모델을 배포할 때는 전체 35B 가중치를 메모리에 올려야 합니다.\n[it:1034#s37] 온프레미스에서는 양자화 모델을 기준으로 H100 80GB 한 장부터 배포할 수 있습니다.\n[it:1034#s38] *4K 입력·1K 출력, prefix caching 없이 600초 이상 연속 부하를 적용한 내부 측정 결과입니다.\n[it:1034#s45] 정가로 계산한 1,000세트의 완료 비용은 Solar Mini 4가 $1.25, MiMo-V2.5가 $2.20으로, Solar Mini 4가 약 43% 낮았습니다.\n[it:1034#s46] 캘린더에서 일정을 조회하고 참석자에게 메시지를 보내는 다단계 도구 호출 작업에서는 1,000회 실행 비용이 Solar Mini 4 $0.36, MiMo-V2.5 $0.61로 나타났습니다.\n[it:1034#s48] 이번 테스트에서 MiMo-V2.5는 작업을 완료하는 데 더 많은 입력·출력 토큰을 사용해 전체 비용이 높아졌습니다.\n[it:1034#s55] Solar Mini 4는 기본적으로 추론을 사용하지 않습니다.\n[it:1034#s56] 다단계 분석이 필요한 작업에서는 reasoning_effort를 조절해 필요한 만큼 추론을 사용할 수 있습니다.\n[it:1034#s57] 추론 수준이 높아질수록 출력 토큰과 응답 시간이 늘어날 수 있으므로, 작업에 필요한 수준부터 적용하는 것을 권장합니다.\n[it:1034#s70] API 정가는 100만 토큰당 입력 $0.10, 캐시 입력 $0.01, 출력 $0.40입니다.\n[it:1034#s71] Upstage Console에서는 UTC 기준 10월 10일까지 70% 할인된 가격을 적용하며, 10월 11일부터 정상 가격으로 전환됩니다.\n[it:1034#s94] 실제 의사결정에 영향을 주는 업무에서는 모델의 출력을 최종 판단으로 사용하지 말고 별도의 검증 절차를 두는 것을 권장합니다.",
+    "title": "업스테이지, GPU 한 장에서 실행하는 Solar Mini 4 발표",
+    "url": "https://news.hada.io/topic?id=34738"
+   }
+  ],
+  "aliases": [
+   {
+    "canonical": "Gemma 4 31B",
+    "aliases": [
+     "젬마 4 31B"
+    ]
+   }
+  ]
+ },
+ "expect": {
+  "action": "edit"
+ },
+ "note": "이슈 delete(오류를 심음)"
+}

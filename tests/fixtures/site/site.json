@@ -88,140 +88,186 @@
     "topic_id": "w40-base",
     "label": "10월 1주차 토픽의 후속"
    },
-   "overview": "지난주 호환 서버에 이어 이번 주에는 상용 API와 오픈소스 모델이 나란히 나왔다. `jevcompat`는 응답 150ms, 정확도 86.6%에서 93.5%로 올랐다는 수치를 내놨고, ==빠르고 싸야 한다는 취지==와 부딪힌다는 비판도 나왔다.",
-   "points": [
+   "head_tiles": [
     {
-     "text": "Decision API 응답 150ms, 일반 모델(1.6초)보다 약 10배 빠름. 9월 29일 기준 제한적 프리뷰",
+     "value": "150ms",
+     "label": "Decision API 응답",
+     "note": "일반 모델 1.6초 대비",
      "refs": [
-      "s1",
+      "s1"
+     ]
+    },
+    {
+     "value": "93.5%",
+     "label": "Jeeves 정확도",
+     "note": "JevBench 231문항",
+     "refs": [
       "s2"
+     ]
+    },
+    {
+     "value": "0.3초",
+     "label": "H100 추론 없는 지연",
+     "note": "",
+     "refs": [
+      "s3"
+     ]
+    },
+    {
+     "value": "MIT",
+     "label": "라이선스",
+     "note": "가중치·학습 코드 공개",
+     "refs": [
+      "g1"
+     ]
+    }
+   ],
+   "sections": [
+    {
+     "heading": "Decision API 응답 150ms, 일반 모델 대비 약 10배 빠름",
+     "paragraphs": [
+      {
+       "text": "Decision API 응답 150ms, 일반 모델(1.6초)보다 약 10배 빠름. 9월 29일 기준 제한적 프리뷰",
+       "refs": [
+        "s1",
+        "s2"
+       ]
+      }
      ],
+     "visual": null,
+     "slide": null,
+     "video_secs": [],
      "check": true
     },
     {
-     "text": "어려운 111문항에서는 ==86.5% 대 73.0%==로 차이가 더 큼",
-     "refs": [
-      "s2",
-      "v1"
-     ]
-    },
-    {
-     "text": "H100 기준 추론 없이 약 0.3초, 전체 추론 시 지연 중앙값 3.3초. 가중치, 학습 코드 MIT 공개",
-     "refs": [
-      "s3",
-      "g1"
-     ]
-    },
-    {
-     "text": "oh-my-jev: 서빙, 비교, 미세조정을 한곳에서 하는 CLI와 웹 UI. 정확도와 보정(ECE, Brier)까지 측정",
-     "refs": [
-      "s4",
-      "g2",
-      "g3"
-     ]
-    },
-    {
-     "text": "영상 발표에서는 라우터로 쓰는 구조와 호출 비용 비교를 소개",
-     "refs": [
-      "v2",
-      "s5",
-      "s6",
-      "g4"
-     ]
-    }
-   ],
-   "diagrams": [
-    {
-     "type": "bars",
-     "anchor": 2,
-     "title": "Jeeves가 4개 모델 중 정확도 최고",
-     "unit": "%",
-     "context": "같은 JevBench 231문항으로 잰 정확도. [it:8#q2]",
-     "items": [
+     "heading": "Jeeves가 4개 모델 중 정확도 최고",
+     "paragraphs": [
       {
-       "label": "Jeeves",
-       "value": "93.5%",
-       "emphasis": true
-      },
-      {
-       "label": "Jev",
-       "value": "86.6%"
-      },
-      {
-       "label": "Luna",
-       "value": "81.2%"
-      },
-      {
-       "label": "Orbit",
-       "value": 79
+       "text": "어려운 111문항에서는 ==86.5% 대 73.0%==로 차이가 더 큼",
+       "refs": [
+        "s2",
+        "v1"
+       ]
       }
      ],
-     "ref": "s2"
+     "visual": {
+      "type": "bars",
+      "title": "Jeeves가 4개 모델 중 정확도 최고",
+      "context": "같은 JevBench 231문항으로 잰 정확도.",
+      "unit": "%",
+      "ref": "s2",
+      "items": [
+       {
+        "label": "Jeeves",
+        "value": "93.5%",
+        "emphasis": true
+       },
+       {
+        "label": "Jev",
+        "value": "86.6%"
+       },
+       {
+        "label": "Luna",
+        "value": "81.2%"
+       },
+       {
+        "label": "Orbit",
+        "value": "79"
+       }
+      ]
+     },
+     "slide": null,
+     "video_secs": [],
+     "check": false
     },
     {
-     "type": "events",
-     "anchor": 2,
-     "title": "판단 모델 흐름 2주",
-     "context": "지난주 로컬 도구에서 이번 주 상용 API로.",
-     "items": [
+     "heading": "판단 모델 흐름 2주",
+     "paragraphs": [
       {
-       "date": "2026-09-22",
-       "text": "Jev 사용 후기",
-       "topic_id": "w40-base"
-      },
-      {
-       "date": "2026-09-29",
-       "text": "Decision API 프리뷰",
-       "ref": "s1"
-      },
-      {
-       "date": "2026-10-02",
-       "text": "oh-my-jev 공개",
-       "ref": "s4"
+       "text": "H100 기준 추론 없이 약 0.3초, 전체 추론 시 지연 중앙값 3.3초. 가중치, 학습 코드 MIT 공개",
+       "refs": [
+        "s3",
+        "g1"
+       ]
       }
-     ]
+     ],
+     "visual": {
+      "type": "events",
+      "title": "판단 모델 흐름 2주",
+      "context": "지난주 로컬 도구에서 이번 주 상용 API로.",
+      "items": [
+       {
+        "date": "2026-09-22",
+        "text": "Jev 사용 후기",
+        "topic_id": "w40-base"
+       },
+       {
+        "date": "2026-09-29",
+        "text": "Decision API 프리뷰",
+        "ref": "s1"
+       },
+       {
+        "date": "2026-10-02",
+        "text": "oh-my-jev 공개",
+        "ref": "s4"
+       }
+      ]
+     },
+     "slide": null,
+     "video_secs": [],
+     "check": false
     },
     {
-     "type": "video",
-     "ref": "v1",
-     "title": "발표 타임라인",
-     "marks": [
+     "heading": "oh-my-jev: 서빙·비교·미세조정을 한곳에서",
+     "paragraphs": [
       {
-       "t": "01:50",
-       "text": "문제 제기",
-       "sec": 110
+       "text": "oh-my-jev: 서빙, 비교, 미세조정을 한곳에서 하는 CLI와 웹 UI. 정확도와 보정(ECE, Brier)까지 측정",
+       "refs": [
+        "s4",
+        "g2",
+        "g3"
+       ]
+      }
+     ],
+     "visual": null,
+     "slide": null,
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "영상 발표에서는 라우터로 쓰는 구조와 호출 비용 비교를 소개",
+     "paragraphs": [
+      {
+       "text": "영상 발표에서는 라우터로 쓰는 구조와 호출 비용 비교를 소개",
+       "refs": [
+        "v2",
+        "s5",
+        "s6",
+        "g4"
+       ]
+      }
+     ],
+     "visual": null,
+     "slide": null,
+     "video_secs": [
+      {
+       "sec": 110,
+       "label": "문제 제기",
+       "slide": false
       },
       {
-       "t": "15:20",
-       "text": "호출 비용 비교",
-       "slide": true,
-       "sec": 920
+       "sec": 920,
+       "label": "호출 비용 비교",
+       "slide": true
       }
-     ]
-    }
-   ],
-   "concepts": [
-    {
-     "term": "보정(calibration)",
-     "desc": "모델이 말한 확률과 실제로 맞을 확률이 얼마나 일치하는지. ECE로 잼"
-    },
-    {
-     "term": "p90 지연",
-     "desc": "요청 100개 중 90번째로 느린 응답 시간"
-    }
-   ],
-   "contributions": [
-    {
-     "channel": "text",
-     "text": "API 공개 내용과 벤치마크"
-    },
-    {
-     "channel": "video",
-     "text": "라우팅 적용 사례"
-    },
-    {
-     "channel": "github",
-     "text": "가중치와 학습 코드"
+     ],
+     "slide": {
+      "sec": 920,
+      "title": "호출 비용 비교 표",
+      "caption": "라우터 구조와 비용 비교(5.9 슬라이드·영상 타임라인 토픽)",
+      "image": "slides/V1xxxxxxxxx_920.jpg"
+     },
+     "check": false
     }
    ],
    "sources": [
@@ -280,7 +326,20 @@
      "site": "Tech Bridge",
      "title": "발표 영상: 판단 모델 라우팅",
      "date": "2026-10-07",
-     "url": "https://example.com/v1"
+     "url": "https://example.com/v1",
+     "video_id": "V1xxxxxxxxx",
+     "timeline": [
+      {
+       "sec": 110,
+       "label": "문제 제기",
+       "slide": false
+      },
+      {
+       "sec": 920,
+       "label": "호출 비용 비교",
+       "slide": true
+      }
+     ]
     },
     {
      "id": "v2",
@@ -288,7 +347,9 @@
      "site": "Tech Bridge",
      "title": "링크 없는 영상",
      "date": "2026-10-08",
-     "url": null
+     "url": null,
+     "video_id": "V2xxxxxxxxx",
+     "timeline": []
     },
     {
      "id": "g1",
@@ -330,10 +391,7 @@
    ],
    "has_check": true,
    "checks": [
-    "overview",
-    "points[0]",
-    "concepts[0]",
-    "빠진 도식: 응답 지연"
+    "sections[0]"
    ]
   },
   {
@@ -347,24 +405,39 @@
     "type": "follow_up",
     "topic_id": "w39-gone"
    },
-   "overview": "한 글이 새 설정 방식을 소개했다. 자세한 비교는 없다.",
-   "points": [
+   "head_tiles": [
     {
-     "text": "설정 파일 하나로 모든 옵션을 선언",
-     "refs": [
-      "s1"
-     ]
-    },
-    {
-     "text": "기본값은 보수적으로 잡힘",
+     "value": "1건",
+     "label": "소개된 설정 방식",
+     "note": "",
      "refs": [
       "s1"
      ]
     }
    ],
-   "diagrams": [],
-   "concepts": [],
-   "contributions": [],
+   "sections": [
+    {
+     "heading": "설정 파일 하나로 모든 옵션을 선언",
+     "paragraphs": [
+      {
+       "text": "설정 파일 하나로 모든 옵션을 선언한다.",
+       "refs": [
+        "s1"
+       ]
+      },
+      {
+       "text": "기본값은 보수적으로 잡힌다.",
+       "refs": [
+        "s1"
+       ]
+      }
+     ],
+     "visual": null,
+     "slide": null,
+     "video_secs": [],
+     "check": false
+    }
+   ],
    "sources": [
     {
      "id": "s1",
@@ -391,82 +464,96 @@
    "relation": {
     "type": "new"
    },
-   "overview": "세 출처가 같은 수치를 각자 다른 조건으로 보고했다.",
-   "points": [
+   "head_tiles": [
     {
-     "text": "처리량 2.4배 증가, 지연은 비슷",
-     "refs": [
-      "s1",
-      "s2"
-     ]
-    },
-    {
-     "text": "메모리 사용은 30% 감소",
-     "refs": [
-      "s3"
-     ]
-    },
-    {
-     "text": "레포는 MIT로 공개",
-     "refs": [
-      "g1"
-     ]
-    },
-    {
-     "text": "AAII 벤치마크 43점",
+     "value": "2.4배",
+     "label": "처리량 증가",
+     "note": "이전 대비",
      "refs": [
       "s1"
      ]
     },
     {
-     "text": "설치는 `uv`로",
-     "refs": [
-      "s2"
-     ]
-    },
-    {
-     "text": "처리량이 ==2배 늘어==됨",
+     "value": "30%",
+     "label": "메모리 감소",
+     "note": "",
      "refs": [
       "s3"
-     ]
-    },
-    {
-     "text": "정확도 ==93.5%==가",
-     "refs": [
-      "g1"
-     ]
-    },
-    {
-     "text": "그는 \"빠르다\"고 했고 it's 안정적 & 저렴 <b>",
-     "refs": [
-      "s1"
      ]
     }
    ],
-   "diagrams": [
+   "sections": [
     {
-     "type": "bars",
-     "anchor": 1,
-     "title": "처리량 비교",
-     "unit": "배",
-     "context": "같은 조건. [it:924#q3, it:924#q4]",
-     "items": [
+     "heading": "처리량 비교",
+     "paragraphs": [
       {
-       "label": "이전",
-       "value": "1",
-       "baseline": true
+       "text": "처리량 2.4배 증가, 지연은 비슷하다. AAII 벤치마크 43점.",
+       "refs": [
+        "s1",
+        "s2"
+       ]
       },
       {
-       "label": "이번",
-       "value": "2.4",
-       "emphasis": true
+       "text": "설치는 `uv`로 한다. 그는 \"빠르다\"고 했고 it's 안정적 & 저렴 <b>",
+       "refs": [
+        "s1"
+       ]
       }
      ],
-     "ref": "s1"
+     "visual": {
+      "type": "bars",
+      "title": "처리량 비교",
+      "context": "같은 조건.",
+      "unit": "배",
+      "ref": "s1",
+      "items": [
+       {
+        "label": "이전",
+        "value": "1",
+        "baseline": true
+       },
+       {
+        "label": "이번",
+        "value": "2.4",
+        "emphasis": true
+       }
+      ]
+     },
+     "slide": null,
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "메모리 사용은 30% 감소",
+     "paragraphs": [
+      {
+       "text": "메모리 사용은 30% 감소했다. 처리량이 ==2배 늘어==됐다.",
+       "refs": [
+        "s3"
+       ]
+      }
+     ],
+     "visual": null,
+     "slide": null,
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "레포는 MIT로 공개",
+     "paragraphs": [
+      {
+       "text": "레포는 MIT로 공개됐다. 정확도 ==93.5%==가 보고됐다.",
+       "refs": [
+        "g1"
+       ]
+      }
+     ],
+     "visual": null,
+     "slide": null,
+     "video_secs": [],
+     "check": false
     }
    ],
-   "concepts": [],
-   "contributions": [],
    "sources": [
     {
      "id": "s1",
@@ -518,24 +605,64 @@
    "relation": {
     "type": "new"
    },
-   "overview": "개요 문단이다.",
-   "points": [
+   "head_tiles": [
     {
-     "text": "포인트 하나",
+     "value": "1",
+     "label": "포인트 하나",
+     "note": "",
      "refs": [
       "s1"
      ]
     },
     {
-     "text": "포인트 둘",
+     "value": "2",
+     "label": "포인트 둘",
+     "note": "",
      "refs": [
       "s2"
      ]
+    },
+    {
+     "value": "3",
+     "label": "포인트 합",
+     "note": "",
+     "refs": [
+      "s1"
+     ]
     }
    ],
-   "diagrams": [],
-   "concepts": [],
-   "contributions": [],
+   "sections": [
+    {
+     "heading": "포인트 하나",
+     "paragraphs": [
+      {
+       "text": "포인트 하나다.",
+       "refs": [
+        "s1"
+       ]
+      }
+     ],
+     "visual": null,
+     "slide": null,
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "포인트 둘",
+     "paragraphs": [
+      {
+       "text": "포인트 둘이다.",
+       "refs": [
+        "s2"
+       ]
+      }
+     ],
+     "visual": null,
+     "slide": null,
+     "video_secs": [],
+     "check": false
+    }
+   ],
    "sources": [
     {
      "id": "s1",
@@ -570,18 +697,45 @@
    "relation": {
     "type": "new"
    },
-   "overview": "개요다.",
-   "points": [
+   "head_tiles": [],
+   "sections": [
     {
-     "text": "포인트",
-     "refs": [
-      "s1"
-     ]
+     "heading": "포인트",
+     "paragraphs": [
+      {
+       "text": "포인트다.",
+       "refs": [
+        "s1"
+       ]
+      }
+     ],
+     "visual": {
+      "type": "table",
+      "title": "비교 표",
+      "note": "",
+      "columns": [
+       "구분",
+       "값"
+      ],
+      "rows": [
+       [
+        "항목 A",
+        "10"
+       ],
+       [
+        "항목 B",
+        "20"
+       ]
+      ],
+      "refs": [
+       "s1"
+      ]
+     },
+     "slide": null,
+     "video_secs": [],
+     "check": false
     }
    ],
-   "diagrams": [],
-   "concepts": [],
-   "contributions": [],
    "sources": [
     {
      "id": "s1",
@@ -608,18 +762,44 @@
    "relation": {
     "type": "new"
    },
-   "overview": "개요다.",
-   "points": [
+   "head_tiles": [],
+   "sections": [
     {
-     "text": "포인트",
-     "refs": [
-      "s1"
-     ]
+     "heading": "포인트",
+     "paragraphs": [
+      {
+       "text": "포인트다.",
+       "refs": [
+        "s1"
+       ]
+      }
+     ],
+     "visual": {
+      "type": "tiles",
+      "items": [
+       {
+        "value": "10",
+        "label": "지표 A",
+        "note": "",
+        "refs": [
+         "s1"
+        ]
+       },
+       {
+        "value": "20",
+        "label": "지표 B",
+        "note": "",
+        "refs": [
+         "s1"
+        ]
+       }
+      ]
+     },
+     "slide": null,
+     "video_secs": [],
+     "check": false
     }
    ],
-   "diagrams": [],
-   "concepts": [],
-   "contributions": [],
    "sources": [
     {
      "id": "s1",

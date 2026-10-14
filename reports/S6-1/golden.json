@@ -1,0 +1,110 @@
+{
+ "pages": [
+  {
+   "autofix": [],
+   "issues": [],
+   "topic_id": "w40-llamaindex-context-layer",
+   "warnings": []
+  },
+  {
+   "autofix": [],
+   "issues": [
+    {
+     "comment": "sections[2].paragraphs[0]의 근거 id vd:D7q8fa589FY@469가 이 토픽 근거 목록에 없음",
+     "loc": "sections[2].paragraphs[0]",
+     "type": "wrong_ref"
+    },
+    {
+     "comment": "sections[2].paragraphs[1]의 근거 id vd:D7q8fa589FY@526가 이 토픽 근거 목록에 없음",
+     "loc": "sections[2].paragraphs[1]",
+     "type": "wrong_ref"
+    },
+    {
+     "comment": "sections[3].paragraphs[0]의 근거 id vd:D7q8fa589FY@717가 이 토픽 근거 목록에 없음",
+     "loc": "sections[3].paragraphs[0]",
+     "type": "wrong_ref"
+    },
+    {
+     "comment": "heading이 문장으로 끝남('…에 적용할 필요는 없다')",
+     "loc": "sections[4].heading",
+     "type": "format"
+    },
+    {
+     "comment": "summary 금지 표현: 핵심이다",
+     "loc": "summary",
+     "type": "format"
+    }
+   ],
+   "topic_id": "w41-agent-slop-state-machine",
+   "warnings": []
+  },
+  {
+   "autofix": [],
+   "issues": [
+    {
+     "comment": "sections[0].paragraphs[1]의 '10'가 it:1144#s6, it:1144#s8, it:1144#s11, it:1144#s12에 없음. 근거의 가까운 값은 6, 0.75, 0.5",
+     "loc": "sections[0].paragraphs[1]",
+     "type": "number_mismatch"
+    },
+    {
+     "comment": "sections[2].table.rows[0] 값 '1620점'가 it:1180#s18, it:1180#s20, it:1180#s24, it:1180#s26에 없음",
+     "loc": "sections[2].table.rows[0]",
+     "type": "number_mismatch"
+    },
+    {
+     "comment": "sections[2].table.rows[0] 값 '1437점'가 it:1180#s18, it:1180#s20, it:1180#s24, it:1180#s26에 없음",
+     "loc": "sections[2].table.rows[0]",
+     "type": "number_mismatch"
+    },
+    {
+     "comment": "sections[2].table.rows[1] 값 '1578점'가 it:1180#s18, it:1180#s20, it:1180#s24, it:1180#s26에 없음",
+     "loc": "sections[2].table.rows[1]",
+     "type": "number_mismatch"
+    },
+    {
+     "comment": "sections[2].table.rows[1] 값 '1336점'가 it:1180#s18, it:1180#s20, it:1180#s24, it:1180#s26에 없음",
+     "loc": "sections[2].table.rows[1]",
+     "type": "number_mismatch"
+    },
+    {
+     "comment": "sections[2].table.rows[2] 값 '72.4%'가 it:1180#s18, it:1180#s20, it:1180#s24, it:1180#s26에 없음",
+     "loc": "sections[2].table.rows[2]",
+     "type": "number_mismatch"
+    },
+    {
+     "comment": "sections[3].paragraphs[1] 금지 표현: 뛰어난",
+     "loc": "sections[3].paragraphs[1]",
+     "type": "format"
+    }
+   ],
+   "topic_id": "w41-claude-haiku-5-5",
+   "warnings": []
+  },
+  {
+   "autofix": [],
+   "issues": [],
+   "topic_id": "w41-embedding-gemma-2",
+   "warnings": []
+  },
+  {
+   "autofix": [],
+   "issues": [],
+   "topic_id": "w41-mistral-large-4",
+   "warnings": [
+    "반복 의심: head_tiles 수치가 sections[1].table에 다시 나옴"
+   ]
+  },
+  {
+   "autofix": [],
+   "issues": [
+    {
+     "comment": "tiles 1개(2~3)",
+     "loc": "sections[2]",
+     "type": "format"
+    }
+   ],
+   "topic_id": "w41-openrig-multi-agent",
+   "warnings": []
+  }
+ ]
+}

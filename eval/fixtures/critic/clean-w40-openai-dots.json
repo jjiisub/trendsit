@@ -1,0 +1,1406 @@
+{
+ "input": {
+  "loc_lines": [
+   "title: Dots, B2B 상시 에이전트 포지셔닝",
+   "summary: 오픈AI가 GPT-6 Astra 기반 24시간 상시 가동 B2B 에이전트 Dots를 공개했다. 메타 Muse와 달리 기업 워크플로우 전담에 초점을 맞췄으며, Enterprise 정식 출시와 보안 검증이 남은 쟁점이다.",
+   "head_tiles[0]: 4,000개 / 연결 가능한 앱 수 (OpenAI 플러그인 생태계 기준) (refs it:10#s5, it:986#s5)",
+   "head_tiles[1]: 월 500달러 / ChatGPT 프로 500 플랜 (초당 최대 300토큰 울트라패스트 티어 포함) (refs it:893#s21)",
+   "sections[0].heading: 메타 Muse와 다른 축, B2B 상시 근무형 에이전트 포지셔닝",
+   "sections[0].paragraphs[0]: 오픈AI는 29일 데브데이 2026에서 24시간 백그라운드에서 상시 가동되는 자율형 AI 에이전트 서비스 Dots를 공개했다. 당초 메타의 개인 맞춤형 에이전트 Muse를 겨냥한 제품으로 예상됐으나, 독립된 클라우드 가상 컴퓨팅 환경을 할당받아 기업과 전문가의 복잡한 비즈니스 워크플로우를 대행하는 상시 근무형 B2B 에이전트로 초점을 맞췄다. (refs it:893#s1, it:893#s2, it:893#s3, it:893#s5)",
+   "sections[1].heading: GPT-6 Astra 기반 격리 클라우드 컴퓨터와 4,000개 앱 연결",
+   "sections[1].paragraphs[0]: Dots는 플래그십 모델 GPT-6 Astra를 기반으로 구동되며, 각 에이전트마다 격리된 가상 클라우드 컴퓨터와 전용 브라우저 환경이 부여된다. 사용자의 컴퓨터나 스마트폰 전원이 꺼져 있어도 백그라운드에서 코드를 작성하고 테스트해 앱을 구현하거나 웹 리서치 및 데이터 수집을 자율 추진한다. (refs it:893#s8, it:893#s10, it:893#s11)",
+   "sections[1].paragraphs[1]: 오픈AI 플러그인 생태계를 통해 4,000개가 넘는 사내외 응용 프로그램과 연결되며, ChatGPT 웹·앱은 물론 Slack, Microsoft Teams, 문자 메시지 등 기존 업무 채널 전반에서 단일한 대화 맥락을 유지한다. iMessage 및 RCS를 통한 문자 메시지 기능은 Pro 사용자 대상 대기자 명단 신청 형태로 우선 제공된다. (refs it:893#s12, it:893#s13)",
+   "sections[2].heading: 조직 단위 전담 사원 형태의 전문 Dots와 Microsoft Agent 365 통합",
+   "sections[2].paragraphs[0]: 조직 단위 도입을 위한 전담 사원 형태의 전문 Dots(Specialized dots) 기능도 도입됐다. 개별 제품에 전용 ID, 시스템 로그인 자격 증명, 사내 DB 접근 권한을 부여해 조달, 청구서 처리, 이메일 마케팅, 고객 지원, 계약서 검토 등 전담 직원이 맡던 B2B 업무 프로세스를 에이전트에 위임할 수 있다. (refs it:893#s14, it:893#s15)",
+   "sections[2].paragraphs[1]: Microsoft와 협력하여 Agent 365의 기업 거버넌스 및 보안 제어 기능에 전문 Dots를 통합하고 있으며, 기업이 이미 사용하고 있는 Microsoft 도구를 통해 Dots를 관리할 수 있도록 하는 것이 목표다. OpenAI 엔지니어링 팀이 조직과 직접 협력해 각 Dots의 책임, 사용할 수 있는 도구, 사람이 작업을 검토하고 승인하는 방식을 정할 예정이다. (refs it:986#s65, it:986#s66, it:986#s63)",
+   "sections[3].heading: 읽기 전용 선제 리서치와 민감 작업 인간 승인 설계",
+   "sections[3].paragraphs[0]: 보안 레이어도 강화됐다. 저장된 비밀번호를 모델에 직접 노출하지 않고 안전하게 처리하며, 선제적 리서치 진행 시에는 메시지 발송이나 데이터 변경이 불가능한 읽기 전용 모드로만 제한 구동된다. 계정 변경이나 결제 등 민감 업무는 반드시 인간 승인을 거치도록 설계됐다. (refs it:893#s17, it:893#s18)",
+   "sections[3].paragraphs[1]: 기업 고객을 위해 사내 입력 데이터 및 백그라운드 작업 내역이 모델 학습에 절대 활용되지 않는 엄격한 데이터 프라이버시 정책을 적용해, 메타 등 소비자 중심 서비스와 차별화된 보안 기준을 확립했다. OpenAI는 기본적으로 ChatGPT Business, Enterprise, Edu 워크스페이스의 콘텐츠를 모델 개선에 사용하지 않으며, 선제적 리서치나 Dots가 자체적으로 작성한 메모를 직접 학습에 사용하지 않는다. (refs it:893#s19, it:986#s49, it:986#s51)",
+   "sections[4].heading: Pro·Business Premium 기본 포함, Enterprise는 4분기 대기자 명단 출시",
+   "sections[4].paragraphs[0]: Dots 에이전트는 Pro 및 Business Premium 구독자에게 기본 1개가 포함돼 제공되며, 첫 번째 Dots는 추가 비용 없이 해당 요금제에 포함된다. Dots 도입에 맞춰 초당 최대 300토큰의 응답 속도를 내는 Ultrafast 티어가 탑재된 ChatGPT 프로 500(월 500달러) 플랜도 신설했다. (refs it:893#s22, it:986#s69, it:893#s21)",
+   "sections[4].paragraphs[1]: 추가 토큰 소모량이 발생하는 고부하 백그라운드 작업의 경우 요금제별 기본 토큰 한도 초과 시 종량제 형태로 과금된다. 기업용 Enterprise 고객 대상 정식 출시 및 일반 개발자 API 공개는 대기자 명단 거쳐 오는 4분기부터 차례 진행될 예정이다. (refs it:893#s23)",
+   "sections[5].heading: 자율 에이전트 오작동 우려와 보안 검증 과제",
+   "sections[5].paragraphs[0]: 개발자 커뮤니티의 초기 반응은 기대와 우려가 엇갈렸다. 사용자가 기기를 꺼두어도 Slack이나 Teams에서 스스로 업무를 진행하고 완성된 풀리퀘스트를 제출하는 클라우드 가상 컴퓨터 구조에 대해 진정한 의미의 자율형 AI 사원이 등장했다는 긍정적 평가가 이어졌다. (refs it:893#s25, it:893#s26)",
+   "sections[5].paragraphs[1]: 반면 일부는 시연 과정에서 발생한 소폭의 응답 지연 현상과 더불어, 백그라운드 상시 작동 특성상 발생할 수 있는 사내 기밀 유출이나 시스템 오작동 위험에 대한 우려를 표했다. 최근 에이전트들의 오작동 이슈가 잇따랐던 만큼, 백그라운드 작업을 수행할 때 보안 및 승인 검토 체계가 완벽하게 작동할지에 대해서는 신중한 검증이 필요하다는 지적이 나오고 있다. (refs it:893#s27, it:893#s28)"
+  ],
+  "page": {
+   "log": "절 6개, 단락 11개, 표 0개, 타일 2개",
+   "attention": false,
+   "head_tiles": [
+    {
+     "value": "4,000개",
+     "label": "연결 가능한 앱 수",
+     "note": "OpenAI 플러그인 생태계 기준",
+     "refs": [
+      "it:10#s5",
+      "it:986#s5"
+     ]
+    },
+    {
+     "value": "월 500달러",
+     "label": "ChatGPT 프로 500 플랜",
+     "note": "초당 최대 300토큰 울트라패스트 티어 포함",
+     "refs": [
+      "it:893#s21"
+     ]
+    }
+   ],
+   "sections": [
+    {
+     "heading": "메타 Muse와 다른 축, B2B 상시 근무형 에이전트 포지셔닝",
+     "paragraphs": [
+      {
+       "text": "오픈AI는 29일 데브데이 2026에서 24시간 백그라운드에서 상시 가동되는 자율형 AI 에이전트 서비스 Dots를 공개했다. 당초 메타의 개인 맞춤형 에이전트 Muse를 겨냥한 제품으로 예상됐으나, 독립된 클라우드 가상 컴퓨팅 환경을 할당받아 기업과 전문가의 복잡한 비즈니스 워크플로우를 대행하는 상시 근무형 B2B 에이전트로 초점을 맞췄다.",
+       "refs": [
+        "it:893#s1",
+        "it:893#s2",
+        "it:893#s3",
+        "it:893#s5"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "GPT-6 Astra 기반 격리 클라우드 컴퓨터와 4,000개 앱 연결",
+     "paragraphs": [
+      {
+       "text": "Dots는 플래그십 모델 GPT-6 Astra를 기반으로 구동되며, 각 에이전트마다 격리된 가상 클라우드 컴퓨터와 전용 브라우저 환경이 부여된다. 사용자의 컴퓨터나 스마트폰 전원이 꺼져 있어도 백그라운드에서 코드를 작성하고 테스트해 앱을 구현하거나 웹 리서치 및 데이터 수집을 자율 추진한다.",
+       "refs": [
+        "it:893#s8",
+        "it:893#s10",
+        "it:893#s11"
+       ]
+      },
+      {
+       "text": "오픈AI 플러그인 생태계를 통해 4,000개가 넘는 사내외 응용 프로그램과 연결되며, ChatGPT 웹·앱은 물론 Slack, Microsoft Teams, 문자 메시지 등 기존 업무 채널 전반에서 단일한 대화 맥락을 유지한다. iMessage 및 RCS를 통한 문자 메시지 기능은 Pro 사용자 대상 대기자 명단 신청 형태로 우선 제공된다.",
+       "refs": [
+        "it:893#s12",
+        "it:893#s13"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "조직 단위 전담 사원 형태의 전문 Dots와 Microsoft Agent 365 통합",
+     "paragraphs": [
+      {
+       "text": "조직 단위 도입을 위한 전담 사원 형태의 전문 Dots(Specialized dots) 기능도 도입됐다. 개별 제품에 전용 ID, 시스템 로그인 자격 증명, 사내 DB 접근 권한을 부여해 조달, 청구서 처리, 이메일 마케팅, 고객 지원, 계약서 검토 등 전담 직원이 맡던 B2B 업무 프로세스를 에이전트에 위임할 수 있다.",
+       "refs": [
+        "it:893#s14",
+        "it:893#s15"
+       ]
+      },
+      {
+       "text": "Microsoft와 협력하여 Agent 365의 기업 거버넌스 및 보안 제어 기능에 전문 Dots를 통합하고 있으며, 기업이 이미 사용하고 있는 Microsoft 도구를 통해 Dots를 관리할 수 있도록 하는 것이 목표다. OpenAI 엔지니어링 팀이 조직과 직접 협력해 각 Dots의 책임, 사용할 수 있는 도구, 사람이 작업을 검토하고 승인하는 방식을 정할 예정이다.",
+       "refs": [
+        "it:986#s65",
+        "it:986#s66",
+        "it:986#s63"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "읽기 전용 선제 리서치와 민감 작업 인간 승인 설계",
+     "paragraphs": [
+      {
+       "text": "보안 레이어도 강화됐다. 저장된 비밀번호를 모델에 직접 노출하지 않고 안전하게 처리하며, 선제적 리서치 진행 시에는 메시지 발송이나 데이터 변경이 불가능한 읽기 전용 모드로만 제한 구동된다. 계정 변경이나 결제 등 민감 업무는 반드시 인간 승인을 거치도록 설계됐다.",
+       "refs": [
+        "it:893#s17",
+        "it:893#s18"
+       ]
+      },
+      {
+       "text": "기업 고객을 위해 사내 입력 데이터 및 백그라운드 작업 내역이 모델 학습에 절대 활용되지 않는 엄격한 데이터 프라이버시 정책을 적용해, 메타 등 소비자 중심 서비스와 차별화된 보안 기준을 확립했다. OpenAI는 기본적으로 ChatGPT Business, Enterprise, Edu 워크스페이스의 콘텐츠를 모델 개선에 사용하지 않으며, 선제적 리서치나 Dots가 자체적으로 작성한 메모를 직접 학습에 사용하지 않는다.",
+       "refs": [
+        "it:893#s19",
+        "it:986#s49",
+        "it:986#s51"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "Pro·Business Premium 기본 포함, Enterprise는 4분기 대기자 명단 출시",
+     "paragraphs": [
+      {
+       "text": "Dots 에이전트는 Pro 및 Business Premium 구독자에게 기본 1개가 포함돼 제공되며, 첫 번째 Dots는 추가 비용 없이 해당 요금제에 포함된다. Dots 도입에 맞춰 초당 최대 300토큰의 응답 속도를 내는 Ultrafast 티어가 탑재된 ChatGPT 프로 500(월 500달러) 플랜도 신설했다.",
+       "refs": [
+        "it:893#s22",
+        "it:986#s69",
+        "it:893#s21"
+       ]
+      },
+      {
+       "text": "추가 토큰 소모량이 발생하는 고부하 백그라운드 작업의 경우 요금제별 기본 토큰 한도 초과 시 종량제 형태로 과금된다. 기업용 Enterprise 고객 대상 정식 출시 및 일반 개발자 API 공개는 대기자 명단 거쳐 오는 4분기부터 차례 진행될 예정이다.",
+       "refs": [
+        "it:893#s23"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "자율 에이전트 오작동 우려와 보안 검증 과제",
+     "paragraphs": [
+      {
+       "text": "개발자 커뮤니티의 초기 반응은 기대와 우려가 엇갈렸다. 사용자가 기기를 꺼두어도 Slack이나 Teams에서 스스로 업무를 진행하고 완성된 풀리퀘스트를 제출하는 클라우드 가상 컴퓨터 구조에 대해 진정한 의미의 자율형 AI 사원이 등장했다는 긍정적 평가가 이어졌다.",
+       "refs": [
+        "it:893#s25",
+        "it:893#s26"
+       ]
+      },
+      {
+       "text": "반면 일부는 시연 과정에서 발생한 소폭의 응답 지연 현상과 더불어, 백그라운드 상시 작동 특성상 발생할 수 있는 사내 기밀 유출이나 시스템 오작동 위험에 대한 우려를 표했다. 최근 에이전트들의 오작동 이슈가 잇따랐던 만큼, 백그라운드 작업을 수행할 때 보안 및 승인 검토 체계가 완벽하게 작동할지에 대해서는 신중한 검증이 필요하다는 지적이 나오고 있다.",
+       "refs": [
+        "it:893#s27",
+        "it:893#s28"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    }
+   ],
+   "summary": "오픈AI가 GPT-6 Astra 기반 24시간 상시 가동 B2B 에이전트 Dots를 공개했다. 메타 Muse와 달리 기업 워크플로우 전담에 초점을 맞췄으며, Enterprise 정식 출시와 보안 검증이 남은 쟁점이다.",
+   "title": "Dots, B2B 상시 에이전트 포지셔닝"
+  },
+  "evidence": [
+   {
+    "id": "it:893#s1",
+    "source": "AI타임스",
+    "text": "오픈AI가 24시간 백그라운드에서 상시 가동되는 자율형 AI 에이전트 서비스 '닷츠(dots)'를 공개했다. 당초 메타의 개인 맞춤형 에이전트 '뮤즈(Muse)'를 겨냥한 제품으로 예상됐으나, 완전히 성격이 다른 기업용 업무 에이전트에 초점을 맞췄다.",
+    "title": "오픈AI, 24시간 자율 에이전트 '닷츠' 공개…소비자용 아닌 B2B 승부수",
+    "url": null
+   },
+   {
+    "id": "it:893#s2",
+    "source": "AI타임스",
+    "text": "오픈AI가 24시간 백그라운드에서 상시 가동되는 자율형 AI 에이전트 서비스 '닷츠(dots)'를 공개했다. 당초 메타의 개인 맞춤형 에이전트 '뮤즈(Muse)'를 겨냥한 제품으로 예상됐으나, 완전히 성격이 다른 기업용 업무 에이전트에 초점을 맞췄다. 오픈AI는 29일(현지시간) 연례 개발자 행사 '데브데이 2026'에서 20여개의 신규 업데이트 항목 가운데 핵심 카드인 닷츠를 선보였다.",
+    "title": "오픈AI, 24시간 자율 에이전트 '닷츠' 공개…소비자용 아닌 B2B 승부수",
+    "url": null
+   },
+   {
+    "id": "it:893#s3",
+    "source": "AI타임스",
+    "text": "당초 메타의 개인 맞춤형 에이전트 '뮤즈(Muse)'를 겨냥한 제품으로 예상됐으나, 완전히 성격이 다른 기업용 업무 에이전트에 초점을 맞췄다. 오픈AI는 29일(현지시간) 연례 개발자 행사 '데브데이 2026'에서 20여개의 신규 업데이트 항목 가운데 핵심 카드인 닷츠를 선보였다. 기존 단발성 질의응답을 넘어 사용자를 대행해 스스로 결정을 내리고 연속적인 업무 프로세스를 관장하는 '상시 가동 에이전트 시스템'을 본격적으로 제품화한 것으로, 이는 출시 전 'o'라는 이름으로 기대를 모았던 프로젝트다.",
+    "title": "오픈AI, 24시간 자율 에이전트 '닷츠' 공개…소비자용 아닌 B2B 승부수",
+    "url": null
+   },
+   {
+    "id": "it:893#s5",
+    "source": "AI타임스",
+    "text": "기존 단발성 질의응답을 넘어 사용자를 대행해 스스로 결정을 내리고 연속적인 업무 프로세스를 관장하는 '상시 가동 에이전트 시스템'을 본격적으로 제품화한 것으로, 이는 출시 전 'o'라는 이름으로 기대를 모았던 프로젝트다. 최근 큰 인기를 끄는 메타의 뮤즈가 소비자의 일상과 라이프스타일을 밀착 지원하는 B2C AI 비서라면, 닷츠는 독립된 클라우드 가상 컴퓨팅 환경을 할당받아 기업과 전문가의 복잡한 비즈니스 워크플로우를 대행하는 '상시 근무형 B2B 에이전트'로 볼 수 있다. 샘 알트먼 CEO는 데브데이 키노트 무대에서 \"닷츠에 책임을 부여하면 알아서 백그라운드에서 일을 지속하기 때문에 스마트폰을 확인하는 시간도 줄었다\"며 \"사람을 부속품 취급하는 산업혁명이 아닌, 인간의 역량을 꽃피우는 '새로운 르네상스'로서 AI 에이전트를 바라보고 있다\"고 말했다.",
+    "title": "오픈AI, 24시간 자율 에이전트 '닷츠' 공개…소비자용 아닌 B2B 승부수",
+    "url": null
+   },
+   {
+    "id": "it:893#s8",
+    "source": "AI타임스",
+    "text": "또 메타의 뮤즈에 대해서는 \"직접 사용해 봤고 훌륭한 제품이지만, 기업 중심의 우리 로드맵에 확신이 있다\"고 밝히며 B2B 에이전트 시장 선점에 대한 자신감을 드러냈다. 닷츠는 플래그십 모델인 'GPT-6 아스트라'를 기반으로 구동된다. 단순 대화 응답이나 단발성 명령어 이행에 그쳤던 기존 AI의 한계를 극복하기 위해 기술 구조를 크게 고도화했다.",
+    "title": "오픈AI, 24시간 자율 에이전트 '닷츠' 공개…소비자용 아닌 B2B 승부수",
+    "url": null
+   },
+   {
+    "id": "it:893#s10",
+    "source": "AI타임스",
+    "text": "단순 대화 응답이나 단발성 명령어 이행에 그쳤던 기존 AI의 한계를 극복하기 위해 기술 구조를 크게 고도화했다. 우선 닷츠마다 격리된 가상 클라우드 컴퓨터와 전용 브라우저 환경이 부여된다. 사용자의 컴퓨터나 스마트폰 전원이 꺼져 있어도 백그라운드에서 코드를 작성하고 테스트해 앱을 구현하거나 웹 리서치 및 데이터 수집을 자율 추진한다.",
+    "title": "오픈AI, 24시간 자율 에이전트 '닷츠' 공개…소비자용 아닌 B2B 승부수",
+    "url": null
+   },
+   {
+    "id": "it:893#s11",
+    "source": "AI타임스",
+    "text": "우선 닷츠마다 격리된 가상 클라우드 컴퓨터와 전용 브라우저 환경이 부여된다. 사용자의 컴퓨터나 스마트폰 전원이 꺼져 있어도 백그라운드에서 코드를 작성하고 테스트해 앱을 구현하거나 웹 리서치 및 데이터 수집을 자율 추진한다. 또 오픈AI 플러그인 생태계를 통해 4000개가 넘는 사내외 응용 프로그램과 연결되며, 챗GPT 웹·앱은 물론 슬랙, 마이크로소프트 팀즈, 문자 메시지 등 기존 업무 채널 전반에서 단일한 대화 맥락을 유지한다.",
+    "title": "오픈AI, 24시간 자율 에이전트 '닷츠' 공개…소비자용 아닌 B2B 승부수",
+    "url": null
+   },
+   {
+    "id": "it:893#s12",
+    "source": "AI타임스",
+    "text": "사용자의 컴퓨터나 스마트폰 전원이 꺼져 있어도 백그라운드에서 코드를 작성하고 테스트해 앱을 구현하거나 웹 리서치 및 데이터 수집을 자율 추진한다. 또 오픈AI 플러그인 생태계를 통해 4000개가 넘는 사내외 응용 프로그램과 연결되며, 챗GPT 웹·앱은 물론 슬랙, 마이크로소프트 팀즈, 문자 메시지 등 기존 업무 채널 전반에서 단일한 대화 맥락을 유지한다. 단, i메시지 및 RCS를 통한 문자 메시지 기능은 프로 사용자 대상 대기자 명단 신청 형태로 우선 제공된다.",
+    "title": "오픈AI, 24시간 자율 에이전트 '닷츠' 공개…소비자용 아닌 B2B 승부수",
+    "url": null
+   },
+   {
+    "id": "it:893#s13",
+    "source": "AI타임스",
+    "text": "또 오픈AI 플러그인 생태계를 통해 4000개가 넘는 사내외 응용 프로그램과 연결되며, 챗GPT 웹·앱은 물론 슬랙, 마이크로소프트 팀즈, 문자 메시지 등 기존 업무 채널 전반에서 단일한 대화 맥락을 유지한다. 단, i메시지 및 RCS를 통한 문자 메시지 기능은 프로 사용자 대상 대기자 명단 신청 형태로 우선 제공된다. 조직 단위 도입을 위한 전담 사원 형태의 '전문 닷츠(Specialized dots)' 기능도 도입됐다.",
+    "title": "오픈AI, 24시간 자율 에이전트 '닷츠' 공개…소비자용 아닌 B2B 승부수",
+    "url": null
+   },
+   {
+    "id": "it:893#s14",
+    "source": "AI타임스",
+    "text": "단, i메시지 및 RCS를 통한 문자 메시지 기능은 프로 사용자 대상 대기자 명단 신청 형태로 우선 제공된다. 조직 단위 도입을 위한 전담 사원 형태의 '전문 닷츠(Specialized dots)' 기능도 도입됐다. 개별 제품에 전용 ID, 시스템 로그인 자격 증명, 사내 DB 접근 권한을 부여해 조달, 청구서 처리, 이메일 마케팅, 고객 지원(CS), 계약서 검토 등 전담 직원이 맡던 B2B 업무 프로세스를 에이전트에 위임할 수 있다.",
+    "title": "오픈AI, 24시간 자율 에이전트 '닷츠' 공개…소비자용 아닌 B2B 승부수",
+    "url": null
+   },
+   {
+    "id": "it:893#s15",
+    "source": "AI타임스",
+    "text": "조직 단위 도입을 위한 전담 사원 형태의 '전문 닷츠(Specialized dots)' 기능도 도입됐다. 개별 제품에 전용 ID, 시스템 로그인 자격 증명, 사내 DB 접근 권한을 부여해 조달, 청구서 처리, 이메일 마케팅, 고객 지원(CS), 계약서 검토 등 전담 직원이 맡던 B2B 업무 프로세스를 에이전트에 위임할 수 있다. 보안 레이어도 강화했다.",
+    "title": "오픈AI, 24시간 자율 에이전트 '닷츠' 공개…소비자용 아닌 B2B 승부수",
+    "url": null
+   },
+   {
+    "id": "it:986#s65",
+    "source": "GeekNews",
+    "text": "전문 dot에 맡기고 싶은 업무가 있다면 알려주세요. 또한 Microsoft와 협력하여 Agent 365의 기업 거버넌스 및 보안 제어 기능에 전문 dots를 통합하고 있습니다. 기업이 이미 사용하고 있는 Microsoft 도구를 통해 dots를 관리할 수 있도록 하는 것이 목표입니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:986#s66",
+    "source": "GeekNews",
+    "text": "또한 Microsoft와 협력하여 Agent 365의 기업 거버넌스 및 보안 제어 기능에 전문 dots를 통합하고 있습니다. 기업이 이미 사용하고 있는 Microsoft 도구를 통해 dots를 관리할 수 있도록 하는 것이 목표입니다. 오늘부터 지원 지역(새 창에서 열기)의 Pro 및 Business Premium 사용자를 대상으로 ChatGPT에서 dots를 순차적으로 제공합니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:986#s63",
+    "source": "GeekNews",
+    "text": "우선 특정 업무에 초점을 맞춘 기업 파일럿 프로그램부터 시작합니다. OpenAI 엔지니어링 팀이 조직과 직접 협력해 각 dot의 책임, 사용할 수 있는 도구, 사람이 작업을 검토하고 승인하는 방식을 정할 예정입니다. 전문 dot에 맡기고 싶은 업무가 있다면 알려주세요.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:893#s17",
+    "source": "AI타임스",
+    "text": "보안 레이어도 강화했다. 저장된 비밀번호를 모델에 직접 노출하지 않고 안전하게 처리하며, 선제적 리서치 진행 시에는 메시지 발송이나 데이터 변경이 불가능한 '읽기 전용' 모드로만 제한 구동된다. 계정 변경이나 결제 등 민감 업무는 반드시 인간 승인을 거치도록 설계됐으며, 마이크로소프트의 기업 보안 제어 체계인 '에이전트 365' 및 엔터프라이즈 ID 관리 시스템과의 통합 계획도 발표됐다.",
+    "title": "오픈AI, 24시간 자율 에이전트 '닷츠' 공개…소비자용 아닌 B2B 승부수",
+    "url": null
+   },
+   {
+    "id": "it:893#s18",
+    "source": "AI타임스",
+    "text": "저장된 비밀번호를 모델에 직접 노출하지 않고 안전하게 처리하며, 선제적 리서치 진행 시에는 메시지 발송이나 데이터 변경이 불가능한 '읽기 전용' 모드로만 제한 구동된다. 계정 변경이나 결제 등 민감 업무는 반드시 인간 승인을 거치도록 설계됐으며, 마이크로소프트의 기업 보안 제어 체계인 '에이전트 365' 및 엔터프라이즈 ID 관리 시스템과의 통합 계획도 발표됐다. 특히 기업 고객을 위해 사내 입력 데이터 및 백그라운드 작업 내역이 모델 학습에 절대 활용되지 않는 엄격한 데이터 프라이버시 정책을 적용, 메타 등 소비자 중심 서비스와 차별화된 보안 기준을 확립했다.",
+    "title": "오픈AI, 24시간 자율 에이전트 '닷츠' 공개…소비자용 아닌 B2B 승부수",
+    "url": null
+   },
+   {
+    "id": "it:893#s19",
+    "source": "AI타임스",
+    "text": "계정 변경이나 결제 등 민감 업무는 반드시 인간 승인을 거치도록 설계됐으며, 마이크로소프트의 기업 보안 제어 체계인 '에이전트 365' 및 엔터프라이즈 ID 관리 시스템과의 통합 계획도 발표됐다. 특히 기업 고객을 위해 사내 입력 데이터 및 백그라운드 작업 내역이 모델 학습에 절대 활용되지 않는 엄격한 데이터 프라이버시 정책을 적용, 메타 등 소비자 중심 서비스와 차별화된 보안 기준을 확립했다. 이와 함께 인간 팀원들과 닷츠 에이전트가 한 공간에 모여 협업 문서를 실시간 공동 편집하고 프로젝트를 관리할 수 있는 전용 협업 워크스페이스 '챗GPT 스페이스(Space)'와 문서 도구 '페이지스(Pages)'가 추가됐다.",
+    "title": "오픈AI, 24시간 자율 에이전트 '닷츠' 공개…소비자용 아닌 B2B 승부수",
+    "url": null
+   },
+   {
+    "id": "it:986#s49",
+    "source": "GeekNews",
+    "text": "활동 보기에서 백그라운드 작업을 포함한 진행 상황을 확인하고, 필요에 따라 dots의 작업 방향을 바꿀 수 있습니다. OpenAI는 기본적으로 ChatGPT Business, Enterprise, Edu 워크스페이스의 콘텐츠를 모델 개선에 사용하지 않습니다. 개인용 ChatGPT 요금제에서는 dots와 나눈 대화와 작업을 모델 개선(새 창에서 열기)에 사용할지 직접 설정할 수 있습니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:986#s51",
+    "source": "GeekNews",
+    "text": "개인용 ChatGPT 요금제에서는 dots와 나눈 대화와 작업을 모델 개선(새 창에서 열기)에 사용할지 직접 설정할 수 있습니다. 선제적 리서치나 dot이 자체적으로 작성한 메모를 직접 학습에 사용하지는 않습니다. 다만 사용자의 설정에 따라 해당 정보가 모델 개선에 사용될 수 있는 적격 대화나 작업에 도움이 되는 경우에는 사용될 수 있습니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:893#s22",
+    "source": "AI타임스",
+    "text": "오픈AI는 닷츠 도입에 맞춰 초당 최대 300토큰의 응답 속도를 내는 '울트라패스트(Ultrafast)' 티어가 탑재된 '챗GPT 프로 500(월 500달러)' 플랜을 신설했다. 닷츠 에이전트는 프로 및 비즈니스 프리미엄 구독자에게 기본 1개가 포함돼 제공된다. 추가 토큰 소모량이 발생하는 고부하 백그라운드 작업의 경우 요금제별 기본 토큰 한도 초과 시 종량제 형태로 과금되며, 기업용 엔터프라이즈 고객 대상 정식 출시 및 일반 개발자 API 공개는 대기자 명단 거쳐 오는 4분기부터 차례 진행될 예정이다.",
+    "title": "오픈AI, 24시간 자율 에이전트 '닷츠' 공개…소비자용 아닌 B2B 승부수",
+    "url": null
+   },
+   {
+    "id": "it:986#s69",
+    "source": "GeekNews",
+    "text": "Enterprise 사용자(Edu 및 Healthcare 포함)는 워크스페이스 관리자가 베타 기능을 활성화하면 체험할 수 있습니다. 첫 번째 dot은 추가 비용 없이 Pro 또는 Business Premium 요금제에 포함됩니다. 24시간 내내 대화를 나누고, 생각을 정리하고, 중요한 일을 놓치지 않도록 도와줍니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:893#s21",
+    "source": "AI타임스",
+    "text": "이와 함께 인간 팀원들과 닷츠 에이전트가 한 공간에 모여 협업 문서를 실시간 공동 편집하고 프로젝트를 관리할 수 있는 전용 협업 워크스페이스 '챗GPT 스페이스(Space)'와 문서 도구 '페이지스(Pages)'가 추가됐다. 오픈AI는 닷츠 도입에 맞춰 초당 최대 300토큰의 응답 속도를 내는 '울트라패스트(Ultrafast)' 티어가 탑재된 '챗GPT 프로 500(월 500달러)' 플랜을 신설했다. 닷츠 에이전트는 프로 및 비즈니스 프리미엄 구독자에게 기본 1개가 포함돼 제공된다.",
+    "title": "오픈AI, 24시간 자율 에이전트 '닷츠' 공개…소비자용 아닌 B2B 승부수",
+    "url": null
+   },
+   {
+    "id": "it:893#s23",
+    "source": "AI타임스",
+    "text": "닷츠 에이전트는 프로 및 비즈니스 프리미엄 구독자에게 기본 1개가 포함돼 제공된다. 추가 토큰 소모량이 발생하는 고부하 백그라운드 작업의 경우 요금제별 기본 토큰 한도 초과 시 종량제 형태로 과금되며, 기업용 엔터프라이즈 고객 대상 정식 출시 및 일반 개발자 API 공개는 대기자 명단 거쳐 오는 4분기부터 차례 진행될 예정이다. 전문가들도 두 제품을 비교하며 메타가 대중적 소비자 시장을 선점하는 사이 오픈AI는 실제 매출에 도움이 되는 기업용 워크플레이스 영역을 정조준했다는 분석을 내놓았다.",
+    "title": "오픈AI, 24시간 자율 에이전트 '닷츠' 공개…소비자용 아닌 B2B 승부수",
+    "url": null
+   },
+   {
+    "id": "it:893#s25",
+    "source": "AI타임스",
+    "text": "전문가들도 두 제품을 비교하며 메타가 대중적 소비자 시장을 선점하는 사이 오픈AI는 실제 매출에 도움이 되는 기업용 워크플레이스 영역을 정조준했다는 분석을 내놓았다. 개발자 커뮤니티의 초기 반응은 기대와 우려가 엇갈렸다. 사용자가 기기를 꺼두어도 슬랙이나 팀즈에서 스스로 업무를 진행하고 완성된 풀리퀘스트(PR)를 제출하는 클라우드 가상 컴퓨터 구조에 대해 \"진정한 의미의 자율형 AI 사원이 등장했다\"는 긍정적 평가가 이어졌다.",
+    "title": "오픈AI, 24시간 자율 에이전트 '닷츠' 공개…소비자용 아닌 B2B 승부수",
+    "url": null
+   },
+   {
+    "id": "it:893#s26",
+    "source": "AI타임스",
+    "text": "개발자 커뮤니티의 초기 반응은 기대와 우려가 엇갈렸다. 사용자가 기기를 꺼두어도 슬랙이나 팀즈에서 스스로 업무를 진행하고 완성된 풀리퀘스트(PR)를 제출하는 클라우드 가상 컴퓨터 구조에 대해 \"진정한 의미의 자율형 AI 사원이 등장했다\"는 긍정적 평가가 이어졌다. 반면 일부는 시연 과정에서 발생한 소폭의 응답 지연 현상과 더불어, 백그라운드 상시 작동 특성상 발생할 수 있는 사내 기밀 유출이나 시스템 오작동 위험에 대한 우려를 표했다.",
+    "title": "오픈AI, 24시간 자율 에이전트 '닷츠' 공개…소비자용 아닌 B2B 승부수",
+    "url": null
+   },
+   {
+    "id": "it:893#s27",
+    "source": "AI타임스",
+    "text": "사용자가 기기를 꺼두어도 슬랙이나 팀즈에서 스스로 업무를 진행하고 완성된 풀리퀘스트(PR)를 제출하는 클라우드 가상 컴퓨터 구조에 대해 \"진정한 의미의 자율형 AI 사원이 등장했다\"는 긍정적 평가가 이어졌다. 반면 일부는 시연 과정에서 발생한 소폭의 응답 지연 현상과 더불어, 백그라운드 상시 작동 특성상 발생할 수 있는 사내 기밀 유출이나 시스템 오작동 위험에 대한 우려를 표했다. 특히 최근 에이전트들의 오작동 이슈가 잇따랐던 만큼, 백그라운드 작업을 수행할 때 보안 및 승인 검토 체계가 완벽하게 작동할지에 대해서는 신중한 검증이 필요하다는 지적이 나오고 있다.",
+    "title": "오픈AI, 24시간 자율 에이전트 '닷츠' 공개…소비자용 아닌 B2B 승부수",
+    "url": null
+   },
+   {
+    "id": "it:893#s28",
+    "source": "AI타임스",
+    "text": "반면 일부는 시연 과정에서 발생한 소폭의 응답 지연 현상과 더불어, 백그라운드 상시 작동 특성상 발생할 수 있는 사내 기밀 유출이나 시스템 오작동 위험에 대한 우려를 표했다. 특히 최근 에이전트들의 오작동 이슈가 잇따랐던 만큼, 백그라운드 작업을 수행할 때 보안 및 승인 검토 체계가 완벽하게 작동할지에 대해서는 신중한 검증이 필요하다는 지적이 나오고 있다. 임대준 기자 ydj@aitimes.com",
+    "title": "오픈AI, 24시간 자율 에이전트 '닷츠' 공개…소비자용 아닌 B2B 승부수",
+    "url": null
+   },
+   {
+    "id": "it:10#s5",
+    "source": "OpenAI News",
+    "text": "Powered by GPT‑6 Astra, they have their own cloud computer, learn from feedback over time, and can work towards your goals 24/7. Through our ecosystem of plugins, they can readily connect to over 4,000 apps, giving them the tools to help wherever you need them. Your dot is always within reach, whether it is through ChatGPT, Slack, or Teams.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:986#s5",
+    "source": "GeekNews",
+    "text": "GPT‑6 Astra를 기반으로 구동되며 자체 클라우드 컴퓨터를 갖추고, 시간이 지나면서 피드백을 통해 학습하며 24시간 내내 사용자의 목표를 향해 일할 수 있습니다. OpenAI의 플러그인 생태계를 통해 4,000개가 넘는 앱에 손쉽게 연결하여 필요한 곳에서 도움을 제공하는 데 필요한 도구를 갖출 수 있습니다. ChatGPT, Slack 또는 Teams를 통해 언제든 사용자의 dot과 소통할 수 있습니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s1",
+    "source": "OpenAI News",
+    "text": "Dots are remarkably capable, always-on agents built to handle everything. They’re a whole new way to work with AI—one that gets to know what matters to you, is always working on your behalf, and takes important work off your plate so you get more of your time and attention back.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "og:986#q1",
+    "source": "GeekNews",
+    "text": "dots는 모든 일을 처리하도록 설계된, 뛰어난 역량을 갖춘 상시 작동 에이전트입니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s2",
+    "source": "OpenAI News",
+    "text": "Dots are remarkably capable, always-on agents built to handle everything. They’re a whole new way to work with AI—one that gets to know what matters to you, is always working on your behalf, and takes important work off your plate so you get more of your time and attention back. Dots are frontier intelligence that have your back.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "og:986#q2",
+    "source": "GeekNews",
+    "text": "GPT‑6 Astra를 기반으로 구동되며 자체 클라우드 컴퓨터를 갖추고, 시간이 지나면서 피드백을 통해 학습하며 24시간 내내 사용자의 목표를 향해 일할 수 있습니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s3",
+    "source": "OpenAI News",
+    "text": "They’re a whole new way to work with AI—one that gets to know what matters to you, is always working on your behalf, and takes important work off your plate so you get more of your time and attention back. Dots are frontier intelligence that have your back. Powered by GPT‑6 Astra, they have their own cloud computer, learn from feedback over time, and can work towards your goals 24/7.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "og:986#q3",
+    "source": "GeekNews",
+    "text": "OpenAI의 플러그인 생태계를 통해 4,000개가 넘는 앱에 손쉽게 연결하여 필요한 곳에서 도움을 제공하는 데 필요한 도구를 갖출 수 있습니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s4",
+    "source": "OpenAI News",
+    "text": "Dots are frontier intelligence that have your back. Powered by GPT‑6 Astra, they have their own cloud computer, learn from feedback over time, and can work towards your goals 24/7. Through our ecosystem of plugins, they can readily connect to over 4,000 apps, giving them the tools to help wherever you need them.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:893#s4",
+    "source": "AI타임스",
+    "text": "오픈AI는 29일(현지시간) 연례 개발자 행사 '데브데이 2026'에서 20여개의 신규 업데이트 항목 가운데 핵심 카드인 닷츠를 선보였다. 기존 단발성 질의응답을 넘어 사용자를 대행해 스스로 결정을 내리고 연속적인 업무 프로세스를 관장하는 '상시 가동 에이전트 시스템'을 본격적으로 제품화한 것으로, 이는 출시 전 'o'라는 이름으로 기대를 모았던 프로젝트다. 최근 큰 인기를 끄는 메타의 뮤즈가 소비자의 일상과 라이프스타일을 밀착 지원하는 B2C AI 비서라면, 닷츠는 독립된 클라우드 가상 컴퓨팅 환경을 할당받아 기업과 전문가의 복잡한 비즈니스 워크플로우를 대행하는 '상시 근무형 B2B 에이전트'로 볼 수 있다.",
+    "title": "오픈AI, 24시간 자율 에이전트 '닷츠' 공개…소비자용 아닌 B2B 승부수",
+    "url": null
+   },
+   {
+    "id": "og:986#q4",
+    "source": "GeekNews",
+    "text": "첫 번째 dot은 추가 비용 없이 Pro 또는 Business Premium 요금제에 포함됩니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:986",
+    "source": "GeekNews",
+    "text": "OpenAI 공식 블로그 원문에 따르면 dots는 GPT‑6 Astra 기반 상시 작동 에이전트로, 자체 클라우드 컴퓨터를 갖추고 24시간 내내 사용자의 목표를 향해 일한다. OpenAI 플러그인 생태계를 통해 4,000개가 넘는 앱에 연결되며, 첫 번째 dot은 추가 비용 없이 Pro 또는 Business Premium 요금제에 포함된다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s6",
+    "source": "OpenAI News",
+    "text": "Through our ecosystem of plugins, they can readily connect to over 4,000 apps, giving them the tools to help wherever you need them. Your dot is always within reach, whether it is through ChatGPT, Slack, or Teams. You can ask questions, explore ideas, and give feedback along the way; or you can simply hop on a voice call when you need to talk something out.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:893#s6",
+    "source": "AI타임스",
+    "text": "최근 큰 인기를 끄는 메타의 뮤즈가 소비자의 일상과 라이프스타일을 밀착 지원하는 B2C AI 비서라면, 닷츠는 독립된 클라우드 가상 컴퓨팅 환경을 할당받아 기업과 전문가의 복잡한 비즈니스 워크플로우를 대행하는 '상시 근무형 B2B 에이전트'로 볼 수 있다. 샘 알트먼 CEO는 데브데이 키노트 무대에서 \"닷츠에 책임을 부여하면 알아서 백그라운드에서 일을 지속하기 때문에 스마트폰을 확인하는 시간도 줄었다\"며 \"사람을 부속품 취급하는 산업혁명이 아닌, 인간의 역량을 꽃피우는 '새로운 르네상스'로서 AI 에이전트를 바라보고 있다\"고 말했다. 또 메타의 뮤즈에 대해서는 \"직접 사용해 봤고 훌륭한 제품이지만, 기업 중심의 우리 로드맵에 확신이 있다\"고 밝히며 B2B 에이전트 시장 선점에 대한 자신감을 드러냈다.",
+    "title": "오픈AI, 24시간 자율 에이전트 '닷츠' 공개…소비자용 아닌 B2B 승부수",
+    "url": null
+   },
+   {
+    "id": "it:986#s1",
+    "source": "GeekNews",
+    "text": "dots는 모든 일을 처리하도록 설계된, 뛰어난 역량을 갖춘 상시 작동 에이전트입니다. AI와 함께 일하는 완전히 새로운 방식으로, 여러분이 중요하게 여기는 것을 알아가고, 늘 여러분을 대신해 일하며, 중요한 업무를 맡아 처리해 시간과 집중할 여유를 되찾아 줍니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s7",
+    "source": "OpenAI News",
+    "text": "Your dot is always within reach, whether it is through ChatGPT, Slack, or Teams. You can ask questions, explore ideas, and give feedback along the way; or you can simply hop on a voice call when you need to talk something out. The more you work together, the more your dot learns your preferences, how you think, and what good looks like to you.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:893#s7",
+    "source": "AI타임스",
+    "text": "샘 알트먼 CEO는 데브데이 키노트 무대에서 \"닷츠에 책임을 부여하면 알아서 백그라운드에서 일을 지속하기 때문에 스마트폰을 확인하는 시간도 줄었다\"며 \"사람을 부속품 취급하는 산업혁명이 아닌, 인간의 역량을 꽃피우는 '새로운 르네상스'로서 AI 에이전트를 바라보고 있다\"고 말했다. 또 메타의 뮤즈에 대해서는 \"직접 사용해 봤고 훌륭한 제품이지만, 기업 중심의 우리 로드맵에 확신이 있다\"고 밝히며 B2B 에이전트 시장 선점에 대한 자신감을 드러냈다. 닷츠는 플래그십 모델인 'GPT-6 아스트라'를 기반으로 구동된다.",
+    "title": "오픈AI, 24시간 자율 에이전트 '닷츠' 공개…소비자용 아닌 B2B 승부수",
+    "url": null
+   },
+   {
+    "id": "it:986#s2",
+    "source": "GeekNews",
+    "text": "dots는 모든 일을 처리하도록 설계된, 뛰어난 역량을 갖춘 상시 작동 에이전트입니다. AI와 함께 일하는 완전히 새로운 방식으로, 여러분이 중요하게 여기는 것을 알아가고, 늘 여러분을 대신해 일하며, 중요한 업무를 맡아 처리해 시간과 집중할 여유를 되찾아 줍니다. dots는 사용자를 든든하게 뒷받침하는 프런티어 AI입니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s8",
+    "source": "OpenAI News",
+    "text": "You can ask questions, explore ideas, and give feedback along the way; or you can simply hop on a voice call when you need to talk something out. The more you work together, the more your dot learns your preferences, how you think, and what good looks like to you. The magic of dots is when they bring you work done the way you would do it, sometimes before you even think to ask.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:986#s3",
+    "source": "GeekNews",
+    "text": "AI와 함께 일하는 완전히 새로운 방식으로, 여러분이 중요하게 여기는 것을 알아가고, 늘 여러분을 대신해 일하며, 중요한 업무를 맡아 처리해 시간과 집중할 여유를 되찾아 줍니다. dots는 사용자를 든든하게 뒷받침하는 프런티어 AI입니다. GPT‑6 Astra를 기반으로 구동되며 자체 클라우드 컴퓨터를 갖추고, 시간이 지나면서 피드백을 통해 학습하며 24시간 내내 사용자의 목표를 향해 일할 수 있습니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s9",
+    "source": "OpenAI News",
+    "text": "The more you work together, the more your dot learns your preferences, how you think, and what good looks like to you. The magic of dots is when they bring you work done the way you would do it, sometimes before you even think to ask. With dots alongside you, ambitious ideas and projects you haven’t had the time or support to pursue start to feel achievable.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:893#s9",
+    "source": "AI타임스",
+    "text": "닷츠는 플래그십 모델인 'GPT-6 아스트라'를 기반으로 구동된다. 단순 대화 응답이나 단발성 명령어 이행에 그쳤던 기존 AI의 한계를 극복하기 위해 기술 구조를 크게 고도화했다. 우선 닷츠마다 격리된 가상 클라우드 컴퓨터와 전용 브라우저 환경이 부여된다.",
+    "title": "오픈AI, 24시간 자율 에이전트 '닷츠' 공개…소비자용 아닌 B2B 승부수",
+    "url": null
+   },
+   {
+    "id": "it:986#s4",
+    "source": "GeekNews",
+    "text": "dots는 사용자를 든든하게 뒷받침하는 프런티어 AI입니다. GPT‑6 Astra를 기반으로 구동되며 자체 클라우드 컴퓨터를 갖추고, 시간이 지나면서 피드백을 통해 학습하며 24시간 내내 사용자의 목표를 향해 일할 수 있습니다. OpenAI의 플러그인 생태계를 통해 4,000개가 넘는 앱에 손쉽게 연결하여 필요한 곳에서 도움을 제공하는 데 필요한 도구를 갖출 수 있습니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s10",
+    "source": "OpenAI News",
+    "text": "The magic of dots is when they bring you work done the way you would do it, sometimes before you even think to ask. With dots alongside you, ambitious ideas and projects you haven’t had the time or support to pursue start to feel achievable. Inside OpenAI, we’re getting a glimpse of what work looks like when intelligence is always working by your side.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:10#s11",
+    "source": "OpenAI News",
+    "text": "With dots alongside you, ambitious ideas and projects you haven’t had the time or support to pursue start to feel achievable. Inside OpenAI, we’re getting a glimpse of what work looks like when intelligence is always working by your side. A bug appears in Slack, and dots immediately start investigating.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:986#s6",
+    "source": "GeekNews",
+    "text": "OpenAI의 플러그인 생태계를 통해 4,000개가 넘는 앱에 손쉽게 연결하여 필요한 곳에서 도움을 제공하는 데 필요한 도구를 갖출 수 있습니다. ChatGPT, Slack 또는 Teams를 통해 언제든 사용자의 dot과 소통할 수 있습니다. 질문하고 아이디어를 탐색하며 진행 중에 피드백을 제공할 수 있고, 이야기를 나누고 싶을 때는 간단히 음성 통화를 시작할 수도 있습니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s12",
+    "source": "OpenAI News",
+    "text": "Inside OpenAI, we’re getting a glimpse of what work looks like when intelligence is always working by your side. A bug appears in Slack, and dots immediately start investigating. A new design arrives, and dots turn it into a working app while the team focuses on customer feedback.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:986#s7",
+    "source": "GeekNews",
+    "text": "ChatGPT, Slack 또는 Teams를 통해 언제든 사용자의 dot과 소통할 수 있습니다. 질문하고 아이디어를 탐색하며 진행 중에 피드백을 제공할 수 있고, 이야기를 나누고 싶을 때는 간단히 음성 통화를 시작할 수도 있습니다. 함께 일할수록 dot은 사용자의 선호와 사고방식, 그리고 사용자가 생각하는 좋은 결과물의 기준을 더 잘 이해하게 됩니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s13",
+    "source": "OpenAI News",
+    "text": "A bug appears in Slack, and dots immediately start investigating. A new design arrives, and dots turn it into a working app while the team focuses on customer feedback. A planning cycle gets underway, and dots keep everyone moving in sync toward the deadline.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:986#s8",
+    "source": "GeekNews",
+    "text": "질문하고 아이디어를 탐색하며 진행 중에 피드백을 제공할 수 있고, 이야기를 나누고 싶을 때는 간단히 음성 통화를 시작할 수도 있습니다. 함께 일할수록 dot은 사용자의 선호와 사고방식, 그리고 사용자가 생각하는 좋은 결과물의 기준을 더 잘 이해하게 됩니다. dots의 진가는 때로는 부탁할 생각조차 하기 전에 사용자가 직접 했을 법한 방식으로 완성된 결과물을 가져다줄 때 드러납니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s14",
+    "source": "OpenAI News",
+    "text": "A new design arrives, and dots turn it into a working app while the team focuses on customer feedback. A planning cycle gets underway, and dots keep everyone moving in sync toward the deadline. Outside OpenAI, an early tester’s dot noticed he’d forgotten to invoice a publication, prepared the invoice, and sent it after his approval.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:986#s9",
+    "source": "GeekNews",
+    "text": "함께 일할수록 dot은 사용자의 선호와 사고방식, 그리고 사용자가 생각하는 좋은 결과물의 기준을 더 잘 이해하게 됩니다. dots의 진가는 때로는 부탁할 생각조차 하기 전에 사용자가 직접 했을 법한 방식으로 완성된 결과물을 가져다줄 때 드러납니다. dots가 곁에 있으면 시간이나 지원이 부족해 시도하지 못했던 큰 아이디어와 프로젝트도 실현할 수 있을 것처럼 느껴지기 시작합니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s15",
+    "source": "OpenAI News",
+    "text": "A planning cycle gets underway, and dots keep everyone moving in sync toward the deadline. Outside OpenAI, an early tester’s dot noticed he’d forgotten to invoice a publication, prepared the invoice, and sent it after his approval. Today, you can start with your primary dot, give it a name, and make it your own.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:986#s10",
+    "source": "GeekNews",
+    "text": "dots의 진가는 때로는 부탁할 생각조차 하기 전에 사용자가 직접 했을 법한 방식으로 완성된 결과물을 가져다줄 때 드러납니다. dots가 곁에 있으면 시간이나 지원이 부족해 시도하지 못했던 큰 아이디어와 프로젝트도 실현할 수 있을 것처럼 느껴지기 시작합니다. OpenAI 내부에서는 AI가 늘 곁에서 함께 일할 때 업무가 어떻게 달라지는지 엿보고 있습니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s16",
+    "source": "OpenAI News",
+    "text": "Outside OpenAI, an early tester’s dot noticed he’d forgotten to invoice a publication, prepared the invoice, and sent it after his approval. Today, you can start with your primary dot, give it a name, and make it your own. Over time, we envision teams of dots working together on your behalf.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:893#s16",
+    "source": "AI타임스",
+    "text": "개별 제품에 전용 ID, 시스템 로그인 자격 증명, 사내 DB 접근 권한을 부여해 조달, 청구서 처리, 이메일 마케팅, 고객 지원(CS), 계약서 검토 등 전담 직원이 맡던 B2B 업무 프로세스를 에이전트에 위임할 수 있다. 보안 레이어도 강화했다. 저장된 비밀번호를 모델에 직접 노출하지 않고 안전하게 처리하며, 선제적 리서치 진행 시에는 메시지 발송이나 데이터 변경이 불가능한 '읽기 전용' 모드로만 제한 구동된다.",
+    "title": "오픈AI, 24시간 자율 에이전트 '닷츠' 공개…소비자용 아닌 B2B 승부수",
+    "url": null
+   },
+   {
+    "id": "it:986#s11",
+    "source": "GeekNews",
+    "text": "dots가 곁에 있으면 시간이나 지원이 부족해 시도하지 못했던 큰 아이디어와 프로젝트도 실현할 수 있을 것처럼 느껴지기 시작합니다. OpenAI 내부에서는 AI가 늘 곁에서 함께 일할 때 업무가 어떻게 달라지는지 엿보고 있습니다. Slack에 버그가 나타나면 dots가 즉시 조사를 시작합니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s17",
+    "source": "OpenAI News",
+    "text": "Today, you can start with your primary dot, give it a name, and make it your own. Over time, we envision teams of dots working together on your behalf. We’re beginning to roll out dots across Pro, Business Premium, and Enterprise plans in eligible markets.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:986#s12",
+    "source": "GeekNews",
+    "text": "OpenAI 내부에서는 AI가 늘 곁에서 함께 일할 때 업무가 어떻게 달라지는지 엿보고 있습니다. Slack에 버그가 나타나면 dots가 즉시 조사를 시작합니다. 새로운 디자인이 도착하면 팀이 고객 피드백에 집중하는 동안 dots가 이를 실제로 작동하는 앱으로 구현합니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s18",
+    "source": "OpenAI News",
+    "text": "Over time, we envision teams of dots working together on your behalf. We’re beginning to roll out dots across Pro, Business Premium, and Enterprise plans in eligible markets. We plan to expand dots to more users soon.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:986#s13",
+    "source": "GeekNews",
+    "text": "Slack에 버그가 나타나면 dots가 즉시 조사를 시작합니다. 새로운 디자인이 도착하면 팀이 고객 피드백에 집중하는 동안 dots가 이를 실제로 작동하는 앱으로 구현합니다. 계획 수립 주기가 시작되면 dots가 팀이 마감일에 맞춰 업무를 계속 진행하도록 돕습니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s19",
+    "source": "OpenAI News",
+    "text": "We’re beginning to roll out dots across Pro, Business Premium, and Enterprise plans in eligible markets. We plan to expand dots to more users soon. We’re also sharing a preview of specialist dots with their own identity for access management, IT-provisioned hardware, and support for deep integrations with a company’s systems of record to allow them to take on well-defined responsibilities inside organizations.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:986#s14",
+    "source": "GeekNews",
+    "text": "새로운 디자인이 도착하면 팀이 고객 피드백에 집중하는 동안 dots가 이를 실제로 작동하는 앱으로 구현합니다. 계획 수립 주기가 시작되면 dots가 팀이 마감일에 맞춰 업무를 계속 진행하도록 돕습니다. OpenAI 외부의 한 초기 테스터가 사용하는 dot은 테스터가 한 매체에 청구서를 보내는 것을 잊었다는 사실을 알아차리고, 청구서를 작성한 뒤 승인을 받아 발송했습니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s20",
+    "source": "OpenAI News",
+    "text": "We plan to expand dots to more users soon. We’re also sharing a preview of specialist dots with their own identity for access management, IT-provisioned hardware, and support for deep integrations with a company’s systems of record to allow them to take on well-defined responsibilities inside organizations. Dots can do nearly anything using their own cloud computer, their own browser, and the apps you’ve connected.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:893#s20",
+    "source": "AI타임스",
+    "text": "특히 기업 고객을 위해 사내 입력 데이터 및 백그라운드 작업 내역이 모델 학습에 절대 활용되지 않는 엄격한 데이터 프라이버시 정책을 적용, 메타 등 소비자 중심 서비스와 차별화된 보안 기준을 확립했다. 이와 함께 인간 팀원들과 닷츠 에이전트가 한 공간에 모여 협업 문서를 실시간 공동 편집하고 프로젝트를 관리할 수 있는 전용 협업 워크스페이스 '챗GPT 스페이스(Space)'와 문서 도구 '페이지스(Pages)'가 추가됐다. 오픈AI는 닷츠 도입에 맞춰 초당 최대 300토큰의 응답 속도를 내는 '울트라패스트(Ultrafast)' 티어가 탑재된 '챗GPT 프로 500(월 500달러)' 플랜을 신설했다.",
+    "title": "오픈AI, 24시간 자율 에이전트 '닷츠' 공개…소비자용 아닌 B2B 승부수",
+    "url": null
+   },
+   {
+    "id": "it:986#s15",
+    "source": "GeekNews",
+    "text": "계획 수립 주기가 시작되면 dots가 팀이 마감일에 맞춰 업무를 계속 진행하도록 돕습니다. OpenAI 외부의 한 초기 테스터가 사용하는 dot은 테스터가 한 매체에 청구서를 보내는 것을 잊었다는 사실을 알아차리고, 청구서를 작성한 뒤 승인을 받아 발송했습니다. 오늘부터 기본 dot 하나로 시작해 이름을 붙이고 나만의 dot으로 만들어 보세요.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s21",
+    "source": "OpenAI News",
+    "text": "We’re also sharing a preview of specialist dots with their own identity for access management, IT-provisioned hardware, and support for deep integrations with a company’s systems of record to allow them to take on well-defined responsibilities inside organizations. Dots can do nearly anything using their own cloud computer, their own browser, and the apps you’ve connected. You can open your dot’s computer at any time to inspect its work.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:986#s16",
+    "source": "GeekNews",
+    "text": "OpenAI 외부의 한 초기 테스터가 사용하는 dot은 테스터가 한 매체에 청구서를 보내는 것을 잊었다는 사실을 알아차리고, 청구서를 작성한 뒤 승인을 받아 발송했습니다. 오늘부터 기본 dot 하나로 시작해 이름을 붙이고 나만의 dot으로 만들어 보세요. 앞으로는 여러 dot이 팀을 이루어 사용자를 대신해 함께 일하게 될 것입니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s22",
+    "source": "OpenAI News",
+    "text": "Dots can do nearly anything using their own cloud computer, their own browser, and the apps you’ve connected. You can open your dot’s computer at any time to inspect its work. Dots can connect to other devices in addition to their own and you can also give your dot permission to connect and use your laptop, where it can then be useful directly alongside you.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:986#s17",
+    "source": "GeekNews",
+    "text": "오늘부터 기본 dot 하나로 시작해 이름을 붙이고 나만의 dot으로 만들어 보세요. 앞으로는 여러 dot이 팀을 이루어 사용자를 대신해 함께 일하게 될 것입니다. 현재 적격 시장의 Pro, Business Premium 및 Enterprise 요금제에 dots를 순차적으로 제공하기 시작했으며, 곧 더 많은 사용자에게 dots를 확대 제공할 예정입니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s23",
+    "source": "OpenAI News",
+    "text": "You can open your dot’s computer at any time to inspect its work. Dots can connect to other devices in addition to their own and you can also give your dot permission to connect and use your laptop, where it can then be useful directly alongside you. Your dot can take a project and run with it, even while it’s working on several others.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:986#s18",
+    "source": "GeekNews",
+    "text": "앞으로는 여러 dot이 팀을 이루어 사용자를 대신해 함께 일하게 될 것입니다. 현재 적격 시장의 Pro, Business Premium 및 Enterprise 요금제에 dots를 순차적으로 제공하기 시작했으며, 곧 더 많은 사용자에게 dots를 확대 제공할 예정입니다. 또한 액세스 관리를 위한 고유 ID를 갖추고, IT에서 제공하는 하드웨어를 사용하며, 기업의 기록 시스템과 심층적으로 통합할 수 있는 전문 dots의 미리 보기도 선보입니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s24",
+    "source": "OpenAI News",
+    "text": "Dots can connect to other devices in addition to their own and you can also give your dot permission to connect and use your laptop, where it can then be useful directly alongside you. Your dot can take a project and run with it, even while it’s working on several others. You can keep bringing it new tasks and ideas without having to juggle separate threads or direct every step.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:893#s24",
+    "source": "AI타임스",
+    "text": "추가 토큰 소모량이 발생하는 고부하 백그라운드 작업의 경우 요금제별 기본 토큰 한도 초과 시 종량제 형태로 과금되며, 기업용 엔터프라이즈 고객 대상 정식 출시 및 일반 개발자 API 공개는 대기자 명단 거쳐 오는 4분기부터 차례 진행될 예정이다. 전문가들도 두 제품을 비교하며 메타가 대중적 소비자 시장을 선점하는 사이 오픈AI는 실제 매출에 도움이 되는 기업용 워크플레이스 영역을 정조준했다는 분석을 내놓았다. 개발자 커뮤니티의 초기 반응은 기대와 우려가 엇갈렸다.",
+    "title": "오픈AI, 24시간 자율 에이전트 '닷츠' 공개…소비자용 아닌 B2B 승부수",
+    "url": null
+   },
+   {
+    "id": "it:986#s19",
+    "source": "GeekNews",
+    "text": "현재 적격 시장의 Pro, Business Premium 및 Enterprise 요금제에 dots를 순차적으로 제공하기 시작했으며, 곧 더 많은 사용자에게 dots를 확대 제공할 예정입니다. 또한 액세스 관리를 위한 고유 ID를 갖추고, IT에서 제공하는 하드웨어를 사용하며, 기업의 기록 시스템과 심층적으로 통합할 수 있는 전문 dots의 미리 보기도 선보입니다. 이를 통해 전문 dots가 조직 내에서 명확하게 정의된 책임을 맡을 수 있습니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s25",
+    "source": "OpenAI News",
+    "text": "Your dot can take a project and run with it, even while it’s working on several others. You can keep bringing it new tasks and ideas without having to juggle separate threads or direct every step. With a dot that knows your goals and standards, you can take on more without directing every step.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:986#s20",
+    "source": "GeekNews",
+    "text": "또한 액세스 관리를 위한 고유 ID를 갖추고, IT에서 제공하는 하드웨어를 사용하며, 기업의 기록 시스템과 심층적으로 통합할 수 있는 전문 dots의 미리 보기도 선보입니다. 이를 통해 전문 dots가 조직 내에서 명확하게 정의된 책임을 맡을 수 있습니다. dots는 자체 클라우드 컴퓨터와 자체 브라우저, 그리고 사용자가 연결한 앱을 사용해 거의 모든 작업을 수행할 수 있습니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s26",
+    "source": "OpenAI News",
+    "text": "You can keep bringing it new tasks and ideas without having to juggle separate threads or direct every step. With a dot that knows your goals and standards, you can take on more without directing every step. Here’s what that looks like:",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:986#s21",
+    "source": "GeekNews",
+    "text": "이를 통해 전문 dots가 조직 내에서 명확하게 정의된 책임을 맡을 수 있습니다. dots는 자체 클라우드 컴퓨터와 자체 브라우저, 그리고 사용자가 연결한 앱을 사용해 거의 모든 작업을 수행할 수 있습니다. 언제든 dot의 컴퓨터를 열어 작업을 살펴볼 수 있습니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s27",
+    "source": "OpenAI News",
+    "text": "With a dot that knows your goals and standards, you can take on more without directing every step. Here’s what that looks like: Working with your dot is as simple as having a conversation.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:986#s22",
+    "source": "GeekNews",
+    "text": "dots는 자체 클라우드 컴퓨터와 자체 브라우저, 그리고 사용자가 연결한 앱을 사용해 거의 모든 작업을 수행할 수 있습니다. 언제든 dot의 컴퓨터를 열어 작업을 살펴볼 수 있습니다. Dots는 자체 컴퓨터 외에도 다른 기기에 연결할 수 있으며, dot이 노트북에 연결해 사용할 수 있도록 권한을 부여할 수도 있습니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s28",
+    "source": "OpenAI News",
+    "text": "Here’s what that looks like: Working with your dot is as simple as having a conversation. You can message or call dots in ChatGPT on desktop, web, and mobile.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:986#s23",
+    "source": "GeekNews",
+    "text": "언제든 dot의 컴퓨터를 열어 작업을 살펴볼 수 있습니다. Dots는 자체 컴퓨터 외에도 다른 기기에 연결할 수 있으며, dot이 노트북에 연결해 사용할 수 있도록 권한을 부여할 수도 있습니다. 그러면 dot이 바로 곁에서 도움을 줄 수 있습니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s29",
+    "source": "OpenAI News",
+    "text": "Working with your dot is as simple as having a conversation. You can message or call dots in ChatGPT on desktop, web, and mobile. They can also message you with progress, questions, or decisions that need you.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:893#s29",
+    "source": "AI타임스",
+    "text": "특히 최근 에이전트들의 오작동 이슈가 잇따랐던 만큼, 백그라운드 작업을 수행할 때 보안 및 승인 검토 체계가 완벽하게 작동할지에 대해서는 신중한 검증이 필요하다는 지적이 나오고 있다. 임대준 기자 ydj@aitimes.com",
+    "title": "오픈AI, 24시간 자율 에이전트 '닷츠' 공개…소비자용 아닌 B2B 승부수",
+    "url": null
+   },
+   {
+    "id": "it:986#s24",
+    "source": "GeekNews",
+    "text": "Dots는 자체 컴퓨터 외에도 다른 기기에 연결할 수 있으며, dot이 노트북에 연결해 사용할 수 있도록 권한을 부여할 수도 있습니다. 그러면 dot이 바로 곁에서 도움을 줄 수 있습니다. 여러분의 dot은 여러 프로젝트를 동시에 진행하면서도 새 프로젝트를 맡아 주도적으로 추진할 수 있습니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s30",
+    "source": "OpenAI News",
+    "text": "You can message or call dots in ChatGPT on desktop, web, and mobile. They can also message you with progress, questions, or decisions that need you. You can also message your dot in Slack and Teams, with texting coming soon.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:986#s25",
+    "source": "GeekNews",
+    "text": "그러면 dot이 바로 곁에서 도움을 줄 수 있습니다. 여러분의 dot은 여러 프로젝트를 동시에 진행하면서도 새 프로젝트를 맡아 주도적으로 추진할 수 있습니다. 별도의 대화들을 번갈아 관리하거나 모든 단계를 지시할 필요 없이, 새로운 작업과 아이디어를 계속 맡길 수 있습니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s31",
+    "source": "OpenAI News",
+    "text": "They can also message you with progress, questions, or decisions that need you. You can also message your dot in Slack and Teams, with texting coming soon. Start a project in ChatGPT, share context with the working team in Slack, and let your dot follow through.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:986#s26",
+    "source": "GeekNews",
+    "text": "여러분의 dot은 여러 프로젝트를 동시에 진행하면서도 새 프로젝트를 맡아 주도적으로 추진할 수 있습니다. 별도의 대화들을 번갈아 관리하거나 모든 단계를 지시할 필요 없이, 새로운 작업과 아이디어를 계속 맡길 수 있습니다. 목표와 기준을 아는 dot과 함께라면, 모든 단계를 지시하지 않고도 더 많은 일을 해낼 수 있습니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s32",
+    "source": "OpenAI News",
+    "text": "You can also message your dot in Slack and Teams, with texting coming soon. Start a project in ChatGPT, share context with the working team in Slack, and let your dot follow through. Dots carry context across every channel, so your dot will have the full context wherever you reach it.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:986#s27",
+    "source": "GeekNews",
+    "text": "별도의 대화들을 번갈아 관리하거나 모든 단계를 지시할 필요 없이, 새로운 작업과 아이디어를 계속 맡길 수 있습니다. 목표와 기준을 아는 dot과 함께라면, 모든 단계를 지시하지 않고도 더 많은 일을 해낼 수 있습니다. 어떤 모습인지 살펴보세요.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s33",
+    "source": "OpenAI News",
+    "text": "Start a project in ChatGPT, share context with the working team in Slack, and let your dot follow through. Dots carry context across every channel, so your dot will have the full context wherever you reach it. Dots build on ChatGPT’s protections with additional safety and privacy safeguards for the work they can do.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:986#s28",
+    "source": "GeekNews",
+    "text": "목표와 기준을 아는 dot과 함께라면, 모든 단계를 지시하지 않고도 더 많은 일을 해낼 수 있습니다. 어떤 모습인지 살펴보세요. dot과 함께 일하는 것은 대화를 나누는 것만큼 간단합니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s34",
+    "source": "OpenAI News",
+    "text": "Dots carry context across every channel, so your dot will have the full context wherever you reach it. Dots build on ChatGPT’s protections with additional safety and privacy safeguards for the work they can do. You can set boundaries, follow progress, and stay involved in decisions that need you.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:986#s29",
+    "source": "GeekNews",
+    "text": "어떤 모습인지 살펴보세요. dot과 함께 일하는 것은 대화를 나누는 것만큼 간단합니다. 데스크톱, 웹, 모바일의 ChatGPT에서 dot에게 메시지를 보내거나 전화를 걸 수 있습니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s35",
+    "source": "OpenAI News",
+    "text": "Dots build on ChatGPT’s protections with additional safety and privacy safeguards for the work they can do. You can set boundaries, follow progress, and stay involved in decisions that need you. Each dot works on its own cloud computer, while your computer and its contents stay separate unless you choose to connect it.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:986#s30",
+    "source": "GeekNews",
+    "text": "dot과 함께 일하는 것은 대화를 나누는 것만큼 간단합니다. 데스크톱, 웹, 모바일의 ChatGPT에서 dot에게 메시지를 보내거나 전화를 걸 수 있습니다. dot도 진행 상황이나 질문, 사용자의 판단이 필요한 사항을 메시지로 보낼 수 있습니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s36",
+    "source": "OpenAI News",
+    "text": "You can set boundaries, follow progress, and stay involved in decisions that need you. Each dot works on its own cloud computer, while your computer and its contents stay separate unless you choose to connect it. For signing into supported websites, dots can use saved passwords without exposing them to the model.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:986#s31",
+    "source": "GeekNews",
+    "text": "데스크톱, 웹, 모바일의 ChatGPT에서 dot에게 메시지를 보내거나 전화를 걸 수 있습니다. dot도 진행 상황이나 질문, 사용자의 판단이 필요한 사항을 메시지로 보낼 수 있습니다. Slack과 Teams에서도 dot에게 메시지를 보낼 수 있으며, 문자 메시지 기능도 곧 제공됩니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s37",
+    "source": "OpenAI News",
+    "text": "Each dot works on its own cloud computer, while your computer and its contents stay separate unless you choose to connect it. For signing into supported websites, dots can use saved passwords without exposing them to the model. When you aren’t actively working with it, your dot looks for ways to help in the background.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:986#s32",
+    "source": "GeekNews",
+    "text": "dot도 진행 상황이나 질문, 사용자의 판단이 필요한 사항을 메시지로 보낼 수 있습니다. Slack과 Teams에서도 dot에게 메시지를 보낼 수 있으며, 문자 메시지 기능도 곧 제공됩니다. ChatGPT에서 프로젝트를 시작하고, Slack에서 함께 일하는 팀에 필요한 맥락을 공유한 뒤, dot에 후속 작업을 맡기세요.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s38",
+    "source": "OpenAI News",
+    "text": "For signing into supported websites, dots can use saved passwords without exposing them to the model. When you aren’t actively working with it, your dot looks for ways to help in the background. We call this “proactive research”.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:986#s33",
+    "source": "GeekNews",
+    "text": "Slack과 Teams에서도 dot에게 메시지를 보낼 수 있으며, 문자 메시지 기능도 곧 제공됩니다. ChatGPT에서 프로젝트를 시작하고, Slack에서 함께 일하는 팀에 필요한 맥락을 공유한 뒤, dot에 후속 작업을 맡기세요. dot은 모든 채널에 걸쳐 맥락을 유지하므로, 어디서 연락하든 전체 맥락을 바탕으로 작업합니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s39",
+    "source": "OpenAI News",
+    "text": "When you aren’t actively working with it, your dot looks for ways to help in the background. We call this “proactive research”. It does this by using the apps you’ve already connected with tools that are restricted to be read-only, which means that they can’t send messages, change app content, or control your browser or computer.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:986#s34",
+    "source": "GeekNews",
+    "text": "ChatGPT에서 프로젝트를 시작하고, Slack에서 함께 일하는 팀에 필요한 맥락을 공유한 뒤, dot에 후속 작업을 맡기세요. dot은 모든 채널에 걸쳐 맥락을 유지하므로, 어디서 연락하든 전체 맥락을 바탕으로 작업합니다. dots는 ChatGPT의 보호 체계를 바탕으로, 수행할 수 있는 작업에 맞는 추가적인 안전 및 개인정보 보호 장치를 갖추고 있습니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s40",
+    "source": "OpenAI News",
+    "text": "We call this “proactive research”. It does this by using the apps you’ve already connected with tools that are restricted to be read-only, which means that they can’t send messages, change app content, or control your browser or computer. Security safeguards built into dots help defend against malicious instructions and monitor for potentially harmful behavior.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:986#s35",
+    "source": "GeekNews",
+    "text": "dot은 모든 채널에 걸쳐 맥락을 유지하므로, 어디서 연락하든 전체 맥락을 바탕으로 작업합니다. dots는 ChatGPT의 보호 체계를 바탕으로, 수행할 수 있는 작업에 맞는 추가적인 안전 및 개인정보 보호 장치를 갖추고 있습니다. 사용자는 작업 범위를 정하고, 진행 상황을 확인하며, 직접 판단이 필요한 결정에 계속 관여할 수 있습니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s41",
+    "source": "OpenAI News",
+    "text": "It does this by using the apps you’ve already connected with tools that are restricted to be read-only, which means that they can’t send messages, change app content, or control your browser or computer. Security safeguards built into dots help defend against malicious instructions and monitor for potentially harmful behavior. If our monitoring system detects a safety concern, it can pause or stop the dot’s work.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:986#s36",
+    "source": "GeekNews",
+    "text": "dots는 ChatGPT의 보호 체계를 바탕으로, 수행할 수 있는 작업에 맞는 추가적인 안전 및 개인정보 보호 장치를 갖추고 있습니다. 사용자는 작업 범위를 정하고, 진행 상황을 확인하며, 직접 판단이 필요한 결정에 계속 관여할 수 있습니다. 각 dot은 자체 클라우드 컴퓨터에서 작업하며, 사용자가 연결하기로 선택하지 않는 한 사용자의 컴퓨터와 그 안의 콘텐츠는 분리된 상태로 유지됩니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s42",
+    "source": "OpenAI News",
+    "text": "Security safeguards built into dots help defend against malicious instructions and monitor for potentially harmful behavior. If our monitoring system detects a safety concern, it can pause or stop the dot’s work. You choose which apps dots can access and can manage their permissions through your existing ChatGPT app controls.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:986#s37",
+    "source": "GeekNews",
+    "text": "사용자는 작업 범위를 정하고, 진행 상황을 확인하며, 직접 판단이 필요한 결정에 계속 관여할 수 있습니다. 각 dot은 자체 클라우드 컴퓨터에서 작업하며, 사용자가 연결하기로 선택하지 않는 한 사용자의 컴퓨터와 그 안의 콘텐츠는 분리된 상태로 유지됩니다. 지원되는 웹사이트에 로그인할 때 dots는 저장된 비밀번호를 모델에 노출하지 않고 사용할 수 있습니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s43",
+    "source": "OpenAI News",
+    "text": "If our monitoring system detects a safety concern, it can pause or stop the dot’s work. You choose which apps dots can access and can manage their permissions through your existing ChatGPT app controls. Dots start with built-in rules for when to act independently and when to ask for approval.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:986#s38",
+    "source": "GeekNews",
+    "text": "각 dot은 자체 클라우드 컴퓨터에서 작업하며, 사용자가 연결하기로 선택하지 않는 한 사용자의 컴퓨터와 그 안의 콘텐츠는 분리된 상태로 유지됩니다. 지원되는 웹사이트에 로그인할 때 dots는 저장된 비밀번호를 모델에 노출하지 않고 사용할 수 있습니다. 사용자가 dot과 직접 작업하지 않을 때도 dot은 백그라운드에서 도울 방법을 찾습니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s44",
+    "source": "OpenAI News",
+    "text": "You choose which apps dots can access and can manage their permissions through your existing ChatGPT app controls. Dots start with built-in rules for when to act independently and when to ask for approval. Custom Rules let you allow specific actions, require approval, or block them.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:986#s39",
+    "source": "GeekNews",
+    "text": "지원되는 웹사이트에 로그인할 때 dots는 저장된 비밀번호를 모델에 노출하지 않고 사용할 수 있습니다. 사용자가 dot과 직접 작업하지 않을 때도 dot은 백그라운드에서 도울 방법을 찾습니다. 이를 '선제적 리서치'라고 합니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s45",
+    "source": "OpenAI News",
+    "text": "Dots start with built-in rules for when to act independently and when to ask for approval. Custom Rules let you allow specific actions, require approval, or block them. Built-in safety requirements always apply and you can follow progress, including background work, in Activity View and redirect dots as needed.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:986#s40",
+    "source": "GeekNews",
+    "text": "사용자가 dot과 직접 작업하지 않을 때도 dot은 백그라운드에서 도울 방법을 찾습니다. 이를 '선제적 리서치'라고 합니다. 이 과정에서 이미 연결한 앱을 읽기 전용으로 제한된 도구를 통해 사용하므로 메시지를 보내거나 앱 콘텐츠를 변경하거나 브라우저 또는 컴퓨터를 제어할 수 없습니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s46",
+    "source": "OpenAI News",
+    "text": "Custom Rules let you allow specific actions, require approval, or block them. Built-in safety requirements always apply and you can follow progress, including background work, in Activity View and redirect dots as needed. We don’t use content from ChatGPT Business, Enterprise, or Edu workspaces to improve our models by default.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:986#s41",
+    "source": "GeekNews",
+    "text": "이를 '선제적 리서치'라고 합니다. 이 과정에서 이미 연결한 앱을 읽기 전용으로 제한된 도구를 통해 사용하므로 메시지를 보내거나 앱 콘텐츠를 변경하거나 브라우저 또는 컴퓨터를 제어할 수 없습니다. dots에 내장된 보안 장치는 악의적인 지시를 방어하고 잠재적으로 유해한 행동을 모니터링하는 데 도움을 줍니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s47",
+    "source": "OpenAI News",
+    "text": "Built-in safety requirements always apply and you can follow progress, including background work, in Activity View and redirect dots as needed. We don’t use content from ChatGPT Business, Enterprise, or Edu workspaces to improve our models by default. On personal ChatGPT plans, you can control whether dots’ conversations and work are used to improve our models(opens in a new window).",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:986#s42",
+    "source": "GeekNews",
+    "text": "이 과정에서 이미 연결한 앱을 읽기 전용으로 제한된 도구를 통해 사용하므로 메시지를 보내거나 앱 콘텐츠를 변경하거나 브라우저 또는 컴퓨터를 제어할 수 없습니다. dots에 내장된 보안 장치는 악의적인 지시를 방어하고 잠재적으로 유해한 행동을 모니터링하는 데 도움을 줍니다. 모니터링 시스템이 안전 문제를 감지하면 dot의 작업을 일시 중지하거나 중단할 수 있습니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s48",
+    "source": "OpenAI News",
+    "text": "We don’t use content from ChatGPT Business, Enterprise, or Edu workspaces to improve our models by default. On personal ChatGPT plans, you can control whether dots’ conversations and work are used to improve our models(opens in a new window). We don’t train directly on proactive research or your dot’s notes to itself.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:986#s43",
+    "source": "GeekNews",
+    "text": "dots에 내장된 보안 장치는 악의적인 지시를 방어하고 잠재적으로 유해한 행동을 모니터링하는 데 도움을 줍니다. 모니터링 시스템이 안전 문제를 감지하면 dot의 작업을 일시 중지하거나 중단할 수 있습니다. dots가 접근할 앱을 직접 선택하고, 기존 ChatGPT 앱 제어 기능으로 권한을 관리할 수 있습니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s49",
+    "source": "OpenAI News",
+    "text": "On personal ChatGPT plans, you can control whether dots’ conversations and work are used to improve our models(opens in a new window). We don’t train directly on proactive research or your dot’s notes to itself. Information from them may be used if it helps inform an eligible conversation or task, depending on your settings.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:986#s44",
+    "source": "GeekNews",
+    "text": "모니터링 시스템이 안전 문제를 감지하면 dot의 작업을 일시 중지하거나 중단할 수 있습니다. dots가 접근할 앱을 직접 선택하고, 기존 ChatGPT 앱 제어 기능으로 권한을 관리할 수 있습니다. dots에는 언제 독립적으로 행동하고 언제 승인을 요청해야 하는지 정하는 규칙이 기본으로 내장되어 있습니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s50",
+    "source": "OpenAI News",
+    "text": "We don’t train directly on proactive research or your dot’s notes to itself. Information from them may be used if it helps inform an eligible conversation or task, depending on your settings. Dots use auto-review(opens in a new window) to check actions that could affect your accounts or share information against your instructions, Custom Rules, and safety requirements.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:986#s45",
+    "source": "GeekNews",
+    "text": "dots가 접근할 앱을 직접 선택하고, 기존 ChatGPT 앱 제어 기능으로 권한을 관리할 수 있습니다. dots에는 언제 독립적으로 행동하고 언제 승인을 요청해야 하는지 정하는 규칙이 기본으로 내장되어 있습니다. 맞춤 규칙을 통해 특정 작업을 허용하거나, 승인을 요구하거나, 차단할 수 있습니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s51",
+    "source": "OpenAI News",
+    "text": "Information from them may be used if it helps inform an eligible conversation or task, depending on your settings. Dots use auto-review(opens in a new window) to check actions that could affect your accounts or share information against your instructions, Custom Rules, and safety requirements. This helps determine what work can proceed, what needs approval, and what you must do yourself.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:986#s46",
+    "source": "GeekNews",
+    "text": "dots에는 언제 독립적으로 행동하고 언제 승인을 요청해야 하는지 정하는 규칙이 기본으로 내장되어 있습니다. 맞춤 규칙을 통해 특정 작업을 허용하거나, 승인을 요구하거나, 차단할 수 있습니다. 내장된 안전 요건은 항상 적용됩니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s52",
+    "source": "OpenAI News",
+    "text": "Dots use auto-review(opens in a new window) to check actions that could affect your accounts or share information against your instructions, Custom Rules, and safety requirements. This helps determine what work can proceed, what needs approval, and what you must do yourself. Certain sensitive tasks, such as changing a password, always stay with you.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:986#s47",
+    "source": "GeekNews",
+    "text": "맞춤 규칙을 통해 특정 작업을 허용하거나, 승인을 요구하거나, 차단할 수 있습니다. 내장된 안전 요건은 항상 적용됩니다. 활동 보기에서 백그라운드 작업을 포함한 진행 상황을 확인하고, 필요에 따라 dots의 작업 방향을 바꿀 수 있습니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s53",
+    "source": "OpenAI News",
+    "text": "This helps determine what work can proceed, what needs approval, and what you must do yourself. Certain sensitive tasks, such as changing a password, always stay with you. You can learn more about our safety approach for dots in our dots safety blog, in our Help Center(opens in a new window), and in our system card(opens in a new window).",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:986#s48",
+    "source": "GeekNews",
+    "text": "내장된 안전 요건은 항상 적용됩니다. 활동 보기에서 백그라운드 작업을 포함한 진행 상황을 확인하고, 필요에 따라 dots의 작업 방향을 바꿀 수 있습니다. OpenAI는 기본적으로 ChatGPT Business, Enterprise, Edu 워크스페이스의 콘텐츠를 모델 개선에 사용하지 않습니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s54",
+    "source": "OpenAI News",
+    "text": "Certain sensitive tasks, such as changing a password, always stay with you. You can learn more about our safety approach for dots in our dots safety blog, in our Help Center(opens in a new window), and in our system card(opens in a new window). Dots can still make mistakes, so always review consequential work.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:10#s55",
+    "source": "OpenAI News",
+    "text": "You can learn more about our safety approach for dots in our dots safety blog, in our Help Center(opens in a new window), and in our system card(opens in a new window). Dots can still make mistakes, so always review consequential work. Your dot works on your behalf; specialist dots take on dedicated responsibilities within your organization.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:986#s50",
+    "source": "GeekNews",
+    "text": "OpenAI는 기본적으로 ChatGPT Business, Enterprise, Edu 워크스페이스의 콘텐츠를 모델 개선에 사용하지 않습니다. 개인용 ChatGPT 요금제에서는 dots와 나눈 대화와 작업을 모델 개선(새 창에서 열기)에 사용할지 직접 설정할 수 있습니다. 선제적 리서치나 dot이 자체적으로 작성한 메모를 직접 학습에 사용하지는 않습니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:10#s56",
+    "source": "OpenAI News",
+    "text": "Dots can still make mistakes, so always review consequential work. Your dot works on your behalf; specialist dots take on dedicated responsibilities within your organization. Your company sets up each dot with its own identity, credentials, and access to the systems it needs to complete its tasks.",
+    "title": "Introducing dots",
+    "url": null
+   },
+   {
+    "id": "it:986#s52",
+    "source": "GeekNews",
+    "text": "선제적 리서치나 dot이 자체적으로 작성한 메모를 직접 학습에 사용하지는 않습니다. 다만 사용자의 설정에 따라 해당 정보가 모델 개선에 사용될 수 있는 적격 대화나 작업에 도움이 되는 경우에는 사용될 수 있습니다. dots는 계정에 영향을 주거나 정보를 공유할 수 있는 작업이 사용자의 지시, 맞춤 규칙 및 안전 요건에 부합하는지 자동 검토(새 창에서 열기)를 통해 확인합니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:986#s53",
+    "source": "GeekNews",
+    "text": "다만 사용자의 설정에 따라 해당 정보가 모델 개선에 사용될 수 있는 적격 대화나 작업에 도움이 되는 경우에는 사용될 수 있습니다. dots는 계정에 영향을 주거나 정보를 공유할 수 있는 작업이 사용자의 지시, 맞춤 규칙 및 안전 요건에 부합하는지 자동 검토(새 창에서 열기)를 통해 확인합니다. 이를 통해 어떤 작업을 진행할 수 있는지, 어떤 작업에 승인이 필요한지, 어떤 작업을 사용자가 직접 수행해야 하는지를 판단합니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:986#s54",
+    "source": "GeekNews",
+    "text": "dots는 계정에 영향을 주거나 정보를 공유할 수 있는 작업이 사용자의 지시, 맞춤 규칙 및 안전 요건에 부합하는지 자동 검토(새 창에서 열기)를 통해 확인합니다. 이를 통해 어떤 작업을 진행할 수 있는지, 어떤 작업에 승인이 필요한지, 어떤 작업을 사용자가 직접 수행해야 하는지를 판단합니다. 비밀번호 변경과 같은 일부 민감한 작업은 항상 사용자가 직접 수행해야 합니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:986#s55",
+    "source": "GeekNews",
+    "text": "이를 통해 어떤 작업을 진행할 수 있는지, 어떤 작업에 승인이 필요한지, 어떤 작업을 사용자가 직접 수행해야 하는지를 판단합니다. 비밀번호 변경과 같은 일부 민감한 작업은 항상 사용자가 직접 수행해야 합니다. dots의 안전을 위한 OpenAI의 접근 방식에 대한 자세한 내용은 dots 안전 블로그, 도움말 센터(새 창에서 열기) 및 시스템 카드(새 창에서 열기)에서 확인할 수 있습니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:986#s56",
+    "source": "GeekNews",
+    "text": "비밀번호 변경과 같은 일부 민감한 작업은 항상 사용자가 직접 수행해야 합니다. dots의 안전을 위한 OpenAI의 접근 방식에 대한 자세한 내용은 dots 안전 블로그, 도움말 센터(새 창에서 열기) 및 시스템 카드(새 창에서 열기)에서 확인할 수 있습니다. dots도 실수할 수 있으므로 중요한 결과를 초래할 수 있는 작업은 항상 검토하세요.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:986#s57",
+    "source": "GeekNews",
+    "text": "dots의 안전을 위한 OpenAI의 접근 방식에 대한 자세한 내용은 dots 안전 블로그, 도움말 센터(새 창에서 열기) 및 시스템 카드(새 창에서 열기)에서 확인할 수 있습니다. dots도 실수할 수 있으므로 중요한 결과를 초래할 수 있는 작업은 항상 검토하세요. 사용자의 dot은 사용자를 대신해 업무를 수행하며, 전문 dots는 조직 내에서 특정 업무를 전담합니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:986#s58",
+    "source": "GeekNews",
+    "text": "dots도 실수할 수 있으므로 중요한 결과를 초래할 수 있는 작업은 항상 검토하세요. 사용자의 dot은 사용자를 대신해 업무를 수행하며, 전문 dots는 조직 내에서 특정 업무를 전담합니다. 회사는 각 dot에 고유한 ID와 인증 정보를 설정하고 업무 수행에 필요한 시스템에 대한 액세스 권한을 부여합니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:986#s59",
+    "source": "GeekNews",
+    "text": "사용자의 dot은 사용자를 대신해 업무를 수행하며, 전문 dots는 조직 내에서 특정 업무를 전담합니다. 회사는 각 dot에 고유한 ID와 인증 정보를 설정하고 업무 수행에 필요한 시스템에 대한 액세스 권한을 부여합니다. dot은 업무를 수행하면서 새로운 정보에 적응하고 팀의 피드백을 바탕으로 개선됩니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:986#s60",
+    "source": "GeekNews",
+    "text": "회사는 각 dot에 고유한 ID와 인증 정보를 설정하고 업무 수행에 필요한 시스템에 대한 액세스 권한을 부여합니다. dot은 업무를 수행하면서 새로운 정보에 적응하고 팀의 피드백을 바탕으로 개선됩니다. OpenAI는 조달, 청구서 처리, 이메일 마케팅, 고객 지원 및 상업 계약 분야에서 진행한 사내 초기 테스트를 통해 얻은 교훈을 바탕으로 개발을 이어가고 있습니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:986#s61",
+    "source": "GeekNews",
+    "text": "dot은 업무를 수행하면서 새로운 정보에 적응하고 팀의 피드백을 바탕으로 개선됩니다. OpenAI는 조달, 청구서 처리, 이메일 마케팅, 고객 지원 및 상업 계약 분야에서 진행한 사내 초기 테스트를 통해 얻은 교훈을 바탕으로 개발을 이어가고 있습니다. 우선 특정 업무에 초점을 맞춘 기업 파일럿 프로그램부터 시작합니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:986#s62",
+    "source": "GeekNews",
+    "text": "OpenAI는 조달, 청구서 처리, 이메일 마케팅, 고객 지원 및 상업 계약 분야에서 진행한 사내 초기 테스트를 통해 얻은 교훈을 바탕으로 개발을 이어가고 있습니다. 우선 특정 업무에 초점을 맞춘 기업 파일럿 프로그램부터 시작합니다. OpenAI 엔지니어링 팀이 조직과 직접 협력해 각 dot의 책임, 사용할 수 있는 도구, 사람이 작업을 검토하고 승인하는 방식을 정할 예정입니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:986#s64",
+    "source": "GeekNews",
+    "text": "OpenAI 엔지니어링 팀이 조직과 직접 협력해 각 dot의 책임, 사용할 수 있는 도구, 사람이 작업을 검토하고 승인하는 방식을 정할 예정입니다. 전문 dot에 맡기고 싶은 업무가 있다면 알려주세요. 또한 Microsoft와 협력하여 Agent 365의 기업 거버넌스 및 보안 제어 기능에 전문 dots를 통합하고 있습니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:986#s67",
+    "source": "GeekNews",
+    "text": "기업이 이미 사용하고 있는 Microsoft 도구를 통해 dots를 관리할 수 있도록 하는 것이 목표입니다. 오늘부터 지원 지역(새 창에서 열기)의 Pro 및 Business Premium 사용자를 대상으로 ChatGPT에서 dots를 순차적으로 제공합니다. Enterprise 사용자(Edu 및 Healthcare 포함)는 워크스페이스 관리자가 베타 기능을 활성화하면 체험할 수 있습니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:986#s68",
+    "source": "GeekNews",
+    "text": "오늘부터 지원 지역(새 창에서 열기)의 Pro 및 Business Premium 사용자를 대상으로 ChatGPT에서 dots를 순차적으로 제공합니다. Enterprise 사용자(Edu 및 Healthcare 포함)는 워크스페이스 관리자가 베타 기능을 활성화하면 체험할 수 있습니다. 첫 번째 dot은 추가 비용 없이 Pro 또는 Business Premium 요금제에 포함됩니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:986#s70",
+    "source": "GeekNews",
+    "text": "첫 번째 dot은 추가 비용 없이 Pro 또는 Business Premium 요금제에 포함됩니다. 24시간 내내 대화를 나누고, 생각을 정리하고, 중요한 일을 놓치지 않도록 도와줍니다. 요금제에는 더 심층적인 작업을 위한 사용량도 포함되며, 출시 후 첫 한 달 동안은 한도가 확대됩니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:986#s71",
+    "source": "GeekNews",
+    "text": "24시간 내내 대화를 나누고, 생각을 정리하고, 중요한 일을 놓치지 않도록 도와줍니다. 요금제에는 더 심층적인 작업을 위한 사용량도 포함되며, 출시 후 첫 한 달 동안은 한도가 확대됩니다. 앞으로는 dots를 추가하고 각 dot의 처리 속도나 월간 작업량을 늘려 작업 결과를 확장할 수 있습니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:986#s72",
+    "source": "GeekNews",
+    "text": "요금제에는 더 심층적인 작업을 위한 사용량도 포함되며, 출시 후 첫 한 달 동안은 한도가 확대됩니다. 앞으로는 dots를 추가하고 각 dot의 처리 속도나 월간 작업량을 늘려 작업 결과를 확장할 수 있습니다. dot과의 대화는 ChatGPT 사용량 한도에 포함되지 않습니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:986#s73",
+    "source": "GeekNews",
+    "text": "앞으로는 dots를 추가하고 각 dot의 처리 속도나 월간 작업량을 늘려 작업 결과를 확장할 수 있습니다. dot과의 대화는 ChatGPT 사용량 한도에 포함되지 않습니다. dot에게 Codex 또는 ChatGPT Work에서 작업을 시작하거나 관리하도록 요청하면, 해당 작업은 기존과 동일하게 사용량 한도에 포함됩니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:986#s74",
+    "source": "GeekNews",
+    "text": "dot과의 대화는 ChatGPT 사용량 한도에 포함되지 않습니다. dot에게 Codex 또는 ChatGPT Work에서 작업을 시작하거나 관리하도록 요청하면, 해당 작업은 기존과 동일하게 사용량 한도에 포함됩니다. 시작하려면 ChatGPT 데스크톱 앱이나 데스크톱 브라우저에서 첫 번째 dot을 만들고 앱을 연결한 다음 dot이 자신을 소개하도록 해보세요.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:986#s75",
+    "source": "GeekNews",
+    "text": "dot에게 Codex 또는 ChatGPT Work에서 작업을 시작하거나 관리하도록 요청하면, 해당 작업은 기존과 동일하게 사용량 한도에 포함됩니다. 시작하려면 ChatGPT 데스크톱 앱이나 데스크톱 브라우저에서 첫 번째 dot을 만들고 앱을 연결한 다음 dot이 자신을 소개하도록 해보세요. 초기 설정을 마치면 ChatGPT 모바일 앱에서 dot과 메시지를 주고받을 수 있습니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:986#s76",
+    "source": "GeekNews",
+    "text": "시작하려면 ChatGPT 데스크톱 앱이나 데스크톱 브라우저에서 첫 번째 dot을 만들고 앱을 연결한 다음 dot이 자신을 소개하도록 해보세요. 초기 설정을 마치면 ChatGPT 모바일 앱에서 dot과 메시지를 주고받을 수 있습니다. dots가 매일 유용하게 쓰이는 데 무엇이 필요한지 배우며 계속 개선해 나가겠습니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:986#s77",
+    "source": "GeekNews",
+    "text": "초기 설정을 마치면 ChatGPT 모바일 앱에서 dot과 메시지를 주고받을 수 있습니다. dots가 매일 유용하게 쓰이는 데 무엇이 필요한지 배우며 계속 개선해 나가겠습니다. 그 과정에서 배운 내용을 가능한 범위에서 공유하고, 앞으로 개발할 기능의 방향을 정하는 데 활용하겠습니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   },
+   {
+    "id": "it:986#s78",
+    "source": "GeekNews",
+    "text": "dots가 매일 유용하게 쓰이는 데 무엇이 필요한지 배우며 계속 개선해 나가겠습니다. 그 과정에서 배운 내용을 가능한 범위에서 공유하고, 앞으로 개발할 기능의 방향을 정하는 데 활용하겠습니다.",
+    "title": "OpenAI Dots - 상시 작동하는 AI 에이전트 공개",
+    "url": null
+   }
+  ],
+  "angle": "24시간 상시 가동 에이전트의 B2B 포지셔닝",
+  "previous": null,
+  "code_warnings": [],
+  "round": 1
+ },
+ "expect": {
+  "status": "pass"
+ },
+ "note": "통과한 최종판(깨끗한 초안 가정, 라벨로 확인)"
+}

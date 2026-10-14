@@ -1,0 +1,274 @@
+{
+ "item_id": 274,
+ "video_id": "S-bRN-avZ4Q",
+ "slides": [
+  {
+   "sec": 0,
+   "frame_kind": "speaker",
+   "title": "",
+   "ocr_text": "",
+   "numbers": [],
+   "table": null
+  },
+  {
+   "sec": 5,
+   "frame_kind": "speaker",
+   "title": "",
+   "ocr_text": "",
+   "numbers": [],
+   "table": null
+  },
+  {
+   "sec": 78,
+   "frame_kind": "slide",
+   "title": "RAG in 2026",
+   "ocr_text": "RAG in 2026\nLlamaIndex - Redefine Document Workflows with AI Agents",
+   "numbers": [],
+   "table": null
+  },
+  {
+   "sec": 208,
+   "frame_kind": "slide",
+   "title": "The Modern Generalized Agent",
+   "ocr_text": "The Modern Generalized Agent\nToday's stack\n1. Retrieval complexity is in the agent\nlayer: Interleave simple tools (grep + CLI)\nwith semantic search to achieve complex\nresults.\n2. Context is moving up the stack:\nManaging the agent context window →\nconfigure the right MCP servers and skills.\n3. Agent Orchestration is moving up the\nstack:\na. 2023-2025: define programs through\ncode\nb. 2025-2026: define runbooks through\nEnglish\nc. 2026+: define goals and alignment\nPost\nBoris Cherny\nEarly versions of Claude Code used RAG + a vector store, but we\nfound pretty quickly that agentic search generally works better. It is also\nsimpler and doesn't have the same issues around security, privacy,\nstaleness, and reliability.\n5:56 PM · Jan 31, 2026\n12M Views\nPost\nAndrej Karpathy\nLLM Knowledge Bases\nSomething I'm finding very useful recently: using LLMs to build\nknowledge bases of various topics of research interest. In this\ntarget phase of my recent token through/put: going less into\nmultiplying code, and more into maintaining knowledge (at\nmarkdown and images). The latest LLMs are quite good at it.\nTools\n(Research, Code)\nHarness\nSession\nSandbox\nOrchestration\nCalibrating the system prompt",
+   "numbers": [],
+   "table": null
+  },
+  {
+   "sec": 300,
+   "frame_kind": "slide",
+   "title": "The Modern Document Context Layer for Agents",
+   "ocr_text": "The Modern\nDocument Context\nLayer for Agents\nLlamaIndex - Redefine Document Workflows with AI Agents",
+   "numbers": [],
+   "table": null
+  },
+  {
+   "sec": 422,
+   "frame_kind": "slide",
+   "title": "Building an Agent-Native Document Platform",
+   "ocr_text": "Building an Agent-Native Document Platform\nAgent\nDocument Context Layer\nParsing Layer\nSemantic and Storage Layer\nAgentic Workflow Layer\nDigitalize the 10T+ pages of human-created documents into accurate, token-efficient context.\nDocument management for humans and agents. Edit, version, and collaborate over documents.\nHillclimb repeatable workflows over documents to optimize accuracy and lower cost.",
+   "numbers": [
+    {
+     "confidence": "high",
+     "value": "10T+",
+     "unit": "pages",
+     "what": "human-created documents",
+     "kind": "claim"
+    }
+   ],
+   "table": null
+  },
+  {
+   "sec": 447,
+   "frame_kind": "slide",
+   "title": "Building an Agent-Native Document Platform",
+   "ocr_text": "Building an Agent-Native Document Platform\nAgent\nDocument Context Layer\nParsing Layer\nSemantic and Storage Layer\nAgentic Workflow Layer\nDigitize the 10T+ pages of human-created documents into accurate, token-efficient context.\nDocument management for humans and agents. Edit, version, and collaborate over documents.\nHillclimb repeatable workflows over documents to optimize accuracy and lower cost.\nLlamaindex - Redefine Document Workflows with AI Agents",
+   "numbers": [
+    {
+     "confidence": "high",
+     "value": "10T+",
+     "unit": "T+",
+     "what": "pages of human-created documents",
+     "kind": "claim"
+    }
+   ],
+   "table": null
+  },
+  {
+   "sec": 525,
+   "frame_kind": "slide",
+   "title": "Document OCR is Hard",
+   "ocr_text": "Document OCR is Hard\n90% of the world's data lies in unstructured documents like PDFs, Powerpoints, Word, Excel\nThese documents are not natively machine readable and require machine learning to extract information\nPDF\nThe quick brown fox jumps over the lazy dog.\n[clean text]\nWhat you see\nPDF\nB1 /F0 12 Tf\n10 0 172 740 Tm\n(The quick bro ) Tj\n10 0 168 740 Tm\n(wn ) Tj\n10 0 172 726 Tm\n(fox jumps over ) Tj\nET\nWhat the PDF actually stores\nWhat You See vs. What the PDF Stores\nLlamaindex\nRedefine Document Workflows with AI Agents",
+   "numbers": [
+    {
+     "confidence": "high",
+     "value": "90%",
+     "unit": "%",
+     "what": "of the world's data lies in unstructured documents",
+     "kind": "claim"
+    }
+   ],
+   "table": null
+  },
+  {
+   "sec": 680,
+   "frame_kind": "slide",
+   "title": "An Evolution of Approaches",
+   "ocr_text": "An Evolution of Approaches\n1. Deterministic Pipelines: Heuristics and ML models\n2. Vision Models\n3. Hybrid Approach (Ours)\npipeline approach\nmodel approach\nhybrid approach\npage image\ntext direction\nchat recog\nlayout analysis\noutput\npage image\n[VLM]\nStructured Output\nPDF page\nlayout detection\nText extraction (body text) fast / $\nVLM processing (tables, charts)\nagentc validation\neach stage independent\nreasons about everything together\nstructured output (markdown + metadata/bounding boxes)\nLlamaindex - Redefine Document Workflows with AI Agents",
+   "numbers": [],
+   "table": null
+  },
+  {
+   "sec": 780,
+   "frame_kind": "slide",
+   "title": "The Document OCR Agent Harness",
+   "ocr_text": "The Document OCR Agent Harness\nLlamaParse: https://cloud.llamaindex.ai/\nSOTA Document OCR\n(LlamaParse)\nIncreased Accuracy:\n- Post-train VLMs with RLVR for tables, charts, hand-writing, etc\n- Agentic judge & refinement\nCost Optimization:\n- Auto-routing (doc complexity model)\n- Model distillation & quantization\n- Direct extraction (optimized PDFium fork)\nLatest Frontier Models\nAccuracy\nCost\nLlamaIndex - Redefine Document Workflows with AI Agents",
+   "numbers": [],
+   "table": null
+  },
+  {
+   "sec": 873,
+   "frame_kind": "slide",
+   "title": "ParseBench: An Enterprise Document Benchmark for Agents",
+   "ocr_text": "ParseBench: An Enterprise Document Benchmark for Agents\nWe evaluate frontier models, OSS models, specialized parse providers (including LlamaParse)\nNo parser gets close to 100%, the benchmark is meant to be hard!\nOverall vs. Cost\nLlamaParse\nVLMs\nSpecialized Document Parsers\nLP Agentic\nLP Cost-Eff\nGemini (high)\nReducto (agentic)\nGemini (mini)\nReducto\nGPT-5.4\nAzure DI\nExtend\nHaku 4.5 (think)\nOpus 4.6\nGoogle DocAI\nGPT-mini (med)\nGemini Pro\nTexttract\nGPT-mini (mini)\nLandimgAI\nHaku 4.5\nOverall score (%)\nCost per page (cents)",
+   "numbers": [
+    {
+     "confidence": "high",
+     "value": "100%",
+     "unit": "%",
+     "what": "No parser gets close to",
+     "kind": "claim"
+    }
+   ],
+   "table": null
+  },
+  {
+   "sec": 892,
+   "frame_kind": "slide",
+   "title": "ParseBench: An Enterprise Document Benchmark for Agents",
+   "ocr_text": "ParseBench: An Enterprise Document Benchmark for Agents\nWe evaluate frontier models, OSS models, specialized parse providers (including LlamaParse)\nNo parser gets close to 100%, the benchmark is meant to be hard!\nOverall vs. Cost\nLlamaParse\nVLMs\nSpecialized Document Parsers\nLP Agentic\nLP Cost-Eff\nGemini (high)\nReducto (agentic)\nGemini (min)\nReducto\nGemini Pro\nAzure DI\nGPT-5.4\nExtend\nHaku 4.5 (think)\nOpus 4.6\nGoogle DocAI\nGPT-mini (med)\nTextract\nGPT-mini (min)\nHaku 4.5\nLandingAI\n0.0 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0\nCost per page (cents)\nOverall score (%)\nLlamaIndex - Redefine Document Workflows with AI Agents",
+   "numbers": [
+    {
+     "confidence": "high",
+     "value": "100%",
+     "unit": "%",
+     "what": "parser score (no parser gets close to)",
+     "kind": "claim"
+    }
+   ],
+   "table": null
+  },
+  {
+   "sec": 900,
+   "frame_kind": "slide",
+   "title": "The Accuracy-Cost-Latency Pareto Curve",
+   "ocr_text": "The Accuracy-Cost-Latency Pareto Curve\n1. High Accuracy Regime: require ~99%+ accuracy, price insensitive\n* e.g. financial data room extraction\n2. Low Cost Regime: require 1M docs per day, accuracy above min threshold\n* e.g. offline indexing a petabyte of Sharepoint data for retrieval\n3. Low Latency/Low Cost Regime: require parsing massive volumes in seconds, price sensitive\n* e.g. real-time file uploads to Cowork\nVLM-based approaches are primarily good for latency-insensitive batch processing.\nThey are not great in the agent loop.\nOverall vs. Cost\nLP Agentic\nLlamaParse\nVLMs\nSpecialized Document Parsers\nLP Cost-Eff\nGemini (high)\nReducto (agentic)\nGemini (mini)\nReducto\nGPT-5.4\nAzure Di\nExtend\nHaku 4.5 (think)\nOpus 4.6\nGoogle DocAI\nTexttract\nGPT-mini (med)\nGPT-mini (min)\nHaku 4.5\nLandingAI\nLlamaIndex - Redefine Document Workflows with AI Agents",
+   "numbers": [
+    {
+     "confidence": "high",
+     "value": "99%",
+     "unit": "%",
+     "what": "High Accuracy Regime accuracy",
+     "kind": "claim"
+    },
+    {
+     "confidence": "high",
+     "value": "1M",
+     "unit": "docs per day",
+     "what": "Low Cost Regime volume",
+     "kind": "claim"
+    }
+   ],
+   "table": null
+  },
+  {
+   "sec": 957,
+   "frame_kind": "slide",
+   "title": "The Accuracy-Cost-Latency Pareto Curve",
+   "ocr_text": "The Accuracy-Cost-Latency Pareto Curve\n1. High Accuracy Regime: require ~99%+ accuracy, price insensitive\n* e.g. financial data room extraction\n2. Low Cost Regime: require 1M docs per day, accuracy above min threshold\n* e.g. offline indexing a petabyte of Sharepoint data for retrieval\n3. Low Latency-Low Cost Regime: require parsing massive volumes in seconds, price sensitive\n* e.g. real-time file uploads to Cowork\nVLM-based approaches are primarily good for latency-insensitive batch processing.\nThey are not great in the agent loop.\nOverall vs. Cost\nLP Agentic\nLP Cost-Eff\nGemini (high)\nReducto (agentic)\nLlamaParse\nVLM\nSpecialized Document Parsers\nGemini (min)\nReducto\nAzure Dr\nGPT-5.4\nExtend\nHaku 4.5 (think)\nOpus 4.6\nGoogle DocAI\nTexttract\nGPT-mini (med)\nGPT-mini (min)\nHaku 4.5\nLandingAI\nGemini Pro\nCost per page (cents)",
+   "numbers": [
+    {
+     "confidence": "high",
+     "value": "99%+",
+     "unit": "%",
+     "what": "accuracy (High Accuracy Regime)",
+     "kind": "claim"
+    },
+    {
+     "confidence": "high",
+     "value": "1M",
+     "unit": "docs per day",
+     "what": "require (Low Cost Regime)",
+     "kind": "claim"
+    }
+   ],
+   "table": null
+  },
+  {
+   "sec": 992,
+   "frame_kind": "slide",
+   "title": "The Accuracy-Cost-Latency Pareto Curve",
+   "ocr_text": "The Accuracy-Cost-Latency Pareto Curve\n1. High Accuracy Regime: require ~99%+ accuracy, price insensitive\n* e.g. financial data room extraction\n2. Low Cost Regime: require 1M docs per day, accuracy above min threshold\n* e.g. offline indexing a petabyte of Sharepoint data for retrieval\n3. Low Latency/Low Cost Regime: require parsing massive volumes in seconds, price sensitive\n* e.g. real-time file uploads to Cowork\nVLM-based approaches are primarily good for latency-insensitive batch processing.\nThey are not great in the agent loop.\nOverall vs. Cost\nLP Agentic\nLlamaParse\nVLM\nSpecialized Document Parsers\nLP Cost-Eff\nGemini (high)\nReducto (agentic)\nGemini (mini)\nReducto\nGPT-5.4\nAzure Dr\nExtend\nHaku 4.5 (think)\nOpus 4.6\nGoogle DocAI\nTexttract\nGPT-mini (med)\nGPT-mini (mini)\nHaku 4.5\nLandingAI\nGemini Pro\nOverall score (%)\nCost per page (cents)",
+   "numbers": [
+    {
+     "confidence": "high",
+     "value": "99%+",
+     "unit": "%",
+     "what": "accuracy (High Accuracy Regime)",
+     "kind": "claim"
+    },
+    {
+     "confidence": "high",
+     "value": "1M",
+     "unit": "docs per day",
+     "what": "requirement (Low Cost Regime)",
+     "kind": "claim"
+    }
+   ],
+   "table": null
+  },
+  {
+   "sec": 1063,
+   "frame_kind": "slide",
+   "title": "LiteParse: Fast, Free, Surprisingly Good Parsing",
+   "ocr_text": "LiteParse: Fast, Free, Surprisingly Good Parsing\nIt is perfect as a default in the\nassistive agent loop:\n- Extremely fast over any set of\n  data\n- Good enough that the agent\n  can do text search\n- The agent can decide to\n  \"zoom-in\" with a VLM-based\n  OCR tool if it needs to do\n  deeper analysis.\nDrop a PDF here or click to browse\nPaste 14 page(s) in 0.03s\nOutput: JSON (with bounding boxes)\nWrap: On\nLlamaIndex - Redefine Document Workflows with AI Agents",
+   "numbers": [
+    {
+     "confidence": "high",
+     "value": "14",
+     "unit": "page(s)",
+     "what": "Paste 14 page(s) in 0.03s",
+     "kind": "ui"
+    },
+    {
+     "confidence": "high",
+     "value": "0.03s",
+     "unit": "s",
+     "what": "Paste 14 page(s) in 0.03s",
+     "kind": "ui"
+    }
+   ],
+   "table": null
+  },
+  {
+   "sec": 1133,
+   "frame_kind": "slide",
+   "title": "Document Extraction",
+   "ocr_text": "Document Extraction\nGoal: Schema-based structured extraction over any document, regardless of document complexity or schema complexity.\nUse Cases:\n- Automate human data entry\n- Batch ETL\n- Add metadata for search\nExtraction Modalities:\n- Fast Extraction\n- Agentic Extraction\nGrounding and Semantics:\n- Granular attribution\n- Calibrated Confidence Scores\nOutput Options\nGranular Boundary Boxes Beta\nLine\nWord\nCell\nMarkdown\nAnnotate links\nInline images in markdown\nGranular Bounding Boxes - Available now in LlamaParse.\nLlamaIndex - Redefine Document Workflows with AI Agents",
+   "numbers": [],
+   "table": null
+  },
+  {
+   "sec": 1188,
+   "frame_kind": "slide",
+   "title": "Document Search",
+   "ocr_text": "Document Search\n2026: Retrieval Harness\nGive access to a full set of retrieval and filesystem tools for full range of operations\n- Keyword search: BM25, grep\n- Semantic search: Vector\n- File operations: Read/scroll\n- Filesystem operations: compose via pipes\nAgents can iteratively crawl context and generate in a multi-turn fashion.\nSemantic Search Alone\nLlamaIndex - Redefine Document Workflows with AI Agents",
+   "numbers": [
+    {
+     "confidence": "high",
+     "value": "2026",
+     "unit": "",
+     "what": "Retrieval Harness",
+     "kind": "version"
+    }
+   ],
+   "table": null
+  },
+  {
+   "sec": 1220,
+   "frame_kind": "slide",
+   "title": "Thanks!",
+   "ocr_text": "Thanks!\nCome find us at booth #L-G47\nJUNE 29-JULY 2, MOSCONE WEST\nBOOTH L-G47\nAI Engineer\nWorld's Fair\nLlamaIndex\nAlso pickleball\nhttps://luma.com/the-agent-open\nTHE\nAGENT OPEN\nHOSTED BY\nBraintrust\nLlamaIndex\nturbopuffer\nModal\nparallel\nBrowserbase\nCURSOR",
+   "numbers": [],
+   "table": null
+  },
+  {
+   "sec": 1226,
+   "frame_kind": "speaker",
+   "title": "",
+   "ocr_text": "",
+   "numbers": [],
+   "table": null
+  }
+ ]
+}

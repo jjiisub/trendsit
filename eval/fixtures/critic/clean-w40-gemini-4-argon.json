@@ -1,0 +1,1332 @@
+{
+ "input": {
+  "loc_lines": [
+   "title: Gemini 4 Argon: 에이전트 작업 강화와 출시 기념 가격 구조",
+   "summary: 구글이 출력 토큰 한도 1백만 개와 출시 기념 특가(입력 2달러, 출력 10달러)를 갖춘 Gemini 4 Argon을 Fairwind 프로그램으로 제한 출시했다. 쟁점은 벤치마크 13개 부문 정상에도 일반 API 접근이 제한된 점이다.",
+   "head_tiles[0]: 1백만 개 / 출력 토큰 한도 (기존 6만 4천개에서 확장) (refs it:18#s21, it:997#s23)",
+   "head_tiles[1]: 2달러 / 입력 토큰 1백만 개당 가격 (출시 기념 특가) (refs it:18#s9, it:997#s9)",
+   "head_tiles[2]: 10달러 / 출력 토큰 1백만 개당 가격 (출시 기념 특가) (refs it:18#s9, it:997#s9)",
+   "head_tiles[3]: 95% / 캐시 입력 토큰 할인율 (입력 토큰 가격 대비) (refs it:18#s9, it:997#s9)",
+   "sections[0].heading: 출력 토큰 한도 1백만 개로 확장, 단일 트래잭션 장기 추론 지원",
+   "sections[0].paragraphs[0]: 구글은 더 길고 복잡한 활용 사례를 뒷받침하기 위해 Gemini 4 Argon의 출력 토큰 한도를 기존 6만 4천개에서 업계 최고 수준인 1백만 개로 대폭 확장했다. 단일 실행 경로 내에서 수십만 토큰을 생성할 수 있는 여유 공간이 확보되면서, 까다로운 과제도 한 번에 해결할 수 있는 한 차원 더 깊은 추론 성능을 제공한다. (refs it:18#s21, it:18#s22, it:997#s23, it:997#s24)",
+   "sections[1].heading: 출시 기념 특가: 입력 2달러, 출력 10달러, 캐시 95% 할인",
+   "sections[1].paragraphs[0]: Gemini 4 Argon은 출시 기념 특가로 입력 토큰 1백만 개당 2달러, 출력 토큰 1백만 개당 10달러에 제공된다. 캐시된 입력 토큰은 입력 토큰 가격 대비 95% 할인된 금액으로 이용할 수 있다. (refs it:18#s9, it:997#s9)",
+   "sections[1].paragraphs[1]: AI타임스는 프로모션 종료 후 정가로 입력 4달러, 출력 20달러로 전환될 예정이라고 보도했다. 이 가격은 GPT-6 Astra 대비 5분의 1, Claude Opus 5.5의 절반 수준이라고 평가받았다. (refs it:864#s38, it:864#s37)",
+   "sections[1].table (구분/입력/출력): 출시 기념 특가와 정가 비교 / note: 1백만 토큰당",
+   "sections[1].table.rows[0]: 출시 기념 특가 | 2달러 | 10달러",
+   "sections[1].table.rows[1]: 정가(프로모션 종료 후) | 4달러 | 20달러",
+   "sections[2].heading: 에이전트 작업 강화: 양자 최적화 40% 개선, 메모리 300 TiB 확보",
+   "sections[2].paragraphs[0]: 양자 컴퓨팅 연구에서 Argon은 시공간 자원(큐비트 × 게이트) 최적화에서 기존 발표된 베이스라인을 몇 분 만에 40% 이상 뛰어넘었다. 데이터센터 메모리 최적화에서는 전체 서버군의 프로파일링 텔레메트리를 분석해 300 TiB 이상의 메모리를 확보했으며, 총 절감 규모는 500 TiB에서 최대 1 PiB에 이를 것으로 예상된다. (refs it:18#s14, it:18#s15, it:997#s14, it:997#s16)",
+   "sections[2].paragraphs[1]: 대규모 코드베이스 마이그레이션에서는 re2, libgav1 등 핵심 라이브러리부터 80만 줄 이상의 Fuchsia OS Zircon 커널에 이르기까지 C/C++ 코드베이스를 Rust로 전환하는 작업을 수행하고 있다. libgav1의 경우 3만 2천 줄의 SIMD 코드를 안전한 Rust 코드로 대체해 동일한 비디오 출력 품질을 유지하면서 기존 Rust 버전 대비 2.7배 빠르게 작동하도록 만들었다. (refs it:18#s16, it:18#s18, it:18#s19, it:997#s17)",
+   "sections[3].heading: 제한적 출시: Fairwind 프로그램과 미국 정부 사전 평가 절차",
+   "sections[3].paragraphs[0]: Gemini 4 Argon은 Fairwind Program을 통해 사전 검증된 사이버 보안 방어 파트너 및 미국 정부의 출시 전 평가 프로세스 참가자에게만 초기 접근 권한을 우선 부여했다. 코레이 카부쿠오글루 수석 부사장은 \"첨단 기술을 안전하게 공개하려면 단계적인 접근 방식이 필요하다\"라며 초기 테스터 피드백을 수집해 guardrails를 개선할 것이라고 밝혔다. (refs it:18#s2, it:18#s5, it:18#s7, it:864#s3)",
+   "sections[3].paragraphs[1]: 개발자, 기업 및 일반 이용자에 대한 API 배포는 추후 단계적으로 진행할 계획이다. 기술 커뮤니티에서는 엔터프라이즈 및 에이전트 성능에서 반격을 이루어냈다는 긍정적 평가와 함께, 실질적인 일반 API 사용 접근이 제한된 점을 지적하는 목소리가 교차하고 있다. (refs it:864#s4, it:864#s40, it:997#s63)",
+   "sections[4].heading: 벤치마크 13개 부문 정상, AAII 종합 53점으로 공동 3위권",
+   "sections[4].paragraphs[0]: 구글이 공개한 18개 주요 벤치마크 중 Gemini 4 Argon은 12개 부문 단독 1위, 1개 부문 공동 1위를 기록하며 총 13개 부문에서 정상을 차지했다. DeepSWE v1.1에서 77.9%, AutomationBench에서 51.3%, LVBench에서 91.7%를 기록했다. (refs it:864#s12, it:18#s26, it:18#s30, it:18#s33)",
+   "sections[4].paragraphs[1]: 독립 평가 기관 Artificial Analysis의 지능 지수(AAII)에서는 종합 53점으로 GPT-6 Astra 및 Fable 5.1 등과 공동 3위권을 이뤘다. 고난도 과학·터미널 제어 영역에서 GPT-6 Astra와 Claude Opus 5.5에 밀려 순수 지능 종합 점수에서는 1위를 놓쳤지만, 할인 가격 기준으로 작업당 비용을 60% 수준으로 낮추면서도 인텔리전스 지수에서 GPT-6 Astra와 동률을 기록해 가성비 측면에서 높은 평가를 받았다. (refs it:864#s24, it:864#s26, it:864#s28)"
+  ],
+  "page": {
+   "log": "절 5개, 단락 8개, 표 1개, 타일 4개",
+   "attention": false,
+   "head_tiles": [
+    {
+     "value": "1백만 개",
+     "label": "출력 토큰 한도",
+     "note": "기존 6만 4천개에서 확장",
+     "refs": [
+      "it:18#s21",
+      "it:997#s23"
+     ]
+    },
+    {
+     "value": "2달러",
+     "label": "입력 토큰 1백만 개당 가격",
+     "note": "출시 기념 특가",
+     "refs": [
+      "it:18#s9",
+      "it:997#s9"
+     ]
+    },
+    {
+     "value": "10달러",
+     "label": "출력 토큰 1백만 개당 가격",
+     "note": "출시 기념 특가",
+     "refs": [
+      "it:18#s9",
+      "it:997#s9"
+     ]
+    },
+    {
+     "value": "95%",
+     "label": "캐시 입력 토큰 할인율",
+     "note": "입력 토큰 가격 대비",
+     "refs": [
+      "it:18#s9",
+      "it:997#s9"
+     ]
+    }
+   ],
+   "sections": [
+    {
+     "heading": "출력 토큰 한도 1백만 개로 확장, 단일 트래잭션 장기 추론 지원",
+     "paragraphs": [
+      {
+       "text": "구글은 더 길고 복잡한 활용 사례를 뒷받침하기 위해 Gemini 4 Argon의 출력 토큰 한도를 기존 6만 4천개에서 업계 최고 수준인 1백만 개로 대폭 확장했다. 단일 실행 경로 내에서 수십만 토큰을 생성할 수 있는 여유 공간이 확보되면서, 까다로운 과제도 한 번에 해결할 수 있는 한 차원 더 깊은 추론 성능을 제공한다.",
+       "refs": [
+        "it:18#s21",
+        "it:18#s22",
+        "it:997#s23",
+        "it:997#s24"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "출시 기념 특가: 입력 2달러, 출력 10달러, 캐시 95% 할인",
+     "paragraphs": [
+      {
+       "text": "Gemini 4 Argon은 출시 기념 특가로 입력 토큰 1백만 개당 2달러, 출력 토큰 1백만 개당 10달러에 제공된다. 캐시된 입력 토큰은 입력 토큰 가격 대비 95% 할인된 금액으로 이용할 수 있다.",
+       "refs": [
+        "it:18#s9",
+        "it:997#s9"
+       ]
+      },
+      {
+       "text": "AI타임스는 프로모션 종료 후 정가로 입력 4달러, 출력 20달러로 전환될 예정이라고 보도했다. 이 가격은 GPT-6 Astra 대비 5분의 1, Claude Opus 5.5의 절반 수준이라고 평가받았다.",
+       "refs": [
+        "it:864#s38",
+        "it:864#s37"
+       ]
+      }
+     ],
+     "visual": "table",
+     "bars": null,
+     "table": {
+      "title": "출시 기념 특가와 정가 비교",
+      "note": "1백만 토큰당",
+      "columns": [
+       "구분",
+       "입력",
+       "출력"
+      ],
+      "rows": [
+       [
+        "출시 기념 특가",
+        "2달러",
+        "10달러"
+       ],
+       [
+        "정가(프로모션 종료 후)",
+        "4달러",
+        "20달러"
+       ]
+      ],
+      "refs": [
+       "it:18#s9",
+       "it:864#s38"
+      ]
+     },
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "에이전트 작업 강화: 양자 최적화 40% 개선, 메모리 300 TiB 확보",
+     "paragraphs": [
+      {
+       "text": "양자 컴퓨팅 연구에서 Argon은 시공간 자원(큐비트 × 게이트) 최적화에서 기존 발표된 베이스라인을 몇 분 만에 40% 이상 뛰어넘었다. 데이터센터 메모리 최적화에서는 전체 서버군의 프로파일링 텔레메트리를 분석해 300 TiB 이상의 메모리를 확보했으며, 총 절감 규모는 500 TiB에서 최대 1 PiB에 이를 것으로 예상된다.",
+       "refs": [
+        "it:18#s14",
+        "it:18#s15",
+        "it:997#s14",
+        "it:997#s16"
+       ]
+      },
+      {
+       "text": "대규모 코드베이스 마이그레이션에서는 re2, libgav1 등 핵심 라이브러리부터 80만 줄 이상의 Fuchsia OS Zircon 커널에 이르기까지 C/C++ 코드베이스를 Rust로 전환하는 작업을 수행하고 있다. libgav1의 경우 3만 2천 줄의 SIMD 코드를 안전한 Rust 코드로 대체해 동일한 비디오 출력 품질을 유지하면서 기존 Rust 버전 대비 2.7배 빠르게 작동하도록 만들었다.",
+       "refs": [
+        "it:18#s16",
+        "it:18#s18",
+        "it:18#s19",
+        "it:997#s17"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "제한적 출시: Fairwind 프로그램과 미국 정부 사전 평가 절차",
+     "paragraphs": [
+      {
+       "text": "Gemini 4 Argon은 Fairwind Program을 통해 사전 검증된 사이버 보안 방어 파트너 및 미국 정부의 출시 전 평가 프로세스 참가자에게만 초기 접근 권한을 우선 부여했다. 코레이 카부쿠오글루 수석 부사장은 \"첨단 기술을 안전하게 공개하려면 단계적인 접근 방식이 필요하다\"라며 초기 테스터 피드백을 수집해 guardrails를 개선할 것이라고 밝혔다.",
+       "refs": [
+        "it:18#s2",
+        "it:18#s5",
+        "it:18#s7",
+        "it:864#s3"
+       ]
+      },
+      {
+       "text": "개발자, 기업 및 일반 이용자에 대한 API 배포는 추후 단계적으로 진행할 계획이다. 기술 커뮤니티에서는 엔터프라이즈 및 에이전트 성능에서 반격을 이루어냈다는 긍정적 평가와 함께, 실질적인 일반 API 사용 접근이 제한된 점을 지적하는 목소리가 교차하고 있다.",
+       "refs": [
+        "it:864#s4",
+        "it:864#s40",
+        "it:997#s63"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "벤치마크 13개 부문 정상, AAII 종합 53점으로 공동 3위권",
+     "paragraphs": [
+      {
+       "text": "구글이 공개한 18개 주요 벤치마크 중 Gemini 4 Argon은 12개 부문 단독 1위, 1개 부문 공동 1위를 기록하며 총 13개 부문에서 정상을 차지했다. DeepSWE v1.1에서 77.9%, AutomationBench에서 51.3%, LVBench에서 91.7%를 기록했다.",
+       "refs": [
+        "it:864#s12",
+        "it:18#s26",
+        "it:18#s30",
+        "it:18#s33"
+       ]
+      },
+      {
+       "text": "독립 평가 기관 Artificial Analysis의 지능 지수(AAII)에서는 종합 53점으로 GPT-6 Astra 및 Fable 5.1 등과 공동 3위권을 이뤘다. 고난도 과학·터미널 제어 영역에서 GPT-6 Astra와 Claude Opus 5.5에 밀려 순수 지능 종합 점수에서는 1위를 놓쳤지만, 할인 가격 기준으로 작업당 비용을 60% 수준으로 낮추면서도 인텔리전스 지수에서 GPT-6 Astra와 동률을 기록해 가성비 측면에서 높은 평가를 받았다.",
+       "refs": [
+        "it:864#s24",
+        "it:864#s26",
+        "it:864#s28"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    }
+   ],
+   "summary": "구글이 출력 토큰 한도 1백만 개와 출시 기념 특가(입력 2달러, 출력 10달러)를 갖춘 Gemini 4 Argon을 Fairwind 프로그램으로 제한 출시했다. 쟁점은 벤치마크 13개 부문 정상에도 일반 API 접근이 제한된 점이다.",
+   "title": "Gemini 4 Argon: 에이전트 작업 강화와 출시 기념 가격 구조"
+  },
+  "evidence": [
+   {
+    "id": "it:18#s21",
+    "source": "Google DeepMind Blog",
+    "text": "Working harder on your most complex problems To support Gemini 4 Argon’s capabilities across longer, more complex use cases, we are significantly expanding the model’s output token limit to an industry-leading 1M tokens, up from the previous 64K tokens. When the model has the headroom to think deeply and generate hundreds of thousands of tokens in a single trajectory, it adds a new level of depth in reasoning to solve tough problems in one go.",
+    "title": "Gemini 4 Argon: our next era of frontier intelligence",
+    "url": null
+   },
+   {
+    "id": "it:18#s22",
+    "source": "Google DeepMind Blog",
+    "text": "To support Gemini 4 Argon’s capabilities across longer, more complex use cases, we are significantly expanding the model’s output token limit to an industry-leading 1M tokens, up from the previous 64K tokens. When the model has the headroom to think deeply and generate hundreds of thousands of tokens in a single trajectory, it adds a new level of depth in reasoning to solve tough problems in one go. Enabling coding and enterprise workflows across domains",
+    "title": "Gemini 4 Argon: our next era of frontier intelligence",
+    "url": null
+   },
+   {
+    "id": "it:997#s23",
+    "source": "GeekNews",
+    "text": "가장 복잡한 문제도 끈기 있게 해결하는 역량 구글은 더 길고 복잡한 활용 사례에서도 제미나이 4 아르곤의 역량을 충분히 뒷받침할 수 있도록, 모델의 출력 토큰 한도를 기존 6만 4천개에서 업계 최고 수준인 1백만 개로 대폭 확장했습니다. 제미나이 4 아르곤은 단일 실행 경로 내에서 깊이 있게 사고하고 수십만 개의 토큰을 생성할 수 있는 여유 공간을 확보하게 되면서, 까다로운 과제도 한 번에 해결할 수 있는 한 차원 더 깊은 추론 성능을 제공합니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:997#s24",
+    "source": "GeekNews",
+    "text": "구글은 더 길고 복잡한 활용 사례에서도 제미나이 4 아르곤의 역량을 충분히 뒷받침할 수 있도록, 모델의 출력 토큰 한도를 기존 6만 4천개에서 업계 최고 수준인 1백만 개로 대폭 확장했습니다. 제미나이 4 아르곤은 단일 실행 경로 내에서 깊이 있게 사고하고 수십만 개의 토큰을 생성할 수 있는 여유 공간을 확보하게 되면서, 까다로운 과제도 한 번에 해결할 수 있는 한 차원 더 깊은 추론 성능을 제공합니다. 다양한 영역을 아우르는 코딩 및 엔터프라이즈 워크플로우 지원",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:18#s9",
+    "source": "Google DeepMind Blog",
+    "text": "We’ll continue to gather feedback from early testers as we iterate on guardrails before making Argon available to developers, enterprises, and consumers as soon as possible. Argon will launch at an introductory price 1 of $2 per million input tokens and $10 per million output tokens, with cached input tokens priced at 95% off input token price. Changing how we work and build at Google",
+    "title": "Gemini 4 Argon: our next era of frontier intelligence",
+    "url": null
+   },
+   {
+    "id": "it:997#s9",
+    "source": "GeekNews",
+    "text": "또한 개발자, 기업 및 일반 이용자에 아르곤을 조속히 선보일 수 있도록, 초기 테스터들의 피드백을 지속적으로 수렴해 안전장치(guardrails)를 정교화해 나갈 예정입니다. 아르곤은 출시 기념 특가1로 입력 토큰 1백만 개당 2달러, 출력 토큰 1백만 개당 10달러에 제공되며, 캐시된 입력 토큰은 입력 토큰 가격 대비 95% 할인된 금액으로 이용할 수 있습니다. 구글이 일하고 개발하는 방식 혁신",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:864#s38",
+    "source": "AI타임스",
+    "text": "이는 GPT-6 아스트라 대비 5분의 1 가격이며, 클로드 오퍼스 5.5의 절반 가격이다. 프로모션 종료 후에는 입력 4달러, 출력 20달러의 정가로 전환될 예정이다. 기술 커뮤니티와 시장의 반응은 기대감과 아쉬움이 교차하고 있다.",
+    "title": "구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\"",
+    "url": null
+   },
+   {
+    "id": "it:864#s37",
+    "source": "AI타임스",
+    "text": "캐시 입력 토큰에는 95% 할인이 적용돼 100만 토큰당 0.1달러(약 135원) 수준이다. 이는 GPT-6 아스트라 대비 5분의 1 가격이며, 클로드 오퍼스 5.5의 절반 가격이다. 프로모션 종료 후에는 입력 4달러, 출력 20달러의 정가로 전환될 예정이다.",
+    "title": "구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\"",
+    "url": null
+   },
+   {
+    "id": "it:18#s14",
+    "source": "Google DeepMind Blog",
+    "text": "- Quantum algorithmic optimization: Argon is helping our quantum computing researchers optimize the spacetime resources (qubits × gates) of subroutines that bottleneck important applications. In one example, it beat the published baseline by 40% in a matter of minutes. - Memory efficiency: A team of Argon agents analyzed fleet-wide profiling telemetry to autonomously identify and apply memory optimizations across Google’s data centers, freeing up over 300 TiB of memory once rolled out, with an estimated 500 TiB to 1 PiB in total savings.",
+    "title": "Gemini 4 Argon: our next era of frontier intelligence",
+    "url": null
+   },
+   {
+    "id": "it:18#s15",
+    "source": "Google DeepMind Blog",
+    "text": "In one example, it beat the published baseline by 40% in a matter of minutes. - Memory efficiency: A team of Argon agents analyzed fleet-wide profiling telemetry to autonomously identify and apply memory optimizations across Google’s data centers, freeing up over 300 TiB of memory once rolled out, with an estimated 500 TiB to 1 PiB in total savings. - Large Scale Codebase Migrations and Optimizations: Argon agents are working on migrating C/C++ codebases to Rust across Google — scaling from tens of thousands of lines in core libraries like re2, libgav1 up to 800K+ lines for the Fuchsia Zircon kernel.",
+    "title": "Gemini 4 Argon: our next era of frontier intelligence",
+    "url": null
+   },
+   {
+    "id": "it:997#s14",
+    "source": "GeekNews",
+    "text": "- 양자 알고리즘 최적화: 아르곤은 구글의 양자 컴퓨팅 연구원들이 주요 애플리케이션의 병목 현상을 유발하는 서브루틴의 시공간 리소스(큐비트 × 게이트)를 최적화하는 데 기여하고 있습니다. 일례로, 아르곤은 기존 발표된 베이스라인 성능을 불과 몇 분 만에 40% 이상 뛰어넘는 성과를 거두었습니다. - 메모리 효율성 향: 아르곤 에이전트 팀은 전체 서버군(fleet)의 프로파일링 텔레메트리 데이터를 분석해 구글 데이터센터 전반의 메모리 최적화 방안을 자율적으로 도출하고 적용했습니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:997#s16",
+    "source": "GeekNews",
+    "text": "- 메모리 효율성 향: 아르곤 에이전트 팀은 전체 서버군(fleet)의 프로파일링 텔레메트리 데이터를 분석해 구글 데이터센터 전반의 메모리 최적화 방안을 자율적으로 도출하고 적용했습니다. 배포 이후 300 TiB 이상의 메모리를 확보할 수 있게 되었으며, 총 절감 규모는 500 TiB에서 최대 1 PiB에 이를 것으로 예상됩니다. - 대규모 코드베이스 마이그레이션 및 최적화: 아르곤 에이전트는 ‘re2’, ‘libgav1’과 같은 수만 줄 규모의 핵심 라이브러리부터 80만 줄 이상의 Fuchsia OS Zircon 커널에 이르기까지, 구글 전반의 C/C++ 코드베이스를 러스트(Rust)로 전환하는 작업을 수행하고 있습니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:18#s16",
+    "source": "Google DeepMind Blog",
+    "text": "- Memory efficiency: A team of Argon agents analyzed fleet-wide profiling telemetry to autonomously identify and apply memory optimizations across Google’s data centers, freeing up over 300 TiB of memory once rolled out, with an estimated 500 TiB to 1 PiB in total savings. - Large Scale Codebase Migrations and Optimizations: Argon agents are working on migrating C/C++ codebases to Rust across Google — scaling from tens of thousands of lines in core libraries like re2, libgav1 up to 800K+ lines for the Fuchsia Zircon kernel. Given the criticality of many of these systems, such large-scale rewrites are undergoing rigorous automated and manual auditing, emulation testing, and review before rolling out to production.",
+    "title": "Gemini 4 Argon: our next era of frontier intelligence",
+    "url": null
+   },
+   {
+    "id": "it:18#s18",
+    "source": "Google DeepMind Blog",
+    "text": "Given the criticality of many of these systems, such large-scale rewrites are undergoing rigorous automated and manual auditing, emulation testing, and review before rolling out to production. For libgav1, Google's open source software for decoding video, Argon agents took an existing Rust port and replaced 32K lines of SIMD code by running many rounds of profile-guided experiments, studying the compiler's output, producing safe Rust so the compiler would vectorize it automatically. The end result is a memory-safe video decoder that runs 2.7x faster than the Rust port, with identical video output, bringing it closer to the optimized C++.",
+    "title": "Gemini 4 Argon: our next era of frontier intelligence",
+    "url": null
+   },
+   {
+    "id": "it:18#s19",
+    "source": "Google DeepMind Blog",
+    "text": "For libgav1, Google's open source software for decoding video, Argon agents took an existing Rust port and replaced 32K lines of SIMD code by running many rounds of profile-guided experiments, studying the compiler's output, producing safe Rust so the compiler would vectorize it automatically. The end result is a memory-safe video decoder that runs 2.7x faster than the Rust port, with identical video output, bringing it closer to the optimized C++. Working harder on your most complex problems",
+    "title": "Gemini 4 Argon: our next era of frontier intelligence",
+    "url": null
+   },
+   {
+    "id": "it:997#s17",
+    "source": "GeekNews",
+    "text": "배포 이후 300 TiB 이상의 메모리를 확보할 수 있게 되었으며, 총 절감 규모는 500 TiB에서 최대 1 PiB에 이를 것으로 예상됩니다. - 대규모 코드베이스 마이그레이션 및 최적화: 아르곤 에이전트는 ‘re2’, ‘libgav1’과 같은 수만 줄 규모의 핵심 라이브러리부터 80만 줄 이상의 Fuchsia OS Zircon 커널에 이르기까지, 구글 전반의 C/C++ 코드베이스를 러스트(Rust)로 전환하는 작업을 수행하고 있습니다. 해당 시스템들의 높은 중요도를 고려해, 이러한 대규모 코드 재작성 결과물은 실제 운영 환경에 배포되기 전 엄격한 자동 및 수동 감사, 에뮬레이션 테스트, 코드 리뷰 과정을 철저히 거치고 있습니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:18#s2",
+    "source": "Google DeepMind Blog",
+    "text": "Gemini 4 Argon: our next era of frontier intelligence Today, we’re announcing our new frontier model, Gemini 4 Argon, which is rolling out to a set of trusted cyber defenders through our Fairwind Program. Built to sustain deep reasoning across complex, long-horizon workflows, Argon is fundamentally changing the way we work and build at Google.",
+    "title": "Gemini 4 Argon: our next era of frontier intelligence",
+    "url": null
+   },
+   {
+    "id": "it:18#s5",
+    "source": "Google DeepMind Blog",
+    "text": "It delivers frontier performance in complex workflows across real-world software engineering, enterprise knowledge work like legal and finance, and cybersecurity defense. Safely releasing frontier capabilities at this level requires a phased approach. We are actively engaged in the U.S.",
+    "title": "Gemini 4 Argon: our next era of frontier intelligence",
+    "url": null
+   },
+   {
+    "id": "it:18#s7",
+    "source": "Google DeepMind Blog",
+    "text": "We are actively engaged in the U.S. government’s voluntary process for pre-release model access while we gradually expand access. We’ll continue to gather feedback from early testers as we iterate on guardrails before making Argon available to developers, enterprises, and consumers as soon as possible.",
+    "title": "Gemini 4 Argon: our next era of frontier intelligence",
+    "url": null
+   },
+   {
+    "id": "it:864#s3",
+    "source": "AI타임스",
+    "text": "핵심 경쟁 모델들을 제치고 벤치마크 선두를 탈환했음에도 불구하고, 대다수 개발자와 기업이 당장 사용할 수 없는 '제한적 출시'에 그쳤다. 구글은 30일(현지시간) 제미나이 4 아르곤을 소개하며 '페어윈드(Fairwind)' 프로그램을 통해 사전 검증된 사이버 보안 방어 파트너 및 미국 정부의 출시 전 평가 프로세스 참가자에게만 초기 접근 권한을 우선 부여했다. 구글 AI 울트라 구독자와 개발자 및 기업 대상 일반 API 배포는 추후 단계적으로 진행할 계획이다.",
+    "title": "구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\"",
+    "url": null
+   },
+   {
+    "id": "it:864#s4",
+    "source": "AI타임스",
+    "text": "구글은 30일(현지시간) 제미나이 4 아르곤을 소개하며 '페어윈드(Fairwind)' 프로그램을 통해 사전 검증된 사이버 보안 방어 파트너 및 미국 정부의 출시 전 평가 프로세스 참가자에게만 초기 접근 권한을 우선 부여했다. 구글 AI 울트라 구독자와 개발자 및 기업 대상 일반 API 배포는 추후 단계적으로 진행할 계획이다. 구글 딥마인드의 수장인 코레이 카부쿠오글루 수석 부사장은 \"첨단 기술을 안전하게 공개하려면 단계적인 접근 방식이 필요하다\"라며 \"개발자, 기업 및 일반 사용자에게 아르곤을 최대한 빨리 제공하기 전에, 초기 테스터들의 피드백을 지속적으로 수집하고 가이드라인을 개선해 나갈 것\"이라고 밝혔다.",
+    "title": "구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\"",
+    "url": null
+   },
+   {
+    "id": "it:864#s40",
+    "source": "AI타임스",
+    "text": "기술 커뮤니티와 시장의 반응은 기대감과 아쉬움이 교차하고 있다. 레딧과 X 등에서는 구글이 엔터프라이즈 및 에이전트 성능에서 확실한 반격을 이루어냈다는 긍정적 평가가 쏟아졌지만, \"그림의 떡\"이라며 실질적인 일반 API 사용 접근이 제한된 점을 지적하는 목소리가 강하게 제기됐다. 동시에 터미널 환경 및 프런티어 SWE 일부 고난도 코딩 분야에서는 여전히 GPT-6 아스트라가 우위를 점하고 있다는 분석도 이어졌다.",
+    "title": "구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\"",
+    "url": null
+   },
+   {
+    "id": "it:997#s63",
+    "source": "GeekNews",
+    "text": "제미나이 4 아르곤은 코딩, 지식 기반 업무, 사이버 보안 방어, 창의적 글쓰기 전반에 걸친 프론티어급 역량을 바탕으로, 개발자, 전문가, 그리고 엔터프라이즈들이 가장 까다로운 난제를 해결해 나가는 과정에서 든든한 파트너가 될 수 있도록 설계되었습니다. 유료 API 이용자 및 구글 AI 울트라(Google AI Ultra) 구독자를 시작으로, 개발자, 엔터프라이즈, 일반 이용자에게 순차적으로 모델을 공개하기에 앞서, 실제 환경에서의 평가와 피드백을 통해 시스템을 한층 더 강화할 수 있도록 도움을 주고 계신 초기 사이버 보안 방어자 및 신뢰할 수 있는 테스터 여러분께 깊은 감사를 전합니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:864#s12",
+    "source": "AI타임스",
+    "text": "기술적 성과는 객관적 지표로 입증됐다. 구글이 공개한 18개 주요 벤치마크 중 제미나이 4 아르곤은 12개 부문 단독 1위, 1개 부문 공동 1위를 기록하며 총 13개 부문에서 정상을 차지했다. 장기 소프트웨어 엔지니어링 역량을 평가하는 '딥SWE v1.1' 벤치마크에서 77.9%의 점수를 얻어 최고 기록(SOTA)을 경신했으며, 이는 클로드 오퍼스 5.5(74.2%)와 GPT-6 아스트라(74.1%)를 앞서는 수치다.",
+    "title": "구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\"",
+    "url": null
+   },
+   {
+    "id": "it:18#s26",
+    "source": "Google DeepMind Blog",
+    "text": "Google engineers have been using Argon for their daily tasks, from everyday debugging to large-scale codebase migrations and algorithm designs. It sets a new state of the art on DeepSWE v1.1 (77.9%), which measures a model’s performance in real-world long-horizon software engineering tasks. Beyond coding, Argon is the leading model on the Vals Index, which measures economic impact across finance, coding, legal, and tax work, with every sector weighted by its contribution to U.S.",
+    "title": "Gemini 4 Argon: our next era of frontier intelligence",
+    "url": null
+   },
+   {
+    "id": "it:18#s30",
+    "source": "Google DeepMind Blog",
+    "text": "We see similarly leading performance across other domain specific evaluations, like Vals Finance Agent v2 (multi-step financial research) and Harvey’s Legal Agent Benchmark (legal research and drafting). On AutomationBench, Zapier’s benchmark measuring end-to-end execution across core business functions, Argon ranks #1 with a score of 51.3%. Argon is also uniquely strong when knowledge work requires visual understanding.",
+    "title": "Gemini 4 Argon: our next era of frontier intelligence",
+    "url": null
+   },
+   {
+    "id": "it:18#s33",
+    "source": "Google DeepMind Blog",
+    "text": "It’s able to drive professional chart analysis, identify details from long videos, and take action based on a series of documents. For example, on LVBench, which measures long video understanding, Argon is state of the art with a score of 91.7%. Leading in defensive cybersecurity",
+    "title": "Gemini 4 Argon: our next era of frontier intelligence",
+    "url": null
+   },
+   {
+    "id": "it:864#s24",
+    "source": "AI타임스",
+    "text": "— Artificial Analysis (@ArtificialAnlys) September 30, 2026 독립 평가 기관인 아티피셜 애널리시스의 지능 지수(AAII)에서는 종합 53점으로 GPT-6 아스트라 및 페이블 5.1 등과 공동 3위권을 이뤘다. 구글은 실무 에이전트와 장문 추론 위주의 선택적 벤치마크를 앞세워 다수 1위를 강조했지만, 아티피셜 애널리시스는 수학·과학 연구 및 터미널 환경 제어 등 전 영역의 성능을 종합 가중 평가하기 때문에 생긴 차이다.",
+    "title": "구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\"",
+    "url": null
+   },
+   {
+    "id": "it:864#s26",
+    "source": "AI타임스",
+    "text": "구글은 실무 에이전트와 장문 추론 위주의 선택적 벤치마크를 앞세워 다수 1위를 강조했지만, 아티피셜 애널리시스는 수학·과학 연구 및 터미널 환경 제어 등 전 영역의 성능을 종합 가중 평가하기 때문에 생긴 차이다. 이 때문에 제미나이 4 아르곤은 고난도 과학·터미널 제어 영역에서 GPT-6 아스트라와 클로드 오퍼스 5.5에 밀려 순수 지능 종합 점수에서는 1위를 놓쳤다. 그러나 '가성비' 측면에서 높은 평가를 받았다.",
+    "title": "구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\"",
+    "url": null
+   },
+   {
+    "id": "it:864#s28",
+    "source": "AI타임스",
+    "text": "그러나 '가성비' 측면에서 높은 평가를 받았다. 아티피셜 애널리시스는 \"할인 가격 기준으로 작업당 비용을 60% 수준으로 낮추면서도 인텔리전스 지수에서 GPT-6 아스트라와 동률을 기록했다\"며 \"구글이 선두권 3대 연구소로서의 지능 입지를 성공적으로 탈환했다\"고 분석했다. 이밖에도 아레나(Arena)의 '텍스트 아레나' 평가에서는 1525점으로 1위에 등극했다.",
+    "title": "구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\"",
+    "url": null
+   },
+   {
+    "id": "it:18#s1",
+    "source": "Google DeepMind Blog",
+    "text": "Gemini 4 Argon: our next era of frontier intelligence Today, we’re announcing our new frontier model, Gemini 4 Argon, which is rolling out to a set of trusted cyber defenders through our Fairwind Program.",
+    "title": "Gemini 4 Argon: our next era of frontier intelligence",
+    "url": null
+   },
+   {
+    "id": "it:864#s1",
+    "source": "AI타임스",
+    "text": "구글이 프런티어급 지능과 에이전트 작업 능력을 대폭 끌어올린 차세대 플래그십 모델 '제미나이 4 아르곤(Gemini 4 Argon)'을 공개했다. 핵심 경쟁 모델들을 제치고 벤치마크 선두를 탈환했음에도 불구하고, 대다수 개발자와 기업이 당장 사용할 수 없는 '제한적 출시'에 그쳤다.",
+    "title": "구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\"",
+    "url": null
+   },
+   {
+    "id": "og:997#q1",
+    "source": "GeekNews",
+    "text": "오늘 구글은 새로운 프론티어 모델인 ‘제미나이 4 아르곤(Gemini 4 Argon)’을 공개합니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:864#s2",
+    "source": "AI타임스",
+    "text": "구글이 프런티어급 지능과 에이전트 작업 능력을 대폭 끌어올린 차세대 플래그십 모델 '제미나이 4 아르곤(Gemini 4 Argon)'을 공개했다. 핵심 경쟁 모델들을 제치고 벤치마크 선두를 탈환했음에도 불구하고, 대다수 개발자와 기업이 당장 사용할 수 없는 '제한적 출시'에 그쳤다. 구글은 30일(현지시간) 제미나이 4 아르곤을 소개하며 '페어윈드(Fairwind)' 프로그램을 통해 사전 검증된 사이버 보안 방어 파트너 및 미국 정부의 출시 전 평가 프로세스 참가자에게만 초기 접근 권한을 우선 부여했다.",
+    "title": "구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\"",
+    "url": null
+   },
+   {
+    "id": "og:997#q2",
+    "source": "GeekNews",
+    "text": "아르곤은 출시 기념 특가1로 입력 토큰 1백만 개당 2달러, 출력 토큰 1백만 개당 10달러에 제공되며, 캐시된 입력 토큰은 입력 토큰 가격 대비 95% 할인된 금액으로 이용할 수 있습니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:18#s3",
+    "source": "Google DeepMind Blog",
+    "text": "Today, we’re announcing our new frontier model, Gemini 4 Argon, which is rolling out to a set of trusted cyber defenders through our Fairwind Program. Built to sustain deep reasoning across complex, long-horizon workflows, Argon is fundamentally changing the way we work and build at Google. It delivers frontier performance in complex workflows across real-world software engineering, enterprise knowledge work like legal and finance, and cybersecurity defense.",
+    "title": "Gemini 4 Argon: our next era of frontier intelligence",
+    "url": null
+   },
+   {
+    "id": "og:997#q3",
+    "source": "GeekNews",
+    "text": "구글은 더 길고 복잡한 활용 사례에서도 제미나이 4 아르곤의 역량을 충분히 뒷받침할 수 있도록, 모델의 출력 토큰 한도를 기존 6만 4천개에서 업계 최고 수준인 1백만 개로 대폭 확장했습니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:18#s4",
+    "source": "Google DeepMind Blog",
+    "text": "Built to sustain deep reasoning across complex, long-horizon workflows, Argon is fundamentally changing the way we work and build at Google. It delivers frontier performance in complex workflows across real-world software engineering, enterprise knowledge work like legal and finance, and cybersecurity defense. Safely releasing frontier capabilities at this level requires a phased approach.",
+    "title": "Gemini 4 Argon: our next era of frontier intelligence",
+    "url": null
+   },
+   {
+    "id": "og:997#q4",
+    "source": "GeekNews",
+    "text": "아르곤은 실제 현장에서의 장기 소프트웨어 엔지니어링 작업 수행 능력을 평가하는 DeepSWE v1.1에서 77.9%를 기록하며 최고 수준(SOTA)을 달성했습니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:864#s5",
+    "source": "AI타임스",
+    "text": "구글 AI 울트라 구독자와 개발자 및 기업 대상 일반 API 배포는 추후 단계적으로 진행할 계획이다. 구글 딥마인드의 수장인 코레이 카부쿠오글루 수석 부사장은 \"첨단 기술을 안전하게 공개하려면 단계적인 접근 방식이 필요하다\"라며 \"개발자, 기업 및 일반 사용자에게 아르곤을 최대한 빨리 제공하기 전에, 초기 테스터들의 피드백을 지속적으로 수집하고 가이드라인을 개선해 나갈 것\"이라고 밝혔다. 아르곤 4는 소프트웨어 엔지니어링, 엔터프라이즈 업무 자동화, 사이버 보안 방어 및 장문 문맥 추론에 특화된 프런티어 모델이다.",
+    "title": "구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\"",
+    "url": null
+   },
+   {
+    "id": "og:997#q5",
+    "source": "GeekNews",
+    "text": "보안 취약점 해결 능력을 평가하는 CWE-bench v1에서, 아르곤은 CWE-bench v0에서 프론티어급 성능을 입증한 3.8 플래시 사이버(3.8 Flash Cyber)의 성과를 바탕으로 68%라는 최고 점수로 공동 1위를 기록했습니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:18#s6",
+    "source": "Google DeepMind Blog",
+    "text": "Safely releasing frontier capabilities at this level requires a phased approach. We are actively engaged in the U.S. government’s voluntary process for pre-release model access while we gradually expand access.",
+    "title": "Gemini 4 Argon: our next era of frontier intelligence",
+    "url": null
+   },
+   {
+    "id": "it:864#s6",
+    "source": "AI타임스",
+    "text": "구글 딥마인드의 수장인 코레이 카부쿠오글루 수석 부사장은 \"첨단 기술을 안전하게 공개하려면 단계적인 접근 방식이 필요하다\"라며 \"개발자, 기업 및 일반 사용자에게 아르곤을 최대한 빨리 제공하기 전에, 초기 테스터들의 피드백을 지속적으로 수집하고 가이드라인을 개선해 나갈 것\"이라고 밝혔다. 아르곤 4는 소프트웨어 엔지니어링, 엔터프라이즈 업무 자동화, 사이버 보안 방어 및 장문 문맥 추론에 특화된 프런티어 모델이다. 특히 오픈AI의 'GPT-6 아스트라' 및 앤트로픽의 '클로드 오퍼스 5.5'와 비교해 다수의 벤치마크 항목에서 선두를 차지하며 기술적 우위를 재확인했다.",
+    "title": "구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\"",
+    "url": null
+   },
+   {
+    "id": "it:997",
+    "source": "GeekNews",
+    "text": "구글 공식 블로그 원문 기준으로, 제미나이 4 아르곤은 출시 기념 특가로 입력 토큰 1M당 2달러, 출력 토큰 1M당 10달러에 제공되며 캐시 입력은 95% 할인된다. 출력 토큰 한도는 기존 6만 4천개에서 1백만 개로 확장되었고, DeepSWE v1.1에서 77.9%(SOTA), CWE-bench v1에서 68%(공동 1위)를 기록했다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:864#s7",
+    "source": "AI타임스",
+    "text": "아르곤 4는 소프트웨어 엔지니어링, 엔터프라이즈 업무 자동화, 사이버 보안 방어 및 장문 문맥 추론에 특화된 프런티어 모델이다. 특히 오픈AI의 'GPT-6 아스트라' 및 앤트로픽의 '클로드 오퍼스 5.5'와 비교해 다수의 벤치마크 항목에서 선두를 차지하며 기술적 우위를 재확인했다. 순다르 피차이 구글 CEO는 X를 통해 \"복잡한 워크플로우와 사이버 방어, 소프트웨어 엔지니어링 분야에서 프런티어급 성능을 보여준다\"며 \"이미 구글 내부에서 개발, 연구, 문서 작성 등에 광범위하게 활용되고 있다\"고 밝혔다.",
+    "title": "구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\"",
+    "url": null
+   },
+   {
+    "id": "it:997#s1",
+    "source": "GeekNews",
+    "text": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대 오늘 구글은 새로운 프론티어 모델인 ‘제미나이 4 아르곤(Gemini 4 Argon)’을 공개합니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:18#s8",
+    "source": "Google DeepMind Blog",
+    "text": "government’s voluntary process for pre-release model access while we gradually expand access. We’ll continue to gather feedback from early testers as we iterate on guardrails before making Argon available to developers, enterprises, and consumers as soon as possible. Argon will launch at an introductory price 1 of $2 per million input tokens and $10 per million output tokens, with cached input tokens priced at 95% off input token price.",
+    "title": "Gemini 4 Argon: our next era of frontier intelligence",
+    "url": null
+   },
+   {
+    "id": "it:864#s8",
+    "source": "AI타임스",
+    "text": "특히 오픈AI의 'GPT-6 아스트라' 및 앤트로픽의 '클로드 오퍼스 5.5'와 비교해 다수의 벤치마크 항목에서 선두를 차지하며 기술적 우위를 재확인했다. 순다르 피차이 구글 CEO는 X를 통해 \"복잡한 워크플로우와 사이버 방어, 소프트웨어 엔지니어링 분야에서 프런티어급 성능을 보여준다\"며 \"이미 구글 내부에서 개발, 연구, 문서 작성 등에 광범위하게 활용되고 있다\"고 밝혔다. 가장 큰 기술적 특징은 출력 토큰 한도가 기존 6만4000 토큰에서 업계 최고 수준인 100만 토큰으로 확장됐다는 점이다.",
+    "title": "구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\"",
+    "url": null
+   },
+   {
+    "id": "it:997#s2",
+    "source": "GeekNews",
+    "text": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대 오늘 구글은 새로운 프론티어 모델인 ‘제미나이 4 아르곤(Gemini 4 Argon)’을 공개합니다. 제미나이 4 아르곤은 구글의 페어윈드 프로그램(Fairwind Program)을 통해 신뢰할 수 있는 사이버 보안 전문가들에게 우선 배포됩니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:864#s9",
+    "source": "AI타임스",
+    "text": "순다르 피차이 구글 CEO는 X를 통해 \"복잡한 워크플로우와 사이버 방어, 소프트웨어 엔지니어링 분야에서 프런티어급 성능을 보여준다\"며 \"이미 구글 내부에서 개발, 연구, 문서 작성 등에 광범위하게 활용되고 있다\"고 밝혔다. 가장 큰 기술적 특징은 출력 토큰 한도가 기존 6만4000 토큰에서 업계 최고 수준인 100만 토큰으로 확장됐다는 점이다. 단일 작업 흐름 내에서 수십만 토큰에 달하는 장기 추론과 코드 생성을 인간의 중간 개입 없이 지속할 수 있게 돼, 복잡한 업무를 스스로 처리하는 AI 에이전트 구축에 최적화됐다.",
+    "title": "구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\"",
+    "url": null
+   },
+   {
+    "id": "it:997#s3",
+    "source": "GeekNews",
+    "text": "오늘 구글은 새로운 프론티어 모델인 ‘제미나이 4 아르곤(Gemini 4 Argon)’을 공개합니다. 제미나이 4 아르곤은 구글의 페어윈드 프로그램(Fairwind Program)을 통해 신뢰할 수 있는 사이버 보안 전문가들에게 우선 배포됩니다. 복잡하고 장기적인 워크플로우 전반에서 깊이 있는 추론을 지속하도록 설계된 아르곤은, 구글의 일하는 방식과 개발 문화 자체를 혁신하고 있습니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:18#s10",
+    "source": "Google DeepMind Blog",
+    "text": "Argon will launch at an introductory price 1 of $2 per million input tokens and $10 per million output tokens, with cached input tokens priced at 95% off input token price. Changing how we work and build at Google Gemini 4 Argon is already powering our internal workflows, with thousands of Googlers highlighting the model’s strengths in specialized coding tasks, conducting deeper research, and writing quality.",
+    "title": "Gemini 4 Argon: our next era of frontier intelligence",
+    "url": null
+   },
+   {
+    "id": "it:864#s10",
+    "source": "AI타임스",
+    "text": "가장 큰 기술적 특징은 출력 토큰 한도가 기존 6만4000 토큰에서 업계 최고 수준인 100만 토큰으로 확장됐다는 점이다. 단일 작업 흐름 내에서 수십만 토큰에 달하는 장기 추론과 코드 생성을 인간의 중간 개입 없이 지속할 수 있게 돼, 복잡한 업무를 스스로 처리하는 AI 에이전트 구축에 최적화됐다. 기술적 성과는 객관적 지표로 입증됐다.",
+    "title": "구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\"",
+    "url": null
+   },
+   {
+    "id": "it:997#s4",
+    "source": "GeekNews",
+    "text": "제미나이 4 아르곤은 구글의 페어윈드 프로그램(Fairwind Program)을 통해 신뢰할 수 있는 사이버 보안 전문가들에게 우선 배포됩니다. 복잡하고 장기적인 워크플로우 전반에서 깊이 있는 추론을 지속하도록 설계된 아르곤은, 구글의 일하는 방식과 개발 문화 자체를 혁신하고 있습니다. 또한 실제 현장의 소프트웨어 엔지니어링, 법률 및 금융 등 엔터프라이즈 지식 기반 업무, 그리고 사이버 보안 방어에 이르기까지 복잡한 워크플로우 전반에서 프론티어급 성능을 발휘합니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:18#s11",
+    "source": "Google DeepMind Blog",
+    "text": "Changing how we work and build at Google Gemini 4 Argon is already powering our internal workflows, with thousands of Googlers highlighting the model’s strengths in specialized coding tasks, conducting deeper research, and writing quality. It’s helping teams build faster and push the boundaries of engineering productivity and accelerating breakthroughs:",
+    "title": "Gemini 4 Argon: our next era of frontier intelligence",
+    "url": null
+   },
+   {
+    "id": "it:864#s11",
+    "source": "AI타임스",
+    "text": "단일 작업 흐름 내에서 수십만 토큰에 달하는 장기 추론과 코드 생성을 인간의 중간 개입 없이 지속할 수 있게 돼, 복잡한 업무를 스스로 처리하는 AI 에이전트 구축에 최적화됐다. 기술적 성과는 객관적 지표로 입증됐다. 구글이 공개한 18개 주요 벤치마크 중 제미나이 4 아르곤은 12개 부문 단독 1위, 1개 부문 공동 1위를 기록하며 총 13개 부문에서 정상을 차지했다.",
+    "title": "구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\"",
+    "url": null
+   },
+   {
+    "id": "it:997#s5",
+    "source": "GeekNews",
+    "text": "복잡하고 장기적인 워크플로우 전반에서 깊이 있는 추론을 지속하도록 설계된 아르곤은, 구글의 일하는 방식과 개발 문화 자체를 혁신하고 있습니다. 또한 실제 현장의 소프트웨어 엔지니어링, 법률 및 금융 등 엔터프라이즈 지식 기반 업무, 그리고 사이버 보안 방어에 이르기까지 복잡한 워크플로우 전반에서 프론티어급 성능을 발휘합니다. 이처럼 고도화된 프론티어 기술을 안전하게 공개하기 위해서는 단계적인 접근 방식이 필요합니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:18#s12",
+    "source": "Google DeepMind Blog",
+    "text": "Gemini 4 Argon is already powering our internal workflows, with thousands of Googlers highlighting the model’s strengths in specialized coding tasks, conducting deeper research, and writing quality. It’s helping teams build faster and push the boundaries of engineering productivity and accelerating breakthroughs: - Quantum algorithmic optimization: Argon is helping our quantum computing researchers optimize the spacetime resources (qubits × gates) of subroutines that bottleneck important applications.",
+    "title": "Gemini 4 Argon: our next era of frontier intelligence",
+    "url": null
+   },
+   {
+    "id": "it:997#s6",
+    "source": "GeekNews",
+    "text": "또한 실제 현장의 소프트웨어 엔지니어링, 법률 및 금융 등 엔터프라이즈 지식 기반 업무, 그리고 사이버 보안 방어에 이르기까지 복잡한 워크플로우 전반에서 프론티어급 성능을 발휘합니다. 이처럼 고도화된 프론티어 기술을 안전하게 공개하기 위해서는 단계적인 접근 방식이 필요합니다. 구글은 모델 접근 권한을 단계적으로 확대하는 한편, 미국 정부의 자발적 사전 출시 모델 액세스(pre-release model access) 절차에 적극적으로 임하고 있습니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:18#s13",
+    "source": "Google DeepMind Blog",
+    "text": "It’s helping teams build faster and push the boundaries of engineering productivity and accelerating breakthroughs: - Quantum algorithmic optimization: Argon is helping our quantum computing researchers optimize the spacetime resources (qubits × gates) of subroutines that bottleneck important applications. In one example, it beat the published baseline by 40% in a matter of minutes.",
+    "title": "Gemini 4 Argon: our next era of frontier intelligence",
+    "url": null
+   },
+   {
+    "id": "it:864#s13",
+    "source": "AI타임스",
+    "text": "구글이 공개한 18개 주요 벤치마크 중 제미나이 4 아르곤은 12개 부문 단독 1위, 1개 부문 공동 1위를 기록하며 총 13개 부문에서 정상을 차지했다. 장기 소프트웨어 엔지니어링 역량을 평가하는 '딥SWE v1.1' 벤치마크에서 77.9%의 점수를 얻어 최고 기록(SOTA)을 경신했으며, 이는 클로드 오퍼스 5.5(74.2%)와 GPT-6 아스트라(74.1%)를 앞서는 수치다. 비즈니스 실행 자동화 평가인 '오토메이션벤치(AutomationBench)'에서도 51.3%를 기록해 클로드 오퍼스 5.5(42.5%)와 GPT-6 아스트라(41.4%)를 제쳤다.",
+    "title": "구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\"",
+    "url": null
+   },
+   {
+    "id": "it:997#s7",
+    "source": "GeekNews",
+    "text": "이처럼 고도화된 프론티어 기술을 안전하게 공개하기 위해서는 단계적인 접근 방식이 필요합니다. 구글은 모델 접근 권한을 단계적으로 확대하는 한편, 미국 정부의 자발적 사전 출시 모델 액세스(pre-release model access) 절차에 적극적으로 임하고 있습니다. 또한 개발자, 기업 및 일반 이용자에 아르곤을 조속히 선보일 수 있도록, 초기 테스터들의 피드백을 지속적으로 수렴해 안전장치(guardrails)를 정교화해 나갈 예정입니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:864#s14",
+    "source": "AI타임스",
+    "text": "장기 소프트웨어 엔지니어링 역량을 평가하는 '딥SWE v1.1' 벤치마크에서 77.9%의 점수를 얻어 최고 기록(SOTA)을 경신했으며, 이는 클로드 오퍼스 5.5(74.2%)와 GPT-6 아스트라(74.1%)를 앞서는 수치다. 비즈니스 실행 자동화 평가인 '오토메이션벤치(AutomationBench)'에서도 51.3%를 기록해 클로드 오퍼스 5.5(42.5%)와 GPT-6 아스트라(41.4%)를 제쳤다. 법률 분석 평가인 '하비 레갈 에이전트'에서는 19.6%로 경쟁 모델 대비 압도적인 격차를 보였으며, 금융 에이전트 평가 '발스 인덱스 v2'에서도 65.4%로 1위에 올랐다.",
+    "title": "구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\"",
+    "url": null
+   },
+   {
+    "id": "it:997#s8",
+    "source": "GeekNews",
+    "text": "구글은 모델 접근 권한을 단계적으로 확대하는 한편, 미국 정부의 자발적 사전 출시 모델 액세스(pre-release model access) 절차에 적극적으로 임하고 있습니다. 또한 개발자, 기업 및 일반 이용자에 아르곤을 조속히 선보일 수 있도록, 초기 테스터들의 피드백을 지속적으로 수렴해 안전장치(guardrails)를 정교화해 나갈 예정입니다. 아르곤은 출시 기념 특가1로 입력 토큰 1백만 개당 2달러, 출력 토큰 1백만 개당 10달러에 제공되며, 캐시된 입력 토큰은 입력 토큰 가격 대비 95% 할인된 금액으로 이용할 수 있습니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:864#s15",
+    "source": "AI타임스",
+    "text": "비즈니스 실행 자동화 평가인 '오토메이션벤치(AutomationBench)'에서도 51.3%를 기록해 클로드 오퍼스 5.5(42.5%)와 GPT-6 아스트라(41.4%)를 제쳤다. 법률 분석 평가인 '하비 레갈 에이전트'에서는 19.6%로 경쟁 모델 대비 압도적인 격차를 보였으며, 금융 에이전트 평가 '발스 인덱스 v2'에서도 65.4%로 1위에 올랐다. 장문 비디오 이해 평가인 'LV벤치'에서는 91.7%를 기록했다.",
+    "title": "구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\"",
+    "url": null
+   },
+   {
+    "id": "it:864#s16",
+    "source": "AI타임스",
+    "text": "법률 분석 평가인 '하비 레갈 에이전트'에서는 19.6%로 경쟁 모델 대비 압도적인 격차를 보였으며, 금융 에이전트 평가 '발스 인덱스 v2'에서도 65.4%로 1위에 올랐다. 장문 비디오 이해 평가인 'LV벤치'에서는 91.7%를 기록했다. 보안 및 신뢰성 측면에서도 성과를 보였다.",
+    "title": "구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\"",
+    "url": null
+   },
+   {
+    "id": "it:997#s10",
+    "source": "GeekNews",
+    "text": "아르곤은 출시 기념 특가1로 입력 토큰 1백만 개당 2달러, 출력 토큰 1백만 개당 10달러에 제공되며, 캐시된 입력 토큰은 입력 토큰 가격 대비 95% 할인된 금액으로 이용할 수 있습니다. 구글이 일하고 개발하는 방식 혁신 제미나이 4 아르곤은 이미 구글의 내부 워크플로우에 적용되고 있으며, 수천 명의 구글 임직원은 전문 코딩 작업, 심층 연구 조사, 높은 수준의 글쓰기 역량을 제미나이 4 아르곤의 강점으로 꼽고 있습니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:18#s17",
+    "source": "Google DeepMind Blog",
+    "text": "- Large Scale Codebase Migrations and Optimizations: Argon agents are working on migrating C/C++ codebases to Rust across Google — scaling from tens of thousands of lines in core libraries like re2, libgav1 up to 800K+ lines for the Fuchsia Zircon kernel. Given the criticality of many of these systems, such large-scale rewrites are undergoing rigorous automated and manual auditing, emulation testing, and review before rolling out to production. For libgav1, Google's open source software for decoding video, Argon agents took an existing Rust port and replaced 32K lines of SIMD code by running many rounds of profile-guided experiments, studying the compiler's output, producing safe Rust so the compiler would vectorize it automatically.",
+    "title": "Gemini 4 Argon: our next era of frontier intelligence",
+    "url": null
+   },
+   {
+    "id": "it:864#s17",
+    "source": "AI타임스",
+    "text": "장문 비디오 이해 평가인 'LV벤치'에서는 91.7%를 기록했다. 보안 및 신뢰성 측면에서도 성과를 보였다. 취약점 보완 평가인 'CWE-벤치 v1'에서 68.0%로 GPT-6 아스트라와 공동 1위를 달성했다.",
+    "title": "구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\"",
+    "url": null
+   },
+   {
+    "id": "it:997#s11",
+    "source": "GeekNews",
+    "text": "구글이 일하고 개발하는 방식 혁신 제미나이 4 아르곤은 이미 구글의 내부 워크플로우에 적용되고 있으며, 수천 명의 구글 임직원은 전문 코딩 작업, 심층 연구 조사, 높은 수준의 글쓰기 역량을 제미나이 4 아르곤의 강점으로 꼽고 있습니다. 아르곤은 각 팀의 개발 속도를 높이고 엔지니어링 생산성의 한계를 넓히며, 기술적 혁신을 가속화하는 데 기여하고 있습니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:864#s18",
+    "source": "AI타임스",
+    "text": "보안 및 신뢰성 측면에서도 성과를 보였다. 취약점 보완 평가인 'CWE-벤치 v1'에서 68.0%로 GPT-6 아스트라와 공동 1위를 달성했다. 간접 프롬프트 주입 공격 방어 성능을 측정하는 '그레이 스완' 벤치마크에서는 공격 성공률 0.7%를 기록하며 GPT-6 아스트라(8.5%), 그록 4.8(51.8%) 대비 뛰어난 안전성을 보였다.",
+    "title": "구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\"",
+    "url": null
+   },
+   {
+    "id": "it:997#s12",
+    "source": "GeekNews",
+    "text": "제미나이 4 아르곤은 이미 구글의 내부 워크플로우에 적용되고 있으며, 수천 명의 구글 임직원은 전문 코딩 작업, 심층 연구 조사, 높은 수준의 글쓰기 역량을 제미나이 4 아르곤의 강점으로 꼽고 있습니다. 아르곤은 각 팀의 개발 속도를 높이고 엔지니어링 생산성의 한계를 넓히며, 기술적 혁신을 가속화하는 데 기여하고 있습니다. - 양자 알고리즘 최적화: 아르곤은 구글의 양자 컴퓨팅 연구원들이 주요 애플리케이션의 병목 현상을 유발하는 서브루틴의 시공간 리소스(큐비트 × 게이트)를 최적화하는 데 기여하고 있습니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:864#s19",
+    "source": "AI타임스",
+    "text": "취약점 보완 평가인 'CWE-벤치 v1'에서 68.0%로 GPT-6 아스트라와 공동 1위를 달성했다. 간접 프롬프트 주입 공격 방어 성능을 측정하는 '그레이 스완' 벤치마크에서는 공격 성공률 0.7%를 기록하며 GPT-6 아스트라(8.5%), 그록 4.8(51.8%) 대비 뛰어난 안전성을 보였다. Google’s new Gemini 4 Argon equals GPT-6 Astra on the Artificial Analysis Intelligence Index at 60% of the Cost per Task with discounted prices.",
+    "title": "구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\"",
+    "url": null
+   },
+   {
+    "id": "it:997#s13",
+    "source": "GeekNews",
+    "text": "아르곤은 각 팀의 개발 속도를 높이고 엔지니어링 생산성의 한계를 넓히며, 기술적 혁신을 가속화하는 데 기여하고 있습니다. - 양자 알고리즘 최적화: 아르곤은 구글의 양자 컴퓨팅 연구원들이 주요 애플리케이션의 병목 현상을 유발하는 서브루틴의 시공간 리소스(큐비트 × 게이트)를 최적화하는 데 기여하고 있습니다. 일례로, 아르곤은 기존 발표된 베이스라인 성능을 불과 몇 분 만에 40% 이상 뛰어넘는 성과를 거두었습니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:18#s20",
+    "source": "Google DeepMind Blog",
+    "text": "The end result is a memory-safe video decoder that runs 2.7x faster than the Rust port, with identical video output, bringing it closer to the optimized C++. Working harder on your most complex problems To support Gemini 4 Argon’s capabilities across longer, more complex use cases, we are significantly expanding the model’s output token limit to an industry-leading 1M tokens, up from the previous 64K tokens.",
+    "title": "Gemini 4 Argon: our next era of frontier intelligence",
+    "url": null
+   },
+   {
+    "id": "it:864#s20",
+    "source": "AI타임스",
+    "text": "간접 프롬프트 주입 공격 방어 성능을 측정하는 '그레이 스완' 벤치마크에서는 공격 성공률 0.7%를 기록하며 GPT-6 아스트라(8.5%), 그록 4.8(51.8%) 대비 뛰어난 안전성을 보였다. Google’s new Gemini 4 Argon equals GPT-6 Astra on the Artificial Analysis Intelligence Index at 60% of the Cost per Task with discounted prices. Google is now back to being one of the top three labs in intelligence achieved",
+    "title": "구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\"",
+    "url": null
+   },
+   {
+    "id": "it:864#s21",
+    "source": "AI타임스",
+    "text": "Google’s new Gemini 4 Argon equals GPT-6 Astra on the Artificial Analysis Intelligence Index at 60% of the Cost per Task with discounted prices. Google is now back to being one of the top three labs in intelligence achieved Gemini 4 Argon is @GoogleDeepMind’s first proprietary… pic.twitter.com/VRhPydyV1l",
+    "title": "구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\"",
+    "url": null
+   },
+   {
+    "id": "it:997#s15",
+    "source": "GeekNews",
+    "text": "일례로, 아르곤은 기존 발표된 베이스라인 성능을 불과 몇 분 만에 40% 이상 뛰어넘는 성과를 거두었습니다. - 메모리 효율성 향: 아르곤 에이전트 팀은 전체 서버군(fleet)의 프로파일링 텔레메트리 데이터를 분석해 구글 데이터센터 전반의 메모리 최적화 방안을 자율적으로 도출하고 적용했습니다. 배포 이후 300 TiB 이상의 메모리를 확보할 수 있게 되었으며, 총 절감 규모는 500 TiB에서 최대 1 PiB에 이를 것으로 예상됩니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:864#s22",
+    "source": "AI타임스",
+    "text": "Google is now back to being one of the top three labs in intelligence achieved Gemini 4 Argon is @GoogleDeepMind’s first proprietary… pic.twitter.com/VRhPydyV1l — Artificial Analysis (@ArtificialAnlys) September 30, 2026",
+    "title": "구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\"",
+    "url": null
+   },
+   {
+    "id": "it:18#s23",
+    "source": "Google DeepMind Blog",
+    "text": "When the model has the headroom to think deeply and generate hundreds of thousands of tokens in a single trajectory, it adds a new level of depth in reasoning to solve tough problems in one go. Enabling coding and enterprise workflows across domains Gemini 4 Argon’s capabilities across coding, reasoning, and multimodality and its ability to sustain long, multi-step tasks enable it to excel across a range of enterprise workflows.",
+    "title": "Gemini 4 Argon: our next era of frontier intelligence",
+    "url": null
+   },
+   {
+    "id": "it:864#s23",
+    "source": "AI타임스",
+    "text": "Gemini 4 Argon is @GoogleDeepMind’s first proprietary… pic.twitter.com/VRhPydyV1l — Artificial Analysis (@ArtificialAnlys) September 30, 2026 독립 평가 기관인 아티피셜 애널리시스의 지능 지수(AAII)에서는 종합 53점으로 GPT-6 아스트라 및 페이블 5.1 등과 공동 3위권을 이뤘다.",
+    "title": "구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\"",
+    "url": null
+   },
+   {
+    "id": "it:18#s24",
+    "source": "Google DeepMind Blog",
+    "text": "Enabling coding and enterprise workflows across domains Gemini 4 Argon’s capabilities across coding, reasoning, and multimodality and its ability to sustain long, multi-step tasks enable it to excel across a range of enterprise workflows. Google engineers have been using Argon for their daily tasks, from everyday debugging to large-scale codebase migrations and algorithm designs.",
+    "title": "Gemini 4 Argon: our next era of frontier intelligence",
+    "url": null
+   },
+   {
+    "id": "it:997#s18",
+    "source": "GeekNews",
+    "text": "- 대규모 코드베이스 마이그레이션 및 최적화: 아르곤 에이전트는 ‘re2’, ‘libgav1’과 같은 수만 줄 규모의 핵심 라이브러리부터 80만 줄 이상의 Fuchsia OS Zircon 커널에 이르기까지, 구글 전반의 C/C++ 코드베이스를 러스트(Rust)로 전환하는 작업을 수행하고 있습니다. 해당 시스템들의 높은 중요도를 고려해, 이러한 대규모 코드 재작성 결과물은 실제 운영 환경에 배포되기 전 엄격한 자동 및 수동 감사, 에뮬레이션 테스트, 코드 리뷰 과정을 철저히 거치고 있습니다. 구글의 오픈소스 비디오 디코딩 소프트웨어인 ‘libgav1’의 경우, 아르곤 에이전트는 기존 러스트 이식 버전을 기반으로 프로파일 기반 실험을 반복 수행하고, 컴파일러의 출력 결과를 분석했습니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:18#s25",
+    "source": "Google DeepMind Blog",
+    "text": "Gemini 4 Argon’s capabilities across coding, reasoning, and multimodality and its ability to sustain long, multi-step tasks enable it to excel across a range of enterprise workflows. Google engineers have been using Argon for their daily tasks, from everyday debugging to large-scale codebase migrations and algorithm designs. It sets a new state of the art on DeepSWE v1.1 (77.9%), which measures a model’s performance in real-world long-horizon software engineering tasks.",
+    "title": "Gemini 4 Argon: our next era of frontier intelligence",
+    "url": null
+   },
+   {
+    "id": "it:864#s25",
+    "source": "AI타임스",
+    "text": "독립 평가 기관인 아티피셜 애널리시스의 지능 지수(AAII)에서는 종합 53점으로 GPT-6 아스트라 및 페이블 5.1 등과 공동 3위권을 이뤘다. 구글은 실무 에이전트와 장문 추론 위주의 선택적 벤치마크를 앞세워 다수 1위를 강조했지만, 아티피셜 애널리시스는 수학·과학 연구 및 터미널 환경 제어 등 전 영역의 성능을 종합 가중 평가하기 때문에 생긴 차이다. 이 때문에 제미나이 4 아르곤은 고난도 과학·터미널 제어 영역에서 GPT-6 아스트라와 클로드 오퍼스 5.5에 밀려 순수 지능 종합 점수에서는 1위를 놓쳤다.",
+    "title": "구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\"",
+    "url": null
+   },
+   {
+    "id": "it:997#s19",
+    "source": "GeekNews",
+    "text": "해당 시스템들의 높은 중요도를 고려해, 이러한 대규모 코드 재작성 결과물은 실제 운영 환경에 배포되기 전 엄격한 자동 및 수동 감사, 에뮬레이션 테스트, 코드 리뷰 과정을 철저히 거치고 있습니다. 구글의 오픈소스 비디오 디코딩 소프트웨어인 ‘libgav1’의 경우, 아르곤 에이전트는 기존 러스트 이식 버전을 기반으로 프로파일 기반 실험을 반복 수행하고, 컴파일러의 출력 결과를 분석했습니다. 이를 통해 컴파일러가 코드를 자동으로 벡터화할 수 있도록 안전한 러스트 코드를 생성함으로써 3만 2천 줄에 달하는 SIMD 코드를 대체했습니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:997#s20",
+    "source": "GeekNews",
+    "text": "구글의 오픈소스 비디오 디코딩 소프트웨어인 ‘libgav1’의 경우, 아르곤 에이전트는 기존 러스트 이식 버전을 기반으로 프로파일 기반 실험을 반복 수행하고, 컴파일러의 출력 결과를 분석했습니다. 이를 통해 컴파일러가 코드를 자동으로 벡터화할 수 있도록 안전한 러스트 코드를 생성함으로써 3만 2천 줄에 달하는 SIMD 코드를 대체했습니다. 그 결과 동일한 비디오 출력 품질을 유지하면서도, 기존 러스트 버전 대비 2.7배 빠르게 작동하며 최적화된 C++ 수준에 근접한 메모리 안전(memory-safe) 비디오 디코더를 완성했습니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:18#s27",
+    "source": "Google DeepMind Blog",
+    "text": "It sets a new state of the art on DeepSWE v1.1 (77.9%), which measures a model’s performance in real-world long-horizon software engineering tasks. Beyond coding, Argon is the leading model on the Vals Index, which measures economic impact across finance, coding, legal, and tax work, with every sector weighted by its contribution to U.S. GDP.",
+    "title": "Gemini 4 Argon: our next era of frontier intelligence",
+    "url": null
+   },
+   {
+    "id": "it:864#s27",
+    "source": "AI타임스",
+    "text": "이 때문에 제미나이 4 아르곤은 고난도 과학·터미널 제어 영역에서 GPT-6 아스트라와 클로드 오퍼스 5.5에 밀려 순수 지능 종합 점수에서는 1위를 놓쳤다. 그러나 '가성비' 측면에서 높은 평가를 받았다. 아티피셜 애널리시스는 \"할인 가격 기준으로 작업당 비용을 60% 수준으로 낮추면서도 인텔리전스 지수에서 GPT-6 아스트라와 동률을 기록했다\"며 \"구글이 선두권 3대 연구소로서의 지능 입지를 성공적으로 탈환했다\"고 분석했다.",
+    "title": "구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\"",
+    "url": null
+   },
+   {
+    "id": "it:997#s21",
+    "source": "GeekNews",
+    "text": "이를 통해 컴파일러가 코드를 자동으로 벡터화할 수 있도록 안전한 러스트 코드를 생성함으로써 3만 2천 줄에 달하는 SIMD 코드를 대체했습니다. 그 결과 동일한 비디오 출력 품질을 유지하면서도, 기존 러스트 버전 대비 2.7배 빠르게 작동하며 최적화된 C++ 수준에 근접한 메모리 안전(memory-safe) 비디오 디코더를 완성했습니다. 가장 복잡한 문제도 끈기 있게 해결하는 역량",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:18#s28",
+    "source": "Google DeepMind Blog",
+    "text": "Beyond coding, Argon is the leading model on the Vals Index, which measures economic impact across finance, coding, legal, and tax work, with every sector weighted by its contribution to U.S. GDP. We see similarly leading performance across other domain specific evaluations, like Vals Finance Agent v2 (multi-step financial research) and Harvey’s Legal Agent Benchmark (legal research and drafting).",
+    "title": "Gemini 4 Argon: our next era of frontier intelligence",
+    "url": null
+   },
+   {
+    "id": "it:997#s22",
+    "source": "GeekNews",
+    "text": "그 결과 동일한 비디오 출력 품질을 유지하면서도, 기존 러스트 버전 대비 2.7배 빠르게 작동하며 최적화된 C++ 수준에 근접한 메모리 안전(memory-safe) 비디오 디코더를 완성했습니다. 가장 복잡한 문제도 끈기 있게 해결하는 역량 구글은 더 길고 복잡한 활용 사례에서도 제미나이 4 아르곤의 역량을 충분히 뒷받침할 수 있도록, 모델의 출력 토큰 한도를 기존 6만 4천개에서 업계 최고 수준인 1백만 개로 대폭 확장했습니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:18#s29",
+    "source": "Google DeepMind Blog",
+    "text": "GDP. We see similarly leading performance across other domain specific evaluations, like Vals Finance Agent v2 (multi-step financial research) and Harvey’s Legal Agent Benchmark (legal research and drafting). On AutomationBench, Zapier’s benchmark measuring end-to-end execution across core business functions, Argon ranks #1 with a score of 51.3%.",
+    "title": "Gemini 4 Argon: our next era of frontier intelligence",
+    "url": null
+   },
+   {
+    "id": "it:864#s29",
+    "source": "AI타임스",
+    "text": "아티피셜 애널리시스는 \"할인 가격 기준으로 작업당 비용을 60% 수준으로 낮추면서도 인텔리전스 지수에서 GPT-6 아스트라와 동률을 기록했다\"며 \"구글이 선두권 3대 연구소로서의 지능 입지를 성공적으로 탈환했다\"고 분석했다. 이밖에도 아레나(Arena)의 '텍스트 아레나' 평가에서는 1525점으로 1위에 등극했다. 구글이 밝힌 내부 실무 적용 사례에서도 뛰어난 성과를 만들었다.",
+    "title": "구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\"",
+    "url": null
+   },
+   {
+    "id": "it:864#s30",
+    "source": "AI타임스",
+    "text": "이밖에도 아레나(Arena)의 '텍스트 아레나' 평가에서는 1525점으로 1위에 등극했다. 구글이 밝힌 내부 실무 적용 사례에서도 뛰어난 성과를 만들었다. 양자 컴퓨터 연구진이 몇분 만에 시공간 자원 최적화 기준을 40% 개선했으며, 데이터센터 메모리 최적화 에이전트를 통해 300TiB 이상의 메모리를 확보해 향후 최대 1PiB의 절감 효과를 거둘 것으로 예상된다고 밝혔다.",
+    "title": "구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\"",
+    "url": null
+   },
+   {
+    "id": "it:18#s31",
+    "source": "Google DeepMind Blog",
+    "text": "On AutomationBench, Zapier’s benchmark measuring end-to-end execution across core business functions, Argon ranks #1 with a score of 51.3%. Argon is also uniquely strong when knowledge work requires visual understanding. It’s able to drive professional chart analysis, identify details from long videos, and take action based on a series of documents.",
+    "title": "Gemini 4 Argon: our next era of frontier intelligence",
+    "url": null
+   },
+   {
+    "id": "it:864#s31",
+    "source": "AI타임스",
+    "text": "구글이 밝힌 내부 실무 적용 사례에서도 뛰어난 성과를 만들었다. 양자 컴퓨터 연구진이 몇분 만에 시공간 자원 최적화 기준을 40% 개선했으며, 데이터센터 메모리 최적화 에이전트를 통해 300TiB 이상의 메모리를 확보해 향후 최대 1PiB의 절감 효과를 거둘 것으로 예상된다고 밝혔다. 또 핵심 라이브러리 및 훅샤(Fuchsia) OS의 저콘(Zircon) 커널을 포함해 80만줄 이상의 C/C++ 코드베이스를 러스트(Rust) 언어로 전환하는 작업을 안정적으로 지원했다.",
+    "title": "구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\"",
+    "url": null
+   },
+   {
+    "id": "it:997#s25",
+    "source": "GeekNews",
+    "text": "제미나이 4 아르곤은 단일 실행 경로 내에서 깊이 있게 사고하고 수십만 개의 토큰을 생성할 수 있는 여유 공간을 확보하게 되면서, 까다로운 과제도 한 번에 해결할 수 있는 한 차원 더 깊은 추론 성능을 제공합니다. 다양한 영역을 아우르는 코딩 및 엔터프라이즈 워크플로우 지원 제미나이 4 아르곤은 코딩, 추론, 멀티모달 전반을 아우르는 역량과 장기적인 다단계 작업을 지속 수행하는 능력을 바탕으로, 다양한 엔터프라이즈 워크플로우에서 탁월한 성능을 발휘합니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:18#s32",
+    "source": "Google DeepMind Blog",
+    "text": "Argon is also uniquely strong when knowledge work requires visual understanding. It’s able to drive professional chart analysis, identify details from long videos, and take action based on a series of documents. For example, on LVBench, which measures long video understanding, Argon is state of the art with a score of 91.7%.",
+    "title": "Gemini 4 Argon: our next era of frontier intelligence",
+    "url": null
+   },
+   {
+    "id": "it:864#s32",
+    "source": "AI타임스",
+    "text": "양자 컴퓨터 연구진이 몇분 만에 시공간 자원 최적화 기준을 40% 개선했으며, 데이터센터 메모리 최적화 에이전트를 통해 300TiB 이상의 메모리를 확보해 향후 최대 1PiB의 절감 효과를 거둘 것으로 예상된다고 밝혔다. 또 핵심 라이브러리 및 훅샤(Fuchsia) OS의 저콘(Zircon) 커널을 포함해 80만줄 이상의 C/C++ 코드베이스를 러스트(Rust) 언어로 전환하는 작업을 안정적으로 지원했다. 동영상 데코더 'libgav1'의 SIMD 코드 3만2000 줄을 안전한 러스트 코드로 재작성해 동일한 화질을 유지하면서 처리 속도를 2.7배 향상했다.",
+    "title": "구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\"",
+    "url": null
+   },
+   {
+    "id": "it:997#s26",
+    "source": "GeekNews",
+    "text": "다양한 영역을 아우르는 코딩 및 엔터프라이즈 워크플로우 지원 제미나이 4 아르곤은 코딩, 추론, 멀티모달 전반을 아우르는 역량과 장기적인 다단계 작업을 지속 수행하는 능력을 바탕으로, 다양한 엔터프라이즈 워크플로우에서 탁월한 성능을 발휘합니다. 구글 엔지니어들은 일상적인 디버깅부터 대규모 코드베이스 마이그레이션, 알고리즘 설계에 이르기까지 매일 다양한 실무에 아르곤을 활용하고 있습니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:864#s33",
+    "source": "AI타임스",
+    "text": "또 핵심 라이브러리 및 훅샤(Fuchsia) OS의 저콘(Zircon) 커널을 포함해 80만줄 이상의 C/C++ 코드베이스를 러스트(Rust) 언어로 전환하는 작업을 안정적으로 지원했다. 동영상 데코더 'libgav1'의 SIMD 코드 3만2000 줄을 안전한 러스트 코드로 재작성해 동일한 화질을 유지하면서 처리 속도를 2.7배 향상했다. API 가격은 공격적으로 책정됐다.",
+    "title": "구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\"",
+    "url": null
+   },
+   {
+    "id": "it:997#s27",
+    "source": "GeekNews",
+    "text": "제미나이 4 아르곤은 코딩, 추론, 멀티모달 전반을 아우르는 역량과 장기적인 다단계 작업을 지속 수행하는 능력을 바탕으로, 다양한 엔터프라이즈 워크플로우에서 탁월한 성능을 발휘합니다. 구글 엔지니어들은 일상적인 디버깅부터 대규모 코드베이스 마이그레이션, 알고리즘 설계에 이르기까지 매일 다양한 실무에 아르곤을 활용하고 있습니다. 아르곤은 실제 현장에서의 장기 소프트웨어 엔지니어링 작업 수행 능력을 평가하는 DeepSWE v1.1에서 77.9%를 기록하며 최고 수준(SOTA)을 달성했습니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:18#s34",
+    "source": "Google DeepMind Blog",
+    "text": "For example, on LVBench, which measures long video understanding, Argon is state of the art with a score of 91.7%. Leading in defensive cybersecurity To better equip cyber defenders for the new era of cyberattacks, we trained Gemini 4 Argon to be highly capable at cybersecurity defense.",
+    "title": "Gemini 4 Argon: our next era of frontier intelligence",
+    "url": null
+   },
+   {
+    "id": "it:864#s34",
+    "source": "AI타임스",
+    "text": "동영상 데코더 'libgav1'의 SIMD 코드 3만2000 줄을 안전한 러스트 코드로 재작성해 동일한 화질을 유지하면서 처리 속도를 2.7배 향상했다. API 가격은 공격적으로 책정됐다. 출시 프로모션 기간 100만 토큰당 입력 2달러(약 2700원), 출력 100만 토큰당 10달러(약 1만3500원)에 제공된다.",
+    "title": "구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\"",
+    "url": null
+   },
+   {
+    "id": "it:997#s28",
+    "source": "GeekNews",
+    "text": "구글 엔지니어들은 일상적인 디버깅부터 대규모 코드베이스 마이그레이션, 알고리즘 설계에 이르기까지 매일 다양한 실무에 아르곤을 활용하고 있습니다. 아르곤은 실제 현장에서의 장기 소프트웨어 엔지니어링 작업 수행 능력을 평가하는 DeepSWE v1.1에서 77.9%를 기록하며 최고 수준(SOTA)을 달성했습니다. 아르곤은 코딩을 넘어 금융, 코딩, 법률, 세무 분야의 경제적 파급 효과를 미국 GDP 기여도에 따라 가중 평가하는 Vals Index에서도 선두에 올랐습니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:18#s35",
+    "source": "Google DeepMind Blog",
+    "text": "Leading in defensive cybersecurity To better equip cyber defenders for the new era of cyberattacks, we trained Gemini 4 Argon to be highly capable at cybersecurity defense. Argon can autonomously find, validate, and patch critical software vulnerabilities.",
+    "title": "Gemini 4 Argon: our next era of frontier intelligence",
+    "url": null
+   },
+   {
+    "id": "it:864#s35",
+    "source": "AI타임스",
+    "text": "API 가격은 공격적으로 책정됐다. 출시 프로모션 기간 100만 토큰당 입력 2달러(약 2700원), 출력 100만 토큰당 10달러(약 1만3500원)에 제공된다. 캐시 입력 토큰에는 95% 할인이 적용돼 100만 토큰당 0.1달러(약 135원) 수준이다.",
+    "title": "구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\"",
+    "url": null
+   },
+   {
+    "id": "it:997#s29",
+    "source": "GeekNews",
+    "text": "아르곤은 실제 현장에서의 장기 소프트웨어 엔지니어링 작업 수행 능력을 평가하는 DeepSWE v1.1에서 77.9%를 기록하며 최고 수준(SOTA)을 달성했습니다. 아르곤은 코딩을 넘어 금융, 코딩, 법률, 세무 분야의 경제적 파급 효과를 미국 GDP 기여도에 따라 가중 평가하는 Vals Index에서도 선두에 올랐습니다. 다단계 금융 리서치를 평가하는 Vals Finance Agent v2와 법률 리서치 및 문서 초안 작성을 평가하는 Harvey’s Legal Agent Benchmark 등 도메인 특화 평가에서도 마찬가지로, 업계를 선도하는 성능을 보였습니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:18#s36",
+    "source": "Google DeepMind Blog",
+    "text": "To better equip cyber defenders for the new era of cyberattacks, we trained Gemini 4 Argon to be highly capable at cybersecurity defense. Argon can autonomously find, validate, and patch critical software vulnerabilities. For trusted defenders and our own internal teams at Google, we’ll be releasing Argon without cyber guardrails so they can leverage its full frontier-level cybersecurity defense capabilities.",
+    "title": "Gemini 4 Argon: our next era of frontier intelligence",
+    "url": null
+   },
+   {
+    "id": "it:864#s36",
+    "source": "AI타임스",
+    "text": "출시 프로모션 기간 100만 토큰당 입력 2달러(약 2700원), 출력 100만 토큰당 10달러(약 1만3500원)에 제공된다. 캐시 입력 토큰에는 95% 할인이 적용돼 100만 토큰당 0.1달러(약 135원) 수준이다. 이는 GPT-6 아스트라 대비 5분의 1 가격이며, 클로드 오퍼스 5.5의 절반 가격이다.",
+    "title": "구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\"",
+    "url": null
+   },
+   {
+    "id": "it:997#s30",
+    "source": "GeekNews",
+    "text": "아르곤은 코딩을 넘어 금융, 코딩, 법률, 세무 분야의 경제적 파급 효과를 미국 GDP 기여도에 따라 가중 평가하는 Vals Index에서도 선두에 올랐습니다. 다단계 금융 리서치를 평가하는 Vals Finance Agent v2와 법률 리서치 및 문서 초안 작성을 평가하는 Harvey’s Legal Agent Benchmark 등 도메인 특화 평가에서도 마찬가지로, 업계를 선도하는 성능을 보였습니다. 또한 핵심 기업 업무 전반의 엔드투엔드(end-to-end) 실행 능력을 측정하는 Zapier의 AutomationBench에서도 51.3%의 점수를 기록하며 1위에 올랐습니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:18#s37",
+    "source": "Google DeepMind Blog",
+    "text": "Argon can autonomously find, validate, and patch critical software vulnerabilities. For trusted defenders and our own internal teams at Google, we’ll be releasing Argon without cyber guardrails so they can leverage its full frontier-level cybersecurity defense capabilities. Wiz is already using Argon for cybersecurity defense through its Scan for Good initiative – a program dedicated to protecting critical public infrastructure for free by finding and remediating high-risk exposures.",
+    "title": "Gemini 4 Argon: our next era of frontier intelligence",
+    "url": null
+   },
+   {
+    "id": "it:997#s31",
+    "source": "GeekNews",
+    "text": "다단계 금융 리서치를 평가하는 Vals Finance Agent v2와 법률 리서치 및 문서 초안 작성을 평가하는 Harvey’s Legal Agent Benchmark 등 도메인 특화 평가에서도 마찬가지로, 업계를 선도하는 성능을 보였습니다. 또한 핵심 기업 업무 전반의 엔드투엔드(end-to-end) 실행 능력을 측정하는 Zapier의 AutomationBench에서도 51.3%의 점수를 기록하며 1위에 올랐습니다. 아르곤은 시각적 이해가 요구되는 지식 기반 업무에서도 독보적인 강점을 발휘합니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:18#s38",
+    "source": "Google DeepMind Blog",
+    "text": "For trusted defenders and our own internal teams at Google, we’ll be releasing Argon without cyber guardrails so they can leverage its full frontier-level cybersecurity defense capabilities. Wiz is already using Argon for cybersecurity defense through its Scan for Good initiative – a program dedicated to protecting critical public infrastructure for free by finding and remediating high-risk exposures. In an early demonstration of its impact, the model uncovered a critical vulnerability exposing sensitive personal information across healthcare software used by hospitals worldwide, identifying a severe risk that previous frontier models had missed.",
+    "title": "Gemini 4 Argon: our next era of frontier intelligence",
+    "url": null
+   },
+   {
+    "id": "it:997#s32",
+    "source": "GeekNews",
+    "text": "또한 핵심 기업 업무 전반의 엔드투엔드(end-to-end) 실행 능력을 측정하는 Zapier의 AutomationBench에서도 51.3%의 점수를 기록하며 1위에 올랐습니다. 아르곤은 시각적 이해가 요구되는 지식 기반 업무에서도 독보적인 강점을 발휘합니다. 전문적인 차트 분석을 수행하고, 긴 영상에서 세부 정보를 파악하며, 일련의 문서를 바탕으로 후속 조치를 수행할 수 있습니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:18#s39",
+    "source": "Google DeepMind Blog",
+    "text": "Wiz is already using Argon for cybersecurity defense through its Scan for Good initiative – a program dedicated to protecting critical public infrastructure for free by finding and remediating high-risk exposures. In an early demonstration of its impact, the model uncovered a critical vulnerability exposing sensitive personal information across healthcare software used by hospitals worldwide, identifying a severe risk that previous frontier models had missed. On CWE-bench v1, which evaluates the model’s ability to remediate security vulnerabilities, Argon ties for first place with a top score of 68%, building on 3.8 Flash Cyber’s frontier performance on CWE-bench v0.",
+    "title": "Gemini 4 Argon: our next era of frontier intelligence",
+    "url": null
+   },
+   {
+    "id": "it:864#s39",
+    "source": "AI타임스",
+    "text": "프로모션 종료 후에는 입력 4달러, 출력 20달러의 정가로 전환될 예정이다. 기술 커뮤니티와 시장의 반응은 기대감과 아쉬움이 교차하고 있다. 레딧과 X 등에서는 구글이 엔터프라이즈 및 에이전트 성능에서 확실한 반격을 이루어냈다는 긍정적 평가가 쏟아졌지만, \"그림의 떡\"이라며 실질적인 일반 API 사용 접근이 제한된 점을 지적하는 목소리가 강하게 제기됐다.",
+    "title": "구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\"",
+    "url": null
+   },
+   {
+    "id": "it:997#s33",
+    "source": "GeekNews",
+    "text": "아르곤은 시각적 이해가 요구되는 지식 기반 업무에서도 독보적인 강점을 발휘합니다. 전문적인 차트 분석을 수행하고, 긴 영상에서 세부 정보를 파악하며, 일련의 문서를 바탕으로 후속 조치를 수행할 수 있습니다. 예를 들어, 장편 영상 이해도를 측정하는 LVBench에서 아르곤은 91.7%의 점수로 최고 수준(SOTA)의 성능을 기록했습니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:18#s40",
+    "source": "Google DeepMind Blog",
+    "text": "In an early demonstration of its impact, the model uncovered a critical vulnerability exposing sensitive personal information across healthcare software used by hospitals worldwide, identifying a severe risk that previous frontier models had missed. On CWE-bench v1, which evaluates the model’s ability to remediate security vulnerabilities, Argon ties for first place with a top score of 68%, building on 3.8 Flash Cyber’s frontier performance on CWE-bench v0. Gemini 4 Argon demonstrates impressive leaps in vulnerability discovery over 3.8 Flash Cyber.",
+    "title": "Gemini 4 Argon: our next era of frontier intelligence",
+    "url": null
+   },
+   {
+    "id": "it:997#s34",
+    "source": "GeekNews",
+    "text": "전문적인 차트 분석을 수행하고, 긴 영상에서 세부 정보를 파악하며, 일련의 문서를 바탕으로 후속 조치를 수행할 수 있습니다. 예를 들어, 장편 영상 이해도를 측정하는 LVBench에서 아르곤은 91.7%의 점수로 최고 수준(SOTA)의 성능을 기록했습니다. 방어적 사이버 보안을 선도하는 역량",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:18#s41",
+    "source": "Google DeepMind Blog",
+    "text": "On CWE-bench v1, which evaluates the model’s ability to remediate security vulnerabilities, Argon ties for first place with a top score of 68%, building on 3.8 Flash Cyber’s frontier performance on CWE-bench v0. Gemini 4 Argon demonstrates impressive leaps in vulnerability discovery over 3.8 Flash Cyber. For example:",
+    "title": "Gemini 4 Argon: our next era of frontier intelligence",
+    "url": null
+   },
+   {
+    "id": "it:864#s41",
+    "source": "AI타임스",
+    "text": "레딧과 X 등에서는 구글이 엔터프라이즈 및 에이전트 성능에서 확실한 반격을 이루어냈다는 긍정적 평가가 쏟아졌지만, \"그림의 떡\"이라며 실질적인 일반 API 사용 접근이 제한된 점을 지적하는 목소리가 강하게 제기됐다. 동시에 터미널 환경 및 프런티어 SWE 일부 고난도 코딩 분야에서는 여전히 GPT-6 아스트라가 우위를 점하고 있다는 분석도 이어졌다. 전문가 및 전문 매체들은 구글이 최근 제기됐던 기술적 지연 우려를 털어내고 강력한 성능을 보여줬으나, 실제 시장에서 영향력을 발휘하려면 일반 개발자 대상의 본격적인 배포 속도가 관건이 될 것이라고 평가했다.",
+    "title": "구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\"",
+    "url": null
+   },
+   {
+    "id": "it:997#s35",
+    "source": "GeekNews",
+    "text": "예를 들어, 장편 영상 이해도를 측정하는 LVBench에서 아르곤은 91.7%의 점수로 최고 수준(SOTA)의 성능을 기록했습니다. 방어적 사이버 보안을 선도하는 역량 구글은 새로운 양상의 사이버 공격 시대에 맞서 보안 담당자들이 더 철저히 대비할 수 있도록, 제미나이 4 아르곤을 사이버 보안에 특화된 높은 방어 역량을 갖춘 모델로 학습시켰습니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:18#s42",
+    "source": "Google DeepMind Blog",
+    "text": "Gemini 4 Argon demonstrates impressive leaps in vulnerability discovery over 3.8 Flash Cyber. For example: - On Google’s internal comprehensive vulnerability benchmark, Argon uncovered a wide range of exposures across complex codebases spanning 20 programming languages.",
+    "title": "Gemini 4 Argon: our next era of frontier intelligence",
+    "url": null
+   },
+   {
+    "id": "it:864#s42",
+    "source": "AI타임스",
+    "text": "동시에 터미널 환경 및 프런티어 SWE 일부 고난도 코딩 분야에서는 여전히 GPT-6 아스트라가 우위를 점하고 있다는 분석도 이어졌다. 전문가 및 전문 매체들은 구글이 최근 제기됐던 기술적 지연 우려를 털어내고 강력한 성능을 보여줬으나, 실제 시장에서 영향력을 발휘하려면 일반 개발자 대상의 본격적인 배포 속도가 관건이 될 것이라고 평가했다. 임대준 기자 ydj@aitimes.com",
+    "title": "구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\"",
+    "url": null
+   },
+   {
+    "id": "it:997#s36",
+    "source": "GeekNews",
+    "text": "방어적 사이버 보안을 선도하는 역량 구글은 새로운 양상의 사이버 공격 시대에 맞서 보안 담당자들이 더 철저히 대비할 수 있도록, 제미나이 4 아르곤을 사이버 보안에 특화된 높은 방어 역량을 갖춘 모델로 학습시켰습니다. 아르곤은 치명적인 소프트웨어 취약점을 자율적으로 탐지하고, 검증하며, 패치할 수 있습니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:864#s43",
+    "source": "AI타임스",
+    "text": "전문가 및 전문 매체들은 구글이 최근 제기됐던 기술적 지연 우려를 털어내고 강력한 성능을 보여줬으나, 실제 시장에서 영향력을 발휘하려면 일반 개발자 대상의 본격적인 배포 속도가 관건이 될 것이라고 평가했다. 임대준 기자 ydj@aitimes.com",
+    "title": "구글, '제미나이 4 아르곤' 공개…성능 1위 탈환에도 \"일반 사용 제한\"",
+    "url": null
+   },
+   {
+    "id": "it:997#s37",
+    "source": "GeekNews",
+    "text": "구글은 새로운 양상의 사이버 공격 시대에 맞서 보안 담당자들이 더 철저히 대비할 수 있도록, 제미나이 4 아르곤을 사이버 보안에 특화된 높은 방어 역량을 갖춘 모델로 학습시켰습니다. 아르곤은 치명적인 소프트웨어 취약점을 자율적으로 탐지하고, 검증하며, 패치할 수 있습니다. 프론티어급 사이버 보안 방어 역량을 온전히 활용할 수 있도록, 신뢰할 수 있는 보안 전문가 방어자들과 구글 내부 팀에는 사이버 가드레일이 적용되지 않은 버전의 아르곤이 제공될 예정입니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:997#s38",
+    "source": "GeekNews",
+    "text": "아르곤은 치명적인 소프트웨어 취약점을 자율적으로 탐지하고, 검증하며, 패치할 수 있습니다. 프론티어급 사이버 보안 방어 역량을 온전히 활용할 수 있도록, 신뢰할 수 있는 보안 전문가 방어자들과 구글 내부 팀에는 사이버 가드레일이 적용되지 않은 버전의 아르곤이 제공될 예정입니다. 위즈(Wiz)는 고위험 보안 노출 요소를 찾아 해결함으로써 주요 공공 인프라를 무상으로 보호하는 프로그램인 ‘스캔 포 굿(Scan for Good)’ 이니셔티브를 통해 이미 사이버 보안 방어에 아르곤을 활용하고 있습니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:997#s39",
+    "source": "GeekNews",
+    "text": "프론티어급 사이버 보안 방어 역량을 온전히 활용할 수 있도록, 신뢰할 수 있는 보안 전문가 방어자들과 구글 내부 팀에는 사이버 가드레일이 적용되지 않은 버전의 아르곤이 제공될 예정입니다. 위즈(Wiz)는 고위험 보안 노출 요소를 찾아 해결함으로써 주요 공공 인프라를 무상으로 보호하는 프로그램인 ‘스캔 포 굿(Scan for Good)’ 이니셔티브를 통해 이미 사이버 보안 방어에 아르곤을 활용하고 있습니다. 초기 실증 사례에서 아르곤은 기존 프론티어 모델들이 놓쳤던 심각한 보안 위험을 식별해 냈으며, 전 세계 병원에서 사용하는 헬스케어 소프트웨어 전반에 걸쳐 민감한 개인정보 노출을 야기할 수 있는 치명적인 취약점을 찾아냈습니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:997#s40",
+    "source": "GeekNews",
+    "text": "위즈(Wiz)는 고위험 보안 노출 요소를 찾아 해결함으로써 주요 공공 인프라를 무상으로 보호하는 프로그램인 ‘스캔 포 굿(Scan for Good)’ 이니셔티브를 통해 이미 사이버 보안 방어에 아르곤을 활용하고 있습니다. 초기 실증 사례에서 아르곤은 기존 프론티어 모델들이 놓쳤던 심각한 보안 위험을 식별해 냈으며, 전 세계 병원에서 사용하는 헬스케어 소프트웨어 전반에 걸쳐 민감한 개인정보 노출을 야기할 수 있는 치명적인 취약점을 찾아냈습니다. 보안 취약점 해결 능력을 평가하는 CWE-bench v1에서, 아르곤은 CWE-bench v0에서 프론티어급 성능을 입증한 3.8 플래시 사이버(3.8 Flash Cyber)의 성과를 바탕으로 68%라는 최고 점수로 공동 1위를 기록했습니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:997#s41",
+    "source": "GeekNews",
+    "text": "초기 실증 사례에서 아르곤은 기존 프론티어 모델들이 놓쳤던 심각한 보안 위험을 식별해 냈으며, 전 세계 병원에서 사용하는 헬스케어 소프트웨어 전반에 걸쳐 민감한 개인정보 노출을 야기할 수 있는 치명적인 취약점을 찾아냈습니다. 보안 취약점 해결 능력을 평가하는 CWE-bench v1에서, 아르곤은 CWE-bench v0에서 프론티어급 성능을 입증한 3.8 플래시 사이버(3.8 Flash Cyber)의 성과를 바탕으로 68%라는 최고 점수로 공동 1위를 기록했습니다. 또한 제미나이 4 아르곤은 취약점 탐지(vulnerability discovery) 영역에서도 3.8 플래시 사이버 대비 괄목할 만한 성장을 보여줍니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:997#s42",
+    "source": "GeekNews",
+    "text": "보안 취약점 해결 능력을 평가하는 CWE-bench v1에서, 아르곤은 CWE-bench v0에서 프론티어급 성능을 입증한 3.8 플래시 사이버(3.8 Flash Cyber)의 성과를 바탕으로 68%라는 최고 점수로 공동 1위를 기록했습니다. 또한 제미나이 4 아르곤은 취약점 탐지(vulnerability discovery) 영역에서도 3.8 플래시 사이버 대비 괄목할 만한 성장을 보여줍니다. 주요 사례는 다음과 같습니다:",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:997#s43",
+    "source": "GeekNews",
+    "text": "또한 제미나이 4 아르곤은 취약점 탐지(vulnerability discovery) 영역에서도 3.8 플래시 사이버 대비 괄목할 만한 성장을 보여줍니다. 주요 사례는 다음과 같습니다: - 구글의 내부 종합 취약점 벤치마크 평가에서 아르곤은 20개 프로그래밍 언어로 작성된 복잡한 코드베이스 전반에서 광범위한 보안 취약점을 찾아냈습니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:997#s44",
+    "source": "GeekNews",
+    "text": "주요 사례는 다음과 같습니다: - 구글의 내부 종합 취약점 벤치마크 평가에서 아르곤은 20개 프로그래밍 언어로 작성된 복잡한 코드베이스 전반에서 광범위한 보안 취약점을 찾아냈습니다. - 소스 코드 없이 실제 운영 중인 라이브 웹 시스템을 분석하는 능력을 평가하는 위즈(Wiz)의 자체 블랙박스 모의 침투 테스트 벤치마크에서, 아르곤은 공격 표면 탐지, 취약점 식별, 그리고 이를 검증하기 위한 개념 증명(PoC, proof-of-concept) 근거 생성에 이르기까지 모든 영역에서 3.8 플래시 사이버를 상회하는 성능을 기록했습니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:997#s45",
+    "source": "GeekNews",
+    "text": "- 구글의 내부 종합 취약점 벤치마크 평가에서 아르곤은 20개 프로그래밍 언어로 작성된 복잡한 코드베이스 전반에서 광범위한 보안 취약점을 찾아냈습니다. - 소스 코드 없이 실제 운영 중인 라이브 웹 시스템을 분석하는 능력을 평가하는 위즈(Wiz)의 자체 블랙박스 모의 침투 테스트 벤치마크에서, 아르곤은 공격 표면 탐지, 취약점 식별, 그리고 이를 검증하기 위한 개념 증명(PoC, proof-of-concept) 근거 생성에 이르기까지 모든 영역에서 3.8 플래시 사이버를 상회하는 성능을 기록했습니다. 정식 출시 전 프론티어 안전장치 강화",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:997#s46",
+    "source": "GeekNews",
+    "text": "- 소스 코드 없이 실제 운영 중인 라이브 웹 시스템을 분석하는 능력을 평가하는 위즈(Wiz)의 자체 블랙박스 모의 침투 테스트 벤치마크에서, 아르곤은 공격 표면 탐지, 취약점 식별, 그리고 이를 검증하기 위한 개념 증명(PoC, proof-of-concept) 근거 생성에 이르기까지 모든 영역에서 3.8 플래시 사이버를 상회하는 성능을 기록했습니다. 정식 출시 전 프론티어 안전장치 강화 제미나이 4 아르곤을 본격적으로 출시하기에 앞서, 구글은 다음 네 가지 핵심 영역에 걸쳐 중대한 프론티어 안전장치를 지속적으로 강화하고 있습니다:",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:997#s47",
+    "source": "GeekNews",
+    "text": "정식 출시 전 프론티어 안전장치 강화 제미나이 4 아르곤을 본격적으로 출시하기에 앞서, 구글은 다음 네 가지 핵심 영역에 걸쳐 중대한 프론티어 안전장치를 지속적으로 강화하고 있습니다: 오용 및 악용 방지: 악의적인 행위자가 아르곤을 사이버 공격이나 화학·생물학·방사능·핵(CBRN) 공격에 악용하는 것을 방지하기 위해, 구글의 프론티어 안전 프레임워크(Frontier Safety Framework)에 따라 정당한 이중 용도의 과학 연구는 지원하는 한편, 유해한 요청은 거부하도록 모델을 설계했습니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:997#s48",
+    "source": "GeekNews",
+    "text": "제미나이 4 아르곤을 본격적으로 출시하기에 앞서, 구글은 다음 네 가지 핵심 영역에 걸쳐 중대한 프론티어 안전장치를 지속적으로 강화하고 있습니다: 오용 및 악용 방지: 악의적인 행위자가 아르곤을 사이버 공격이나 화학·생물학·방사능·핵(CBRN) 공격에 악용하는 것을 방지하기 위해, 구글의 프론티어 안전 프레임워크(Frontier Safety Framework)에 따라 정당한 이중 용도의 과학 연구는 지원하는 한편, 유해한 요청은 거부하도록 모델을 설계했습니다. 이번 출시에 맞춰 모델의 내부 활성화(internal activations) 상태를 모니터링해 오용 징후를 포착하는 기술을 고도화하는 등 안전장치의 견고함을 한층 강화하고 있습니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:997#s49",
+    "source": "GeekNews",
+    "text": "오용 및 악용 방지: 악의적인 행위자가 아르곤을 사이버 공격이나 화학·생물학·방사능·핵(CBRN) 공격에 악용하는 것을 방지하기 위해, 구글의 프론티어 안전 프레임워크(Frontier Safety Framework)에 따라 정당한 이중 용도의 과학 연구는 지원하는 한편, 유해한 요청은 거부하도록 모델을 설계했습니다. 이번 출시에 맞춰 모델의 내부 활성화(internal activations) 상태를 모니터링해 오용 징후를 포착하는 기술을 고도화하는 등 안전장치의 견고함을 한층 강화하고 있습니다. 이러한 안전장치는 수동 및 자동 공격 기법을 종합적으로 활용한 내부 및 외부 레드팀(red team)의 엄격한 내구성 테스트를 거쳤습니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:997#s50",
+    "source": "GeekNews",
+    "text": "이번 출시에 맞춰 모델의 내부 활성화(internal activations) 상태를 모니터링해 오용 징후를 포착하는 기술을 고도화하는 등 안전장치의 견고함을 한층 강화하고 있습니다. 이러한 안전장치는 수동 및 자동 공격 기법을 종합적으로 활용한 내부 및 외부 레드팀(red team)의 엄격한 내구성 테스트를 거쳤습니다. 프롬프트 인젝션 공격 방어: 아르곤은 악의적인 지시나 컨텍스트를 이용해 모델의 동작을 탈취하려는 간접 프롬프트 인젝션(indirect prompt injection) 공격에 대해서도 역대 구글 모델 중 가장 강력한 방어력을 갖추고 있습니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:997#s51",
+    "source": "GeekNews",
+    "text": "이러한 안전장치는 수동 및 자동 공격 기법을 종합적으로 활용한 내부 및 외부 레드팀(red team)의 엄격한 내구성 테스트를 거쳤습니다. 프롬프트 인젝션 공격 방어: 아르곤은 악의적인 지시나 컨텍스트를 이용해 모델의 동작을 탈취하려는 간접 프롬프트 인젝션(indirect prompt injection) 공격에 대해서도 역대 구글 모델 중 가장 강력한 방어력을 갖추고 있습니다. 이러한 공격은 복잡한 방식으로 이루어지기 때문에 상시적인 경계와 다층적인 방어 체계가 필수적입니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:997#s52",
+    "source": "GeekNews",
+    "text": "프롬프트 인젝션 공격 방어: 아르곤은 악의적인 지시나 컨텍스트를 이용해 모델의 동작을 탈취하려는 간접 프롬프트 인젝션(indirect prompt injection) 공격에 대해서도 역대 구글 모델 중 가장 강력한 방어력을 갖추고 있습니다. 이러한 공격은 복잡한 방식으로 이루어지기 때문에 상시적인 경계와 다층적인 방어 체계가 필수적입니다. 자동화된 레드팀 테스트와 적대적 학습(adversarial training)을 거친 제미나이 4 아르곤은 그레이 스완(Gray Swan)의 간접 프롬프트 인젝션(IPI) 벤치마크에서 프롬프트 인젝션 방어 견고성 부문 선두를 기록하고 있습니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:997#s53",
+    "source": "GeekNews",
+    "text": "이러한 공격은 복잡한 방식으로 이루어지기 때문에 상시적인 경계와 다층적인 방어 체계가 필수적입니다. 자동화된 레드팀 테스트와 적대적 학습(adversarial training)을 거친 제미나이 4 아르곤은 그레이 스완(Gray Swan)의 간접 프롬프트 인젝션(IPI) 벤치마크에서 프롬프트 인젝션 방어 견고성 부문 선두를 기록하고 있습니다. 정렬 불일치(misalignment) 모니터링: 아르곤이 이용자의 의도를 벗어나 허용 범위를 넘어서는 방식으로 과업을 수행하려는 시도를 방지하기 위해, 아르곤의 추론 과정과 행동을 모니터링하고 필요시 실행을 중단하는 정렬 불일치 완화 조치(misalignment mitigations)를 적용하고 있습니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:997#s54",
+    "source": "GeekNews",
+    "text": "자동화된 레드팀 테스트와 적대적 학습(adversarial training)을 거친 제미나이 4 아르곤은 그레이 스완(Gray Swan)의 간접 프롬프트 인젝션(IPI) 벤치마크에서 프롬프트 인젝션 방어 견고성 부문 선두를 기록하고 있습니다. 정렬 불일치(misalignment) 모니터링: 아르곤이 이용자의 의도를 벗어나 허용 범위를 넘어서는 방식으로 과업을 수행하려는 시도를 방지하기 위해, 아르곤의 추론 과정과 행동을 모니터링하고 필요시 실행을 중단하는 정렬 불일치 완화 조치(misalignment mitigations)를 적용하고 있습니다. 구글은 모델 학습 과정에서도 유사한 시스템을 활용해 학습 실행을 모니터링하고 전담 사고 대응팀에 알림을 전송하게 했습니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:997#s55",
+    "source": "GeekNews",
+    "text": "정렬 불일치(misalignment) 모니터링: 아르곤이 이용자의 의도를 벗어나 허용 범위를 넘어서는 방식으로 과업을 수행하려는 시도를 방지하기 위해, 아르곤의 추론 과정과 행동을 모니터링하고 필요시 실행을 중단하는 정렬 불일치 완화 조치(misalignment mitigations)를 적용하고 있습니다. 구글은 모델 학습 과정에서도 유사한 시스템을 활용해 학습 실행을 모니터링하고 전담 사고 대응팀에 알림을 전송하게 했습니다. 또한, 아르곤이 모니터링을 회피하는 방향으로 추론 방식을 학습할 위험을 방지하기 위해, 탐지 결과를 다시 학습에 반영하지 않도록 세심한 주의를 기울였습니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:997#s56",
+    "source": "GeekNews",
+    "text": "구글은 모델 학습 과정에서도 유사한 시스템을 활용해 학습 실행을 모니터링하고 전담 사고 대응팀에 알림을 전송하게 했습니다. 또한, 아르곤이 모니터링을 회피하는 방향으로 추론 방식을 학습할 위험을 방지하기 위해, 탐지 결과를 다시 학습에 반영하지 않도록 세심한 주의를 기울였습니다. 구글은 모델의 성능이 비약적으로 발전하고 정렬 리스크를 신중히 다루어야 하는 이 중대한 시점에, 모델의 사고 과정이 정렬 불일치 위험을 감지하고 진단하는 데 계속해서 유의미하게 활용되도록 업계 전반이 추론 투명성(reasoning transparency)을 지켜나갈 것 것을 강력히 권고합니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:997#s57",
+    "source": "GeekNews",
+    "text": "또한, 아르곤이 모니터링을 회피하는 방향으로 추론 방식을 학습할 위험을 방지하기 위해, 탐지 결과를 다시 학습에 반영하지 않도록 세심한 주의를 기울였습니다. 구글은 모델의 성능이 비약적으로 발전하고 정렬 리스크를 신중히 다루어야 하는 이 중대한 시점에, 모델의 사고 과정이 정렬 불일치 위험을 감지하고 진단하는 데 계속해서 유의미하게 활용되도록 업계 전반이 추론 투명성(reasoning transparency)을 지켜나갈 것 것을 강력히 권고합니다. 시스템 보안 강화: 프론티어 모델의 역량이 고도화됨에 따라, 이를 안전하게 테스트하기 위해서는 모델의 발전 속도에 맞춘 안전한 보안 환경이 필수적입니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:997#s58",
+    "source": "GeekNews",
+    "text": "구글은 모델의 성능이 비약적으로 발전하고 정렬 리스크를 신중히 다루어야 하는 이 중대한 시점에, 모델의 사고 과정이 정렬 불일치 위험을 감지하고 진단하는 데 계속해서 유의미하게 활용되도록 업계 전반이 추론 투명성(reasoning transparency)을 지켜나갈 것 것을 강력히 권고합니다. 시스템 보안 강화: 프론티어 모델의 역량이 고도화됨에 따라, 이를 안전하게 테스트하기 위해서는 모델의 발전 속도에 맞춘 안전한 보안 환경이 필수적입니다. 구글은 에이전트 제어 로드맵(agent control roadmap)에 따라 고위험 모델 학습 및 평가를 시작하기 전에 샌드박스 환경을 완전히 격리·봉쇄(isolating and sealing)하여 보안성을 대폭 강화하고 있습니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:997#s59",
+    "source": "GeekNews",
+    "text": "시스템 보안 강화: 프론티어 모델의 역량이 고도화됨에 따라, 이를 안전하게 테스트하기 위해서는 모델의 발전 속도에 맞춘 안전한 보안 환경이 필수적입니다. 구글은 에이전트 제어 로드맵(agent control roadmap)에 따라 고위험 모델 학습 및 평가를 시작하기 전에 샌드박스 환경을 완전히 격리·봉쇄(isolating and sealing)하여 보안성을 대폭 강화하고 있습니다. 또한 생태계 전반의 보안 수준을 강화할 수 있도록 이러한 에이전트 보안 모범 사례를 파트너들과 적극 공유해 나갈 것입니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:997#s60",
+    "source": "GeekNews",
+    "text": "구글은 에이전트 제어 로드맵(agent control roadmap)에 따라 고위험 모델 학습 및 평가를 시작하기 전에 샌드박스 환경을 완전히 격리·봉쇄(isolating and sealing)하여 보안성을 대폭 강화하고 있습니다. 또한 생태계 전반의 보안 수준을 강화할 수 있도록 이러한 에이전트 보안 모범 사례를 파트너들과 적극 공유해 나갈 것입니다. 곧 만나보실 수 있습니다",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:997#s61",
+    "source": "GeekNews",
+    "text": "또한 생태계 전반의 보안 수준을 강화할 수 있도록 이러한 에이전트 보안 모범 사례를 파트너들과 적극 공유해 나갈 것입니다. 곧 만나보실 수 있습니다 제미나이 4 아르곤은 코딩, 지식 기반 업무, 사이버 보안 방어, 창의적 글쓰기 전반에 걸친 프론티어급 역량을 바탕으로, 개발자, 전문가, 그리고 엔터프라이즈들이 가장 까다로운 난제를 해결해 나가는 과정에서 든든한 파트너가 될 수 있도록 설계되었습니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   },
+   {
+    "id": "it:997#s62",
+    "source": "GeekNews",
+    "text": "곧 만나보실 수 있습니다 제미나이 4 아르곤은 코딩, 지식 기반 업무, 사이버 보안 방어, 창의적 글쓰기 전반에 걸친 프론티어급 역량을 바탕으로, 개발자, 전문가, 그리고 엔터프라이즈들이 가장 까다로운 난제를 해결해 나가는 과정에서 든든한 파트너가 될 수 있도록 설계되었습니다. 유료 API 이용자 및 구글 AI 울트라(Google AI Ultra) 구독자를 시작으로, 개발자, 엔터프라이즈, 일반 이용자에게 순차적으로 모델을 공개하기에 앞서, 실제 환경에서의 평가와 피드백을 통해 시스템을 한층 더 강화할 수 있도록 도움을 주고 계신 초기 사이버 보안 방어자 및 신뢰할 수 있는 테스터 여러분께 깊은 감사를 전합니다.",
+    "title": "제미나이 4 아르곤(Argon): 프론티어 인텔리전스의 새로운 시대",
+    "url": null
+   }
+  ],
+  "angle": "에이전트 작업 강화와 출시 기념 가격 구조",
+  "previous": null,
+  "code_warnings": [],
+  "round": 1
+ },
+ "expect": {
+  "status": "pass"
+ },
+ "note": "통과한 최종판(깨끗한 초안 가정, 라벨로 확인)"
+}

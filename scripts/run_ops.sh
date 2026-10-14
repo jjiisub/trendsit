@@ -26,8 +26,9 @@ except BlockingIOError:
   say "ops 잠금 사용 중: git pull·uv sync 건너뜀"
 else
   # 실패해도 기존 코드로 계속하되, ops가 runs 행(note, summary_json.pull_failed)에 남기게 환경 변수로 알린다. 서버가 멈춰도 60초 뒤 포기
-  if ! GIT_HTTP_LOW_SPEED_LIMIT=1000 GIT_HTTP_LOW_SPEED_TIME=60 git pull --ff-only origin main >>"$log" 2>&1; then
-    say "git pull 실패: 기존 코드로 계속"
+  # 실행 폴더는 배포 전용이라 로컬 변경을 만들지 않는다: fetch 뒤 origin/main으로 하드 리셋(머지 대신). data·site는 .gitignore라 보존
+  if ! { GIT_HTTP_LOW_SPEED_LIMIT=1000 GIT_HTTP_LOW_SPEED_TIME=60 git fetch origin main && git reset --hard origin/main; } >>"$log" 2>&1; then
+    say "git 동기화 실패: 기존 코드로 계속"
     export TRENDSIT_PULL_FAILED=1
   fi
   # 정확 동기화라 지정하지 않은 묶음을 지운다: 영상(video)과 임베딩 필터(embed) 둘 다

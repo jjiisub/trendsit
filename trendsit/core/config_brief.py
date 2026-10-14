@@ -16,7 +16,7 @@ class _Strict(BaseModel):
 
 class EvidenceCfg(_Strict):
     max_tokens_per_topic: int = Field(ge=1000)
-    max_refs_per_point: int = Field(ge=1, le=5)
+    max_refs_per_paragraph: int = Field(ge=1, le=6)
     video_relevance_high: float = Field(gt=0, le=1)
 
 
@@ -79,27 +79,55 @@ class SelectCfg(_Strict):
 
 class HighlightsCfg(_Strict):
     summary: int
-    overview: int
-    per_point: int
+    per_paragraph: int
     page: tuple[int, int]
 
 
-class DiagramsCfg(_Strict):
-    numbers_groups_max: int
-    events_groups_max: int
+class WriteInputCfg(_Strict):
+    text_chars: int = Field(ge=100)
+    transcript_chars: int = Field(ge=100)
+
+
+class SummaryCfg(_Strict):
+    sentences: tuple[int, int]
+    chars_max: int
+
+
+class SectionsCfg(_Strict):
+    single_source: tuple[int, int]
+    multi_source: tuple[int, int]
+
+
+class ParagraphsCfg(_Strict):
+    per_section: tuple[int, int]
+    sentences_max: int
+    chars_max: int
+
+
+class TableCfg(_Strict):
+    rows: tuple[int, int]
+    cols: tuple[int, int]
 
 
 class WriteCfg(_Strict):
-    points: dict[Literal["single_source", "multi_source"], tuple[int, int]]
-    overview_sentences: tuple[int, int]
-    summary_sentences: tuple[int, int]
+    input: WriteInputCfg
+    summary: SummaryCfg
+    sections: SectionsCfg
+    paragraphs: ParagraphsCfg
+    heading_chars_max: int
+    head_tiles_max: int
+    tiles_per_section: tuple[int, int]
+    visuals_max: int
+    visuals_target: tuple[int, int]
+    bars_items: tuple[int, int]
+    table: TableCfg
+    slides_max: int
+    video_secs_max: int
     highlights: HighlightsCfg
-    diagrams: DiagramsCfg
-    concepts_max: int
 
-    def points_for(self, n_sources: int) -> tuple[int, int]:
-        """작성자 points 개수 범위: 근거 소스가 둘 이상이면 multi_source."""
-        return self.points["multi_source" if n_sources > 1 else "single_source"]
+    def sections_for(self, n_sources: int) -> tuple[int, int]:
+        """작성자 sections 개수 범위: 근거 소스가 둘 이상이면 multi_source."""
+        return self.sections.multi_source if n_sources > 1 else self.sections.single_source
 
 
 class ReviewCfg(_Strict):

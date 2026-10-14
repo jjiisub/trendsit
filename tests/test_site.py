@@ -74,18 +74,17 @@ def inside(el, cls=None, id_=None) -> bool:
     return any((cls and cls in c) or (id_ and i == id_) for _, c, i in el["chain"])
 
 
-# ---------- A3 ----------
-def test_a3_diagrams_after_anchor_point_and_source_numbers(site):
+# ---------- A3(v2 5.8) ----------
+def test_a3_sections_order_visual_after_first_paragraph_and_source_numbers(site):
     d = dom(site, "topic/w41-long")
-    pts = [e["id"] for e in d.find("li", "pt")]
-    assert pts == ["pt-1", "pt-2", "pt-3", "pt-4", "pt-5"]
+    secs = [e["id"] for e in d.find("section", "dsec")]
+    assert secs == ["sec-0", "sec-1", "sec-2", "sec-3", "sec-4"]
     figs = d.find("figure")
-    # C-8: 도식은 모두 anchor 포인트(2번) 안, 포인트 문장 다음에. 같은 포인트에서 수치 → 사건 → 타임라인
-    assert [tuple(c for c in f["cls"] if c != "dg") for f in figs] == [("dg-bars",), ("dg-events",), ("dg-video",)]
-    assert all(inside(f, id_="pt-2") for f in figs)
-    p2 = [e for e in d.els if inside(e, id_="pt-2")]
-    assert next(i for i, e in enumerate(p2) if "pt-x" in e["cls"]) < next(i for i, e in enumerate(p2) if e["tag"] == "figure")
-    assert d.find("ol", "vtl") and inside(d.find("ol", "vtl")[0], id_="pt-2")  # 영상 v1을 처음 인용한 포인트
+    assert [tuple(c for c in f["cls"] if c != "dg") for f in figs] == [("dg-bars",), ("dg-events",), ("simg",)]
+    assert inside(figs[0], id_="sec-1") and inside(figs[1], id_="sec-2") and inside(figs[2], id_="sec-4")
+    p1 = [e for e in d.els if inside(e, id_="sec-1")]
+    assert next(i for i, e in enumerate(p1) if "dp" in e["cls"]) < next(i for i, e in enumerate(p1) if e["tag"] == "figure")
+    assert d.find("ol", "vgo") and inside(d.find("ol", "vgo")[0], id_="sec-4")  # 영상 구간이 있는 절 아래
     # 출처 번호: 채널 순(글 → 영상 → 레포), 채널 안 id 순
     refs = {e["href"]: e["text"] for e in d.find("a", "ref")}
     assert [refs[f"#src-{i}"] for i in ("s1", "s6", "v1", "v2", "g1", "g4")] == ["[1]", "[6]", "[7]", "[8]", "[9]", "[12]"]
@@ -97,47 +96,64 @@ def test_a3_diagrams_after_anchor_point_and_source_numbers(site):
     html = (site / "topic/w41-long/index.html").read_text(encoding="utf-8")
     tip_v2 = re.search(r'<span class="tip"[^>]*>(?:(?!</span></span></span>).)*출처 목록 \[8\]', html).group(0)
     assert "원문 열기" not in tip_v2 and html.count("원본 <a href=") == 1
-    # 도식 없는 토픽에는 도식 없음, 수치 막대는 anchor 1번 포인트 아래
+    # 영상 출처 아래 전체 타임라인
+    assert d.find("ol", "vtl")
+    # 도식 없는 토픽에는 도식 없음, 수치 막대는 그 절 안
     assert not dom(site, "topic/w41-one").find("figure")
     mid = dom(site, "topic/w41-mid")
-    assert [inside(f, id_="pt-1") for f in mid.find("figure")] == [True]
+    assert [inside(f, id_="sec-0") for f in mid.find("figure")] == [True]
 
 
 def test_a3_topic_blocks_order_and_links(site):
     html = (site / "topic/w41-long/index.html").read_text(encoding="utf-8")
-    order = [html.index(x) for x in ('id="h-ov"', 'id="h-pt"', 'id="h-cc"', 'id="h-cb"', 'id="h-src"', 'class="pn"')]
+    order = [html.index(x) for x in ('id="sec-0"', 'id="sec-4"', 'id="h-src"', 'class="pn"')]
     assert order == sorted(order)
     assert html.index('class="follow"') < order[0] and "/topic/w40-base/" in html  # 대상이 있는 후속은 지난 흐름 링크
+    assert "개요" not in html and "핵심 포인트" not in html and "핵심 개념" not in html  # 옛 섹션 제목 없음
     assert 'class="follow"' not in (site / "topic/w41-one/index.html").read_text(encoding="utf-8")  # 대상 없는 후속은 링크 없음
     one = dom(site, "topic/w41-one")
     assert not one.find("nav", "pn") or all("w41-" in (e["href"] or "") for e in one.find("a", "pn-next") + one.find("a", "pn-prev"))
     assert "<script" not in html and 'title="' not in html
 
 
-# ---------- A4 ----------
+def test_a3_head_tiles_class_matches_count(site):
+    d = dom(site, "topic/w41-long")
+    wrap = d.find("div", "tiles")
+    assert wrap and f"n{len(d.find('div', 'tile'))}" in wrap[0]["cls"]
+
+
+def test_a3_video_secs_links(site):
+    html = (site / "topic/w41-long/index.html").read_text(encoding="utf-8")
+    assert "&t=920s" in html and "&t=110s" in html
+
+
+# ---------- A4(v2 C-9) ----------
 class ChkWalk(HTMLParser):
     def __init__(self, html):
         super().__init__()
-        self.depth_end, self.chk, self.chk_in_end, self.stack = 0, 0, 0, []
+        self.chk, self.stack = 0, []
         self.feed(html)
 
     def handle_starttag(self, tag, attrs):
         cls = dict(attrs).get("class", "").split()
-        self.stack.append((tag, "nb-end" in cls))
+        self.stack.append(tag)
         if "chk" in cls:
             self.chk += 1
-            self.chk_in_end += any(e for _, e in self.stack[:-1])
 
     def handle_endtag(self, tag):
-        while self.stack and self.stack.pop()[0] != tag:
+        while self.stack and self.stack.pop() != tag:
             pass
 
 
-@pytest.mark.parametrize("tid,total,in_points", [("w41-long", 3, 1), ("w41-one", 0, 0), ("w41-mid", 0, 0), ("w40-base", 0, 0)])
-def test_a4_check_marks(site, tid, total, in_points):
+@pytest.mark.parametrize("tid,total", [("w41-long", 1), ("w41-one", 0), ("w41-mid", 0), ("w40-base", 0)])
+def test_a4_check_marks(site, tid, total):
     w = ChkWalk((site / "topic" / tid / "index.html").read_text(encoding="utf-8"))
-    assert w.chk == total  # C-9: 포인트 1(points[0]) + 개요 + 개념[0]. '빠진 도식'은 표시 안 함
-    assert w.chk_in_end == in_points  # 포인트의 표기는 인용과 같은 .nb-end 묶음 안
+    assert w.chk == total  # C-9: 절 하나(sections[0])만 확인 필요. '빠진 시각 요소'는 표시 안 함
+
+
+def test_a4_check_mark_target_matches_meta_link(site):
+    html = (site / "topic/w41-long/index.html").read_text(encoding="utf-8")
+    assert '<a class="fu" href="#chk-1">확인 필요</a>' in html and 'id="chk-1"' in html
 
 
 def test_a4_home_meta_has_check(site):
@@ -145,6 +161,7 @@ def test_a4_home_meta_has_check(site):
     items = html.split('<li class="it">')[1:]
     assert ["확인 필요" in re.search(r'<p class="tmeta.*?</p>', i).group(0) for i in items] == [True, False, False]
     assert 'class="chk"' not in html  # 홈 메타의 표기는 .chk가 아니라 글자만
+    assert '<a class="fu" href="#chk-1">' not in html  # 홈에서는 그 토픽 페이지 안의 앵커로 가지 않음(링크 없는 글자)
 
 
 # ---------- A5~A7: 정적 검사가 실제로 잡아내는가 ----------
@@ -187,7 +204,7 @@ def test_c10_bad_input_keeps_site_untouched(site, tmp_path):
     broken.write_text("{ 깨짐", encoding="utf-8")
     assert run_build(broken, out).returncode == 1
     data = json.loads(FIXTURE.read_text(encoding="utf-8"))
-    del data["topics"][0]["points"]  # 렌더링 도중 실패
+    del data["topics"][0]["sections"]  # 렌더링 도중 실패
     half = tmp_path / "half.json"
     half.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
     assert run_build(half, out).returncode == 1
@@ -282,7 +299,7 @@ def test_f01_no_broken_markup_in_real_shaped_points(site):
     html = (site / "topic/w41-mid/index.html").read_text(encoding="utf-8")
     assert not re.search(r"<\w+ <", html) and 'class="nb">' not in re.sub(r"<[^>]+>", "", html)
     assert ChkWalk(html).stack == []  # 태그가 어긋나면 스택이 비지 않음
-    assert '<span class="nb-end"><span class="nb">43</span>점&nbsp;' in html
+    assert '<span class="nb-end"><span class="nb">43</span>점.&nbsp;' in html
 
 
 def test_f01_checker_catches_broken_markup(site, tmp_path):
@@ -362,13 +379,16 @@ def test_f50_literal_markup_text_in_data_is_kept_and_passes_m1(site, tmp_path):
     import io
 
     sys.path.insert(0, str(ROOT / "site_src"))
+    import shutil
+
     import check
 
     data = json.loads(FIXTURE.read_text(encoding="utf-8"))
     t = next(t for t in data["topics"] if t["id"] == "w41-one")
-    t["points"][0]["text"] = 'HTML 태그 `<span class="x">`를 쓰고 &amp; 문제 &#x27; 확인'
+    t["sections"][0]["paragraphs"][0]["text"] = 'HTML 태그 `<span class="x">`를 쓰고 &amp; 문제 &#x27; 확인'
     p = tmp_path / "s.json"
     p.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+    shutil.copytree(FIXTURE.parent / "slides", tmp_path / "slides")  # w41-long의 슬라이드는 --data 옆 slides/(5.9)
     out = tmp_path / "site"
     assert run_build(p, out).returncode == 0
     html = (out / "topic/w41-one/index.html").read_text(encoding="utf-8")
@@ -379,6 +399,29 @@ def test_f50_literal_markup_text_in_data_is_kept_and_passes_m1(site, tmp_path):
     with contextlib.redirect_stdout(io.StringIO()):
         check.static_checks(out, data, pages)
     assert not [n for n, ok, _ in check.results if n.startswith("M-1") and not ok]
+
+
+def test_t_query_on_non_video_source_link_is_not_flagged(site, tmp_path):
+    """006-C1-17: &t= 쿼리가 있는 글 출처 링크(.vgo·.vtl·.simg 밖)는 A9 시점 링크 검사 대상이 아니다(오탐 방지)."""
+    import contextlib
+    import io
+    import shutil
+
+    sys.path.insert(0, str(ROOT / "site_src"))
+    import check
+
+    bad = tmp_path / "site"
+    shutil.copytree(site, bad)
+    f = bad / "topic/w41-long/index.html"
+    html = f.read_text(encoding="utf-8")
+    assert "</main>" in html
+    f.write_text(html.replace("</main>", '<p><a href="https://x.example/post?id=1&t=5s">글 출처</a></p></main>', 1), encoding="utf-8")
+    check.results.clear()
+    pages = {p: check.parse(p) for p in sorted(bad.rglob("*.html"))}
+    with contextlib.redirect_stdout(io.StringIO()):
+        check.static_checks(bad, json.loads(FIXTURE.read_text(encoding="utf-8")), pages)
+    bad_names = [n for n, ok, _ in check.results if not ok]
+    assert not any("&t=" in n for n in bad_names), bad_names
 
 
 def test_f68_evidence_ids_stripped_from_diagram_context(site, tmp_path):
@@ -414,6 +457,8 @@ def test_f59_build_restores_old_site_when_site_missing(tmp_path):
 
 # ---------- F39 수집 URL 스킴 ----------
 def test_f39_only_http_urls_become_links(tmp_path):
+    import shutil
+
     data = json.loads(FIXTURE.read_text(encoding="utf-8"))
     t = next(t for t in data["topics"] if t["id"] == "w41-one")
     t["sources"][0]["url"] = "javascript:alert(1)"
@@ -422,6 +467,7 @@ def test_f39_only_http_urls_become_links(tmp_path):
     data["sources"][0]["url"] = "vbscript:x"
     p = tmp_path / "s.json"
     p.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+    shutil.copytree(FIXTURE.parent / "slides", tmp_path / "slides")  # w41-long의 슬라이드는 --data 옆 slides/(5.9)
     out = tmp_path / "site"
     assert run_build(p, out).returncode == 0
     pages = "".join(f.read_text(encoding="utf-8") for f in out.rglob("*.html"))

@@ -1,0 +1,97 @@
+{
+ "input": {
+  "plan": {
+   "rank": 2,
+   "angle": "질문 맥락에 맞는 화면 실시간 구성",
+   "relation": {
+    "type": "follow_up",
+    "topic_id": "w40-gpt-6-1-sol"
+   }
+  },
+  "evidence": [
+   {
+    "id": "it:1100",
+    "source": "OpenAI News",
+    "text": "[it:1100#s1] Last month we introduced the first GPT‑6 models for paid customers and today we're bringing that next generation of intelligence to more people with a new GPT‑6 model built for more than 1.2 billion people who use ChatGPT each week.\n[it:1100#s2] GPT‑6 in ChatGPT introduces Intelligent UI, a new capability that allows ChatGPT to answer quickly with fully interactive user interfaces that make everyday answers more visual, make learning complex topics easier and that can quickly create a tool to solve a task right in the moment.\n[it:1100#s3] We’ve trained GPT‑6 to compose responses using text, visuals and interactive elements, choosing how they fit together based on your question.\n[it:1100#s4] With Intelligent UI, responses can include graphics, tappable buttons, forms, charts, and interactive experiences you can use directly in your conversation.\n[it:1100#s5] The format depends on what you’re asking.\n[it:1100#s6] A comparison might work best side by side.\n[it:1100#s7] An explanation might be easier to understand through an interactive diagram.\n[it:1100#s8] And when a simple text answer is the most useful response, ChatGPT can give you that.\n[it:1100#s9] ChatGPT can make a plan easier to follow by showing how it fits together.\n[it:1100#s10] The timing for a Sunday roast can sit alongside the recipe, or the stops on a road trip can appear on a map, with notes on what’s worth a detour.\n[it:1100#s11] Visual and interactive explanations let you explore how something works, change an input to see what happens, or work through a problem step by step.\n[it:1100#s12] You can also ask ChatGPT to create a tool for the task at hand, such as a calculator to explore how savings could grow, a bill splitter for dinner with friends, or a game you can play in the conversation.\n[it:1100#s13] With Intelligent UI, we gave GPT‑6 the freedom to create the most useful interface for each question, while keeping the experience fast and familiar across web and mobile.\n[it:1100#s14] We built a library of native, streamable components, along with a compiler that processes the interface as the model generates it.\n[it:1100#s15] The library gives each response a familiar design foundation while leaving the model room to decide how the pieces fit together.\n[it:1100#s16] The compiler allows the interface to appear progressively as the model generates it, without waiting for the entire response to be complete.\n[it:1100#s17] We expanded our training methods to help the model make thoughtful decisions about content, layout, visuals, and interaction.\n[it:1100#s18] This included evaluating the interfaces it creates for clarity, usefulness, and completeness.\n[it:1100#s19] GPT‑6 learned to use the component library and make good design decisions, including how to organize information clearly, when to use interactivity, and when a simple text response is enough.\n[it:1100#s20] There's still work ahead to improve the model's design judgment and expand what it can create, but Intelligent UI marks a significant shift in how people interact with ChatGPT.\n[it:1100#s21] Instead of fitting every question into the same conversational format, ChatGPT can combine UI, data, and actions to create entirely new ways for people to explore, understand, and interact with information.\n[it:1100#s22] With GPT‑6, we’re also making it possible for ChatGPT to begin answering while it continues to think.\n[it:1100#s23] With the introduction of reasoning models, users could get help with much harder problems, but had to wait for the model to finish thinking before getting an answer.\n[it:1100#s24] Now, ChatGPT can interleave thinking with answering.\n[it:1100#s25] We trained it to take into account the user’s waiting time and progressively compose an answer using its knowledge and findings up to that point.\n[it:1100#s26] It learned to build answers across multiple partial responses, each adding useful information without unnecessary filler, while keeping the full answer as cohesive and factual as one written all at once.\n[it:1100#s27] In an internal evaluation of high-value, everyday agentic tasks, GPT‑6 Extra High is able to begin answering in the same amount of time as GPT‑5.6 Medium while achieving a better overall score than GPT‑5.6 Extra High.\n[it:1100#s28] For questions that need web search, GPT‑6 Instant starts answering 44% sooner, on average, than GPT‑5.6 Instant.\n[it:1100#s29] GPT‑6 also improves the quality of answers that require web search.\n[it:1100#s30] It makes better decisions about when to look something up and more reliably finds information that supports its answer.\n[it:1100#s31] In an internal evaluation of difficult problems, GPT‑6 correctly addressed the key aspect of the user’s question more often than GPT‑5.6.\n[it:1100#s32] As we bring more intelligent AI to more people, we work to improve how it recognizes real-world risks, how honestly it responds, and how well it respects the limits that people set.\n[it:1100#s33] GPT‑6 makes progress in each of these areas, building on several of Astra’s safety advances to better resist attempts to bypass its safety training, follow safeguards, and be clearer about what it can and can’t do relative to GPT‑5.6 Sol.\n[it:1100#s34] We updated its safety training based on lessons from real-world use to strengthen protections against high-risk misuse involving cyberattacks, biological threats, and violence.\n[it:1100#s35] In adversarial testing, GPT‑6 showed stronger resistance to attempts to bypass its safety training, particularly attacks that adapt across multiple turns.\n[it:1100#s36] GPT‑6 is also trained to respond safely in higher-risk scenarios while avoiding unnecessary refusals of harmless requests.\n[it:1100#s37] This includes using conversation history and relevant context to recognize risks that may not be apparent from a single prompt.\n[it:1100#s38] We ran alignment evaluations throughout training, assessing honesty and responses to safety restrictions.\n[it:1100#s39] GPT‑6 is better at recognizing and communicating the limits of its own capabilities, including when it lacks the information or tools needed to answer.\n[it:1100#s40] More detail on the results and our review is available in the system card(opens in a new window).\n[it:1100#s41] GPT‑6 with Intelligent UI starts rolling out globally to ChatGPT Plus, Pro, Business and Enterprise tiers today in the Chat tab.\n[it:1100#s42] Starting tomorrow, the rollout expands to Free and Go tiers.\n[it:1100#s43] Enterprise availability depends on workplace admin settings.",
+    "title": "GPT-6 and Intelligent UI for everyone",
+    "url": "https://openai.com/index/gpt-6-for-everyone"
+   },
+   {
+    "id": "it:1172",
+    "source": "AI타임스",
+    "text": "[it:1172#s1] 오픈AI가 텍스트 중심의 기존 챗봇에서 벗어나, 질문의 맥락에 맞는 화면과 기능을 실시간으로 구성하는 ‘지능형 UI(Intelligent UI)’를 탑재한 ‘GPT-6’를 공개했다.\n[it:1172#s2] 질문에 따라 차트와 버튼, 입력창, 지도, 계산기 등 다양한 인터랙티브 요소를 조합해 답변 자체를 하나의 맞춤형 도구처럼 제공하는 것이 특징이다.\n[it:1172#s3] 오픈AI는 7일(현지시간) GPT-6가 주간 12억명 이상이 사용하는 챗GPT를 대상으로 확대 적용된다고 밝혔다.\n[it:1172#s4] 지난달 유료 고객을 대상으로 GPT-6 모델을 처음 선보인 데 이어 이번에는 챗GPT 사용자 전체로 적용 범위를 넓힌다.\n[it:1172#s5] 지능형 UI는 GPT-6가 질문의 의도를 파악한 뒤 답변에 가장 적합한 인터페이스를 스스로 구성하는 기능이다.\n[it:1172#s6] 기존처럼 모든 질문에 동일한 텍스트 형식으로 답하는 대신 질문의 성격에 따라 시각 자료와 상호작용 요소를 배치한다.\n[it:1172#s7] 예를 들어 두 가지 제품이나 개념을 비교할 때는 나란히 비교할 수 있는 화면을 만들고, 복잡한 개념을 설명할 때는 사용자가 직접 값을 변경해 결과를 확인할 수 있는 인터랙티브 다이어그램을 제공한다.\n[it:1172#s8] 여행 계획을 요청하면 방문 경로와 주요 장소를 지도에 표시하고 우회해서 들를 만한 곳을 함께 보여줄 수 있다.\n[it:1172#s9] 요리법을 물으면 레시피 옆에 각 단계의 소요 시간을 표시하는 식으로 계획을 시각화할 수도 있다.\n[it:1172#s10] 필요하면 특정 작업을 위한 도구를 대화 중에 직접 만들 수도 있다.\n[it:1172#s11] 저축액이 어떻게 늘어나는지 확인하는 계산기나 친구들과 식사비를 나누는 계산기, 대화창에서 바로 실행할 수 있는 간단한 게임 등을 생성할 수 있다.\n[it:1172#s12] GPT-6 and Intelligent UI, now rolling out in ChatGPT for everyone.\n[it:1172#s13] Intelligent UI in ChatGPT delivers fast, interactive answers that make everyday questions more visual, complex topics easier to grasp, and interactive tools for your task available on the spot.\n[it:1172#s14] pic.twitter.com/XL2gDCPBwG\n[it:1172#s15] — OpenAI (@OpenAI) October 7, 2026\n[it:1172#s16] 오픈AI는 이를 위해 자체적인 네이티브 스트리밍 컴포넌트 라이브러리와 컴파일러를 구축했다.\n[it:1172#s17] 모델이 답변을 생성하는 동시에 인터페이스도 구성하고, 완성된 결과를 한꺼번에 보여주는 대신 필요한 요소부터 차례로 화면에 표시하는 방식이다.\n[it:1172#s18] 이 때문에 사용자는 AI가 전체 답변을 완성할 때까지 기다리지 않고 답변과 인터페이스가 만들어지는 과정을 점진적으로 확인할 수 있다.\n[it:1172#s19] 오픈AI는 웹과 모바일에서 익숙한 디자인을 유지하면서도 GPT-6가 질문마다 가장 적합한 UI를 선택하도록 설계했다고 설명했다.\n[it:1172#s20] GPT-6는 콘텐츠와 레이아웃, 시각 요소, 상호작용의 필요성을 판단하는 능력도 학습했다.\n[it:1172#s21] 오픈AI는 모델이 생성한 인터페이스를 명확성, 유용성, 완성도 등의 기준으로 평가하면서 어떤 정보를 어떻게 배치해야 하는지 훈련했다고 밝혔다.\n[it:1172#s22] 단순한 텍스트가 가장 효과적인 질문에는 기존처럼 텍스트로 답할 수도 있다.\n[it:1172#s23] 사용자가 원하지 않는 경우 시각적 요소를 줄이는 것도 가능하다.\n[it:1172#s24] 챗GPT의 다른 개인화 기능과 마찬가지로 조정할 수 있도록 했다.\n[it:1172#s25] GPT-6는 답변 속도도 개선했다.\n[it:1172#s26] 특히 모델이 복잡한 문제를 추론하는 동안 사용자가 결과를 기다려야 했던 기존 방식에서 벗어나, 생각하는 과정과 답변을 병행할 수 있도록 했다.\n[it:1172#s27] 이 모델은 현재까지 확보한 정보와 추론 결과를 활용해 먼저 유용한 내용을 답하고, 이후 추가로 얻은 정보를 이용해 답변을 계속 보완한다.\n[it:1172#s28] 여러 차례에 걸쳐 답변을 구성하더라도 최종적으로 하나의 일관된 답변처럼 연결되도록 학습했다.\n[it:1172#s29] 내부 평가에서는 일상형 에이전트 작업에서 'GPT-6 엑스트라 하이(Extra High)'는 이전 버전인 'GPT-5.6 미디엄(Medium)'과 비슷한 시간에 답변을 시작하면서도, 'GPT-5.6 엑스트라 하이'보다 높은 종합 점수를 기록했다.\n[it:1172#s30] 웹 검색이 필요한 질문에서는 'GPT-6 인스턴트(Instant)'가 'GPT-5.6 인스턴트'보다 평균 44% 빠르게 답변을 시작하는 것으로 나타났다.\n[it:1172#s31] 검색이 필요한 상황을 판단하는 능력과 답변을 뒷받침할 정보를 찾는 능력도 개선됐다는 설명이다.\n[it:1172#s32] 안전성도 강화했다.\n[it:1172#s33] 여러 차례의 대화를 통해 안전장치를 우회하려는 공격에 대한 저항력을 높였으며, 사이버 공격과 생물학적 위협, 폭력 등 고위험 영역에서 AI가 악용되는 것을 막기 위한 안전 학습을 강화했다.\n[it:1172#s34] 동시에 정상적인 요청을 불필요하게 거부하는 문제를 줄이는 데도 초점을 맞췄다.\n[it:1172#s35] 대화의 이전 내용과 관련 맥락을 활용해 한 번의 질문만으로는 드러나지 않는 위험을 파악하도록 했으며, 자신에게 필요한 정보나 도구가 없을 때 이를 더 명확하게 설명하도록 훈련했다.\n[it:1172#s36] GPT-6와 지능형 UI는 이날부터 챗GPT 플러스, 프로, 비즈니스, 엔터프라이즈 사용자를 대상으로 글로벌 출시된다.\n[it:1172#s37] 다음 날부터 무료 및 고(Go) 사용자로 확대된다.\n[it:1172#s38] 엔터프라이즈 이용 가능 여부는 기업 관리자의 설정에 따라 달라질 수 있다.\n[it:1172#s39] 유료 사용자에게는 ‘GPT-6 솔’, 무료와 Go 이용자에게는 ‘GPT-6 루나’가 제공된다.\n[it:1172#s40] 두 모델 모두 일상적인 대화와 작업에 맞춰 조정됐다.\n[it:1172#s41] 이번 업데이트는 챗GPT의 채팅 경험에 적용되며, 업무용 ‘챗GPT 워크’와 코딩용 ‘코덱스’를 구동하는 모델은 변경되지 않는다.\n[it:1172#s42] 박찬 기자 cpark@aitimes.com",
+    "title": "오픈AI, 질문에 맞춰 화면 생성하는 'GPT-6' 공개...전 사용자 무료 적용",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=216059"
+   }
+  ],
+  "previous": {
+   "topic_id": "w40-gpt-6-1-sol",
+   "title": "GPT-6.1 Sol: Astra급 지능 5분의 1 가격",
+   "summary": "OpenAI가 GPT-6 Astra에 가까운 지능을 5분의 1 가격으로 제공하는 GPT-6.1 Sol을 공개했다. 캐시 입력 $0.10으로 에이전트 실행 비용을 95%까지 낮추는 것이 핵심이고, 고난도 과학 연구와 출력 토큰 소모가 남은 쟁점이다.",
+   "headings": [
+    "Astra급 지능을 5분의 1 가격으로 제공",
+    "캐시 입력 $0.10으로 에이전트 실행 비용 95% 절감",
+    "코딩·컴퓨터 사용·과학 연구에서 Astra에 근접",
+    "전문 업무·사실 정확성에서 경쟁 모델 대비 우위",
+    "출시 범위와 남은 쟁점"
+   ]
+  },
+  "aliases": [
+   {
+    "canonical": "GPT-6 Luna",
+    "aliases": [
+     "GPT-6 루나"
+    ]
+   },
+   {
+    "canonical": "GPT-6 Sol",
+    "aliases": [
+     "GPT-6 솔"
+    ]
+   }
+  ],
+  "limits": {
+   "sections": [
+    4,
+    7
+   ],
+   "paragraphs_per_section": [
+    1,
+    2
+   ],
+   "paragraph_sentences_max": 4,
+   "paragraph_chars_max": 320,
+   "summary_sentences": [
+    1,
+    2
+   ],
+   "summary_chars_max": 200,
+   "heading_chars_max": 70,
+   "head_tiles_max": 4,
+   "tiles_per_section": [
+    2,
+    3
+   ],
+   "visuals_max": 4,
+   "bars_items": [
+    2,
+    6
+   ],
+   "table_rows": [
+    2,
+    6
+   ],
+   "table_cols": [
+    2,
+    4
+   ],
+   "slides_max": 2,
+   "video_secs_max": 3,
+   "max_refs_per_paragraph": 4
+  },
+  "slide_candidates": [],
+  "no_visuals": false
+ },
+ "expect": {},
+ "note": "2026-W41 실제 토픽 입력(run 20261013-205302-weekly-b981)"
+}

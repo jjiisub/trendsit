@@ -1,125 +1,60 @@
-"""골든 회귀(S5-1a 5.1): 저장된 W40·W41 현재판의 모든 토픽 × 모든 라운드 판에 코드 검사를 다시 돌려 JSON으로 남긴다.
+"""골든 회귀(S6-1 5.11 B1, D-31): v2 픽스처(tests/fixtures/s6_1/topic_v2.json)에 코드 검사(checks.py)를 다시
+돌려 JSON으로 남긴다. 실DB·LLM·임베딩 호출 없음. 이후 스펙은 이 결과가 reports/S6-1/golden.json과 완전히
+같은지로 회귀를 잰다(옛 실DB 전후 비교 방식은 D-31로 폐기).
 
-실행: uv run python scripts/s5_1_golden.py --out <path> [--db data/trendsit.db] [--before <golden.json> --removals <표.json>]
-DB는 읽기 전용으로 연다. --before가 있으면 현재판이 아니라 그 파일의 runs(같은 run_id)로 계산한다. LLM·임베딩 호출 없음. 종료 코드: 0 성공, 1 전후 차이가 의도한 제거 표와 다름, 2 DB·run 없음.
---before/--removals(S5-1b B1): 이번 결과와 --before의 차이가 --removals 표와 정확히 같아야 한다. 차이의 단위는 이슈 한 건,
-자동 수정 한 건, 경고 한 건이고 "금지 표현: a, b"는 낱말마다 한 건으로 센다. 표 한 줄은 차이 한 건에 대응한다.
+실행: uv run python scripts/s5_1_golden.py --out <path> [--fixture tests/fixtures/s6_1/topic_v2.json] [--golden <golden.json>]
+종료 코드: 0 성공(또는 --golden과 일치), 1 --golden과 다름.
 """
 
 from __future__ import annotations
 
 import argparse
 import json
-import sqlite3
 import sys
-from collections import Counter
 from pathlib import Path
-from types import SimpleNamespace
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from trendsit.brief import aliases as al  # noqa: E402
 from trendsit.brief import checks  # noqa: E402
-from trendsit.brief.evidence import cap_pack, pack_index, week_evidence  # noqa: E402
-from trendsit.brief.write import alias_lines  # noqa: E402
+from trendsit.brief.evidence import EvidenceItem  # noqa: E402
 from trendsit.core import config  # noqa: E402
 from trendsit.core.artifacts_brief import TopicPage  # noqa: E402
 
-WEEKS = ("2026-W40", "2026-W41")
+DEFAULT_FIXTURE = ROOT / "tests" / "fixtures" / "s6_1" / "topic_v2.json"
 
 
-def _units(pages: list[dict]) -> Counter:
-    out: Counter = Counter()
-    for p in pages:
-        key = (p["topic_id"], p["round"])
-        for i in p["issues"]:
-            head, sep, rest = i["comment"].partition(" 금지 표현: ")
-            for text in ([f"{head}{sep}{w}" for w in rest.split(", ")] if sep else [i["comment"]]):
-                out[(*key, "issue", text)] += 1
-        out.update((*key, "autofix", f["rule"]) for f in p["autofix"])
-        out.update((*key, "warning", w) for w in p["warnings"])
-    return out
-
-
-def check_removals(before: Path, after: list[dict], removals: Path) -> str | None:
-    """전후 차이가 의도한 제거 표와 같으면 None, 아니면 첫 불일치."""
-    old = _units(json.loads(before.read_text(encoding="utf-8"))["pages"])
-    new = _units(after)
-    if added := new - old:
-        return f"전에 없던 결과: {next(iter(added))}"
-    rows = json.loads(removals.read_text(encoding="utf-8"))
-    for unit in (old - new).elements():
-        hit = next((r for r in rows if (r["topic_id"], r["round"], r["kind"]) == unit[:3] and unit[3].startswith(r["match"])), None)
-        if hit is None:
-            return f"표에 없는 제거: {unit}"
-        rows.remove(hit)
-    return f"차이로 나타나지 않은 표 항목: {rows[0]}" if rows else None
+def run(fixture: Path) -> list[dict]:
+    cfg = config.load("brief.yaml")
+    entries = json.loads(fixture.read_text(encoding="utf-8"))
+    pages = []
+    for e in entries:
+        page = TopicPage.model_validate(e["page"])
+        pack = {k: [EvidenceItem(**it) for it in v] for k, v in e["pack"].items()}
+        n_sources = e["n_sources"]
+        cr = checks.run_checks(page, pack, n_sources, cfg, {}, e.get("slide_candidates", []), set(e.get("timeline_secs", [])))
+        pages.append({
+            "topic_id": e["topic_id"],
+            "issues": [{"loc": i.loc, "type": i.type, "comment": i.comment} for i in cr.issues],
+            "autofix": [{"loc": f["loc"], "rule": f["rule"]} for f in cr.autofix],
+            "warnings": cr.warnings})
+    return pages
 
 
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", required=True)
-    ap.add_argument("--before")
-    ap.add_argument("--removals")
-    ap.add_argument("--db", default=str(ROOT / "data" / "trendsit.db"))
+    ap.add_argument("--fixture", default=str(DEFAULT_FIXTURE))
+    ap.add_argument("--golden")
     args = ap.parse_args()
-    if not Path(args.db).exists():
-        print(f"DB 없음: {args.db}", file=sys.stderr)
-        return 2
-    conn = sqlite3.connect(f"file:{args.db}?mode=ro", uri=True)
-    conn.row_factory = sqlite3.Row
-    db = SimpleNamespace(conn=conn)
-    if args.before:  # 전후 비교는 --before가 기록한 run으로 고정(그 뒤 weekly 재실행으로 현재판이 바뀌어도 같은 판을 비교)
-        runs = json.loads(Path(args.before).read_text(encoding="utf-8"))["runs"]
-        for w, run in runs.items():
-            if conn.execute("SELECT 1 FROM runs WHERE id=?", (run,)).fetchone() is None or not conn.execute(
-                    "SELECT 1 FROM topics WHERE run_id=?", (run,)).fetchone():
-                print(f"--before의 run이 DB에 없음: {w} {run}", file=sys.stderr)
-                return 2
-    else:
-        runs = {}
-        for w in WEEKS:
-            r = conn.execute("SELECT current_run_id FROM weeks WHERE week=?", (w,)).fetchone()
-            if r is None or not r[0]:
-                print(f"run 없음: {w}", file=sys.stderr)
-                return 2
-            runs[w] = r[0]
-    cfg = config.load("brief.yaml")
-    tl = cfg.aliases.transliteration
-    pages = []
-    for week, run in runs.items():
-        ev = week_evidence(db, week)  # type: ignore[arg-type]
-        table = al.decided_table(db, list(ev.members.values()), cfg)  # type: ignore[arg-type]
-        for t in conn.execute("SELECT topic_id, cluster_ids_json FROM topics WHERE run_id=? ORDER BY rank, topic_id", (run,)):
-            cids = json.loads(t["cluster_ids_json"])
-            members = list(dict.fromkeys(
-                r["member"] for cid in cids for r in conn.execute(
-                    "SELECT member FROM cluster_items WHERE cluster_id=? ORDER BY rowid", (cid,))))
-            ms = [ev.members[k] for k in members if k in ev.members]
-            kept, _ = cap_pack(ms, cfg.evidence.max_tokens_per_topic)
-            pack = pack_index(kept)
-            n_sources = len({it.member for it in kept})
-            canon = {a: c.canonical for c in alias_lines(table, ms) for a in c.aliases}
-            translit = []
-            for name in sorted({n for m in ms for n in m.entities if n.strip()}):
-                target = al.to_original(table.canonical(name), tl)
-                if (pat := al.translit_pattern(target, tl)) is not None:
-                    translit.append((pat, target))
-            for p in conn.execute("SELECT round, page_json, raw_json FROM topic_pages WHERE run_id=? AND topic_id=? ORDER BY round",
-                                  (run, t["topic_id"])):
-                page = TopicPage.model_validate_json(p["raw_json"] if p["round"] == 1 and p["raw_json"] else p["page_json"])
-                cr = checks.run_checks(page, pack, n_sources, cfg, canon, translit)
-                pages.append({
-                    "topic_id": t["topic_id"], "round": p["round"],
-                    "issues": [{"loc": i.loc, "type": i.type, "comment": i.comment} for i in cr.issues],
-                    "autofix": [{"loc": f["loc"], "rule": f["rule"]} for f in cr.autofix],
-                    "warnings": cr.warnings})
-    Path(args.out).write_text(json.dumps({"runs": runs, "pages": pages}, ensure_ascii=False, sort_keys=True, indent=1) + "\n",
-                              encoding="utf-8")
-    if args.before and args.removals and (msg := check_removals(Path(args.before), pages, Path(args.removals))):
-        print(f"골든 차이 != 의도한 제거: {msg}", file=sys.stderr)
-        return 1
+    pages = run(Path(args.fixture))
+    text = json.dumps({"pages": pages}, ensure_ascii=False, sort_keys=True, indent=1) + "\n"
+    Path(args.out).write_text(text, encoding="utf-8")
+    if args.golden:
+        golden = Path(args.golden).read_text(encoding="utf-8")
+        if text != golden:
+            print("golden.json과 다름(코드 검사 결과가 바뀜)", file=sys.stderr)
+            return 1
     return 0
 
 

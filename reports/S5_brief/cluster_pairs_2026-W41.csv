@@ -1,204 +1,410 @@
 a,b,cross_channel,sim,route,decided,answer,confidence,same_cluster,reason
 it:1111,it:1132,0,0.9572,auto,0,,,1,
+rp:anthropics/claude-code,rp:openai/codex,0,0.9001,none,0,,,0,
+rp:mvschwarz/openrig,rp:openai/codex,0,0.8744,none,0,,,0,
+rp:anthropics/claude-code,rp:mvschwarz/openrig,0,0.8405,none,0,,,0,
 it:1219,it:1249,0,0.825,auto,0,,,1,
-rp:mvschwarz/openrig,rp:thedotmack/claude-mem,0,0.8142,none,0,,,0,
+rp:ollama/ollama,rp:openai/codex,0,0.8133,none,0,,,0,
+rp:NousResearch/hermes-agent,rp:mvschwarz/openrig,0,0.8066,none,0,,,0,
 it:1100,it:1172,0,0.8039,auto,0,,,1,
 it:1132,it:1183,0,0.798,decide,1,1,0.95,1,"a, b 모두 Google의 EmbeddingGemma 2 모델 공개를 다룸"
 it:1161,it:1165,0,0.7944,decide,1,0,0.8,0,"a는 서피스 랩톱 울트라 출시에 맞춰 공개된 MAI-코드-1.1 플래시의 온디바이스 최적화 버전(모델 성능·축소)에 초점을 맞춘 글, b는 서피스 랩톱 울트라 하드웨어 자체의 공개와 온디바이스 AI 전략 발표를 다룸 → 같은 발표 이벤트(서피스 랩톱 울트라 출시)의 일부이지만, a는 특정 모델 최적화, b는 하드웨어/전략 발표로 대상이 다름"
+rp:mvschwarz/openrig,rp:thedotmack/claude-mem,0,0.7942,none,0,,,0,
+rp:NousResearch/hermes-agent,rp:openai/codex,0,0.785,none,0,,,0,
+rp:openai/codex,rp:thedotmack/claude-mem,0,0.7798,none,0,,,0,
+rp:mvschwarz/openrig,rp:ollama/ollama,0,0.7688,none,0,,,0,
+it:1342,it:1377,0,0.7611,decide,1,1,0.95,1,"a는 마이크로소프트의 '디시전-1' 모델 공개를 다루며, b는 'Microsoft-Decision-1' 모델의 상세 스펙과 벤치마크를 다루므로 같은 대상"
 it:1149,it:1182,0,0.7558,decide,1,0,0.95,0,"a는 구글 클라우드의 기업용 '제미나이 에이전트' 출시, b는 구글 제미나이의 개인용 '제미나이 콜링' 기능 확대 → 다른 제품"
-it:1122,rp:mvschwarz/openrig,1,0.7379,decide,1,1,0.95,1,"a는 OpenRig 오케스트레이터 소개, b는 OpenRig 공식 레포 → 같은 제품"
+rp:NousResearch/hermes-agent,rp:thedotmack/claude-mem,0,0.7518,none,0,,,0,
+rp:anthropics/claude-code,rp:thedotmack/claude-mem,0,0.7497,none,0,,,0,
+rp:NousResearch/hermes-agent,rp:Panniantong/Agent-Reach,0,0.749,none,0,,,0,
+it:1122,rp:mvschwarz/openrig,1,0.7432,decide,1,1,0.95,1,"a는 OpenRig 오케스트레이터 소개, b는 OpenRig 공식 레포 → 같은 제품"
+it:1191,it:1348,0,0.7396,decide,1,0,0.95,0,"a는 호주 청문회에서의 규제 찬성, b는 백악관의 사고 보고 의무화 발표 → 다른 사건"
+rp:ollama/ollama,rp:thedotmack/claude-mem,0,0.7386,none,0,,,0,
+rp:NousResearch/hermes-agent,rp:ollama/ollama,0,0.7354,none,0,,,0,
 it:1179,it:1180,0,0.7327,decide,1,0,0.95,0,"a는 Claude Opus 5.5의 구독 가치 분석, b는 Claude Haiku 5.5 출시 발표 → 같은 회사지만 다른 모델 라인업"
-rp:Panniantong/Agent-Reach,rp:mvschwarz/openrig,0,0.7306,none,0,,,0,
+rp:anthropics/claude-code,rp:ollama/ollama,0,0.7282,none,0,,,0,
+rp:Panniantong/Agent-Reach,rp:openai/codex,0,0.7276,none,0,,,0,
 it:1111,it:1183,0,0.7258,decide,1,1,0.95,1,"a, b 모두 Google DeepMind의 EmbeddingGemma 2 모델 공개를 다룸"
+rp:NousResearch/hermes-agent,rp:anthropics/claude-code,0,0.7157,none,0,,,0,
 it:1046,it:1198,0,0.7153,decide,1,1,0.95,1,"a는 Mistral Large 4 공식 발표, b는 Mistral Large 4 공개 및 벤치마크 보도 → 같은 모델"
 it:1044,it:1046,0,0.7146,decide,1,0,0.95,0,"a는 llm-mistral 0.16 릴리스, b는 Mistral Large 4 모델 출시 발표 → 다른 대상"
 it:1191,it:1246,0,0.7079,decide,1,0,0.9,0,"a는 호주 청문회 출석 및 규제 찬성, b는 전 세계적 법적·규제 경고 및 IPO 연기 등 다른 사건을 다룸"
+it:1160,it:1342,0,0.7075,decide,1,0,0.95,0,"a는 리퀴드 AI의 d1-3B 모델 출시, b는 마이크로소프트의 디시전-1 모델 공개 → 다른 회사의 다른 모델"
+rp:Panniantong/Agent-Reach,rp:mvschwarz/openrig,0,0.707,none,0,,,0,
 it:1179,it:1206,0,0.7053,decide,1,0,0.95,0,"a는 AI 구독 서비스의 가격 대비 가치 비교 분석, b는 기업들의 클로드 사용량 축소 사건 → 다른 주제"
+it:1112,rp:mvschwarz/openrig,1,0.7045,decide,1,0,0.95,0,"a는 OpenMuse, b는 openrig → 서로 다른 에이전트 도구"
 it:1122,it:1138,0,0.7039,decide,1,0,0.95,0,"a는 OpenRig, b는 Lemma → 서로 다른 오픈소스 에이전트 오케스트레이션/워크스페이스 도구"
-it:1102,it:1156,0,0.6964,decide,1,1,0.95,1,a와 b 모두 OpenAI가 내부 프런티어 모델을 이용해 수학 문제를 해결하고 결과를 공개한 동일한 발표를 다룸
+it:1149,it:1381,0,0.7026,decide,1,1,0.95,1,"a는 '제미나이 에이전트' 출시, b는 'Gemini agent' 발표 → 같은 제품"
+it:1185,it:1307,0,0.6979,decide,1,0,0.95,0,"a는 구글 워크스페이스 연동 기능, b는 대시보드·모션 등 다른 제품군 공개 → 다른 발표"
+it:1102,it:1156,0,0.6964,decide,1,1,0.95,1,a와 b 모두 OpenAI가 내부 프런티어 모델로 생성한 수학 결과를 GitHub에 공개한 동일한 발표를 다룸
 it:1041,it:1209,0,0.696,decide,1,1,0.95,1,"a, b 모두 OpenAI의 'rogue' 에이전트가 위키미디어 재단에서 일으킨 활동과 5월 장애 연관성을 다룸"
+it:1181,it:1344,0,0.6956,decide,1,0,0.95,0,"a는 구글의 '나노 바나나 2.1', b는 알리바바의 '큐원 이미지 2.1 터보' → 다른 회사의 다른 모델"
+it:1112,rp:openai/codex,1,0.6951,none,0,,,0,
 it:1106,it:1207,0,0.6923,decide,1,1,0.95,1,a와 b 모두 OpenAI가 ChatGPT에 시각적 광고 포맷을 도입하는 발표를 다룸
 it:1046,it:1048,0,0.6892,decide,1,1,0.9,1,"a는 Mistral Large 4 출시 발표, b는 Mistral Large 4를 포함한 모델들의 벤치마크 테스트 → 같은 모델"
-it:1105,it:1225,0,0.6832,decide,1,1,0.95,1,"a, b 모두 OpenAI의 textGrain 워터마킹 기술 도입 및 EU 적용 발표를 다룸"
-it:1138,rp:mvschwarz/openrig,1,0.6794,decide,1,0,0.95,0,"a는 Lemma, b는 openrig → 서로 다른 오픈소스 에이전트 팀워크 도구"
+it:1169,it:1335,0,0.6888,decide,1,0,,0,대체 출력: LLMError
+rp:Panniantong/Agent-Reach,rp:anthropics/claude-code,0,0.6846,none,0,,,0,
+it:1348,it:1350,0,0.6835,decide,1,0,,0,대체 출력: LLMError
+it:1105,it:1225,0,0.6832,decide,1,0,,0,대체 출력: LLMError
+it:1307,it:1338,0,0.6831,decide,1,0,,0,대체 출력: LLMError
+it:1112,rp:NousResearch/hermes-agent,1,0.679,none,0,,,0,
 it:1171,it:1239,0,0.6757,decide,1,0,0.95,0,"a는 스페이스X의 GPU 구매 자금 조달, b는 아마존의 AI 칩 매각 후 리스 구조 → 다른 회사의 다른 재무 이벤트"
-it:1144,it:1180,0,0.6743,decide,1,1,0.95,1,"a는 Claude Haiku 5.5의 가격 구조 분석, b는 Claude Haiku 5.5 출시 발표 → 같은 모델"
-it:1112,rp:mvschwarz/openrig,1,0.6736,decide,1,0,0.95,0,"a는 OpenMuse, b는 openrig → 서로 다른 오픈소스 에이전트 도구"
-it:1120,vd:kcflfXb6dBM,1,0.6733,decide,1,0,0.9,0,"a는 'AI 네이티브 SDLC'라는 특정 방법론/프레임워크를 소개하는 글, b는 AI 코드 워크플로우의 미래와 개발자 역량 변화에 대한 일반적인 논의 영상 → 다른 대상"
+rp:Panniantong/Agent-Reach,rp:ollama/ollama,0,0.6751,none,0,,,0,
+it:1232,it:1338,0,0.6744,decide,1,0,,0,대체 출력: LLMError
+it:1144,it:1180,0,0.6743,decide,1,1,0.95,1,"a는 Claude Haiku 5.5, b는 클로드 하이쿠 5.5(음차)로 같은 모델의 출시를 다룸"
+it:1120,vd:kcflfXb6dBM,1,0.6733,decide,1,0,0.9,0,"a는 Claude 공식 블로그의 'AI 네이티브 SDLC' 프로세스를 다루고, b는 AI 코드 워크플로우의 미래와 개발자 역량 변화에 대한 일반적 논의 영상 → 다른 대상"
+rp:heygen-com/hyperframes,rp:mvschwarz/openrig,0,0.6704,none,0,,,0,
+it:1341,it:1393,0,0.6696,decide,1,0,0.95,0,"a는 엔비디아가 d-매트릭스에 투자하는 사건, b는 엔비디아가 리플렉션 AI를 인수·투자하는 사건 → 대상 회사가 다름"
+it:1240,it:1310,0,0.6692,decide,1,0,,0,대체 출력: LLMError
+it:1348,it:1352,0,0.6683,decide,1,0,,0,대체 출력: LLMError
+rp:earthtojake/text-to-cad,rp:mvschwarz/openrig,0,0.6665,none,0,,,0,
 it:1044,it:1048,0,0.663,decide,1,0,0.95,0,"a는 llm-mistral 0.16 릴리스, b는 Mistral Large 4 벤치마크 테스트 → 다른 대상"
 it:1180,it:1186,0,0.6616,decide,1,0,0.95,0,"a는 클로드 하이쿠 5.5 모델 출시, b는 클로드 포 스타트업 지원 프로그램 확대 → 다른 대상"
-rp:mvschwarz/openrig,rp:tile-ai/tilelang,0,0.6616,none,0,,,0,
-it:1144,it:1179,0,0.6611,decide,1,0,0.95,0,"a는 Claude Haiku 5.5의 가격 구조 분석, b는 Claude Opus 5.5와 GPT-6.1 Sol의 구독 가치 비교 → 다른 모델"
+it:1144,it:1179,0,0.6611,decide,1,0,,0,대체 출력: LLMError
+rp:anthropics/claude-code,rp:cursor/plugins,0,0.6609,none,0,,,0,
 it:1191,it:1219,0,0.6597,decide,1,0,0.95,0,"a는 호주 의회 청문회, b는 뉴욕시의회 청문회 → 장소와 주제가 다른 별개의 사건"
 it:1186,it:1206,0,0.6593,decide,1,0,0.95,0,"a는 앤트로픽의 스타트업 지원 프로그램 '클로드 포 스타트업' 확대 발표, b는 MS·메타의 클로드 사내 사용 축소 및 앤트로픽의 기업 시장 성장 현황 → 다른 사건"
 it:1191,it:1204,0,0.6588,decide,1,0,0.95,0,"a는 호주 의회 청문회에서의 에이전트 사고 신고 의무화 지지, b는 알트먼의 규제 접근법 인터뷰 및 앤트로픽의 과학 연구 방법론 → 다른 사건"
-rp:Panniantong/Agent-Reach,rp:thedotmack/claude-mem,0,0.6585,none,0,,,0,
+rp:anthropics/claude-code,rp:earthtojake/text-to-cad,0,0.658,none,0,,,0,
+it:1221,it:1350,0,0.6559,decide,1,0,,0,대체 출력: LLMError
+it:1138,rp:mvschwarz/openrig,1,0.6557,decide,1,0,0.95,0,"a는 Lemma라는 오픈소스 작업 공간, b는 openrig라는 에이전트 오케스트레이션 CLI → 다른 제품"
 it:1167,it:1188,0,0.6556,decide,1,0,0.95,0,"a는 SKT와 업스테이지의 AI 보안 협의체 출범, b는 SKT의 A.X K2 활용 단신 → 다른 사건"
+it:1138,rp:openai/codex,1,0.6539,decide,1,0,0.95,0,"a는 오픈소스 팀 작업 공간 Lemma, b는 OpenAI의 코딩 에이전트 CLI Codex → 다른 제품"
+it:1219,it:1352,0,0.6533,decide,1,0,0.95,0,"a는 뉴욕시의회가 개최한 AI 기업 임원 청문회, b는 AI 기업들의 내부 재난 시나리오 검토 → 다른 사건"
 it:1126,it:1138,0,0.6528,decide,1,0,0.95,0,"a는 Octop(셀프 호스팅 AI 비서), b는 Lemma(오픈소스 팀 작업 공간) → 다른 제품"
+it:1185,it:1338,0,0.6524,decide,1,0,0.95,0,"a는 구글 워크스페이스 연동 기능 출시, b는 클로드 웹의 음성 기능 포착 → 다른 기능/사건"
+it:1043,rp:ollama/ollama,1,0.6519,none,0,,,0,
+it:1102,it:1323,0,0.6517,decide,1,0,0.95,0,"a는 OpenAI의 프런티어 모델로 생성한 수학 결과 공개, b는 Lean 증명기 신뢰성과 AI 자동형식화 현황을 다루는 Thomas Hales의 기고문 → 다른 대상"
+rp:mvschwarz/openrig,rp:tile-ai/tilelang,0,0.6515,none,0,,,0,
 it:1191,it:1249,0,0.6513,decide,1,0,0.95,0,"a는 호주 의회 청문회, b는 뉴욕시의회 청문회 → 장소와 주제가 다른 별개의 사건"
 it:1180,it:1206,0,0.6512,decide,1,0,0.95,0,"a는 클로드 하이쿠 5.5 모델 출시, b는 MS·메타의 클로드(코드) 사용 축소 → 다른 대상"
+rp:anthropics/claude-code,rp:tile-ai/tilelang,0,0.6493,none,0,,,0,
 it:1210,it:1214,0,0.6487,decide,1,0,0.95,0,"a는 두산로보틱스의 피지컬 AI 국책과제 선정, b는 딥엑스-두산로보틱스의 원전 AI 용접 솔루션 협력 → 다른 사건"
+it:1138,vd:RVnSsolR3uE,1,0.6486,none,0,,,0,
 it:1148,it:1179,0,0.6484,none,0,,,0,
 it:1190,it:1224,0,0.6484,none,0,,,0,
 it:1154,it:1243,0,0.6479,none,0,,,0,
-rp:heygen-com/hyperframes,rp:mvschwarz/openrig,0,0.6465,none,0,,,0,
+it:1138,rp:anthropics/claude-code,1,0.6471,decide,1,0,0.95,0,"a는 오픈소스 팀 작업 공간 Lemma, b는 Anthropic의 코딩 에이전트 Claude Code → 다른 제품"
+it:1205,it:1393,0,0.6469,decide,1,0,0.95,0,"a는 리플렉션 AI의 모델 '빔' 공개, b는 엔비디아의 리플렉션 AI 인수·투자 논의 → 다른 사건"
+rp:openai/codex,rp:tile-ai/tilelang,0,0.6467,none,0,,,0,
+it:1163,it:1345,0,0.6441,none,0,,,0,
+it:1160,it:1377,0,0.6425,none,0,,,0,
+it:1044,rp:ollama/ollama,1,0.6418,none,0,,,0,
+it:1186,it:1307,0,0.6415,none,0,,,0,
+it:1186,it:1338,0,0.6412,none,0,,,0,
+rp:anthropics/claude-code,rp:heygen-com/hyperframes,0,0.6396,none,0,,,0,
 it:1112,rp:Panniantong/Agent-Reach,1,0.6395,none,0,,,0,
+rp:mattpocock/skills,rp:mvschwarz/openrig,0,0.6395,none,0,,,0,
+rp:Panniantong/Agent-Reach,rp:thedotmack/claude-mem,0,0.6391,none,0,,,0,
 it:1193,it:1223,0,0.6389,decide,1,0,0.9,0,"a는 코덱스 2일차 업데이트(오토리뷰 무료화), b는 코덱스 28일 개선 이벤트 발표 및 1일차 업데이트(속도 향상) → 같은 이벤트의 다른 날짜 업데이트"
+it:1171,it:1341,0,0.6387,none,0,,,0,
+rp:NousResearch/hermes-agent,rp:tile-ai/tilelang,0,0.6387,none,0,,,0,
+rp:earthtojake/text-to-cad,rp:openai/codex,0,0.6377,none,0,,,0,
+vd:eTtZlAPA9H4,vd:sAu_4QuAI0w,0,0.6373,none,0,,,0,
+it:1376,vd:kcflfXb6dBM,1,0.637,none,0,,,0,
 it:1159,it:1217,0,0.6351,none,0,,,0,
+rp:heygen-com/hyperframes,rp:openai/codex,0,0.6349,none,0,,,0,
+it:1112,rp:anthropics/claude-code,1,0.6348,none,0,,,0,
+it:1219,it:1348,0,0.6339,none,0,,,0,
 it:1179,vd:31XD1O74pks,1,0.6325,none,0,,,0,
-it:1112,rp:thedotmack/claude-mem,1,0.6322,none,0,,,0,
 it:1229,it:1250,0,0.6322,decide,1,0,0.95,0,"a는 도서 『CEO의 AI』 소개, b는 도서 『AI 루프를 설계하라』 소개 → 다른 책"
-it:1045,it:1111,0,0.6319,decide,1,1,0.95,1,"a, b 모두 EmbeddingGemma 2 모델을 다룸"
+it:1045,it:1111,0,0.6319,decide,1,0,,0,대체 출력: LLMError
 it:1172,it:1207,0,0.6319,decide,1,0,0.95,0,"a는 GPT-6 모델 공개 및 지능형 UI 도입, b는 챗GPT 내 시각적 광고 도입 → 다른 사안"
+rp:NousResearch/hermes-agent,rp:mattpocock/skills,0,0.6315,none,0,,,0,
+it:1131,vd:sAu_4QuAI0w,1,0.631,none,0,,,0,
+it:1043,it:1377,0,0.6295,none,0,,,0,
+rp:mvschwarz/openrig,vd:RVnSsolR3uE,1,0.628,none,0,,,0,
+it:1249,it:1348,0,0.6273,none,0,,,0,
+rp:openai/codex,vd:RVnSsolR3uE,1,0.6265,none,0,,,0,
+it:1127,it:1351,0,0.6259,none,0,,,0,
 it:1149,it:1230,0,0.6253,none,0,,,0,
+it:1191,it:1304,0,0.6245,none,0,,,0,
+it:1112,rp:ollama/ollama,1,0.6243,none,0,,,0,
 it:1204,vd:wrii8VocfZU,1,0.6232,none,0,,,0,
-rp:cursor/plugins,rp:mvschwarz/openrig,0,0.623,none,0,,,0,
 it:1163,it:1211,0,0.6227,none,0,,,0,
+it:1122,rp:openai/codex,1,0.6226,decide,1,0,0.95,0,"a는 Claude Code와 Codex를 오케스트레이션하는 OpenRig, b는 OpenAI의 Codex CLI 자체 → 다른 대상"
+it:1239,it:1341,0,0.6225,none,0,,,0,
 it:1209,it:1246,0,0.6222,none,0,,,0,
-it:1138,rp:thedotmack/claude-mem,1,0.621,none,0,,,0,
+rp:cursor/plugins,rp:mvschwarz/openrig,0,0.6219,none,0,,,0,
+rp:NousResearch/hermes-agent,rp:earthtojake/text-to-cad,0,0.6204,none,0,,,0,
+rp:NousResearch/hermes-agent,rp:heygen-com/hyperframes,0,0.6204,none,0,,,0,
+it:1149,it:1353,0,0.6201,decide,1,0,0.95,0,"a는 기업용 솔루션 '제미나이 에이전트' 출시, b는 모델 '제미나이 4 아르곤'의 후속 '카본' 테스트 → 다른 대상"
+it:1206,it:1307,0,0.6194,decide,1,0,0.95,0,"a는 MS·메타의 클로드 사용 축소, b는 앤트로픽의 Claude Dashboards·Motion 공개 → 다른 사건"
 it:1156,it:1231,0,0.6193,none,0,,,0,
+it:1204,it:1348,0,0.6183,decide,1,0,0.95,0,"a는 알트먼의 규제 관련 인터뷰, b는 앤트로픽 보안 사고에 따른 백악관 의무화 조치 → 다른 사건"
+rp:NousResearch/hermes-agent,vd:0kVsv2WlL44,1,0.6172,none,0,,,0,
 it:1191,it:1209,0,0.6168,none,0,,,0,
 it:1247,it:1249,0,0.6167,none,0,,,0,
+it:1112,rp:thedotmack/claude-mem,1,0.6165,none,0,,,0,
 it:1186,it:1242,0,0.6165,none,0,,,0,
-it:1120,it:1131,0,0.6144,decide,1,0,0.95,0,"a는 AI 네이티브 SDLC 재설계 방법론, b는 소프트웨어 팩토리 패턴 시도 → 다른 개발 접근법"
-it:1161,it:1206,0,0.6132,decide,1,0,0.95,0,"a는 MAI-코드-1.1 플래시 온디바이스 최적화 공개, b는 MS·메타의 클로드 사용 축소 → 다른 대상"
+it:1120,it:1131,0,0.6144,decide,0,,,0,
+vd:5tdMgKkX5dU,vd:8DRjkp_X8yY,0,0.6133,none,0,,,0,
+it:1161,it:1206,0,0.6132,decide,0,,,0,
 rp:Panniantong/Agent-Reach,rp:heygen-com/hyperframes,0,0.613,none,0,,,0,
 it:1219,it:1247,0,0.6129,none,0,,,0,
 it:1179,it:1186,0,0.6122,none,0,,,0,
-it:1045,it:1132,0,0.6117,decide,1,1,0.95,1,"a, b 모두 EmbeddingGemma 2 모델을 다룸"
-it:1204,it:1246,0,0.6109,decide,1,0,0.95,0,"a는 알트먼의 규제 관련 인터뷰, b는 오픈AI 에이전트 보안 사고와 규제 조사 → 다른 사건"
+it:1045,it:1132,0,0.6117,decide,0,,,0,
+it:1120,it:1376,0,0.6117,decide,0,,,0,
+vd:D7q8fa589FY,vd:HjQ1G1NvvHQ,0,0.6114,none,0,,,0,
+it:1204,it:1246,0,0.6109,decide,0,,,0,
 it:1185,it:1186,0,0.6106,none,0,,,0,
+it:1191,it:1352,0,0.6098,none,0,,,0,
+rp:mattpocock/skills,rp:openai/codex,0,0.6091,none,0,,,0,
+it:1048,rp:openai/codex,1,0.6089,none,0,,,0,
+it:1161,it:1342,0,0.6089,none,0,,,0,
+it:1194,it:1349,0,0.6089,none,0,,,0,
+rp:ollama/ollama,rp:tile-ai/tilelang,0,0.6089,none,0,,,0,
 it:1180,vd:31XD1O74pks,1,0.6085,none,0,,,0,
+it:1141,rp:ollama/ollama,1,0.6082,none,0,,,0,
 it:1149,it:1183,0,0.6065,none,0,,,0,
+it:1191,it:1350,0,0.6065,none,0,,,0,
 it:1204,it:1249,0,0.6061,none,0,,,0,
-rp:cursor/plugins,rp:thedotmack/claude-mem,0,0.6061,none,0,,,0,
+rp:cursor/plugins,rp:openai/codex,0,0.6059,none,0,,,0,
+rp:NousResearch/hermes-agent,rp:cursor/plugins,0,0.6054,none,0,,,0,
+vd:5tdMgKkX5dU,vd:sAu_4QuAI0w,0,0.6052,none,0,,,0,
 it:1219,it:1246,0,0.6051,none,0,,,0,
+rp:anthropics/claude-code,vd:RVnSsolR3uE,1,0.605,none,0,,,0,
+vd:5bg469hWGGc,vd:D7q8fa589FY,0,0.6036,none,0,,,0,
+it:1246,it:1304,0,0.6025,decide,0,,,0,
+it:1050,rp:mvschwarz/openrig,1,0.6021,none,0,,,0,
 it:1159,vd:31XD1O74pks,1,0.6014,none,0,,,0,
+it:1048,rp:ollama/ollama,1,0.6012,none,0,,,0,
+it:1138,rp:thedotmack/claude-mem,1,0.6004,none,0,,,0,
 it:1204,it:1219,0,0.5986,none,0,,,0,
-rp:thedotmack/claude-mem,rp:tile-ai/tilelang,0,0.5986,none,0,,,0,
+it:1239,it:1393,0,0.5983,none,0,,,0,
+rp:earthtojake/text-to-cad,rp:heygen-com/hyperframes,0,0.5981,none,0,,,0,
 it:1125,it:1130,0,0.598,none,0,,,0,
 rp:Panniantong/Agent-Reach,rp:cursor/plugins,0,0.5973,none,0,,,0,
-rp:heygen-com/hyperframes,rp:thedotmack/claude-mem,0,0.5971,none,0,,,0,
+rp:cursor/plugins,rp:thedotmack/claude-mem,0,0.5971,none,0,,,0,
 it:1131,vd:kcflfXb6dBM,1,0.5965,none,0,,,0,
-rp:mvschwarz/openrig,vd:eTtZlAPA9H4,1,0.5965,none,0,,,0,
 it:1191,it:1221,0,0.5955,none,0,,,0,
+it:1122,rp:anthropics/claude-code,1,0.5952,decide,0,,,0,
 it:1238,vd:D7q8fa589FY,1,0.5952,none,0,,,0,
+it:1206,it:1338,0,0.5951,decide,0,,,0,
+it:1335,it:1345,0,0.5951,none,0,,,0,
+it:1180,it:1307,0,0.5949,none,0,,,0,
 it:1112,it:1138,0,0.5948,none,0,,,0,
-it:1207,it:1241,0,0.5935,decide,1,0,0.95,0,"a는 챗GPT 이미지 생성 기능에 시각적 광고 도입, b는 챗GPT 의류 가상 착용(Try On) 기능 출시 → 다른 기능 발표"
+rp:thedotmack/claude-mem,rp:tile-ai/tilelang,0,0.5942,none,0,,,0,
+it:1207,it:1241,0,0.5935,decide,0,,,0,
+it:1246,it:1352,0,0.5924,decide,0,,,0,
+it:1163,rp:NousResearch/hermes-agent,1,0.5923,none,0,,,0,
+rp:thedotmack/claude-mem,vd:0kVsv2WlL44,1,0.592,none,0,,,0,
+rp:mvschwarz/openrig,vd:eTtZlAPA9H4,1,0.5919,none,0,,,0,
+vd:0kVsv2WlL44,vd:D7q8fa589FY,0,0.5913,none,0,,,0,
 it:1171,it:1213,0,0.591,none,0,,,0,
+it:1193,it:1310,0,0.5909,none,0,,,0,
+it:1204,it:1304,0,0.5909,decide,0,,,0,
 it:1043,it:1044,0,0.5901,none,0,,,0,
-it:1131,it:1138,0,0.5898,decide,1,0,0.95,0,"a는 소프트웨어 팩토리 패턴이라는 개발 방식과 Linear/Datadog 연동 에이전트 스킬 구현, b는 Lemma라는 오픈소스 팀 작업 공간 제품 소개 → 다른 대상"
-it:1126,rp:mvschwarz/openrig,1,0.5896,none,0,,,0,
+it:1131,it:1138,0,0.5898,decide,0,,,0,
+it:1212,it:1393,0,0.5894,none,0,,,0,
 it:1149,it:1178,0,0.5891,none,0,,,0,
-it:1155,it:1229,0,0.5884,decide,1,0,0.95,0,"a는 책 『이너 프롬프트』, b는 책 『CEO의 AI』 → 다른 도서"
+it:1193,vd:8DRjkp_X8yY,1,0.5891,none,0,,,0,
+it:1048,rp:mvschwarz/openrig,1,0.5889,none,0,,,0,
+it:1155,it:1229,0,0.5884,decide,0,,,0,
 it:1193,it:1240,0,0.5884,none,0,,,0,
+rp:cursor/plugins,rp:earthtojake/text-to-cad,0,0.5884,none,0,,,0,
 it:1112,it:1126,0,0.588,none,0,,,0,
 it:1209,it:1240,0,0.5875,none,0,,,0,
+it:1250,vd:HjQ1G1NvvHQ,1,0.5875,none,0,,,0,
+it:1141,rp:openai/codex,1,0.5872,none,0,,,0,
+it:1221,it:1348,0,0.5867,decide,0,,,0,
+rp:anthropics/claude-code,rp:mattpocock/skills,0,0.5865,none,0,,,0,
 it:1122,it:1126,0,0.5859,none,0,,,0,
+it:1138,rp:NousResearch/hermes-agent,1,0.5856,none,0,,,0,
+it:1243,it:1350,0,0.5854,none,0,,,0,
 it:1161,it:1217,0,0.5848,none,0,,,0,
+it:1111,rp:ollama/ollama,1,0.5847,none,0,,,0,
 it:1159,it:1188,0,0.5846,none,0,,,0,
-it:1048,rp:mvschwarz/openrig,1,0.5842,none,0,,,0,
 it:1126,rp:NVIDIA/OpenShell,1,0.584,none,0,,,0,
+it:1131,it:1376,0,0.5839,decide,0,,,0,
 it:1112,it:1169,0,0.5836,none,0,,,0,
+it:1148,it:1352,0,0.5828,none,0,,,0,
 it:1250,vd:kcflfXb6dBM,1,0.5825,none,0,,,0,
+rp:anthropics/claude-code,vd:oeL0uP-NO-U,1,0.582,decide,0,,,0,
+it:1163,it:1351,0,0.5818,none,0,,,0,
 it:1042,it:1246,0,0.5816,none,0,,,0,
-it:1103,it:1104,0,0.5806,decide,1,0,0.95,0,"a는 OpenAI와 Ironclad의 계약 업무 에이전트 평가, b는 Atlassian과 OpenAI의 파트너십 확대 및 Rovo 적용 → 다른 협력사·사건"
+it:1219,it:1391,0,0.5815,none,0,,,0,
+it:1239,it:1306,0,0.5814,none,0,,,0,
+rp:heygen-com/hyperframes,rp:thedotmack/claude-mem,0,0.5808,none,0,,,0,
+it:1103,it:1104,0,0.5806,decide,0,,,0,
 it:1164,it:1172,0,0.5804,none,0,,,0,
+it:1249,it:1352,0,0.5804,none,0,,,0,
+it:1179,it:1307,0,0.5803,none,0,,,0,
 it:1144,vd:31XD1O74pks,1,0.58,none,0,,,0,
 it:1250,vd:D7q8fa589FY,1,0.58,none,0,,,0,
 it:1159,it:1198,0,0.5797,none,0,,,0,
+vd:0kVsv2WlL44,vd:HjQ1G1NvvHQ,0,0.5797,none,0,,,0,
+it:1180,it:1338,0,0.5796,none,0,,,0,
 it:1160,it:1205,0,0.5795,none,0,,,0,
 it:1188,it:1189,0,0.5794,none,0,,,0,
+rp:earthtojake/text-to-cad,rp:thedotmack/claude-mem,0,0.5794,none,0,,,0,
 it:1165,it:1206,0,0.5793,none,0,,,0,
-it:1145,rp:thedotmack/claude-mem,1,0.5782,none,0,,,0,
+rp:earthtojake/text-to-cad,rp:tile-ai/tilelang,0,0.5793,none,0,,,0,
+it:1043,rp:openai/codex,1,0.5792,none,0,,,0,
+it:1376,vd:oeL0uP-NO-U,1,0.579,decide,0,,,0,
+it:1379,rp:NousResearch/hermes-agent,1,0.5785,none,0,,,0,
 it:1164,it:1193,0,0.5782,none,0,,,0,
+it:1247,it:1352,0,0.5777,none,0,,,0,
+it:1379,rp:mvschwarz/openrig,1,0.5774,none,0,,,0,
+rp:heygen-com/hyperframes,rp:ollama/ollama,0,0.5774,none,0,,,0,
 it:1193,rp:NVIDIA/OpenShell,1,0.5772,none,0,,,0,
-it:1043,it:1144,0,0.5768,decide,1,0,0.95,0,"a는 OpenAI의 Decisions API와 gpt-6-luna 모델을 다룸, b는 Anthropic의 Claude Haiku 5.5 모델을 다룸 → 다른 회사의 다른 모델"
+it:1043,it:1144,0,0.5768,decide,0,,,0,
 it:1167,it:1216,0,0.5768,none,0,,,0,
 it:1148,it:1236,0,0.5767,none,0,,,0,
-it:1182,it:1230,0,0.5766,decide,1,0,0.95,0,"a는 구글 제미나이의 전화 대행 기능(콜 포 미) 확대, b는 구글 AI 프로 요금제 할인 프로모션 → 다른 대상"
+it:1238,vd:8DRjkp_X8yY,1,0.5767,none,0,,,0,
+it:1182,it:1230,0,0.5766,decide,0,,,0,
+it:1247,it:1348,0,0.5764,none,0,,,0,
+it:1126,rp:mvschwarz/openrig,1,0.5763,none,0,,,0,
 it:1148,it:1156,0,0.5761,none,0,,,0,
-it:1185,it:1206,0,0.5757,decide,1,0,0.95,0,"a는 '클로드 포 구글 워크스페이스' 출시, b는 MS·메타의 클로드 사용 축소 → 다른 사건"
+it:1375,rp:anthropics/claude-code,1,0.5761,none,0,,,0,
+it:1149,rp:NousResearch/hermes-agent,1,0.576,none,0,,,0,
+it:1185,it:1206,0,0.5757,decide,0,,,0,
+it:1223,vd:RVnSsolR3uE,1,0.5756,none,0,,,0,
 it:1122,rp:NVIDIA/OpenShell,1,0.5753,none,0,,,0,
-it:1155,it:1250,0,0.5749,decide,1,0,0.95,0,"a는 책 『이너 프롬프트』 소개, b는 책 『AI 루프를 설계하라』 소개 → 다른 책"
+it:1155,it:1250,0,0.5749,decide,0,,,0,
+it:1145,rp:thedotmack/claude-mem,1,0.5748,none,0,,,0,
 it:1193,it:1211,0,0.5748,none,0,,,0,
+it:1379,rp:openai/codex,1,0.5748,none,0,,,0,
 it:1122,vd:eTtZlAPA9H4,1,0.5747,none,0,,,0,
+it:1212,it:1341,0,0.5741,decide,0,,,0,
 vd:kcflfXb6dBM,vd:oeL0uP-NO-U,0,0.5739,none,0,,,0,
 it:1238,vd:31XD1O74pks,1,0.5736,none,0,,,0,
 it:1210,it:1216,0,0.5735,none,0,,,0,
+it:1231,it:1303,0,0.5732,none,0,,,0,
 it:1165,vd:PACIHCnvNMo,1,0.5729,none,0,,,0,
+it:1232,it:1350,0,0.5729,none,0,,,0,
 rp:heygen-com/hyperframes,rp:tile-ai/tilelang,0,0.5727,none,0,,,0,
 it:1193,it:1238,0,0.5725,none,0,,,0,
 it:1198,it:1205,0,0.5724,none,0,,,0,
+it:1252,it:1348,0,0.5722,none,0,,,0,
 it:1164,it:1221,0,0.572,none,0,,,0,
 rp:cursor/plugins,rp:heygen-com/hyperframes,0,0.5718,none,0,,,0,
 it:1206,vd:31XD1O74pks,1,0.5717,none,0,,,0,
 it:1041,it:1042,0,0.5714,none,0,,,0,
-it:1122,rp:thedotmack/claude-mem,1,0.5714,none,0,,,0,
 it:1188,it:1210,0,0.5713,none,0,,,0,
+it:1204,it:1352,0,0.5713,decide,0,,,0,
 it:1117,it:1155,0,0.5712,none,0,,,0,
-it:1104,it:1138,0,0.571,decide,1,0,0.95,0,"a는 Atlassian과 OpenAI의 파트너십 확대 및 Rovo 적용, b는 오픈소스 작업 공간 Lemma 소개 → 다른 대상"
+it:1104,it:1138,0,0.571,decide,0,,,0,
+it:1041,it:1333,0,0.5709,none,0,,,0,
 it:1246,it:1249,0,0.5708,none,0,,,0,
 vd:6YuIp-MwPv4,vd:oeL0uP-NO-U,0,0.5703,none,0,,,0,
-it:1149,it:1190,0,0.5702,decide,1,0,0.95,0,"a는 구글 클라우드의 '제미나이 에이전트' 출시, b는 구글의 원전 전력 계약 체결 → 다른 사건"
+it:1149,it:1190,0,0.5702,decide,0,,,0,
 it:1112,it:1122,0,0.5701,none,0,,,0,
+vd:5tdMgKkX5dU,vd:D7q8fa589FY,0,0.5694,none,0,,,0,
+it:1193,vd:RVnSsolR3uE,1,0.5687,none,0,,,0,
+vd:8DRjkp_X8yY,vd:D7q8fa589FY,0,0.5687,none,0,,,0,
 it:1189,it:1211,0,0.5683,none,0,,,0,
 it:1214,it:1220,0,0.5683,none,0,,,0,
 it:1178,it:1250,0,0.5682,none,0,,,0,
+vd:5tdMgKkX5dU,vd:HjQ1G1NvvHQ,0,0.5679,none,0,,,0,
 it:1050,it:1112,0,0.5678,none,0,,,0,
 it:1165,it:1171,0,0.5675,none,0,,,0,
+it:1121,rp:anthropics/claude-code,1,0.5674,decide,0,,,0,
 it:1042,it:1191,0,0.5671,none,0,,,0,
+it:1122,rp:NousResearch/hermes-agent,1,0.5671,none,0,,,0,
 it:1191,it:1193,0,0.5671,none,0,,,0,
 it:1187,it:1210,0,0.5669,none,0,,,0,
+it:1376,vd:eTtZlAPA9H4,1,0.5667,none,0,,,0,
+it:1125,it:1376,0,0.5666,none,0,,,0,
+rp:thedotmack/claude-mem,vd:RVnSsolR3uE,1,0.5664,none,0,,,0,
+it:1156,it:1323,0,0.5662,decide,0,,,0,
+it:1122,vd:RVnSsolR3uE,1,0.5661,none,0,,,0,
+it:1308,it:1309,0,0.5659,none,0,,,0,
+it:1121,rp:thedotmack/claude-mem,1,0.5657,none,0,,,0,
 it:1251,vd:PACIHCnvNMo,1,0.5657,none,0,,,0,
 it:1125,vd:kcflfXb6dBM,1,0.565,none,0,,,0,
 it:1159,it:1205,0,0.5645,none,0,,,0,
+it:1116,it:1376,0,0.5641,none,0,,,0,
+vd:6YuIp-MwPv4,vd:8DRjkp_X8yY,0,0.564,none,0,,,0,
 it:1179,it:1185,0,0.5639,none,0,,,0,
+it:1046,rp:ollama/ollama,1,0.5637,none,0,,,0,
+it:1209,it:1352,0,0.5636,none,0,,,0,
+it:1165,it:1342,0,0.5634,none,0,,,0,
+vd:5tdMgKkX5dU,vd:kcflfXb6dBM,0,0.5634,none,0,,,0,
+it:1303,it:1307,0,0.5632,none,0,,,0,
 it:1211,vd:31XD1O74pks,1,0.563,none,0,,,0,
-it:1121,rp:thedotmack/claude-mem,1,0.5629,none,0,,,0,
 it:1190,vd:PACIHCnvNMo,1,0.5629,none,0,,,0,
 it:1245,vd:oeL0uP-NO-U,1,0.5627,none,0,,,0,
+rp:ollama/ollama,vd:31XD1O74pks,1,0.5622,none,0,,,0,
 it:1204,it:1247,0,0.5621,none,0,,,0,
 it:1159,it:1206,0,0.562,none,0,,,0,
 it:1129,it:1240,0,0.5614,none,0,,,0,
 it:1043,it:1046,0,0.5613,none,0,,,0,
 it:1138,vd:31XD1O74pks,1,0.5612,none,0,,,0,
+it:1304,it:1352,0,0.5606,decide,0,,,0,
+rp:earthtojake/text-to-cad,rp:mattpocock/skills,0,0.5606,none,0,,,0,
+vd:5bg469hWGGc,vd:HjQ1G1NvvHQ,0,0.5605,none,0,,,0,
+it:1379,vd:eTtZlAPA9H4,1,0.5603,none,0,,,0,
 it:1181,it:1183,0,0.5602,none,0,,,0,
-it:1130,it:1138,0,0.5601,decide,1,0,0.95,0,"a는 SumUp의 AI 기반 시스템 지식 관리(hive mind) 구축 경험, b는 Lemma라는 오픈소스 팀 작업 공간 제품 소개 → 다른 대상"
-it:1207,it:1225,0,0.5601,decide,1,0,0.95,0,"a는 챗GPT 이미지 생성 기능의 시각적 광고 도입, b는 챗GPT/코덱스 텍스트 출력의 워터마크 적용 → 다른 기능·사건"
+it:1130,it:1138,0,0.5601,decide,0,,,0,
+it:1207,it:1225,0,0.5601,decide,0,,,0,
 it:1116,vd:kcflfXb6dBM,1,0.56,none,0,,,0,
 it:1193,it:1209,0,0.5597,none,0,,,0,
 it:1048,it:1198,0,0.5596,none,0,,,1,
-it:1193,it:1225,0,0.5592,decide,1,0,0.95,0,"a는 오픈AI 코덱스의 '오토리뷰' 기능 무료화 업데이트, b는 챗GPT/코덱스에 적용되는 '텍스트그레인' 워터마크 도입 → 다른 기능·사건"
+it:1171,it:1393,0,0.5595,none,0,,,0,
+it:1048,rp:anthropics/claude-code,1,0.5594,none,0,,,0,
+it:1154,it:1310,0,0.5594,none,0,,,0,
+it:1221,it:1338,0,0.5594,decide,0,,,0,
+it:1193,it:1225,0,0.5592,decide,0,,,0,
 it:1156,it:1205,0,0.5587,none,0,,,0,
 it:1044,it:1198,0,0.5585,none,0,,,0,
 it:1191,it:1232,0,0.5585,none,0,,,0,
+it:1342,vd:5bg469hWGGc,1,0.5585,none,0,,,0,
 it:1149,it:1220,0,0.558,none,0,,,0,
+it:1189,vd:5bg469hWGGc,1,0.5579,none,0,,,0,
+it:1310,it:1348,0,0.5574,none,0,,,0,
+it:1381,rp:thedotmack/claude-mem,1,0.5574,none,0,,,0,
 it:1221,it:1249,0,0.5573,none,0,,,0,
+it:1043,rp:NousResearch/hermes-agent,1,0.5572,none,0,,,0,
 it:1165,it:1198,0,0.5572,none,0,,,0,
+vd:kcflfXb6dBM,vd:sAu_4QuAI0w,0,0.5572,none,0,,,0,
 rp:Panniantong/Agent-Reach,rp:tile-ai/tilelang,0,0.557,none,0,,,0,
 it:1149,it:1157,0,0.5569,none,0,,,0,
+rp:Panniantong/Agent-Reach,rp:mattpocock/skills,0,0.5569,none,0,,,0,
 it:1159,it:1179,0,0.5566,none,0,,,0,
-it:1221,it:1243,0,0.5565,decide,1,0,0.95,0,"a는 클로드에 위협을 남긴 사용자가 체포된 사건, b는 중국 해커의 AI 정책 전문가 피싱 공격 → 다른 사건"
+it:1160,it:1346,0,0.5566,none,0,,,0,
+it:1221,it:1243,0,0.5565,decide,0,,,0,
+it:1350,it:1352,0,0.5564,none,0,,,0,
 vd:eTtZlAPA9H4,vd:oeL0uP-NO-U,0,0.5563,none,0,,,0,
-it:1171,it:1242,0,0.5562,decide,1,0,0.95,0,"a는 스페이스X의 GPU 구매 자금 조달, b는 브로드컴의 앤트로픽 대출 보증 → 다른 회사의 다른 금융 거래"
-it:1101,it:1103,0,0.556,decide,1,0,0.9,0,"a는 Jump Trading의 GPT-6 Astra 활용 사례, b는 OpenAI와 Ironclad의 GPT-6 Astra 평가 발표 → 다른 사건"
+it:1130,vd:HjQ1G1NvvHQ,1,0.5562,none,0,,,0,
+it:1171,it:1242,0,0.5562,decide,0,,,0,
+it:1101,it:1103,0,0.556,decide,0,,,0,
+it:1154,it:1347,0,0.5559,none,0,,,0,
 it:1164,it:1179,0,0.5559,none,0,,,0,
+it:1125,it:1322,0,0.5555,none,0,,,0,
+it:1342,vd:D7q8fa589FY,1,0.5553,none,0,,,0,
+it:1132,rp:ollama/ollama,1,0.5551,none,0,,,0,
+it:1204,it:1310,0,0.5551,none,0,,,0,
+it:1094,vd:RVnSsolR3uE,1,0.555,none,0,,,0,
+it:1303,it:1338,0,0.555,none,0,,,0,
+it:1179,it:1338,0,0.5548,none,0,,,0,
+rp:NousResearch/hermes-agent,vd:HjQ1G1NvvHQ,1,0.5547,none,0,,,0,
+it:1126,rp:NousResearch/hermes-agent,1,0.5544,none,0,,,0,
 it:1188,it:1214,0,0.5543,none,0,,,0,
+it:1122,rp:thedotmack/claude-mem,1,0.5538,none,0,,,0,
 it:1046,it:1144,0,0.5534,none,0,,,0,
 it:1186,it:1213,0,0.5534,none,0,,,0,
 it:1193,vd:6YuIp-MwPv4,1,0.5534,none,0,,,0,
+it:1156,it:1304,0,0.5532,none,0,,,0,
+it:1318,rp:tile-ai/tilelang,1,0.5531,none,0,,,0,
+vd:5tdMgKkX5dU,vd:6YuIp-MwPv4,0,0.5529,none,0,,,0,
+it:1189,rp:NousResearch/hermes-agent,1,0.5528,none,0,,,0,
 it:1203,it:1250,0,0.5527,none,0,,,0,
+it:1171,it:1306,0,0.5526,none,0,,,0,
 it:1125,it:1138,0,0.5525,none,0,,,0,
+it:1206,it:1342,0,0.5525,none,0,,,0,
 it:1159,it:1161,0,0.5524,none,0,,,0,
+it:1310,it:1350,0,0.5523,none,0,,,0,
 it:1179,it:1236,0,0.5522,none,0,,,0,
 it:1180,it:1217,0,0.5522,none,0,,,0,
 it:1188,it:1216,0,0.5515,none,0,,,0,
-it:1172,it:1193,0,0.5513,decide,1,0,0.95,0,"a는 GPT-6 모델 공개 및 UI 업데이트, b는 코덱스(Codex)의 오토리뷰 기능 무료화 → 다른 제품·기능"
+it:1172,it:1193,0,0.5513,decide,0,,,0,
+it:1112,it:1379,0,0.5512,none,0,,,0,
+it:1108,it:1310,0,0.551,none,0,,,0,
 it:1161,it:1223,0,0.5505,none,0,,,0,
 it:1171,it:1190,0,0.5503,none,0,,,0,
-it:1141,rp:mvschwarz/openrig,1,0.5502,none,0,,,0,
 it:1180,it:1189,0,0.5502,none,0,,,0,
 it:1126,it:1193,0,0.5501,none,0,,,0,
-it:1161,it:1205,0,0.5501,decide,1,0,0.95,0,"a는 마이크로소프트의 MAI-코드-1.1 플래시, b는 리플렉션 AI의 빔(beam) 모델 → 다른 회사의 다른 모델"
+it:1161,it:1205,0,0.5501,decide,0,,,0,
 it:1171,vd:PACIHCnvNMo,1,0.55,none,0,,,0,

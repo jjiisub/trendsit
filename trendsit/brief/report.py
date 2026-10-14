@@ -238,23 +238,23 @@ def write_cluster_report(stage: ClusterStage, cfg: BriefConfig, note: str = "") 
 
 def _merge_csv(path: Path, key: tuple[str, ...], cols: list[str], rows: list[dict[str, Any]], keep: tuple[str, ...],
                other_week: str | None = None) -> None:
-    """라벨 시트를 다시 만들 때 이미 채운 라벨 칸(keep)은 같은 열쇠의 행에 보존한다. other_week를 주면 다른 주의
-    기존 행은 그대로 남긴다(W40·W41을 차례로 돌려도 앞 주 라벨이 지워지지 않게)."""
+    """라벨 시트를 다시 만들 때 이미 채운 라벨 칸(keep)은 같은 열쇠의 행에 보존하고, 새 rows에 없는 옛 행도
+    지우지 않는다(S6-1 5.15-4: 재생성·weekly 재실행이 추적 중인 사람 라벨을 줄이면 안 됨). other_week는 과거
+    호출 호환용으로 받되 더는 행을 거르는 데 쓰지 않는다 — 안 지우는 쪽이 늘 더 안전하다."""
     old: dict[tuple[str, ...], dict[str, str]] = {}
     if path.exists():
         with path.open(encoding="utf-8") as f:
             for r in csv.DictReader(f):
                 old[tuple(r.get(k, "") for k in key)] = r
+    merged = dict(old)
+    for r in rows:
+        k = tuple(str(r[k2]) for k2 in key)
+        merged[k] = r | {k2: old.get(k, {}).get(k2, "") for k2 in keep}
     with path.open("w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=cols)
         w.writeheader()
-        if other_week:
-            for r in old.values():
-                if r.get("week") != other_week:
-                    w.writerow({c: r.get(c, "") for c in cols})
-        for r in rows:
-            prev = old.get(tuple(str(r[k]) for k in key), {})
-            w.writerow(r | {k: prev.get(k, "") for k in keep})
+        for r in merged.values():
+            w.writerow({c: r.get(c, "") for c in cols})
 
 
 def write_label_sheets(stage: ClusterStage) -> list[Path]:

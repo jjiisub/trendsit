@@ -1,0 +1,86 @@
+{
+ "input": {
+  "plan": {
+   "rank": 6,
+   "angle": "구조화된 의사결정 작업 특화",
+   "relation": {
+    "type": "new",
+    "topic_id": null
+   }
+  },
+  "evidence": [
+   {
+    "id": "it:1342",
+    "source": "AI타임스",
+    "text": "[it:1342#s1] 마이크로소프트(MS)가 AI 에이전트의 의사결정을 빠르고 효율적으로 처리하는 전용 모델을 공개했다.\n[it:1342#s2] MS는 9일(현지시간) 구조화된 의사결정 작업에 특화한 AI 모델 '마이크로소프트 디시전-1(Microsoft-Decision-1)'을 공개했다.\n[it:1342#s3] 초기 버전은 '큐원3.5-9B'를 기반으로 구축됐으며, 앞으로 마이크로소프트의 'MAI'와 오픈AI의 다른 모델을 기반으로도 확장할 계획이다.\n[it:1342#s4] 이 모델은 모델 선택과 요청 분류, 작업 우선순위 지정, 결과 검증, 에이전트 제어 등 다양한 작업에서 기존 대형언어모델(LLM)보다 빠르고 효율적인 의사결정을 지원한다.\n[it:1342#s5] 고정된 선택지에 대한 보정(calibration) 확률 점수를 한 번의 추론으로 산출하도록 설계됐다.\n[it:1342#s6] 예/아니요 판정, 객관식 선택, 등급 평가를 지원하며, 평가 기준표에 따라 AI 응답이나 에이전트의 행동을 채점할 수도 있다.\n[it:1342#s7] 개발자는 구조화된 API 호출을 통해 결과를 받아 기존 애플리케이션과 AI 에이전트, 업무 흐름에 적용할 수 있다.\n[it:1342#s8] 특히 최대 3만2000 토큰의 긴 입력 컨텍스트를 한 번에 처리할 수 있어, 방대한 로그나 문서 검토에서 강점을 보인다.\n[it:1342#s9] MS는 이 모델이 반환하는 보정된 확률 점수를 활용해 \"확신도가 높으면 자동으로 작업을 처리하고, 애매한 경우 사람에게 검토를 요청하거나 재시도·우회하는 제어 레이어로 효과적으로 활용할 수 있다\"고 전했다.\n[it:1342#s10] 모델의 정확도뿐 아니라 일관성과 신뢰도도 주요 설계 목표로 삼았다.\n[it:1342#s11] 동일한 요청의 표현이나 선택지 순서, 형식 등을 바꿔도 결과가 달라지지 않는지 평가한 결과, 8가지 방식으로 입력을 변형했을 때 판단이 바뀌는 비율은 평균 1.3%였다.\n[it:1342#s12] 선택지 설명을 바꾸거나 순서를 뒤집고 섞은 경우에는 판단이 바뀌지 않았다고 밝혔다.\n[it:1342#s13] 학습 데이터에 포함되지 않은 평가 항목을 활용해 약 15만개의 질문과 36개 벤치마크에서 성능을 검증한 결과, 비교 대상 가운데 가장 높은 정확도를 기록했다.\n[it:1342#s14] 속도도 가장 빨랐다.\n[it:1342#s15] 측정 결과 디시전-1이 2위 모델인 '퀘옛-1.0-라지(Quyet-1.0-Large)'보다 4.5배, 'GPT-6 솔'보다 최대 35배 빠르게 작동했다고 설명했다.\n[it:1342#s16] 안전성 평가에서는 유해 콘텐츠와 탈옥 시도, 프롬프트 인젝션 등을 포함한 11개 벤치마크의 5250개 요청을 테스트했다.\n[it:1342#s17] 유해한 요청을 거부하면서도 정상적인 요청에 대한 활용성을 유지했다는 설명이다.\n[it:1342#s18] 실제 업무 적용에서도 속도와 비용 절감 효과가 확인됐다.\n[it:1342#s19] X박스 연구팀은 설문과 스팀(Steam), X 등에 올라온 1만건 이상의 사용자 의견을 주제별로 분류하는 데 디시전-1을 활용했다.\n[it:1342#s20] GPT-6 솔과 비슷한 수준의 품질을 유지하면서 처리 속도는 14배 이상 빨랐고 비용은 200분의 1 수준으로 줄었다.\n[it:1342#s21] 코파일럿 팀의 응답 품질 평가에서도 디시전-1은 'GPT-5.6 루나'와 경쟁할 만한 품질을 보이면서 속도는 100배 빨랐다.\n[it:1342#s22] 긴급 장애 대응을 위한 지식 검색에서도 기존 LLM보다 빠르고 나은 성능을 보였으며, MS 디스커버리의 과학 실험 계획 조정 작업에서는 LLM 기반 평가보다 일관성이 46배 높았다고 MS는 밝혔다.\n[it:1342#s23] 디시전-1은 MS 파운드리와 오픈라우터를 통해 이용할 수 있다.\n[it:1342#s24] 입력 토큰 가격은 100만개당 0.042달러이며, 출력 토큰은 무료다.\n[it:1342#s25] Let your app choose the right model, tool, or action in near real-time with Decisions API, now available to all developers in public beta.\n[it:1342#s26] The Decisions API makes decisions up to 10x faster than GPT-6 Luna through the Responses API.\n[it:1342#s27] pic.twitter.com/zhgRVzJ3aP\n[it:1342#s28] — OpenAI Developers (@OpenAIDevs) October 6, 2026\n[it:1342#s29] 한편, 오픈AI는 지난달 데브데이 행사에서 제한적 프리뷰로 선보였던 '디시전스 API(Decisions API)'를 7일 공개 베타 버전으로 정식 출시했다.\n[it:1342#s30] 'GPT-6 루나'를 거치는 기존 '리스폰스 API(Responses API)' 방식 대비 약 10배 빠른 응답 속도를 제공하는 이 API는 텍스트나 이미지 분석 시 산문 형태의 답변 대신 정해진 선택지나 확률, 점수만을 반환하여 소프트웨어가 즉시 처리할 수 있도록 지원한다.\n[it:1342#s31] 박찬 기자 cpark@aitimes.com",
+    "title": "MS, 에이전트 의사결정 특화 모델 ‘디시전-1’ 공개…오픈AI도 API 정식 출시",
+    "url": "https://www.aitimes.com/news/articleView.html?idxno=216107"
+   },
+   {
+    "id": "it:1377",
+    "source": "GeekNews",
+    "text": "[og:1377#q1] 원문: Today we’re introducing Microsoft-Decision-1, our new model for fast decision-scoring, available in Microsoft Foundry and through OpenRouter.\n[og:1377#q2] 원문: Microsoft-Decision-1 achieved the highest accuracy in our 36-benchmark comparison, spanning nearly 150,000 questions across benchmarks kept blind from training.\n[og:1377#q2] (카드 수치, 위 원문에서 뽑음) 벤치마크 비교 수 [36]\n[og:1377#q2] (카드 수치, 위 원문에서 뽑음) 평가 질문 수(거의) [150,000]\n[og:1377#q3] 원문: And in our benchmarking, it was the fastest measured: 2.5 times quicker than H2O-Lightning-4B v1.1, the runner-up, and 35 times quicker than GPT-6 Sol.\n[og:1377#q3] (카드 수치, 위 원문에서 뽑음) H2O-Lightning-4B v1.1 대비 속도 [2.5 times]\n[og:1377#q3] (카드 수치, 위 원문에서 뽑음) GPT-6 Sol 대비 속도 [35 times]\n[og:1377#q4] 원문: To build Microsoft-Decision-1, we post trained Qwen3.5-9B for fast, single-pass decision scoring and will soon rebase it on other models, including Microsoft AI (MAI) and OpenAI.\n[og:1377#q5] 원문: Microsoft-Decision-1 changes its decision on 1.3% of perturbations on average with zero flips when option descriptions are paraphrased or when options are reversed or shuffled.\n[og:1377#q5] (카드 수치, 위 원문에서 뽑음) 평균 결정 변동률 [1.3%]\n[og:1377#q6] 원문: XBOX Research used Microsoft-Decision-1 to process more than 10,000 open-ended pieces of feedback and reviews from surveys, STEAM, and Twitter/X\n[og:1377#q6] (카드 수치, 위 원문에서 뽑음) 처리한 피드백 및 리뷰 수(이상) [10,000]\n[it:1377#s1] Decision models are quickly emerging as an important new category in AI.\n[it:1377#s2] Unlike LLMs, which are designed to generate text or reason through complex problems, decision models are purpose-built to deliver structured outputs that software can immediately act on.\n[it:1377#s3] And once you understand that capability—making decisions and classifying things at very low cost with high performance—all kinds of useful tasks get unlocked.\n[it:1377#s4] Today we’re introducing Microsoft-Decision-1, our new model for fast decision-scoring, available in Microsoft Foundry and through OpenRouter.\n[it:1377#s5] This model is designed for routing, classification, prioritization, verification, and workflow control, making it easier to incorporate decision intelligence into existing applications, agents, and workflows in a secure, trusted environment.\n[it:1377#s6] Microsoft-Decision-1 delivers top performance in latency and quality on structured decision tasks to outperform both LLMs and other decision models.\n[it:1377#s7] Microsoft-Decision-1 achieved the highest accuracy in our 36-benchmark comparison, spanning nearly 150,000 questions across benchmarks kept blind from training.\n[it:1377#s8] And in our benchmarking, it was the fastest measured: 2.5 times quicker than H2O-Lightning-4B v1.1, the runner-up, and 35 times quicker than GPT-6 Sol.\n[it:1377#s9] Editor’s note: This post was updated from the original to add benchmarks for Jev on accuracy and calibration.\n[it:1377#s10] How Microsoft-Decision-1 works\n[it:1377#s11] To build Microsoft-Decision-1, we post trained Qwen3.5-9B for fast, single-pass decision scoring and will soon rebase it on other models, including Microsoft AI (MAI) and OpenAI.\n[it:1377#s12] When given a fixed set of answer options, Microsoft-Decision-1 provides a calibrated probability score for each option.\n[it:1377#s13] The model supports yes/no, multiple-choice, and rating options, as well as rubric-based grading of AI responses and agent actions, all through a simple structured API call.\n[it:1377#s14] To build a reliable decision model, we had to address several challenges:\n[it:1377#s15] 1.\n[it:1377#s16] Speed\n[it:1377#s17] Each decision adds delay, especially when one step depends on another.\n[it:1377#s18] For example, adding just 100 milliseconds to each of 20 sequential decisions adds two seconds to the overall workflow.\n[it:1377#s19] Microsoft-Decision-1 P50 latency is ~35x faster than GPT-6 Sol.\n[it:1377#s20] 2.\n[it:1377#s21] Quality that generalizes\n[it:1377#s22] It’s easy to overfit a model for one benchmark or one type of decision task.\n[it:1377#s23] We need to know whether that quality carries over to various tasks the model wasn’t trained on.\n[it:1377#s24] That’s why we evaluated Microsoft-Decision-1 across dozens of benchmarks kept blinded from training, spanning routing, ranking, long context, multilingual and out-of-distribution tasks, reasoning, and safety.\n[it:1377#s25] We also took several of the top public models on the popular open leaderboard JevBench and tested them across 36 additional public and private benchmarks.\n[it:1377#s26] Microsoft-Decision-1 performed the best across these broader sets of benchmarks, demonstrating strong generalization.\n[it:1377#s27] 3.\n[it:1377#s28] Robustness\n[it:1377#s29] Equivalent inputs should produce equivalent decisions.\n[it:1377#s30] In production, states and instructions get paraphrased, option descriptions change, choices are reordered, keys change, and harmless formatting noise appears.\n[it:1377#s31] None of those changes should materially alter the decision.\n[it:1377#s32] We perturb the same request in eight ways and measure how often the decision flips.\n[it:1377#s33] Microsoft-Decision-1 changes its decision on 1.3% of perturbations on average with zero flips when option descriptions are paraphrased or when options are reversed or shuffled.\n[it:1377#s34] 4.\n[it:1377#s35] Probability and confidence calibration\n[it:1377#s36] The probability itself is part of the API, not just a ranking score.\n[it:1377#s37] Applications use confidence to decide when to act, defer, or ask for review, so a 90% prediction should be right about nine times out of 10 on representative cases.\n[it:1377#s38] 5.\n[it:1377#s39] Safety\n[it:1377#s40] A decision model should recognize harmful requests without needlessly blocking harmless ones.\n[it:1377#s41] We tested Microsoft-Decision-1 on 5,250 requests across 11 benchmarks, covering harmful content, jailbreak attempts, and prompt injection, and found that the model successfully refused harmful behavior while retaining a high degree of utility.\n[it:1377#s42] Demo examples\n[it:1377#s43] Classification is a key use case for decision models.\n[it:1377#s44] Check out how accurately and quickly Microsoft-Decision-1 can categorize a variety of queries compared to GPT-6 Sol:\n[it:1377#s45] Decision models can also be efficient for computer use scenarios.\n[it:1377#s46] This demo shows how fast Microsoft-Decision-1 can complete the task of buying a backpack compared to GPT-6 Sol:\n[it:1377#s47] How we’re testing Microsoft-Decision-1 internally\n[it:1377#s48] Here are some of the ways we’ve been testing Microsoft-Decision-1 internally, with a lot more to come.\n[it:1377#s49] Labeling data\n[it:1377#s50] XBOX Research used Microsoft-Decision-1 to process more than 10,000 open-ended pieces of feedback and reviews from surveys, STEAM, and Twitter/X and sort them into a fixed set of themes established by researchers to understand what people are saying about different games, launches, streams, and more.\n[it:1377#s51] They found Microsoft-Decision-1 to be competitive on quality with GPT-6 Sol while running over 14 times faster and 200 times less expensive.\n[it:1377#s52] Quality control\n[it:1377#s53] The Copilot team measures the quality of chat and agentic responses.\n[it:1377#s54] Their testing found Microsoft-Decision-1 to be competitive with GPT5.6 Luna and 100 times faster.\n[it:1377#s55] Incident response\n[it:1377#s56] Our on-call engineers use AI to retrieve relevant knowledge to respond to live incidents across logs, ticketing systems, calls, messages, and other data sources.\n[it:1377#s57] Microsoft-Decision-1 performed better and faster than an LLM for knowledge retrieval.\n[it:1377#s58] Scientific discovery\n[it:1377#s59] Microsoft Discovery implements an adaptive replanning feature where an agent evaluates a previous experiment, revises its approach based on rubric grades, and repeats until it has completed its objectives.\n[it:1377#s60] Microsoft-Decision-1 scored as 46 times more consistent than the LLM-based score at three times the speed and resulted in nearly four times the speed on adaptive replanning\n[it:1377#s61] Faster, more reliable planning could significantly impact outcomes for long-running scientific experiments.\n[it:1377#s62] Those are just a small handful of examples.",
+    "title": "Microsoft-Decision-1 - 선택지별 확률을 반환하는 저비용 의사결정 모델",
+    "url": "https://commandline.microsoft.com/microsoft-decision-1-model-foundry/"
+   }
+  ],
+  "previous": null,
+  "aliases": [
+   {
+    "canonical": "GPT-6 Luna",
+    "aliases": [
+     "GPT-6 루나"
+    ]
+   },
+   {
+    "canonical": "GPT-6 Sol",
+    "aliases": [
+     "GPT-6 솔"
+    ]
+   }
+  ],
+  "limits": {
+   "sections": [
+    4,
+    7
+   ],
+   "paragraphs_per_section": [
+    1,
+    2
+   ],
+   "paragraph_sentences_max": 4,
+   "paragraph_chars_max": 320,
+   "summary_sentences": [
+    1,
+    2
+   ],
+   "summary_chars_max": 200,
+   "heading_chars_max": 70,
+   "head_tiles_max": 4,
+   "tiles_per_section": [
+    2,
+    3
+   ],
+   "visuals_max": 4,
+   "bars_items": [
+    2,
+    6
+   ],
+   "table_rows": [
+    2,
+    6
+   ],
+   "table_cols": [
+    2,
+    4
+   ],
+   "slides_max": 2,
+   "video_secs_max": 3,
+   "max_refs_per_paragraph": 4
+  },
+  "slide_candidates": [],
+  "no_visuals": false
+ },
+ "expect": {},
+ "note": "2026-W41 실제 토픽 입력(run 20261013-205302-weekly-b981)"
+}

@@ -134,11 +134,25 @@ class BriefingPlan(RoleOutput):
     featured_repos: list[str] = Field(description="홈에 올릴 레포 이름(최대 5)")
 
 
-# ---------- writer (작성자) ----------
-class Point(_Strict):
-    text: str = Field(description="명사형 1~2문장, 80자 안팎")
-    refs: list[str] = Field(description="근거 id 1~3개")
-    check: bool = Field(default=False, description="코드가 정함: 같은 이슈가 두 번 남으면 true(확인 필요)")
+# ---------- writer (작성자, v2: 절 구조, D-27·S6-1 5.3) ----------
+VisualType = Literal["none", "bars", "table", "tiles", "events"]
+
+
+def _num_text(v: float) -> str:
+    """부동소수점 값을 원래 자릿수로(007-A2-2): f'{v:g}'의 유효숫자 6자리 잘림·지수 표기(1.62e+06)를 피한다."""
+    return str(int(v)) if v == int(v) else f"{v:.10f}".rstrip("0")
+
+
+class Tile(_Strict):
+    value: str
+    label: str
+    note: str = ""
+    refs: list[str] = Field(min_length=1, max_length=3)
+
+
+class Para(_Strict):
+    text: str
+    refs: list[str] = Field(min_length=1, max_length=4)
 
 
 class NumberItem(_Strict):
@@ -150,47 +164,59 @@ class NumberItem(_Strict):
     @field_validator("value", mode="after")
     @classmethod
     def _as_text(cls, v: str | float) -> str:
-        if isinstance(v, float):
-            return f"{v:g}" if abs(v) < 1e15 else str(v)
-        return v
+        return _num_text(v) if isinstance(v, float) else v
     ref: str
     baseline: bool = Field(default=False, description="전후 비교의 이전 값")
     emphasis: bool = False
 
 
-class NumberGroup(_Strict):
-    anchor: int = Field(ge=1, description="붙는 포인트 번호(1부터)")
-    group: str
-    title: str = Field(description="발견을 말하는 제목")
-    context: str = Field(description="무엇을 어떤 조건에서 비교했는지 1~2문장, 근거 id 포함")
+class BarGroup(_Strict):
+    title: str
+    context: str = ""
     unit: str
-    items: list[NumberItem]
+    items: list[NumberItem] = Field(min_length=2, max_length=6)
+
+
+class Table(_Strict):
+    title: str
+    note: str = ""
+    columns: list[str] = Field(min_length=2, max_length=4)
+    rows: list[list[str | float]] = Field(min_length=2, max_length=6,
+                                          description="행마다 columns와 같은 길이, 첫 열은 행 머리. 숫자 셀도 받음(NumberItem과 같은 이유)")
+    refs: list[str] = Field(min_length=1, max_length=4)
+
+    @field_validator("rows", mode="after")
+    @classmethod
+    def _rows_as_text(cls, v: list[list[str | float]]) -> list[list[str]]:
+        return [[_num_text(c) if isinstance(c, float) else c for c in row] for row in v]
 
 
 class EventItem(_Strict):
     date: str = Field(description="YYYY-MM-DD(근거에 있는 날짜)")
     text: str
-    ref: str | None = Field(description="근거 id. 지난 토픽이면 null")
-    topic_id: str | None = Field(description="지난 토픽 id. 근거 id가 있으면 null")
+    ref: str | None = Field(default=None, description="근거 id. 지난 토픽이면 null")
+    topic_id: str | None = Field(default=None, description="지난 토픽 id. 근거 id가 있으면 null")
 
 
 class EventGroup(_Strict):
-    anchor: int = Field(ge=1)
     title: str
-    context: str
+    context: str = ""
     flow_is_point: bool = False
-    items: list[EventItem]
+    items: list[EventItem] = Field(min_length=2, max_length=6)
 
 
-class Contribution(_Strict):
-    channel: Channel
-    text: str
-    refs: list[str]
-
-
-class Concept(_Strict):
-    term: str
-    desc: str
+class Section(_Strict):
+    heading: str
+    paragraphs: list[Para] = Field(min_length=1, max_length=2)
+    visual: VisualType
+    bars: BarGroup | None = None
+    table: Table | None = None
+    tiles: list[Tile] = Field(default_factory=list, description="visual=tiles일 때 2~3개, 아니면 []")
+    events: EventGroup | None = None
+    slide: str | None = Field(default=None, description="slide_candidates 중 하나의 sl: id. 코드가 채울 수도 있음")
+    slide_caption: str = ""
+    video_secs: list[int] = Field(default_factory=list, max_length=3, description="입력 타임라인의 sec")
+    check: bool = Field(default=False, description="코드가 정함(같은 이슈가 두 번 남으면 true). 작성자 출력은 false")
 
 
 class PlanBrief(_Strict):
@@ -203,7 +229,7 @@ class PreviousTopic(_Strict):
     topic_id: str
     title: str
     summary: str
-    points: list[str]
+    headings: list[str] = Field(description="v2: 지난 토픽 sections[].heading(5.3 하위 호환 없음, D-31)")
 
 
 class AliasLine(_Strict):
@@ -212,13 +238,24 @@ class AliasLine(_Strict):
 
 
 class WriterLimits(_Strict):
-    points: tuple[int, int] = Field(description="이 토픽의 근거 소스 수로 고른 points 개수 범위")
-    overview_sentences: tuple[int, int]
+    sections: tuple[int, int] = Field(description="이 토픽의 근거 소스 수로 고른 sections 개수 범위")
+    paragraphs_per_section: tuple[int, int]
+    paragraph_sentences_max: int
+    paragraph_chars_max: int
     summary_sentences: tuple[int, int]
+    summary_chars_max: int
+    heading_chars_max: int
+    head_tiles_max: int
+    tiles_per_section: tuple[int, int]
+    visuals_max: int
+    visuals_target: tuple[int, int] = Field(description="페이지 시각 요소 목표(원문에 재료가 있을 때)")
     highlights_page: tuple[int, int] = Field(description="페이지 전체 형광 개수 범위")
-    numbers_groups_max: int
-    events_groups_max: int
-    concepts_max: int
+    bars_items: tuple[int, int]
+    table_rows: tuple[int, int]
+    table_cols: tuple[int, int]
+    slides_max: int
+    video_secs_max: int
+    max_refs_per_paragraph: int
 
 
 class WriterInput(RoleInput):
@@ -227,50 +264,62 @@ class WriterInput(RoleInput):
     previous: PreviousTopic | None
     aliases: list[AliasLine]
     limits: WriterLimits
+    slide_candidates: list[str] = Field(default_factory=list, max_length=2, description="sl: id, 0~2")
+    no_visuals: bool = Field(default=False, description="true면 모든 절의 visual을 none, head_tiles만")
 
 
 class TopicPage(RoleOutput):
-    points: list[Point]
-    numbers: list[NumberGroup]
-    events: list[EventGroup]
-    contributions: list[Contribution]
-    concepts: list[Concept]
-    overview: str = Field(description="1문단 2~4문장, '~다'")
-    summary: str = Field(description="1~2문장(최대 3), 첫 문장이 결론")
+    head_tiles: list[Tile] = Field(default_factory=list, max_length=4)
+    sections: list[Section]
+    summary: str = Field(description="1~2문장(사건+쟁점), 150자 안팎")
     title: str = Field(description="명사구 30자 안팎")
 
     def enforce(self, inp: Any, ctx: Ctx | None) -> Self:
-        """points[].check는 코드가 정하는 값(같은 이슈 두 번 → true). 작성자 출력의 check는 false로."""
-        if any(p.check for p in self.points):
-            return self.fix("points", [p.model_copy(update={"check": False}) for p in self.points],
+        """sections[].check는 코드가 정하는 값(같은 이슈 두 번 → true). 작성자 출력의 check는 false로."""
+        if any(s.check for s in self.sections):
+            return self.fix("sections", [s.model_copy(update={"check": False}) for s in self.sections],
                             "check는 코드 소유(작성자 출력은 false)", owned=True)
         return self
 
 
 def loc_lines(page: TopicPage) -> list[str]:
-    """위치 이름이 붙은 줄(번호 0부터). 검수자·수정이 위치를 1부터 세던 문제(W40·W41 평가 13/13)를 입력에서 막는다."""
-    out = [f"title: {page.title}", f"summary: {page.summary}", f"overview: {page.overview}"]
-    out += [f"points[{i}]: {p.text} (refs {', '.join(p.refs)})" + (" [확인 필요]" if p.check else "") for i, p in enumerate(page.points)]
-    for i, g in enumerate(page.numbers):
-        out.append(f"numbers[{i}] (anchor {g.anchor}, group {g.group}, 단위 {g.unit}): {g.title} / context: {g.context}")
-        out += [f"numbers[{i}].items[{j}]: {it.label} = {it.value} ({it.ref})" + (" [기준]" if it.baseline else "")
-                + (" [강조]" if it.emphasis else "") for j, it in enumerate(g.items)]
-    for i, g in enumerate(page.events):
-        out.append(f"events[{i}] (anchor {g.anchor}{', 흐름이 핵심' if g.flow_is_point else ''}): {g.title} / context: {g.context}")
-        out += [f"events[{i}].items[{j}]: {it.date} {it.text} ({"ref " + it.ref if it.ref else "topic " + it.topic_id if it.topic_id else "근거 없음"})" for j, it in enumerate(g.items)]
-    out += [f"contributions[{i}]: [{c.channel}] {c.text} (refs {', '.join(c.refs)})" for i, c in enumerate(page.contributions)]
-    out += [f"concepts[{i}]: {c.term} - {c.desc}" for i, c in enumerate(page.concepts)]
+    """위치 이름이 붙은 줄(번호 0부터, 5.3). 검수자·수정이 위치를 1부터 세던 문제를 입력에서 막는다."""
+    out = [f"title: {page.title}", f"summary: {page.summary}"]
+    out += [f"head_tiles[{i}]: {t.value} / {t.label} ({t.note}) (refs {', '.join(t.refs)})" for i, t in enumerate(page.head_tiles)]
+    for i, s in enumerate(page.sections):
+        out.append(f"sections[{i}].heading: {s.heading}" + (" [확인 필요]" if s.check else ""))
+        out += [f"sections[{i}].paragraphs[{j}]: {p.text} (refs {', '.join(p.refs)})" for j, p in enumerate(s.paragraphs)]
+        if s.bars is not None:
+            g = s.bars
+            out.append(f"sections[{i}].bars (단위 {g.unit}): {g.title} / context: {g.context}")
+            out += [f"sections[{i}].bars.items[{k}]: {it.label} = {it.value} ({it.ref})" + (" [기준]" if it.baseline else "")
+                    + (" [강조]" if it.emphasis else "") for k, it in enumerate(g.items)]
+        if s.table is not None:
+            t = s.table
+            out.append(f"sections[{i}].table ({'/'.join(t.columns)}): {t.title} / note: {t.note}")
+            out += [f"sections[{i}].table.rows[{k}]: {' | '.join(row)}" for k, row in enumerate(t.rows)]
+        if s.visual == "tiles":
+            out += [f"sections[{i}].tiles[{k}]: {t.value} / {t.label} ({t.note})" for k, t in enumerate(s.tiles)]
+        if s.events is not None:
+            g = s.events
+            out.append(f"sections[{i}].events{' (흐름이 핵심)' if g.flow_is_point else ''}: {g.title} / context: {g.context}")
+            out += [f"sections[{i}].events.items[{k}]: {it.date} {it.text} ({'ref ' + it.ref if it.ref else 'topic ' + it.topic_id if it.topic_id else '근거 없음'})"
+                    for k, it in enumerate(g.items)]
+        if s.slide:
+            out.append(f"sections[{i}].slide: {s.slide} ({s.slide_caption})")
+        if s.video_secs:
+            out.append(f"sections[{i}].video_secs: {s.video_secs}")
     return out
 
 
-# ---------- writer_revise (작성자 수정: 고친 칸만) ----------
-# 검수자 이슈 7종 + format(코드 검사 반려: 분량, 필수 칸, 금지 표현, 도식 칸 규칙)
+# ---------- writer_revise (작성자 수정: 고친 칸만, v2 위치 문법) ----------
+# 검수자 이슈 7종 + format(코드 검사 반려: 분량, 필수 칸, 금지 표현, 시각 요소 칸 규칙)
 IssueType = Literal["unsupported", "number_mismatch", "overclaim", "wrong_ref", "missing_key", "overuse",
                     "missing_diagram", "format"]
 
 
 class Issue(_Strict):
-    loc: str = Field(description="위치(예: points[2], numbers[0].items[1], summary)")
+    loc: str = Field(description="위치(예: sections[1].paragraphs[0], sections[0].bars.items[1], summary)")
     type: IssueType
     evidence_id: str | None
     comment: str
@@ -285,7 +334,7 @@ class WriterReviseInput(RoleInput):
     RENDER_LINES: ClassVar[tuple[str, ...]] = ("loc_lines",)
     RENDER_SKIP: ClassVar[tuple[str, ...]] = ("previous",)  # loc_lines와 같은 내용이라 렌더하지 않음(코드는 객체를 씀)
 
-    loc_lines: list[str] = Field(default=[], description="previous 페이지의 모든 칸을 위치 이름(loc)이 붙은 줄로 펼친 것")
+    loc_lines: list[str] = Field(default_factory=list, description="previous 페이지의 모든 칸을 위치 이름(loc)이 붙은 줄로 펼친 것")
     previous: TopicPage
     issues: list[IndexedIssue]
     evidence: list[Document] = Field(description="지적된 칸의 근거 원문만")
@@ -296,8 +345,15 @@ class Change(_Strict):
     issue_idx: int
     loc: str
     action: Literal["edit", "delete", "add"]
-    value: str | Point | NumberGroup | EventGroup | Contribution | Concept | NumberItem | EventItem | None = Field(
-        description="그 위치의 새 값(writer와 같은 칸 형식, 하위 위치면 그 항목·글자). delete면 null")
+    value: str | Para | Tile | BarGroup | Table | EventGroup | NumberItem | EventItem | Section | list[str | float] | list[int] | None = Field(
+        description="그 위치의 새 값(writer와 같은 칸 형식, 하위 위치면 그 항목·글자). delete면 null. "
+                     "sections 전체 add/delete 허용(sections[i]), sections 전체 삭제는 거부")
+
+    @field_validator("value", mode="after")
+    @classmethod
+    def _row_as_text(cls, v: Any) -> Any:
+        # R2-04: table.rows[k] 수정도 writer처럼 숫자 셀을 받는다(문자열만 허용하면 구조화 출력이 막혀 수정 전체가 버려짐)
+        return [_num_text(c) if isinstance(c, float) else c for c in v] if isinstance(v, list) and v and not isinstance(v[0], int) else v
 
 
 class TopicPageRevision(RoleOutput):
@@ -309,11 +365,11 @@ class CriticInput(RoleInput):
     RENDER_LINES: ClassVar[tuple[str, ...]] = ("loc_lines",)
     RENDER_SKIP: ClassVar[tuple[str, ...]] = ("page",)  # loc_lines와 같은 내용이라 렌더하지 않음(코드는 객체를 씀)
 
-    loc_lines: list[str] = Field(default=[], description="page의 모든 칸을 위치 이름(loc)이 붙은 줄로 펼친 것. 이슈 loc은 이 이름 그대로")
+    loc_lines: list[str] = Field(default_factory=list, description="page의 모든 칸을 위치 이름(loc)이 붙은 줄로 펼친 것. 이슈 loc은 이 이름 그대로")
     page: TopicPage
     evidence: list[Document] = Field(description="이 토픽의 근거 원문(refs가 가리키는 것 먼저, 카드 요약 id 제외)")
     angle: str
-    previous: PreviousTopic | None = Field(default=None, description="후속 토픽이면 지난 토픽(요약·포인트). 지난 토픽을 말하는 문장은 이것과 대조")
+    previous: PreviousTopic | None = Field(default=None, description="후속 토픽이면 지난 토픽(요약·절 제목). 지난 토픽을 말하는 문장은 이것과 대조")
     code_warnings: list[str]
     round: int = Field(ge=1, le=3)
 

@@ -9,13 +9,12 @@ from pathlib import Path
 import pytest
 
 from trendsit.core.artifacts_brief import (
-    Concept,
-    Contribution,
+    BarGroup,
     EventGroup,
     EventItem,
-    NumberGroup,
     NumberItem,
-    Point,
+    Para,
+    Section,
     TopicPage,
 )
 from trendsit.core.db import DB
@@ -32,18 +31,18 @@ def _spec(path: str, name: str):
 
 
 def page(title: str, n_points: int = 3, check_first: bool = False) -> str:
-    pts = [Point(text=f"포인트 {i}", refs=r, check=check_first and i == 0)
-           for i, r in enumerate([["it:1#q1"], ["it:2#q1"], ["it:1#q2", "rp:a/b"]][:n_points])]
-    return TopicPage(
-        log="x", points=pts, title=title, summary="요약이다.", overview="개요다.",
-        numbers=[NumberGroup(anchor=1, group="g", title="수치", context="맥락", unit="%",
-                             items=[NumberItem(label="가", value="10%", ref="it:1#q1", emphasis=True),
-                                    NumberItem(label="나", value=5, ref="it:2#q1", baseline=True)])],
-        events=[EventGroup(anchor=2, title="흐름", context="맥락", items=[
-            EventItem(date="2026-10-06", text="사건", ref="it:1#q1", topic_id=None),
-            EventItem(date="2026-09-29", text="지난 사건", ref=None, topic_id="w40-x")])],
-        contributions=[Contribution(channel="text", text="글에서 더한 것", refs=["it:1#q1"])],
-        concepts=[Concept(term="용어", desc="설명")]).model_dump_json()
+    paras = [Para(text=f"문장 {i}", refs=r)
+             for i, r in enumerate([["it:1#q1"], ["it:2#q1"], ["it:1#q2", "rp:a/b"]][:n_points])]
+    sections = [Section(heading="절 하나", paragraphs=paras[:2] or [paras[0]], visual="bars", check=check_first,
+                        bars=BarGroup(title="수치", context="맥락", unit="%",
+                                     items=[NumberItem(label="가", value="10%", ref="it:1#q1", emphasis=True),
+                                            NumberItem(label="나", value=5, ref="it:2#q1", baseline=True)]))]
+    if len(paras) > 2:
+        sections.append(Section(heading="절 둘", paragraphs=[paras[2]], visual="events",
+                                events=EventGroup(title="흐름", context="맥락", items=[
+                                    EventItem(date="2026-10-06", text="사건", ref="it:1#q1", topic_id=None),
+                                    EventItem(date="2026-09-29", text="지난 사건", ref=None, topic_id="w40-x")])))
+    return TopicPage(log="x", head_tiles=[], sections=sections, title=title, summary="요약이다. 쟁점이다.").model_dump_json()
 
 
 def make_db(tmp_path: Path, published: tuple[str, ...] = ("2026-W41",)) -> DB:
@@ -112,7 +111,7 @@ def make_db(tmp_path: Path, published: tuple[str, ...] = ("2026-W41",)) -> DB:
 
     topic("r40", "w40-x", "2026-W40", 1, "W40 토픽", n_points=2)
     topic("r41", "w41-a", "2026-W41", 1, "첫 토픽")
-    topic("r41", "w41-b", "2026-W41", 2, "둘째 토픽", "follow_up", "w40-x", '["points[0]"]', check_first=True)
+    topic("r41", "w41-b", "2026-W41", 2, "둘째 토픽", "follow_up", "w40-x", '["sections[0]"]', check_first=True)
     c.commit()
     return db
 
@@ -136,7 +135,8 @@ def test_a1_structure_and_only_published(tmp_path):
     assert "cross_checked" not in t["w41-a"]
     for x in site["topics"]:  # C-2
         ids = {s["id"] for s in x["sources"]}
-        assert all(p["refs"] and set(p["refs"]) <= ids for p in x["points"])
+        for sec in x["sections"]:
+            assert all(p["refs"] and set(p["refs"]) <= ids for p in sec["paragraphs"])
     assert [(r["name"], r["stars_7d"], r["signal"], r["what"], r["topic_id"]) for r in site["repos"]] == [
         ("a/b", "+1.6k", "release", "에이비 도구", "w41-a")]
     assert "ghost" not in {s["id"] for s in site["sources"]}  # sources.yaml에 없는 소스는 제외
@@ -150,8 +150,8 @@ def test_a1_structure_and_only_published(tmp_path):
     assert kw["weeks"] == ["2026-w41"] and next(i for i in kw["items"] if i["id"] == "agent")["mentions"] == [1]
     assert next(i for i in kw["items"] if i["id"] == "agent")["topics"] == ["w41-a", "w41-b"]
     run = next(r for r in site["runs"] if r["id"] == "r41")
-    assert run["counts"] == {"candidates": 9, "related": {"follow_up": 1, "new": 1, "duplicate": 0}, "selected": 2, "evidence_ids": 4,
-                             "review": {"passed_first": 1, "rejected": 1, "needs_check": 1}, "published": 2}  # 확인 필요는 화면에 표시되는 수(w41-b points[0])
+    assert run["counts"] == {"candidates": 9, "related": {"follow_up": 1, "new": 1, "duplicate": 0}, "selected": 2, "evidence_ids": 4, "written": 0,
+                             "review": {"passed_first": 1, "rejected": 1, "needs_check": 1}, "published": 2}  # written(D-37)은 steps(writer,code) 행이 없어 0. 확인 필요는 화면에 표시되는 수(w41-b points[0])
     assert [s["role"] for s in run["steps"]] == ["writer", "critic"] and run["steps"][1]["attention"] is True
     assert run["steps"][1]["detail"]["draft"] == "초안" and "detail" not in run["steps"][0]
     night = next(r for r in site["runs"] if r["id"] == "n1")
@@ -178,6 +178,37 @@ def test_a1_with_week_includes_unpublished_week_and_export_failures_keep_file(tm
     with pytest.raises(ExportError):
         export(make_db(tmp_path / "x", published=()), out)
     assert out.read_text() == before
+
+
+def test_weekly_counts_written_ignores_budget_stop_record_without_topic_id(tmp_path):
+    """006-A2-35: role.py가 예산 초과 때 남기는 중단 기록(detail에 topic_id 없음)은 counts.written에 안 셈(이중 집계 방지)."""
+    from trendsit.export import _weekly_counts
+
+    db = DB(tmp_path / "t.db")
+    db.conn.execute("INSERT INTO runs(id, kind, started_at) VALUES ('r','weekly','2026-10-12T00:00:00+09:00')")
+    db.conn.execute("INSERT INTO steps(run_id, seq, t, role, kind, detail) VALUES ('r', 1, 't', 'writer', 'code', ?)",
+                    (json.dumps({"topic_id": "w41-a"}),))
+    db.conn.execute("INSERT INTO steps(run_id, seq, t, role, kind, detail) VALUES ('r', 2, 't', 'writer', 'code', ?)",
+                    (json.dumps({"attempt": 1}),))  # role.py의 BudgetExceeded 중단 기록(topic_id 없음)
+    c = _weekly_counts(db, "r", {}, 0, 0)
+    assert c["written"] == 1
+
+
+def test_topic_ref_slots_covers_tiles_table_events_not_just_paragraphs():
+    """006-A1-15: C-2가 단락 refs만 보지 않고 head_tiles·table·tiles·events도 봄."""
+    from trendsit.export import _topic_ref_slots
+
+    t = {"head_tiles": [{"value": "1", "refs": ["s1"]}],
+         "sections": [{"paragraphs": [{"refs": ["s1"]}],
+                       "visual": {"type": "tiles", "items": [{"value": "1", "refs": ["s1", "zz"]}]}},
+                      {"paragraphs": [{"refs": ["s1"]}], "visual": {"type": "table", "refs": ["s1", "zz"]}},
+                      {"paragraphs": [{"refs": ["s1"]}],
+                       "visual": {"type": "events", "items": [{"ref": "zz"}, {"ref": None}]}}]}
+    slots = dict(_topic_ref_slots(t))
+    assert slots["sections[0].tiles[0]"] == ["s1", "zz"]
+    assert slots["sections[1].table"] == ["s1", "zz"]
+    assert slots["sections[2].events.items[0]"] == ["zz"]
+    assert "sections[2].events.items[1]" not in slots  # ref 없는 사건은 topic_id로 받침, C-2 대상 아님
 
 
 def test_a1_cli_exit_codes(tmp_path, monkeypatch):

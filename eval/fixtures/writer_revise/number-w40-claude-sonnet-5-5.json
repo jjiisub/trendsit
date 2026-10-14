@@ -1,193 +1,281 @@
 {
  "input": {
   "loc_lines": [
-   "title: Claude Sonnet 5.5 출시: Opus급 성능, 동일 가격",
-   "summary: Anthropic이 Sonnet 5.5를 출시했다. ==중급 모델이 Opus급 성능에 근접하면서 가격은 동일==하다.",
-   "overview: Anthropic이 Claude 5.5 패밀리의 두 번째 모델인 Sonnet 5.5를 출시했다. 전작 대비 출력 속도 30%+ 향상과 동일 작업당 최대 30% 비용 절감을 달성했으며, 터미널벤치 4.0에서 70.6%로 Opus 5.5(66.4%)를 상회했다. 토큰당 가격은 Sonnet 5와 동일하지만, 같은 작업을 더 적은 토큰으로 처리해 실질 비용이 줄어든다. 100만 토큰 컨텍스트와 12만8000 토큰 출력을 지원하며, claude.ai 무료 티어 모델로 지정됐다.",
-   "points[0]: Sonnet 5.5가 Sonnet 5 대비 출력 속도 45%+ 향상, 동일 작업당 비용 최대 30% 절감 (refs og:162#q1, it:924#q2)",
-   "points[1]: ==터미널벤치 4.0에서 70.6%로 전작 Sonnet 5(10.3%)와 Opus 5.5(66.4%)를 모두 상회== (refs it:924#q3, it:924#q4)",
-   "points[2]: 토큰당 가격은 Sonnet 5와 동일(입력 $2, 출력 $10, 캐시 읽기 $0.20 / 100만 토큰)이나, 같은 작업을 더 적은 토큰으로 처리해 비용 절감 (refs og:162#q2, it:951#q3)",
-   "points[3]: 최대 100만 토큰 컨텍스트 창과 12만8000 토큰 최대 출력 지원 (refs it:951#q2)",
-   "points[4]: claude.ai 무료 티어 모델로 지정, ChatGPT 무료 티어(Luna 5.6)보다 높은 성능 제공 (refs og:162#q5)",
-   "points[5]: 여러 평가에서 Max effort 설정 시 Opus 5.5와 동등한 성능 기록, Haiku 5.5는 몇 주 내 5.5 패밀리 합류 예정 (refs og:162#q4, og:162#q3)",
-   "numbers[0] (anchor 2): Sonnet 5.5가 터미널벤치 4.0에서 Opus 5.5와 전작을 모두 상회 / context: 터미널 환경의 복잡한 작업을 평가하는 터미널벤치 4.0 점수 비교 [it:924#q3, it:924#q4]",
-   "numbers[0].items[0]: Sonnet 5.5 = 70.6 (it:924#q3)",
-   "numbers[0].items[1]: Opus 5.5 = 66.4 (it:924#q4)",
-   "numbers[0].items[2]: Sonnet 5 = 10.3 (it:924#q4)"
+   "title: Claude Sonnet 5.5, 오퍼스급 지능에 가성비",
+   "summary: 앤트로픽이 Claude Sonnet 5.5를 출시해 오퍼스급 지능(종합 2위 56점)에 기존 가격을 유지하고 작업당 비용을 최대 30% 절감했다. 쟁점은 오픈AI 데브데이 하루 앞선 선제 출시가 개발자 모델 경쟁을 어떻게 바꿀지다.",
+   "head_tiles[0]: 70.6% / 터미널벤치 4.0 점수 (전작 소네트 5(10.3%) 대비 7배 이상, 오퍼스 5.5(66.4%) 상회) (refs it:924#s7, it:924#s8)",
+   "head_tiles[1]: 56점 / 아티피셜 애널리시스 지능 종합 2위 (오퍼스 5.5(58점)에 2점 뒤처짐) (refs it:924#s13, it:924#s17)",
+   "head_tiles[2]: 최대 30% 절감 / 동일 작업당 비용 (토큰 수·도구 호출 횟수 감소로 실질 단가 하락) (refs it:924#s3, it:924#s4)",
+   "head_tiles[3]: 100만 토큰 / 컨텍스트 창(출시 전 추정) (출력 최대 12만8000 토큰) (refs it:951#s7)",
+   "sections[0].heading: 오퍼스급 지능에 소네트 가격, 작업당 비용 30% 절감",
+   "sections[0].paragraphs[0]: 앤트로픽이 28일(현지시간) Claude Sonnet 5.5를 출시했다. 입력 토큰당 2달러, 출력 토큰당 10달러, 캐시 읽기 토큰당 0.2달러라는 기존 가격 정책을 유지하면서, 작업 완료에 필요한 토큰 수와 도구 호출 횟수를 줄여 동일 작업당 비용을 최대 45% 절감했다. (refs it:924#s1, it:924#s3, it:924#s4)",
+   "sections[0].paragraphs[1]: 출력은 이전 세대 소네트 5 대비 30% 이상 빨라졌고, 아티피셜 애널리시스 지능 종합 순위에서 Opus 5.5(58점)에 이어 2위(56점)에 올랐다. 페이블 5.1과 GPT-6 아스트라(이상 53점)를 넘는 점수다. (refs it:924#s3, it:924#s13, it:924#s14)",
+   "sections[1].heading: 터미널벤치 70.6%로 Opus 5.5 제친 에이전트 코딩",
+   "sections[1].paragraphs[0]: 터미널 환경의 복잡한 작업을 평가하는 터미널벤치 4.0에서 70.6%를 기록했다. 전작 소네트 5의 10.3%를 7배 이상 뛰어넘고, 최상위 모델 Opus 5.5(66.4%)마저 제친 수치다. (refs it:924#s7, it:924#s8)",
+   "sections[1].paragraphs[1]: 에이전틱 개발 환경 커서벤치 4.0에서도 55.5%를 달성해 플래그십 모델에 근접한 코드 생성 역량을 보였다. 44개 직종 업무 수행 능력을 측정하는 GDPval-AA에서는 1844점을 기록해 소네트 5(1449점)를 약 400점 차이로 따돌리고 Opus 5.5(1846점)와 대등한 수준에 도달했다. (refs it:924#s9, it:924#s11)",
+   "sections[1].table (벤치마크/소네트 5.5/소네트 5/오퍼스 5.5): 벤치마크별 점수 비교 / note: 소네트 5.5 vs 전작·플래그십",
+   "sections[1].table.rows[0]: 터미널벤치 4.0 | 70.6% | 10.3% | 66.4%",
+   "sections[1].table.rows[1]: 커서벤치 4.0 | 55.5% | - | -",
+   "sections[1].table.rows[2]: GDPval-AA | 1844점 | 1449점 | 1846점",
+   "sections[2].heading: 도구 호출 묶음 처리로 불필요한 검색·질문 축소",
+   "sections[2].paragraphs[0]: 여러 도구 호출을 하나로 묶어 처리하는 방식으로 불필요한 검색이나 중간 질문을 대폭 줄였다. 스크린샷 이미지 분석만으로 프롬프트 입력 없이 포켓몬 레드 게임을 끝까지 클리어한 최초의 소네트 모델이라는 기록도 얻었다. (refs it:924#s16, it:924#s12)",
+   "sections[2].paragraphs[1]: 출시 전 유출 정보에서는 최대 100만 토큰의 컨텍스트 창과 최대 12만8000 토큰의 출력을 지원할 것으로 예상됐고, 적응형 사고(Adaptive Thinking) 기능이 기본 적용되며 필요할 때 외부 도구를 강제로 사용하는 기능이 개선될 것으로 전해졌다. (refs it:951#s7, it:951#s8)",
+   "sections[3].heading: 기업 현장 검증과 오픈AI 데브데이 견제",
+   "sections[3].paragraphs[0]: 에픽게임즈 다니엘 보겔 COO는 소네트 5.5가 더 상위 모델에 기대할 만한 품질 기준을 충족하며 시스템 설계 감사와 멀티아워 단위의 복잡한 게임플레이 아키텍처 작업을 처리했다고 밝혔다. 베이스44 가브리엘 그린버그 AI 엔지니어링 리드는 118개 실제 앱 구축 테스트에서 기존 오퍼스 5 수준의 앱을 평균 3.6회의 반복 횟수만으로 만들어냈다고 평가했다. (refs it:924#s21)",
+   "sections[3].paragraphs[1]: 출시 시점은 29일 오픈AI 데브데이 하루 앞둔 28일로, 선제적 개발자 모델 경쟁이 주목된다. 앤트로픽은 초고속·저비용 모델 클로드 하이쿠 5.5도 몇 주 안으로 출시해 5.5 제품군 라인업을 완성할 계획이다. (refs it:951#s5, it:951#s20, it:924#s26)"
   ],
   "previous": {
-   "log": "포인트 6개, 수치 그룹 1개, 근거 id 12개",
+   "log": "절 4개, 단락 8개, 표 1개, 타일 4개",
    "attention": false,
-   "points": [
+   "head_tiles": [
     {
-     "text": "Sonnet 5.5가 Sonnet 5 대비 출력 속도 45%+ 향상, 동일 작업당 비용 최대 30% 절감",
+     "value": "70.6%",
+     "label": "터미널벤치 4.0 점수",
+     "note": "전작 소네트 5(10.3%) 대비 7배 이상, 오퍼스 5.5(66.4%) 상회",
      "refs": [
-      "og:162#q1",
-      "it:924#q2"
-     ],
-     "check": false
+      "it:924#s7",
+      "it:924#s8"
+     ]
     },
     {
-     "text": "==터미널벤치 4.0에서 70.6%로 전작 Sonnet 5(10.3%)와 Opus 5.5(66.4%)를 모두 상회==",
+     "value": "56점",
+     "label": "아티피셜 애널리시스 지능 종합 2위",
+     "note": "오퍼스 5.5(58점)에 2점 뒤처짐",
      "refs": [
-      "it:924#q3",
-      "it:924#q4"
-     ],
-     "check": false
+      "it:924#s13",
+      "it:924#s17"
+     ]
     },
     {
-     "text": "토큰당 가격은 Sonnet 5와 동일(입력 $2, 출력 $10, 캐시 읽기 $0.20 / 100만 토큰)이나, 같은 작업을 더 적은 토큰으로 처리해 비용 절감",
+     "value": "최대 30% 절감",
+     "label": "동일 작업당 비용",
+     "note": "토큰 수·도구 호출 횟수 감소로 실질 단가 하락",
      "refs": [
-      "og:162#q2",
-      "it:951#q3"
-     ],
-     "check": false
+      "it:924#s3",
+      "it:924#s4"
+     ]
     },
     {
-     "text": "최대 100만 토큰 컨텍스트 창과 12만8000 토큰 최대 출력 지원",
+     "value": "100만 토큰",
+     "label": "컨텍스트 창(출시 전 추정)",
+     "note": "출력 최대 12만8000 토큰",
      "refs": [
-      "it:951#q2"
-     ],
-     "check": false
-    },
-    {
-     "text": "claude.ai 무료 티어 모델로 지정, ChatGPT 무료 티어(Luna 5.6)보다 높은 성능 제공",
-     "refs": [
-      "og:162#q5"
-     ],
-     "check": false
-    },
-    {
-     "text": "여러 평가에서 Max effort 설정 시 Opus 5.5와 동등한 성능 기록, Haiku 5.5는 몇 주 내 5.5 패밀리 합류 예정",
-     "refs": [
-      "og:162#q4",
-      "og:162#q3"
-     ],
-     "check": false
-    }
-   ],
-   "numbers": [
-    {
-     "anchor": 2,
-     "group": "terminalbench",
-     "title": "Sonnet 5.5가 터미널벤치 4.0에서 Opus 5.5와 전작을 모두 상회",
-     "context": "터미널 환경의 복잡한 작업을 평가하는 터미널벤치 4.0 점수 비교 [it:924#q3, it:924#q4]",
-     "unit": "%",
-     "items": [
-      {
-       "label": "Sonnet 5.5",
-       "value": "70.6",
-       "ref": "it:924#q3",
-       "baseline": false,
-       "emphasis": true
-      },
-      {
-       "label": "Opus 5.5",
-       "value": "66.4",
-       "ref": "it:924#q4",
-       "baseline": false,
-       "emphasis": false
-      },
-      {
-       "label": "Sonnet 5",
-       "value": "10.3",
-       "ref": "it:924#q4",
-       "baseline": true,
-       "emphasis": false
-      }
+      "it:951#s7"
      ]
     }
    ],
-   "events": [],
-   "contributions": [],
-   "concepts": [],
-   "overview": "Anthropic이 Claude 5.5 패밀리의 두 번째 모델인 Sonnet 5.5를 출시했다. 전작 대비 출력 속도 30%+ 향상과 동일 작업당 최대 30% 비용 절감을 달성했으며, 터미널벤치 4.0에서 70.6%로 Opus 5.5(66.4%)를 상회했다. 토큰당 가격은 Sonnet 5와 동일하지만, 같은 작업을 더 적은 토큰으로 처리해 실질 비용이 줄어든다. 100만 토큰 컨텍스트와 12만8000 토큰 출력을 지원하며, claude.ai 무료 티어 모델로 지정됐다.",
-   "summary": "Anthropic이 Sonnet 5.5를 출시했다. ==중급 모델이 Opus급 성능에 근접하면서 가격은 동일==하다.",
-   "title": "Claude Sonnet 5.5 출시: Opus급 성능, 동일 가격"
+   "sections": [
+    {
+     "heading": "오퍼스급 지능에 소네트 가격, 작업당 비용 30% 절감",
+     "paragraphs": [
+      {
+       "text": "앤트로픽이 28일(현지시간) Claude Sonnet 5.5를 출시했다. 입력 토큰당 2달러, 출력 토큰당 10달러, 캐시 읽기 토큰당 0.2달러라는 기존 가격 정책을 유지하면서, 작업 완료에 필요한 토큰 수와 도구 호출 횟수를 줄여 동일 작업당 비용을 최대 45% 절감했다.",
+       "refs": [
+        "it:924#s1",
+        "it:924#s3",
+        "it:924#s4"
+       ]
+      },
+      {
+       "text": "출력은 이전 세대 소네트 5 대비 30% 이상 빨라졌고, 아티피셜 애널리시스 지능 종합 순위에서 Opus 5.5(58점)에 이어 2위(56점)에 올랐다. 페이블 5.1과 GPT-6 아스트라(이상 53점)를 넘는 점수다.",
+       "refs": [
+        "it:924#s3",
+        "it:924#s13",
+        "it:924#s14"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "터미널벤치 70.6%로 Opus 5.5 제친 에이전트 코딩",
+     "paragraphs": [
+      {
+       "text": "터미널 환경의 복잡한 작업을 평가하는 터미널벤치 4.0에서 70.6%를 기록했다. 전작 소네트 5의 10.3%를 7배 이상 뛰어넘고, 최상위 모델 Opus 5.5(66.4%)마저 제친 수치다.",
+       "refs": [
+        "it:924#s7",
+        "it:924#s8"
+       ]
+      },
+      {
+       "text": "에이전틱 개발 환경 커서벤치 4.0에서도 55.5%를 달성해 플래그십 모델에 근접한 코드 생성 역량을 보였다. 44개 직종 업무 수행 능력을 측정하는 GDPval-AA에서는 1844점을 기록해 소네트 5(1449점)를 약 400점 차이로 따돌리고 Opus 5.5(1846점)와 대등한 수준에 도달했다.",
+       "refs": [
+        "it:924#s9",
+        "it:924#s11"
+       ]
+      }
+     ],
+     "visual": "table",
+     "bars": null,
+     "table": {
+      "title": "벤치마크별 점수 비교",
+      "note": "소네트 5.5 vs 전작·플래그십",
+      "columns": [
+       "벤치마크",
+       "소네트 5.5",
+       "소네트 5",
+       "오퍼스 5.5"
+      ],
+      "rows": [
+       [
+        "터미널벤치 4.0",
+        "70.6%",
+        "10.3%",
+        "66.4%"
+       ],
+       [
+        "커서벤치 4.0",
+        "55.5%",
+        "-",
+        "-"
+       ],
+       [
+        "GDPval-AA",
+        "1844점",
+        "1449점",
+        "1846점"
+       ]
+      ],
+      "refs": [
+       "it:924#s7",
+       "it:924#s8",
+       "it:924#s9",
+       "it:924#s11"
+      ]
+     },
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "도구 호출 묶음 처리로 불필요한 검색·질문 축소",
+     "paragraphs": [
+      {
+       "text": "여러 도구 호출을 하나로 묶어 처리하는 방식으로 불필요한 검색이나 중간 질문을 대폭 줄였다. 스크린샷 이미지 분석만으로 프롬프트 입력 없이 포켓몬 레드 게임을 끝까지 클리어한 최초의 소네트 모델이라는 기록도 얻었다.",
+       "refs": [
+        "it:924#s16",
+        "it:924#s12"
+       ]
+      },
+      {
+       "text": "출시 전 유출 정보에서는 최대 100만 토큰의 컨텍스트 창과 최대 12만8000 토큰의 출력을 지원할 것으로 예상됐고, 적응형 사고(Adaptive Thinking) 기능이 기본 적용되며 필요할 때 외부 도구를 강제로 사용하는 기능이 개선될 것으로 전해졌다.",
+       "refs": [
+        "it:951#s7",
+        "it:951#s8"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    },
+    {
+     "heading": "기업 현장 검증과 오픈AI 데브데이 견제",
+     "paragraphs": [
+      {
+       "text": "에픽게임즈 다니엘 보겔 COO는 소네트 5.5가 더 상위 모델에 기대할 만한 품질 기준을 충족하며 시스템 설계 감사와 멀티아워 단위의 복잡한 게임플레이 아키텍처 작업을 처리했다고 밝혔다. 베이스44 가브리엘 그린버그 AI 엔지니어링 리드는 118개 실제 앱 구축 테스트에서 기존 오퍼스 5 수준의 앱을 평균 3.6회의 반복 횟수만으로 만들어냈다고 평가했다.",
+       "refs": [
+        "it:924#s21"
+       ]
+      },
+      {
+       "text": "출시 시점은 29일 오픈AI 데브데이 하루 앞둔 28일로, 선제적 개발자 모델 경쟁이 주목된다. 앤트로픽은 초고속·저비용 모델 클로드 하이쿠 5.5도 몇 주 안으로 출시해 5.5 제품군 라인업을 완성할 계획이다.",
+       "refs": [
+        "it:951#s5",
+        "it:951#s20",
+        "it:924#s26"
+       ]
+      }
+     ],
+     "visual": "none",
+     "bars": null,
+     "table": null,
+     "tiles": [],
+     "events": null,
+     "slide": null,
+     "slide_caption": "",
+     "video_secs": [],
+     "check": false
+    }
+   ],
+   "summary": "앤트로픽이 Claude Sonnet 5.5를 출시해 오퍼스급 지능(종합 2위 56점)에 기존 가격을 유지하고 작업당 비용을 최대 30% 절감했다. 쟁점은 오픈AI 데브데이 하루 앞선 선제 출시가 개발자 모델 경쟁을 어떻게 바꿀지다.",
+   "title": "Claude Sonnet 5.5, 오퍼스급 지능에 가성비"
   },
   "issues": [
    {
-    "loc": "points[0]",
+    "loc": "sections[0].paragraphs[0]",
     "type": "number_mismatch",
-    "evidence_id": "og:162#q1",
-    "comment": "points[0]의 수치가 근거와 다름",
+    "evidence_id": "it:924#s1",
+    "comment": "sections[0].paragraphs[0]의 수치가 근거와 다름",
     "hint": "근거 표기 그대로",
     "idx": 0
    }
   ],
   "evidence": [
    {
-    "id": "og:162#q1",
-    "source": "Simon Willison's Weblog",
-    "text": "Introducing Claude Sonnet 5.5, the second model in the Claude 5.5 family. It’s a clear upgrade over Claude Sonnet 5, runs 30%+ faster, and costs up to 30% less for most work.\n수치: Sonnet 5.5 출력 속도 향상(Sonnet 5 대비) [30%+]\n수치: Sonnet 5.5 비용 절감(대부분 작업, 최대) [30%]\n주장: Sonnet 5.5는 Sonnet 5와 동일 가격으로, 대부분 작업에서 최대 30% 저렴하고 30%+ 빠름",
-    "title": "Claude Sonnet 5.5",
-    "url": "https://www.anthropic.com/claude-sonnet-5-5"
-   },
-   {
-    "id": "og:162#q2",
-    "source": "Simon Willison's Weblog",
-    "text": "Sonnet 5.5 is priced the same as Sonnet 5 at $2 per million input tokens, $10 per million output tokens, and $0.20 per million tokens for cache reads, but it typically needs far fewer tokens to do the same work. In our testing, it costs up to 30% less per task than its predecessor.\n수치: Sonnet 5.5 입력 토큰 가격 [$2 per million input tokens]\n수치: Sonnet 5.5 출력 토큰 가격 [$10 per million output tokens]\n수치: Sonnet 5.5 캐시 읽기 가격 [$0.20 per million tokens]",
-    "title": "Claude Sonnet 5.5",
-    "url": "https://www.anthropic.com/claude-sonnet-5-5"
-   },
-   {
-    "id": "it:924#q2",
+    "id": "it:924",
     "source": "AI타임스",
-    "text": "28일(현지시간) 발표에 따르면, 소네트 5.5는 이전 세대인 '소네트 5' 대비 출력이 30% 이상 빨라졌으며, 압도적인 작업 처리 효율성 덕분에 동일 작업당 비용을 최대 30% 절감했다.\n수치: 출력 속도 향상률 [30%]\n수치: 동일 작업당 비용 절감률 [30%]",
+    "text": "[it:924#s1] 앤트로픽이 차세대 모델 라인업의 두 번째 주자인 '클로드 소네트 5.5(Claude Sonnet 5.5)'를 출시했다.\n[it:924#s3] 28일(현지시간) 발표에 따르면, 소네트 5.5는 이전 세대인 '소네트 5' 대비 출력이 30% 이상 빨라졌으며, 압도적인 작업 처리 효율성 덕분에 동일 작업당 비용을 최대 30% 절감했다.\n[it:924#s4] 입력 토큰당 2달러, 출력 토큰당 10달러, 캐시 읽기 토큰당 0.2달러라는 기존 가격 정책을 유지하면서도, 작업을 완료하는 데 필요한 토큰 수와 도구 호출 횟수를 대폭 줄여 실질 단가를 크게 떨어뜨렸다.\n[it:924#s7] 터미널 환경의 복잡한 작업을 평가하는 '터미널벤치 4.0'에서 70.6%의 점수를 기록했다.\n[it:924#s8] 이는 전작인 소네트 5가 기록했던 10.3%를 무려 7배 이상 뛰어넘는 수치이며, 최상위 모델인 '오퍼스 5.5(66.4%)'마저 제친 기록이다.\n[it:924#s9] 실제 에이전틱 개발 환경인 '커서벤치 4.0'에서도 55.5%를 달성해 플래그십 모델에 근접한 정교한 코드 생성 역량을 입증했다.\n[it:924#s11] 44개 직종의 업무 수행 능력을 측정하는 'GDPval-AA' 테스트에서 1844점을 기록해 소네트 5(1449점)를 약 400점 차이로 따돌렸고 오퍼스 5.5(1846점)와 대등한 수준에 도달했다.\n[it:924#s12] 장기적인 작업 지점 추적과 시각 지능도 대폭 개선돼, 스크린샷 이미지 분석만으로 프롬프트 입력 없이 '포켓몬 레드' 게임을 끝까지 클리어한 최초의 소네트 모델이라는 타이틀도 얻었다.\n[it:924#s13] 아티피셜 애널리시스(Artificial Analysis)의 지능 종합 순위에서도 오퍼스 5.5(58점)에 이어 종합 2위(56점)에 올랐다.\n[it:924#s14] 이는 페이블 5.1과 'GPT-6 아스트라'(이상 53점)를 넘는 점수다.\n[it:924#s16] 특히 여러 도구 호출을 하나로 묶어 처리하는 방식으로 불필요한 검색이나 중간 질문을 대폭 줄였다는 평이다.\n[it:924#s21] 에픽게임즈의 다니엘 보겔 최고 운영책임자(COO)는 \"소네트 5.5는 더 상위 모델에 기대할 만한 수준의 품질 기준을 충족하며, 시스템 설계 감사와 멀티아워 단위의 복잡한 게임플레이 아키텍처 작업을 완벽히 처리했다\"고 밝혔으며, 베이스44의 가브리엘 그린버그 AI 엔지니어링 리드는 \"118개 실제 앱 구축 테스트에서 기존 오퍼스 5 수준의 앱을 절반 수준의 반복 횟수(평균 3.6회)만으로 만들어냈다\"고 평가했다.\n[it:924#s26] 한편, 앤트로픽은 초고속·저비용 모델인 '클로드 하이쿠 5.5'도 몇주 안으로 출시해 5.5 제품군 라인업을 완성할 계획이다.",
     "title": "앤트로픽, '클로드 소네트 5.5' 공개…오퍼스급 지능에 최강 가성비",
     "url": "https://www.aitimes.com/news/articleView.html?idxno=215734"
    },
    {
-    "id": "it:951#q2",
+    "id": "it:951",
     "source": "AI타임스",
-    "text": "현재까지 알려진 사양을 보면 소네트 5.5는 최대 100만 토큰의 컨텍스트 창과 최대 12만8000 토큰의 출력을 지원할 것으로 예상된다.\n수치: 컨텍스트 창 크기 [100만 토큰]\n수치: 최대 출력 크기 [12만8000 토큰]\n주장: 소네트 5.5는 100만 토큰 컨텍스트와 12만8000 토큰 출력을 지원하며, 토큰당 가격은 입력 2달러, 출력 10달러, 캐시 0.20달러로 추정",
+    "text": "[it:951#s5] 이는 29일 열리는 오픈AI의 데브데이를 하루 앞둔 시점이다.\n[it:951#s7] 현재까지 알려진 사양을 보면 소네트 5.5는 최대 100만 토큰의 컨텍스트 창과 최대 12만8000 토큰의 출력을 지원할 것으로 예상된다.\n[it:951#s8] 특히 적응형 사고(Adaptive Thinking) 기능이 기본 적용되고, 모델이 필요할 때 외부 도구를 강제로 사용하는 기능도 개선될 것으로 전해졌다.\n[it:951#s20] 오픈AI는 데브데이에서 상시 작동형 에이전트로 알려진 새로운 기능이나 개발자용 도구를 공개할 가능성이 거론되고 있어, 앤트로픽의 선제적인 모델 출시가 개발자들의 관심을 끌기 위한 움직임인지 주목된다.",
     "title": "앤트로픽, '클로드 소네트 5.5' 출시 임박...오픈AI '데브데이' 견제하나",
     "url": "https://www.aitimes.com/news/articleView.html?idxno=215700"
-   },
-   {
-    "id": "og:162#q3",
-    "source": "Simon Willison's Weblog",
-    "text": "Claude Haiku 5.5, built for high-volume and cost-sensitive applications, will join the Claude 5.5 family in the coming weeks.\n주장: Haiku 5.5는 몇 주 안에 Claude 5.5 패밀리로 합류 예정",
-    "title": "Claude Sonnet 5.5",
-    "url": "https://www.anthropic.com/claude-sonnet-5-5"
-   },
-   {
-    "id": "it:924#q3",
-    "source": "AI타임스",
-    "text": "터미널 환경의 복잡한 작업을 평가하는 '터미널벤치 4.0'에서 70.6%의 점수를 기록했다.\n수치: 터미널벤치 4.0 점수 [70.6%]\n주장: 터미널벤치 4.0에서 70.6%를 기록해 전작 소네트 5(10.3%)와 최상위 모델 오퍼스 5.5(66.4%)를 모두 상회했다.",
-    "title": "앤트로픽, '클로드 소네트 5.5' 공개…오퍼스급 지능에 최강 가성비",
-    "url": "https://www.aitimes.com/news/articleView.html?idxno=215734"
-   },
-   {
-    "id": "it:951#q3",
-    "source": "AI타임스",
-    "text": "입력 토큰은 100만개당 2달러, 출력 토큰은 100만개당 10달러, 캐시 읽기는 100만개당 0.20달러 수준으로 추정된다.\n수치: 입력 토큰 100만개당 가격 [2 달러]\n수치: 출력 토큰 100만개당 가격 [10 달러]\n수치: 캐시 읽기 100만개당 가격 [0.20 달러]",
-    "title": "앤트로픽, '클로드 소네트 5.5' 출시 임박...오픈AI '데브데이' 견제하나",
-    "url": "https://www.aitimes.com/news/articleView.html?idxno=215700"
-   },
-   {
-    "id": "og:162#q4",
-    "source": "Simon Willison's Weblog",
-    "text": "On several evaluations, Sonnet 5.5 at Max effort even performs comparably to Opus 5.5.\n주장: 여러 평가에서 Sonnet 5.5(Max effort)가 Opus 5.5와 동등한 성능을 보임",
-    "title": "Claude Sonnet 5.5",
-    "url": "https://www.anthropic.com/claude-sonnet-5-5"
-   },
-   {
-    "id": "it:924#q4",
-    "source": "AI타임스",
-    "text": "이는 전작인 소네트 5가 기록했던 10.3%를 무려 7배 이상 뛰어넘는 수치이며, 최상위 모델인 '오퍼스 5.5(66.4%)'마저 제친 기록이다.\n수치: 소네트 5 터미널벤치 4.0 점수 [10.3%]\n수치: 오퍼스 5.5 터미널벤치 4.0 점수 [66.4%]",
-    "title": "앤트로픽, '클로드 소네트 5.5' 공개…오퍼스급 지능에 최강 가성비",
-    "url": "https://www.aitimes.com/news/articleView.html?idxno=215734"
-   },
-   {
-    "id": "og:162#q5",
-    "source": "Simon Willison's Weblog",
-    "text": "The most interesting thing about Sonnet 5.5 is that it's now the model used for the free tier on claude.ai. OpenAI's ChatGPT free tier uses Luna 5.6, which means Anthropic currently have a much more capable free offering.\n주장: Sonnet 5.5가 claude.ai 무료 티어 모델이며, ChatGPT 무료 티어(Luna 5.6)보다 더 높은 성능 제공",
-    "title": "Claude Sonnet 5.5",
-    "url": "https://simonwillison.net/2026/Sep/28/claude-sonnet-5-5/"
    }
   ],
-  "aliases": []
+  "aliases": [
+   {
+    "canonical": "Claude Sonnet 5.5",
+    "aliases": [
+     "클로드 소네트 5.5"
+    ]
+   },
+   {
+    "canonical": "GPT-6 Sol",
+    "aliases": [
+     "GPT-6 솔"
+    ]
+   },
+   {
+    "canonical": "Luna",
+    "aliases": [
+     "루나"
+    ]
+   },
+   {
+    "canonical": "Opus 5.5",
+    "aliases": [
+     "오퍼스 5.5"
+    ]
+   },
+   {
+    "canonical": "클로드 소넷 5",
+    "aliases": [
+     "클로드 소네트 5"
+    ]
+   }
+  ]
  },
  "expect": {
   "action": "edit"
