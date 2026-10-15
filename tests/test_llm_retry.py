@@ -71,7 +71,9 @@ def _make_transport(monkeypatch, effects: list, waits: list[int]) -> tuple[OpenA
     client = _FakeClient()
     client.chat = chat
     monkeypatch.setattr(openai, "OpenAI", lambda **kw: client)
-    return OpenAITransport(waits), completions
+    transport = OpenAITransport()
+    transport.retry_waits_sec = waits
+    return transport, completions
 
 
 def test_retries_429_twice_then_succeeds(monkeypatch):

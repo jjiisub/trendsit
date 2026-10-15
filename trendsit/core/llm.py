@@ -126,9 +126,10 @@ class OpenAITransport:
 
     SDK 재시도 소진 뒤에도 429·5xx·연결 오류면 retry_waits_sec만큼 더 대기하고 다시 보낸다(S9 FR-2·FR-3)."""
 
-    def __init__(self, retry_waits_sec: list[int] | None = None) -> None:
+    retry_waits_sec: list[int] = DEFAULT_RETRY_WAITS_SEC  # LLMClient가 models.yaml 값으로 덮어씀
+
+    def __init__(self) -> None:
         self._clients: dict[tuple[str, str], Any] = {}
-        self.retry_waits_sec = retry_waits_sec if retry_waits_sec is not None else DEFAULT_RETRY_WAITS_SEC
 
     def __call__(self, body: dict[str, Any], base_url: str, api_key: str) -> dict[str, Any]:
         import openai
@@ -184,7 +185,10 @@ class LLMClient:
         self.models = models
         self.cache = cache
         self.budget = budget
-        self.transport = transport or OpenAITransport(models.retry_waits_sec)
+        if transport is None:
+            transport = OpenAITransport()
+            transport.retry_waits_sec = models.retry_waits_sec
+        self.transport = transport
         self.generation_cost = generation_cost or _generation_cost
         self.secret = secret
         self.network_calls = 0

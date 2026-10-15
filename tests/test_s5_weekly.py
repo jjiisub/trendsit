@@ -681,6 +681,36 @@ def test_weekly_retries_llm_error_failed_topics_then_succeeds(week, monkeypatch)
                      "writer", "critic", "writer", "writer", "critic"]  # C-4: 재시도 2라운드 안
 
 
+def test_weekly_retry_export_does_not_merge_topics_under_dash(week, monkeypatch):
+    """010-F01: 재시도 호출도 writer code 경계 행을 남겨, 실행 기록 export(export_runs.py)에서 재시도한
+    토픽들이 topic_id '-'(중단·진행 중) 블록 하나로 뭉치지 않고 각자의 topic_id로 귀속된다."""
+    from trendsit import export_runs as er
+    from trendsit.brief import write as wr
+    from trendsit.core.errors import LLMError
+
+    ctx, cids = week
+    responses = [plan(cids)]
+    for i in (3, 4, 1, 2):
+        responses += [page(i, f"{TITLES[i]} 근거 문장 요약 정리했다"), verdict([])]
+    ctx.llm.transport.responses = [response(r) for r in responses]
+    monkeypatch.setattr(pipeline.time, "sleep", lambda s: None)
+    stub_run_role(monkeypatch, wr, lambda n, role: LLMError("HTTP 429") if n in (1, 2, 9) else None)
+    ctx.tracer = Tracer(ctx.db, "weekly", "S0")
+    summary = pipeline.run_weekly("2026-W41", ctx, from_step="select", embedder=HashEmbedder(), cfg=CFG)
+    run_id = ctx.tracer.run_id
+    r = dict(ctx.db.conn.execute("SELECT * FROM runs WHERE id=?", (run_id,)).fetchone())
+    d = er._weekly(ctx.db, r, summary, current=None)
+    _, steps = er._weekly_detail(ctx.db, d, {})
+    wr_step = next(s for s in steps if s["name"] == "writer ⇄ critic")
+    topics = wr_step["detail"][0]["items"]
+    ids = [t["topic_id"] for t in topics]
+    assert "-" not in ids  # 재시도 호출이 경계 없는 '-' 블록으로 새지 않음
+    assert ids.count("w41-model-1") >= 1 and ids.count("w41-model-2") >= 1  # 재시도된 토픽은 자기 id로 귀속
+    # 재시도된 토픽의 두 블록(초기 실패 + 재시도) 중 적어도 하나는 재시도의 실제 writer·critic 호출을 담는다
+    retried = [t for t in topics if t["topic_id"] == "w41-model-2"]
+    assert any(c[0] in ("writer", "critic") for blk in retried for c in blk["chain"])
+
+
 def test_role_failed_topics_are_not_retried(week, monkeypatch):
     """C-3·AC-7: 잘림·스키마 실패(RoleFailed)로 failed인 토픽은 LLMError가 아니므로 재시도 대상이 아니다(라운드 0)."""
     from trendsit.core.role import RoleFailed
