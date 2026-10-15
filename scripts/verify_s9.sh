@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
-# S9 관문(109_S9_handoff.md §7). 하나라도 실패하면 종료 코드 1. 0원, LLM·네트워크 호출 없음.
-# = ruff check . && pytest -q && check-config && verify_s6-1.sh && verify_s6b.sh + C-7(config/models.yaml:
+# S9 관문(109_S9_handoff.md §7, v2). 하나라도 실패하면 종료 코드 1. 0원, LLM·네트워크 호출 없음.
+# = ruff check . && pytest -q && check-config + C-7(config/models.yaml:
 # generate 외 별칭 내용이 origin/main과 같음)
+# 회귀(verify_s6b.sh·verify_s7a.sh)는 런 끝 1회만, 이 스크립트 밖에서 돈다. verify_s6-1.sh는 S9에서 돌리지 않는다.
 set -u
 cd "$(dirname "$0")/.."
 FAILED=0
@@ -19,10 +20,6 @@ if out=$(uv run --quiet python -m trendsit check-config 2>&1) && echo "$out" | g
 else
   fail check-config "$out"
 fi
-
-echo "== 회귀: verify_s6-1.sh, verify_s6b.sh =="
-if out=$(bash scripts/verify_s6-1.sh 2>&1); then pass verify_s6-1 "종료 코드 0"; else fail verify_s6-1 "$(echo "$out" | grep '^FAIL' | tr '\n' ' ')"; fi
-if out=$(bash scripts/verify_s6b.sh 2>&1); then pass verify_s6b "종료 코드 0"; else fail verify_s6b "$(echo "$out" | grep '^FAIL' | tr '\n' ' ')"; fi
 
 # C-7: config/models.yaml에서 generate 외 별칭의 내용이 origin/main과 같다(구조 비교, 들여쓰기·줄바꿈 차이는 무시)
 c7() {

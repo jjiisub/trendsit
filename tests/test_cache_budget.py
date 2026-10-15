@@ -166,6 +166,39 @@ def test_unknown_spec_is_refused(tmp_path):
             Budget(cfg, spec, DB(tmp_path / "t.db"), tmp_path / "b.json", None, PriceBook(tmp_path / "p.json"))
 
 
+# ---------- S9 FR-6(AC-11·AC-12·C-8): 실패 응답은 캐시에 저장하지 않음 ----------
+def _raw(content=None, finish_reason="stop", cost=0.0001):
+    return {"id": "gen-test", "model": "test/model", "provider": "TestProvider",
+           "choices": [{"message": {"role": "assistant", "content": content}, "finish_reason": finish_reason}],
+           "usage": {"prompt_tokens": 10, "completion_tokens": 5, "cost": cost}}
+
+
+@pytest.mark.parametrize("first, schema", [
+    (_raw(content='{"bad": 1}'), RepoOnelinerInput),          # (a) 스키마 위반
+    (_raw(content=None), None),                                # (b) 빈 content·tool_calls 없음
+    (_raw(content="부분 응답", finish_reason="error"), None),   # (c) finish_reason "error"
+    (_raw(content="부분 응답", finish_reason="length"), None),  # (d) finish_reason "length"
+])
+def test_send_does_not_cache_failed_response(tmp_path, models, first, schema):
+    t = FakeTransport([first, _raw(content=GOOD)])
+    ctx = make_ctx(tmp_path, t)
+    body = ctx.llm.build_body("generate", MSG, schema=schema, max_tokens=10)
+    key = cache_key(body)
+    ctx.llm.send("generate", body, schema=schema)
+    assert ctx.llm.cache.get(key) is None  # C-8
+    r2 = ctx.llm.send("generate", body, schema=schema)
+    assert t.calls == 2 and r2.cache_hit is False  # 같은 본문 재호출이 네트워크 호출(AC-11)
+
+
+def test_send_caches_normal_response(tmp_path, models):
+    t = FakeTransport([_raw(content=GOOD), _raw(content=GOOD)])
+    ctx = make_ctx(tmp_path, t)
+    body = ctx.llm.build_body("generate", MSG, max_tokens=10)
+    r1 = ctx.llm.send("generate", body)
+    r2 = ctx.llm.send("generate", body)
+    assert t.calls == 1 and r1.cache_hit is False and r2.cache_hit is True  # AC-12
+
+
 def test_reasoning_tokens_are_inside_max_tokens(tmp_path, models):
     """추론 토큰은 max_tokens 안에서 센다(OpenRouter). 예상 출력 = max(max_tokens, reasoning.max_tokens)."""
     ctx = make_ctx(tmp_path, FakeTransport())

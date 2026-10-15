@@ -684,8 +684,9 @@ def test_weekly_retries_llm_error_failed_topics_then_succeeds(week, monkeypatch)
 
 
 def test_weekly_retry_export_does_not_merge_topics_under_dash(week, monkeypatch):
-    """FR-5: 재시도 호출도 writer code 경계 행을 남겨, 실행 기록 export(export_runs.py)에서 재시도한
-    토픽들이 topic_id '-'(중단·진행 중) 블록 하나로 뭉치지 않고 각자의 topic_id로 귀속된다."""
+    """FR-5·FR-7(AC-13): 재시도 호출도 writer code 경계 행을 남기고, 실행 기록 export(export_runs.py)에서
+    재시도한 토픽은 topic_id '-'(중단·진행 중) 블록으로 새지 않고, 같은 topic_id의 여러 시도가 블록 하나로
+    합쳐진다(C-9): 시도 사이에 chain ["code", "재시도"] 한 칸, tokens·cost는 합, status·rank·title은 최종."""
     from trendsit import export_runs as er
     from trendsit.brief import write as wr
     from trendsit.core.errors import LLMError
@@ -707,10 +708,44 @@ def test_weekly_retry_export_does_not_merge_topics_under_dash(week, monkeypatch)
     topics = wr_step["detail"][0]["items"]
     ids = [t["topic_id"] for t in topics]
     assert "-" not in ids  # 재시도 호출이 경계 없는 '-' 블록으로 새지 않음
-    assert ids.count("w41-model-1") >= 1 and ids.count("w41-model-2") >= 1  # 재시도된 토픽은 자기 id로 귀속
-    # 재시도된 토픽의 두 블록(초기 실패 + 재시도) 중 적어도 하나는 재시도의 실제 writer·critic 호출을 담는다
-    retried = [t for t in topics if t["topic_id"] == "w41-model-2"]
-    assert any(c[0] in ("writer", "critic") for blk in retried for c in blk["chain"])
+    distinct_ids = {t["topic_id"] for t in topics}
+    assert len(distinct_ids) == len(ids) == 4  # C-9: topic_id마다 블록 수 == 1
+    assert wr_step["line"].split(" / ")[0] == f"topics {len(distinct_ids)}"  # C-9: topics N == 서로 다른 topic_id 수
+
+    final_topics = {t["topic_id"]: dict(t) for t in ctx.db.conn.execute(
+        "SELECT topic_id, status, rank, title FROM topics WHERE run_id=?", (run_id,))}
+    retried = next(t for t in topics if t["topic_id"] == "w41-model-2")  # 초기 실패 + 1라운드 LLMError + 2라운드 성공
+    assert sum(c == ["code", "재시도"] for c in retried["chain"]) == 2  # 시도 세 번 → 경계 2개
+    assert retried["chain"][-1] != ["code", "재시도"]  # 경계는 시도 사이, 체인 끝이 아님
+    assert any(c[0] in ("writer", "critic") for c in retried["chain"])  # 재시도의 실제 호출을 담는다
+    ft = final_topics["w41-model-2"]
+    assert (retried["status"], retried["rank"], retried["title"]) == (ft["status"], ft["rank"], ft["title"])  # 최종값
+
+    not_retried = next(t for t in topics if t["topic_id"] == "w41-model-3")
+    assert ["code", "재시도"] not in not_retried["chain"]  # 재시도 안 한 토픽은 경계 칸이 생기지 않음
+
+
+def test_merge_retry_attempts_sums_tokens_cost_and_keeps_final_fields():
+    """C-9·AC-13 단위 테스트: 같은 topic_id의 시도 2개(실패 + 재시도 성공)를 블록 하나로.
+    chain은 시도 순서대로 이어 붙이고 사이에 ["code", "재시도"] 한 칸, tokens·cost는 합, status·rank·title은 최종(2번째)."""
+    from trendsit import export_runs as er
+
+    first = {"rank": 1, "title": "구 제목", "topic_id": "w41-x", "status": "failed", "final_round": 1,
+            "tokens_in": 100, "tokens_out": 10, "cost_usd": 0.001,
+            "chain": [["writer", "실패"], ["code", "failed"]], "issues": [["loc1", "t", "c", "-"]]}
+    second = {"rank": 1, "title": "최종 제목", "topic_id": "w41-x", "status": "passed", "final_round": 1,
+             "tokens_in": 200, "tokens_out": 20, "cost_usd": 0.002,
+             "chain": [["writer", "재작성"], ["code", "passed"]], "issues": []}
+    other = {"rank": 2, "title": "다른 토픽", "topic_id": "w41-y", "status": "passed", "final_round": 1,
+            "tokens_in": 5, "tokens_out": 5, "cost_usd": 0.0005, "chain": [["code", "passed"]], "issues": []}
+    merged = er._merge_retry_attempts([first, second, other])
+    assert [m["topic_id"] for m in merged] == ["w41-x", "w41-y"]  # 블록 수 == distinct topic_id 수
+    m = merged[0]
+    assert m["chain"] == [["writer", "실패"], ["code", "failed"], ["code", "재시도"], ["writer", "재작성"], ["code", "passed"]]
+    assert (m["tokens_in"], m["tokens_out"], m["cost_usd"]) == (300, 30, 0.003)
+    assert (m["status"], m["rank"], m["title"]) == ("passed", 1, "최종 제목")  # 최종(마지막 시도) 값
+    assert m["issues"] == [["loc1", "t", "c", "-"]]
+    assert merged[1] == other  # 재시도 없는 토픽은 그대로
 
 
 def test_role_failed_topics_are_not_retried(week, monkeypatch):

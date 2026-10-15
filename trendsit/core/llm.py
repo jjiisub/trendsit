@@ -275,9 +275,19 @@ class LLMClient:
             result.cost_usd = float(cost or 0)
         if self.budget is not None:
             self.budget.add(result.cost_usd)
-        if self.cache is not None:
+        if self.cache is not None and not self._is_failed_response(result, response):
             self.cache.put(key, {"request": request, "response": response})
         return result
+
+    @staticmethod
+    def _is_failed_response(result: LLMResult, response: dict[str, Any]) -> bool:
+        """S9 FR-6: 실패 응답(스키마 위반, 빈 본문, 비정상 finish_reason)은 캐시에 저장하지 않는다."""
+        if result.parse_error is not None:
+            return True
+        if not result.content and not result.tool_calls:
+            return True
+        finish_reason = response["choices"][0].get("finish_reason")
+        return finish_reason not in ("stop", "tool_calls")
 
     def _free(self, alias: str) -> bool:
         return self.models.models[alias].id.endswith(":free") or not self.is_openrouter(alias)
