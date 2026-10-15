@@ -23,7 +23,7 @@ def test_generate_provider_allows_fallback_bf16_fp8():
 
 
 def test_llmclient_wires_models_retry_waits_sec_into_transport():
-    """010-F16: models.yaml의 retry_waits_sec이 LLMClient를 거쳐 실제 전송(OpenAITransport)까지 간다.
+    """§4: models.yaml의 retry_waits_sec이 LLMClient를 거쳐 실제 전송(OpenAITransport)까지 간다.
     LLMClient.__init__의 연결 줄(transport.retry_waits_sec = models.retry_waits_sec)이 없으면 실패한다."""
     models = config.load("models.yaml").model_copy(update={"retry_waits_sec": [7, 13]})
     client = LLMClient(models, secret=lambda _name: "test-key")

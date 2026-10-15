@@ -674,7 +674,7 @@ def test_weekly_retries_llm_error_failed_topics_then_succeeds(week, monkeypatch)
     runs_after = ctx.db.conn.execute("SELECT COUNT(*) FROM runs").fetchone()[0]
     assert summary["status"] == "done" and summary["write"]["failed"] == 0
     assert runs_after == runs_before  # C-6: 새 run 행을 만들지 않음
-    assert waits_seen == [300, 600]  # 010-F11: 라운드 n의 대기 = wait_sec * n(5분, 10분), 순서대로
+    assert waits_seen == [300, 600]  # §4: 라운드 n의 대기 = wait_sec * n(5분, 10분), 순서대로
     rounds = ctx.db.conn.execute(
         "SELECT text, attention FROM steps WHERE run_id=? AND role='weekly' AND text LIKE '429 재시도%' ORDER BY id",
         (run_id,)).fetchall()
@@ -684,7 +684,7 @@ def test_weekly_retries_llm_error_failed_topics_then_succeeds(week, monkeypatch)
 
 
 def test_weekly_retry_export_does_not_merge_topics_under_dash(week, monkeypatch):
-    """010-F01: 재시도 호출도 writer code 경계 행을 남겨, 실행 기록 export(export_runs.py)에서 재시도한
+    """FR-5: 재시도 호출도 writer code 경계 행을 남겨, 실행 기록 export(export_runs.py)에서 재시도한
     토픽들이 topic_id '-'(중단·진행 중) 블록 하나로 뭉치지 않고 각자의 topic_id로 귀속된다."""
     from trendsit import export_runs as er
     from trendsit.brief import write as wr
@@ -727,7 +727,7 @@ def test_role_failed_topics_are_not_retried(week, monkeypatch):
 
 
 def test_budget_stopped_skips_retry_rounds(week, monkeypatch):
-    """C-5·AC-8·010-F02: 첫 작성에서 LLMError failed 토픽(topic 1)이 있어도, 그 뒤 BudgetExceeded로
+    """C-5·AC-8: 첫 작성에서 LLMError failed 토픽(topic 1)이 있어도, 그 뒤 BudgetExceeded로
     run이 stopped면 재시도 라운드를 하지 않는다. 가드(`if not ctx.stopped ...`)를 지우면 재시도 대상
     (topic 1)이 있으므로 이 테스트가 실패해야 한다."""
     from trendsit.core.budget import BudgetExceeded
@@ -744,7 +744,7 @@ def test_budget_stopped_skips_retry_rounds(week, monkeypatch):
 
 
 def test_budget_stopped_during_retry_round_skips_remaining_rounds(week, monkeypatch):
-    """§6·010-F02·F09: 재시도 1라운드 중(토픽 1의 재시도 호출) 예산 중단이 나면 그 라운드에서 바로 멈추고
+    """§6: 재시도 1라운드 중(토픽 1의 재시도 호출) 예산 중단이 나면 그 라운드에서 바로 멈추고
     남은 라운드(2회차)를 하지 않는다. 라운드 텍스트의 '토픽 k개'는 실제로 다시 쓴 수(0, 중단된 토픽은
     저장되지 않아 0)여야 한다."""
     from trendsit.brief import write as wr

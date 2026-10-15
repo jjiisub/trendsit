@@ -145,10 +145,10 @@ def _retry_failed_topics(ctx: Ctx, results: list[wr.TopicResult], ev: WeekEviden
                                      attention=[f"재시도 중 오류: {type(e).__name__}: {e}"[:300]])
             wr.save(db, res, tr.run_id)
             results[i] = res
-            _log_topic(tr, t, res)  # 010-F01: 재시도 호출도 writer code 경계 행을 남겨 export가 이 토픽으로 묶게 함
+            _log_topic(tr, t, res)  # FR-5: 재시도 호출도 writer code 경계 행을 남겨 export가 이 토픽으로 묶게 함
             retried += 1
         still_failing = sum(1 for i in failing if _llm_error_failed(results[i]))
-        tr.step(kind="code", role="weekly", text=f"429 재시도 {rnd}회차: 토픽 {retried}개",  # 010-F09: 실제로 다시 쓴 수
+        tr.step(kind="code", role="weekly", text=f"429 재시도 {rnd}회차: 토픽 {retried}개",  # AC-6: 실제로 다시 쓴 수
                attention=still_failing > 0, detail={"round": rnd, "retried": retried, "still_failing": still_failing})
         if ctx.stopped:
             break
