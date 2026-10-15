@@ -72,6 +72,7 @@ write:                              # S6-1: 절 구조(5.10)
   slides_max: 2
   video_secs_max: 3
   highlights: {summary: 1, per_paragraph: 1, page: [2, 4]}
+  retry_failed: {rounds: 2, wait_sec: 300}   # S9(015 흡수): 라운드 n의 대기 = wait_sec * n (5분, 10분)
 
 review:
   max_rounds: 3                     # 초안 1 + 수정 2. 코드 반려도 셈

@@ -109,6 +109,11 @@ class TableCfg(_Strict):
     cols: tuple[int, int]
 
 
+class RetryFailedCfg(_Strict):
+    rounds: int = Field(ge=0)
+    wait_sec: int = Field(ge=0)
+
+
 class WriteCfg(_Strict):
     input: WriteInputCfg
     summary: SummaryCfg
@@ -124,6 +129,7 @@ class WriteCfg(_Strict):
     slides_max: int
     video_secs_max: int
     highlights: HighlightsCfg
+    retry_failed: RetryFailedCfg  # S9(015 흡수): weekly 작성 단계 뒤 LLMError failed 토픽 재시도
 
     def sections_for(self, n_sources: int) -> tuple[int, int]:
         """작성자 sections 개수 범위: 근거 소스가 둘 이상이면 multi_source."""

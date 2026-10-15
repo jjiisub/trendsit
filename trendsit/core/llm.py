@@ -113,12 +113,22 @@ def _short_validation(e: ValidationError) -> str:
     return "; ".join(parts)
 
 
+DEFAULT_RETRY_WAITS_SEC = [30, 120]
+
+
+def _retryable_status(status_code: int) -> bool:
+    return status_code == 429 or status_code >= 500
+
+
 # ---------- 전송 ----------
 class OpenAITransport:
-    """공식 openai SDK로 보낸다. 429, 5xx, 연결 오류는 SDK가 지수 백오프로 3회 재시도, 그 밖의 4xx는 재시도 없음."""
+    """공식 openai SDK로 보낸다. 429, 5xx, 연결 오류는 SDK가 지수 백오프로 3회 재시도, 그 밖의 4xx는 재시도 없음.
 
-    def __init__(self) -> None:
+    SDK 재시도 소진 뒤에도 429·5xx·연결 오류면 retry_waits_sec만큼 더 대기하고 다시 보낸다(S9 FR-2·FR-3)."""
+
+    def __init__(self, retry_waits_sec: list[int] | None = None) -> None:
         self._clients: dict[tuple[str, str], Any] = {}
+        self.retry_waits_sec = retry_waits_sec if retry_waits_sec is not None else DEFAULT_RETRY_WAITS_SEC
 
     def __call__(self, body: dict[str, Any], base_url: str, api_key: str) -> dict[str, Any]:
         import openai
@@ -129,13 +139,21 @@ class OpenAITransport:
             self._clients[(base_url, api_key)] = client
         kwargs = {k: body[k] for k in SDK_FIELDS if body.get(k) is not None}
         extra = {k: v for k, v in body.items() if k not in SDK_FIELDS}
-        try:
-            resp = client.chat.completions.create(**kwargs, extra_body=extra or None)
-        except openai.APIStatusError as e:
-            raise LLMError(f"HTTP {e.status_code}: {_error_text(e)}") from e
-        except openai.APIConnectionError as e:
-            raise LLMError(f"연결 실패: {e}") from e
-        return resp.model_dump()
+        attempts = 1 + len(self.retry_waits_sec)
+        for attempt in range(attempts):
+            try:
+                resp = client.chat.completions.create(**kwargs, extra_body=extra or None)
+                return resp.model_dump()
+            except openai.APIStatusError as e:
+                exc: LLMError = LLMError(f"HTTP {e.status_code}: {_error_text(e)}")
+                if not _retryable_status(e.status_code) or attempt == attempts - 1:
+                    raise exc from e
+            except openai.APIConnectionError as e:
+                exc = LLMError(f"연결 실패: {e}")
+                if attempt == attempts - 1:
+                    raise exc from e
+            time.sleep(self.retry_waits_sec[attempt])
+        raise exc  # pragma: no cover - 루프가 항상 return/raise로 끝남
 
 
 def _error_text(e: Any) -> str:
@@ -166,7 +184,7 @@ class LLMClient:
         self.models = models
         self.cache = cache
         self.budget = budget
-        self.transport = transport or OpenAITransport()
+        self.transport = transport or OpenAITransport(models.retry_waits_sec)
         self.generation_cost = generation_cost or _generation_cost
         self.secret = secret
         self.network_calls = 0

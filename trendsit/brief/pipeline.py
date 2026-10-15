@@ -115,6 +115,43 @@ def _write_phase(ctx: Ctx, topics: list[sel.Applied], ev: WeekEvidence, table: a
     return results
 
 
+def _llm_error_failed(res: wr.TopicResult) -> bool:
+    """C-3: 첫 작성에서 failed이고 error가 LLMError로 시작(write_topic의 '작성 실패: LLMError: ...')."""
+    return res.status == "failed" and any(a.startswith("작성 실패: LLMError") for a in res.attention)
+
+
+def _retry_failed_topics(ctx: Ctx, results: list[wr.TopicResult], ev: WeekEvidence, table: al.AliasTable,
+                         cfg: BriefConfig, until: str | None) -> list[wr.TopicResult]:
+    """S9 FR-4(015 흡수): 작성 단계 뒤 LLMError로 failed인 토픽만 모아 최대 retry_failed.rounds라운드 다시 쓴다.
+    라운드 n의 대기는 wait_sec * n. 재시도 중 예산 중단이면 남은 라운드를 하지 않는다(C-4·C-5)."""
+    db, tr = ctx.db, ctx.tracer
+    assert tr is not None
+    r_cfg = cfg.write.retry_failed
+    for rnd in range(1, r_cfg.rounds + 1):
+        failing = [i for i, r in enumerate(results) if _llm_error_failed(r)]
+        if not failing:
+            break
+        time.sleep(r_cfg.wait_sec * rnd)
+        for i in failing:
+            t = results[i].topic
+            try:
+                res = wr.write_topic(ctx, t, ev.members, table, cfg, review=until != "write")
+            except Exception as e:  # noqa: BLE001 - 토픽 하나의 예상 밖 오류가 재시도 전체를 멈추지 않게. 예산 초과만 중단
+                if isinstance(e, (BudgetExceeded, PriceUnknown)):
+                    ctx.stopped = f"{type(e).__name__}: {e}"
+                    break
+                res = wr.TopicResult(t, "failed", None, [], [], [], [], 0,
+                                     attention=[f"재시도 중 오류: {type(e).__name__}: {e}"[:300]])
+            wr.save(db, res, tr.run_id)
+            results[i] = res
+        still_failing = sum(1 for i in failing if _llm_error_failed(results[i]))
+        tr.step(kind="code", role="weekly", text=f"429 재시도 {rnd}회차: 토픽 {len(failing)}개",
+               attention=still_failing > 0, detail={"round": rnd, "retried": len(failing), "still_failing": still_failing})
+        if ctx.stopped:
+            break
+    return results
+
+
 def run_weekly(week: str, ctx: Ctx, from_step: str = "cluster", only_topic: str | None = None,
                embedder: Any = None, cfg: BriefConfig | None = None, until: str | None = None) -> dict[str, Any]:
     """from_step부터 until까지(없으면 끝까지). until=select면 선별까지, write면 초안 + 코드 검사까지(검수자 없음)."""
@@ -146,6 +183,8 @@ def run_weekly(week: str, ctx: Ctx, from_step: str = "cluster", only_topic: str 
     t2 = time.monotonic()
     results = _write_phase(ctx, [] if until == "select" else topics, ev, table, cfg, from_step, src, only_topic, until)
     dur["write_review"] = round(time.monotonic() - t2, 1)
+    if not ctx.stopped and until != "select":
+        results = _retry_failed_topics(ctx, results, ev, table, cfg, until)
     if ctx.stopped:
         return _close(ctx, week, t0, dur, len(results))
     if only_topic and from_step != "cluster":  # 묶기부터 새로 했으면 원본 토픽과 맞지 않아 이어 오지 않음

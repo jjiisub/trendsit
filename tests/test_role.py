@@ -86,7 +86,7 @@ def test_request_body_pins_provider_and_reasoning(tmp_path, models):
     run_role(load_role("repo_oneliner", models), INPUT, make_ctx(tmp_path, t))
     body = t.bodies[0]
     assert body["model"] == models.models["generate"].id
-    assert body["provider"]["allow_fallbacks"] is False and body["provider"]["order"] == ["deepinfra"]
+    assert body["provider"]["allow_fallbacks"] is True and body["provider"]["order"] == ["deepinfra"]  # S9 FR-1
     assert body["reasoning"] == {"enabled": False}
     assert body["usage"] == {"include": True}
     rf = body["response_format"]["json_schema"]
