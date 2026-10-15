@@ -228,7 +228,30 @@ def _topic_blocks(db: DB, by: dict[str, list[Any]], rid: str, tid: str | None = 
             continue
         out.append(_topic(seg, dt, meta.get(dt["topic_id"]), revise, len(out) + 1))
         seg = []
+    out = _merge_retry_attempts(out)
     return out + ([_topic(seg, {"topic_id": tid or "-"}, None, revise, len(out) + 1)] if seg else [])
+
+
+def _merge_retry_attempts(blocks: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """S9 FR-7: 같은 weekly run 안 같은 topic_id의 여러 시도(재시도)를 블록 하나로 합친다.
+    chain은 시도 순서대로 이어 붙이고 시도 사이에 ["code", "재시도"] 한 칸, tokens·cost는 합, status·rank·title은 최종(topics 표)."""
+    merged: dict[str, dict[str, Any]] = {}
+    order: list[str] = []
+    for b in blocks:
+        tid = b["topic_id"]
+        prev = merged.get(tid)
+        if prev is None:
+            merged[tid] = b
+            order.append(tid)
+            continue
+        # 재시도는 실패한 토픽만 하므로 앞 시도의 끝 칸은 최종 status가 아니라 failed(011-F01)
+        prev["chain"] = prev["chain"][:-1] + [["code", "failed"], ["code", "재시도"]] + b["chain"]
+        prev["tokens_in"] += b["tokens_in"]
+        prev["tokens_out"] += b["tokens_out"]
+        prev["cost_usd"] = round(prev["cost_usd"] + b["cost_usd"], 4)
+        prev["issues"] = prev["issues"] + b["issues"]
+        prev["status"], prev["rank"], prev["title"], prev["final_round"] = b["status"], b["rank"], b["title"], b["final_round"]
+    return [merged[tid] for tid in order]
 
 
 def _topic(seg: list[Any], dt: dict[str, Any], t: Any, revise: dict[int, Any], n: int) -> dict[str, Any]:

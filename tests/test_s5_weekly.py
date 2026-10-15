@@ -652,6 +652,160 @@ def test_summary_status_stopped(week, monkeypatch):
     assert tuple(ctx.db.conn.execute("SELECT status, current_run_id FROM weeks").fetchone()) == before
 
 
+# ---------- S9 FR-4·FR-5(015 흡수): weekly 작성 단계 뒤 LLMError failed 토픽 재시도 ----------
+def test_weekly_retries_llm_error_failed_topics_then_succeeds(week, monkeypatch):
+    """AC-6: 토픽 4개 중 2개(1,2)가 첫 시도 LLMError. 1라운드에 1개(1) 성공·1개(2) 계속 LLMError, 2라운드에 성공.
+    run done, write.failed 0, 라운드마다 code 단계 한 줄(429 재시도 n회차) + attention, runs 행 수 변화 0."""
+    from trendsit.brief import write as wr
+    from trendsit.core.errors import LLMError
+
+    ctx, cids = week
+    responses = [plan(cids)]
+    for i in (3, 4, 1, 2):
+        responses += [page(i, f"{TITLES[i]} 근거 문장 요약 정리했다"), verdict([])]
+    ctx.llm.transport.responses = [response(r) for r in responses]
+    waits_seen: list[int] = []
+    monkeypatch.setattr(pipeline.time, "sleep", lambda s: waits_seen.append(s))
+    calls = stub_run_role(monkeypatch, wr, lambda n, role: LLMError("HTTP 429") if n in (1, 2, 9) else None)
+    ctx.tracer = Tracer(ctx.db, "weekly", "S0")
+    runs_before = ctx.db.conn.execute("SELECT COUNT(*) FROM runs").fetchone()[0]
+    summary = pipeline.run_weekly("2026-W41", ctx, from_step="select", embedder=HashEmbedder(), cfg=CFG)
+    run_id = ctx.tracer.run_id
+    runs_after = ctx.db.conn.execute("SELECT COUNT(*) FROM runs").fetchone()[0]
+    assert summary["status"] == "done" and summary["write"]["failed"] == 0
+    assert runs_after == runs_before  # C-6: 새 run 행을 만들지 않음
+    assert waits_seen == [300, 600]  # §4: 라운드 n의 대기 = wait_sec * n(5분, 10분), 순서대로
+    rounds = ctx.db.conn.execute(
+        "SELECT text, attention FROM steps WHERE run_id=? AND role='weekly' AND text LIKE '429 재시도%' ORDER BY id",
+        (run_id,)).fetchall()
+    assert [tuple(r) for r in rounds] == [("429 재시도 1회차: 토픽 2개", 1), ("429 재시도 2회차: 토픽 1개", 0)]
+    assert calls == ["writer", "writer", "writer", "critic", "writer", "critic",
+                     "writer", "critic", "writer", "writer", "critic"]  # C-4: 재시도 2라운드 안
+
+
+def test_weekly_retry_export_does_not_merge_topics_under_dash(week, monkeypatch):
+    """FR-5·FR-7(AC-13): 재시도 호출도 writer code 경계 행을 남기고, 실행 기록 export(export_runs.py)에서
+    재시도한 토픽은 topic_id '-'(중단·진행 중) 블록으로 새지 않고, 같은 topic_id의 여러 시도가 블록 하나로
+    합쳐진다(C-9): 시도 사이에 chain ["code", "재시도"] 한 칸, tokens·cost는 합, status·rank·title은 최종."""
+    from trendsit import export_runs as er
+    from trendsit.brief import write as wr
+    from trendsit.core.errors import LLMError
+
+    ctx, cids = week
+    responses = [plan(cids)]
+    for i in (3, 4, 1, 2):
+        responses += [page(i, f"{TITLES[i]} 근거 문장 요약 정리했다"), verdict([])]
+    ctx.llm.transport.responses = [response(r) for r in responses]
+    monkeypatch.setattr(pipeline.time, "sleep", lambda s: None)
+    stub_run_role(monkeypatch, wr, lambda n, role: LLMError("HTTP 429") if n in (1, 2, 9) else None)
+    ctx.tracer = Tracer(ctx.db, "weekly", "S0")
+    summary = pipeline.run_weekly("2026-W41", ctx, from_step="select", embedder=HashEmbedder(), cfg=CFG)
+    run_id = ctx.tracer.run_id
+    r = dict(ctx.db.conn.execute("SELECT * FROM runs WHERE id=?", (run_id,)).fetchone())
+    d = er._weekly(ctx.db, r, summary, current=None)
+    _, steps = er._weekly_detail(ctx.db, d, {})
+    wr_step = next(s for s in steps if s["name"] == "writer ⇄ critic")
+    topics = wr_step["detail"][0]["items"]
+    ids = [t["topic_id"] for t in topics]
+    assert "-" not in ids  # 재시도 호출이 경계 없는 '-' 블록으로 새지 않음
+    distinct_ids = {t["topic_id"] for t in topics}
+    assert len(distinct_ids) == len(ids) == 4  # C-9: topic_id마다 블록 수 == 1
+    assert wr_step["line"].split(" / ")[0] == f"topics {len(distinct_ids)}"  # C-9: topics N == 서로 다른 topic_id 수
+
+    final_topics = {t["topic_id"]: dict(t) for t in ctx.db.conn.execute(
+        "SELECT topic_id, status, rank, title FROM topics WHERE run_id=?", (run_id,))}
+    retried = next(t for t in topics if t["topic_id"] == "w41-model-2")  # 초기 실패 + 1라운드 LLMError + 2라운드 성공
+    assert sum(c == ["code", "재시도"] for c in retried["chain"]) == 2  # 시도 세 번 → 경계 2개
+    assert retried["chain"][-1] != ["code", "재시도"]  # 경계는 시도 사이, 체인 끝이 아님
+    bi = [i for i, c in enumerate(retried["chain"]) if c == ["code", "재시도"]]
+    assert all(retried["chain"][i - 1] == ["code", "failed"] for i in bi)  # 011-F01: 앞 시도 끝 칸은 failed
+    assert any(c[0] in ("writer", "critic") for c in retried["chain"])  # 재시도의 실제 호출을 담는다
+    ft = final_topics["w41-model-2"]
+    assert (retried["status"], retried["rank"], retried["title"]) == (ft["status"], ft["rank"], ft["title"])  # 최종값
+
+    not_retried = next(t for t in topics if t["topic_id"] == "w41-model-3")
+    assert ["code", "재시도"] not in not_retried["chain"]  # 재시도 안 한 토픽은 경계 칸이 생기지 않음
+
+
+def test_merge_retry_attempts_sums_tokens_cost_and_keeps_final_fields():
+    """C-9·AC-13 단위 테스트: 같은 topic_id의 시도 2개(실패 + 재시도 성공)를 블록 하나로.
+    chain은 시도 순서대로 이어 붙이고 사이에 ["code", "재시도"] 한 칸, tokens·cost는 합, status·rank·title은 최종(2번째)."""
+    from trendsit import export_runs as er
+
+    first = {"rank": 1, "title": "구 제목", "topic_id": "w41-x", "status": "failed", "final_round": 1,
+            "tokens_in": 100, "tokens_out": 10, "cost_usd": 0.001,
+            "chain": [["writer", "실패"], ["code", "failed"]], "issues": [["loc1", "t", "c", "-"]]}
+    second = {"rank": 1, "title": "최종 제목", "topic_id": "w41-x", "status": "passed", "final_round": 1,
+             "tokens_in": 200, "tokens_out": 20, "cost_usd": 0.002,
+             "chain": [["writer", "재작성"], ["code", "passed"]], "issues": []}
+    other = {"rank": 2, "title": "다른 토픽", "topic_id": "w41-y", "status": "passed", "final_round": 1,
+            "tokens_in": 5, "tokens_out": 5, "cost_usd": 0.0005, "chain": [["code", "passed"]], "issues": []}
+    merged = er._merge_retry_attempts([first, second, other])
+    assert [m["topic_id"] for m in merged] == ["w41-x", "w41-y"]  # 블록 수 == distinct topic_id 수
+    m = merged[0]
+    assert m["chain"] == [["writer", "실패"], ["code", "failed"], ["code", "재시도"], ["writer", "재작성"], ["code", "passed"]]
+    assert (m["tokens_in"], m["tokens_out"], m["cost_usd"]) == (300, 30, 0.003)
+    assert (m["status"], m["rank"], m["title"]) == ("passed", 1, "최종 제목")  # 최종(마지막 시도) 값
+    assert m["issues"] == [["loc1", "t", "c", "-"]]
+    assert merged[1] == other  # 재시도 없는 토픽은 그대로
+
+
+def test_role_failed_topics_are_not_retried(week, monkeypatch):
+    """C-3·AC-7: 잘림·스키마 실패(RoleFailed)로 failed인 토픽은 LLMError가 아니므로 재시도 대상이 아니다(라운드 0)."""
+    from trendsit.core.role import RoleFailed
+
+    ctx, cids = week
+    summary = _status_of(ctx, cids, monkeypatch, lambda n, role: RoleFailed("출력 검증 실패") if n == 7 else None)
+    run_id = ctx.tracer.run_id
+    assert summary["status"] == "partial" and summary["write"] == {"topics": 4, "failed": 1}
+    n_rounds = ctx.db.conn.execute("SELECT COUNT(*) FROM steps WHERE run_id=? AND text LIKE '429 재시도%'",
+                                   (run_id,)).fetchone()[0]
+    assert n_rounds == 0
+
+
+def test_budget_stopped_skips_retry_rounds(week, monkeypatch):
+    """C-5·AC-8: 첫 작성에서 LLMError failed 토픽(topic 1)이 있어도, 그 뒤 BudgetExceeded로
+    run이 stopped면 재시도 라운드를 하지 않는다. 가드(`if not ctx.stopped ...`)를 지우면 재시도 대상
+    (topic 1)이 있으므로 이 테스트가 실패해야 한다."""
+    from trendsit.core.budget import BudgetExceeded
+    from trendsit.core.errors import LLMError
+
+    ctx, cids = week
+    summary = _status_of(ctx, cids, monkeypatch,
+                         lambda n, role: LLMError("HTTP 429") if n == 1 else (BudgetExceeded("상한") if n == 2 else None))
+    run_id = ctx.tracer.run_id
+    assert summary["status"] == "stopped" and ctx.stopped == "BudgetExceeded: 상한"
+    n_rounds = ctx.db.conn.execute("SELECT COUNT(*) FROM steps WHERE run_id=? AND text LIKE '429 재시도%'",
+                                   (run_id,)).fetchone()[0]
+    assert n_rounds == 0
+
+
+def test_budget_stopped_during_retry_round_skips_remaining_rounds(week, monkeypatch):
+    """§6: 재시도 1라운드 중(토픽 1의 재시도 호출) 예산 중단이 나면 그 라운드에서 바로 멈추고
+    남은 라운드(2회차)를 하지 않는다. 라운드 텍스트의 '토픽 k개'는 실제로 다시 쓴 수(0, 중단된 토픽은
+    저장되지 않아 0)여야 한다."""
+    from trendsit.brief import write as wr
+    from trendsit.core.budget import BudgetExceeded
+    from trendsit.core.errors import LLMError
+
+    ctx, cids = week
+    responses = [plan(cids)]
+    for i in (3, 4):
+        responses += [page(i, f"{TITLES[i]} 근거 문장 요약 정리했다"), verdict([])]
+    ctx.llm.transport.responses = [response(r) for r in responses]
+    monkeypatch.setattr(pipeline.time, "sleep", lambda s: None)
+    stub_run_role(monkeypatch, wr, lambda n, role: LLMError("HTTP 429") if n in (1, 2) else
+                  (BudgetExceeded("상한") if n == 7 else None))
+    ctx.tracer = Tracer(ctx.db, "weekly", "S0")
+    summary = pipeline.run_weekly("2026-W41", ctx, from_step="select", embedder=HashEmbedder(), cfg=CFG)
+    run_id = ctx.tracer.run_id
+    assert summary["status"] == "stopped" and ctx.stopped == "BudgetExceeded: 상한"
+    rounds = ctx.db.conn.execute(
+        "SELECT text, attention FROM steps WHERE run_id=? AND role='weekly' AND text LIKE '429 재시도%' ORDER BY id",
+        (run_id,)).fetchall()
+    assert [tuple(r) for r in rounds] == [("429 재시도 1회차: 토픽 0개", 1)]  # 2회차 없음, retried=0(실제로 못 씀)
+
+
 def test_editor_select_fallback_reason_tells_call_failure_from_validation(week, monkeypatch):
     """대체 계획 이유: 마지막 시도가 예외면 호출 실패, 검증이 계속 실패하면 검증 실패(F-17)."""
     from trendsit.brief import select as sel

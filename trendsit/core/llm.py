@@ -1,6 +1,6 @@
 """LLM 호출 층. OpenAI 호환 /v1 한 가지 방식(개발은 OpenRouter, 이후 Ollama).
 
-제공사 고정, 추론 설정은 models.yaml에서 읽어 요청 본문에 넣는다. 캐시와 예산은 호출 직전에 확인한다.
+제공사(fallback 포함), 추론 설정은 models.yaml에서 읽어 요청 본문에 넣는다. 캐시와 예산은 호출 직전에 확인한다.
 """
 
 from __future__ import annotations
@@ -115,7 +115,11 @@ def _short_validation(e: ValidationError) -> str:
 
 # ---------- 전송 ----------
 class OpenAITransport:
-    """공식 openai SDK로 보낸다. 429, 5xx, 연결 오류는 SDK가 지수 백오프로 3회 재시도, 그 밖의 4xx는 재시도 없음."""
+    """공식 openai SDK로 보낸다. 429, 5xx, 연결 오류는 SDK가 지수 백오프로 3회 재시도, 그 밖의 4xx는 재시도 없음.
+
+    SDK 재시도 소진 뒤에도 429·5xx·연결 오류면 retry_waits_sec만큼 더 대기하고 다시 보낸다(S9 FR-2·FR-3)."""
+
+    retry_waits_sec: list[int]  # LLMClient.__init__이 models.yaml 값으로 채움(기본값은 거기 하나만)
 
     def __init__(self) -> None:
         self._clients: dict[tuple[str, str], Any] = {}
@@ -129,13 +133,19 @@ class OpenAITransport:
             self._clients[(base_url, api_key)] = client
         kwargs = {k: body[k] for k in SDK_FIELDS if body.get(k) is not None}
         extra = {k: v for k, v in body.items() if k not in SDK_FIELDS}
-        try:
-            resp = client.chat.completions.create(**kwargs, extra_body=extra or None)
-        except openai.APIStatusError as e:
-            raise LLMError(f"HTTP {e.status_code}: {_error_text(e)}") from e
-        except openai.APIConnectionError as e:
-            raise LLMError(f"연결 실패: {e}") from e
-        return resp.model_dump()
+        attempts = 1 + len(self.retry_waits_sec)
+        for attempt in range(attempts):
+            try:
+                resp = client.chat.completions.create(**kwargs, extra_body=extra or None)
+                return resp.model_dump()
+            except openai.APIStatusError as e:
+                retryable = e.status_code == 429 or 500 <= e.status_code <= 599
+                if not retryable or attempt == attempts - 1:
+                    raise LLMError(f"HTTP {e.status_code}: {_error_text(e)}") from e
+            except openai.APIConnectionError as e:
+                if attempt == attempts - 1:
+                    raise LLMError(f"연결 실패: {e}") from e
+            time.sleep(self.retry_waits_sec[attempt])
 
 
 def _error_text(e: Any) -> str:
@@ -166,7 +176,10 @@ class LLMClient:
         self.models = models
         self.cache = cache
         self.budget = budget
-        self.transport = transport or OpenAITransport()
+        if transport is None:
+            transport = OpenAITransport()
+            transport.retry_waits_sec = models.retry_waits_sec
+        self.transport = transport
         self.generation_cost = generation_cost or _generation_cost
         self.secret = secret
         self.network_calls = 0
@@ -262,9 +275,19 @@ class LLMClient:
             result.cost_usd = float(cost or 0)
         if self.budget is not None:
             self.budget.add(result.cost_usd)
-        if self.cache is not None:
+        if self.cache is not None and not self._is_failed_response(result, response):
             self.cache.put(key, {"request": request, "response": response})
         return result
+
+    @staticmethod
+    def _is_failed_response(result: LLMResult, response: dict[str, Any]) -> bool:
+        """S9 FR-6: 실패 응답(스키마 위반, 빈 본문, 비정상 finish_reason)은 캐시에 저장하지 않는다."""
+        if result.parse_error is not None:
+            return True
+        if not result.content and not result.tool_calls:
+            return True
+        finish_reason = response["choices"][0].get("finish_reason")
+        return finish_reason not in ("stop", "tool_calls")
 
     def _free(self, alias: str) -> bool:
         return self.models.models[alias].id.endswith(":free") or not self.is_openrouter(alias)

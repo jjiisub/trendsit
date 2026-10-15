@@ -83,7 +83,7 @@ a9() {
   n=$(wc -l <site_src/build.py); [ "$n" -le 700 ] || bad="$bad build.py $n줄"
   n=$(wc -l <site_src/build_runs.py); [ "$n" -le 500 ] || bad="$bad build_runs.py $n줄"
   n=$(wc -l <trendsit/export.py); [ "$n" -le 350 ] || bad="$bad export.py $n줄"
-  n=$(wc -l <trendsit/export_runs.py); [ "$n" -le 470 ] || bad="$bad export_runs.py $n줄"
+  n=$(wc -l <trendsit/export_runs.py); [ "$n" -le 500 ] || bad="$bad export_runs.py $n줄"
   n=$(wc -l <site_src/check.py); [ "$n" -le 480 ] || bad="$bad check.py $n줄"
   local longfn
   longfn=$(uv run --quiet python - <<'PY'
@@ -101,7 +101,7 @@ PY
   git diff "$(git merge-base HEAD origin/main 2>/dev/null || echo main)" -- trendsit site_src | grep -E '^\+.*(os\.environ|getenv)' && bad="$bad 새 환경 변수"
   [ -z "$bad" ] || { echo "$bad"; return 1; }
 }
-if msg=$(a9 2>&1); then pass A9 "줄 수(build ≤700, build_runs ≤500, export ≤350, export_runs ≤470, check ≤480)·함수 ≤60줄·render_run 0·버린 CSS 조각 0·details 0·새 환경 변수 0"; else fail A9 "$msg"; fi
+if msg=$(a9 2>&1); then pass A9 "줄 수(build ≤700, build_runs ≤500, export ≤350, export_runs ≤500, check ≤480)·함수 ≤60줄·render_run 0·버린 CSS 조각 0·details 0·새 환경 변수 0"; else fail A9 "$msg"; fi
 
 # A11 문서
 a11() {

@@ -62,6 +62,7 @@ class ModelSpec(Strict):
 class ModelsConfig(Strict):
     default_base_url: str
     models: dict[str, ModelSpec]
+    retry_waits_sec: list[Annotated[int, Field(ge=0)]] = Field(default_factory=lambda: [30, 120])  # S9: SDK 재시도 소진 뒤 추가 대기(초)
 
     @model_validator(mode="after")
     def _required(self) -> ModelsConfig:
