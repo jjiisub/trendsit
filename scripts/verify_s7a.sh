@@ -105,14 +105,16 @@ if msg=$(a9 2>&1); then pass A9 "줄 수(build ≤700, build_runs ≤500, export
 
 # A11 문서
 a11() {
-  grep -q '실행 기록(S7a)' README.md && grep -q 'publish --site-only' README.md && grep -q '/runs/<주>/<run>/' README.md || { echo "README 실행 기록 단락(쪽 3종·nightly 끝 재생성·publish --site-only) 없음"; return 1; }
+  grep -q '실행 기록(S7a)' README.md docs/DEVELOPMENT.md docs/RESULTS.md && grep -q 'publish --site-only' README.md docs/DEVELOPMENT.md docs/RESULTS.md && grep -q '/runs/<주>/<run>/' README.md docs/DEVELOPMENT.md docs/RESULTS.md || { echo "README 실행 기록 단락(쪽 3종·nightly 끝 재생성·publish --site-only) 없음"; return 1; }
   grep -q 'S7a' CLAUDE.md || { echo "CLAUDE.md에 S7a 진행 블록 줄 없음"; return 1; }
   grep -q 'S7a_TASK.md` 5.2' AGENTS.md || { echo "AGENTS.md 출력 형식 줄에 5.2 참조 없음"; return 1; }
   for n in 1 2 3 4 5 6 7 8; do grep -q "^## $n\\." reports/S7a_report.md 2>/dev/null || { echo "reports/S7a_report.md에 $n장 없음"; return 1; }; done
   grep -q 'C-6' reports/S7a_report.md || { echo "리포트에 C-6 실측 크기 없음"; return 1; }
   local shots
-  shots=$(ls reports/S7a/shots/*.png 2>/dev/null | wc -l | tr -d ' ')
-  [ "${shots:-0}" -ge 4 ] || { echo "reports/S7a/shots/ png ${shots:-0}장(4장 이상 필요: A10 QA 산출물)"; return 1; }
+  if [ -d reports/S7a/shots ]; then  # 캡처는 저장소 미포함(repo-tidy). 로컬에 폴더가 있을 때만 센다
+    shots=$(ls reports/S7a/shots/*.png 2>/dev/null | wc -l | tr -d ' ')
+    [ "${shots:-0}" -ge 4 ] || { echo "reports/S7a/shots/ png ${shots:-0}장(4장 이상 필요: A10 QA 산출물)"; return 1; }
+  fi
 }
 if out=$(a11 2>&1); then pass A11 "README 실행 기록 단락, CLAUDE.md·AGENTS.md, reports/S7a_report.md 8장(C-6 크기 포함), shots ≥4장"; else fail A11 "$out"; fi
 

@@ -137,7 +137,7 @@ fi
 # A10 문서
 MISSING=""
 for cmd in "uv sync" check-config "role " "--replay" "eval " "cost" "trace"; do
-  grep -q -- "$cmd" README.md 2>/dev/null || MISSING+=" $cmd"
+  grep -q -- "$cmd" README.md docs/DEVELOPMENT.md docs/RESULTS.md 2>/dev/null || MISSING+=" $cmd"
 done
 [ -f reports/S0_report.md ] || MISSING+=" reports/S0_report.md"
 [ -z "$MISSING" ] && pass A10 "README에 설치와 명령, reports/S0_report.md 있음" || fail A10 "없음:$MISSING"

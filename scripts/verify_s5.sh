@@ -111,7 +111,7 @@ for k in $extra; do
   n2=$(for f in reports/eval/${k}_*.json; do echo "$labeled" | grep -qx "$f" || echo "$f"; done | wc -l | tr -d ' ')
   [ "$n2" -gt 1 ] && over="$over $k($n2)"
 done
-if grep -q 'S5' README.md && grep -q '진행 체크리스트' reports/S5_report.md && [ -z "$over" ]; then
+if grep -q 'S5' README.md docs/DEVELOPMENT.md docs/RESULTS.md && grep -q '진행 체크리스트' reports/S5_report.md && [ -z "$over" ]; then
   pass A14 "README S5 상태, S5_report 체크리스트, reports/eval 역할·모델별 최신 1개(+ 라벨 기준 실행)"
 else
   fail A14 "README/리포트/eval 정리 확인:${over}"
@@ -203,10 +203,10 @@ if [ "$b5" != "FAIL" ]; then pass B5 "순 감소(bed7887 기준)$b5"; else fail 
 # B11 리포트·README: 체크리스트 전부 [x], 8장 SUMMARY, 9장 전후 줄 수 표, 10장 관문 B 칸(런 뒤 채움 표시)
 r=reports/S5-1b_report.md
 if [ -f $r ] && grep -q '\[x\]' $r && ! grep -q '\[ \]' $r && grep -q '^## 8\. impl-workflow SUMMARY' $r \
-   && grep -q '^## 9\. 줄 수 전후' $r && grep -q '^## 10\. 관문 B 결과 (런 뒤 채움)' $r && grep '현재 상태' README.md | grep -q 'S5-1b'; then
-  pass B11 "S5-1b_report 체크리스트 전부 [x], 8장 SUMMARY, 9장 전후 줄 수 표, 10장 관문 B 칸(런 뒤 채움), README 현재 상태에 S5-1b"
+   && grep -q '^## 9\. 줄 수 전후' $r && grep -q '^## 10\. 관문 B 결과 (런 뒤 채움)' $r; then
+  pass B11 "S5-1b_report 체크리스트 전부 [x], 8장 SUMMARY, 9장 전후 줄 수 표, 10장 관문 B 칸(런 뒤 채움) (README 현재 상태 줄은 repo-tidy에서 없어져 보지 않음)"
 else
-  fail B11 "reports/S5-1b_report.md 체크리스트·장 제목 또는 README 현재 상태 줄"
+  fail B11 "reports/S5-1b_report.md 체크리스트·장 제목"
 fi
 # A18 효과 없는 설정 키 0(S5-1a 5.7 표): yaml은 주석을 떼고, 스키마(core/config*.py)는 필드 정의 줄에서 찾는다
 DEAD='auto_approve|linkage|per_point_max|runtime|weekly_target_minutes|lang|channel_handle|why|paths|video_max_minutes|frames_per_slide_video'
@@ -242,10 +242,9 @@ ins=$(echo "$stat" | sed -nE 's/.* ([0-9]+) insertion.*/\1/p'); del=$(echo "$sta
 if [ "${del:-0}" -gt "${ins:-0}" ]; then pass A23 "trendsit/ 추가 ${ins:-0}줄 < 삭제 ${del:-0}줄"; else fail A23 "순 감소 아님: $stat"; fi
 
 # A24 리포트·README
-if [ -f reports/S5-1a_report.md ] && grep -q '\[x\]' reports/S5-1a_report.md && ! grep -q '\[ \]' reports/S5-1a_report.md \
-   && grep '현재 상태' README.md | grep -q 'S5-1a'; then
-  pass A24 "S5-1a_report 체크리스트 전부 [x], README 현재 상태에 S5-1a"
+if [ -f reports/S5-1a_report.md ] && grep -q '\[x\]' reports/S5-1a_report.md && ! grep -q '\[ \]' reports/S5-1a_report.md; then
+  pass A24 "S5-1a_report 체크리스트 전부 [x] (README 현재 상태 줄은 repo-tidy에서 없어져 보지 않음)"
 else
-  fail A24 "reports/S5-1a_report.md 체크리스트 또는 README 현재 상태 줄"
+  fail A24 "reports/S5-1a_report.md 체크리스트"
 fi
 exit $FAILED

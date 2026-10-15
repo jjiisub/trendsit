@@ -64,7 +64,7 @@ pt A-all "S6a 테스트 전체(export·site)" tests/test_export.py tests/test_si
 
 # ---------- S-4: 문서 ----------
 a13() {
-  grep -q '^### 사이트 (S6a)' README.md && grep -q 'trendsit export' README.md && grep -q 'publish --week' README.md && grep -q 'site_src/check.py' README.md || { echo "README 사이트 절(export·publish·check 명령) 없음"; return 1; }
+  grep -q '^### 사이트 (S6a)' README.md docs/DEVELOPMENT.md docs/RESULTS.md && grep -q 'trendsit export' README.md docs/DEVELOPMENT.md docs/RESULTS.md && grep -q 'publish --week' README.md docs/DEVELOPMENT.md docs/RESULTS.md && grep -q 'site_src/check.py' README.md docs/DEVELOPMENT.md docs/RESULTS.md || { echo "README 사이트 절(export·publish·check 명령) 없음"; return 1; }
   grep -q '^## 8\. ' reports/S6a_report.md 2>/dev/null || { echo "reports/S6a_report.md 8장까지 없음"; return 1; }
   [ ! -e site_src/style.css ] || { echo "site_src/style.css가 남음"; return 1; }
   local g

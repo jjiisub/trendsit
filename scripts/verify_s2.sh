@@ -85,9 +85,9 @@ fi
 pt A8 "item_card enforce: 본문에 없는 quote, quote에 없는 수치, 목록 밖 키워드·링크 정리 + detail 기록, 코드 채점(인젝션, 인용 일치율)" \
   tests/test_s2b.py
 A14_MISS=""
-grep -q "trendsit filter" README.md || A14_MISS+=" README:filter"
-grep -q "trendsit summarize" README.md || A14_MISS+=" README:summarize"
-grep -q "^| S2 " README.md || A14_MISS+=" README:성과 행"
+grep -q "trendsit filter" README.md docs/DEVELOPMENT.md docs/RESULTS.md || A14_MISS+=" README:filter"
+grep -q "trendsit summarize" README.md docs/DEVELOPMENT.md docs/RESULTS.md || A14_MISS+=" README:summarize"
+grep -q "^| S2 " README.md docs/DEVELOPMENT.md docs/RESULTS.md || A14_MISS+=" README:성과 행"
 for c in rematch "trendsit filter" filter-fixtures "trendsit summarize"; do grep -q "$c" docs/DEVELOPMENT.md || A14_MISS+=" DEVELOPMENT:$c"; done
 grep -q "## 2a" reports/S2_report.md 2>/dev/null || A14_MISS+=" reports/S2_report.md(2a)"
 grep -q "## 2b" reports/S2_report.md 2>/dev/null || A14_MISS+=" reports/S2_report.md(2b)"

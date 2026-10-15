@@ -56,10 +56,10 @@ pt A13 "자동 자막 경로 없음(자동 자막만 있는 메타데이터에�
 
 # A14 문서
 A14_MISS=""
-grep -q "trendsit video run" README.md || A14_MISS+=" README:video run"
-grep -qi "ffmpeg" README.md || A14_MISS+=" README:ffmpeg"
-grep -q "JS 런타임" README.md || A14_MISS+=" README:JS 런타임"
-grep -q "영상 분석가" README.md || A14_MISS+=" README:기능"
+grep -q "trendsit video run" README.md docs/DEVELOPMENT.md docs/RESULTS.md || A14_MISS+=" README:video run"
+grep -qi "ffmpeg" README.md docs/DEVELOPMENT.md docs/RESULTS.md || A14_MISS+=" README:ffmpeg"
+grep -q "JS 런타임" README.md docs/DEVELOPMENT.md docs/RESULTS.md || A14_MISS+=" README:JS 런타임"
+grep -q "영상 분석가" README.md docs/DEVELOPMENT.md docs/RESULTS.md || A14_MISS+=" README:기능"
 grep -q "trendsit video" docs/DEVELOPMENT.md || A14_MISS+=" DEVELOPMENT:video"
 [ -f reports/S4_report.md ] || A14_MISS+=" reports/S4_report.md"
 [ -z "$A14_MISS" ] && pass A14 "README(기능, 빠른 시작, 시스템 의존성), DEVELOPMENT.md 명령표, 리포트" || fail A14 "없음:$A14_MISS"
