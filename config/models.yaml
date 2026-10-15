@@ -1,6 +1,6 @@
 # 초안. S0 TASK 5.1 참고
 default_base_url: https://openrouter.ai/api/v1
-retry_waits_sec: [30, 120]   # S9: SDK 재시도(3회) 소진 뒤 429·5xx·연결 오류에 추가로 대기하는 횟수
+retry_waits_sec: [30, 120]   # S9: SDK 재시도(3회) 소진 뒤 429·5xx·연결 오류에 추가로 대기하는 시간 목록(초)
 models:
   generate:
     id: qwen/qwen3.8-27b

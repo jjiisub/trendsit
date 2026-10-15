@@ -50,8 +50,6 @@ def test_loader_rejects_bad_frontmatter(tmp_path, models, field, value, path):
     assert e.value.path == path
 
 
-
-
 def test_run_role_retries_then_succeeds(tmp_path, models):
     t = FakeTransport([response("not json"), response(GOOD)])
     ctx = make_ctx(tmp_path, t)

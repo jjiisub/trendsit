@@ -1,6 +1,6 @@
 """LLM 호출 층. OpenAI 호환 /v1 한 가지 방식(개발은 OpenRouter, 이후 Ollama).
 
-제공사 고정, 추론 설정은 models.yaml에서 읽어 요청 본문에 넣는다. 캐시와 예산은 호출 직전에 확인한다.
+제공사(fallback 포함), 추론 설정은 models.yaml에서 읽어 요청 본문에 넣는다. 캐시와 예산은 호출 직전에 확인한다.
 """
 
 from __future__ import annotations
@@ -113,20 +113,13 @@ def _short_validation(e: ValidationError) -> str:
     return "; ".join(parts)
 
 
-DEFAULT_RETRY_WAITS_SEC = [30, 120]
-
-
-def _retryable_status(status_code: int) -> bool:
-    return status_code == 429 or status_code >= 500
-
-
 # ---------- 전송 ----------
 class OpenAITransport:
     """공식 openai SDK로 보낸다. 429, 5xx, 연결 오류는 SDK가 지수 백오프로 3회 재시도, 그 밖의 4xx는 재시도 없음.
 
     SDK 재시도 소진 뒤에도 429·5xx·연결 오류면 retry_waits_sec만큼 더 대기하고 다시 보낸다(S9 FR-2·FR-3)."""
 
-    retry_waits_sec: list[int] = DEFAULT_RETRY_WAITS_SEC  # LLMClient가 models.yaml 값으로 덮어씀
+    retry_waits_sec: list[int]  # LLMClient.__init__이 models.yaml 값으로 채움(기본값은 거기 하나만)
 
     def __init__(self) -> None:
         self._clients: dict[tuple[str, str], Any] = {}
@@ -146,15 +139,13 @@ class OpenAITransport:
                 resp = client.chat.completions.create(**kwargs, extra_body=extra or None)
                 return resp.model_dump()
             except openai.APIStatusError as e:
-                exc: LLMError = LLMError(f"HTTP {e.status_code}: {_error_text(e)}")
-                if not _retryable_status(e.status_code) or attempt == attempts - 1:
-                    raise exc from e
+                retryable = e.status_code == 429 or 500 <= e.status_code <= 599
+                if not retryable or attempt == attempts - 1:
+                    raise LLMError(f"HTTP {e.status_code}: {_error_text(e)}") from e
             except openai.APIConnectionError as e:
-                exc = LLMError(f"연결 실패: {e}")
                 if attempt == attempts - 1:
-                    raise exc from e
+                    raise LLMError(f"연결 실패: {e}") from e
             time.sleep(self.retry_waits_sec[attempt])
-        raise exc  # pragma: no cover - 루프가 항상 return/raise로 끝남
 
 
 def _error_text(e: Any) -> str:
