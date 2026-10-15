@@ -717,6 +717,8 @@ def test_weekly_retry_export_does_not_merge_topics_under_dash(week, monkeypatch)
     retried = next(t for t in topics if t["topic_id"] == "w41-model-2")  # 초기 실패 + 1라운드 LLMError + 2라운드 성공
     assert sum(c == ["code", "재시도"] for c in retried["chain"]) == 2  # 시도 세 번 → 경계 2개
     assert retried["chain"][-1] != ["code", "재시도"]  # 경계는 시도 사이, 체인 끝이 아님
+    bi = [i for i, c in enumerate(retried["chain"]) if c == ["code", "재시도"]]
+    assert all(retried["chain"][i - 1] == ["code", "failed"] for i in bi)  # 011-F01: 앞 시도 끝 칸은 failed
     assert any(c[0] in ("writer", "critic") for c in retried["chain"])  # 재시도의 실제 호출을 담는다
     ft = final_topics["w41-model-2"]
     assert (retried["status"], retried["rank"], retried["title"]) == (ft["status"], ft["rank"], ft["title"])  # 최종값
