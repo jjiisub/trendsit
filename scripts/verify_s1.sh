@@ -42,7 +42,7 @@ pt A9 "트렌딩(설계 결정 Q2): 주간 페이지에 보이는 전부 저장(
 pt A10 "키워드: 제목 매칭 3점, 단어 경계(eval ≠ evaluate), 제외어 규칙" tests/test_s1b.py -k "keyword_rules"
 pt A11 "robots: 막힌 경로는 가져오지 않고 기록" tests/test_s1b.py -k "robots"
 A12_MISS=""
-grep -q "trendsit collect --since" README.md || A12_MISS+=" README:collect"
+grep -q "trendsit collect --since" README.md docs/DEVELOPMENT.md docs/RESULTS.md || A12_MISS+=" README:collect"
 grep -q "trendsit collect" docs/DEVELOPMENT.md || A12_MISS+=" DEVELOPMENT:collect"
 grep -q "## 1b 수집" reports/S1_report.md 2>/dev/null || A12_MISS+=" reports/S1_report.md(1b)"
 [ -z "$A12_MISS" ] && pass A12 "README와 DEVELOPMENT.md에 수집 명령, reports/S1_report.md" || fail A12 "없음:$A12_MISS"
@@ -54,8 +54,8 @@ pt P3 "자료 탈출 방지: </document>, </data> 등이 태그 밖으로 나가
 pt P4 "스키마 순서: 모든 출력의 마지막 두 칸 log, attention, basis가 oneliner 앞" tests/test_s1a.py -k "schema_ends or basis_before"
 pt P5 "라벨 도구: --label CSV 생성, 모의 라벨로 --agreement 일치율" tests/test_s1a.py -k "label"
 P6_MISS=""
-# 지금 README의 제목(PR #2 판) 기준: 맨 위 한 줄 소개(제목 없음) + 아래 11개
-HEADS=("1. 왜 만들었나" "2. 핵심 기능" "3. 아키텍처" "4. 빠른 시작" "5. 사용 예시 / 결과물" "6. 성과와 평가" "7. 기술적 도전" "8. 기술 스택" "9. 폴더 구조" "10. 로드맵 / 한계" "만든 사람")
+# 지금 README의 제목(repo-tidy 판) 기준: 맨 위 한 줄 소개(제목 없음) + 아래 6개. 옛 4·6·7장은 docs/DEVELOPMENT.md·docs/RESULTS.md
+HEADS=("무엇을 하나" "어떻게 동작하나" "지금 상태" "실행 (내 환경 기준)" "폴더" "라이선스")
 ORDER=$(grep -n '^## ' README.md | sed 's/^\([0-9]*\):## /\1 /')
 last=0
 for h in "${HEADS[@]}"; do
@@ -66,9 +66,9 @@ for f in .github/pull_request_template.md .github/workflows/ci.yml docs/RULES.md
   [ -f "$f" ] || P6_MISS+=" $f"
 done
 uv run --quiet python -c "import yaml; yaml.safe_load(open('.github/workflows/ci.yml'))" 2>/dev/null || P6_MISS+=" ci.yml 문법"
-head -1 README.md | grep -q '^# TrendsIT' && sed -n '2,4p' README.md | grep -q '^> ' || P6_MISS+=" README:맨 위 한 줄 소개"
-grep -q 'actions/workflows/ci.yml/badge.svg' README.md || P6_MISS+=" README:CI 배지"
-[ -z "$P6_MISS" ] && pass P6 "README 한 줄 소개 + 제목 11개 순서, CI 배지, PR 양식, CI(YAML 통과), RULES.md, ADR 틀 (CI 초록은 PR에서 확인)" || fail P6 "없음:$P6_MISS"
+head -1 README.md | grep -q '^# TrendsIT' && sed -n '3p' README.md | grep -q . || P6_MISS+=" README:맨 위 한 줄 소개"
+grep -q 'actions/workflows/ci.yml' README.md || P6_MISS+=" README:CI 링크"
+[ -z "$P6_MISS" ] && pass P6 "README 한 줄 소개 + 제목 6개 순서, CI 링크, PR 양식, CI(YAML 통과), RULES.md, ADR 틀 (CI 초록은 PR에서 확인)" || fail P6 "없음:$P6_MISS"
 
 # ---------- 1a: S0 리뷰 반영 (S0_REVIEW 4장) ----------
 pt R1 "태그 탈출 대소문자: </DATA>, </Data >, </document >, <DOCUMENT id=\"x\">" tests/test_s1a.py -k "escape"

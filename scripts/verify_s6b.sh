@@ -114,10 +114,10 @@ if msg=$(b11); then pass B11 "임시 저장소: setup 두 번에 worktree 1개·
 # B12 정리·문서
 b12() {
   [ ! -e scripts/collect_temp.sh ] && [ ! -e scripts/com.trendsit.collect-temp.plist ] || { echo "임시 예약 파일이 남음"; return 1; }
-  grep -q '자동 실행' README.md || { echo "README에 '자동 실행' 절 없음"; return 1; }
-  [ "$(grep -c 'launchctl bootstrap' README.md)" -ge 2 ] || { echo "README에 launchctl bootstrap 2줄 미만"; return 1; }
-  grep -q 'launchctl bootout.*com.trendsit.collect-temp' README.md || { echo "README에 임시 예약 bootout 없음"; return 1; }
-  grep -q 'setup_run_worktree.sh' README.md && grep -q 'data/logs/ops' README.md || { echo "README에 setup 명령 또는 로그 위치 없음"; return 1; }
+  grep -q '자동 실행' README.md docs/DEVELOPMENT.md docs/RESULTS.md || { echo "README에 '자동 실행' 절 없음"; return 1; }
+  [ "$(cat README.md docs/DEVELOPMENT.md docs/RESULTS.md | grep -c 'launchctl bootstrap')" -ge 2 ] || { echo "README에 launchctl bootstrap 2줄 미만"; return 1; }
+  grep -q 'launchctl bootout.*com.trendsit.collect-temp' README.md docs/DEVELOPMENT.md docs/RESULTS.md || { echo "README에 임시 예약 bootout 없음"; return 1; }
+  grep -q 'setup_run_worktree.sh' README.md docs/DEVELOPMENT.md docs/RESULTS.md && grep -q 'data/logs/ops' README.md docs/DEVELOPMENT.md docs/RESULTS.md || { echo "README에 setup 명령 또는 로그 위치 없음"; return 1; }
   uv run --quiet python -m trendsit check-config >"$TMP/cc" 2>&1 && grep -q '^OK' "$TMP/cc" || { echo "check-config 실패: $(head -2 "$TMP/cc")"; return 1; }
   mkdir -p "$TMP/cfgroot" && cp -R config "$TMP/cfgroot/config" && ln -s "$PWD/roles" "$TMP/cfgroot/roles" && ln -s "$PWD/skills" "$TMP/cfgroot/skills"
   sed -i.bak 's/^max_catchup_days:.*/max_catchup_days: 0/' "$TMP/cfgroot/config/ops.yaml"

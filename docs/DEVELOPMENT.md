@@ -12,6 +12,66 @@ OPENROUTER_API_KEY=sk-or-v1-...
 GITHUB_TOKEN=...             # 선택. 픽스처 README 수집에만
 ```
 
+## 명령 모음
+```bash
+uv sync                                        # 파이썬 3.12 + 의존성
+export OPENROUTER_API_KEY=...                  # 또는 ~/.config/trendsit/.env (변수 이름은 .env.example)
+uv run python -m trendsit check-config         # 설정과 역할 정의 검증
+uv run python -m trendsit role repo_oneliner --input eval/fixtures/repo_oneliner/ollama__ollama.json
+uv run python -m trendsit collect --since 2026-09-28 --until 2026-10-04   # 기간 수집(RSS가 짧으면 백필)
+uv run python -m trendsit report collection --since 2026-09-28 --until 2026-10-04
+uv run python -m trendsit rematch --since 2026-09-28 --until 2026-10-04   # 바뀐 키워드로 판정만 다시(수집 없음)
+uv sync --extra embed                          # 임베딩 필터용(sentence-transformers, Qwen3-Embedding)
+uv run python -m trendsit filter --since 2026-09-28 --until 2026-10-04 --report   # 관련성 keep/drop + 같은 URL 연결
+uv run python -m trendsit summarize --since 2026-09-28 --until 2026-10-04 --spec S2   # 글 1차 요약 카드
+uv run python -m trendsit repo-analyze --week 2026-W41 --traces   # 레포 분석가(규칙 기반 큐 또는 --queue)
+uv run python -m trendsit plan --day 2026-10-04 --report          # 편집장 계획(plan show --day D --video-queue로 S4 입력)
+uv run python -m trendsit deep text --day 2026-10-04 --traces     # 글 분석가: 계획의 원본 추적 큐
+uv run python -m trendsit cluster --week 2026-W41 --spec S5      # 주간 묶기 + 과거 대조 → reports/S5_brief/cluster_<주>.md
+uv run python -m trendsit weekly --week 2026-W41 --spec S5       # 주간 브리핑 끝까지 → 칠판 저장 + reports/S5_brief/briefing_<주>.md(읽기본)
+uv run python -m trendsit weekly --week 2026-W41 --from-step write --topic w41-mistral-large-4   # 단계·토픽만 다시(새 run)
+uv run python -m trendsit cost --spec S0       # 사용액과 남은 예산
+```
+영상 분석가(맥, Apple Silicon): `uv sync --extra video` 뒤
+```bash
+TRENDSIT_SPEC=S4 uv run --extra video python -m trendsit video run --video-id xRZHLI5SPWo --mode whisper+slides
+TRENDSIT_SPEC=S4 uv run --extra video python -m trendsit video run --queue q.json   # 영상 처리 지시 배열
+uv run python -m trendsit video purge --older-than 7                                # 영상·프레임 정리(DB 텍스트는 남음)
+```
+시스템 의존성(영상): ffmpeg·ffprobe(`brew install ffmpeg`), yt-dlp용 JS 런타임 deno·node·bun 중 하나(없으면 유튜브 영상 포맷이 403). 전사는 로컬 mlx-whisper(`large-v3-turbo`, 첫 실행 때 약 1.6GB 받음). 외부 전사 API와 유튜브 자동 자막은 쓰지 않는다. `uv run`은 선택 묶음을 지우므로 영상 명령은 `--extra video`를 붙인다.
+### 자동 실행 (S6b)
+매일 02:00 `ops nightly`(수집 → 필터 → 글 요약 → 날마다 편집장 계획·글·영상·레포 분석)와 월 07:00 `ops weekly`(막 끝난 주의 브리핑 → 성공하면 사이트 발행)가 launchd로 돈다. 개발 중인 브랜치 코드가 섞이지 않게 main만 체크아웃한 별도 폴더 `~/Claude/projects/trendsit-run`(git worktree)에서 돌고, `data/`와 `site/`는 이 작업 폴더 것을 링크로 함께 쓴다. 자동 실행 비용은 주당 $1.50 상한(`RUN-<ISO 주차>` 꼬리표, `config/budget.yaml`). 맥이 꺼졌던 날은 다음 실행이 따라잡는다(`config/ops.yaml`). 실행 전 `scripts/run_ops.sh`가 그 폴더에서 `git fetch origin main && git reset --hard origin/main`으로 origin/main에 맞춘다(배포 전용 폴더, `data/`·`site/` 링크는 보존). 동기화에 실패해도 기존 코드로 ops는 계속 돌고 `TRENDSIT_PULL_FAILED=1`을 남긴다.
+```bash
+bash scripts/setup_run_worktree.sh        # 실행 폴더 만들기(두 번 돌려도 같음). 이 작업 폴더는 main이 아닌 브랜치여야 함
+launchctl bootout gui/$(id -u)/com.trendsit.collect-temp    # 임시 수집 예약 해제(이 예약은 이 스펙에서 대체됨)
+rm ~/Library/LaunchAgents/com.trendsit.collect-temp.plist   # 로그인 때 다시 등록되지 않게 plist도 지움
+cp ops/launchd/com.trendsit.*.plist ~/Library/LaunchAgents/
+launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.trendsit.nightly.plist
+launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.trendsit.weekly.plist
+```
+- `ops weekly`가 잠금 대기 초과·전원 꺼짐으로 못 돈 주는 자동 재시도가 없다. `uv run python -m trendsit ops weekly --week W`로 손 실행
+- setup 뒤에는 이 작업 폴더에서 `git checkout main`을 할 수 없다(실행 폴더가 main을 씀). main 작업은 임시 worktree(`git worktree add`)로
+- `ops weekly`는 같은 잠금 안에서 먼저 nightly 따라잡기를 한 뒤 브리핑·발행한다(일요일 분이 빠지지 않게). `ops`는 SIGTERM을 받으면 하위 프로세스를 끝내고 잠금·실행 기록을 정리한다
+- 로그: `data/logs/ops/<날짜>-nightly.log`, `<날짜>-weekly.log`(단계 출력 전체), `data/logs/ops/launchd.log`. 단계별 종료 코드·시간·오류는 실행 기록의 `runs.summary_json`(`kind='nightly'`)
+- 종료 코드: 0 성공, 1 단계 실패(나머지 단계는 계속 돔), 2 거부(발행된 주의 `weekly`·`cluster`, 발행 대상이 아닌 주, 어제 이후 날의 `ops nightly --day`), 3 잠금을 못 얻음·실행 폴더가 main 아님(다음 예약이 다시 시도)
+- 손 실행: `uv run python -m trendsit ops nightly [--day 2026-10-12]`, `ops weekly [--week 2026-W42]`, `publish --week 2026-W42`. 실패한 날은 자동 재시도하지 않으니 `ops nightly --day D`로 다시. 발행된 주를 다시 쓰려면 `weekly --week W --force` 뒤 `publish --week W`
+### 사이트 (S6a)
+발행된(`published`) 주만 사이트에 나온다. `publish --week W`가 `export`(DB → `data/site.json`) → `site_src/build.py`(→ `site/`) 순서로 부르고, 둘 중 하나가 실패하면 상태를 바꾸지 않는다. 빌드는 임시 폴더에 다 만든 뒤 `site/`를 한 번에 바꿔 실패해도 이전 사이트가 그대로 나간다. 글꼴은 Pretendard 400·500을 직접 호스팅하고 CSS는 내용 해시가 붙은 파일 하나다(사이트에 JS 없음, 외부 요청 없음). 디자인 규칙은 `docs/reference/s6_design/DESIGN.md`.
+```bash
+uv run python -m trendsit export [--out data/site.json]     # 발행된 주만. published 주가 없거나 출처 번호가 어긋나면 종료 1(기존 파일 유지)
+uv run python site_src/build.py [--data data/site.json] [--out site]   # 표준 라이브러리만
+uv run python site_src/check.py [--fixture]                      # 정적 검사 + 관문 9(Chromium·WebKit) + 동작. 인자 없으면 site/(실데이터), --fixture는 픽스처 빌드
+uv run python scripts/trending_monthly.py --week 2026-W40   # W40 월간 트렌딩 근사 목록(1회, repo_oneliner 약 $0.01)
+uv run python -m trendsit backup [--tag 글자]                # data/trendsit.db를 data/backup/<시각>[-<tag>].db로(일관 사본, 수동만)
+```
+브라우저 측정은 전역 playwright-core(`@playwright/cli`에 포함)와 Node로 한다. 못 찾으면 브라우저 항목은 건너뛰지 않고 실패한다.
+
+**토픽 상세(S6-1)**: 상세는 "한 페이지 보고서"다. 요약(리드) → 핵심 수치 타일 → 절(포인트 문장이 제목, 단락 1~2개, 필요한 절에만 타일·표·막대·사건 흐름 하나) → 출처. 영상 토픽은 절마다 그 구간으로 가는 타임라인 링크와 코드가 고른 슬라이드 이미지(최대 2장, `ffmpeg`로 `data/slides/`에 저장)가 붙는다. 작성자는 카드 인용이 아니라 원문 문장(`it:{item_id}#s{n}`)을 근거로 바로 쓴다. `data/slides/`는 git 제외, `site/assets/slides/`로 build가 복사한다.
+
+**실행 기록(S7a)**: `/runs/`는 주차별 표(주차·기간·nightly n/7·weekly·publish 시각), 주차를 누르면 `/runs/<주>/`에 그 주의 날 → run 표(시각·자동/수동·run·결과·시간/비용·상태, 하위 run은 `└`), run을 누르면 `/runs/<주>/<run>/`에 수치 레일과 단계 목록(누가: 코드 또는 LLM 역할·모델, 한 줄 결과, decide 판정·선별 이유·토픽별 작성⇄검수 체인과 반려 표까지 접힘 없이)이 나온다. 새 기록을 만들지 않고 `runs`·`steps`·`cluster_pairs` 등 DB에 있는 행에서 `export`가 뽑는다(오류 원문은 종료 코드·상태만). 매일 02:00 `ops nightly`가 끝나면 사이트만 다시 만들어(export → build → `data/site.json` 교체, 주 상태·발행 시각 불변, 실패해도 nightly 결과 불변, 결과는 그 nightly 행 `summary_json.site`) 실행 기록이 그날 것으로 바뀐다. 손으로는 `uv run python -m trendsit publish --site-only`.
+
+그 밖의 명령: 수집 항목 보기 `items [--week 2026-W40] [--status pass]`, 기록된 호출 다시 실행 `role --replay <step_id> [--model 별칭]`, 평가 `eval <역할> [--model 별칭]`, 실행 기록 보기 `trace <run_id>`. 전체 명령표와 동작 방식은 이 문서 아래 절.
+
 ## 명령
 | 명령 | 하는 일 |
 |---|---|

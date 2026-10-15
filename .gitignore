@@ -17,3 +17,8 @@ __pycache__/
 
 # S6-1 샘플 사이트(사람이 보는 용도, site_src/build.py --data tests/fixtures/s6_1/site_v2.json --out site.sample)
 /site.sample
+
+# 캡처·영상 프레임·옛 화면 모형: 로컬 보관, 저장소 미포함(공개 전 정리)
+/reports/*/shots/
+/reports/S4_video/thumbs/
+/mockups/

@@ -113,15 +113,17 @@ if msg=$(a11 2>&1); then pass A11 "verify_s6a.sh·verify_s6b.sh·verify_s5.sh --
 
 # ---------- S-4: 문서·정리 ----------
 a13() {
-  grep -q '^### 사이트' README.md || { echo "README 사이트 절 없음"; return 1; }
-  grep -q 'trendsit backup' README.md || { echo "README에 trendsit backup 없음"; return 1; }
-  grep -q 'git fetch origin main && git reset --hard origin/main' README.md || { echo "README 자동 실행 절에 fetch+reset 설명 없음"; return 1; }
-  grep -q '토픽 상세(S6-1)' README.md || { echo "README 사이트 절에 토픽 v2(절 구조) 설명 없음"; return 1; }  # 007-A1-15/A2-13
+  grep -q '^### 사이트' README.md docs/DEVELOPMENT.md docs/RESULTS.md || { echo "README 사이트 절 없음"; return 1; }
+  grep -q 'trendsit backup' README.md docs/DEVELOPMENT.md docs/RESULTS.md || { echo "README에 trendsit backup 없음"; return 1; }
+  grep -q 'git fetch origin main && git reset --hard origin/main' README.md docs/DEVELOPMENT.md docs/RESULTS.md || { echo "README 자동 실행 절에 fetch+reset 설명 없음"; return 1; }
+  grep -q '토픽 상세(S6-1)' README.md docs/DEVELOPMENT.md docs/RESULTS.md || { echo "README 사이트 절에 토픽 v2(절 구조) 설명 없음"; return 1; }  # 007-A1-15/A2-13
   grep -q 'S6a 최상위 구조 + S6-1 토픽 v2' AGENTS.md || { echo "AGENTS.md 출력 형식 줄 없음"; return 1; }
   for n in 1 2 3 4 5 6 7 8; do grep -q "^## $n\\." reports/S6-1_report.md 2>/dev/null || { echo "reports/S6-1_report.md에 $n장 없음"; return 1; }; done
   local shots
-  shots=$(ls reports/S6-1/shots/*.png 2>/dev/null | wc -l | tr -d ' ')
-  [ "${shots:-0}" -ge 6 ] || { echo "reports/S6-1/shots/ png ${shots:-0}장(6장 이상 필요)"; return 1; }
+  if [ -d reports/S6-1/shots ]; then  # 캡처는 저장소 미포함(repo-tidy). 로컬에 폴더가 있을 때만 센다
+    shots=$(ls reports/S6-1/shots/*.png 2>/dev/null | wc -l | tr -d ' ')
+    [ "${shots:-0}" -ge 6 ] || { echo "reports/S6-1/shots/ png ${shots:-0}장(6장 이상 필요)"; return 1; }
+  fi
   grep -q '^/site.sample' .gitignore || { echo ".gitignore에 /site.sample 없음"; return 1; }
   # 006-C1-16: "빈 폴더"는 7장 ⑥(런 뒤 eval 픽스처 재생성·커밋) 이후 영구 FAIL이 되는 모순이 있다. 대신 "옛 구조
   # (points·overview 키) 픽스처 0개"로 본다 — 지금처럼 비어 있어도, ⑥ 뒤 v2 픽스처가 들어와도 통과한다

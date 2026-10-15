@@ -33,7 +33,7 @@ PASS A10 README에 설치와 명령, reports/S0_report.md 있음
 ## 4. 결정한 것 (스펙에 없어서 정한 것)
 | 결정 | 이유 |
 |---|---|
-| 기존 로컬 저장소(`~/Claude/projects/trendsit`, 예시 사이트 포함) 위에 handoff를 얹어 GitHub 비공개 `jjiisub/trendsit`로 올림 | S7에서 쓸 `site_src/`, 출력 계약 `data/trendsit-example.json`, `docs/02_DESIGN.md`를 그대로 이어 쓰기 위해(사용자 확인) |
+| 기존 로컬 저장소(`~/Claude/projects/trendsit`, 예시 사이트 포함) 위에 handoff를 얹어 GitHub 비공개 `jjiisub/trendsit`로 올림 | S7에서 쓸 `site_src/`, 출력 계약 `data/trendsit-example.json`, `docs/archive/02_DESIGN.md`를 그대로 이어 쓰기 위해(사용자 확인) |
 | `CLAUDE.md`는 handoff 판(`@AGENTS.md`)으로 교체, 예전 `docs/01_CONTEXT.md` 삭제(`docs/CONTEXT.md`가 10/7판), 예시 사이트 빌드·서빙 명령은 README로 이동 | 맥락 문서를 하나로 |
 | `.gitignore`: `data/*` + 예외 `data/trendsit-example.json`, `data/make_data.py` | 스펙은 `data/` 제외인데, 출력 계약 파일이 이미 `data/`에 있어 추적 유지 |
 | 역할 md 앞부분에 `input:`(입력 클래스 이름) 추가 | CLI `--input` JSON을 검증할 입력 모델이 필요. 스펙 예시에는 `output`만 있음 |

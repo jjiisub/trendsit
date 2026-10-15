@@ -463,6 +463,8 @@
 
 ## 3. 프레임 썸네일, 판독, 발화 (영상당 최대 5장)
 
+> 캡처는 로컬 보관(저장소 미포함). 썸네일 칸에는 파일 이름(`thumbs/<이름>.png`)만 남긴다.
+
 썸네일은 판독 수치가 있는 프레임 → 판독 우선순위 순으로 고른다. 포착률 확인: 썸네일에 보이는 수치 중 판독이 놓친 것이 있으면 `[x]`. 놓친 수치는 브리핑에 쓸 수 있는 수치(결과·규모)만 센다(버전, 축 눈금, 출처 줄의 날짜·arXiv 번호, 도식 예시 값 제외).
 
 > labeler: opus-5.5(잠정). 설계 세션의 2차 채점이며 사람 라벨이 아니다. 기준은 PR #7 리뷰 댓글 부록 B.
@@ -471,71 +473,71 @@
 
 | 썸네일 | 시각·이유 | 발화(spoken_text) | 판독 | 놓친 수치 있음 |
 |---|---|---|---|---|
-| ![](thumbs/xRZHLI5SPWo_105.png) | [1:45](https://youtu.be/xRZHLI5SPWo?t=105) scene-change | organization. So here's our Dora metric for deployment frequency. Who's | slide, 제목 `Deployment frequency steadily increasing`, 수치 78(high, Q3 2025 deployment frequency), 80(high, Q4 2025 deployment frequency), 105(high, Q1 2026 deployment frequency), 114(high, Q2 2026 deployment frequency) | [ ] |
-| ![](thumbs/xRZHLI5SPWo_299.png) | [4:59](https://youtu.be/xRZHLI5SPWo?t=299) transcript-cue | terms of your change failure rate. You want to go down. You want to be on the | slide, 제목 `Volatility in change failure rate %`, 수치 61(high, companies (data from)) | [ ] |
-| ![](thumbs/xRZHLI5SPWo_428.png) | [7:08](https://youtu.be/xRZHLI5SPWo?t=428) scene-change | of reasons for this. It's not just, you know, the likelihood that the way that these models work | slide, 제목 `PR size is increasing...`, 수치 44(high, Median PR size Q3 2025), 48(high, Median PR size Q4 2025), 58(high, Median PR size Q1 2026), 72(high, Median PR size Q2 2026) | [x] 400+(표본 기업 수) |
-| ![](thumbs/xRZHLI5SPWo_535.png) | [8:55](https://youtu.be/xRZHLI5SPWo?t=535) scene-change | unlearn when you're coming into the industry, right? In many, many cases, you've already been working with | slide, 제목 `Junior engineers use AI the most`, 수치 400+(high, Sample from) | [ ] |
-| ![](thumbs/xRZHLI5SPWo_1047.png) | [17:27](https://youtu.be/xRZHLI5SPWo?t=1047) transcript-cue | Increased innovative capacity story. This is not a headcount replacement story. Fair. They're automating about 3,000 of  | slide, 제목 `Zapier - Administrative Automation`, 수치 ~2(high, new engineers become productive within) | [ ] |
+| `xRZHLI5SPWo_105` | [1:45](https://youtu.be/xRZHLI5SPWo?t=105) scene-change | organization. So here's our Dora metric for deployment frequency. Who's | slide, 제목 `Deployment frequency steadily increasing`, 수치 78(high, Q3 2025 deployment frequency), 80(high, Q4 2025 deployment frequency), 105(high, Q1 2026 deployment frequency), 114(high, Q2 2026 deployment frequency) | [ ] |
+| `xRZHLI5SPWo_299` | [4:59](https://youtu.be/xRZHLI5SPWo?t=299) transcript-cue | terms of your change failure rate. You want to go down. You want to be on the | slide, 제목 `Volatility in change failure rate %`, 수치 61(high, companies (data from)) | [ ] |
+| `xRZHLI5SPWo_428` | [7:08](https://youtu.be/xRZHLI5SPWo?t=428) scene-change | of reasons for this. It's not just, you know, the likelihood that the way that these models work | slide, 제목 `PR size is increasing...`, 수치 44(high, Median PR size Q3 2025), 48(high, Median PR size Q4 2025), 58(high, Median PR size Q1 2026), 72(high, Median PR size Q2 2026) | [x] 400+(표본 기업 수) |
+| `xRZHLI5SPWo_535` | [8:55](https://youtu.be/xRZHLI5SPWo?t=535) scene-change | unlearn when you're coming into the industry, right? In many, many cases, you've already been working with | slide, 제목 `Junior engineers use AI the most`, 수치 400+(high, Sample from) | [ ] |
+| `xRZHLI5SPWo_1047` | [17:27](https://youtu.be/xRZHLI5SPWo?t=1047) transcript-cue | Increased innovative capacity story. This is not a headcount replacement story. Fair. They're automating about 3,000 of  | slide, 제목 `Zapier - Administrative Automation`, 수치 ~2(high, new engineers become productive within) | [ ] |
 
 ### -TeOEuplMrQ
 
 | 썸네일 | 시각·이유 | 발화(spoken_text) | 판독 | 놓친 수치 있음 |
 |---|---|---|---|---|
-| ![](thumbs/-TeOEuplMrQ_68.png) | [1:08](https://youtu.be/-TeOEuplMrQ?t=68) transcript-cue | Some folks are trying that too. | slide, 제목 `What are we talking about today?`, 수치  | [ ] |
-| ![](thumbs/-TeOEuplMrQ_415.png) | [6:54](https://youtu.be/-TeOEuplMrQ?t=415) transcript-cue | And they got them to look at PRs that had already passed Sweebench's greater. | slide, 제목 `Passes tests is not the same as mergeable`, 수치  | [ ] |
-| ![](thumbs/-TeOEuplMrQ_421.png) | [7:01](https://youtu.be/-TeOEuplMrQ?t=421) transcript-cue | So Sweebench said, this pull request is good enough to merge. | slide, 제목 `Passes tests is not the same as mergeable`, 수치  | [ ] |
-| ![](thumbs/-TeOEuplMrQ_527.png) | [8:47](https://youtu.be/-TeOEuplMrQ?t=527) scene-change | And this isn't one model having a bad day. On the same set of tests, GPT 5.5 scores under 6%. | slide, 제목 `Mergeable is a much harder test`, 수치 80.3%(high, Fable 5 on SWE-Bench Pro), 29.3%(high, Fable 5 on FrontierCode) | [ ] |
-| ![](thumbs/-TeOEuplMrQ_991.png) | [16:31](https://youtu.be/-TeOEuplMrQ?t=991) scene-change | Somebody looked carefully at the ported code, and it has 13,044 unsafe blocks. | slide, 제목 `Thirteen thousand assertions nobody checked`, 수치 13,044(high, unsafe blocks in the port), 73(high, in a comparable hand-written project) | [ ] |
+| `-TeOEuplMrQ_68` | [1:08](https://youtu.be/-TeOEuplMrQ?t=68) transcript-cue | Some folks are trying that too. | slide, 제목 `What are we talking about today?`, 수치  | [ ] |
+| `-TeOEuplMrQ_415` | [6:54](https://youtu.be/-TeOEuplMrQ?t=415) transcript-cue | And they got them to look at PRs that had already passed Sweebench's greater. | slide, 제목 `Passes tests is not the same as mergeable`, 수치  | [ ] |
+| `-TeOEuplMrQ_421` | [7:01](https://youtu.be/-TeOEuplMrQ?t=421) transcript-cue | So Sweebench said, this pull request is good enough to merge. | slide, 제목 `Passes tests is not the same as mergeable`, 수치  | [ ] |
+| `-TeOEuplMrQ_527` | [8:47](https://youtu.be/-TeOEuplMrQ?t=527) scene-change | And this isn't one model having a bad day. On the same set of tests, GPT 5.5 scores under 6%. | slide, 제목 `Mergeable is a much harder test`, 수치 80.3%(high, Fable 5 on SWE-Bench Pro), 29.3%(high, Fable 5 on FrontierCode) | [ ] |
+| `-TeOEuplMrQ_991` | [16:31](https://youtu.be/-TeOEuplMrQ?t=991) scene-change | Somebody looked carefully at the ported code, and it has 13,044 unsafe blocks. | slide, 제목 `Thirteen thousand assertions nobody checked`, 수치 13,044(high, unsafe blocks in the port), 73(high, in a comparable hand-written project) | [ ] |
 
 ### oeL0uP-NO-U
 
 | 썸네일 | 시각·이유 | 발화(spoken_text) | 판독 | 놓친 수치 있음 |
 |---|---|---|---|---|
-| ![](thumbs/oeL0uP-NO-U_325.png) | [5:25](https://youtu.be/oeL0uP-NO-U?t=325) scene-change | And this bigger problem of these code bases beginning to fall apart is going unnoticed. | slide, 제목 `Today's agent dev tools are not meeting the moment`, 수치 50,000(high, repo codebase) | [ ] |
-| ![](thumbs/oeL0uP-NO-U_326.png) | [5:25](https://youtu.be/oeL0uP-NO-U?t=326) transcript-cue | And this bigger problem of these code bases beginning to fall apart is going unnoticed. | slide, 제목 `Today's agent dev tools are not meeting the moment`, 수치 50,000(high, repo codebase) | [ ] |
-| ![](thumbs/oeL0uP-NO-U_392.png) | [6:31](https://youtu.be/oeL0uP-NO-U?t=392) scene-change | This is actually a specific quote about a specific supply chain vulnerability, an NPM thing. | slide, 제목 ``, 수치 90,000(high, repositories) | [ ] |
-| ![](thumbs/oeL0uP-NO-U_538.png) | [8:58](https://youtu.be/oeL0uP-NO-U?t=538) scene-change | And we actually built a lot on top of this, right? | slide, 제목 `The code graph foundation`, 수치 10+(high, of investment) | [ ] |
-| ![](thumbs/oeL0uP-NO-U_605.png) | [10:05](https://youtu.be/oeL0uP-NO-U?t=605) scene-change | Actually, Mercari, a global shopping tool out of Japan. | slide, 제목 ``, 수치 80(high, potential repos affected) | [ ] |
+| `oeL0uP-NO-U_325` | [5:25](https://youtu.be/oeL0uP-NO-U?t=325) scene-change | And this bigger problem of these code bases beginning to fall apart is going unnoticed. | slide, 제목 `Today's agent dev tools are not meeting the moment`, 수치 50,000(high, repo codebase) | [ ] |
+| `oeL0uP-NO-U_326` | [5:25](https://youtu.be/oeL0uP-NO-U?t=326) transcript-cue | And this bigger problem of these code bases beginning to fall apart is going unnoticed. | slide, 제목 `Today's agent dev tools are not meeting the moment`, 수치 50,000(high, repo codebase) | [ ] |
+| `oeL0uP-NO-U_392` | [6:31](https://youtu.be/oeL0uP-NO-U?t=392) scene-change | This is actually a specific quote about a specific supply chain vulnerability, an NPM thing. | slide, 제목 ``, 수치 90,000(high, repositories) | [ ] |
+| `oeL0uP-NO-U_538` | [8:58](https://youtu.be/oeL0uP-NO-U?t=538) scene-change | And we actually built a lot on top of this, right? | slide, 제목 `The code graph foundation`, 수치 10+(high, of investment) | [ ] |
+| `oeL0uP-NO-U_605` | [10:05](https://youtu.be/oeL0uP-NO-U?t=605) scene-change | Actually, Mercari, a global shopping tool out of Japan. | slide, 제목 ``, 수치 80(high, potential repos affected) | [ ] |
 
 ### 31XD1O74pks
 
 | 썸네일 | 시각·이유 | 발화(spoken_text) | 판독 | 놓친 수치 있음 |
 |---|---|---|---|---|
-| ![](thumbs/31XD1O74pks_63.png) | [1:03](https://youtu.be/31XD1O74pks?t=63) scene-change | he actually used the entire budget of Anthropic for the entire year. | slide, 제목 `THE PROBLEM`, 수치 $500M(high, Claude bill — one enterprise, one month), 1,000x(high, more tokens than a chat query), 4 months(high, to burn an entire year's AI coding budget) | [ ] |
-| ![](thumbs/31XD1O74pks_197.png) | [3:16](https://youtu.be/31XD1O74pks?t=197) scene-change | On the other side, you see the cost per task for the same task, | slide, 제목 `Token optimization?`, 수치 4.7(high, Opus (model version)), $30.0(high, Opus 4.7 listed price per MTok), 5.4(high, GPT-5.4 (model version)), $17.5(high, GPT-5.4 listed price per MTok), 3.1(high, Gemini 3.1 Pro (model version)), $14.0(high, Gemini 3.1 Pro listed price per MTok), 4.5(high, Haiku 4.5 (model version)), $6.00(high, Haiku 4.5 listed price per MTok), 5.4(high, GPT-5.4 Mini (model version)), $5.25(high, GPT-5.4 Mini listed price per MTok), K2.6(high, Kimi K2.6 (model version)), $4.95(high, Kimi K2.6 listed price per MTok), 3(high, Gemini 3 Flash (model version)), $3.50(high, Gemini 3 Flash listed price per MTok), M2.7(high, MiniMax M2.7 (model version)), $1.50(high, MiniMax M2.7 listed price per MTok), $708(high, Opus 4.7 actual total cost), $705(high, Gemini 3 Flash actual total cost), $677(high, Gemini 3.1 Pro actual total cost), $509(high, GPT-5.4 actual total cost), $422(high, Kimi K2.6 actual total cost), $421(high, Haiku 4.5 actual total cost), $325(high, GPT-5.4 Mini actual total cost), $148(high, MiniMax M2.7 actual total cost) | [ ] |
-| ![](thumbs/31XD1O74pks_280.png) | [4:40](https://youtu.be/31XD1O74pks?t=280) scene-change | We've been using it for three months. | slide, 제목 `The result:`, 수치 2.5×(high, The result) | [ ] |
-| ![](thumbs/31XD1O74pks_306.png) | [5:05](https://youtu.be/31XD1O74pks?t=306) transcript-cue | Same outcome. | slide, 제목 `Daily Claude Code Cost ($K)`, 수치 60%(high, savings in 2 weeks) | [x] 일일 비용 값(With Kimchi 약 4.0→2.6, 없을 때 4.4→6.5) |
-| ![](thumbs/31XD1O74pks_375.png) | [6:15](https://youtu.be/31XD1O74pks?t=375) scene-change | The 3rd of June, Kimi 2.6 is winning by far the most popular | slide, 제목 `3 June`, 수치 1871.7M(high, Total), 1141.8M(high, kimi-k2.6), 369.1M(high, minimax-m2.7), 272.5M(high, kimi-k2.5), 17.0M(high, claude-sonnet-4-6), 25.2M(high, claude-opus-4-6), 31.4M(high, nemotron-3-super-fp4), 3.0M(high, gpt-5), 1.8M(high, claude-haiku-4-5-20251001), 1.8M(high, claude-sonnet-4-5), 2.2M(high, minimax-m2.5), 1.2M(high, gpt-5-mini), 3.2M(high, gpt-4.1-mini), 1,784(high, o3), 281.8K(high, gpt-4.1), 690.1K(high, claude-haiku-4-6) | [ ] |
+| `31XD1O74pks_63` | [1:03](https://youtu.be/31XD1O74pks?t=63) scene-change | he actually used the entire budget of Anthropic for the entire year. | slide, 제목 `THE PROBLEM`, 수치 $500M(high, Claude bill — one enterprise, one month), 1,000x(high, more tokens than a chat query), 4 months(high, to burn an entire year's AI coding budget) | [ ] |
+| `31XD1O74pks_197` | [3:16](https://youtu.be/31XD1O74pks?t=197) scene-change | On the other side, you see the cost per task for the same task, | slide, 제목 `Token optimization?`, 수치 4.7(high, Opus (model version)), $30.0(high, Opus 4.7 listed price per MTok), 5.4(high, GPT-5.4 (model version)), $17.5(high, GPT-5.4 listed price per MTok), 3.1(high, Gemini 3.1 Pro (model version)), $14.0(high, Gemini 3.1 Pro listed price per MTok), 4.5(high, Haiku 4.5 (model version)), $6.00(high, Haiku 4.5 listed price per MTok), 5.4(high, GPT-5.4 Mini (model version)), $5.25(high, GPT-5.4 Mini listed price per MTok), K2.6(high, Kimi K2.6 (model version)), $4.95(high, Kimi K2.6 listed price per MTok), 3(high, Gemini 3 Flash (model version)), $3.50(high, Gemini 3 Flash listed price per MTok), M2.7(high, MiniMax M2.7 (model version)), $1.50(high, MiniMax M2.7 listed price per MTok), $708(high, Opus 4.7 actual total cost), $705(high, Gemini 3 Flash actual total cost), $677(high, Gemini 3.1 Pro actual total cost), $509(high, GPT-5.4 actual total cost), $422(high, Kimi K2.6 actual total cost), $421(high, Haiku 4.5 actual total cost), $325(high, GPT-5.4 Mini actual total cost), $148(high, MiniMax M2.7 actual total cost) | [ ] |
+| `31XD1O74pks_280` | [4:40](https://youtu.be/31XD1O74pks?t=280) scene-change | We've been using it for three months. | slide, 제목 `The result:`, 수치 2.5×(high, The result) | [ ] |
+| `31XD1O74pks_306` | [5:05](https://youtu.be/31XD1O74pks?t=306) transcript-cue | Same outcome. | slide, 제목 `Daily Claude Code Cost ($K)`, 수치 60%(high, savings in 2 weeks) | [x] 일일 비용 값(With Kimchi 약 4.0→2.6, 없을 때 4.4→6.5) |
+| `31XD1O74pks_375` | [6:15](https://youtu.be/31XD1O74pks?t=375) scene-change | The 3rd of June, Kimi 2.6 is winning by far the most popular | slide, 제목 `3 June`, 수치 1871.7M(high, Total), 1141.8M(high, kimi-k2.6), 369.1M(high, minimax-m2.7), 272.5M(high, kimi-k2.5), 17.0M(high, claude-sonnet-4-6), 25.2M(high, claude-opus-4-6), 31.4M(high, nemotron-3-super-fp4), 3.0M(high, gpt-5), 1.8M(high, claude-haiku-4-5-20251001), 1.8M(high, claude-sonnet-4-5), 2.2M(high, minimax-m2.5), 1.2M(high, gpt-5-mini), 3.2M(high, gpt-4.1-mini), 1,784(high, o3), 281.8K(high, gpt-4.1), 690.1K(high, claude-haiku-4-6) | [ ] |
 
 ### yNPS1Z64wQM
 
 | 썸네일 | 시각·이유 | 발화(spoken_text) | 판독 | 놓친 수치 있음 |
 |---|---|---|---|---|
-| ![](thumbs/yNPS1Z64wQM_346.png) | [5:46](https://youtu.be/yNPS1Z64wQM?t=346) transcript-cue | produces that exact answer. | slide, 제목 `BrowseComp-Plus puts search inside the loop.`, 수치 830(high, questions fixed answer set), 100,195(high, web pages fixed corpus) | [ ] |
-| ![](thumbs/yNPS1Z64wQM_576.png) | [9:36](https://youtu.be/yNPS1Z64wQM?t=576) transcript-cue | And this is a new type of workload. | slide, 제목 `GPT-5 issues power-user queries.`, 수치 10(high, BrowseComp-Plus query workload), 2 terms(high, human search log), 10 terms median(high, agent search trajectory), 2 terms(high, AOL human median), 18 terms(high, GPT-5 median), 19 terms(high, GPT-5 first query mean) | [ ] |
-| ![](thumbs/yNPS1Z64wQM_613.png) | [10:13](https://youtu.be/yNPS1Z64wQM?t=613) transcript-cue | than BM25, if you look at the original paper. | slide, 제목 `Which BM25 Do You Mean?`, 수치 64.0%(high, answer accuracy (Default BM25)), 82.0%(high, answer accuracy (Tuned BM25)), +18(high, same 100-query subset), 84.6%(high, Surfaced evidence recall), 95.7%(high, Surfaced evidence recall) | [x] 100-query subset, k1=0.9·b=0.4 / k1=25·b=1 |
-| ![](thumbs/yNPS1Z64wQM_635.png) | [10:34](https://youtu.be/yNPS1Z64wQM?t=635) transcript-cue | on the overall accuracy. | slide, 제목 `Which BM25 Do You Mean?`, 수치 64.0%(high, answer accuracy (Default BM25)), 82.0%(high, answer accuracy (Tuned BM25)), +18(high, same 100-query subset), 64.0%(high, answer accuracy from), 82.0%(high, answer accuracy to), 84.6%(high, Surfaced evidence recall), 95.7%(high, Surfaced evidence recall) | [x] 100-query subset, k1·b 값 |
-| ![](thumbs/yNPS1Z64wQM_878.png) | [14:37](https://youtu.be/yNPS1Z64wQM?t=878) transcript-cue | and a whole editing search experience. | slide, 제목 `BM25 + grep Is All You Need`, 수치 61%(high, DCI read + grep), 45%(high, Qwen3 retrieval agent), 73.3%(high, DR-DCI + reset dynamic workspace expansion on BrowseComp-Plus) | [ ] |
+| `yNPS1Z64wQM_346` | [5:46](https://youtu.be/yNPS1Z64wQM?t=346) transcript-cue | produces that exact answer. | slide, 제목 `BrowseComp-Plus puts search inside the loop.`, 수치 830(high, questions fixed answer set), 100,195(high, web pages fixed corpus) | [ ] |
+| `yNPS1Z64wQM_576` | [9:36](https://youtu.be/yNPS1Z64wQM?t=576) transcript-cue | And this is a new type of workload. | slide, 제목 `GPT-5 issues power-user queries.`, 수치 10(high, BrowseComp-Plus query workload), 2 terms(high, human search log), 10 terms median(high, agent search trajectory), 2 terms(high, AOL human median), 18 terms(high, GPT-5 median), 19 terms(high, GPT-5 first query mean) | [ ] |
+| `yNPS1Z64wQM_613` | [10:13](https://youtu.be/yNPS1Z64wQM?t=613) transcript-cue | than BM25, if you look at the original paper. | slide, 제목 `Which BM25 Do You Mean?`, 수치 64.0%(high, answer accuracy (Default BM25)), 82.0%(high, answer accuracy (Tuned BM25)), +18(high, same 100-query subset), 84.6%(high, Surfaced evidence recall), 95.7%(high, Surfaced evidence recall) | [x] 100-query subset, k1=0.9·b=0.4 / k1=25·b=1 |
+| `yNPS1Z64wQM_635` | [10:34](https://youtu.be/yNPS1Z64wQM?t=635) transcript-cue | on the overall accuracy. | slide, 제목 `Which BM25 Do You Mean?`, 수치 64.0%(high, answer accuracy (Default BM25)), 82.0%(high, answer accuracy (Tuned BM25)), +18(high, same 100-query subset), 64.0%(high, answer accuracy from), 82.0%(high, answer accuracy to), 84.6%(high, Surfaced evidence recall), 95.7%(high, Surfaced evidence recall) | [x] 100-query subset, k1·b 값 |
+| `yNPS1Z64wQM_878` | [14:37](https://youtu.be/yNPS1Z64wQM?t=878) transcript-cue | and a whole editing search experience. | slide, 제목 `BM25 + grep Is All You Need`, 수치 61%(high, DCI read + grep), 45%(high, Qwen3 retrieval agent), 73.3%(high, DR-DCI + reset dynamic workspace expansion on BrowseComp-Plus) | [ ] |
 
 ### S-bRN-avZ4Q
 
 | 썸네일 | 시각·이유 | 발화(spoken_text) | 판독 | 놓친 수치 있음 |
 |---|---|---|---|---|
-| ![](thumbs/S-bRN-avZ4Q_422.png) | [7:01](https://youtu.be/S-bRN-avZ4Q?t=422) scene-change | The next is actually what we call the semantic and storage layer, | slide, 제목 `Building an Agent-Native Document Platform`, 수치 10T+(high, pages of human-created documents) | [ ] |
-| ![](thumbs/S-bRN-avZ4Q_525.png) | [8:45](https://youtu.be/S-bRN-avZ4Q?t=525) scene-change | That's because the way PDFs are actually stored as a format is it's rendered for kind of like display purposes, | slide, 제목 `Document OCR is Hard`, 수치 90%(high, of the world's data lies in unstructured documents) | [ ] |
-| ![](thumbs/S-bRN-avZ4Q_873.png) | [14:32](https://youtu.be/S-bRN-avZ4Q?t=873) transcript-cue | various types of documents out there. | slide, 제목 `ParseBench: An Enterprise Document Benchmark for Agents`, 수치 100%(high, parser score (no parser gets close to)) | 판단 불가(320px, 그래프 라벨을 읽을 수 없음) |
-| ![](thumbs/S-bRN-avZ4Q_892.png) | [14:51](https://youtu.be/S-bRN-avZ4Q?t=892) transcript-cue | to make sure that you're able to process, unlock the vast troves of enterprise context out there. | slide, 제목 `ParseBench: An Enterprise Document Benchmark for Agents`, 수치 100%(high, parser score (no parser gets close to)), 4.5(high, Haku 4.5 (think)), 4.6(high, Opus 4.6), 4.5(high, Haku 4.5) | 판단 불가(320px, 그래프 라벨을 읽을 수 없음) |
-| ![](thumbs/S-bRN-avZ4Q_900.png) | [15:00](https://youtu.be/S-bRN-avZ4Q?t=900) scene-change | There's what I call like the high accuracy regime, where like, you know, some institutions basically need like 99 to alm | slide, 제목 `The Accuracy-Cost-Latency Pareto Curve`, 수치 99%(high, High Accuracy Regime accuracy), 1M(high, Low Cost Regime volume) | [ ] |
+| `S-bRN-avZ4Q_422` | [7:01](https://youtu.be/S-bRN-avZ4Q?t=422) scene-change | The next is actually what we call the semantic and storage layer, | slide, 제목 `Building an Agent-Native Document Platform`, 수치 10T+(high, pages of human-created documents) | [ ] |
+| `S-bRN-avZ4Q_525` | [8:45](https://youtu.be/S-bRN-avZ4Q?t=525) scene-change | That's because the way PDFs are actually stored as a format is it's rendered for kind of like display purposes, | slide, 제목 `Document OCR is Hard`, 수치 90%(high, of the world's data lies in unstructured documents) | [ ] |
+| `S-bRN-avZ4Q_873` | [14:32](https://youtu.be/S-bRN-avZ4Q?t=873) transcript-cue | various types of documents out there. | slide, 제목 `ParseBench: An Enterprise Document Benchmark for Agents`, 수치 100%(high, parser score (no parser gets close to)) | 판단 불가(320px, 그래프 라벨을 읽을 수 없음) |
+| `S-bRN-avZ4Q_892` | [14:51](https://youtu.be/S-bRN-avZ4Q?t=892) transcript-cue | to make sure that you're able to process, unlock the vast troves of enterprise context out there. | slide, 제목 `ParseBench: An Enterprise Document Benchmark for Agents`, 수치 100%(high, parser score (no parser gets close to)), 4.5(high, Haku 4.5 (think)), 4.6(high, Opus 4.6), 4.5(high, Haku 4.5) | 판단 불가(320px, 그래프 라벨을 읽을 수 없음) |
+| `S-bRN-avZ4Q_900` | [15:00](https://youtu.be/S-bRN-avZ4Q?t=900) scene-change | There's what I call like the high accuracy regime, where like, you know, some institutions basically need like 99 to alm | slide, 제목 `The Accuracy-Cost-Latency Pareto Curve`, 수치 99%(high, High Accuracy Regime accuracy), 1M(high, Low Cost Regime volume) | [ ] |
 
 ### eTtZlAPA9H4
 
 | 썸네일 | 시각·이유 | 발화(spoken_text) | 판독 | 놓친 수치 있음 |
 |---|---|---|---|---|
-| ![](thumbs/eTtZlAPA9H4_201.png) | [3:21](https://youtu.be/eTtZlAPA9H4?t=201) transcript-cue | So now that we have this and we understand the basics, | demo, 제목 ``, 수치  | [ ] |
-| ![](thumbs/eTtZlAPA9H4_245.png) | [4:05](https://youtu.be/eTtZlAPA9H4?t=245) transcript-cue | And these files are represented as rooms on the map, | demo, 제목 ``, 수치  | [ ] |
-| ![](thumbs/eTtZlAPA9H4_484.png) | [8:04](https://youtu.be/eTtZlAPA9H4?t=484) transcript-cue | if you look at what a team does, for example, | slide, 제목 `Engineering the future of AI`, 수치  | [ ] |
-| ![](thumbs/eTtZlAPA9H4_563.png) | [9:22](https://youtu.be/eTtZlAPA9H4?t=563) transcript-cue | I can use Git, but I'm not really bound to something. | demo, 제목 ``, 수치  | [ ] |
-| ![](thumbs/eTtZlAPA9H4_573.png) | [9:33](https://youtu.be/eTtZlAPA9H4?t=573) transcript-cue | but also between agents. | demo, 제목 ``, 수치  | [ ] |
+| `eTtZlAPA9H4_201` | [3:21](https://youtu.be/eTtZlAPA9H4?t=201) transcript-cue | So now that we have this and we understand the basics, | demo, 제목 ``, 수치  | [ ] |
+| `eTtZlAPA9H4_245` | [4:05](https://youtu.be/eTtZlAPA9H4?t=245) transcript-cue | And these files are represented as rooms on the map, | demo, 제목 ``, 수치  | [ ] |
+| `eTtZlAPA9H4_484` | [8:04](https://youtu.be/eTtZlAPA9H4?t=484) transcript-cue | if you look at what a team does, for example, | slide, 제목 `Engineering the future of AI`, 수치  | [ ] |
+| `eTtZlAPA9H4_563` | [9:22](https://youtu.be/eTtZlAPA9H4?t=563) transcript-cue | I can use Git, but I'm not really bound to something. | demo, 제목 ``, 수치  | [ ] |
+| `eTtZlAPA9H4_573` | [9:33](https://youtu.be/eTtZlAPA9H4?t=573) transcript-cue | but also between agents. | demo, 제목 ``, 수치  | [ ] |
 ## 4. slide_only_facts 전체 (발화에 없고 화면에만 있는 수치)
 
 판독 수치 정확도 문턱값: 이 표에서 '화면에 있음' 비율 90% 이상. 문턱값은 '화면에 있음' 칸으로만 계산한다.
@@ -546,130 +548,130 @@
 
 | 영상 | 초 | 수치 | 단위 | 무엇 | 확신도 | 근거 id | 썸네일 | 화면에 있음 | 쓸 수 없음 |
 |---|---|---|---|---|---|---|---|---|---|
-| xRZHLI5SPWo | [105](https://youtu.be/xRZHLI5SPWo?t=105) | 78 |  | Q3 2025 deployment frequency | high | `vd:15@105` | ![](thumbs/xRZHLI5SPWo_105.png) | [x] | [ ] |
-| xRZHLI5SPWo | [105](https://youtu.be/xRZHLI5SPWo?t=105) | 80 |  | Q4 2025 deployment frequency | high | `vd:15@105` | ![](thumbs/xRZHLI5SPWo_105.png) | [x] | [ ] |
-| xRZHLI5SPWo | [105](https://youtu.be/xRZHLI5SPWo?t=105) | 105 |  | Q1 2026 deployment frequency | high | `vd:15@105` | ![](thumbs/xRZHLI5SPWo_105.png) | [x] | [ ] |
-| xRZHLI5SPWo | [105](https://youtu.be/xRZHLI5SPWo?t=105) | 114 |  | Q2 2026 deployment frequency | high | `vd:15@105` | ![](thumbs/xRZHLI5SPWo_105.png) | [x] | [ ] |
-| xRZHLI5SPWo | [299](https://youtu.be/xRZHLI5SPWo?t=299) | 61 |  | companies (data from) | high | `vd:15@299` | ![](thumbs/xRZHLI5SPWo_299.png) | [x] | [ ] |
-| xRZHLI5SPWo | [428](https://youtu.be/xRZHLI5SPWo?t=428) | 48 | lines of code | Median PR size Q4 2025 | high | `vd:15@428` | ![](thumbs/xRZHLI5SPWo_428.png) | [x] | [ ] |
-| xRZHLI5SPWo | [428](https://youtu.be/xRZHLI5SPWo?t=428) | 58 | lines of code | Median PR size Q1 2026 | high | `vd:15@428` | ![](thumbs/xRZHLI5SPWo_428.png) | [x] | [ ] |
-| xRZHLI5SPWo | [535](https://youtu.be/xRZHLI5SPWo?t=535) | 400+ | companies | Sample from | high | `vd:15@535` | ![](thumbs/xRZHLI5SPWo_535.png) | [x] | [ ] |
-| xRZHLI5SPWo | [833](https://youtu.be/xRZHLI5SPWo?t=833) | 336 |  | Incomplete | high | `vd:15@833` | ![](thumbs/xRZHLI5SPWo_833.png) | [x] | [x] UI |
-| xRZHLI5SPWo | [833](https://youtu.be/xRZHLI5SPWo?t=833) | 2 | hours ago | time | high | `vd:15@833` | ![](thumbs/xRZHLI5SPWo_833.png) | [x] | [x] UI |
-| xRZHLI5SPWo | [833](https://youtu.be/xRZHLI5SPWo?t=833) | > 80% | % | code coverage | high | `vd:15@833` | ![](thumbs/xRZHLI5SPWo_833.png) | [x] | [x] UI |
-| xRZHLI5SPWo | [905](https://youtu.be/xRZHLI5SPWo?t=905) | 400+ |  | companies (random sample) | high | `vd:15@905` | ![](thumbs/xRZHLI5SPWo_905.png) | [x] | [ ] |
-| xRZHLI5SPWo | [905](https://youtu.be/xRZHLI5SPWo?t=905) | 7.76% | % | Median weighted PR throughput increase | high | `vd:15@905` | ![](thumbs/xRZHLI5SPWo_905.png) | [x] | [ ] |
-| xRZHLI5SPWo | [905](https://youtu.be/xRZHLI5SPWo?t=905) | 13.1% | % | Average weighted PR throughput increase | high | `vd:15@905` | ![](thumbs/xRZHLI5SPWo_905.png) | [x] | [ ] |
-| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 2500 |  | Molding Max. per color | high | `vd:15@966` | ![](thumbs/xRZHLI5SPWo_966.png) | 판단 불가(2500/2900 구분 불가) | [x] 도식 예시 |
-| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 12,500 | pcs | Molding max. | high | `vd:15@966` | ![](thumbs/xRZHLI5SPWo_966.png) | [x] | [x] 도식 예시 |
-| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 6 s | s | Molding PT | high | `vd:15@966` | ![](thumbs/xRZHLI5SPWo_966.png) | [x] | [x] 도식 예시 |
-| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 8 s | s | Molding CT | high | `vd:15@966` | ![](thumbs/xRZHLI5SPWo_966.png) | 판단 불가(6 s로 보임) | [x] 도식 예시 |
-| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 60% | % | Molding A | high | `vd:15@966` | ![](thumbs/xRZHLI5SPWo_966.png) | [x] | [x] 도식 예시 |
-| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 2500 |  | Painting Max. per color | high | `vd:15@966` | ![](thumbs/xRZHLI5SPWo_966.png) | 판단 불가(2500/2900 구분 불가) | [x] 도식 예시 |
-| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 3 |  | Painting (count) | high | `vd:15@966` | ![](thumbs/xRZHLI5SPWo_966.png) | [x] | [x] 도식 예시 |
-| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 24 s | s | Painting PT | high | `vd:15@966` | ![](thumbs/xRZHLI5SPWo_966.png) | [x] | [x] 도식 예시 |
-| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 8 s | s | Painting CT | high | `vd:15@966` | ![](thumbs/xRZHLI5SPWo_966.png) | [x] | [x] 도식 예시 |
-| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 30 min | min | Painting CTeff | high | `vd:15@966` | ![](thumbs/xRZHLI5SPWo_966.png) | [ ] 화면에 없음(화면은 Painting C/O, CTeff는 10 s) | [ ] |
-| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 333 |  | Logo Printing Max. | high | `vd:15@966` | ![](thumbs/xRZHLI5SPWo_966.png) | [x] | [x] 도식 예시 |
-| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 80 s | s | Logo Printing PT | high | `vd:15@966` | ![](thumbs/xRZHLI5SPWo_966.png) | [x] | [x] 도식 예시 |
-| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 7.5 h | h | Logo Printing BPEL | high | `vd:15@966` | ![](thumbs/xRZHLI5SPWo_966.png) | [x] | [x] 도식 예시 |
-| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 9 s | s | Logo Printing CTeff | high | `vd:15@966` | ![](thumbs/xRZHLI5SPWo_966.png) | [x] | [x] 도식 예시 |
-| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 35 s | s | Assembly PT | high | `vd:15@966` | ![](thumbs/xRZHLI5SPWo_966.png) | [x] | [x] 도식 예시 |
-| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 100% | % | Assembly A | high | `vd:15@966` | ![](thumbs/xRZHLI5SPWo_966.png) | [x] | [x] 도식 예시 |
-| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 2500 |  | Assembly Max. | high | `vd:15@966` | ![](thumbs/xRZHLI5SPWo_966.png) | 판단 불가(2500/2900 구분 불가) | [x] 도식 예시 |
-| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 3 |  | Assembly (count) | high | `vd:15@966` | ![](thumbs/xRZHLI5SPWo_966.png) | [x] | [x] 도식 예시 |
-| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 135,000 |  | WT (first) | high | `vd:15@966` | ![](thumbs/xRZHLI5SPWo_966.png) | [x] | [x] 도식 예시 |
-| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 3,600 |  | WT | high | `vd:15@966` | ![](thumbs/xRZHLI5SPWo_966.png) | [x] | [x] 도식 예시 |
-| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 1,800 |  | WT | high | `vd:15@966` | ![](thumbs/xRZHLI5SPWo_966.png) | [x] | [x] 도식 예시 |
-| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 27,000 |  | WT (last) | high | `vd:15@966` | ![](thumbs/xRZHLI5SPWo_966.png) | [x] | [x] 도식 예시 |
-| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 6 |  | WT (interval) | high | `vd:15@966` | ![](thumbs/xRZHLI5SPWo_966.png) | [x] | [x] 도식 예시 |
-| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 24 |  | WT (interval) | high | `vd:15@966` | ![](thumbs/xRZHLI5SPWo_966.png) | [x] | [x] 도식 예시 |
-| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 80 |  | WT (interval) | high | `vd:15@966` | ![](thumbs/xRZHLI5SPWo_966.png) | [x] | [x] 도식 예시 |
-| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 35 |  | WT (interval) | high | `vd:15@966` | ![](thumbs/xRZHLI5SPWo_966.png) | [x] | [x] 도식 예시 |
-| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 144,000 | sec | WT | high | `vd:15@966` | ![](thumbs/xRZHLI5SPWo_966.png) | [x] | [x] 도식 예시 |
-| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 151 | sec | PT | high | `vd:15@966` | ![](thumbs/xRZHLI5SPWo_966.png) | [x] | [x] 도식 예시 |
-| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 144,151 | sec | PLT | high | `vd:15@966` | ![](thumbs/xRZHLI5SPWo_966.png) | [x] | [x] 도식 예시 |
-| xRZHLI5SPWo | [1075](https://youtu.be/xRZHLI5SPWo?t=1075) | 90% | % | of all incidents at Spotify | high | `vd:15@1075` | ![](thumbs/xRZHLI5SPWo_1075.png) | [x] | [ ] |
-| -TeOEuplMrQ | [527](https://youtu.be/-TeOEuplMrQ?t=527) | 80.3% | % | Fable 5 on SWE-Bench Pro | high | `vd:13@527` | ![](thumbs/-TeOEuplMrQ_527.png) | [x] | [ ] |
-| -TeOEuplMrQ | [527](https://youtu.be/-TeOEuplMrQ?t=527) | 29.3% | % | Fable 5 on FrontierCode | high | `vd:13@527` | ![](thumbs/-TeOEuplMrQ_527.png) | [x] | [ ] |
-| -TeOEuplMrQ | [991](https://youtu.be/-TeOEuplMrQ?t=991) | 73 |  | in a comparable hand-written project | high | `vd:13@991` | ![](thumbs/-TeOEuplMrQ_991.png) | [x] | [ ] |
-| oeL0uP-NO-U | [538](https://youtu.be/oeL0uP-NO-U?t=538) | 10+ | years | of investment | high | `vd:6@538` | ![](thumbs/oeL0uP-NO-U_538.png) | [x] | [ ] |
-| 31XD1O74pks | [63](https://youtu.be/31XD1O74pks?t=63) | 1,000x | x | more tokens than a chat query | high | `vd:2@63` | ![](thumbs/31XD1O74pks_63.png) | [x] | [ ] |
-| 31XD1O74pks | [197](https://youtu.be/31XD1O74pks?t=197) | 4.7 |  | Opus (model version) | high | `vd:2@197` | ![](thumbs/31XD1O74pks_197.png) | [x] | [x] 버전 |
-| 31XD1O74pks | [197](https://youtu.be/31XD1O74pks?t=197) | $30.0 | $ | Opus 4.7 listed price per MTok | high | `vd:2@197` | ![](thumbs/31XD1O74pks_197.png) | [x] | [ ] |
-| 31XD1O74pks | [197](https://youtu.be/31XD1O74pks?t=197) | $17.5 | $ | GPT-5.4 listed price per MTok | high | `vd:2@197` | ![](thumbs/31XD1O74pks_197.png) | [x] | [ ] |
-| 31XD1O74pks | [197](https://youtu.be/31XD1O74pks?t=197) | $14.0 | $ | Gemini 3.1 Pro listed price per MTok | high | `vd:2@197` | ![](thumbs/31XD1O74pks_197.png) | [x] | [ ] |
-| 31XD1O74pks | [197](https://youtu.be/31XD1O74pks?t=197) | $6.00 | $ | Haiku 4.5 listed price per MTok | high | `vd:2@197` | ![](thumbs/31XD1O74pks_197.png) | [x] | [ ] |
-| 31XD1O74pks | [197](https://youtu.be/31XD1O74pks?t=197) | $5.25 | $ | GPT-5.4 Mini listed price per MTok | high | `vd:2@197` | ![](thumbs/31XD1O74pks_197.png) | [x] | [ ] |
-| 31XD1O74pks | [197](https://youtu.be/31XD1O74pks?t=197) | $4.95 | $ | Kimi K2.6 listed price per MTok | high | `vd:2@197` | ![](thumbs/31XD1O74pks_197.png) | [x] | [ ] |
-| 31XD1O74pks | [197](https://youtu.be/31XD1O74pks?t=197) | $1.50 | $ | MiniMax M2.7 listed price per MTok | high | `vd:2@197` | ![](thumbs/31XD1O74pks_197.png) | [x] | [ ] |
-| 31XD1O74pks | [197](https://youtu.be/31XD1O74pks?t=197) | $708 | $ | Opus 4.7 actual total cost | high | `vd:2@197` | ![](thumbs/31XD1O74pks_197.png) | [x] | [ ] |
-| 31XD1O74pks | [197](https://youtu.be/31XD1O74pks?t=197) | $705 | $ | Gemini 3 Flash actual total cost | high | `vd:2@197` | ![](thumbs/31XD1O74pks_197.png) | [x] | [ ] |
-| 31XD1O74pks | [197](https://youtu.be/31XD1O74pks?t=197) | $677 | $ | Gemini 3.1 Pro actual total cost | high | `vd:2@197` | ![](thumbs/31XD1O74pks_197.png) | [x] | [ ] |
-| 31XD1O74pks | [197](https://youtu.be/31XD1O74pks?t=197) | $509 | $ | GPT-5.4 actual total cost | high | `vd:2@197` | ![](thumbs/31XD1O74pks_197.png) | [x] | [ ] |
-| 31XD1O74pks | [197](https://youtu.be/31XD1O74pks?t=197) | $422 | $ | Kimi K2.6 actual total cost | high | `vd:2@197` | ![](thumbs/31XD1O74pks_197.png) | [x] | [ ] |
-| 31XD1O74pks | [197](https://youtu.be/31XD1O74pks?t=197) | $421 | $ | Haiku 4.5 actual total cost | high | `vd:2@197` | ![](thumbs/31XD1O74pks_197.png) | [x] | [ ] |
-| 31XD1O74pks | [197](https://youtu.be/31XD1O74pks?t=197) | $325 | $ | GPT-5.4 Mini actual total cost | high | `vd:2@197` | ![](thumbs/31XD1O74pks_197.png) | [x] | [ ] |
-| 31XD1O74pks | [197](https://youtu.be/31XD1O74pks?t=197) | $148 | $ | MiniMax M2.7 actual total cost | high | `vd:2@197` | ![](thumbs/31XD1O74pks_197.png) | [x] | [ ] |
-| 31XD1O74pks | [306](https://youtu.be/31XD1O74pks?t=306) | 60% | % | savings in 2 weeks | high | `vd:2@306` | ![](thumbs/31XD1O74pks_306.png) | [x] | [ ] |
-| 31XD1O74pks | [375](https://youtu.be/31XD1O74pks?t=375) | 1871.7M | M | Total | high | `vd:2@375` | ![](thumbs/31XD1O74pks_375.png) | [x] | [ ] |
-| 31XD1O74pks | [375](https://youtu.be/31XD1O74pks?t=375) | 1141.8M | M | kimi-k2.6 | high | `vd:2@375` | ![](thumbs/31XD1O74pks_375.png) | [x] | [ ] |
-| 31XD1O74pks | [375](https://youtu.be/31XD1O74pks?t=375) | 369.1M | M | minimax-m2.7 | high | `vd:2@375` | ![](thumbs/31XD1O74pks_375.png) | [x] | [ ] |
-| 31XD1O74pks | [375](https://youtu.be/31XD1O74pks?t=375) | 272.5M | M | kimi-k2.5 | high | `vd:2@375` | ![](thumbs/31XD1O74pks_375.png) | [x] | [ ] |
-| 31XD1O74pks | [375](https://youtu.be/31XD1O74pks?t=375) | 17.0M | M | claude-sonnet-4-6 | high | `vd:2@375` | ![](thumbs/31XD1O74pks_375.png) | [x] | [x] UI(대시보드 작은 행) |
-| 31XD1O74pks | [375](https://youtu.be/31XD1O74pks?t=375) | 25.2M | M | claude-opus-4-6 | high | `vd:2@375` | ![](thumbs/31XD1O74pks_375.png) | [x] | [x] UI(대시보드 작은 행) |
-| 31XD1O74pks | [375](https://youtu.be/31XD1O74pks?t=375) | 31.4M | M | nemotron-3-super-fp4 | high | `vd:2@375` | ![](thumbs/31XD1O74pks_375.png) | [x] | [x] UI(대시보드 작은 행) |
-| 31XD1O74pks | [375](https://youtu.be/31XD1O74pks?t=375) | 3.0M | M | gpt-5 | high | `vd:2@375` | ![](thumbs/31XD1O74pks_375.png) | [x] | [x] UI(대시보드 작은 행) |
-| 31XD1O74pks | [375](https://youtu.be/31XD1O74pks?t=375) | 1.8M | M | claude-haiku-4-5-20251001 | high | `vd:2@375` | ![](thumbs/31XD1O74pks_375.png) | [x] | [x] UI(대시보드 작은 행) |
-| 31XD1O74pks | [375](https://youtu.be/31XD1O74pks?t=375) | 1.8M | M | claude-sonnet-4-5 | high | `vd:2@375` | ![](thumbs/31XD1O74pks_375.png) | [x] | [x] UI(대시보드 작은 행) |
-| 31XD1O74pks | [375](https://youtu.be/31XD1O74pks?t=375) | 2.2M | M | minimax-m2.5 | high | `vd:2@375` | ![](thumbs/31XD1O74pks_375.png) | [x] | [x] UI(대시보드 작은 행) |
-| 31XD1O74pks | [375](https://youtu.be/31XD1O74pks?t=375) | 1.2M | M | gpt-5-mini | high | `vd:2@375` | ![](thumbs/31XD1O74pks_375.png) | [x] | [x] UI(대시보드 작은 행) |
-| 31XD1O74pks | [375](https://youtu.be/31XD1O74pks?t=375) | 3.2M | M | gpt-4.1-mini | high | `vd:2@375` | ![](thumbs/31XD1O74pks_375.png) | [x] | [x] UI(대시보드 작은 행) |
-| 31XD1O74pks | [375](https://youtu.be/31XD1O74pks?t=375) | 1,784 |  | o3 | high | `vd:2@375` | ![](thumbs/31XD1O74pks_375.png) | [x] | [x] UI(대시보드 작은 행) |
-| 31XD1O74pks | [375](https://youtu.be/31XD1O74pks?t=375) | 281.8K | K | gpt-4.1 | high | `vd:2@375` | ![](thumbs/31XD1O74pks_375.png) | [x] | [x] UI(대시보드 작은 행) |
-| 31XD1O74pks | [375](https://youtu.be/31XD1O74pks?t=375) | 690.1K | K | claude-haiku-4-6 | high | `vd:2@375` | ![](thumbs/31XD1O74pks_375.png) | [x] | [x] UI(대시보드 작은 행) |
-| 31XD1O74pks | [488](https://youtu.be/31XD1O74pks?t=488) | 42 | lines | src/store/todo.ts | low | `vd:2@488` | ![](thumbs/31XD1O74pks_488.png) | [x] | [x] UI(터미널 데모) |
-| 31XD1O74pks | [488](https://youtu.be/31XD1O74pks?t=488) | 88 | lines | src/components/TodoList.tsx | low | `vd:2@488` | ![](thumbs/31XD1O74pks_488.png) | 판단 불가 | [x] UI(터미널 데모) |
-| 31XD1O74pks | [488](https://youtu.be/31XD1O74pks?t=488) | 31 | lines | src/components/AddTodo.tsx | low | `vd:2@488` | ![](thumbs/31XD1O74pks_488.png) | [x] | [x] UI(터미널 데모) |
-| 31XD1O74pks | [488](https://youtu.be/31XD1O74pks?t=488) | 14 | lines | src/App.tsx wired | low | `vd:2@488` | ![](thumbs/31XD1O74pks_488.png) | [x] | [x] UI(터미널 데모) |
-| 31XD1O74pks | [488](https://youtu.be/31XD1O74pks?t=488) | 8/8 | pass | vitest | low | `vd:2@488` | ![](thumbs/31XD1O74pks_488.png) | [x] | [x] UI(터미널 데모) |
-| 31XD1O74pks | [488](https://youtu.be/31XD1O74pks?t=488) | 480ms | ms | vitest | low | `vd:2@488` | ![](thumbs/31XD1O74pks_488.png) | 판단 불가 | [x] UI(터미널 데모) |
-| 31XD1O74pks | [488](https://youtu.be/31XD1O74pks?t=488) | 72% | % | multi-model (kimi-k2) | low | `vd:2@488` | ![](thumbs/31XD1O74pks_488.png) | 판단 불가 | [x] UI(터미널 데모) |
-| 31XD1O74pks | [488](https://youtu.be/31XD1O74pks?t=488) | +13M |  | multi-model (kimi-k2) | low | `vd:2@488` | ![](thumbs/31XD1O74pks_488.png) | 판단 불가 | [x] UI(터미널 데모) |
-| 31XD1O74pks | [488](https://youtu.be/31XD1O74pks?t=488) | 7/8 |  | multi-model (kimi-k2) | low | `vd:2@488` | ![](thumbs/31XD1O74pks_488.png) | 판단 불가 | [x] UI(터미널 데모) |
-| yNPS1Z64wQM | [138](https://youtu.be/yNPS1Z64wQM?t=138) | 1990s |  | Okapi/TREC-era lexical ranking from the | high | `vd:43@138` | ![](thumbs/yNPS1Z64wQM_138.png) | [x] | [x] 기타(연대) |
-| yNPS1Z64wQM | [280](https://youtu.be/yNPS1Z64wQM?t=280) | 100,195 |  | web pages fixed corpus | high | `vd:43@280` | ![](thumbs/yNPS1Z64wQM_280.png) | [x] | [ ] |
-| yNPS1Z64wQM | [397](https://youtu.be/yNPS1Z64wQM?t=397) | 55.9% | % | retriever A | high | `vd:43@397` | ![](thumbs/yNPS1Z64wQM_397.png) | [x] | [ ] |
-| yNPS1Z64wQM | [397](https://youtu.be/yNPS1Z64wQM?t=397) | 70.1% | % | retriever B | high | `vd:43@397` | ![](thumbs/yNPS1Z64wQM_397.png) | [x] | [ ] |
-| yNPS1Z64wQM | [397](https://youtu.be/yNPS1Z64wQM?t=397) | 93% | % | oracle evidence | high | `vd:43@397` | ![](thumbs/yNPS1Z64wQM_397.png) | [x] | [ ] |
-| yNPS1Z64wQM | [397](https://youtu.be/yNPS1Z64wQM?t=397) | 93% | % | Oracle evidence reaches | high | `vd:43@397` | ![](thumbs/yNPS1Z64wQM_397.png) | [x] | [ ] |
-| yNPS1Z64wQM | [576](https://youtu.be/yNPS1Z64wQM?t=576) | 10 |  | BrowseComp-Plus query workload | high | `vd:43@576` | ![](thumbs/yNPS1Z64wQM_576.png) | [x] | [x] 슬라이드 번호 |
-| yNPS1Z64wQM | [576](https://youtu.be/yNPS1Z64wQM?t=576) | 10 terms median | terms | agent search trajectory | high | `vd:43@576` | ![](thumbs/yNPS1Z64wQM_576.png) | [x] | [ ] |
-| yNPS1Z64wQM | [576](https://youtu.be/yNPS1Z64wQM?t=576) | 18 terms | terms | GPT-5 median | high | `vd:43@576` | ![](thumbs/yNPS1Z64wQM_576.png) | [ ] 화면에 없음(확대하면 10 terms, 확신 낮음) | [ ] |
-| yNPS1Z64wQM | [576](https://youtu.be/yNPS1Z64wQM?t=576) | 19 terms | terms | GPT-5 first query mean | high | `vd:43@576` | ![](thumbs/yNPS1Z64wQM_576.png) | [x] | [ ] |
-| yNPS1Z64wQM | [592](https://youtu.be/yNPS1Z64wQM?t=592) | 64.0% | % | answer accuracy (Default BM25) | high | `vd:43@592` | ![](thumbs/yNPS1Z64wQM_592.png) | [x] | [ ] |
-| yNPS1Z64wQM | [592](https://youtu.be/yNPS1Z64wQM?t=592) | 82.0% | % | answer accuracy (Tuned BM25) | high | `vd:43@592` | ![](thumbs/yNPS1Z64wQM_592.png) | [x] | [ ] |
-| yNPS1Z64wQM | [592](https://youtu.be/yNPS1Z64wQM?t=592) | +18 | points | same 100-query subset | high | `vd:43@592` | ![](thumbs/yNPS1Z64wQM_592.png) | [x] | [ ] |
-| yNPS1Z64wQM | [592](https://youtu.be/yNPS1Z64wQM?t=592) | 84.6% | % | Surfaced evidence recall | high | `vd:43@592` | ![](thumbs/yNPS1Z64wQM_592.png) | [x] | [ ] |
-| yNPS1Z64wQM | [592](https://youtu.be/yNPS1Z64wQM?t=592) | 95.7% | % | Surfaced evidence recall | high | `vd:43@592` | ![](thumbs/yNPS1Z64wQM_592.png) | [x] | [ ] |
-| yNPS1Z64wQM | [635](https://youtu.be/yNPS1Z64wQM?t=635) | 64.0% | % | answer accuracy from | high | `vd:43@635` | ![](thumbs/yNPS1Z64wQM_635.png) | [x] | [ ] |
-| yNPS1Z64wQM | [635](https://youtu.be/yNPS1Z64wQM?t=635) | 82.0% | % | answer accuracy to | high | `vd:43@635` | ![](thumbs/yNPS1Z64wQM_635.png) | [x] | [ ] |
-| yNPS1Z64wQM | [747](https://youtu.be/yNPS1Z64wQM?t=747) | 61% | % | DCI read + grep | high | `vd:43@747` | ![](thumbs/yNPS1Z64wQM_747.png) | [x] | [ ] |
-| yNPS1Z64wQM | [747](https://youtu.be/yNPS1Z64wQM?t=747) | 45% | % | Qwen3 retrieval agent | high | `vd:43@747` | ![](thumbs/yNPS1Z64wQM_747.png) | [x] | [ ] |
-| yNPS1Z64wQM | [747](https://youtu.be/yNPS1Z64wQM?t=747) | 73.3% | % | DR-DCI + reset dynamic workspace expansion on BrowseComp-Plus | high | `vd:43@747` | ![](thumbs/yNPS1Z64wQM_747.png) | [x] | [ ] |
-| yNPS1Z64wQM | [897](https://youtu.be/yNPS1Z64wQM?t=897) | 14 |  | / evals | high | `vd:43@897` | ![](thumbs/yNPS1Z64wQM_897.png) | [x] | [x] 슬라이드 번호 |
-| yNPS1Z64wQM | [897](https://youtu.be/yNPS1Z64wQM?t=897) | 10 |  | static IR query count | high | `vd:43@897` | ![](thumbs/yNPS1Z64wQM_897.png) | [x] | [x] 도식 예시 |
-| yNPS1Z64wQM | [897](https://youtu.be/yNPS1Z64wQM?t=897) | 10 |  | nDCG@10 | high | `vd:43@897` | ![](thumbs/yNPS1Z64wQM_897.png) | [x] | [x] 기타(지표 이름) |
-| yNPS1Z64wQM | [933](https://youtu.be/yNPS1Z64wQM?t=933) | top-100 |  | ranking | high | `vd:43@933` | ![](thumbs/yNPS1Z64wQM_933.png) | [x] | [ ] |
-| yNPS1Z64wQM | [1055](https://youtu.be/yNPS1Z64wQM?t=1055) | 1,509 |  | Following | high | `vd:43@1055` | ![](thumbs/yNPS1Z64wQM_1055.png) | [x] | [x] UI |
-| yNPS1Z64wQM | [1055](https://youtu.be/yNPS1Z64wQM?t=1055) | 20.1K | K | Followers | high | `vd:43@1055` | ![](thumbs/yNPS1Z64wQM_1055.png) | [x] | [x] UI |
-| S-bRN-avZ4Q | [422](https://youtu.be/S-bRN-avZ4Q?t=422) | 10T+ | T+ | pages of human-created documents | high | `vd:28@422` | ![](thumbs/S-bRN-avZ4Q_422.png) | [x] | [ ] |
-| S-bRN-avZ4Q | [525](https://youtu.be/S-bRN-avZ4Q?t=525) | 90% | % | of the world's data lies in unstructured documents | high | `vd:28@525` | ![](thumbs/S-bRN-avZ4Q_525.png) | [x] | [ ] |
-| S-bRN-avZ4Q | [900](https://youtu.be/S-bRN-avZ4Q?t=900) | 1M | docs per day | Low Cost Regime volume | high | `vd:28@900` | ![](thumbs/S-bRN-avZ4Q_900.png) | [x] | [ ] |
-| S-bRN-avZ4Q | [992](https://youtu.be/S-bRN-avZ4Q?t=992) | 99%+ | % | High Accuracy Regime require | high | `vd:28@992` | ![](thumbs/S-bRN-avZ4Q_992.png) | [x] | [ ] |
-| S-bRN-avZ4Q | [992](https://youtu.be/S-bRN-avZ4Q?t=992) | 1M | docs per day | Low Cost Regime require | high | `vd:28@992` | ![](thumbs/S-bRN-avZ4Q_992.png) | [x] | [ ] |
-| S-bRN-avZ4Q | [1063](https://youtu.be/S-bRN-avZ4Q?t=1063) | 16 | page(s) | Paste 16 page(s) in 0.03s | high | `vd:28@1063` | ![](thumbs/S-bRN-avZ4Q_1063.png) | 판단 불가(화면 문구는 Parsed … page(s)) | [x] UI |
-| S-bRN-avZ4Q | [1063](https://youtu.be/S-bRN-avZ4Q?t=1063) | 0.03s | s | Paste 16 page(s) in 0.03s | high | `vd:28@1063` | ![](thumbs/S-bRN-avZ4Q_1063.png) | 판단 불가(화면 문구는 Parsed … page(s)) | [x] UI |
+| xRZHLI5SPWo | [105](https://youtu.be/xRZHLI5SPWo?t=105) | 78 |  | Q3 2025 deployment frequency | high | `vd:15@105` | `xRZHLI5SPWo_105` | [x] | [ ] |
+| xRZHLI5SPWo | [105](https://youtu.be/xRZHLI5SPWo?t=105) | 80 |  | Q4 2025 deployment frequency | high | `vd:15@105` | `xRZHLI5SPWo_105` | [x] | [ ] |
+| xRZHLI5SPWo | [105](https://youtu.be/xRZHLI5SPWo?t=105) | 105 |  | Q1 2026 deployment frequency | high | `vd:15@105` | `xRZHLI5SPWo_105` | [x] | [ ] |
+| xRZHLI5SPWo | [105](https://youtu.be/xRZHLI5SPWo?t=105) | 114 |  | Q2 2026 deployment frequency | high | `vd:15@105` | `xRZHLI5SPWo_105` | [x] | [ ] |
+| xRZHLI5SPWo | [299](https://youtu.be/xRZHLI5SPWo?t=299) | 61 |  | companies (data from) | high | `vd:15@299` | `xRZHLI5SPWo_299` | [x] | [ ] |
+| xRZHLI5SPWo | [428](https://youtu.be/xRZHLI5SPWo?t=428) | 48 | lines of code | Median PR size Q4 2025 | high | `vd:15@428` | `xRZHLI5SPWo_428` | [x] | [ ] |
+| xRZHLI5SPWo | [428](https://youtu.be/xRZHLI5SPWo?t=428) | 58 | lines of code | Median PR size Q1 2026 | high | `vd:15@428` | `xRZHLI5SPWo_428` | [x] | [ ] |
+| xRZHLI5SPWo | [535](https://youtu.be/xRZHLI5SPWo?t=535) | 400+ | companies | Sample from | high | `vd:15@535` | `xRZHLI5SPWo_535` | [x] | [ ] |
+| xRZHLI5SPWo | [833](https://youtu.be/xRZHLI5SPWo?t=833) | 336 |  | Incomplete | high | `vd:15@833` | `xRZHLI5SPWo_833` | [x] | [x] UI |
+| xRZHLI5SPWo | [833](https://youtu.be/xRZHLI5SPWo?t=833) | 2 | hours ago | time | high | `vd:15@833` | `xRZHLI5SPWo_833` | [x] | [x] UI |
+| xRZHLI5SPWo | [833](https://youtu.be/xRZHLI5SPWo?t=833) | > 80% | % | code coverage | high | `vd:15@833` | `xRZHLI5SPWo_833` | [x] | [x] UI |
+| xRZHLI5SPWo | [905](https://youtu.be/xRZHLI5SPWo?t=905) | 400+ |  | companies (random sample) | high | `vd:15@905` | `xRZHLI5SPWo_905` | [x] | [ ] |
+| xRZHLI5SPWo | [905](https://youtu.be/xRZHLI5SPWo?t=905) | 7.76% | % | Median weighted PR throughput increase | high | `vd:15@905` | `xRZHLI5SPWo_905` | [x] | [ ] |
+| xRZHLI5SPWo | [905](https://youtu.be/xRZHLI5SPWo?t=905) | 13.1% | % | Average weighted PR throughput increase | high | `vd:15@905` | `xRZHLI5SPWo_905` | [x] | [ ] |
+| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 2500 |  | Molding Max. per color | high | `vd:15@966` | `xRZHLI5SPWo_966` | 판단 불가(2500/2900 구분 불가) | [x] 도식 예시 |
+| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 12,500 | pcs | Molding max. | high | `vd:15@966` | `xRZHLI5SPWo_966` | [x] | [x] 도식 예시 |
+| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 6 s | s | Molding PT | high | `vd:15@966` | `xRZHLI5SPWo_966` | [x] | [x] 도식 예시 |
+| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 8 s | s | Molding CT | high | `vd:15@966` | `xRZHLI5SPWo_966` | 판단 불가(6 s로 보임) | [x] 도식 예시 |
+| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 60% | % | Molding A | high | `vd:15@966` | `xRZHLI5SPWo_966` | [x] | [x] 도식 예시 |
+| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 2500 |  | Painting Max. per color | high | `vd:15@966` | `xRZHLI5SPWo_966` | 판단 불가(2500/2900 구분 불가) | [x] 도식 예시 |
+| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 3 |  | Painting (count) | high | `vd:15@966` | `xRZHLI5SPWo_966` | [x] | [x] 도식 예시 |
+| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 24 s | s | Painting PT | high | `vd:15@966` | `xRZHLI5SPWo_966` | [x] | [x] 도식 예시 |
+| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 8 s | s | Painting CT | high | `vd:15@966` | `xRZHLI5SPWo_966` | [x] | [x] 도식 예시 |
+| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 30 min | min | Painting CTeff | high | `vd:15@966` | `xRZHLI5SPWo_966` | [ ] 화면에 없음(화면은 Painting C/O, CTeff는 10 s) | [ ] |
+| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 333 |  | Logo Printing Max. | high | `vd:15@966` | `xRZHLI5SPWo_966` | [x] | [x] 도식 예시 |
+| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 80 s | s | Logo Printing PT | high | `vd:15@966` | `xRZHLI5SPWo_966` | [x] | [x] 도식 예시 |
+| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 7.5 h | h | Logo Printing BPEL | high | `vd:15@966` | `xRZHLI5SPWo_966` | [x] | [x] 도식 예시 |
+| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 9 s | s | Logo Printing CTeff | high | `vd:15@966` | `xRZHLI5SPWo_966` | [x] | [x] 도식 예시 |
+| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 35 s | s | Assembly PT | high | `vd:15@966` | `xRZHLI5SPWo_966` | [x] | [x] 도식 예시 |
+| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 100% | % | Assembly A | high | `vd:15@966` | `xRZHLI5SPWo_966` | [x] | [x] 도식 예시 |
+| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 2500 |  | Assembly Max. | high | `vd:15@966` | `xRZHLI5SPWo_966` | 판단 불가(2500/2900 구분 불가) | [x] 도식 예시 |
+| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 3 |  | Assembly (count) | high | `vd:15@966` | `xRZHLI5SPWo_966` | [x] | [x] 도식 예시 |
+| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 135,000 |  | WT (first) | high | `vd:15@966` | `xRZHLI5SPWo_966` | [x] | [x] 도식 예시 |
+| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 3,600 |  | WT | high | `vd:15@966` | `xRZHLI5SPWo_966` | [x] | [x] 도식 예시 |
+| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 1,800 |  | WT | high | `vd:15@966` | `xRZHLI5SPWo_966` | [x] | [x] 도식 예시 |
+| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 27,000 |  | WT (last) | high | `vd:15@966` | `xRZHLI5SPWo_966` | [x] | [x] 도식 예시 |
+| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 6 |  | WT (interval) | high | `vd:15@966` | `xRZHLI5SPWo_966` | [x] | [x] 도식 예시 |
+| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 24 |  | WT (interval) | high | `vd:15@966` | `xRZHLI5SPWo_966` | [x] | [x] 도식 예시 |
+| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 80 |  | WT (interval) | high | `vd:15@966` | `xRZHLI5SPWo_966` | [x] | [x] 도식 예시 |
+| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 35 |  | WT (interval) | high | `vd:15@966` | `xRZHLI5SPWo_966` | [x] | [x] 도식 예시 |
+| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 144,000 | sec | WT | high | `vd:15@966` | `xRZHLI5SPWo_966` | [x] | [x] 도식 예시 |
+| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 151 | sec | PT | high | `vd:15@966` | `xRZHLI5SPWo_966` | [x] | [x] 도식 예시 |
+| xRZHLI5SPWo | [966](https://youtu.be/xRZHLI5SPWo?t=966) | 144,151 | sec | PLT | high | `vd:15@966` | `xRZHLI5SPWo_966` | [x] | [x] 도식 예시 |
+| xRZHLI5SPWo | [1075](https://youtu.be/xRZHLI5SPWo?t=1075) | 90% | % | of all incidents at Spotify | high | `vd:15@1075` | `xRZHLI5SPWo_1075` | [x] | [ ] |
+| -TeOEuplMrQ | [527](https://youtu.be/-TeOEuplMrQ?t=527) | 80.3% | % | Fable 5 on SWE-Bench Pro | high | `vd:13@527` | `-TeOEuplMrQ_527` | [x] | [ ] |
+| -TeOEuplMrQ | [527](https://youtu.be/-TeOEuplMrQ?t=527) | 29.3% | % | Fable 5 on FrontierCode | high | `vd:13@527` | `-TeOEuplMrQ_527` | [x] | [ ] |
+| -TeOEuplMrQ | [991](https://youtu.be/-TeOEuplMrQ?t=991) | 73 |  | in a comparable hand-written project | high | `vd:13@991` | `-TeOEuplMrQ_991` | [x] | [ ] |
+| oeL0uP-NO-U | [538](https://youtu.be/oeL0uP-NO-U?t=538) | 10+ | years | of investment | high | `vd:6@538` | `oeL0uP-NO-U_538` | [x] | [ ] |
+| 31XD1O74pks | [63](https://youtu.be/31XD1O74pks?t=63) | 1,000x | x | more tokens than a chat query | high | `vd:2@63` | `31XD1O74pks_63` | [x] | [ ] |
+| 31XD1O74pks | [197](https://youtu.be/31XD1O74pks?t=197) | 4.7 |  | Opus (model version) | high | `vd:2@197` | `31XD1O74pks_197` | [x] | [x] 버전 |
+| 31XD1O74pks | [197](https://youtu.be/31XD1O74pks?t=197) | $30.0 | $ | Opus 4.7 listed price per MTok | high | `vd:2@197` | `31XD1O74pks_197` | [x] | [ ] |
+| 31XD1O74pks | [197](https://youtu.be/31XD1O74pks?t=197) | $17.5 | $ | GPT-5.4 listed price per MTok | high | `vd:2@197` | `31XD1O74pks_197` | [x] | [ ] |
+| 31XD1O74pks | [197](https://youtu.be/31XD1O74pks?t=197) | $14.0 | $ | Gemini 3.1 Pro listed price per MTok | high | `vd:2@197` | `31XD1O74pks_197` | [x] | [ ] |
+| 31XD1O74pks | [197](https://youtu.be/31XD1O74pks?t=197) | $6.00 | $ | Haiku 4.5 listed price per MTok | high | `vd:2@197` | `31XD1O74pks_197` | [x] | [ ] |
+| 31XD1O74pks | [197](https://youtu.be/31XD1O74pks?t=197) | $5.25 | $ | GPT-5.4 Mini listed price per MTok | high | `vd:2@197` | `31XD1O74pks_197` | [x] | [ ] |
+| 31XD1O74pks | [197](https://youtu.be/31XD1O74pks?t=197) | $4.95 | $ | Kimi K2.6 listed price per MTok | high | `vd:2@197` | `31XD1O74pks_197` | [x] | [ ] |
+| 31XD1O74pks | [197](https://youtu.be/31XD1O74pks?t=197) | $1.50 | $ | MiniMax M2.7 listed price per MTok | high | `vd:2@197` | `31XD1O74pks_197` | [x] | [ ] |
+| 31XD1O74pks | [197](https://youtu.be/31XD1O74pks?t=197) | $708 | $ | Opus 4.7 actual total cost | high | `vd:2@197` | `31XD1O74pks_197` | [x] | [ ] |
+| 31XD1O74pks | [197](https://youtu.be/31XD1O74pks?t=197) | $705 | $ | Gemini 3 Flash actual total cost | high | `vd:2@197` | `31XD1O74pks_197` | [x] | [ ] |
+| 31XD1O74pks | [197](https://youtu.be/31XD1O74pks?t=197) | $677 | $ | Gemini 3.1 Pro actual total cost | high | `vd:2@197` | `31XD1O74pks_197` | [x] | [ ] |
+| 31XD1O74pks | [197](https://youtu.be/31XD1O74pks?t=197) | $509 | $ | GPT-5.4 actual total cost | high | `vd:2@197` | `31XD1O74pks_197` | [x] | [ ] |
+| 31XD1O74pks | [197](https://youtu.be/31XD1O74pks?t=197) | $422 | $ | Kimi K2.6 actual total cost | high | `vd:2@197` | `31XD1O74pks_197` | [x] | [ ] |
+| 31XD1O74pks | [197](https://youtu.be/31XD1O74pks?t=197) | $421 | $ | Haiku 4.5 actual total cost | high | `vd:2@197` | `31XD1O74pks_197` | [x] | [ ] |
+| 31XD1O74pks | [197](https://youtu.be/31XD1O74pks?t=197) | $325 | $ | GPT-5.4 Mini actual total cost | high | `vd:2@197` | `31XD1O74pks_197` | [x] | [ ] |
+| 31XD1O74pks | [197](https://youtu.be/31XD1O74pks?t=197) | $148 | $ | MiniMax M2.7 actual total cost | high | `vd:2@197` | `31XD1O74pks_197` | [x] | [ ] |
+| 31XD1O74pks | [306](https://youtu.be/31XD1O74pks?t=306) | 60% | % | savings in 2 weeks | high | `vd:2@306` | `31XD1O74pks_306` | [x] | [ ] |
+| 31XD1O74pks | [375](https://youtu.be/31XD1O74pks?t=375) | 1871.7M | M | Total | high | `vd:2@375` | `31XD1O74pks_375` | [x] | [ ] |
+| 31XD1O74pks | [375](https://youtu.be/31XD1O74pks?t=375) | 1141.8M | M | kimi-k2.6 | high | `vd:2@375` | `31XD1O74pks_375` | [x] | [ ] |
+| 31XD1O74pks | [375](https://youtu.be/31XD1O74pks?t=375) | 369.1M | M | minimax-m2.7 | high | `vd:2@375` | `31XD1O74pks_375` | [x] | [ ] |
+| 31XD1O74pks | [375](https://youtu.be/31XD1O74pks?t=375) | 272.5M | M | kimi-k2.5 | high | `vd:2@375` | `31XD1O74pks_375` | [x] | [ ] |
+| 31XD1O74pks | [375](https://youtu.be/31XD1O74pks?t=375) | 17.0M | M | claude-sonnet-4-6 | high | `vd:2@375` | `31XD1O74pks_375` | [x] | [x] UI(대시보드 작은 행) |
+| 31XD1O74pks | [375](https://youtu.be/31XD1O74pks?t=375) | 25.2M | M | claude-opus-4-6 | high | `vd:2@375` | `31XD1O74pks_375` | [x] | [x] UI(대시보드 작은 행) |
+| 31XD1O74pks | [375](https://youtu.be/31XD1O74pks?t=375) | 31.4M | M | nemotron-3-super-fp4 | high | `vd:2@375` | `31XD1O74pks_375` | [x] | [x] UI(대시보드 작은 행) |
+| 31XD1O74pks | [375](https://youtu.be/31XD1O74pks?t=375) | 3.0M | M | gpt-5 | high | `vd:2@375` | `31XD1O74pks_375` | [x] | [x] UI(대시보드 작은 행) |
+| 31XD1O74pks | [375](https://youtu.be/31XD1O74pks?t=375) | 1.8M | M | claude-haiku-4-5-20251001 | high | `vd:2@375` | `31XD1O74pks_375` | [x] | [x] UI(대시보드 작은 행) |
+| 31XD1O74pks | [375](https://youtu.be/31XD1O74pks?t=375) | 1.8M | M | claude-sonnet-4-5 | high | `vd:2@375` | `31XD1O74pks_375` | [x] | [x] UI(대시보드 작은 행) |
+| 31XD1O74pks | [375](https://youtu.be/31XD1O74pks?t=375) | 2.2M | M | minimax-m2.5 | high | `vd:2@375` | `31XD1O74pks_375` | [x] | [x] UI(대시보드 작은 행) |
+| 31XD1O74pks | [375](https://youtu.be/31XD1O74pks?t=375) | 1.2M | M | gpt-5-mini | high | `vd:2@375` | `31XD1O74pks_375` | [x] | [x] UI(대시보드 작은 행) |
+| 31XD1O74pks | [375](https://youtu.be/31XD1O74pks?t=375) | 3.2M | M | gpt-4.1-mini | high | `vd:2@375` | `31XD1O74pks_375` | [x] | [x] UI(대시보드 작은 행) |
+| 31XD1O74pks | [375](https://youtu.be/31XD1O74pks?t=375) | 1,784 |  | o3 | high | `vd:2@375` | `31XD1O74pks_375` | [x] | [x] UI(대시보드 작은 행) |
+| 31XD1O74pks | [375](https://youtu.be/31XD1O74pks?t=375) | 281.8K | K | gpt-4.1 | high | `vd:2@375` | `31XD1O74pks_375` | [x] | [x] UI(대시보드 작은 행) |
+| 31XD1O74pks | [375](https://youtu.be/31XD1O74pks?t=375) | 690.1K | K | claude-haiku-4-6 | high | `vd:2@375` | `31XD1O74pks_375` | [x] | [x] UI(대시보드 작은 행) |
+| 31XD1O74pks | [488](https://youtu.be/31XD1O74pks?t=488) | 42 | lines | src/store/todo.ts | low | `vd:2@488` | `31XD1O74pks_488` | [x] | [x] UI(터미널 데모) |
+| 31XD1O74pks | [488](https://youtu.be/31XD1O74pks?t=488) | 88 | lines | src/components/TodoList.tsx | low | `vd:2@488` | `31XD1O74pks_488` | 판단 불가 | [x] UI(터미널 데모) |
+| 31XD1O74pks | [488](https://youtu.be/31XD1O74pks?t=488) | 31 | lines | src/components/AddTodo.tsx | low | `vd:2@488` | `31XD1O74pks_488` | [x] | [x] UI(터미널 데모) |
+| 31XD1O74pks | [488](https://youtu.be/31XD1O74pks?t=488) | 14 | lines | src/App.tsx wired | low | `vd:2@488` | `31XD1O74pks_488` | [x] | [x] UI(터미널 데모) |
+| 31XD1O74pks | [488](https://youtu.be/31XD1O74pks?t=488) | 8/8 | pass | vitest | low | `vd:2@488` | `31XD1O74pks_488` | [x] | [x] UI(터미널 데모) |
+| 31XD1O74pks | [488](https://youtu.be/31XD1O74pks?t=488) | 480ms | ms | vitest | low | `vd:2@488` | `31XD1O74pks_488` | 판단 불가 | [x] UI(터미널 데모) |
+| 31XD1O74pks | [488](https://youtu.be/31XD1O74pks?t=488) | 72% | % | multi-model (kimi-k2) | low | `vd:2@488` | `31XD1O74pks_488` | 판단 불가 | [x] UI(터미널 데모) |
+| 31XD1O74pks | [488](https://youtu.be/31XD1O74pks?t=488) | +13M |  | multi-model (kimi-k2) | low | `vd:2@488` | `31XD1O74pks_488` | 판단 불가 | [x] UI(터미널 데모) |
+| 31XD1O74pks | [488](https://youtu.be/31XD1O74pks?t=488) | 7/8 |  | multi-model (kimi-k2) | low | `vd:2@488` | `31XD1O74pks_488` | 판단 불가 | [x] UI(터미널 데모) |
+| yNPS1Z64wQM | [138](https://youtu.be/yNPS1Z64wQM?t=138) | 1990s |  | Okapi/TREC-era lexical ranking from the | high | `vd:43@138` | `yNPS1Z64wQM_138` | [x] | [x] 기타(연대) |
+| yNPS1Z64wQM | [280](https://youtu.be/yNPS1Z64wQM?t=280) | 100,195 |  | web pages fixed corpus | high | `vd:43@280` | `yNPS1Z64wQM_280` | [x] | [ ] |
+| yNPS1Z64wQM | [397](https://youtu.be/yNPS1Z64wQM?t=397) | 55.9% | % | retriever A | high | `vd:43@397` | `yNPS1Z64wQM_397` | [x] | [ ] |
+| yNPS1Z64wQM | [397](https://youtu.be/yNPS1Z64wQM?t=397) | 70.1% | % | retriever B | high | `vd:43@397` | `yNPS1Z64wQM_397` | [x] | [ ] |
+| yNPS1Z64wQM | [397](https://youtu.be/yNPS1Z64wQM?t=397) | 93% | % | oracle evidence | high | `vd:43@397` | `yNPS1Z64wQM_397` | [x] | [ ] |
+| yNPS1Z64wQM | [397](https://youtu.be/yNPS1Z64wQM?t=397) | 93% | % | Oracle evidence reaches | high | `vd:43@397` | `yNPS1Z64wQM_397` | [x] | [ ] |
+| yNPS1Z64wQM | [576](https://youtu.be/yNPS1Z64wQM?t=576) | 10 |  | BrowseComp-Plus query workload | high | `vd:43@576` | `yNPS1Z64wQM_576` | [x] | [x] 슬라이드 번호 |
+| yNPS1Z64wQM | [576](https://youtu.be/yNPS1Z64wQM?t=576) | 10 terms median | terms | agent search trajectory | high | `vd:43@576` | `yNPS1Z64wQM_576` | [x] | [ ] |
+| yNPS1Z64wQM | [576](https://youtu.be/yNPS1Z64wQM?t=576) | 18 terms | terms | GPT-5 median | high | `vd:43@576` | `yNPS1Z64wQM_576` | [ ] 화면에 없음(확대하면 10 terms, 확신 낮음) | [ ] |
+| yNPS1Z64wQM | [576](https://youtu.be/yNPS1Z64wQM?t=576) | 19 terms | terms | GPT-5 first query mean | high | `vd:43@576` | `yNPS1Z64wQM_576` | [x] | [ ] |
+| yNPS1Z64wQM | [592](https://youtu.be/yNPS1Z64wQM?t=592) | 64.0% | % | answer accuracy (Default BM25) | high | `vd:43@592` | `yNPS1Z64wQM_592` | [x] | [ ] |
+| yNPS1Z64wQM | [592](https://youtu.be/yNPS1Z64wQM?t=592) | 82.0% | % | answer accuracy (Tuned BM25) | high | `vd:43@592` | `yNPS1Z64wQM_592` | [x] | [ ] |
+| yNPS1Z64wQM | [592](https://youtu.be/yNPS1Z64wQM?t=592) | +18 | points | same 100-query subset | high | `vd:43@592` | `yNPS1Z64wQM_592` | [x] | [ ] |
+| yNPS1Z64wQM | [592](https://youtu.be/yNPS1Z64wQM?t=592) | 84.6% | % | Surfaced evidence recall | high | `vd:43@592` | `yNPS1Z64wQM_592` | [x] | [ ] |
+| yNPS1Z64wQM | [592](https://youtu.be/yNPS1Z64wQM?t=592) | 95.7% | % | Surfaced evidence recall | high | `vd:43@592` | `yNPS1Z64wQM_592` | [x] | [ ] |
+| yNPS1Z64wQM | [635](https://youtu.be/yNPS1Z64wQM?t=635) | 64.0% | % | answer accuracy from | high | `vd:43@635` | `yNPS1Z64wQM_635` | [x] | [ ] |
+| yNPS1Z64wQM | [635](https://youtu.be/yNPS1Z64wQM?t=635) | 82.0% | % | answer accuracy to | high | `vd:43@635` | `yNPS1Z64wQM_635` | [x] | [ ] |
+| yNPS1Z64wQM | [747](https://youtu.be/yNPS1Z64wQM?t=747) | 61% | % | DCI read + grep | high | `vd:43@747` | `yNPS1Z64wQM_747` | [x] | [ ] |
+| yNPS1Z64wQM | [747](https://youtu.be/yNPS1Z64wQM?t=747) | 45% | % | Qwen3 retrieval agent | high | `vd:43@747` | `yNPS1Z64wQM_747` | [x] | [ ] |
+| yNPS1Z64wQM | [747](https://youtu.be/yNPS1Z64wQM?t=747) | 73.3% | % | DR-DCI + reset dynamic workspace expansion on BrowseComp-Plus | high | `vd:43@747` | `yNPS1Z64wQM_747` | [x] | [ ] |
+| yNPS1Z64wQM | [897](https://youtu.be/yNPS1Z64wQM?t=897) | 14 |  | / evals | high | `vd:43@897` | `yNPS1Z64wQM_897` | [x] | [x] 슬라이드 번호 |
+| yNPS1Z64wQM | [897](https://youtu.be/yNPS1Z64wQM?t=897) | 10 |  | static IR query count | high | `vd:43@897` | `yNPS1Z64wQM_897` | [x] | [x] 도식 예시 |
+| yNPS1Z64wQM | [897](https://youtu.be/yNPS1Z64wQM?t=897) | 10 |  | nDCG@10 | high | `vd:43@897` | `yNPS1Z64wQM_897` | [x] | [x] 기타(지표 이름) |
+| yNPS1Z64wQM | [933](https://youtu.be/yNPS1Z64wQM?t=933) | top-100 |  | ranking | high | `vd:43@933` | `yNPS1Z64wQM_933` | [x] | [ ] |
+| yNPS1Z64wQM | [1055](https://youtu.be/yNPS1Z64wQM?t=1055) | 1,509 |  | Following | high | `vd:43@1055` | `yNPS1Z64wQM_1055` | [x] | [x] UI |
+| yNPS1Z64wQM | [1055](https://youtu.be/yNPS1Z64wQM?t=1055) | 20.1K | K | Followers | high | `vd:43@1055` | `yNPS1Z64wQM_1055` | [x] | [x] UI |
+| S-bRN-avZ4Q | [422](https://youtu.be/S-bRN-avZ4Q?t=422) | 10T+ | T+ | pages of human-created documents | high | `vd:28@422` | `S-bRN-avZ4Q_422` | [x] | [ ] |
+| S-bRN-avZ4Q | [525](https://youtu.be/S-bRN-avZ4Q?t=525) | 90% | % | of the world's data lies in unstructured documents | high | `vd:28@525` | `S-bRN-avZ4Q_525` | [x] | [ ] |
+| S-bRN-avZ4Q | [900](https://youtu.be/S-bRN-avZ4Q?t=900) | 1M | docs per day | Low Cost Regime volume | high | `vd:28@900` | `S-bRN-avZ4Q_900` | [x] | [ ] |
+| S-bRN-avZ4Q | [992](https://youtu.be/S-bRN-avZ4Q?t=992) | 99%+ | % | High Accuracy Regime require | high | `vd:28@992` | `S-bRN-avZ4Q_992` | [x] | [ ] |
+| S-bRN-avZ4Q | [992](https://youtu.be/S-bRN-avZ4Q?t=992) | 1M | docs per day | Low Cost Regime require | high | `vd:28@992` | `S-bRN-avZ4Q_992` | [x] | [ ] |
+| S-bRN-avZ4Q | [1063](https://youtu.be/S-bRN-avZ4Q?t=1063) | 16 | page(s) | Paste 16 page(s) in 0.03s | high | `vd:28@1063` | `S-bRN-avZ4Q_1063` | 판단 불가(화면 문구는 Parsed … page(s)) | [x] UI |
+| S-bRN-avZ4Q | [1063](https://youtu.be/S-bRN-avZ4Q?t=1063) | 0.03s | s | Paste 16 page(s) in 0.03s | high | `vd:28@1063` | `S-bRN-avZ4Q_1063` | 판단 불가(화면 문구는 Parsed … page(s)) | [x] UI |
 
 124개. 썸네일 31장(폭 640px): 프레임 파일에서 31장, 영상에서 다시 뽑음 0장, 프레임 없음 0장.
 ### 확인 필요(check) 판독

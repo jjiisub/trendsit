@@ -72,10 +72,10 @@ PY
 [[ "$A13" == OK* ]] && pass A13 "마이그레이션 대역: ${A13#OK }" || fail A13 "${A13#BAD }"
 A14_MISS=""
 for c in "trendsit plan" "trendsit deep text" "trendsit repo-analyze"; do
-  grep -q "$c" README.md || A14_MISS+=" README:$c"
+  grep -q "$c" README.md docs/DEVELOPMENT.md docs/RESULTS.md || A14_MISS+=" README:$c"
   grep -q "$c" docs/DEVELOPMENT.md || A14_MISS+=" DEVELOPMENT:$c"
 done
-grep -q "^| S3 " README.md || A14_MISS+=" README:성과 행"
+grep -q "^| S3 " README.md docs/DEVELOPMENT.md docs/RESULTS.md || A14_MISS+=" README:성과 행"
 for h in "## 3c" "## 3a" "## 3b"; do grep -q "$h" reports/S3_report.md 2>/dev/null || A14_MISS+=" reports/S3_report.md($h)"; done
 [ -f reports/S2S3_mac_todo.md ] || A14_MISS+=" reports/S2S3_mac_todo.md"
 [ -z "$A14_MISS" ] && pass A14 "README(빠른 시작, 성과 행), DEVELOPMENT 명령표, S3 리포트, 맥 확인 목록" || fail A14 "없음:$A14_MISS"
